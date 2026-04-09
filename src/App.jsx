@@ -4,6 +4,7 @@ import HomeScreen from './screens/HomeScreen';
 import TrainingScreen from './screens/TrainingScreen';
 import CombatScreen from './screens/CombatScreen';
 import ShopScreen from './screens/ShopScreen';
+import InventoryScreen from './screens/InventoryScreen';
 import StatsScreen from './screens/StatsScreen';
 import './App.css';
 
@@ -15,6 +16,7 @@ function App() {
     training: <TrainingScreen />,
     combat: <CombatScreen />,
     shop: <ShopScreen />,
+    inventory: <InventoryScreen />,
     stats: <StatsScreen />,
   };
 

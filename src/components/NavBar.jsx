@@ -4,6 +4,7 @@ function NavBar({ currentScreen, onNavigate }) {
     { id: 'training', label: 'Training' },
     { id: 'combat', label: 'Combat' },
     { id: 'shop', label: 'Shop' },
+    { id: 'inventory', label: 'Inventory' },
     { id: 'stats', label: 'Stats' },
   ];
 
