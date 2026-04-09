@@ -63,10 +63,14 @@ export default function useCultivation() {
     setBoosting(false);
   }, []);
 
+  const label = (r) => (r.stage ? `${r.name} - ${r.stage}` : r.name);
+
   return {
     realmIndex,
-    realmName: realm.name,
-    nextRealmName: nextRealm?.name ?? 'Peak',
+    realmName: label(realm),
+    realmMajor: realm.name,
+    realmStage: realm.stage,
+    nextRealmName: nextRealm ? label(nextRealm) : 'Peak',
     qi: Math.floor(qi),
     cost,
     progress,
