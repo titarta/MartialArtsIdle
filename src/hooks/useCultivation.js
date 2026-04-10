@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
+import { DEFAULT_LAW } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
 
 const BASE_RATE = 5; // qi per second at 1x
@@ -37,7 +38,10 @@ export default function useCultivation() {
       lastTickRef.current = now;
 
       if (!maxedRef.current) {
-        const rate = BASE_RATE * (boostRef.current ? BOOST_MULTIPLIER : 1);
+        const lawMult = indexRef.current >= DEFAULT_LAW.realmRequirement
+          ? DEFAULT_LAW.cultivationSpeedMult
+          : 1;
+        const rate = BASE_RATE * lawMult * (boostRef.current ? BOOST_MULTIPLIER : 1);
         qiRef.current += rate * dt;
 
         if (qiRef.current >= costRef.current) {
@@ -84,5 +88,7 @@ export default function useCultivation() {
     // Refs for direct DOM updates — avoids React render lag on the progress bar
     qiRef,
     costRef,
+    activeLaw:     DEFAULT_LAW,
+    isLawUnlocked: realmIndex >= DEFAULT_LAW.realmRequirement,
   };
 }

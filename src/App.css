@@ -268,6 +268,136 @@
   font-style: italic;
 }
 
+/* Law Card */
+.build-law-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 392px;
+  overflow-y: auto;
+}
+
+.build-law-locked {
+  opacity: 0.55;
+}
+
+.law-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.law-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.law-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.law-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+
+.law-element {
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.law-rarity-badge {
+  /* color and borderColor set inline from rarity config */
+}
+
+.law-flavour {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.law-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.law-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.law-stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.law-stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.law-passives {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.law-passive {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.law-passive-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.law-passive-desc {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.law-req-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.law-req-met {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+.law-req-locked {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 /* Home Screen */
 .home-screen {
   text-align: center;

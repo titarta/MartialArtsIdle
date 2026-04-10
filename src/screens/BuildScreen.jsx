@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import GearSlotModal from '../components/GearSlotModal';
+import { LAW_RARITY } from '../data/laws';
 
 // col/row are 1-indexed CSS grid positions (3 columns, 5 rows)
 const GEAR_SLOTS = [
@@ -20,8 +21,10 @@ const GEAR_SLOTS = [
   { id: 'ring_4', label: 'Ring',   type: 'ring',   col: 3, row: 5 },
 ];
 
-function BuildScreen() {
+function BuildScreen({ cultivation }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const { activeLaw, isLawUnlocked } = cultivation;
+  const rarity = LAW_RARITY[activeLaw.rarity];
 
   return (
     <div className="screen build-screen">
@@ -49,9 +52,55 @@ function BuildScreen() {
 
         <section className="build-section build-law-section">
           <h2 className="build-section-title">Cultivation Law</h2>
-          <div className="card build-law-card">
-            <span className="build-slot-label">Active Law</span>
-            <p className="build-slot-empty">No law cultivated</p>
+          <div className={`build-law-card ${!isLawUnlocked ? 'build-law-locked' : ''}`}>
+
+            {/* Header */}
+            <div className="law-header">
+              <span className="law-name">{activeLaw.name}</span>
+              <div className="law-badges">
+                <span className="law-badge law-element">{activeLaw.element}</span>
+                <span className="law-badge law-rarity-badge" style={{ color: rarity.color, borderColor: rarity.color }}>
+                  {rarity.label}
+                </span>
+              </div>
+            </div>
+
+            {/* Flavour */}
+            <p className="law-flavour">"{activeLaw.flavour}"</p>
+
+            <div className="law-divider" />
+
+            {/* Cultivation speed */}
+            <div className="law-stat-row">
+              <span className="law-stat-label">Cultivation Speed</span>
+              <span className="law-stat-value">×{activeLaw.cultivationSpeedMult.toFixed(1)}</span>
+            </div>
+
+            <div className="law-divider" />
+
+            {/* Passives */}
+            <div className="law-passives">
+              <span className="law-stat-label">
+                Passives ({activeLaw.passives.length}/{rarity.passiveSlots})
+              </span>
+              {activeLaw.passives.map((p) => (
+                <div key={p.name} className="law-passive">
+                  <span className="law-passive-name">{p.name}</span>
+                  <span className="law-passive-desc">{p.description}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="law-divider" />
+
+            {/* Realm requirement */}
+            <div className="law-req-row">
+              <span className="law-stat-label">Requires</span>
+              <span className={`law-req-status ${isLawUnlocked ? 'law-req-met' : 'law-req-locked'}`}>
+                {isLawUnlocked ? '✓' : '🔒'} {activeLaw.realmRequirementLabel}
+              </span>
+            </div>
+
           </div>
         </section>
       </div>

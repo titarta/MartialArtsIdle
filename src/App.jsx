@@ -20,7 +20,7 @@ function App() {
     home: <HomeScreen cultivation={cultivation} />,
     training: <TrainingScreen />,
     combat: <CombatScreen />,
-    build: <BuildScreen />,
+    build: <BuildScreen cultivation={cultivation} />,
     shop: <ShopScreen />,
     inventory: <InventoryScreen inventory={inventory} />,
     stats: <StatsScreen />,
