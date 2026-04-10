@@ -23,7 +23,7 @@ function App() {
     build: <BuildScreen cultivation={cultivation} />,
     shop: <ShopScreen />,
     inventory: <InventoryScreen inventory={inventory} />,
-    stats: <StatsScreen />,
+    stats: <StatsScreen cultivation={cultivation} />,
   };
 
   return (
