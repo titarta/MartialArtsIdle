@@ -152,7 +152,7 @@
   font-size: 0.9rem;
 }
 
-/* Build Screen */
+/* Build / Equipment Screen */
 .build-section {
   margin-bottom: 24px;
 }
@@ -163,6 +163,53 @@
   letter-spacing: 0.1em;
   color: var(--text-muted);
   margin-bottom: 10px;
+}
+
+/* Body silhouette gear layout — 3 cols × 5 rows */
+.gear-body-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  grid-template-rows: repeat(5, 72px);
+  gap: 8px;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
+.gear-slot {
+  width: 72px;
+  height: 72px;
+  padding: 6px;
+  justify-content: center;
+  border-style: dashed;
+}
+
+.gear-slot-glyph {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.gear-slot-name {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  max-width: 64px;
+}
+
+/* Gear slot modal empty icon */
+.gear-slot-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  margin: 0 auto 16px;
+}
+
+.gear-slot-empty-glyph {
+  font-size: 2.5rem;
+  color: var(--text-muted);
 }
 
 .build-slot {

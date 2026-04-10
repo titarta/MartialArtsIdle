@@ -4,7 +4,7 @@ const SCREENS = [
   { id: 'home',      label: 'Home'   },
   { id: 'training',  label: 'Train'  },
   { id: 'combat',    label: 'Combat' },
-  { id: 'build',     label: 'Build'  },
+  { id: 'build',     label: 'Equip'  },
   { id: 'shop',      label: 'Shop'   },
   { id: 'inventory', label: 'Items'  },
   { id: 'stats',     label: 'Stats'  },
