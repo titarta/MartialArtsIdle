@@ -8,6 +8,7 @@ const SCREENS = [
   { id: 'shop',      label: 'Shop'   },
   { id: 'inventory', label: 'Items'  },
   { id: 'stats',     label: 'Stats'  },
+  { id: 'settings',  label: 'Config', emoji: '⚙' },
 ];
 
 function NavBar({ currentScreen, onNavigate }) {
@@ -19,11 +20,15 @@ function NavBar({ currentScreen, onNavigate }) {
           className={`nav-btn ${currentScreen === screen.id ? 'active' : ''}`}
           onClick={() => onNavigate(screen.id)}
         >
-          <img
-            src={`${BASE}sprites/nav/${screen.id}.png`}
-            alt={screen.label}
-            className="nav-icon-img"
-          />
+          {screen.emoji ? (
+            <span className="nav-icon-emoji">{screen.emoji}</span>
+          ) : (
+            <img
+              src={`${BASE}sprites/nav/${screen.id}.png`}
+              alt={screen.label}
+              className="nav-icon-img"
+            />
+          )}
           <span className="nav-label">{screen.label}</span>
         </button>
       ))}

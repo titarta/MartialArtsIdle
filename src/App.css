@@ -52,6 +52,21 @@
   opacity: 1;
 }
 
+.nav-icon-emoji {
+  width: 24px;
+  height: 24px;
+  font-size: 18px;
+  line-height: 24px;
+  text-align: center;
+  display: block;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.nav-btn.active .nav-icon-emoji {
+  opacity: 1;
+}
+
 .nav-label {
   font-size: 10px;
   line-height: 1;
@@ -604,12 +619,20 @@
    Stats Screen — Triangle primary stat layout
    ───────────────────────────────────────────── */
 
-/* Triangle container: 280 × 230 px, centered */
+/* Triangle + side panel row */
+.stats-primary-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Triangle container: 280 × 230 px, flex-shrink so it doesn't squish */
 .stat-triangle-container {
   position: relative;
   width: 280px;
   height: 230px;
-  margin: 0 auto 4px;
+  flex-shrink: 0;
 }
 
 .stat-triangle-lines {
@@ -685,26 +708,40 @@
   line-height: 1;
 }
 
-/* ── Detail panel ── */
-.stat-detail-wrap {
-  max-width: 300px;
-  margin: 0 auto;
-  min-height: 0;
-  overflow: hidden;
-  transition: min-height 0.2s;
-}
-
-.sdw-visible {
-  min-height: 100px;
+/* ── Side detail panel ── */
+.stat-detail-side {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
 }
 
 .stat-detail-panel {
+  width: 100%;
   background: var(--bg-card);
   border: 1px solid var(--border);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--panel-color) 30%, transparent);
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 12px 14px;
   animation: sdp-in 0.15s ease-out;
+}
+
+.sdp-placeholder {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 16px 8px;
+  opacity: 0.6;
 }
 
 @keyframes sdp-in {
@@ -794,8 +831,8 @@
 
 /* ── Secondary Stats ── */
 .secondary-stats {
-  max-width: 300px;
-  margin: 16px auto 0;
+  max-width: 400px;
+  margin-bottom: 20px;
 }
 
 .secondary-stats-title {

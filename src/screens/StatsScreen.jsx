@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { exportSave, importSave, wipeSave } from '../systems/save';
 
 // Soul stat unlocks at Saint realm (index 24)
 const SAINT_INDEX = 24;
@@ -213,11 +212,6 @@ function StatsScreen({ cultivation }) {
   const [qi, setQi]             = useState(Math.floor(qiRef.current));
   const [activeStat, setActive] = useState(null);
 
-  // Save section state
-  const [showImport, setShowImport] = useState(false);
-  const [importText, setImportText] = useState('');
-  const [message, setMessage]       = useState(null);
-
   // Live qi update every 250 ms
   useEffect(() => {
     const id = setInterval(() => setQi(Math.floor(qiRef.current)), 250);
@@ -225,123 +219,74 @@ function StatsScreen({ cultivation }) {
   }, [qiRef]);
 
   const isSoulLocked = realmIndex < SAINT_INDEX;
-  const essence = Math.floor(qi * activeLaw.essenceMult);
-  const soul    = Math.floor(qi * activeLaw.soulMult);
-  const body    = Math.floor(qi * activeLaw.bodyMult);
-  const def     = essence + body;
+  const essence   = Math.floor(qi * activeLaw.essenceMult);
+  const soul      = Math.floor(qi * activeLaw.soulMult);
+  const body      = Math.floor(qi * activeLaw.bodyMult);
+  const def       = essence + body;
   const intuition = isSoulLocked ? null : soul;
 
   const toggle = (stat) => setActive((s) => (s === stat ? null : stat));
   const enter  = (stat) => setActive(stat);
   const leave  = ()     => setActive(null);
 
-  const flash = (text, isError) => {
-    setMessage({ text, isError });
-    setTimeout(() => setMessage(null), 3000);
-  };
-
-  const handleExport = () => {
-    const encoded = exportSave();
-    if (!encoded) { flash('No save data found', true); return; }
-    navigator.clipboard.writeText(encoded).then(
-      () => flash('Save copied to clipboard!', false),
-      () => { setImportText(encoded); setShowImport(true); flash('Copy the text manually', false); }
-    );
-  };
-
-  const handleImport = () => {
-    if (!importText.trim()) { flash('Paste your save string first', true); return; }
-    const result = importSave(importText);
-    if (result.ok) {
-      flash('Save imported! Reloading…', false);
-      setTimeout(() => window.location.reload(), 1000);
-    } else {
-      flash(result.error, true);
-    }
-  };
-
-  const handleWipe = () => {
-    if (window.confirm('Are you sure? This will delete ALL progress!')) {
-      wipeSave();
-      flash('Save wiped! Reloading…', false);
-      setTimeout(() => window.location.reload(), 1000);
-    }
-  };
-
   return (
     <div className="screen stats-screen">
       <h1>Character Stats</h1>
       <p className="subtitle">{realmName}</p>
 
-      {/* ── Primary Stats Triangle ── */}
-      <div className="stat-triangle-container">
-        <TriangleLines activeStat={activeStat} />
+      {/* ── Primary Stats: triangle left, detail right ── */}
+      <div className="stats-primary-row">
+        <div className="stat-triangle-container">
+          <TriangleLines activeStat={activeStat} />
 
-        {/* Soul — top center */}
-        <div
-          className="stat-circle-wrap stat-wrap-soul"
-          onMouseEnter={() => enter('soul')}
-          onMouseLeave={leave}
-          onClick={() => toggle('soul')}
-        >
-          <StatCircle
-            label="Soul"
-            value={soul}
-            locked={isSoulLocked}
-            glowColor="#c084fc"
-            active={activeStat === 'soul'}
+          {/* Soul — top center */}
+          <div
+            className="stat-circle-wrap stat-wrap-soul"
+            onMouseEnter={() => enter('soul')}
+            onMouseLeave={leave}
+            onClick={() => toggle('soul')}
           >
-            <SoulSprite size={40} locked={isSoulLocked} />
-          </StatCircle>
+            <StatCircle label="Soul" value={soul} locked={isSoulLocked} glowColor="#c084fc" active={activeStat === 'soul'}>
+              <SoulSprite size={40} locked={isSoulLocked} />
+            </StatCircle>
+          </div>
+
+          {/* Essence — bottom left */}
+          <div
+            className="stat-circle-wrap stat-wrap-essence"
+            onMouseEnter={() => enter('essence')}
+            onMouseLeave={leave}
+            onClick={() => toggle('essence')}
+          >
+            <StatCircle label="Essence" value={essence} locked={false} glowColor="#38bdf8" active={activeStat === 'essence'}>
+              <EssenceSprite size={40} />
+            </StatCircle>
+          </div>
+
+          {/* Body — bottom right */}
+          <div
+            className="stat-circle-wrap stat-wrap-body"
+            onMouseEnter={() => enter('body')}
+            onMouseLeave={leave}
+            onClick={() => toggle('body')}
+          >
+            <StatCircle label="Body" value={body} locked={false} glowColor="#f97316" active={activeStat === 'body'}>
+              <BodySprite size={40} />
+            </StatCircle>
+          </div>
         </div>
 
-        {/* Essence — bottom left */}
-        <div
-          className="stat-circle-wrap stat-wrap-essence"
-          onMouseEnter={() => enter('essence')}
-          onMouseLeave={leave}
-          onClick={() => toggle('essence')}
-        >
-          <StatCircle
-            label="Essence"
-            value={essence}
-            locked={false}
-            glowColor="#38bdf8"
-            active={activeStat === 'essence'}
-          >
-            <EssenceSprite size={40} />
-          </StatCircle>
+        {/* Side detail panel */}
+        <div className="stat-detail-side">
+          {activeStat ? (
+            <DetailPanel stat={activeStat} qi={qi} law={activeLaw} realmIndex={realmIndex} />
+          ) : (
+            <div className="sdp-placeholder">
+              <span>Tap a stat</span>
+              <span>for details</span>
+            </div>
+          )}
         </div>
-
-        {/* Body — bottom right */}
-        <div
-          className="stat-circle-wrap stat-wrap-body"
-          onMouseEnter={() => enter('body')}
-          onMouseLeave={leave}
-          onClick={() => toggle('body')}
-        >
-          <StatCircle
-            label="Body"
-            value={body}
-            locked={false}
-            glowColor="#f97316"
-            active={activeStat === 'body'}
-          >
-            <BodySprite size={40} />
-          </StatCircle>
-        </div>
-      </div>
-
-      {/* ── Hover / tap detail panel ── */}
-      <div className={`stat-detail-wrap${activeStat ? ' sdw-visible' : ''}`}>
-        {activeStat && (
-          <DetailPanel
-            stat={activeStat}
-            qi={qi}
-            law={activeLaw}
-            realmIndex={realmIndex}
-          />
-        )}
       </div>
 
       {/* ── Secondary Stats ── */}
@@ -359,33 +304,6 @@ function StatsScreen({ cultivation }) {
             {isSoulLocked ? 'Locked' : fmt(intuition)}
           </span>
         </div>
-      </div>
-
-      {/* ── Save Data ── */}
-      <div className="save-section">
-        <h2>Save Data</h2>
-        {message && (
-          <div className={`save-message ${message.isError ? 'save-error' : 'save-success'}`}>
-            {message.text}
-          </div>
-        )}
-        <div className="save-buttons">
-          <button className="save-btn" onClick={handleExport}>Export Save</button>
-          <button className="save-btn" onClick={() => setShowImport(!showImport)}>Import Save</button>
-          <button className="save-btn save-btn-danger" onClick={handleWipe}>Wipe Save</button>
-        </div>
-        {showImport && (
-          <div className="import-area">
-            <textarea
-              className="import-input"
-              placeholder="Paste your save string here…"
-              value={importText}
-              onChange={(e) => setImportText(e.target.value)}
-              rows={3}
-            />
-            <button className="save-btn" onClick={handleImport}>Load Save</button>
-          </div>
-        )}
       </div>
     </div>
   );

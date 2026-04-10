@@ -7,6 +7,7 @@ import ShopScreen from './screens/ShopScreen';
 import InventoryScreen from './screens/InventoryScreen';
 import BuildScreen from './screens/BuildScreen';
 import StatsScreen from './screens/StatsScreen';
+import SettingsScreen from './screens/SettingsScreen';
 import useCultivation from './hooks/useCultivation';
 import useInventory from './hooks/useInventory';
 import './App.css';
@@ -23,7 +24,8 @@ function App() {
     build: <BuildScreen cultivation={cultivation} />,
     shop: <ShopScreen />,
     inventory: <InventoryScreen inventory={inventory} />,
-    stats: <StatsScreen cultivation={cultivation} />,
+    stats:    <StatsScreen cultivation={cultivation} />,
+    settings: <SettingsScreen />,
   };
 
   return (
