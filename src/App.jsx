@@ -5,6 +5,7 @@ import TrainingScreen from './screens/TrainingScreen';
 import CombatScreen from './screens/CombatScreen';
 import ShopScreen from './screens/ShopScreen';
 import InventoryScreen from './screens/InventoryScreen';
+import BuildScreen from './screens/BuildScreen';
 import StatsScreen from './screens/StatsScreen';
 import useCultivation from './hooks/useCultivation';
 import useInventory from './hooks/useInventory';
@@ -19,6 +20,7 @@ function App() {
     home: <HomeScreen cultivation={cultivation} />,
     training: <TrainingScreen />,
     combat: <CombatScreen />,
+    build: <BuildScreen />,
     shop: <ShopScreen />,
     inventory: <InventoryScreen inventory={inventory} />,
     stats: <StatsScreen />,

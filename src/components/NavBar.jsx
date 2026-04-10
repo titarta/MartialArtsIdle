@@ -1,12 +1,13 @@
 const BASE = import.meta.env.BASE_URL;
 
 const SCREENS = [
-  { id: 'home', label: 'Home' },
-  { id: 'training', label: 'Train' },
-  { id: 'combat', label: 'Combat' },
-  { id: 'shop', label: 'Shop' },
-  { id: 'inventory', label: 'Items' },
-  { id: 'stats', label: 'Stats' },
+  { id: 'home',      label: 'Home'   },
+  { id: 'training',  label: 'Train'  },
+  { id: 'combat',    label: 'Combat' },
+  { id: 'build',     label: 'Build'  },
+  { id: 'shop',      label: 'Shop'   },
+  { id: 'inventory', label: 'Items'  },
+  { id: 'stats',     label: 'Stats'  },
 ];
 
 function NavBar({ currentScreen, onNavigate }) {
