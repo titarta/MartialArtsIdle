@@ -172,7 +172,7 @@
   display: flex;
   gap: 16px;
   align-items: stretch;
-  min-height: 300px;
+  height: 310px;
 }
 
 /* Realm Progress Bar */
@@ -220,7 +220,7 @@
   right: 0;
   background: linear-gradient(to top, var(--accent), #c084fc);
   border-radius: 0 0 13px 13px;
-  transition: height 0.3s ease-out;
+  /* height updated every rAF frame — no CSS transition needed */
 }
 
 .realm-fill-boosted {

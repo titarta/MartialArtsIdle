@@ -44,7 +44,11 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting })
     <div className="realm-bar">
       <div className="realm-label realm-next">{nextRealm}</div>
       <div className="realm-track">
-        <div ref={fillRef} className="realm-fill" style={{ height: '0%' }} />
+        <div
+          ref={fillRef}
+          className="realm-fill"
+          style={{ height: `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
+        />
         <div ref={qiLabelRef} className="realm-qi-label" />
       </div>
       <div className="realm-label realm-current">{currentRealm}</div>
