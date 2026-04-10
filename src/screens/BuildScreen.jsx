@@ -28,32 +28,33 @@ function BuildScreen() {
       <h1>Equipment</h1>
       <p className="subtitle">Gear, laws, and techniques</p>
 
-      {/* ── Artefact body layout ── */}
-      <section className="build-section">
-        <h2 className="build-section-title">Artefacts</h2>
-        <div className="gear-body-layout">
-          {GEAR_SLOTS.map((slot) => (
-            <button
-              key={slot.id}
-              className="inv-slot gear-slot"
-              style={{ gridColumn: slot.col, gridRow: slot.row }}
-              onClick={() => setSelectedSlot(slot)}
-            >
-              <span className="gear-slot-glyph">+</span>
-              <span className="inv-name gear-slot-name">{slot.label}</span>
-            </button>
-          ))}
-        </div>
-      </section>
+      {/* ── Artefacts + Law side by side ── */}
+      <div className="build-top-row">
+        <section className="build-section">
+          <h2 className="build-section-title">Artefacts</h2>
+          <div className="gear-body-layout">
+            {GEAR_SLOTS.map((slot) => (
+              <button
+                key={slot.id}
+                className="inv-slot gear-slot"
+                style={{ gridColumn: slot.col, gridRow: slot.row }}
+                onClick={() => setSelectedSlot(slot)}
+              >
+                <span className="gear-slot-glyph">+</span>
+                <span className="inv-name gear-slot-name">{slot.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
 
-      {/* ── Cultivation Law ── */}
-      <section className="build-section">
-        <h2 className="build-section-title">Cultivation Law</h2>
-        <div className="card build-slot-wide">
-          <span className="build-slot-label">Active Law</span>
-          <p className="build-slot-empty">No law cultivated</p>
-        </div>
-      </section>
+        <section className="build-section build-law-section">
+          <h2 className="build-section-title">Cultivation Law</h2>
+          <div className="card build-law-card">
+            <span className="build-slot-label">Active Law</span>
+            <p className="build-slot-empty">No law cultivated</p>
+          </div>
+        </section>
+      </div>
 
       {/* ── Secret Techniques ── */}
       <section className="build-section">

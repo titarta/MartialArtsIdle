@@ -165,6 +165,31 @@
   margin-bottom: 10px;
 }
 
+/* Artefacts + Law side by side */
+.build-top-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 0;
+}
+
+.build-law-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.build-law-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Match the gear grid height: 5×72px rows + 4×8px gaps */
+  height: 392px;
+}
+
 /* Body silhouette gear layout — 3 cols × 5 rows */
 .gear-body-layout {
   display: grid;
