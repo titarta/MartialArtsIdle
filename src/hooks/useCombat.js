@@ -39,6 +39,10 @@ export default function useCombat() {
   const pHpTextRef = useRef(null);
   const eHpTextRef = useRef(null);
 
+  // ─── Sprite animation callbacks — set by CombatStage ─────────────────────
+  const playerAttackRef = useRef(null); // () => void — player lands a hit
+  const enemyAttackRef  = useRef(null); // () => void — enemy lands a hit
+
   // ─── startFight — writes snapshot into refs, then triggers React render ──
   const startFight = useCallback((stats, equippedTechs) => {
     const { essence, soul, body } = stats;
@@ -132,6 +136,7 @@ export default function useCombat() {
           const dmg = calcDamage(tech, stats.essence, stats.soul, stats.body, stats.lawElement);
           s.eHp = Math.max(0, s.eHp - dmg);
           logs.push({ msg: `${tech.name} → ${dmg.toLocaleString()} dmg`, kind: 'damage' });
+          playerAttackRef.current?.();
 
         } else if (tech.type === 'Heal') {
           const heal = Math.floor(s.pMaxHp * (tech.healPercent ?? 0.25));
@@ -156,6 +161,7 @@ export default function useCombat() {
           const dmg = Math.max(5, Math.floor(stats.essence + stats.body));
           s.eHp = Math.max(0, s.eHp - dmg);
           logs.push({ msg: `Basic attack → ${dmg.toLocaleString()} dmg`, kind: 'damage' });
+          playerAttackRef.current?.();
         }
       }
 
@@ -183,6 +189,7 @@ export default function useCombat() {
           const dmg      = Math.max(1, Math.floor(s.eAtk * 100 / (100 + def)));
           s.pHp          = Math.max(0, s.pHp - dmg);
           logs.push({ msg: `Enemy hits → −${dmg} HP`, kind: 'damage-taken' });
+          enemyAttackRef.current?.();
         }
       }
 
@@ -219,5 +226,8 @@ export default function useCombat() {
     cdBarRefs,
     pHpTextRef,
     eHpTextRef,
+    // Sprite animation callbacks — registered by CombatStage
+    playerAttackRef,
+    enemyAttackRef,
   };
 }

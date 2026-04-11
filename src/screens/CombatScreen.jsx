@@ -1,4 +1,5 @@
 import { TYPE_COLOR, TECHNIQUE_QUALITY, getCooldown } from '../data/techniques';
+import CombatStage from '../components/CombatStage';
 
 const LOG_COLOR = {
   damage:       'var(--accent)',
@@ -33,6 +34,13 @@ function CombatScreen({ cultivation, techniques, combat }) {
     <div className="screen combat-screen">
       <h1>Combat Arena</h1>
       <p className="subtitle">{cultivation.realmName}</p>
+
+      {/* ── Fighter stage ───────────────────────────────────────────────── */}
+      <CombatStage
+        phase={phase}
+        playerAttackRef={combat.playerAttackRef}
+        enemyAttackRef={combat.enemyAttackRef}
+      />
 
       {/* ── HP bars ─────────────────────────────────────────────────────── */}
       <div className="combat-arena">
