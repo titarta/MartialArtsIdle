@@ -65,5 +65,10 @@ Reincarnation is the **prestige mechanic** — the player resets the world in ex
 
 - [[Cultivation System]]
 - [[Items]]
+- [[Materials]]
 - [[Realm Progression]]
 - [[Game Vision]]
+
+---
+
+## Claude Commands

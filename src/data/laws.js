@@ -11,9 +11,9 @@ export const THREE_HARMONY_MANUAL = {
   name:                 'Three Harmony Manual',
   element:              'Normal',
   rarity:               'Iron',
-  // realmIndex 10 = Qi Transformation - Early Stage
-  realmRequirement:     10,
-  realmRequirementLabel:'Qi Transformation',
+  // realmIndex 0 = Tempered Body - Layer 1 (available from the start)
+  realmRequirement:     0,
+  realmRequirementLabel:'Tempered Body',
   flavour:              'The ancient text speaks of no fire, no storm, no mountain — only the even breath between all things.',
   cultivationSpeedMult: 1.0,
   essenceMult:          0.35,

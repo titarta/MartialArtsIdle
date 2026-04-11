@@ -1382,44 +1382,48 @@
    Combat screen
    ───────────────────────────────────────────── */
 
-.combat-arena {
+/* ── Battle field ── */
+.combat-field {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.combatant {
+.combat-fighter-col {
   flex: 1;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 12px 14px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-.combatant-enemy { border-color: rgba(233, 69, 96, 0.35); }
-.combatant-player { border-color: rgba(74, 222, 128, 0.35); }
-
-.combatant-label {
-  font-size: 0.68rem;
+.combat-fighter-label {
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
 }
 
+.combat-hp-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
 .hp-bar-track {
-  height: 10px;
+  height: 8px;
   background: var(--bg-secondary);
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .hp-bar-fill {
   height: 100%;
-  border-radius: 5px;
+  border-radius: 4px;
   /* NO transition — patched every rAF frame */
 }
 
@@ -1434,91 +1438,123 @@
 }
 
 .hp-bar-text {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.combat-sprite-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.combat-vs {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  align-self: center;
+  padding-top: 40px;
+}
+
+/* ── Shake animation ── */
+@keyframes combat-shake {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(-5px); }
+  40%  { transform: translateX(5px); }
+  60%  { transform: translateX(-4px); }
+  80%  { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+.combat-shake {
+  animation: combat-shake 0.35s ease-out;
+}
+
+/* ── Floating damage numbers ── */
+@keyframes dmg-float-anim {
+  0%   { opacity: 1;   transform: translateY(0)    scale(1.1); }
+  30%  { opacity: 1;   transform: translateY(-14px) scale(1.2); }
+  100% { opacity: 0;   transform: translateY(-32px) scale(0.9); }
+}
+
+.dmg-float {
+  position: absolute;
+  top: 50%;
+  font-size: 0.85rem;
+  font-weight: 800;
+  pointer-events: none;
+  animation: dmg-float-anim 0.9s ease-out forwards;
+  z-index: 10;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+.dmg-float-left  { left: 20%; }
+.dmg-float-right { right: 20%; left: auto; }
+
+.dmg-float-damage { color: #f87171; }
+.dmg-float-heal   { color: #4ade80; }
+
+/* ── Technique circles ── */
+.combat-tech-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.combat-tech-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  max-width: 110px;
+}
+
+.combat-tech-empty {
+  opacity: 0.4;
+}
+
+.combat-tech-circle {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.combat-tech-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  /* background set by rAF via conic-gradient */
+}
+
+.combat-tech-name {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+.combat-tech-cd {
+  font-size: 0.58rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
 
-.combat-vs {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-/* Technique bars */
-.technique-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-bottom: 16px;
-}
-
-.tech-bar-slot {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.tech-bar-empty {
-  opacity: 0.45;
-}
-
-.tech-bar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.tech-bar-name {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.tech-bar-meta {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.tech-bar-badge {
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1px 5px;
-  border-radius: 3px;
-  border: 1px solid;
-}
-
-.tech-bar-cd {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-}
-
-.tech-bar-track {
-  height: 5px;
-  background: var(--bg-secondary);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.tech-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  /* gradient matches Soul→Essence colors */
-  background: linear-gradient(to right, #7c3aed, #0284c7);
-  width: 0%;
-  /* NO CSS transition — rAF-patched */
-}
-
-/* Action button */
+/* ── Action button ── */
 .combat-start-btn {
   width: 100%;
   padding: 12px;
@@ -1554,7 +1590,7 @@
 .combat-result-won span  { color: #4ade80; }
 .combat-result-lost span { color: var(--accent); }
 
-/* Combat log */
+/* ── Combat log ── */
 .combat-log {
   background: var(--bg-secondary);
   border: 1px solid var(--border);

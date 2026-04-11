@@ -136,7 +136,7 @@ Export/import uses base64 (`btoa`/`atob`). Stats screen has Save / Export / Impo
 
 | System | Notes |
 |---|---|
-| CHI/Soul/Body stats | Replace `qi` with three separate stats; connect to realm gating |
+| Essence/Soul/Body stats | Replace `qi` with three separate stats; connect to realm gating |
 | Training screen | Bind to Strength/Agility/Spirit growth |
 | Combat screen | Zone assignment, enemy spawning, drop system |
 | Shop screen | Buy/sell materials and items |
@@ -153,3 +153,8 @@ Export/import uses base64 (`btoa`/`atob`). Stats screen has Save / Export / Impo
 - [[Cultivation System]]
 - [[Realm Progression]]
 - [[Items]]
+- [[Materials]]
+
+---
+
+## Claude Commands

@@ -10,7 +10,6 @@ Gathered herbs feed into the [[Items|Alchemy]] system for pill crafting.
 
 - **Idle/automated**: assign character to an unlocked region → they gather herbs continuously
 - The region must first be **unlocked via** [[Worlds/World|the World map]]
-- Gathering speed is driven by **Soul** stat
 - Enemies occasionally spawn and interrupt gathering — the character fights them off automatically, then resumes
 
 ---

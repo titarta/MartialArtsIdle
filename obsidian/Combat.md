@@ -54,15 +54,15 @@ Enemies in a zone have a **normally distributed** power level:
 
 ### Attack Formula (Secret Technique)
 ```
-Damage = K * (CHI + Soul + Body + artefact_dmg_flat) * arte_mult * elem_bonus + bonus
+Damage = K * (Essence + Soul + Body + artefact_dmg_flat) * arte_mult * elem_bonus + bonus
 ```
 
 ### Default Attack
-- Every [[Laws & Secret Techniques#Laws|Law]] provides a default attack
+- Every [[Laws|Law]] provides a default attack
 - Used when no secret technique is available or on cooldown
 
 ### Combat Stats
-- **DEF** = CHI + Body Strength (combo)
+- **DEF** = Essence + Body (combo)
 - **Dodge** — increased by Dodge-type secret techniques
 
 ---
@@ -80,6 +80,12 @@ Damage = K * (CHI + Soul + Body + artefact_dmg_flat) * arte_mult * elem_bonus + 
 ## Related
 
 - [[Primary Stats]]
-- [[Laws & Secret Techniques]]
+- [[Laws]]
+- [[Secret Techniques]]
 - [[Items]]
+- [[Materials]]
 - [[Realm Progression]]
+
+---
+
+## Claude Commands

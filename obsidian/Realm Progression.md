@@ -178,5 +178,10 @@ Total sub-stages: **47**
 
 - [[Cultivation System]]
 - [[Primary Stats]]
-- [[Laws & Secret Techniques]]
+- [[Laws]]
+- [[Secret Techniques]]
 - [[Implementation Notes]]
+
+---
+
+## Claude Commands

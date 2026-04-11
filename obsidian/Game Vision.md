@@ -42,3 +42,7 @@ Progress must feel like: **bump → smooth grind → bump → ...**
 - [[Cultivation System]]
 - [[Reincarnation]]
 - [[Roadmap]]
+
+---
+
+## Claude Commands

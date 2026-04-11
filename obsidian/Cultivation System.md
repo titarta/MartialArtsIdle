@@ -60,4 +60,9 @@ On reincarnation, the player carries over:
 - [[Primary Stats]]
 - [[Realm Progression]]
 - [[Reincarnation]]
-- [[Laws & Secret Techniques]]
+- [[Laws]]
+- [[Secret Techniques]]
+
+---
+
+## Claude Commands
