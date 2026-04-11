@@ -1871,6 +1871,8 @@
   .gear-slot {
     width: 68px;
     height: 68px;
+    min-height: unset;
+    padding: 6px;
   }
 
   /* ── Inventory: larger, easier-to-tap slots ───────────────────────────── */
@@ -1974,6 +1976,8 @@
   .gear-slot {
     width: 60px;
     height: 60px;
+    min-height: unset;
+    padding: 4px;
   }
 
   .nav-label {
