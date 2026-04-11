@@ -1,25 +1,26 @@
+import { useState } from 'react';
 import { TYPE_COLOR, getCooldown } from '../data/techniques';
+import { pickEnemy } from '../data/enemies';
 import CombatStage from '../components/CombatStage';
 
 const LOG_COLOR = {
-  damage:           'var(--accent)',
-  'damage-taken':   '#f97316',
-  heal:             '#4ade80',
-  buff:             '#60a5fa',
-  dodge:            '#facc15',
-  system:           'var(--text-muted)',
+  damage:         'var(--accent)',
+  'damage-taken': '#f97316',
+  heal:           '#4ade80',
+  buff:           '#60a5fa',
+  dodge:          '#facc15',
+  system:         'var(--text-muted)',
 };
-
-
-function pickEnemy(region) {
-  if (!region?.enemies) return 'Training Dummy';
-  const list = region.enemies.split(',').map(s => s.trim()).filter(Boolean);
-  return list[Math.floor(Math.random() * list.length)];
-}
 
 function CombatScreen({ cultivation, techniques, combat, region = null, onBack = null }) {
   const { phase, enemy, log, startFight } = combat;
   const { equippedTechniques } = techniques;
+
+  // Resolve a random enemy from the region's pool once per mount.
+  // Falls back to null (Training Dummy) when no region is provided.
+  const [resolvedEnemy] = useState(() =>
+    region?.enemyPool ? pickEnemy(region.enemyPool) : null
+  );
 
   const handleStart = () => {
     const qi  = cultivation.qiRef.current;
@@ -32,7 +33,7 @@ function CombatScreen({ cultivation, techniques, combat, region = null, onBack =
         lawElement: law.element,
       },
       equippedTechniques,
-      pickEnemy(region),
+      resolvedEnemy,
     );
   };
 
@@ -49,6 +50,7 @@ function CombatScreen({ cultivation, techniques, combat, region = null, onBack =
       {/* ── Fighter stage ───────────────────────────────────────────────── */}
       <CombatStage
         phase={phase}
+        enemy={resolvedEnemy}
         playerAttackRef={combat.playerAttackRef}
         enemyAttackRef={combat.enemyAttackRef}
         playerAnimDoneRef={combat.playerAnimDoneRef}
@@ -57,7 +59,6 @@ function CombatScreen({ cultivation, techniques, combat, region = null, onBack =
 
       {/* ── HP bars ─────────────────────────────────────────────────────── */}
       <div className="combat-arena">
-        {/* Player */}
         <div className="combatant combatant-player">
           <span className="combatant-label">You</span>
           <div className="hp-bar-track">
@@ -72,9 +73,10 @@ function CombatScreen({ cultivation, techniques, combat, region = null, onBack =
 
         <span className="combat-vs">vs</span>
 
-        {/* Enemy */}
         <div className="combatant combatant-enemy">
-          <span className="combatant-label">{phase === 'idle' ? 'Enemy' : enemy.name}</span>
+          <span className="combatant-label">
+            {phase === 'idle' ? (resolvedEnemy?.name ?? 'Enemy') : enemy.name}
+          </span>
           <div className="hp-bar-track">
             <div
               ref={combat.eHpBarRef}

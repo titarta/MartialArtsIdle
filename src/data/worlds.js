@@ -2,6 +2,10 @@
  * World map data — 6 worlds each with multiple regions.
  * minRealmIndex maps to the REALMS array in data/realms.js.
  * Herbs/ores cross-reference Gathering.md and Mining.md.
+ *
+ * enemyPool: [{ enemyId, weight }] — weighted list of enemies that can appear.
+ *   enemyId references ENEMIES in data/enemies.js.
+ *   weight is relative; higher = more likely to appear.
  */
 const WORLDS = [
   {
@@ -18,6 +22,10 @@ const WORLDS = [
         drops: 'Common materials, gold',
         herbs: 'Soul Calming Grass',
         ores: 'Black Tortoise Iron',
+        enemyPool: [
+          { enemyId: 'outer_sect_disciple', weight: 7 },
+          { enemyId: 'sparring_dummy',      weight: 3 },
+        ],
       },
       {
         name: 'Borderland Wilds',
@@ -27,6 +35,11 @@ const WORLDS = [
         drops: 'Common herbs, Black Tortoise Iron',
         herbs: 'Soul Calming Grass, Jade Heart Flower',
         ores: 'Black Tortoise Iron, Crimson Flame Crystal',
+        enemyPool: [
+          { enemyId: 'wolf',            weight: 5 },
+          { enemyId: 'bandit_scout',    weight: 3 },
+          { enemyId: 'wandering_beast', weight: 2 },
+        ],
       },
       {
         name: 'Qi-Vein Ravines',
@@ -36,6 +49,10 @@ const WORLDS = [
         drops: 'Uncommon herbs, Crimson Flame Crystal',
         herbs: 'Jade Heart Flower, Netherworld Flame Mushroom',
         ores: 'Crimson Flame Crystal',
+        enemyPool: [
+          { enemyId: 'qi_beast',       weight: 6 },
+          { enemyId: 'rogue_disciple', weight: 4 },
+        ],
       },
       {
         name: 'Misty Spirit Forest',
@@ -45,6 +62,10 @@ const WORLDS = [
         drops: 'Uncommon materials, Beast Cores',
         herbs: 'Netherworld Flame Mushroom',
         ores: 'Crimson Flame Crystal',
+        enemyPool: [
+          { enemyId: 'forest_spirit', weight: 6 },
+          { enemyId: 'tree_demon',    weight: 4 },
+        ],
       },
       {
         name: "Heaven's Edge Peak",
@@ -54,6 +75,11 @@ const WORLDS = [
         drops: 'Rare herbs, Void Stone fragments',
         herbs: 'Jade Heart Flower, Netherworld Flame Mushroom',
         ores: 'Void Stone',
+        enemyPool: [
+          { enemyId: 'sky_beast',      weight: 5 },
+          { enemyId: 'thunder_hawk',   weight: 3 },
+          { enemyId: 'rogue_disciple', weight: 2 },
+        ],
       },
       {
         name: 'Thunderstorm Plateau',
@@ -63,6 +89,10 @@ const WORLDS = [
         drops: 'Rare materials, Origin Crystal fragments',
         herbs: 'Netherworld Flame Mushroom',
         ores: 'Void Stone',
+        enemyPool: [
+          { enemyId: 'lightning_wyrm',  weight: 5 },
+          { enemyId: 'storm_elemental', weight: 5 },
+        ],
       },
     ],
   },
@@ -80,6 +110,11 @@ const WORLDS = [
         drops: 'Rare herbs, Mithril Essence',
         herbs: 'Thousand-Year Ginseng, Blood Lotus',
         ores: 'Void Stone, Mithril Essence',
+        enemyPool: [
+          { enemyId: 'sand_dragon',    weight: 4 },
+          { enemyId: 'bone_construct', weight: 4 },
+          { enemyId: 'desert_wraith',  weight: 2 },
+        ],
       },
       {
         name: 'Demon Beast Plains',
@@ -89,6 +124,10 @@ const WORLDS = [
         drops: 'Rare minerals, Beast Cores',
         herbs: 'Blood Lotus',
         ores: 'Mithril Essence',
+        enemyPool: [
+          { enemyId: 'wandering_beast', weight: 4 },
+          { enemyId: 'elemental_boar',  weight: 6 },
+        ],
       },
       {
         name: 'Sunken Immortal City',
@@ -98,6 +137,10 @@ const WORLDS = [
         drops: 'Rare–Epic materials, artefact fragments',
         herbs: 'Blood Lotus, Dragon Saliva Grass',
         ores: 'Mithril Essence, Deep Sea Cold Iron',
+        enemyPool: [
+          { enemyId: 'city_guardian',  weight: 5 },
+          { enemyId: 'immortal_shade', weight: 5 },
+        ],
       },
       {
         name: 'Primal Qi Wastes',
@@ -107,6 +150,10 @@ const WORLDS = [
         drops: 'Epic herbs, Origin Crystals',
         herbs: 'Dragon Saliva Grass',
         ores: 'Deep Sea Cold Iron',
+        enemyPool: [
+          { enemyId: 'wandering_beast',    weight: 4 },
+          { enemyId: 'corrupted_cultivator', weight: 6 },
+        ],
       },
       {
         name: 'Blood Sea Periphery',
@@ -116,6 +163,10 @@ const WORLDS = [
         drops: 'Epic materials, Dragon Saliva Grass',
         herbs: 'Dragon Saliva Grass',
         ores: 'Deep Sea Cold Iron',
+        enemyPool: [
+          { enemyId: 'blood_leviathan',    weight: 6 },
+          { enemyId: 'corrupted_cultivator', weight: 4 },
+        ],
       },
     ],
   },
@@ -133,6 +184,10 @@ const WORLDS = [
         drops: 'Epic herbs, Star Metal Ore',
         herbs: 'Dragon Saliva Grass, Purple Cloud Vine',
         ores: 'Deep Sea Cold Iron, Star Metal Ore',
+        enemyPool: [
+          { enemyId: 'burial_guardian',      weight: 5 },
+          { enemyId: 'saint_corpse_soldier', weight: 5 },
+        ],
       },
       {
         name: 'Primal Qi Wastes (Deep)',
@@ -142,6 +197,10 @@ const WORLDS = [
         drops: 'Epic materials, Purple Cloud Vine',
         herbs: 'Purple Cloud Vine',
         ores: 'Star Metal Ore',
+        enemyPool: [
+          { enemyId: 'storm_elemental', weight: 5 },
+          { enemyId: 'ancient_beast',   weight: 5 },
+        ],
       },
       {
         name: 'Void Rift Expanse',
@@ -151,6 +210,10 @@ const WORLDS = [
         drops: 'Epic–Legendary herbs, Skyfire Meteorite',
         herbs: 'Purple Cloud Vine',
         ores: 'Star Metal Ore, Skyfire Meteorite',
+        enemyPool: [
+          { enemyId: 'corrupted_cultivator', weight: 4 },
+          { enemyId: 'void_rift_predator',   weight: 6 },
+        ],
       },
       {
         name: 'Nine-Death Mountain Range',
@@ -160,6 +223,10 @@ const WORLDS = [
         drops: 'Legendary material fragments, Technique scrolls',
         herbs: 'Purple Cloud Vine',
         ores: 'Skyfire Meteorite',
+        enemyPool: [
+          { enemyId: 'burial_guardian',    weight: 4 },
+          { enemyId: 'void_rift_predator', weight: 6 },
+        ],
       },
       {
         name: 'Sealed War Altar',
@@ -169,6 +236,10 @@ const WORLDS = [
         drops: 'Legendary materials, rare Law books',
         herbs: 'Purple Cloud Vine, Immortal Revival Leaf',
         ores: 'Skyfire Meteorite',
+        enemyPool: [
+          { enemyId: 'bone_construct',   weight: 5 },
+          { enemyId: 'immortal_shade',   weight: 5 },
+        ],
       },
     ],
   },
@@ -186,6 +257,10 @@ const WORLDS = [
         drops: 'Legendary herbs, Heavenly Profound Metal shards',
         herbs: 'Immortal Revival Leaf',
         ores: 'Skyfire Meteorite, Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'origin_guardian', weight: 6 },
+          { enemyId: 'bone_construct',  weight: 4 },
+        ],
       },
       {
         name: 'World Root Caverns',
@@ -195,6 +270,10 @@ const WORLDS = [
         drops: 'Legendary minerals, Heaven Spirit Dew',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'ancient_beast',    weight: 5 },
+          { enemyId: 'origin_guardian',  weight: 5 },
+        ],
       },
       {
         name: 'Primordial Forest Core',
@@ -204,6 +283,10 @@ const WORLDS = [
         drops: 'Immortal Revival Leaf, Elemental Essence Beads',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'tree_demon',    weight: 4 },
+          { enemyId: 'ancient_beast', weight: 6 },
+        ],
       },
       {
         name: 'Heaven Beast Sanctuary',
@@ -213,6 +296,10 @@ const WORLDS = [
         drops: 'Legendary materials, soul-type Technique scrolls',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'ancient_beast',   weight: 7 },
+          { enemyId: 'void_elemental',  weight: 3 },
+        ],
       },
       {
         name: 'Ancient Origin Altar',
@@ -222,6 +309,10 @@ const WORLDS = [
         drops: 'High-tier artefact fragments, Legendary law books',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'origin_guardian',      weight: 4 },
+          { enemyId: 'corrupted_cultivator', weight: 6 },
+        ],
       },
     ],
   },
@@ -239,6 +330,10 @@ const WORLDS = [
         drops: 'Void Stone, Skyfire Meteorite',
         herbs: 'Immortal Revival Leaf',
         ores: 'Void Stone, Skyfire Meteorite',
+        enemyPool: [
+          { enemyId: 'void_elemental',     weight: 6 },
+          { enemyId: 'void_rift_predator', weight: 4 },
+        ],
       },
       {
         name: 'Void Sea Shores',
@@ -248,6 +343,10 @@ const WORLDS = [
         drops: 'Heavenly Profound Metal, Elemental Essence Beads',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'blood_leviathan', weight: 5 },
+          { enemyId: 'void_elemental',  weight: 5 },
+        ],
       },
       {
         name: 'Dao Inscription Ruins',
@@ -257,6 +356,10 @@ const WORLDS = [
         drops: 'Heaven Spirit Dew, Emperor artefact fragments',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'dao_inscription_guardian', weight: 6 },
+          { enemyId: 'corrupted_cultivator',     weight: 4 },
+        ],
       },
       {
         name: 'Source Peak Summits',
@@ -266,6 +369,10 @@ const WORLDS = [
         drops: 'Legendary Technique scrolls, Law books',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'dao_inscription_guardian', weight: 5 },
+          { enemyId: 'void_elemental',           weight: 5 },
+        ],
       },
       {
         name: 'Ancient Emperor Tomb',
@@ -275,6 +382,10 @@ const WORLDS = [
         drops: 'Emperor-grade artefact fragments',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'burial_guardian',          weight: 5 },
+          { enemyId: 'dao_inscription_guardian', weight: 5 },
+        ],
       },
       {
         name: 'Heaven Sword Ridge',
@@ -284,6 +395,10 @@ const WORLDS = [
         drops: 'Rare Law books, top-tier artefact cores',
         herbs: 'Immortal Revival Leaf',
         ores: 'Heavenly Profound Metal',
+        enemyPool: [
+          { enemyId: 'immortal_shade',       weight: 5 },
+          { enemyId: 'corrupted_cultivator', weight: 5 },
+        ],
       },
     ],
   },
@@ -301,6 +416,10 @@ const WORLDS = [
         drops: 'Top-tier artefact fragments, esoteric materials',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'open_heaven_beast', weight: 4 },
+          { enemyId: 'boundary_wraith',   weight: 6 },
+        ],
       },
       {
         name: 'Star Sea Approaches',
@@ -310,6 +429,10 @@ const WORLDS = [
         drops: 'Esoteric elemental cores',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'open_heaven_beast', weight: 7 },
+          { enemyId: 'void_elemental',    weight: 3 },
+        ],
       },
       {
         name: 'Celestial Rift Expanse',
@@ -319,6 +442,10 @@ const WORLDS = [
         drops: 'Esoteric materials, spatial law fragments',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'void_rift_predator', weight: 5 },
+          { enemyId: 'open_heaven_beast',  weight: 5 },
+        ],
       },
       {
         name: 'Eternal Storm Arena',
@@ -328,6 +455,10 @@ const WORLDS = [
         drops: 'High-rank Open Heaven drops',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'storm_elemental',  weight: 5 },
+          { enemyId: 'open_heaven_beast', weight: 5 },
+        ],
       },
       {
         name: 'Cosmic Beast Grounds',
@@ -337,6 +468,9 @@ const WORLDS = [
         drops: 'Peak materials',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'open_heaven_beast', weight: 10 },
+        ],
       },
       {
         name: "Heaven's Core",
@@ -346,6 +480,10 @@ const WORLDS = [
         drops: 'Rarest drops in the game',
         herbs: 'Rarest botanicals (TBD)',
         ores: 'Rarest minerals (TBD)',
+        enemyPool: [
+          { enemyId: 'open_heaven_beast', weight: 5 },
+          { enemyId: 'boundary_wraith',   weight: 5 },
+        ],
       },
     ],
   },

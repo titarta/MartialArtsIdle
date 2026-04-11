@@ -4,29 +4,38 @@ import { getSprites, FW, FH } from '../sprites/spriteGen';
 
 const BASE = import.meta.env.BASE_URL;
 
-// Custom player idle: 128×128 px per frame, displayed at 1.5× = 192×192
-const PLAYER_IDLE_SRC    = `${BASE}sprites/combat/player-idle.png`;
-const PLAYER_IDLE_FW     = 128;
-const PLAYER_IDLE_FH     = 128;
-const PLAYER_IDLE_SCALE  = 1.5;
+// Custom player idle: 128×128 px per frame, displayed at 1.5×
+const PLAYER_IDLE_SRC   = `${BASE}sprites/combat/player-idle.png`;
+const PLAYER_IDLE_FW    = 128;
+const PLAYER_IDLE_FH    = 128;
+const PLAYER_IDLE_SCALE = 1.5;
 
-// Canvas-generated attack / enemy sprites: 32×40, displayed at 3×
+// Canvas-generated sprites: 32×40, displayed at 3×
 const GEN_SCALE = 3;
+
+/**
+ * Resolve enemy sprite src for a given animation.
+ * Returns null if the enemy has no custom sprite → canvas fallback.
+ *
+ * Expected file locations:
+ *   public/sprites/enemies/{sprite}-idle.png    (4 frames, 128×128 each)
+ *   public/sprites/enemies/{sprite}-attack.png  (4 frames, 128×128 each)
+ */
+function enemySpriteSrc(enemy, anim) {
+  if (!enemy?.sprite) return null;
+  return `${BASE}sprites/enemies/${enemy.sprite}-${anim}.png`;
+}
 
 /**
  * CombatStage — two fighters, strictly turn-based animations.
  *
- * Player idle uses the custom sprite sheet.
- * Attack animations use canvas-generated sprites (temporary until custom assets arrive).
- *
- * Turn handoff:
- *   useCombat calls playerAttackRef  → we play attack anim
- *   when attack anim ends            → we call playerAnimDoneRef (useCombat advances turn)
- *   useCombat calls enemyAttackRef   → we play enemy attack anim
- *   when enemy anim ends             → we call enemyAnimDoneRef
+ * enemy prop: resolved enemy object from data/enemies.js.
+ *   enemy.sprite set   → load custom PNG sprite sheets.
+ *   enemy.sprite null  → canvas-generated fallback.
  */
 export default function CombatStage({
   phase,
+  enemy,
   playerAttackRef,
   enemyAttackRef,
   playerAnimDoneRef,
@@ -37,8 +46,8 @@ export default function CombatStage({
   const [pAnim, setPAnim] = useState('idle');
   const [eAnim, setEAnim] = useState('idle');
 
-  const pRef     = useRef(null);
-  const eRef     = useRef(null);
+  const pRef      = useRef(null);
+  const eRef      = useRef(null);
   const pFlashRef = useRef(null);
   const eFlashRef = useRef(null);
 
@@ -46,8 +55,11 @@ export default function CombatStage({
   const isWon      = phase === 'won';
   const isLost     = phase === 'lost';
 
+  const hasCustomEnemy = !!enemy?.sprite;
+  const eIdleSrc   = hasCustomEnemy ? enemySpriteSrc(enemy, 'idle')   : null;
+  const eAttackSrc = hasCustomEnemy ? enemySpriteSrc(enemy, 'attack') : null;
+
   useEffect(() => {
-    // Called by useCombat when it's the player's turn to attack
     playerAttackRef.current = () => {
       setPAnim('attack');
       pRef.current?.animate(
@@ -67,7 +79,6 @@ export default function CombatStage({
       );
     };
 
-    // Called by useCombat when it's the enemy's turn to attack
     enemyAttackRef.current = () => {
       setEAnim('attack');
       eRef.current?.animate(
@@ -93,7 +104,6 @@ export default function CombatStage({
     };
   }, [playerAttackRef, enemyAttackRef]);
 
-  // Snap both back to idle when fight ends
   useEffect(() => {
     if (phase !== 'fighting') {
       setPAnim('idle');
@@ -101,17 +111,25 @@ export default function CombatStage({
     }
   }, [phase]);
 
-  // Player attack animation complete → tell useCombat to advance turn
   const onPlayerAttackDone = () => {
     setPAnim('idle');
     playerAnimDoneRef.current?.();
   };
 
-  // Enemy attack animation complete → tell useCombat to advance turn
   const onEnemyAttackDone = () => {
     setEAnim('idle');
     enemyAnimDoneRef.current?.();
   };
+
+  // ── Enemy sprite selection ───────────────────────────────────────────────
+  // Custom sprite when available, canvas fallback otherwise.
+  const enemyIdleProps  = hasCustomEnemy
+    ? { src: eIdleSrc,   frameWidth: 128, frameHeight: 128, scale: PLAYER_IDLE_SCALE }
+    : { src: sprites.enemyIdle,   frameWidth: FW, frameHeight: FH, scale: GEN_SCALE };
+
+  const enemyAttackProps = hasCustomEnemy
+    ? { src: eAttackSrc, frameWidth: 128, frameHeight: 128, scale: PLAYER_IDLE_SCALE }
+    : { src: sprites.enemyAttack, frameWidth: FW, frameHeight: FH, scale: GEN_SCALE };
 
   return (
     <div className={`combat-stage ${isFighting ? 'stage-fighting' : ''}`}>
@@ -150,17 +168,23 @@ export default function CombatStage({
       {/* ── Enemy (right side, CSS-flipped to face left) ─── */}
       <div ref={eRef} className={`stage-side ${isWon ? 'stage-ko' : ''}`}>
         <div ref={eFlashRef} className="stage-flash" />
-        <SpriteAnimator
-          src={eAnim === 'attack' ? sprites.enemyAttack : sprites.enemyIdle}
-          frameWidth={FW}
-          frameHeight={FH}
-          frameCount={4}
-          fps={eAnim === 'attack' ? 10 : (isFighting ? 6 : 4)}
-          loop={eAnim !== 'attack'}
-          onComplete={eAnim === 'attack' ? onEnemyAttackDone : undefined}
-          scale={GEN_SCALE}
-          className="sprite-flipped"
-        />
+        {eAnim === 'idle' ? (
+          <SpriteAnimator
+            {...enemyIdleProps}
+            frameCount={4}
+            fps={isFighting ? 6 : 4}
+            className="sprite-flipped"
+          />
+        ) : (
+          <SpriteAnimator
+            {...enemyAttackProps}
+            frameCount={4}
+            fps={10}
+            loop={false}
+            onComplete={onEnemyAttackDone}
+            className="sprite-flipped"
+          />
+        )}
       </div>
 
     </div>

@@ -73,12 +73,22 @@ export default function useCombat() {
   };
 
   // ─── startFight ───────────────────────────────────────────────────────────
-  const startFight = useCallback((stats, equippedTechs, enemyName = 'Training Dummy') => {
+  /**
+   * @param {object} stats          — { essence, soul, body, lawElement }
+   * @param {array}  equippedTechs  — technique slots
+   * @param {object} enemyDef       — entry from data/enemies.js (or plain { name, statMult })
+   */
+  const startFight = useCallback((stats, equippedTechs, enemyDef = null) => {
     const { essence, soul, body } = stats;
     const total  = essence + soul + body;
+
+    const hpMult  = enemyDef?.statMult?.hp  ?? 1;
+    const atkMult = enemyDef?.statMult?.atk ?? 1;
+    const eName   = enemyDef?.name ?? 'Training Dummy';
+
     const pMaxHp = Math.max(100, Math.floor((essence + body) * 12 + soul * 4));
-    const eMaxHp = Math.max(200, Math.floor(total * 10));
-    const eAtk   = Math.max(10,  Math.floor((essence + body) * 0.15));
+    const eMaxHp = Math.max(200, Math.floor(total * 10 * hpMult));
+    const eAtk   = Math.max(10,  Math.floor((essence + body) * 0.15 * atkMult));
 
     const cds    = equippedTechs.map(t => t ? 0        : Infinity);
     const maxCds = equippedTechs.map(t => t ? getCooldown(t.type, t.quality) : Infinity);
@@ -97,9 +107,9 @@ export default function useCombat() {
     };
 
     lastTRef.current = performance.now();
-    setEnemy({ name: enemyName, maxHp: eMaxHp });
+    setEnemy({ name: eName, maxHp: eMaxHp });
     setPhase('fighting');
-    setLog([{ msg: `${enemyName} appears!`, kind: 'system' }]);
+    setLog([{ msg: `${eName} appears!`, kind: 'system' }]);
   }, []);
 
   // ─── rAF loop ─────────────────────────────────────────────────────────────
