@@ -13,6 +13,7 @@
 - [[Laws]] — Elemental cultivation arts
 - [[Secret Techniques]] — Advanced combat skills
 - [[Items]] — Pills and Artefacts
+- [[Artefacts]] — Affix pools, weights, and generation rules
 - [[Materials]] — Herbs, Minerals, Cultivation resources
 - [[Worlds/World]] — Combat zones, region unlocks
 - [[Worlds/Gathering]] — Herb collection (idle, occasional enemies)
