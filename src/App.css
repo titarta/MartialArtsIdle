@@ -1580,103 +1580,80 @@
   align-items: flex-end;
   justify-content: space-between;
   height: 148px;
-  padding: 0 12px;
+  padding: 0 20px;
   position: relative;
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid var(--border);
   margin-bottom: 12px;
-  /* Pixel-art sky gradient */
-  background:
-    linear-gradient(180deg,
-      color-mix(in srgb, var(--bg-secondary) 55%, var(--accent) 45%) 0%,
-      var(--bg-secondary) 55%,
-      color-mix(in srgb, var(--bg-card) 70%, var(--accent) 30%) 100%
-    );
+  background: linear-gradient(180deg, #080818 0%, #0d0d24 40%, #111130 100%);
 }
 
-/* Pixel ground strip at bottom */
+/* Pixel ground strip */
 .combat-stage::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
+  background: repeating-linear-gradient(90deg,
     var(--accent) 0px, var(--accent) 8px,
-    color-mix(in srgb, var(--accent) 40%, transparent) 8px, color-mix(in srgb, var(--accent) 40%, transparent) 16px
+    color-mix(in srgb, var(--accent) 35%, transparent) 8px,
+    color-mix(in srgb, var(--accent) 35%, transparent) 16px
   );
-  opacity: 0.5;
+  opacity: 0.65;
 }
 
-/* Each fighter's outer wrapper — handles bob animation */
+/* Fighter wrappers */
 .stage-side {
   position: relative;
   display: flex;
   align-items: flex-end;
   flex-shrink: 0;
-  animation: stageBob 2.8s ease-in-out infinite;
 }
 
-.stage-fighting .stage-side {
-  animation-duration: 1.6s;
-}
-
-@keyframes stageBob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-6px); }
-}
-
-/* KO: slump and fade */
+/* KO: tilt and fade */
 .stage-ko {
-  animation: none !important;
-  transform: rotate(20deg) translateY(10px) !important;
-  opacity: 0.45;
-  transition: transform 0.6s ease, opacity 0.6s ease;
+  transform: rotate(25deg) translateY(8px);
+  opacity: 0.35;
+  transition: transform 0.55s ease, opacity 0.55s ease;
   transform-origin: bottom center;
 }
 
-/* Inner div that receives the lunge Web Animation */
-.stage-lunge {
-  position: relative;
-}
-
-/* Hit flash overlay — animated via Web Animations API */
+/* Hit-flash overlay (Web Animations API sets opacity) */
 .stage-flash {
   position: absolute;
   inset: 0;
-  border-radius: 4px;
   pointer-events: none;
   opacity: 0;
   z-index: 2;
+  border-radius: 4px;
 }
 
-/* Enemy sprite: flip + tint to red/magenta */
-.sprite-enemy {
+/* Enemy: same sprite art, flipped to face left */
+.sprite-flipped {
   transform: scaleX(-1);
-  filter: hue-rotate(145deg) saturate(2.2) brightness(0.9);
 }
 
-/* Centre area */
+/* Centre VS / clash icon */
 .stage-centre {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  padding-bottom: 8px;
   font-size: 1.4rem;
   color: var(--accent);
-  padding-bottom: 12px;
 }
 
 .stage-clash {
-  animation: clashPulse 0.8s ease-in-out infinite;
+  display: inline-block;
+  animation: clashPulse 0.9s ease-in-out infinite;
 }
 
 @keyframes clashPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.8); }
+  0%, 100% { opacity: 1;   transform: scale(1)    rotate(0deg); }
+  50%       { opacity: 0.4; transform: scale(0.72) rotate(12deg); }
 }
 
 /* ── Rewarded Ads ─────────────────────────────────────────────────────────── */

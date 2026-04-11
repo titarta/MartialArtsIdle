@@ -44,6 +44,21 @@ function CombatScreen({ cultivation, techniques, combat }) {
 
       {/* ── HP bars ─────────────────────────────────────────────────────── */}
       <div className="combat-arena">
+        {/* Player */}
+        <div className="combatant combatant-player">
+          <span className="combatant-label">You</span>
+          <div className="hp-bar-track">
+            <div
+              ref={combat.pHpBarRef}
+              className="hp-bar-fill player-hp-fill"
+              style={{ width: '100%' }}
+            />
+          </div>
+          <span ref={combat.pHpTextRef} className="hp-bar-text">—</span>
+        </div>
+
+        <span className="combat-vs">vs</span>
+
         {/* Enemy */}
         <div className="combatant combatant-enemy">
           <span className="combatant-label">{phase === 'idle' ? 'Enemy' : enemy.name}</span>
@@ -57,21 +72,6 @@ function CombatScreen({ cultivation, techniques, combat }) {
           <span ref={combat.eHpTextRef} className="hp-bar-text">
             {phase === 'idle' ? '—' : `0 / ${enemy.maxHp}`}
           </span>
-        </div>
-
-        <span className="combat-vs">vs</span>
-
-        {/* Player */}
-        <div className="combatant combatant-player">
-          <span className="combatant-label">You</span>
-          <div className="hp-bar-track">
-            <div
-              ref={combat.pHpBarRef}
-              className="hp-bar-fill player-hp-fill"
-              style={{ width: '100%' }}
-            />
-          </div>
-          <span ref={combat.pHpTextRef} className="hp-bar-text">—</span>
         </div>
       </div>
 
