@@ -7,10 +7,15 @@
 - [[Game Vision]] — Overall concept, target market, monetization angle
 - [[Roadmap]] — Development stages
 - [[Cultivation System]] — Realms, sub-realms, breakthroughs
-- [[Primary Stats]] — CHI, Soul, Body
+- [[Primary Stats]] — Essence, Soul, Body
 - [[Realm Progression]] — Major realms and their thresholds
-- [[Laws & Secret Techniques]] — Combat arts system
+- [[Laws]] — Elemental cultivation arts
+- [[Secret Techniques]] — Advanced combat skills
 - [[Items]] — Pills and Artefacts
+- [[Materials]] — Herbs, Minerals, Cultivation resources
+- [[Realms/Exploration]] — Zone discovery, region unlocks
+- [[Realms/Gathering]] — Herb collection (idle)
+- [[Realms/Mining]] — Ore extraction (idle)
 - [[Combat]] — Map, zones, enemies
 - [[Reincarnation]] — Prestige system
 - [[Implementation Notes]] — Tech stack, file structure, what's built vs stubbed
@@ -37,7 +42,8 @@
 | Screen | Status |
 |---|---|
 | Home (Cultivation) | Implemented |
-| Inventory | Implemented |
+| Inventory (Materials) | Implemented |
+| Inventory (Items) | Stub |
 | Stats | Partial (hardcoded placeholders) |
 | Training | Stub |
 | Combat | Stub |
@@ -48,3 +54,7 @@
 **Game loop:** `requestAnimationFrame` with delta-time
 
 See [[Implementation Notes]] for full technical details.
+
+---
+
+## Claude Commands
