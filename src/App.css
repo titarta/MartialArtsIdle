@@ -216,11 +216,12 @@
 }
 
 .gear-slot {
-  width: 72px;
-  height: 72px;
+  width: 100%;
+  height: 100%;
   padding: 6px;
   justify-content: center;
   border-style: dashed;
+  box-sizing: border-box;
 }
 
 .gear-slot-glyph {
@@ -527,6 +528,15 @@
   box-shadow: inset 0 0 40px rgba(245, 200, 66, 0.1), 0 0 20px rgba(245, 200, 66, 0.15);
 }
 
+/* Aura intensifies when cultivating hard */
+.stage-boosted .sprite-animator {
+  filter: brightness(1.25) saturate(1.4) drop-shadow(0 0 8px rgba(100, 160, 255, 0.7));
+}
+
+.stage-ad-boosted .sprite-animator {
+  filter: brightness(1.4) saturate(1.6) drop-shadow(0 0 14px rgba(100, 200, 255, 0.9));
+}
+
 .boost-label {
   color: var(--gold);
   font-weight: 700;
@@ -695,7 +705,7 @@
 }
 
 .stat-circle-name {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
@@ -1400,8 +1410,11 @@
   gap: 6px;
 }
 
-.combat-fighter-label {
-  font-size: 0.65rem;
+.combatant-enemy { border-color: rgba(233, 69, 96, 0.35); }
+.combatant-player { border-color: rgba(74, 222, 128, 0.35); }
+
+.combatant-label {
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -1438,123 +1451,91 @@
 }
 
 .hp-bar-text {
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
-.combat-sprite-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .combat-vs {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-muted);
   flex-shrink: 0;
-  align-self: center;
-  padding-top: 40px;
 }
 
-/* ── Shake animation ── */
-@keyframes combat-shake {
-  0%   { transform: translateX(0); }
-  20%  { transform: translateX(-5px); }
-  40%  { transform: translateX(5px); }
-  60%  { transform: translateX(-4px); }
-  80%  { transform: translateX(3px); }
-  100% { transform: translateX(0); }
-}
-
-.combat-shake {
-  animation: combat-shake 0.35s ease-out;
-}
-
-/* ── Floating damage numbers ── */
-@keyframes dmg-float-anim {
-  0%   { opacity: 1;   transform: translateY(0)    scale(1.1); }
-  30%  { opacity: 1;   transform: translateY(-14px) scale(1.2); }
-  100% { opacity: 0;   transform: translateY(-32px) scale(0.9); }
-}
-
-.dmg-float {
-  position: absolute;
-  top: 50%;
-  font-size: 0.85rem;
-  font-weight: 800;
-  pointer-events: none;
-  animation: dmg-float-anim 0.9s ease-out forwards;
-  z-index: 10;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-}
-
-.dmg-float-left  { left: 20%; }
-.dmg-float-right { right: 20%; left: auto; }
-
-.dmg-float-damage { color: #f87171; }
-.dmg-float-heal   { color: #4ade80; }
-
-/* ── Technique circles ── */
-.combat-tech-row {
+/* Technique bars */
+.technique-bars {
   display: flex;
-  gap: 12px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 7px;
   margin-bottom: 16px;
 }
 
-.combat-tech-slot {
+.tech-bar-slot {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 5px;
-  flex: 1;
-  max-width: 110px;
 }
 
-.combat-tech-empty {
-  opacity: 0.4;
+.tech-bar-empty {
+  opacity: 0.45;
 }
 
-.combat-tech-circle {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 2px solid;
-  background: var(--bg-card);
+.tech-bar-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+}
+
+.tech-bar-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tech-bar-meta {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.tech-bar-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid;
+}
+
+.tech-bar-cd {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.tech-bar-track {
+  height: 5px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
   overflow: hidden;
 }
 
-.combat-tech-overlay {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  pointer-events: none;
-  /* background set by rAF via conic-gradient */
+.tech-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  /* gradient matches Soul→Essence colors */
+  background: linear-gradient(to right, #7c3aed, #0284c7);
+  width: 0%;
+  /* NO CSS transition — rAF-patched */
 }
 
-.combat-tech-name {
-  font-size: 0.6rem;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.3;
-  max-width: 100%;
-  word-break: break-word;
-}
-
-.combat-tech-cd {
-  font-size: 0.58rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Action button ── */
+/* Action button */
 .combat-start-btn {
   width: 100%;
   padding: 12px;
@@ -1607,4 +1588,495 @@
   font-size: 0.72rem;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Combat Stage ─────────────────────────────────────────────────────────── */
+.combat-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 148px;
+  padding: 0 20px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+  background: linear-gradient(180deg, #080818 0%, #0d0d24 40%, #111130 100%);
+}
+
+/* Pixel ground strip */
+.combat-stage::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 4px;
+  background: repeating-linear-gradient(90deg,
+    var(--accent) 0px, var(--accent) 8px,
+    color-mix(in srgb, var(--accent) 35%, transparent) 8px,
+    color-mix(in srgb, var(--accent) 35%, transparent) 16px
+  );
+  opacity: 0.65;
+}
+
+/* Fighter wrappers */
+.stage-side {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+/* KO: tilt and fade */
+.stage-ko {
+  transform: rotate(25deg) translateY(8px);
+  opacity: 0.35;
+  transition: transform 0.55s ease, opacity 0.55s ease;
+  transform-origin: bottom center;
+}
+
+/* Hit-flash overlay (Web Animations API sets opacity) */
+.stage-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+  border-radius: 4px;
+}
+
+/* Enemy: same sprite art, flipped to face left */
+.sprite-flipped {
+  transform: scaleX(-1);
+}
+
+/* Centre VS / clash icon */
+.stage-centre {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 8px;
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+
+.stage-clash {
+  display: inline-block;
+  animation: clashPulse 0.9s ease-in-out infinite;
+}
+
+@keyframes clashPulse {
+  0%, 100% { opacity: 1;   transform: scale(1)    rotate(0deg); }
+  50%       { opacity: 0.4; transform: scale(0.72) rotate(12deg); }
+}
+
+/* ── Rewarded Ads ─────────────────────────────────────────────────────────── */
+
+.ad-reward-section {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.ad-reward-btn {
+  width: 100%;
+  max-width: 340px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(245,200,66,0.12), rgba(192,132,252,0.12));
+  border: 1px solid rgba(245,200,66,0.4);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.ad-reward-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ad-reward-btn:not(:disabled):active {
+  border-color: var(--gold);
+}
+
+.stage-ad-boosted {
+  border-color: #a78bfa;
+  box-shadow: inset 0 0 40px rgba(167,139,250,0.1), 0 0 20px rgba(167,139,250,0.15);
+}
+
+.ad-boost-label {
+  color: #a78bfa;
+  font-weight: 700;
+  font-size: 0.85rem;
+  animation: pulse-glow 0.6s ease-in-out infinite alternate;
+}
+
+/* ── Offline Earnings Modal ───────────────────────────────────────────────── */
+
+.offline-modal {
+  text-align: center;
+}
+
+.offline-flavour {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.offline-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 16px 0;
+  text-shadow: 0 0 16px rgba(245,200,66,0.4);
+}
+
+.offline-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.offline-double-btn {
+  max-width: 100%;
+}
+
+.wipe-confirm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wipe-confirm-label {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT — sidebar nav, wider content
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+
+  /* App: switch from column stack to row with sidebar */
+  .app {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar nav ──────────────────────────────────────────────────────── */
+  .navbar {
+    /* Override fixed bottom bar */
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+
+    /* Sidebar dimensions */
+    width: 88px;
+    height: 100dvh;
+    flex-shrink: 0;
+
+    /* Vertical stacking */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+
+    /* Border: right instead of top */
+    border-top: none;
+    border-right: 2px solid var(--accent);
+
+    /* Spacing */
+    padding: 20px 6px;
+    padding-bottom: 20px; /* no safe-area needed on sidebar */
+
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .nav-btn {
+    max-width: 100%;
+    width: 100%;
+    padding: 10px 4px;
+    border-radius: 8px;
+    flex-direction: column;
+  }
+
+  .nav-icon-img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+  }
+
+  /* ── Content area ─────────────────────────────────────────────────────── */
+  .screen-container {
+    flex: 1;
+    min-width: 0; /* prevent flex blowout */
+    max-width: 1300px;
+    padding: 36px 48px;
+    padding-bottom: 48px; /* no bottom navbar */
+    margin: 0;
+  }
+
+  /* ── Card grids: more room ────────────────────────────────────────────── */
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* ── Home screen: bigger cultivation stage ────────────────────────────── */
+  .cultivation-layout {
+    min-height: 380px;
+    max-width: 680px;
+  }
+
+  .fighter-stage {
+    min-height: 300px;
+  }
+
+  /* ── Inventory grid: more columns ─────────────────────────────────────── */
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+
+/* ── Wide screens (1200px+) ───────────────────────────────────────────────── */
+@media (min-width: 1200px) {
+
+  .navbar {
+    width: 100px;
+    padding: 24px 8px;
+  }
+
+  .nav-btn {
+    padding: 12px 6px;
+  }
+
+  .nav-icon-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+  }
+
+  .screen-container {
+    padding: 44px 64px;
+    padding-bottom: 56px;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cultivation-layout {
+    min-height: 440px;
+    max-width: 780px;
+  }
+
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  /* Give screens a comfortable reading max-width on ultra-wide monitors */
+  .screen {
+    max-width: 1100px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE FIXES — structural layout, touch targets, readability
+   Applied only below the desktop breakpoint.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ── Screen container: tighter horizontal padding ─────────────────────── */
+  .screen-container {
+    padding: 16px 14px;
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+
+  /* ── Nav: bigger tap targets ──────────────────────────────────────────── */
+  .navbar {
+    padding: 4px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .nav-btn {
+    min-height: 52px;
+    padding: 6px 4px;
+    gap: 3px;
+  }
+
+  .nav-icon-img {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* ── Stats screen: stack triangle above detail panel ─────────────────── */
+  .stats-primary-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-detail-side {
+    width: 100%;
+    align-self: auto;
+  }
+
+  /* ── Build screen: stack gear + law vertically ────────────────────────── */
+  .build-top-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Remove fixed height — let content determine height on mobile */
+  .build-law-card {
+    height: auto;
+  }
+
+  /* Centre the gear grid when it's full width */
+  .build-section:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .build-section:first-child .build-section-title {
+    align-self: flex-start;
+  }
+
+  /* Slightly smaller gear slots to stay within safe margins */
+  .gear-body-layout {
+    grid-template-columns: repeat(3, 68px);
+    grid-template-rows: repeat(5, 68px);
+    gap: 6px;
+  }
+
+  /* ── Inventory: larger, easier-to-tap slots ───────────────────────────── */
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  .inv-slot {
+    padding: 12px 8px;
+    min-height: 100px;
+  }
+
+  /* gear slots share inv-slot but must not grow — grid cell controls size */
+  .inv-slot.gear-slot {
+    min-height: 0;
+    padding: 6px;
+  }
+
+  .inv-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .inv-name {
+    font-size: 0.72rem;
+  }
+
+  .inv-qty {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+  }
+
+  /* ── Inventory tabs: more tappable ───────────────────────────────────── */
+  .inv-tab {
+    padding: 10px 4px;
+    font-size: 0.9rem;
+  }
+
+  /* ── Combat: give HP bars and technique slots more breathing room ─────── */
+  .combat-arena {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .combatant {
+    padding: 12px 10px;
+  }
+
+  .hp-bar-track {
+    height: 12px;
+  }
+
+  .tech-bar-slot {
+    padding: 10px 12px;
+    gap: 7px;
+  }
+
+  .tech-bar-name {
+    font-size: 0.82rem;
+  }
+
+  .tech-bar-cd {
+    font-size: 0.72rem;
+  }
+
+  /* ── Build technique slots: readable ─────────────────────────────────── */
+  .build-tech-name {
+    font-size: 0.85rem;
+  }
+
+  /* ── Cards: more padding for touch ───────────────────────────────────── */
+  .card {
+    padding: 16px;
+  }
+
+  /* ── Realm progress bar: slightly wider on mobile ─────────────────────── */
+  .realm-bar {
+    width: 60px;
+  }
+
+  .realm-track {
+    width: 26px;
+    min-height: 160px;
+  }
+
+  /* ── Screen headings: more breathing room ────────────────────────────── */
+  .screen h1 {
+    font-size: 1.4rem;
+    margin-bottom: 2px;
+  }
+
+  .screen .subtitle {
+    font-size: 0.88rem;
+    margin-bottom: 14px;
+  }
+}
+
+/* Very small phones (< 360px) */
+@media (max-width: 359px) {
+  .gear-body-layout {
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(5, 60px);
+    gap: 5px;
+  }
+
+  .inv-slot.gear-slot {
+    min-height: 0;
+    padding: 4px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+  }
 }

@@ -10,7 +10,10 @@ const TECH_KEY  = 'mai_techniques';
 
 export function saveGame(state) {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      ...state,
+      lastSeen: Date.now(),
+    }));
   } catch {}
 }
 

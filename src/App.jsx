@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from './components/NavBar';
 import HomeScreen from './screens/HomeScreen';
+import { initAds } from './ads/adService';
 import TrainingScreen from './screens/TrainingScreen';
 import CombatScreen from './screens/CombatScreen';
 import ShopScreen from './screens/ShopScreen';
@@ -16,6 +17,9 @@ import './App.css';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
+
+  useEffect(() => { initAds(); }, []);
+
   const cultivation = useCultivation();
   const inventory   = useInventory();
   const techniques  = useTechniques();

@@ -34,15 +34,13 @@ export default function useCombat() {
   const eHpBarRef     = useRef(null);
   const pHpTextRef    = useRef(null);
   const eHpTextRef    = useRef(null);
-  const cdOverlayRefs = useRef([null, null, null]); // conic gradient per slot
+  const cdBarRefs = useRef([null, null, null]); // technique bar fills, patched at 60fps
 
-  // ─── Hit callback refs — set by CombatScreen to trigger VFX ─────────────
-  // Called from rAF loop; stable via ref, no closure needed.
-  const onPlayerHitRef = useRef(null);
-  const onEnemyHitRef  = useRef(null);
-  const onHealRef      = useRef(null);
+  // ─── Sprite animation callbacks — set by CombatStage ─────────────────────
+  const playerAttackRef = useRef(null); // () => void — player lands a hit
+  const enemyAttackRef  = useRef(null); // () => void — enemy lands a hit
 
-  // ─── startFight — writes snapshot into refs, then fires React transition ─
+  // ─── startFight — writes snapshot into refs, then triggers React render ──
   const startFight = useCallback((stats, equippedTechs) => {
     const { essence, soul, body } = stats;
     const total  = essence + soul + body;
@@ -88,20 +86,17 @@ export default function useCombat() {
       if (eHpTextRef.current)
         eHpTextRef.current.textContent = `${Math.ceil(s.eHp)} / ${s.eMaxHp}`;
 
-      // Circular cooldown overlays via conic-gradient
+      // Technique cooldown bars (fill = ready progress)
       for (let i = 0; i < 3; i++) {
-        const el = cdOverlayRefs.current[i];
+        const el = cdBarRefs.current[i];
         if (!el) continue;
         const cd = s.cds[i], maxCd = s.maxCds[i];
         if (!isFinite(cd) || !isFinite(maxCd) || maxCd === 0) {
-          el.style.background = 'none';
+          el.style.width = '0%';
           continue;
         }
         const pct = cd <= 0 ? 0 : cd / maxCd;
-        const deg = Math.round(pct * 360);
-        el.style.background = deg === 0
-          ? 'none'
-          : `conic-gradient(from -90deg, rgba(0,0,0,0.72) ${deg}deg, transparent ${deg}deg)`;
+        el.style.width = `${(1 - pct) * 100}%`;
       }
     };
 
@@ -135,13 +130,12 @@ export default function useCombat() {
         if (tech.type === 'Attack') {
           const dmg = calcDamage(tech, stats.essence, stats.soul, stats.body, stats.lawElement);
           s.eHp = Math.max(0, s.eHp - dmg);
-          onEnemyHitRef.current?.(dmg);
           logs.push({ msg: `${tech.name} → ${dmg.toLocaleString()} dmg`, kind: 'damage' });
+          playerAttackRef.current?.();
 
         } else if (tech.type === 'Heal') {
           const heal = Math.floor(s.pMaxHp * (tech.healPercent ?? 0.25));
           s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
-          onHealRef.current?.(heal);
           logs.push({ msg: `${tech.name} → +${heal.toLocaleString()} HP`, kind: 'heal' });
 
         } else if (tech.type === 'Defend') {
@@ -161,8 +155,8 @@ export default function useCombat() {
         if (s.eHp > 0) {
           const dmg = Math.max(5, Math.floor(stats.essence + stats.body));
           s.eHp = Math.max(0, s.eHp - dmg);
-          onEnemyHitRef.current?.(dmg);
           logs.push({ msg: `Basic attack → ${dmg.toLocaleString()} dmg`, kind: 'damage' });
+          playerAttackRef.current?.();
         }
       }
 
@@ -189,8 +183,8 @@ export default function useCombat() {
           const def     = (stats.essence + stats.body) * defMult;
           const dmg     = Math.max(1, Math.floor(s.eAtk * 100 / (100 + def)));
           s.pHp         = Math.max(0, s.pHp - dmg);
-          onPlayerHitRef.current?.(dmg);
           logs.push({ msg: `Enemy hits → −${dmg} HP`, kind: 'damage-taken' });
+          enemyAttackRef.current?.();
         }
       }
 
@@ -215,9 +209,19 @@ export default function useCombat() {
   }, []); // intentionally empty — all reads go via refs
 
   return {
-    phase, enemy, log, stateRef, startFight,
-    pHpBarRef, eHpBarRef, pHpTextRef, eHpTextRef,
-    cdOverlayRefs,
-    onPlayerHitRef, onEnemyHitRef, onHealRef,
+    phase,
+    enemy,
+    log,
+    stateRef,
+    startFight,
+    // DOM refs for bar patching
+    pHpBarRef,
+    eHpBarRef,
+    cdBarRefs,
+    pHpTextRef,
+    eHpTextRef,
+    // Sprite animation callbacks — registered by CombatStage
+    playerAttackRef,
+    enemyAttackRef,
   };
 }
