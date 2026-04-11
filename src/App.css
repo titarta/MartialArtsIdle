@@ -1572,3 +1572,79 @@
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Rewarded Ads ─────────────────────────────────────────────────────────── */
+
+.ad-reward-section {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.ad-reward-btn {
+  width: 100%;
+  max-width: 340px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(245,200,66,0.12), rgba(192,132,252,0.12));
+  border: 1px solid rgba(245,200,66,0.4);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.ad-reward-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ad-reward-btn:not(:disabled):active {
+  border-color: var(--gold);
+}
+
+.stage-ad-boosted {
+  border-color: #a78bfa;
+  box-shadow: inset 0 0 40px rgba(167,139,250,0.1), 0 0 20px rgba(167,139,250,0.15);
+}
+
+.ad-boost-label {
+  color: #a78bfa;
+  font-weight: 700;
+  font-size: 0.85rem;
+  animation: pulse-glow 0.6s ease-in-out infinite alternate;
+}
+
+/* ── Offline Earnings Modal ───────────────────────────────────────────────── */
+
+.offline-modal {
+  text-align: center;
+}
+
+.offline-flavour {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+
+.offline-amount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin: 16px 0;
+  text-shadow: 0 0 16px rgba(245,200,66,0.4);
+}
+
+.offline-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.offline-double-btn {
+  max-width: 100%;
+}

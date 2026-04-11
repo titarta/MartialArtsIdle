@@ -5,11 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:native": "vite --mode native",
     "build": "vite build",
+    "build:browser": "vite build --mode browser",
+    "build:native": "vite build --mode native",
+    "build:android": "npm run build:native && cap sync android && cap open android",
+    "build:ios": "npm run build:native && cap sync ios && cap open ios",
+    "build:steam": "vite build --mode steam",
+    "build:demo": "vite build --mode demo",
+    "preview:demo": "npm run build:demo && vite preview --host",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "react": "^19.2.4",
