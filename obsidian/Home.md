@@ -19,6 +19,7 @@
 - [[Worlds/Gathering]] — Herb collection (idle, occasional enemies)
 - [[Worlds/Mining]] — Ore extraction for artefact crafting (idle, occasional enemies)
 - [[Combat]] — Map, zones, enemies
+- [[Enemies]] — Enemy types, stat profiles, technique pools, region assignments
 - [[Reincarnation]] — Prestige system
 - [[Implementation Notes]] — Tech stack, file structure, what's built vs stubbed
 
