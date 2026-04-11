@@ -78,7 +78,7 @@ Spiritual power — consciousness and will made tangible.
 - Primary driver of **spiritual / mental attacks**
 - Contributes to **Intuition** (secondary stat)
 - Required threshold for equipping some [[Secret Techniques]]
-- Drives [[Realms/Gathering]] rate
+- Drives [[Worlds/Gathering]] rate
 
 **What can change it:**
 | Source | Effect |
@@ -101,7 +101,7 @@ Physical power — the cultivated flesh, bones, and meridians.
 - Primary driver of **physical attacks**
 - Contributes to **DEF** (Essence + Body)
 - Required threshold for equipping some [[Secret Techniques]]
-- Drives [[Realms/Exploration]] and [[Realms/Mining]] rate
+- Drives [[Worlds/World]] and [[Worlds/Mining]] rate
 
 **What can change it:**
 | Source | Effect |
@@ -337,9 +337,9 @@ Permanent modifiers that carry over across lives and compound with each reincarn
 - [[Cultivation System]]
 - [[Realm Progression]]
 - [[Reincarnation]]
-- [[Realms/Exploration]]
-- [[Realms/Gathering]]
-- [[Realms/Mining]]
+- [[Worlds/World]]
+- [[Worlds/Gathering]]
+- [[Worlds/Mining]]
 
 ---
 

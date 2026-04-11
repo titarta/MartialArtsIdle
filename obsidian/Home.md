@@ -14,9 +14,9 @@
 - [[Secret Techniques]] — Advanced combat skills
 - [[Items]] — Pills and Artefacts
 - [[Materials]] — Herbs, Minerals, Cultivation resources
-- [[Realms/Exploration]] — Zone discovery, region unlocks
-- [[Realms/Gathering]] — Herb collection (idle)
-- [[Realms/Mining]] — Ore extraction (idle)
+- [[Worlds/World]] — Combat zones, region unlocks
+- [[Worlds/Gathering]] — Herb collection (idle, occasional enemies)
+- [[Worlds/Mining]] — Ore extraction for artefact crafting (idle, occasional enemies)
 - [[Combat]] — Map, zones, enemies
 - [[Reincarnation]] — Prestige system
 - [[Implementation Notes]] — Tech stack, file structure, what's built vs stubbed
