@@ -1661,3 +1661,140 @@
   color: var(--accent);
   font-weight: 500;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT — sidebar nav, wider content
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 768px) {
+
+  /* App: switch from column stack to row with sidebar */
+  .app {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar nav ──────────────────────────────────────────────────────── */
+  .navbar {
+    /* Override fixed bottom bar */
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    left: auto;
+    right: auto;
+
+    /* Sidebar dimensions */
+    width: 88px;
+    height: 100dvh;
+    flex-shrink: 0;
+
+    /* Vertical stacking */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+
+    /* Border: right instead of top */
+    border-top: none;
+    border-right: 2px solid var(--accent);
+
+    /* Spacing */
+    padding: 20px 6px;
+    padding-bottom: 20px; /* no safe-area needed on sidebar */
+
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .nav-btn {
+    max-width: 100%;
+    width: 100%;
+    padding: 10px 4px;
+    border-radius: 8px;
+    flex-direction: column;
+  }
+
+  .nav-icon-img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+  }
+
+  /* ── Content area ─────────────────────────────────────────────────────── */
+  .screen-container {
+    flex: 1;
+    min-width: 0; /* prevent flex blowout */
+    max-width: 1300px;
+    padding: 36px 48px;
+    padding-bottom: 48px; /* no bottom navbar */
+    margin: 0;
+  }
+
+  /* ── Card grids: more room ────────────────────────────────────────────── */
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* ── Home screen: bigger cultivation stage ────────────────────────────── */
+  .cultivation-layout {
+    min-height: 380px;
+    max-width: 680px;
+  }
+
+  .fighter-stage {
+    min-height: 300px;
+  }
+
+  /* ── Inventory grid: more columns ─────────────────────────────────────── */
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+
+/* ── Wide screens (1200px+) ───────────────────────────────────────────────── */
+@media (min-width: 1200px) {
+
+  .navbar {
+    width: 100px;
+    padding: 24px 8px;
+  }
+
+  .nav-btn {
+    padding: 12px 6px;
+  }
+
+  .nav-icon-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+  }
+
+  .screen-container {
+    padding: 44px 64px;
+    padding-bottom: 56px;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cultivation-layout {
+    min-height: 440px;
+    max-width: 780px;
+  }
+
+  .inv-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  /* Give screens a comfortable reading max-width on ultra-wide monitors */
+  .screen {
+    max-width: 1100px;
+  }
+}
