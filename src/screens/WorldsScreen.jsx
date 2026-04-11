@@ -7,12 +7,22 @@ const TABS = [
   { id: 'mine',    label: 'Mine'   },
 ];
 
-function RegionRow({ region, tab, locked }) {
+const SCREEN_MAP = {
+  world:  'combat-arena',
+  gather: 'gathering',
+  mine:   'mining',
+};
+
+function RegionRow({ region, tab, locked, onNavigate }) {
   const content = tab === 'world'
     ? { primary: region.enemies, secondary: `Drops: ${region.drops}` }
     : tab === 'gather'
     ? { primary: region.herbs }
     : { primary: region.ores };
+
+  const handleAssign = () => {
+    onNavigate(SCREEN_MAP[tab], { region });
+  };
 
   return (
     <div className={`region-row${locked ? ' region-locked' : ''}`}>
@@ -21,7 +31,7 @@ function RegionRow({ region, tab, locked }) {
           <span className="region-name">{locked ? '???' : region.name}</span>
           <span className="region-min-realm">{region.minRealm}</span>
         </div>
-        <button className="region-assign-btn" disabled={locked}>
+        <button className="region-assign-btn" disabled={locked} onClick={!locked ? handleAssign : undefined}>
           {locked ? 'Locked' : 'Assign'}
         </button>
       </div>
@@ -37,7 +47,7 @@ function RegionRow({ region, tab, locked }) {
   );
 }
 
-function WorldCard({ world, tab, realmIndex }) {
+function WorldCard({ world, tab, realmIndex, onNavigate }) {
   const worldLocked = realmIndex < world.minRealmIndex;
   const [open, setOpen] = useState(!worldLocked && world.id === 1);
 
@@ -69,6 +79,7 @@ function WorldCard({ world, tab, realmIndex }) {
               region={region}
               tab={tab}
               locked={realmIndex < region.minRealmIndex}
+              onNavigate={onNavigate}
             />
           ))}
         </div>
@@ -77,7 +88,7 @@ function WorldCard({ world, tab, realmIndex }) {
   );
 }
 
-function WorldsScreen({ cultivation }) {
+function WorldsScreen({ cultivation, onNavigate }) {
   const [tab, setTab] = useState('world');
   const realmIndex = cultivation.realmIndex;
 
@@ -105,6 +116,7 @@ function WorldsScreen({ cultivation }) {
             world={world}
             tab={tab}
             realmIndex={realmIndex}
+            onNavigate={onNavigate}
           />
         ))}
       </div>
