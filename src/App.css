@@ -1842,6 +1842,7 @@
   /* ── Build screen: stack gear + law vertically ────────────────────────── */
   .build-top-row {
     flex-direction: column;
+    align-items: stretch;
   }
 
   /* Remove fixed height — let content determine height on mobile */
@@ -1854,6 +1855,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .build-section:first-child .build-section-title {
+    align-self: flex-start;
   }
 
   /* Slightly smaller gear slots to stay within safe margins */
