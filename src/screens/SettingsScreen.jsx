@@ -37,8 +37,7 @@ function SettingsScreen() {
   const confirmDoWipe = () => {
     setConfirmWipe(false);
     wipeSave();
-    flash('Save wiped! Reloading…', false);
-    setTimeout(() => window.location.reload(), 1000);
+    window.location.reload();
   };
 
   return (
