@@ -39,6 +39,14 @@ function SpriteAnimator({
   const rafRef = useRef(null);
   const lastTimeRef = useRef(0);
   const frameRef = useRef(startFrame);
+  // Keep onComplete/onFrame in refs so they're always current without
+  // being useCallback dependencies — prevents animate from being recreated
+  // (and the effect from restarting) on every parent re-render.
+  const onCompleteRef = useRef(onComplete);
+  const onFrameRef    = useRef(onFrame);
+  const firedRef      = useRef(false); // guard against double-complete
+  onCompleteRef.current = onComplete;
+  onFrameRef.current    = onFrame;
 
   const cols = columns || frameCount;
   const displayWidth = frameWidth * scale;
@@ -57,7 +65,10 @@ function SpriteAnimator({
         if (loop) {
           frameRef.current = 0;
         } else {
-          onComplete?.();
+          if (!firedRef.current) {
+            firedRef.current = true;
+            onCompleteRef.current?.();
+          }
           return;
         }
       } else {
@@ -65,11 +76,11 @@ function SpriteAnimator({
       }
 
       setFrame(frameRef.current);
-      onFrame?.(frameRef.current);
+      onFrameRef.current?.(frameRef.current);
     }
 
     rafRef.current = requestAnimationFrame(animate);
-  }, [fps, frameCount, loop, onComplete, onFrame]);
+  }, [fps, frameCount, loop]); // onComplete/onFrame removed — read from refs above
 
   useEffect(() => {
     if (playing) {
@@ -84,6 +95,7 @@ function SpriteAnimator({
   // Reset when src or startFrame changes
   useEffect(() => {
     frameRef.current = startFrame;
+    firedRef.current = false;
     setFrame(startFrame);
   }, [src, startFrame]);
 
