@@ -319,21 +319,9 @@ def run_finalize(scene_id, cand_n):
         img = img.resize((BG_WIDTH, BG_HEIGHT), Image.NEAREST)
         print(f"  Resized to {BG_WIDTH}x{BG_HEIGHT}")
 
-    # Apply seamless horizontal tiling
-    seamless = make_seamless(img)
-    print(f"  Applied seamless edge blend (80px zones)")
-
     out_path = OUT_DIR / f"{scene_id}.png"
-    seamless.save(str(out_path))
+    img.save(str(out_path))
     print(f"  Saved -> {out_path}")
-
-    # Also save a 2x tiled preview so you can check the seam
-    preview = Image.new("RGBA", (BG_WIDTH * 2, BG_HEIGHT))
-    preview.paste(seamless, (0, 0))
-    preview.paste(seamless, (BG_WIDTH, 0))
-    preview_path = TMP_DIR / f"{scene_id}_tile_preview.png"
-    preview.save(str(preview_path))
-    print(f"  Tiled preview -> {preview_path}")
     print(f"\n  Done.")
 
 

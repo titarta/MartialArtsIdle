@@ -676,7 +676,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px;
+  padding: 0;
   flex: 1;
   aspect-ratio: 2 / 1;
   background-color: var(--bg-card);
@@ -2415,6 +2415,27 @@
   padding-bottom: 8px;
   font-size: 1.4rem;
   color: var(--accent);
+}
+
+/* Damage number particles */
+.damage-number {
+  position: absolute;
+  display: flex;
+  pointer-events: none;
+  z-index: 20;
+  filter: drop-shadow(0 0 4px rgba(245, 200, 66, 0.85));
+  animation: dmg-float 950ms ease-out forwards;
+}
+
+.damage-number-red {
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.85))
+          hue-rotate(-30deg) saturate(1.4);
+}
+
+@keyframes dmg-float {
+  0%   { transform: translateY(0);     opacity: 1;   }
+  20%  { transform: translateY(-10px); opacity: 1;   }
+  100% { transform: translateY(-54px); opacity: 0;   }
 }
 
 .stage-clash {
