@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
 import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
-import { rollLawMult, pickRandomLawPassive, AFFIX_SLOT_COUNT } from '../data/affixPools';
+import { rollLawMult, pickRandomLawPassive, TIER_SLOT_COUNT } from '../data/affixPools';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -88,30 +88,36 @@ export default function useCultivation() {
     }));
   }, []);
 
-  /** Replace one law passive with a different one from the pool. */
+  /** Replace one law passive with a different one, preserving its tier. */
   const replaceLawPassive = useCallback((lawId, idx) => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
-      const passives     = law.passives ?? [];
+      const passives    = law.passives ?? [];
+      const oldPassive  = passives[idx];
+      if (!oldPassive) return law;
+      const tier = oldPassive.tier ?? 'Iron';
       const excludeNames = passives.map(p => p.name).filter((_, i) => i !== idx);
       const newPassive   = pickRandomLawPassive(excludeNames);
       if (!newPassive) return law;
-      const updated = passives.map((p, i) => (i === idx ? newPassive : p));
+      const tagged = { ...newPassive, tier };
+      const updated = passives.map((p, i) => (i === idx ? tagged : p));
       return { ...law, passives: updated };
     }));
   }, []);
 
-  /** Add a passive to the next empty slot (if rarity allows more). */
-  const addLawPassive = useCallback((lawId) => {
+  /** Add a passive at a specific tier. */
+  const addLawPassive = useCallback((lawId, tier = 'Iron') => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
-      const passives = law.passives ?? [];
-      const maxSlots = AFFIX_SLOT_COUNT[law.rarity] ?? 3;
-      if (passives.length >= maxSlots) return law;
+      const passives  = law.passives ?? [];
+      const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
+      const tierCount = passives.filter(p => (p.tier ?? 'Iron') === tier).length;
+      if (tierCount >= tierMax) return law;
       const excludeNames = passives.map(p => p.name);
       const newPassive   = pickRandomLawPassive(excludeNames);
       if (!newPassive) return law;
-      return { ...law, passives: [...passives, newPassive] };
+      const tagged = { ...newPassive, tier };
+      return { ...law, passives: [...passives, tagged] };
     }));
   }, []);
 

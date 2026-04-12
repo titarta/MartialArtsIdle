@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 import {
   generateAffixes, rollAffix, pickRandomAffix,
-  AFFIX_POOL_BY_SLOT, AFFIX_SLOT_COUNT,
+  AFFIX_POOL_BY_SLOT, TIER_SLOT_COUNT,
 } from '../data/affixPools';
 
 const SAVE_KEY = 'mai_artefacts';
@@ -164,19 +164,18 @@ export default function useArtefacts() {
     });
   }, []);
 
-  /** Re-roll one affix's value within the current rarity range. */
+  /** Re-roll one affix's value, using its own tier's range. */
   const honeAffix = useCallback((uid, idx) => {
     setState(prev => {
       const owned = prev.owned.map(o => {
         if (o.uid !== uid) return o;
-        const art    = ARTEFACTS_BY_ID[o.catalogueId];
-        const rarity = o.rarity ?? art?.rarity ?? 'Iron';
-        const pool   = AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? [];
+        const art  = ARTEFACTS_BY_ID[o.catalogueId];
+        const pool = AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? [];
         const affixes = (o.affixes ?? []).map((a, i) => {
           if (i !== idx) return a;
           const entry = pool.find(e => e.id === a.id);
           if (!entry) return a;
-          return rollAffix(entry, rarity);
+          return rollAffix(entry, a.tier ?? 'Iron');
         });
         return { ...o, affixes };
       });
@@ -186,16 +185,18 @@ export default function useArtefacts() {
     });
   }, []);
 
-  /** Replace one affix with a random different one from the pool. */
+  /** Replace one affix with a random different one from the pool, preserving its tier. */
   const replaceAffix = useCallback((uid, idx) => {
     setState(prev => {
       const owned = prev.owned.map(o => {
         if (o.uid !== uid) return o;
         const art     = ARTEFACTS_BY_ID[o.catalogueId];
-        const rarity  = o.rarity ?? art?.rarity ?? 'Iron';
         const affixes = o.affixes ?? [];
+        const oldAffix = affixes[idx];
+        if (!oldAffix) return o;
+        const tier = oldAffix.tier ?? 'Iron';
         const excludeIds = affixes.map(a => a.id).filter((_, i) => i !== idx);
-        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', rarity, excludeIds);
+        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
         const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
         return { ...o, affixes: updated };
@@ -206,18 +207,18 @@ export default function useArtefacts() {
     });
   }, []);
 
-  /** Add a new affix to an empty slot (if the item still has capacity). */
-  const addAffix = useCallback((uid) => {
+  /** Add a new affix at a specific tier (Iron/Bronze/Silver/Gold/Transcendent). */
+  const addAffix = useCallback((uid, tier = 'Iron') => {
     setState(prev => {
       const owned = prev.owned.map(o => {
         if (o.uid !== uid) return o;
-        const art      = ARTEFACTS_BY_ID[o.catalogueId];
-        const rarity   = o.rarity ?? art?.rarity ?? 'Iron';
-        const affixes  = o.affixes ?? [];
-        const maxSlots = AFFIX_SLOT_COUNT[rarity] ?? 3;
-        if (affixes.length >= maxSlots) return o;
+        const art       = ARTEFACTS_BY_ID[o.catalogueId];
+        const affixes   = o.affixes ?? [];
+        const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
+        const tierCount = affixes.filter(a => (a.tier ?? 'Iron') === tier).length;
+        if (tierCount >= tierMax) return o;
         const excludeIds = affixes.map(a => a.id);
-        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', rarity, excludeIds);
+        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
         return { ...o, affixes: [...affixes, newAffix] };
       });

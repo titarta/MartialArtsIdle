@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { saveTechniques, loadTechniques, saveOwnedTechniques, loadOwnedTechniques } from '../systems/save';
 import { getTechnique, TECHNIQUE_QUALITY } from '../data/techniques';
-import { AFFIX_SLOT_COUNT } from '../data/affixPools';
+import { TIER_SLOT_COUNT } from '../data/affixPools';
 
 // Passive pools re-exported from techniqueDrops for use in transmutation
 const PASSIVE_POOLS = {
@@ -92,31 +92,38 @@ export default function useTechniques() {
   }, []);
 
   /** Replace one passive at index with a different one from the pool. */
+  /** Replace passive at index with a new random one, preserving its tier. */
   const replacePassive = useCallback((id, idx) => {
     setOwned(prev => {
       const tech = prev[id];
       if (!tech) return prev;
       const passives    = tech.passives ?? [];
+      const oldPassive  = passives[idx];
+      if (!oldPassive) return prev;
+      const tier = oldPassive.tier ?? 'Iron';
       const excludeNames = passives.map(p => p.name).filter((_, i) => i !== idx);
       const newPassive  = pickRandomPassive(tech.type, excludeNames);
       if (!newPassive) return prev;
-      const updated = passives.map((p, i) => (i === idx ? newPassive : p));
+      const tagged = { ...newPassive, tier };
+      const updated = passives.map((p, i) => (i === idx ? tagged : p));
       return { ...prev, [id]: { ...tech, passives: updated } };
     });
   }, []);
 
-  /** Add a passive to the next empty slot (if quality allows more). */
-  const addPassive = useCallback((id) => {
+  /** Add a passive at a specific tier. */
+  const addPassive = useCallback((id, tier = 'Iron') => {
     setOwned(prev => {
       const tech = prev[id];
       if (!tech) return prev;
-      const passives = tech.passives ?? [];
-      const maxSlots = AFFIX_SLOT_COUNT[tech.quality] ?? 3;
-      if (passives.length >= maxSlots) return prev;
+      const passives  = tech.passives ?? [];
+      const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
+      const tierCount = passives.filter(p => (p.tier ?? 'Iron') === tier).length;
+      if (tierCount >= tierMax) return prev;
       const excludeNames = passives.map(p => p.name);
       const newPassive   = pickRandomPassive(tech.type, excludeNames);
       if (!newPassive) return prev;
-      return { ...prev, [id]: { ...tech, passives: [...passives, newPassive] } };
+      const tagged = { ...newPassive, tier };
+      return { ...prev, [id]: { ...tech, passives: [...passives, tagged] } };
     });
   }, []);
 

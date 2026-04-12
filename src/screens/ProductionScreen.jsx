@@ -30,20 +30,26 @@ function getActiveBrackets(rarity) {
   return SLOT_BRACKETS.slice(0, tier);
 }
 
-/** Assign items (affixes/passives) to rarity brackets, capped by pool size. */
+/**
+ * Group items by their actual `tier` field into rarity brackets.
+ * Each bracket shows all filled items of that tier, plus ONE empty slot
+ * if the tier is below its limit (and the pool isn't exhausted).
+ */
 function buildBracketSlots(items, rarity, poolSize) {
   const brackets = getActiveBrackets(rarity);
-  let gi = 0;
+  const totalFilled = items.length;
   return brackets.map(b => {
     const slots = [];
-    for (let i = 0; i < b.count; i++) {
-      if (gi < items.length) {
-        slots.push({ filled: true, item: items[gi], gIdx: gi });
-        gi++;
-      } else if (gi < poolSize) {
-        slots.push({ filled: false });
-        gi++;
+    // Find all items in this tier with their global indices
+    items.forEach((item, gIdx) => {
+      const itemTier = item.tier ?? 'Iron';
+      if (itemTier === b.label) {
+        slots.push({ filled: true, item, gIdx });
       }
+    });
+    // Show ONE empty slot if tier under limit AND pool not exhausted
+    if (slots.length < b.count && totalFilled < poolSize) {
+      slots.push({ filled: false });
     }
     return { ...b, slots };
   });
@@ -305,7 +311,10 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
   const brackets = buildBracketSlots(affixes, rarity, poolSize);
 
   const totalFilled = affixes.length;
-  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const totalCapacity = Math.min(
+    getActiveBrackets(rarity).reduce((s, b) => s + b.count, 0),
+    poolSize
+  );
   const nextRar     = ARTEFACT_NEXT_RARITY[rarity];
   const nextQ       = nextRar ? artQuality(nextRar) : null;
 
@@ -319,7 +328,7 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
         <span className="tx-quality-badge" style={{ color: q.color, borderColor: q.color }}>{q.label}</span>
       </div>
 
-      <div className="tx-section-title">Modifiers ({totalFilled}/{totalSlots})</div>
+      <div className="tx-section-title">Modifiers ({totalFilled}/{totalCapacity})</div>
       {brackets.map((b, bi) => (
         <BracketSection
           key={bi}
@@ -342,7 +351,7 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
               color={b.color}
               mineral={b.mineral}
               inventory={inventory}
-              onAdd={() => artefacts.addAffix(inst.uid)}
+              onAdd={() => artefacts.addAffix(inst.uid, b.label)}
             />
           )}
         />
@@ -367,7 +376,10 @@ function TechniqueDetail({ tech, techniques, inventory }) {
   const brackets = buildBracketSlots(passives, tech.quality, TECH_PASSIVE_POOL_SIZE);
 
   const totalFilled = passives.length;
-  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const totalCapacity = Math.min(
+    getActiveBrackets(tech.quality).reduce((s, b) => s + b.count, 0),
+    TECH_PASSIVE_POOL_SIZE
+  );
   const nextQn      = TECH_NEXT_QUALITY[tech.quality];
   const nextQ       = nextQn ? techQuality(nextQn) : null;
 
@@ -408,7 +420,7 @@ function TechniqueDetail({ tech, techniques, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives ({totalFilled}/{totalSlots})</div>
+      <div className="tx-section-title">Passives ({totalFilled}/{totalCapacity})</div>
       {brackets.map((b, bi) => (
         <BracketSection
           key={bi}
@@ -430,7 +442,7 @@ function TechniqueDetail({ tech, techniques, inventory }) {
               color={b.color}
               mineral={b.mineral}
               inventory={inventory}
-              onAdd={() => techniques.addPassive(tech.id)}
+              onAdd={() => techniques.addPassive(tech.id, b.label)}
             />
           )}
         />
@@ -456,7 +468,10 @@ function LawDetail({ law, cultivation, inventory }) {
   const brackets = buildBracketSlots(passives, law.rarity, LAW_PASSIVE_POOL_SIZE);
 
   const totalFilled = passives.length;
-  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const totalCapacity = Math.min(
+    getActiveBrackets(law.rarity).reduce((s, b) => s + b.count, 0),
+    LAW_PASSIVE_POOL_SIZE
+  );
   const nextRn      = LAW_NEXT_RARITY[law.rarity];
   const nextQ       = nextRn ? lawQuality(nextRn) : null;
 
@@ -493,7 +508,7 @@ function LawDetail({ law, cultivation, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives ({totalFilled}/{totalSlots})</div>
+      <div className="tx-section-title">Passives ({totalFilled}/{totalCapacity})</div>
       {brackets.map((b, bi) => (
         <BracketSection
           key={bi}
@@ -515,7 +530,7 @@ function LawDetail({ law, cultivation, inventory }) {
               color={b.color}
               mineral={b.mineral}
               inventory={inventory}
-              onAdd={() => cultivation.addLawPassive(law.id)}
+              onAdd={() => cultivation.addLawPassive(law.id, b.label)}
             />
           )}
         />

@@ -14,6 +14,11 @@ export const AFFIX_SLOT_COUNT = {
   Iron: 3, Bronze: 5, Silver: 7, Gold: 9, Transcendent: 11,
 };
 
+// Per-tier slot limits (Iron has 3 slots, all higher tiers have 2 each).
+export const TIER_SLOT_COUNT = {
+  Iron: 3, Bronze: 2, Silver: 2, Gold: 2, Transcendent: 2,
+};
+
 // ─── Rarity tiers (for cost calculation) ────────────────────────────────────
 
 export const RARITY_TIER = {
@@ -95,14 +100,14 @@ export const AFFIX_POOL_BY_SLOT = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Roll a single affix value within its rarity range. */
+/** Roll a single affix value within its rarity range. The tier is preserved on the affix. */
 export function rollAffix(entry, rarity) {
   const range = entry.ranges[rarity] ?? entry.ranges.Iron;
   const [min, max] = range;
   const value = entry.type === MOD.INCREASED
     ? Math.round((min + Math.random() * (max - min)) * 1000) / 1000
     : Math.floor(min + Math.random() * (max - min + 1));
-  return { id: entry.id, name: entry.name, stat: entry.stat, type: entry.type, value };
+  return { id: entry.id, name: entry.name, stat: entry.stat, type: entry.type, value, tier: rarity };
 }
 
 /** Pick a random affix from the slot pool, avoiding already-used ids. */
