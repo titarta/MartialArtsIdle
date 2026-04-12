@@ -24,7 +24,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
   // Always-fresh ref so the auto-restart timer never captures stale closures.
   const doStartRef = useRef(null);
   doStartRef.current = () => {
-    const qi  = cultivation.qiRef.current;
+    const qi  = cultivation.qiRef.current + cultivation.costRef.current;
     const law = cultivation.activeLaw;
     const enemyDef = region?.enemyPool ? pickEnemy(region.enemyPool) : null;
     setStageEnemy(enemyDef);

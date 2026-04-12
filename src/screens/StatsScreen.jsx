@@ -180,15 +180,15 @@ function StatRow({ label, hint, value, unit = '', locked = false }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 function StatsScreen({ cultivation, artefacts }) {
-  const { qiRef, activeLaw, realmName, realmIndex } = cultivation;
+  const { qiRef, costRef, activeLaw, realmName, realmIndex } = cultivation;
 
-  const [qi, setQi]             = useState(Math.floor(qiRef.current));
+  const [qi, setQi]             = useState(Math.floor(qiRef.current + costRef.current));
   const [activeStat, setActive] = useState(null);
 
   useEffect(() => {
-    const id = setInterval(() => setQi(Math.floor(qiRef.current)), 250);
+    const id = setInterval(() => setQi(Math.floor(qiRef.current + costRef.current)), 250);
     return () => clearInterval(id);
-  }, [qiRef]);
+  }, [qiRef, costRef]);
 
   const { meta, primary, combat, activity } = computeAllStats(qi, activeLaw, realmIndex, artefacts?.getStatModifiers());
   const { soulUnlocked } = meta;
