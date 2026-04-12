@@ -116,7 +116,7 @@ Quality affects cooldown speed, K multiplier, and number of passives on the tech
 - **Element follows world flavour** — World 1 drops Normal/Fire/Lightning; later worlds have Void, Ancient, etc.
 - Dropped techniques are stored in the player's **owned collection** and appear in the equip modal alongside the static catalogue.
 - Rewards from zone clears or boss fights (TBD)
-- Possibly crafted from [[Materials]] (TBD)
+- Crafted / refined at the [[Crafting|Refining Furnace]] once obtained
 
 ### World 1 Technique Drop Rates
 
@@ -139,8 +139,27 @@ Sparring Dummy (Construct archetype) does not drop techniques.
 
 ---
 
+## Crafting Summary
+
+Full operation rules in [[Crafting]]. Quick reference for techniques:
+
+| Goal | Operation | Key Materials |
+|---|---|---|
+| Reroll all passives + element | **Refine** | Soul Calming Grass + Spirit Stones |
+| Fix one passive's value | **Hone** | Dragon Saliva Grass + Spirit Stones |
+| Add a missing passive | **Imbue** | Blood Lotus + Spirit Stones |
+| Delete one passive | **Extract** | Spirit Stones |
+| Protect one passive | **Seal** | Sealing Shard |
+| Change passive type | **Transmute** | Jade Heart Flower + Beast Core |
+| Gain an extra passive slot | **Upgrade** | Tier-matching herb + Origin Crystal + Spirit Stones |
+
+Type (Attack / Heal / Defend / Dodge) and Rank are permanent — they cannot be changed by any crafting operation.
+
+---
+
 ## Related
 
+- [[Crafting]]
 - [[Laws]]
 - [[Primary Stats]]
 - [[Realm Progression]]

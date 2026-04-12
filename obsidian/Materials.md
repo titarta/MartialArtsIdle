@@ -1,6 +1,6 @@
 # Materials
 
-Raw crafting resources used in **pill crafting** (alchemy) and **artefact refining**. Dropped from enemies in combat zones, purchased in the Shop, or found in the world.
+Raw crafting resources used in **pill crafting** (alchemy) and the **[[Crafting|Refining Furnace]]**. Dropped from enemies in combat zones, purchased in the Shop, or found in the world.
 
 ---
 
@@ -29,12 +29,14 @@ Ores and crystals used primarily in artefact refining.
 |---|---|---|---|
 | black_tortoise_iron | Black Tortoise Iron | Common | Extraordinarily dense and durable ore ideal for defensive armors and shields. |
 | crimson_flame_crystal | Crimson Flame Crystal | Uncommon | A fire-element crystal that keeps weapons permanently heated, boosting destructive power. |
-| void_stone | Void Stone | Rare | A space-attribute mineral used to craft spatial rings and dimensional arrays. |
-| mithril_essence | Mithril Essence | Rare | A lightweight, magic-conductive silver ore prized for inscription work and formation plates. |
+| chaos_jade | **Chaos Jade** | Uncommon | A mottled gem that pulses with unstable energy. Used in the Refining Furnace to reroll a single artefact property without disturbing the rest. Drops from World 2+ enemies. |
+| void_stone | Void Stone | Rare | A space-attribute mineral used to craft spatial rings and dimensional arrays. Also used to Transmute artefact affixes. |
+| mithril_essence | Mithril Essence | Rare | A lightweight, magic-conductive silver ore prized for inscription work and formation plates. Key material for Imbue operations on artefacts. |
+| sealing_shard | **Sealing Shard** | Rare | A fragment of an ancient sealing formation array. Used to lock one property of any item (Artefact, Technique, or Law) against future alterations. Drops from World 3+ enemies. |
 | deep_sea_cold_iron | Deep Sea Cold Iron | Rare | Mined from abyssal ocean trenches, it infuses weapons with bone-chilling ice energy. |
-| star_metal_ore | Star Metal Ore | Epic | Meteorite-born metal that channels astral energy, favored for forging heaven-grade weapons. |
+| star_metal_ore | Star Metal Ore | Epic | Meteorite-born metal that channels astral energy, favored for forging heaven-grade weapons and quality upgrades. |
 | skyfire_meteorite | Skyfire Meteorite | Epic | Contains compressed solar essence; a single fragment can serve as a forge's eternal heat source. |
-| heavenly_profound_metal | Heavenly Profound Metal | Legendary | Nearly indestructible alloy-base reserved for emperor-grade artifacts. |
+| heavenly_profound_metal | Heavenly Profound Metal | Legendary | Nearly indestructible alloy-base reserved for Transcendent-grade artefact upgrades. |
 
 ---
 
@@ -74,17 +76,48 @@ Spiritual resources that fuel cultivation directly or are used as ingredients.
 
 ---
 
+## Crafting Uses (Summary)
+
+See [[Crafting]] for full cost tables.
+
+| Material | Primary Crafting Use |
+|---|---|
+| Spirit Stone | Universal cost component for every operation |
+| Black Tortoise Iron | Artefact — Refine base cost |
+| Crimson Flame Crystal | Artefact — Upgrade to Bronze |
+| **Chaos Jade** | Artefact — Hone (single-property reroll) |
+| Void Stone | Artefact — Transmute affix type |
+| Mithril Essence | Artefact — Imbue + Upgrade to Silver |
+| **Sealing Shard** | Any item — Seal (lock one property) |
+| Star Metal Ore | Artefact — Upgrade to Gold |
+| Skyfire Meteorite | General high-tier refinement ingredient |
+| Heavenly Profound Metal | Artefact — Upgrade to Transcendent |
+| Beast Core | Artefact — Upgrade cost component |
+| Origin Crystal | Technique — Upgrade cost component |
+| Heaven Spirit Dew | Law — Refine / Hone / Upgrade |
+| Elemental Essence Bead | Artefact/Law — Transmute |
+| Soul Calming Grass | Technique — Refine base cost; Law — Extract |
+| Blood Lotus | Technique — Imbue |
+| Dragon Saliva Grass | Technique — Hone; Law — Transmute |
+| Jade Heart Flower | Technique — Upgrade to Bronze; Transmute |
+| Thousand-Year Ginseng | Law — Refine |
+| Purple Cloud Vine | Technique — Upgrade to Gold |
+| Immortal Revival Leaf | Technique/Law — Imbue (rare) |
+
+---
+
 ## TODO
 
 - [ ] Define material drop tables per zone/realm tier
+- [ ] Add Chaos Jade and Sealing Shard to enemy drop tables (World 2+ and World 3+ respectively)
 - [ ] Define which materials are used in which pill recipes
-- [ ] Define which materials are used in artefact refining
 - [ ] Define shop pricing per rarity tier
 
 ---
 
 ## Related
 
+- [[Crafting]]
 - [[Items]]
 - [[Combat]]
 - [[Realm Progression]]

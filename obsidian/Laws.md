@@ -95,6 +95,8 @@ The minimum major realm required to use a law gates its overall quality:
 
 Laws are **procedurally generated** — found via books in the world. Each discovered book grants a law with randomized element, multipliers, passives, and rarity within the bounds of the current realm.
 
+Once acquired, any Law can be refined at the [[Crafting|Refining Furnace]].
+
 ---
 
 ## Example Law
@@ -122,6 +124,24 @@ A beginner's law found early in the world. Makes no elemental specialisation, in
 
 ---
 
+## Crafting Summary
+
+Full operation rules in [[Crafting]]. Quick reference for laws:
+
+| Goal | Operation | Key Materials |
+|---|---|---|
+| Reroll all multipliers + passives + element | **Refine** | Thousand-Year Ginseng + Heaven Spirit Dew + Spirit Stones |
+| Fix one multiplier or passive value | **Hone** | Heaven Spirit Dew + Spirit Stones |
+| Add a missing passive | **Imbue** | Immortal Revival Leaf + Heaven Spirit Dew + Spirit Stones |
+| Delete one passive | **Extract** | Soul Calming Grass + Spirit Stones |
+| Protect one passive or multiplier | **Seal** | Sealing Shard |
+| Change element or passive type | **Transmute** | Elemental Essence Bead + Dragon Saliva Grass |
+| Gain an extra passive slot | **Upgrade** | Tier-matching herb + Heaven Spirit Dew + Spirit Stones |
+
+Realm requirement is permanent and cannot be changed by any crafting operation.
+
+---
+
 ## TODO
 
 - [ ] Define multiplier ranges per realm tier and rarity
@@ -134,6 +154,7 @@ A beginner's law found early in the world. Makes no elemental specialisation, in
 
 ## Related
 
+- [[Crafting]]
 - [[Secret Techniques]]
 - [[Primary Stats]]
 - [[Realm Progression]]

@@ -1,6 +1,6 @@
 # Artefacts
 
-Mechanical design for all equippable artefacts. For lore names and slot descriptions see [[Items]]. For modifier stacking rules see [[Stats]]. Crafting is out of scope here — discussed separately.
+Mechanical design for all equippable artefacts. For lore names and slot descriptions see [[Items]]. For modifier stacking rules see [[Stats]]. For crafting and refining operations see [[Crafting]].
 
 ---
 
@@ -253,6 +253,22 @@ The zone tier biases which quality can drop. Higher zones make Iron drops increa
 
 ---
 
+## Crafting Summary
+
+Full operation rules in [[Crafting]]. Quick reference for artefacts:
+
+| Goal | Operation | Key Materials |
+|---|---|---|
+| Start over completely | **Refine** | Black Tortoise Iron + Spirit Stones |
+| Fix one bad affix value | **Hone** | Chaos Jade + Spirit Stones |
+| Add a missing affix | **Imbue** | Mithril Essence + Spirit Stones |
+| Delete one affix | **Extract** | Spirit Stones |
+| Protect one affix | **Seal** | Sealing Shard |
+| Change affix type | **Transmute** | Void Stone + Elemental Essence Bead |
+| Gain an extra affix slot | **Upgrade** | Tier-matching ore + Beast Core + Spirit Stones |
+
+---
+
 ## TODO
 
 - [ ] Define base stat scaling by realm tier (what Essence/Body flat values at each world tier)
@@ -261,8 +277,6 @@ The zone tier biases which quality can drop. Higher zones make Iron drops increa
 - [ ] Define Dodge base value and cap
 - [ ] Decide if `% more` affixes should be rarer via drop rate or quality gate
 - [ ] Define how weapon element is assigned (always matches equipped Law? or fixed on drop?)
-- [ ] Define artefact refining mechanics (Emperor Realm unlock — see [[Items]])
-- [ ] Define soul-binding cost and quality floor
 
 ---
 
