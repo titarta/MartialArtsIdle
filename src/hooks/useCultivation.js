@@ -4,7 +4,8 @@ import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
 import { rollLawMult, pickRandomLawPassive, AFFIX_SLOT_COUNT } from '../data/affixPools';
 
-const OWNED_LAWS_KEY = 'mai_owned_laws';
+const OWNED_LAWS_KEY   = 'mai_owned_laws';
+const ACTIVE_LAW_KEY   = 'mai_active_law';
 export const MAX_LAWS = 100;
 
 export const LAW_NEXT_RARITY = {
@@ -38,10 +39,28 @@ export default function useCultivation() {
     return endsAt > Date.now() ? endsAt : 0;
   });
   const [ownedLaws, setOwnedLaws] = useState(loadOwnedLaws);
+  const [activeLawId, setActiveLawIdRaw] = useState(() => {
+    try {
+      const raw = localStorage.getItem(ACTIVE_LAW_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return null; // will fall back to first owned law
+  });
 
   useEffect(() => {
     try { localStorage.setItem(OWNED_LAWS_KEY, JSON.stringify(ownedLaws)); } catch {}
   }, [ownedLaws]);
+
+  useEffect(() => {
+    try { localStorage.setItem(ACTIVE_LAW_KEY, JSON.stringify(activeLawId)); } catch {}
+  }, [activeLawId]);
+
+  const setActiveLaw = useCallback((lawId) => {
+    setActiveLawIdRaw(lawId);
+  }, []);
+
+  // Derive active law from ownedLaws + activeLawId
+  const activeLaw = ownedLaws.find(l => l.id === activeLawId) || ownedLaws[0] || DEFAULT_LAW;
 
   const addOwnedLaw = useCallback((law) => {
     setOwnedLaws(prev => {
@@ -103,10 +122,15 @@ export default function useCultivation() {
     if (awaySeconds < MIN_OFFLINE_SEC) return 0;
     const realm = REALMS[saved.realmIndex];
     if (!realm || !REALMS[saved.realmIndex + 1]) return 0; // maxed
-    const lawMult = saved.realmIndex >= DEFAULT_LAW.realmRequirement
-      ? DEFAULT_LAW.cultivationSpeedMult : 1;
+    // Use first owned law for offline calc (active law not known at init)
+    const offlineLaw = loadOwnedLaws()[0] ?? DEFAULT_LAW;
+    const lawMult = saved.realmIndex >= offlineLaw.realmRequirement
+      ? offlineLaw.cultivationSpeedMult : 1;
     return Math.floor(BASE_RATE * lawMult * awaySeconds);
   });
+
+  const activeLawRef = useRef(activeLaw);
+  useEffect(() => { activeLawRef.current = activeLaw; }, [activeLaw]);
 
   const boostRef    = useRef(false);
   const adBoostRef  = useRef(
@@ -136,8 +160,9 @@ export default function useCultivation() {
       lastTickRef.current = now;
 
       if (!maxedRef.current) {
-        const lawMult = indexRef.current >= DEFAULT_LAW.realmRequirement
-          ? DEFAULT_LAW.cultivationSpeedMult
+        const law = activeLawRef.current;
+        const lawMult = indexRef.current >= law.realmRequirement
+          ? law.cultivationSpeedMult
           : 1;
         const rate = BASE_RATE * lawMult * (boostRef.current ? BOOST_MULTIPLIER : 1) * adBoostRef.current;
         qiRef.current += rate * dt;
@@ -214,8 +239,9 @@ export default function useCultivation() {
     costRef,
     indexRef,
     setRealmIndex,
-    activeLaw:     DEFAULT_LAW,
-    isLawUnlocked: realmIndex >= DEFAULT_LAW.realmRequirement,
+    activeLaw,
+    setActiveLaw,
+    isLawUnlocked: realmIndex >= activeLaw.realmRequirement,
     ownedLaws,
     addOwnedLaw,
     upgradeLaw,

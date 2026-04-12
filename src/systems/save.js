@@ -33,6 +33,7 @@ export function wipeSave() {
   localStorage.removeItem('mai_artefacts');
   localStorage.removeItem('mai_inventory');
   localStorage.removeItem('mai_owned_laws');
+  localStorage.removeItem('mai_active_law');
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────

@@ -193,6 +193,17 @@
   min-width: 0;
 }
 
+.build-law-compact-section {
+  width: 180px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.build-artefact-section {
+  flex: 1;
+  min-width: 0;
+}
+
 .build-law-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -522,6 +533,49 @@
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-muted);
+}
+
+/* Compact law card for the build screen left column */
+.build-law-card-compact {
+  height: auto;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.build-law-card-compact:hover {
+  border-color: var(--accent);
+}
+
+.build-law-card-compact .law-name {
+  font-size: 0.82rem;
+}
+
+.build-law-card-compact .law-flavour {
+  font-size: 0.65rem;
+}
+
+.build-law-card-compact .law-stat-label {
+  font-size: 0.62rem;
+}
+
+.build-law-card-compact .law-stat-value {
+  font-size: 0.78rem;
+}
+
+.build-law-card-compact .law-passive-name {
+  font-size: 0.68rem;
+}
+
+.build-law-card-compact .law-passive-desc {
+  font-size: 0.62rem;
+}
+
+.law-tap-hint {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+  margin-top: auto;
 }
 
 /* Home Screen */
@@ -1558,6 +1612,208 @@
   flex-shrink: 0;
 }
 
+/* ── Artefact Tooltip ── */
+.art-tooltip {
+  z-index: 1000;
+  pointer-events: none;
+  background: rgba(18, 18, 24, 0.96);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 220px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.art-tooltip-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.art-tooltip-quality {
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.art-tooltip-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.art-tooltip-affixes {
+  border-top: 1px solid var(--border);
+  padding-top: 4px;
+  margin-top: 2px;
+}
+
+.art-tooltip-line {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.art-tooltip-affix {
+  color: var(--gold, #f5c842);
+}
+
+/* ── Inline Artefact Picker ── */
+.art-inline-picker {
+  margin-top: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.art-inline-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.art-inline-picker-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.art-inline-picker-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.art-inline-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.art-inline-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 4px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s, background 0.12s;
+}
+
+.art-inline-card:active {
+  transform: scale(0.95);
+}
+
+@media (hover: hover) {
+  .art-inline-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-1px);
+  }
+}
+
+.art-inline-card-equipped {
+  background: rgba(255, 255, 255, 0.04);
+  border-style: solid;
+}
+
+.art-inline-card-name {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.art-inline-card-tag {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Law Picker Modal ── */
+.law-picker-modal {
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.law-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.law-picker-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+
+.law-picker-card:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (hover: hover) {
+  .law-picker-card:hover {
+    border-color: var(--accent);
+  }
+}
+
+.law-picker-card-active {
+  border-color: var(--gold, #f5c842);
+  background: rgba(245, 200, 66, 0.04);
+}
+
+.law-picker-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.law-picker-card-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.law-picker-card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.law-picker-card-active-tag {
+  font-size: 0.6rem;
+  color: var(--gold, #f5c842);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 /* ─────────────────────────────────────────────
    Combat screen
    ───────────────────────────────────────────── */
@@ -2434,10 +2690,14 @@
     align-self: auto;
   }
 
-  /* ── Build screen: stack gear + law vertically ────────────────────────── */
+  /* ── Build screen: stack law on top, gear below ───────────────────────── */
   .build-top-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .build-law-compact-section {
+    width: 100%;
   }
 
   /* Remove fixed height — let content determine height on mobile */
@@ -2446,14 +2706,19 @@
   }
 
   /* Centre the gear grid when it's full width */
-  .build-section:first-child {
+  .build-artefact-section {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
-  .build-section:first-child .build-section-title {
+  .build-artefact-section .build-section-title {
     align-self: flex-start;
+  }
+
+  /* Inline picker: 3 columns on mobile */
+  .art-inline-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
   /* Slightly smaller gear slots to stay within safe margins */
