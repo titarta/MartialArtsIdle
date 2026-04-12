@@ -675,7 +675,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 0;
   flex: 1;
   aspect-ratio: 2 / 1;
@@ -728,11 +728,16 @@
 
 .tap-hint {
   position: absolute;
-  bottom: 10px;
+  top: 8px;
   left: 0; right: 0;
   text-align: center;
   color: var(--text-muted);
   font-size: 0.75rem;
+}
+
+/* Hide hint while actively cultivating — boost label takes its place */
+.stage-boosted .tap-hint {
+  display: none;
 }
 
 @media (min-width: 768px) {
@@ -2599,7 +2604,7 @@
 
 .ad-boost-label {
   position: absolute;
-  bottom: 28px;
+  top: 28px;
   left: 0; right: 0;
   text-align: center;
   color: #a78bfa;
