@@ -50,6 +50,12 @@ from pathlib import Path
 import urllib.request, urllib.error
 from PIL import Image
 
+# Force UTF-8 output on Windows (cp1252 default chokes on → and em-dashes)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Configuration
 # ─────────────────────────────────────────────────────────────────────────────
@@ -247,17 +253,17 @@ def _reanimate(enemy_id, base):
 
     idle_frames = generate_frames(enemy_id, "idle",   cfg["idle_desc"],   base)
     stitch(idle_frames, OUT_DIR / f"{enemy_id}-idle.png")
-    print(f"  Idle sheet → {enemy_id}-idle.png")
+    print(f"  Idle sheet -> {enemy_id}-idle.png")
 
     atk_frames  = generate_frames(enemy_id, "attack", cfg["attack_desc"], base)
     stitch(atk_frames,  OUT_DIR / f"{enemy_id}-attack.png")
-    print(f"  Attack sheet → {enemy_id}-attack.png")
+    print(f"  Attack sheet -> {enemy_id}-attack.png")
 
     # Hit: fading red tint — 0.75 (hard flash) → 0.50 → 0.25 → 0.00 (clean)
     hit_frames  = generate_frames(enemy_id, "hit",    cfg["hit_desc"],    base,
                                   tint_strengths=[0.75, 0.50, 0.25, 0.0])
     stitch(hit_frames,  OUT_DIR / f"{enemy_id}-hit.png")
-    print(f"  Hit sheet → {enemy_id}-hit.png")
+    print(f"  Hit sheet -> {enemy_id}-hit.png")
 
     print(f"\n  Done. Sprites in: {OUT_DIR}")
 
