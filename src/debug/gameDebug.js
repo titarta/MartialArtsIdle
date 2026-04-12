@@ -19,7 +19,6 @@ import REALMS from '../data/realms';
  *   { cultivation, inventory, techniques, combat, artefacts }
  */
 export function initDebug(hooksRef) {
-  if (!import.meta.env.DEV) return;
 
   const g = () => hooksRef.current; // always-fresh hook bundle
 
