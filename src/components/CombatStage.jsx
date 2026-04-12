@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import SpriteAnimator from './SpriteAnimator';
+import DamageNumber from './DamageNumber';
 import { getSprites, FW, FH } from '../sprites/spriteGen';
 
 const BASE = import.meta.env.BASE_URL;
@@ -42,19 +43,25 @@ function enemySpriteSrc(enemy, anim) {
  *   enemy.sprite set   → load custom PNG sprite sheets.
  *   enemy.sprite null  → canvas-generated fallback.
  */
+let dmgId = 0;
+
 export default function CombatStage({
   phase,
   enemy,
+  worldId = 1,
   playerAttackRef,
   enemyAttackRef,
   playerAnimDoneRef,
   enemyAnimDoneRef,
+  spawnDamageNumberRef,
 }) {
   const sprites = getSprites();
   const spriteScale = getSpriteScale();
 
   const [pAnim, setPAnim] = useState('idle');
   const [eAnim, setEAnim] = useState('idle');
+  const [dmgNums, setDmgNums] = useState([]);
+  const dmgTimersRef = useRef([]);
 
   const pRef      = useRef(null);
   const eRef      = useRef(null);
@@ -122,6 +129,31 @@ export default function CombatStage({
     }
   }, [phase]);
 
+  // Register the damage-number spawn callback so useCombat can trigger it.
+  // Enemy damage (gold) spawns on the right side; player damage taken (red) on the left.
+  useEffect(() => {
+    if (!spawnDamageNumberRef) return;
+    spawnDamageNumberRef.current = (value, side) => {
+      const id = ++dmgId;
+      const isEnemy = side === 'enemy';
+      const x = isEnemy
+        ? `${62 + Math.random() * 16}%`
+        : `${8  + Math.random() * 14}%`;
+      const y = 80 + Math.random() * 55;
+      setDmgNums(prev => [...prev, { id, value, x, y, isEnemy }]);
+      const t = setTimeout(
+        () => setDmgNums(prev => prev.filter(n => n.id !== id)),
+        1000,
+      );
+      dmgTimersRef.current.push(t);
+    };
+    return () => {
+      spawnDamageNumberRef.current = null;
+      dmgTimersRef.current.forEach(clearTimeout);
+      dmgTimersRef.current = [];
+    };
+  }, [spawnDamageNumberRef]);
+
   const onPlayerAttackDone = () => {
     setPAnim('idle');
     playerAnimDoneRef.current?.();
@@ -151,7 +183,10 @@ export default function CombatStage({
     : { src: sprites.enemyAttack, frameWidth: FW, frameHeight: FH, scale: GEN_SCALE };
 
   return (
-    <div className={`combat-stage ${isFighting ? 'stage-fighting' : ''}`}>
+    <div
+      className={`combat-stage ${isFighting ? 'stage-fighting' : ''}`}
+      style={{ backgroundImage: `url(${BASE}backgrounds/world_${worldId}.png)` }}
+    >
 
       {/* ── Player (left side) ─── */}
       <div ref={pRef} className={`stage-side ${isLost ? 'stage-ko' : ''}`}>
@@ -196,6 +231,16 @@ export default function CombatStage({
       <div className="stage-centre">
         {isFighting && <span className="stage-clash">⚔</span>}
       </div>
+
+      {/* ── Damage number particles ─── */}
+      {dmgNums.map(n => (
+        <DamageNumber
+          key={n.id}
+          value={n.value}
+          color={n.isEnemy ? 'gold' : 'red'}
+          style={{ left: n.x, top: n.y }}
+        />
+      ))}
 
       {/* ── Enemy (right side, CSS-flipped to face left) ─── */}
       <div ref={eRef} className={`stage-side ${isWon ? 'stage-ko' : ''}`}>

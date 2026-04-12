@@ -90,10 +90,12 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
       <CombatStage
         phase={phase}
         enemy={stageEnemy}
+        worldId={region?.worldId ?? 1}
         playerAttackRef={combat.playerAttackRef}
         enemyAttackRef={combat.enemyAttackRef}
         playerAnimDoneRef={combat.playerAnimDoneRef}
         enemyAnimDoneRef={combat.enemyAnimDoneRef}
+        spawnDamageNumberRef={combat.spawnDamageNumberRef}
       />
 
       {/* ── HP bars ─────────────────────────────────────────────────────── */}

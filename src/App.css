@@ -2344,14 +2344,17 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  height: 260px;
+  aspect-ratio: 2 / 1;
   padding: 0 6px 12px;
   position: relative;
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid var(--border);
   margin-bottom: 12px;
-  background: linear-gradient(180deg, #080818 0%, #0d0d24 40%, #111130 100%);
+  background-color: #080818;
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
 }
 
 @media (min-width: 431px) {
