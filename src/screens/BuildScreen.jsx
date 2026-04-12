@@ -212,6 +212,7 @@ function BuildScreen({ cultivation, techniques, artefacts }) {
           slotIndex={selectedTechSlot}
           currentId={techniques.slots[selectedTechSlot]}
           realmIndex={realmIndex}
+          ownedTechniques={techniques.ownedTechniques}
           onEquip={handleEquip}
           onClose={() => setSelectedTechSlot(null)}
         />

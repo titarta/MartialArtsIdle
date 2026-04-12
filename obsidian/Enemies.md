@@ -593,6 +593,159 @@ Which types and variants appear in each region. Format: `Type — Variant [Eleme
 
 ---
 
+## Loot System
+
+---
+
+### How Drops Work
+
+Each enemy kill runs each loot category as an **independent roll**. A single kill can produce drops from multiple categories simultaneously. Gold always drops; everything else is probabilistic.
+
+---
+
+### Base Drop Chances
+
+Applies to all Common and Elite enemies. Elite enemies get a flat +15pp bonus on every non-gold category.
+
+| Category | Common | Elite |
+|---|---|---|
+| Gold | 100% | 100% |
+| Cultivation Material | 65% | 80% |
+| Artefact | 15% | 30% |
+| Herb | 8% | 23% |
+| Mineral | 8% | 23% |
+| Technique Scroll | per-enemy (see below) | per-enemy ×2 |
+
+---
+
+### Technique Scroll Drops
+
+Each enemy that can drop a technique scroll has a **flat per-kill chance** defined in its profile. The chance is rolled **independently** of all other drop categories.
+
+When a scroll drops, the technique is **procedurally generated** using the world-tier quality weights below. The quality tier maps technique quality to the material rarity system:
+
+| Material Rarity | Technique Quality |
+|---|---|
+| Common | Iron |
+| Uncommon | Bronze |
+| Rare | Silver |
+| Epic | Gold |
+| Legendary | Transcendent |
+
+**Quality weights per world** (same table as material drops):
+
+| World | Iron | Bronze | Silver | Gold | Transcendent |
+|---|---|---|---|---|---|
+| 1 | 60% | 30% | 9% | 1% | 0% |
+| 2 | 20% | 40% | 30% | 9% | 1% |
+| 3 | 5% | 20% | 40% | 30% | 5% |
+| 4 | 0% | 8% | 28% | 47% | 17% |
+| 5 | 0% | 2% | 10% | 43% | 45% |
+| 6 | 0% | 0% | 3% | 20% | 77% |
+
+**Element pool per world** — techniques draw from world-appropriate elements. Normal is weighted heavily in World 1 (most early players lack elemental Laws).
+
+**Constructs** (Sparring Dummy, Bone Construct, etc.) do **not** drop technique scrolls.
+
+**Per-enemy chances** are defined in `data/enemies.js` under `techniqueDrop.chance`. See [[Secret Techniques#World 1 Technique Drop Rates]] for the full World 1 table.
+
+---
+
+### Boss Drop Table
+
+Bosses always drop a **Law**. Everything else is enhanced on top of the base table.
+
+| Category | Boss |
+|---|---|
+| Gold | 100% (×5 amount) |
+| Cultivation Material | 100% |
+| Artefact | 85% |
+| Herb | 40% |
+| Mineral | 40% |
+| **Law** | **100%** |
+| Secret Technique Scroll | 25% |
+
+**Law drop rules:**
+- Realm requirement: matches the current world's realm range
+- Element: weighted toward the dominant element of enemies in this region (e.g. Lightning Wyrm boss → Lightning-weighted Law)
+- Quality: uses the same world-tier quality bias as [[Artefacts#Quality Drop Bias|Artefacts]]
+
+---
+
+### Rarity Weights by World Tier
+
+Once a category is confirmed to drop, the specific item's rarity is rolled using this table. Applies to Cultivation Materials, Artefacts, Herbs, and Minerals equally.
+
+| World | Common | Uncommon | Rare | Epic | Legendary |
+|---|---|---|---|---|---|
+| 1 | 60% | 30% | 9% | 1% | 0% |
+| 2 | 30% | 40% | 25% | 4% | 1% |
+| 3 | 10% | 25% | 40% | 22% | 3% |
+| 4 | 2% | 10% | 25% | 45% | 18% |
+| 5 | 0% | 3% | 12% | 40% | 45% |
+| 6 | 0% | 0% | 3% | 20% | 77% |
+
+Once the rarity tier is determined, the specific item is drawn uniformly from all items of that rarity in that category (herbs list, minerals list, etc.).
+
+**Artefact slot:** when an Artefact drops, the slot is chosen uniformly at random from all 8 slots (Weapon, Head, Body, Hands, Waist, Feet, Neck, Finger).
+
+---
+
+### Cultivation Material Bias
+
+Within the Cultivation Material category, different enemy types have a biased draw toward specific items that fit their nature. This is expressed as an extra weight added on top of the uniform draw.
+
+| Enemy Type | Biased Item | Extra Weight |
+|---|---|---|
+| Pack Beast / Ancient Beast | Beast Core | +40 |
+| Elemental Spirit / Wyrm | Elemental Essence Bead | +40 |
+| Dao Entity | Elemental Essence Bead, Heaven Spirit Dew | +30 each |
+| Cultivator / Corpse Soldier | Spirit Stone | +30 |
+| Shade / Wraith | Origin Crystal | +25 |
+| Construct | Spirit Stone | +20 |
+| Void Entity | Origin Crystal | +30 |
+| Demon | Beast Core | +20 |
+| Open Heaven Entity | Heaven Spirit Dew, Elemental Essence Bead | +50 each |
+
+Items not in the bias list draw from the standard uniform pool. All items must still pass the rarity gate — if a biased item is a higher rarity than the rolled tier, it is excluded and the draw falls back to the uniform pool for that tier.
+
+---
+
+### Per-Type Drop Chance Adjustments
+
+Small shifts to the base drop chances above. These stack on top of the Common/Elite base (and before the Elite +15pp bonus).
+
+| Enemy Type | Category | Adjustment |
+|---|---|---|
+| Pack Beast | Herb | +5% |
+| Pack Beast | Cultivation Material | +5% |
+| Construct | Mineral | +8% |
+| Construct | Herb | −5% |
+| Elemental Spirit | Cultivation Material | +8% |
+| Elemental Spirit | Mineral | −5% |
+| Wyrm | Herb | +4% |
+| Wyrm | Mineral | +4% |
+| Shade / Wraith | Artefact | +6% |
+| Shade / Wraith | Mineral | −5% |
+| Corpse Soldier | Artefact | +8% |
+| Corpse Soldier | Herb | −4% |
+| Demon | Cultivation Material | +5% |
+| Demon | Mineral | +4% |
+| Ancient Beast | Herb | +7% |
+| Ancient Beast | Cultivation Material | +5% |
+| Void Entity | Artefact | +6% |
+| Void Entity | Herb | −5% |
+| Dao Entity | Cultivation Material | +10% |
+| Dao Entity | Herb | +5% |
+| Open Heaven Entity | Cultivation Material | +15% |
+| Open Heaven Entity | Artefact | +10% |
+| Open Heaven Entity | Herb | +8% |
+| Open Heaven Entity | Mineral | +8% |
+
+No type has an adjustment greater than ±15% on any single category — the differences are flavour, not a complete reorientation of drop identity.
+
+---
+
 ## TODO
 
 - [ ] Define exact region baseline power values (P per region) during balancing
@@ -600,7 +753,8 @@ Which types and variants appear in each region. Format: `Type — Variant [Eleme
 - [ ] Verify K ranges per world tier match player damage output
 - [ ] Decide if enemy Soul Drain heal is visible to the player (UI feedback)
 - [ ] Add Gathering/Mining enemy pools (subset of World pools, lower end of power distribution)
-- [ ] Define boss drop table bonuses on top of region drops
+- [ ] Define gold amount scaling per world tier
+- [ ] Define Law quality and element weighting per boss (refine per region)
 
 ---
 

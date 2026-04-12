@@ -11,6 +11,7 @@ const LOG_COLOR = {
   heal:           '#4ade80',
   buff:           '#60a5fa',
   dodge:          '#facc15',
+  technique:      '#c084fc',
   system:         'var(--text-muted)',
 };
 
@@ -37,7 +38,9 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
       },
       equippedTechniques,
       enemyDef,
-      inventory ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
+      inventory   ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
+      techniques  ? (tech)  => techniques.addOwnedTechnique(tech) : null,
+      region?.worldId ?? 1,
     );
   };
 

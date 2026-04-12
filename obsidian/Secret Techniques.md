@@ -111,9 +111,31 @@ Quality affects cooldown speed, K multiplier, and number of passives on the tech
 
 ## Discovery & Acquisition
 
-- Dropped by mobs (rare, higher quality from stronger zones)
-- Rewards from zone clears or boss fights
+- **Dropped by mobs** — each enemy has a per-kill technique drop chance (see [[Enemies]] drop tables). Chance is rare; stronger zones have higher rates.
+- **Quality is world-gated** — the dropped technique's quality tier is rolled using the same rarity weights as material drops: World 1 yields mostly Iron/Bronze, World 6 yields mostly Transcendent.
+- **Element follows world flavour** — World 1 drops Normal/Fire/Lightning; later worlds have Void, Ancient, etc.
+- Dropped techniques are stored in the player's **owned collection** and appear in the equip modal alongside the static catalogue.
+- Rewards from zone clears or boss fights (TBD)
 - Possibly crafted from [[Materials]] (TBD)
+
+### World 1 Technique Drop Rates
+
+| Enemy | Drop Chance |
+|---|---|
+| Outer Sect Disciple | 2% |
+| Pack Wolf | 1% |
+| Bandit Scout | 3% |
+| Wandering Beast | 1% |
+| Qi-Sensing Beast | 3% |
+| Rogue Disciple | 5% |
+| Forest Spirit | 4% |
+| Awakened Tree Demon | 6% |
+| Sky Beast | 4% |
+| Thunder Hawk | 5% |
+| Lightning Wyrm | 7% |
+| Storm Elemental | 7% |
+
+Sparring Dummy (Construct archetype) does not drop techniques.
 
 ---
 

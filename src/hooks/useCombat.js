@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { calcDamage, getCooldown } from '../data/techniques';
 import { ALL_MATERIALS } from '../data/materials';
+import { generateTechnique } from '../data/techniqueDrops';
 
 function rollDrops(drops) {
   if (!drops?.length) return [];
@@ -57,8 +58,9 @@ export default function useCombat() {
   const eHpTextRef = useRef(null);
   const cdBarRefs  = useRef([null, null, null]);
 
-  // ─── Drop callback — set fresh on each startFight call ───────────────────
-  const onDropsRef = useRef(null);
+  // ─── Drop callbacks — refreshed on each startFight call ─────────────────
+  const onDropsRef          = useRef(null);
+  const onTechniqueDropRef  = useRef(null);
 
   // ─── Sprite animation callbacks ────────────────────────────────────────────
   // playerAttackRef / enemyAttackRef: called by useCombat → CombatStage plays animation
@@ -90,12 +92,14 @@ export default function useCombat() {
 
   // ─── startFight ───────────────────────────────────────────────────────────
   /**
-   * @param {object}   stats          — { essence, soul, body, lawElement }
-   * @param {array}    equippedTechs  — technique slots
-   * @param {object}   enemyDef       — entry from data/enemies.js (or plain { name, statMult })
-   * @param {function} onDrops        — callback(drops: [{itemId, qty}]) fired on victory
+   * @param {object}   stats             — { essence, soul, body, lawElement }
+   * @param {array}    equippedTechs     — technique slots
+   * @param {object}   enemyDef          — entry from data/enemies.js
+   * @param {function} onDrops           — callback([{itemId, qty}]) fired on material victory drops
+   * @param {function} onTechniqueDrop   — callback(techniqueObj) fired when a technique drops
+   * @param {number}   worldId           — world tier 1–6, used for technique generation
    */
-  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null) => {
+  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1) => {
     const { essence, soul, body } = stats;
     const total  = essence + soul + body;
 
@@ -110,7 +114,8 @@ export default function useCombat() {
     const cds    = equippedTechs.map(t => t ? 0        : Infinity);
     const maxCds = equippedTechs.map(t => t ? getCooldown(t.type, t.quality) : Infinity);
 
-    onDropsRef.current = onDrops;
+    onDropsRef.current         = onDrops;
+    onTechniqueDropRef.current = onTechniqueDrop;
 
     stateRef.current = {
       phase:     'fighting',
@@ -123,7 +128,9 @@ export default function useCombat() {
       dodgeBuff: { chance: 0, endsAt: 0 },
       stats:    { ...stats },
       equipped: [...equippedTechs],
-      enemyDrops: enemyDef?.drops ?? [],
+      enemyDrops:       enemyDef?.drops ?? [],
+      techDropChance:   enemyDef?.techniqueDrop?.chance ?? 0,
+      worldId,
     };
 
     lastTRef.current = performance.now();
@@ -204,22 +211,26 @@ export default function useCombat() {
           if (s2.eHp <= 0) {
             s2.phase = 'won';
 
-            // Roll and deliver drops
+            const newLogs = [{ msg: 'Enemy defeated! Victory!', kind: 'system' }];
+
+            // Roll material drops
             const dropped = rollDrops(s2.enemyDrops);
             if (dropped.length > 0) {
               onDropsRef.current?.(dropped);
               const dropMsg = dropped
                 .map(d => `${d.qty}× ${ALL_MATERIALS[d.itemId]?.name ?? d.itemId}`)
                 .join(', ');
-              setLog(prev => [
-                { msg: `Drops: ${dropMsg}`, kind: 'system' },
-                { msg: 'Enemy defeated! Victory!', kind: 'system' },
-                ...prev,
-              ].slice(0, MAX_LOG));
-            } else {
-              setLog(prev => [{ msg: 'Enemy defeated! Victory!', kind: 'system' }, ...prev].slice(0, MAX_LOG));
+              newLogs.unshift({ msg: `Drops: ${dropMsg}`, kind: 'system' });
             }
 
+            // Roll technique drop
+            if (s2.techDropChance > 0 && Math.random() < s2.techDropChance) {
+              const tech = generateTechnique(s2.worldId);
+              onTechniqueDropRef.current?.(tech);
+              newLogs.unshift({ msg: `Scroll found: ${tech.name} (${tech.quality} ${tech.type})`, kind: 'technique' });
+            }
+
+            setLog(prev => [...newLogs, ...prev].slice(0, MAX_LOG));
             patchBars(s2);
             setPhase('won');
           } else {

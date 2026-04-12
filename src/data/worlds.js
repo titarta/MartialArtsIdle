@@ -489,4 +489,10 @@ const WORLDS = [
   },
 ];
 
-export default WORLDS;
+// Denormalize worldId into each region so regions carry their world context.
+const WORLDS_WITH_ID = WORLDS.map(w => ({
+  ...w,
+  regions: w.regions.map(r => ({ ...r, worldId: w.id })),
+}));
+
+export default WORLDS_WITH_ID;

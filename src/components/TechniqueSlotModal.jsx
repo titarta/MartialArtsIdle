@@ -67,10 +67,14 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
   );
 }
 
-function TechniqueSlotModal({ slotIndex, currentId, realmIndex, onEquip, onClose }) {
+function TechniqueSlotModal({ slotIndex, currentId, realmIndex, ownedTechniques = {}, onEquip, onClose }) {
   const [filter, setFilter] = useState('All');
 
-  const visible = TECHNIQUES.filter(t => filter === 'All' || t.type === filter);
+  const owned   = Object.values(ownedTechniques);
+  const visible = [
+    ...TECHNIQUES,
+    ...owned,
+  ].filter(t => filter === 'All' || t.type === filter);
 
   return (
     <div className="modal-overlay" onClick={onClose}>

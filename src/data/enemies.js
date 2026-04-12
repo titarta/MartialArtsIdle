@@ -27,13 +27,14 @@ const ENEMIES = {
       { itemId: 'spirit_stone',       chance: 0.90, qty: [1, 4] },
       { itemId: 'black_tortoise_iron', chance: 0.15, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.02 },
   },
 
   sparring_dummy: {
     id:       'sparring_dummy',
     name:     'Sparring Dummy',
     sprite:   null,
-    statMult: { hp: 1.2, atk: 0.3 },   // tanky, low damage
+    statMult: { hp: 1.2, atk: 0.3 },   // tanky, low damage — constructs don't drop techniques
     drops: [
       { itemId: 'spirit_stone', chance: 0.50, qty: [1, 2] },
     ],
@@ -49,6 +50,7 @@ const ENEMIES = {
       { itemId: 'beast_core',         chance: 0.20, qty: [1, 1] },
       { itemId: 'black_tortoise_iron', chance: 0.10, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.01 },
   },
 
   bandit_scout: {
@@ -60,6 +62,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone',       chance: 0.85, qty: [2, 6] },
       { itemId: 'black_tortoise_iron', chance: 0.20, qty: [1, 2] },
     ],
+    techniqueDrop: { chance: 0.03 },
   },
 
   wandering_beast: {
@@ -71,6 +74,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone', chance: 0.65, qty: [1, 3] },
       { itemId: 'beast_core',   chance: 0.25, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.01 },
   },
 
   qi_beast: {
@@ -83,6 +87,7 @@ const ENEMIES = {
       { itemId: 'beast_core',          chance: 0.30, qty: [1, 1] },
       { itemId: 'crimson_flame_crystal', chance: 0.15, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.03 },
   },
 
   rogue_disciple: {
@@ -94,6 +99,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone',        chance: 0.85, qty: [2, 6] },
       { itemId: 'crimson_flame_crystal', chance: 0.20, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.05 },
   },
 
   forest_spirit: {
@@ -105,6 +111,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone', chance: 0.70, qty: [2, 5] },
       { itemId: 'beast_core',   chance: 0.35, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.04 },
   },
 
   tree_demon: {
@@ -116,6 +123,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone', chance: 0.75, qty: [3, 7] },
       { itemId: 'beast_core',   chance: 0.40, qty: [1, 2] },
     ],
+    techniqueDrop: { chance: 0.06 },
   },
 
   sky_beast: {
@@ -128,17 +136,19 @@ const ENEMIES = {
       { itemId: 'beast_core',   chance: 0.30, qty: [1, 1] },
       { itemId: 'void_stone',   chance: 0.10, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.04 },
   },
 
   thunder_hawk: {
     id:       'thunder_hawk',
     name:     'Thunder Hawk',
     sprite:   null,
-    statMult: { hp: 1.0, atk: 1.4 },   // fast and hit hard
+    statMult: { hp: 1.0, atk: 1.4 },   // fast and hits hard
     drops: [
       { itemId: 'spirit_stone', chance: 0.80, qty: [3, 8] },
       { itemId: 'beast_core',   chance: 0.35, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.05 },
   },
 
   lightning_wyrm: {
@@ -151,6 +161,7 @@ const ENEMIES = {
       { itemId: 'beast_core',   chance: 0.40, qty: [1, 2] },
       { itemId: 'void_stone',   chance: 0.20, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.07 },
   },
 
   storm_elemental: {
@@ -162,6 +173,7 @@ const ENEMIES = {
       { itemId: 'spirit_stone', chance: 0.85, qty: [5, 12] },
       { itemId: 'origin_crystal', chance: 0.15, qty: [1, 1] },
     ],
+    techniqueDrop: { chance: 0.07 },
   },
 
   // ── World 2 — The Ancient Frontier ───────────────────────────────────────

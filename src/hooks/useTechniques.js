@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { saveTechniques, loadTechniques } from '../systems/save';
+import { useState, useEffect, useCallback } from 'react';
+import { saveTechniques, loadTechniques, saveOwnedTechniques, loadOwnedTechniques } from '../systems/save';
 import { getTechnique } from '../data/techniques';
 
 const SLOT_COUNT = 3;
@@ -10,7 +10,24 @@ export default function useTechniques() {
     return Array.from({ length: SLOT_COUNT }, (_, i) => saved?.[i] ?? null);
   });
 
-  // equip by technique ID (null = unequip)
+  // { [id]: techniqueObj } — techniques acquired through drops
+  const [ownedTechniques, setOwned] = useState(() => loadOwnedTechniques());
+
+  useEffect(() => {
+    saveOwnedTechniques(ownedTechniques);
+  }, [ownedTechniques]);
+
+  /** Add a dropped technique to the owned collection. */
+  const addOwnedTechnique = useCallback((tech) => {
+    setOwned(prev => ({ ...prev, [tech.id]: tech }));
+  }, []);
+
+  /** Look up a technique by id — static catalogue first, then owned drops. */
+  const getTechById = useCallback((id) => {
+    if (!id) return null;
+    return getTechnique(id) ?? ownedTechniques[id] ?? null;
+  }, [ownedTechniques]);
+
   const equip = useCallback((slotIndex, techniqueId) => {
     setSlots(prev => {
       const next = [...prev];
@@ -38,8 +55,10 @@ export default function useTechniques() {
   }, []);
 
   return {
-    slots,                                              // string|null per slot
-    equippedTechniques: slots.map(id => getTechnique(id)), // full objects (null if empty)
+    slots,
+    ownedTechniques,                          // { [id]: techniqueObj }
+    equippedTechniques: slots.map(getTechById),
+    addOwnedTechnique,
     equip,
     unequip,
   };
