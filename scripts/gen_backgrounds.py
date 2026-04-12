@@ -172,100 +172,123 @@ SCENES = {
 
     "cultivation": {
         "desc": (
-            "A serene xianxia cultivation chamber or open mountain pavilion at dawn. "
-            "Polished stone or wooden floor tiles in the ground zone (bottom quarter, flat and clear). "
-            "Midground: lacquered wooden pillars, hanging silk lanterns glowing softly, "
-            "wisps of golden qi energy drifting upward like incense smoke, a low meditation "
-            "altar with candles. Background: mist-shrouded green mountain peaks visible "
-            "through an arched opening, pale dawn sky with soft purples and gold. "
-            "Peaceful, meditative, timeless inner-sect atmosphere. "
+            "Interior of a xianxia inner-sect cultivation hall at dawn. "
+            "Flat polished dark-jade floor tiles in the ground zone (bottom quarter, completely clear). "
+            "Midground: red lacquered wooden pillars carved with ascending dragon motifs, "
+            "a bronze incense burner (xianglu) emitting golden qi smoke coiling upward, "
+            "red silk curtains embroidered with crane and cloud patterns hanging between pillars, "
+            "copper wind chimes swaying, a low stone altar bearing jade candles and offering bowls. "
+            "Background: a wide circular moon-gate opening onto mist-wrapped jade-green mountain peaks, "
+            "pine trees visible through the arch, soft violet and gold dawn sky beyond. "
+            "Atmosphere: serene, meditative, timeless Chinese inner-sect sanctuary. "
+            "Palette: deep reds, warm gold, dark jade, soft ink-wash blues and greens. "
             f"{S}"
         ),
     },
 
     "world_1": {
         "desc": (
-            "Combat background for a traditional xianxia sect training ground and borderland wilderness. "
-            "Flat packed-earth or stone-paved ground in the bottom quarter (clear, no obstacles). "
-            "Midground: weathered bamboo grove, stone practice pillars, a low sect wall with "
-            "faded red banners, morning mist drifting through. Background: layered misty green "
-            "mountains receding into a pale grey-blue sky, pine silhouettes at the ridge. "
-            "Grounded, earthly, traditional Chinese martial arts atmosphere, muted greens and greys. "
+            "Outer sect martial training ground at the edge of borderland wilderness, xianxia China. "
+            "Flat packed-earth courtyard ground in the bottom quarter (clear, no obstacles). "
+            "Midground: weathered stone practice pillars with impact marks, a tall wooden pailou gate "
+            "with faded red paint and hanging sect banners bearing Chinese calligraphy, "
+            "a pair of worn stone lion guardians flanking the gate, dense bamboo grove to one side, "
+            "morning mist drifting low across the ground. "
+            "Background: layered misty green mountains in Chinese ink-wash style receding into pale grey-blue sky, "
+            "pine silhouettes along the ridge, a distant waterfall barely visible through haze. "
+            "Atmosphere: grounded, earthly, traditional wuxia/xianxia martial arts school. "
+            "Palette: muted greens, grey stone, faded red and gold banners, pale morning sky. "
             f"{S}"
         ),
     },
 
     "world_2": {
         "desc": (
-            "Combat background for 'The Ancient Frontier' — a vast, once-great xianxia immortal civilization "
-            "now reduced to sun-scorched ruins on a shattered sky desert. "
-            "Flat cracked ochre desert ground in the bottom quarter (completely clear — no rocks, bones, or ruins jutting up). "
-            "Midground: half-buried colossal carved stone archways of ancient immortal architecture, "
-            "shattered qi-inscription pillars with faintly glowing golden runes still burning on cracked stone, "
-            "bleached ribcages of massive dragon-sized beasts half-swallowed by drifting sand. "
-            "Background: a vast cracked sky with deep amber-orange hues and jagged fracture lines of pale light "
-            "cutting across the horizon — as if the sky itself was shattered by an ancient war, "
-            "silhouettes of collapsed immortal towers and an enormous dragon skeleton ribcage arching across "
-            "the far distance. "
-            "Desolate grandeur — a dead empire frozen in time. "
-            "Palette: deep amber, scorched ochre, sun-bleached bone, ancient gold rune-glow, fractured pale sky. "
+            "The Ancient Frontier — ruins of a vast xianxia immortal empire swallowed by desert sands. "
+            "Flat cracked ochre desert floor in the bottom quarter (completely clear, no debris jutting up). "
+            "Midground: half-buried ceremonial stone archways with worn dragon-and-phoenix relief carvings, "
+            "toppled stone stele with ancient Chinese seal-script inscriptions still faintly legible, "
+            "a cracked bronze ding ritual cauldron (tripod vessel) half-submerged in drifting sand, "
+            "bleached dragon-beast ribcage bones curving out of dunes. "
+            "Background: cracked amber-orange sky as if shattered by an ancient war, "
+            "silhouettes of collapsed multi-tiered pagoda towers on the horizon, "
+            "a massive stone torii-style ceremonial gate toppled across the far distance. "
+            "Atmosphere: desolate grandeur, dead empire, scorched ancient glory. "
+            "Palette: deep amber, scorched ochre, sun-bleached bone, ancient bronze-gold, fractured pale sky. "
             f"{S}"
         ),
     },
 
     "world_3": {
         "desc": (
-            "Combat background for forbidden burial grounds and sealed ancient ruins. "
-            "Flat dark cracked stone ground in the bottom quarter (clear, no tombstones crossing into it). "
-            "Midground: ancient tombstone slabs, stone burial altars, chained iron gates, "
-            "faint purple seal-inscription glyphs glowing on stones. "
-            "Background: deep purple-black sky, wisps of ghostly purple-white qi fog rising, "
-            "a distant silhouette of a massive sealed stone mausoleum. "
-            "Ominous, forbidden, death-qi atmosphere. Deep purples, blacks, ghostly blues. "
+            "Forbidden Chinese ancestral burial grounds of ancient Saints, sealed and cursed. "
+            "Flat dark-grey cracked stone courtyard ground in the bottom quarter (clear, no tombstones crossing into it). "
+            "Midground: towering stone memorial stele on turtle-dragon bases (bixi), "
+            "stone civil and military tomb guardian statues (wenwu shixiang) lining a spirit road, "
+            "chained iron spirit-lock gates with ward talismans nailed to them, "
+            "wisps of ghost-fire floating above offering urns still smoldering with black incense. "
+            "Background: deep purple-black sky, ghostly white mourning banners hanging from unseen heights, "
+            "the distant silhouette of a colossal sealed imperial mausoleum with upturned eave rooflines, "
+            "yin-yang and bagua glyphs glowing faintly in purple on the sealed stone gate. "
+            "Atmosphere: ominous, cursed, death-qi soaked forbidden ground. "
+            "Palette: deep purples, blacks, ghost-white, sickly jade-green ghost-fire, cold blue moonlight. "
             f"{S}"
         ),
     },
 
     "world_4": {
         "desc": (
-            "Combat background for deep underground origin-qi caverns. "
-            "Flat ancient stone ground with faint glowing blue qi-vein cracks in the bottom quarter "
-            "(flat and clear, no crystal formations jutting from the ground zone). "
-            "Midground: towering crystal formations glowing teal and blue, massive stone roots "
-            "descending from above, pools of glowing qi water reflecting the cave ceiling. "
-            "Background: deep cavern darkness above with clusters of luminescent fungi and "
-            "hanging crystalline stalactites. Primordial, subterranean atmosphere. "
-            "Deep teals, glowing blues and greens, ancient brown stone. "
+            "Deep underground origin-qi caverns beneath sacred Chinese mountains — ancient and primordial. "
+            "Flat ancient stone floor with faint glowing azure dragon-vein (longmai) qi cracks "
+            "in the bottom quarter (flat and clear, no formations jutting from the ground zone). "
+            "Midground: colossal stone dragon-head carvings set into the cave walls with water flowing "
+            "from their mouths into glowing azure qi pools, "
+            "a half-submerged ancient bronze mirror (tongjing) reflecting pale celestial light, "
+            "massive gnarled tree roots descending from above like pillars, "
+            "glowing jade crystal formations and luminescent spirit mushrooms clustering on cave walls. "
+            "Background: vast cavern ceiling receding into darkness above, "
+            "ancient Buddhist-style relief carvings of celestial figures barely visible on distant stone walls, "
+            "stalactites like jade fangs. "
+            "Atmosphere: primal, sacred underground world, origin of heaven and earth qi. "
+            "Palette: deep teal, glowing azure, ancient bronze, jade green, dark brown stone, pale gold reflections. "
             f"{S}"
         ),
     },
 
     "world_5": {
         "desc": (
-            "Combat background for a fractured void-space realm. "
-            "Flat cosmic stone platform ground in the bottom quarter "
+            "The Void Sea — shattered space between worlds, littered with relics of the Dao. "
+            "Flat ancient stone dao-altar platform ground in the bottom quarter "
             "(clear, no floating debris or rifts crossing into it). "
-            "Midground: jagged spatial rift tears glowing purple-white, floating stone fragments "
-            "suspended in void space, faint dao-inscription runes glowing on broken stone surfaces. "
-            "Background: deep indigo-black void with scattered silver stars, nebula wisps, "
-            "and large glowing spatial cracks splitting the sky. "
-            "Cosmic, empty, void-energy atmosphere. Deep indigo, purple, silver-white. "
+            "Midground: a floating bronze armillary sphere (浑天仪) slowly rotating, "
+            "shattered jade slips with glowing dao-inscription runes tumbling in void, "
+            "fragments of ancient Chinese observatory architecture suspended in space, "
+            "a cracked bronze bagua (八卦) trigram disc radiating cold indigo light. "
+            "Background: deep indigo-black void filled with drifting star-charts in the style of "
+            "ancient Chinese astronomical maps (star mandalas), "
+            "massive spatial rift tears glowing silver-white, distant nebula wisps in ink-wash style. "
+            "Atmosphere: cosmic, ancient, the dao made visible as void. "
+            "Palette: deep indigo, void black, silver-white rift light, cold bronze, glowing jade-green runes. "
             f"{S}"
         ),
     },
 
     "world_6": {
         "desc": (
-            "Combat background for an open heaven celestial realm. "
-            "Flat golden-white divine stone ground in the bottom quarter "
-            "(clear, no pillars or clouds crossing into it). "
-            "Midground: colossal white-gold heaven pillars rising, golden qi streams flowing "
-            "upward like rivers, divine celestial architecture partially visible. "
-            "Background: blinding divine light at the apex, a vast star sea and cosmic qi clouds "
-            "in brilliant golds, whites, and celestial blues behind the pillars, "
-            "radiant heaven energy saturating the air. "
-            "Transcendent, divine, overwhelming celestial power atmosphere. "
-            "Gold, white, brilliant celestial blue, divine radiance. "
+            "The Open Heaven — the celestial palace realm beyond ascension, tier of immortal gods. "
+            "Flat divine white-jade paved ground in the bottom quarter "
+            "(clear, no pillars, clouds, or lotus flowers crossing into it). "
+            "Midground: colossal white-gold tiangong (heavenly palace) pillars carved with coiling "
+            "celestial dragons rising out of frame, "
+            "immortal cranes perched on carved jade railings, "
+            "golden qi rivers flowing upward defying gravity, "
+            "a pair of towering jade gate pillars (yuemen) with golden divine seals blazing. "
+            "Background: blindingly radiant heavenly sky of pure divine gold and white, "
+            "a vast celestial star sea visible through parting clouds of golden qi, "
+            "distant tiangong palace rooflines with upturned eaves silhouetted against divine radiance, "
+            "massive lotus flowers made of light blooming at the horizon. "
+            "Atmosphere: transcendent, overwhelming divine power, the apex of cultivation. "
+            "Palette: divine gold, pure white, celestial blue, jade, blazing radiance. "
             f"{S}"
         ),
     },
