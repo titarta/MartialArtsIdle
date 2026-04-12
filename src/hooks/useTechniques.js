@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { saveTechniques, loadTechniques, saveOwnedTechniques, loadOwnedTechniques } from '../systems/save';
 import { getTechnique, TECHNIQUES, TECHNIQUE_QUALITY } from '../data/techniques';
+import { AFFIX_SLOT_COUNT } from '../data/affixPools';
 
 // Passive pools re-exported from techniqueDrops for use in transmutation
 const PASSIVE_POOLS = {
@@ -116,7 +117,7 @@ export default function useTechniques() {
       const tech = prev[id];
       if (!tech) return prev;
       const passives = tech.passives ?? [];
-      const maxSlots = Object.keys(TECHNIQUE_QUALITY).indexOf(tech.quality) + 1;
+      const maxSlots = AFFIX_SLOT_COUNT[tech.quality] ?? 3;
       if (passives.length >= maxSlots) return prev;
       const excludeNames = passives.map(p => p.name);
       const newPassive   = pickRandomPassive(tech.type, excludeNames);

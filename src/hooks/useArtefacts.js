@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 import {
   generateAffixes, rollAffix, pickRandomAffix,
-  AFFIX_POOL_BY_SLOT,
+  AFFIX_POOL_BY_SLOT, AFFIX_SLOT_COUNT,
 } from '../data/affixPools';
 
 const SAVE_KEY = 'mai_artefacts';
@@ -217,7 +217,7 @@ export default function useArtefacts() {
         const art      = ARTEFACTS_BY_ID[o.catalogueId];
         const rarity   = o.rarity ?? art?.rarity ?? 'common';
         const affixes  = o.affixes ?? [];
-        const maxSlots = rarity === 'common' ? 3 : 2;
+        const maxSlots = AFFIX_SLOT_COUNT[rarity] ?? 3;
         if (affixes.length >= maxSlots) return o;
         const excludeIds = affixes.map(a => a.id);
         const newAffix = pickRandomAffix(art?.slot ?? 'weapon', rarity, excludeIds);

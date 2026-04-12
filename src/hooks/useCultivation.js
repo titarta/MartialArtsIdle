@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
 import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
-import { rollLawMult, pickRandomLawPassive } from '../data/affixPools';
+import { rollLawMult, pickRandomLawPassive, AFFIX_SLOT_COUNT } from '../data/affixPools';
 
 const OWNED_LAWS_KEY = 'mai_owned_laws';
 export const MAX_LAWS = 100;
@@ -87,7 +87,7 @@ export default function useCultivation() {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
       const passives = law.passives ?? [];
-      const maxSlots = LAW_RARITY[law.rarity]?.passiveSlots ?? 1;
+      const maxSlots = AFFIX_SLOT_COUNT[law.rarity] ?? 3;
       if (passives.length >= maxSlots) return law;
       const excludeNames = passives.map(p => p.name);
       const newPassive   = pickRandomLawPassive(excludeNames);

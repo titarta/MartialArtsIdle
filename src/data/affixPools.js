@@ -2,15 +2,19 @@
  * affixPools.js — per-slot affix definitions for artefact transmutation.
  *
  * Each entry: { id, name, stat, type, ranges: { rarity: [min, max], ... } }
- * Slot counts: common = 3 slots, all higher rarities = 2 slots.
+ * Slot counts: base 3 at common/Iron, +2 per quality tier above that.
+ * Items are generated with 1 affix; the rest must be filled via Add.
  */
 
 import { MOD } from './stats';
 
 // ─── Slot counts ──────────────────────────────────────────────────────────────
+// Base 3 at common/Iron, +2 per quality tier.
+// Actual max is naturally capped by the pool size per slot (4–5 entries).
 
 export const AFFIX_SLOT_COUNT = {
-  common: 3, uncommon: 2, rare: 2, epic: 2, legendary: 2,
+  common: 3, uncommon: 5, rare: 7,  epic: 9,  legendary: 11,
+  Iron:   3, Bronze:   5, Silver: 7, Gold: 9,  Transcendent: 11,
 };
 
 // ─── Rarity tiers (for cost calculation) ────────────────────────────────────
@@ -113,20 +117,13 @@ export function pickRandomAffix(slot, rarity, excludeIds = []) {
   return rollAffix(entry, rarity);
 }
 
-/** Generate a full set of affixes for a slot + rarity combination. */
+/** Generate the initial set of affixes for a newly acquired item.
+ *  Items start with just 1 affix — the rest must be added via transmutation. */
 export function generateAffixes(slot, rarity) {
-  const count = AFFIX_SLOT_COUNT[rarity] ?? 2;
-  const pool  = AFFIX_POOL_BY_SLOT[slot] ?? [];
-  const result   = [];
-  const usedIds  = [];
-  for (let i = 0; i < count && usedIds.length < pool.length; i++) {
-    const available = pool.filter(e => !usedIds.includes(e.id));
-    if (!available.length) break;
-    const entry = available[Math.floor(Math.random() * available.length)];
-    usedIds.push(entry.id);
-    result.push(rollAffix(entry, rarity));
-  }
-  return result;
+  const pool = AFFIX_POOL_BY_SLOT[slot] ?? [];
+  if (!pool.length) return [];
+  const entry = pool[Math.floor(Math.random() * pool.length)];
+  return [rollAffix(entry, rarity)];
 }
 
 // ─── Law multiplier ranges ────────────────────────────────────────────────────

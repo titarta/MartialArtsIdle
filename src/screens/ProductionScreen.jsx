@@ -4,7 +4,7 @@ import { LAW_RARITY } from '../data/laws';
 import { TECHNIQUE_QUALITY } from '../data/techniques';
 import { ITEMS_BY_ID } from '../data/items';
 import { MOD } from '../data/stats';
-import { AFFIX_SLOT_COUNT, RARITY_TIER } from '../data/affixPools';
+import { AFFIX_SLOT_COUNT, RARITY_TIER, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
 import { ARTEFACT_NEXT_RARITY } from '../hooks/useArtefacts';
 import { TECH_NEXT_QUALITY } from '../hooks/useTechniques';
 import { LAW_NEXT_RARITY } from '../hooks/useCultivation';
@@ -222,8 +222,9 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
   const rarity = inst.rarity ?? art?.rarity ?? 'common';
   const q      = artQuality(rarity);
   const tier   = getTier(rarity);
-  const affixes   = inst.affixes ?? [];
-  const maxSlots  = AFFIX_SLOT_COUNT[rarity] ?? 2;
+  const affixes    = inst.affixes ?? [];
+  const poolSize   = (AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? []).length;
+  const maxSlots   = Math.min(AFFIX_SLOT_COUNT[rarity] ?? 3, poolSize);
   const emptySlots = Math.max(0, maxSlots - affixes.length);
 
   const nextRar  = ARTEFACT_NEXT_RARITY[rarity];
@@ -241,7 +242,7 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
         <span className="tx-quality-badge" style={{ color: q.color, borderColor: q.color }}>{q.label}</span>
       </div>
 
-      <div className="tx-section-title">Modifiers</div>
+      <div className="tx-section-title">Modifiers ({affixes.length}/{maxSlots})</div>
       <div className="tx-mod-list">
         {affixes.map((a, i) => (
           <AffixRow
@@ -295,11 +296,13 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
   );
 }
 
+const TECH_PASSIVE_POOL_SIZE = 5; // each type has 5 passives
+
 function TechniqueDetail({ tech, techniques, inventory }) {
   const q        = techQuality(tech.quality);
   const tier     = getTier(tech.quality);
   const passives  = tech.passives ?? [];
-  const maxSlots  = Object.keys(TECHNIQUE_QUALITY).indexOf(tech.quality) + 1;
+  const maxSlots  = Math.min(AFFIX_SLOT_COUNT[tech.quality] ?? 3, TECH_PASSIVE_POOL_SIZE);
   const emptySlots = Math.max(0, maxSlots - passives.length);
 
   const nextQn   = TECH_NEXT_QUALITY[tech.quality];
@@ -344,7 +347,7 @@ function TechniqueDetail({ tech, techniques, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives</div>
+      <div className="tx-section-title">Passives ({passives.length}/{maxSlots})</div>
       <div className="tx-mod-list">
         {passives.map((p, i) => (
           <PassiveRow
@@ -398,11 +401,13 @@ function TechniqueDetail({ tech, techniques, inventory }) {
   );
 }
 
+const LAW_PASSIVE_POOL_SIZE = 10; // law passive pool has 10 entries
+
 function LawDetail({ law, cultivation, inventory }) {
   const q        = lawQuality(law.rarity);
   const tier     = getTier(law.rarity);
   const passives  = law.passives ?? [];
-  const maxSlots  = LAW_RARITY[law.rarity]?.passiveSlots ?? 1;
+  const maxSlots  = Math.min(AFFIX_SLOT_COUNT[law.rarity] ?? 3, LAW_PASSIVE_POOL_SIZE);
   const emptySlots = Math.max(0, maxSlots - passives.length);
 
   const nextRn   = LAW_NEXT_RARITY[law.rarity];
@@ -439,7 +444,7 @@ function LawDetail({ law, cultivation, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives</div>
+      <div className="tx-section-title">Passives ({passives.length}/{maxSlots})</div>
       <div className="tx-mod-list">
         {passives.map((p, i) => (
           <PassiveRow
