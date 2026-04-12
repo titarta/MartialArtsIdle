@@ -80,7 +80,7 @@ const ENEMIES = {
   qi_beast: {
     id:       'qi_beast',
     name:     'Qi-Sensing Beast',
-    sprite:   null,
+    sprite:   'qi_beast',
     statMult: { hp: 1.1, atk: 1.2 },
     drops: [
       { itemId: 'spirit_stone',        chance: 0.80, qty: [2, 5] },
