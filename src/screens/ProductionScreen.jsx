@@ -4,26 +4,55 @@ import { LAW_RARITY } from '../data/laws';
 import { TECHNIQUE_QUALITY } from '../data/techniques';
 import { ITEMS_BY_ID } from '../data/items';
 import { MOD } from '../data/stats';
-import { AFFIX_SLOT_COUNT, RARITY_TIER, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
+import { RARITY_TIER, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
 import { ARTEFACT_NEXT_RARITY } from '../hooks/useArtefacts';
 import { TECH_NEXT_QUALITY } from '../hooks/useTechniques';
 import { LAW_NEXT_RARITY } from '../hooks/useCultivation';
 
-// ─── Tier helpers ─────────────────────────────────────────────────────────────
+// ─── Rarity bracket system ───────────────────────────────────────────────────
+// Base 3 slots at Iron/common, +2 per quality tier above that.
+// Each bracket has its own rarity color and mineral for craft costs.
 
-function getTier(rarity) {
-  return RARITY_TIER[rarity] ?? 1;
+const SLOT_BRACKETS = [
+  { count: 3, tier: 1, color: '#9ca3af', label: 'Iron',         mineral: 'black_tortoise_iron'    },
+  { count: 2, tier: 2, color: '#cd7f32', label: 'Bronze',       mineral: 'crimson_flame_crystal'  },
+  { count: 2, tier: 3, color: '#c0c0c0', label: 'Silver',       mineral: 'void_stone'             },
+  { count: 2, tier: 4, color: '#f5c842', label: 'Gold',         mineral: 'star_metal_ore'         },
+  { count: 2, tier: 5, color: '#c084fc', label: 'Transcendent', mineral: 'heavenly_profound_metal' },
+];
+
+function getActiveBrackets(rarity) {
+  const tier = RARITY_TIER[rarity] ?? 1;
+  return SLOT_BRACKETS.slice(0, tier);
 }
 
-// ─── Craft costs ──────────────────────────────────────────────────────────────
+/** Assign items (affixes/passives) to rarity brackets, capped by pool size. */
+function buildBracketSlots(items, rarity, poolSize) {
+  const brackets = getActiveBrackets(rarity);
+  let gi = 0;
+  return brackets.map(b => {
+    const slots = [];
+    for (let i = 0; i < b.count; i++) {
+      if (gi < items.length) {
+        slots.push({ filled: true, item: items[gi], gIdx: gi });
+        gi++;
+      } else if (gi < poolSize) {
+        slots.push({ filled: false });
+        gi++;
+      }
+    }
+    return { ...b, slots };
+  });
+}
 
-const CRAFT_COSTS = {
-  hone:    (tier) => [{ itemId: 'chaos_jade',      qty: 2 * tier }],
-  replace: (tier) => [{ itemId: 'void_stone',      qty: 2 * tier }],
-  add:     (tier) => [{ itemId: 'mithril_essence', qty: 2 * tier }],
-};
+// ─── Craft costs — mineral matches the bracket tier ──────────────────────────
 
-// Upgrade costs: two bracket minerals in increasing amounts.
+function bracketCost(mineral, op) {
+  const qty = op === 'hone' ? 3 : op === 'replace' ? 5 : 8; // add = 8
+  return [{ itemId: mineral, qty }];
+}
+
+// Upgrade costs (quality jump)
 const UPGRADE_COST = {
   common:   [ { itemId: 'black_tortoise_iron',     qty: 10 }, { itemId: 'crimson_flame_crystal',  qty: 3  } ],
   uncommon: [ { itemId: 'crimson_flame_crystal',   qty: 8  }, { itemId: 'void_stone',             qty: 3  } ],
@@ -37,9 +66,9 @@ const UPGRADE_COST = {
 
 // ─── Quality label helpers ───────────────────────────────────────────────────
 
-function artQuality(rarity)  { return QUALITY[rarity]           ?? { label: rarity,   color: '#aaa' }; }
-function techQuality(quality){ return TECHNIQUE_QUALITY[quality] ?? { label: quality,  color: '#aaa' }; }
-function lawQuality(rarity)  { return LAW_RARITY[rarity]         ?? { label: rarity,   color: '#aaa' }; }
+function artQuality(rarity)  { return QUALITY[rarity]           ?? { label: rarity,  color: '#aaa' }; }
+function techQuality(quality){ return TECHNIQUE_QUALITY[quality] ?? { label: quality, color: '#aaa' }; }
+function lawQuality(rarity)  { return LAW_RARITY[rarity]         ?? { label: rarity,  color: '#aaa' }; }
 
 // ─── Value display helpers ────────────────────────────────────────────────────
 
@@ -74,7 +103,7 @@ function formatMultLabel(key) {
   }
 }
 
-// ─── CostBadge ────────────────────────────────────────────────────────────────
+// ─── Cost helpers ─────────────────────────────────────────────────────────────
 
 function CostBadge({ costs, inventory }) {
   return (
@@ -85,7 +114,7 @@ function CostBadge({ costs, inventory }) {
         const ok   = have >= c.qty;
         return (
           <span key={c.itemId} className={`tx-craft-cost-item ${ok ? 'tx-cost-ok' : 'tx-cost-short'}`}>
-            {mat?.name ?? c.itemId} ×{c.qty}
+            {mat?.name ?? c.itemId} x{c.qty}
           </span>
         );
       })}
@@ -101,106 +130,6 @@ function spend(costs, inventory) {
   for (const c of costs) inventory.removeItem(c.itemId, c.qty);
 }
 
-// ─── Modifier rows ────────────────────────────────────────────────────────────
-
-function AffixRow({ affix, idx, tier, inventory, onHone, onReplace }) {
-  const honeCosts    = CRAFT_COSTS.hone(tier);
-  const replaceCosts = CRAFT_COSTS.replace(tier);
-  return (
-    <div className="tx-mod-row">
-      <div className="tx-mod-left">
-        <span className="tx-mod-name">{affix.name}</span>
-        <span className="tx-mod-value">{formatAffixValue(affix)}</span>
-      </div>
-      <div className="tx-mod-actions">
-        <button
-          className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-          onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(idx); } }}
-          title="Hone — randomize this modifier's value"
-        >
-          ⟳
-          <CostBadge costs={honeCosts} inventory={inventory} />
-        </button>
-        <button
-          className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-          onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(idx); } }}
-          title="Replace — swap for a random different modifier"
-        >
-          ↺
-          <CostBadge costs={replaceCosts} inventory={inventory} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PassiveRow({ passive, idx, tier, inventory, onReplace }) {
-  const replaceCosts = CRAFT_COSTS.replace(tier);
-  return (
-    <div className="tx-mod-row">
-      <div className="tx-mod-left">
-        <span className="tx-mod-name">{passive.name}</span>
-        <span className="tx-mod-desc">{passive.description}</span>
-      </div>
-      <div className="tx-mod-actions">
-        <button
-          className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-          onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(idx); } }}
-          title="Replace — swap for a random different passive"
-        >
-          ↺
-          <CostBadge costs={replaceCosts} inventory={inventory} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function MultRow({ label, value, multKey, tier, inventory, onHone }) {
-  const honeCosts = CRAFT_COSTS.hone(tier);
-  return (
-    <div className="tx-mod-row">
-      <div className="tx-mod-left">
-        <span className="tx-mod-name">{label}</span>
-        <span className="tx-mod-value">×{value.toFixed(2)}</span>
-      </div>
-      <div className="tx-mod-actions">
-        <button
-          className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-          onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(multKey); } }}
-          title="Hone — randomize this multiplier's value"
-        >
-          ⟳
-          <CostBadge costs={honeCosts} inventory={inventory} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function EmptySlotRow({ tier, inventory, onAdd }) {
-  const addCosts = CRAFT_COSTS.add(tier);
-  return (
-    <div className="tx-mod-row tx-mod-row-empty">
-      <div className="tx-mod-left">
-        <span className="tx-mod-empty">— Empty Slot —</span>
-      </div>
-      <div className="tx-mod-actions">
-        <button
-          className={`tx-craft-btn tx-craft-btn-add ${canAfford(addCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-          onClick={() => { if (canAfford(addCosts, inventory)) { spend(addCosts, inventory); onAdd(); } }}
-          title="Add — fill this slot with a random modifier"
-        >
-          +
-          <CostBadge costs={addCosts} inventory={inventory} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── CostRow (upgrade section) ───────────────────────────────────────────────
-
 function CostRow({ itemId, needed, owned }) {
   const mat  = ITEMS_BY_ID[itemId];
   const name = mat?.name ?? itemId;
@@ -215,100 +144,232 @@ function CostRow({ itemId, needed, owned }) {
   );
 }
 
+// ─── Modifier rows ────────────────────────────────────────────────────────────
+
+function AffixRow({ affix, gIdx, color, mineral, inventory, onHone, onReplace }) {
+  const honeCosts    = bracketCost(mineral, 'hone');
+  const replaceCosts = bracketCost(mineral, 'replace');
+  return (
+    <div className="tx-mod-row" style={{ borderLeft: `3px solid ${color}` }}>
+      <div className="tx-mod-left">
+        <span className="tx-mod-value" style={{ color }}>{formatAffixValue(affix)}</span>
+      </div>
+      <div className="tx-mod-actions">
+        <button
+          className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(gIdx); } }}
+          title="Hone — randomize value"
+        >
+          ⟳
+          <CostBadge costs={honeCosts} inventory={inventory} />
+        </button>
+        <button
+          className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(gIdx); } }}
+          title="Replace — swap for a different modifier"
+        >
+          ↺
+          <CostBadge costs={replaceCosts} inventory={inventory} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function PassiveRow({ passive, gIdx, color, mineral, inventory, onReplace }) {
+  const replaceCosts = bracketCost(mineral, 'replace');
+  return (
+    <div className="tx-mod-row" style={{ borderLeft: `3px solid ${color}` }}>
+      <div className="tx-mod-left">
+        <span className="tx-mod-desc" style={{ color }}>{passive.description}</span>
+      </div>
+      <div className="tx-mod-actions">
+        <button
+          className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(gIdx); } }}
+          title="Replace — swap for a different passive"
+        >
+          ↺
+          <CostBadge costs={replaceCosts} inventory={inventory} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MultRow({ label, value, multKey, mineral, inventory, onHone }) {
+  const honeCosts = bracketCost(mineral, 'hone');
+  return (
+    <div className="tx-mod-row">
+      <div className="tx-mod-left">
+        <span className="tx-mod-name">{label}</span>
+        <span className="tx-mod-value">x{value.toFixed(2)}</span>
+      </div>
+      <div className="tx-mod-actions">
+        <button
+          className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(multKey); } }}
+          title="Hone — randomize value"
+        >
+          ⟳
+          <CostBadge costs={honeCosts} inventory={inventory} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function EmptySlotRow({ color, mineral, inventory, onAdd }) {
+  const addCosts = bracketCost(mineral, 'add');
+  return (
+    <div className="tx-mod-row tx-mod-row-empty" style={{ borderLeft: `3px solid ${color}` }}>
+      <div className="tx-mod-left">
+        <span className="tx-mod-empty" style={{ color }}>-- Empty Slot --</span>
+      </div>
+      <div className="tx-mod-actions">
+        <button
+          className={`tx-craft-btn tx-craft-btn-add ${canAfford(addCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(addCosts, inventory)) { spend(addCosts, inventory); onAdd(); } }}
+          title="Add — fill with a random modifier"
+        >
+          +
+          <CostBadge costs={addCosts} inventory={inventory} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Bracket section renderer ────────────────────────────────────────────────
+
+function BracketSection({ bracket, renderFilled, renderEmpty }) {
+  if (!bracket.slots.length) return null;
+  return (
+    <div className="tx-bracket">
+      <div className="tx-bracket-label" style={{ color: bracket.color }}>
+        {bracket.label}
+      </div>
+      <div className="tx-mod-list">
+        {bracket.slots.map((slot, i) =>
+          slot.filled
+            ? renderFilled(slot, i, bracket)
+            : renderEmpty(i, bracket)
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Upgrade section ──────────────────────────────────────────────────────────
+
+function UpgradeSection({ rarity, nextQ, inventory, onUpgrade }) {
+  const upgCost   = UPGRADE_COST[rarity];
+  const upgAfford = upgCost?.every(c => inventory.getQuantity(c.itemId) >= c.qty) ?? false;
+
+  if (!nextQ) return <p className="tx-max-quality">Already at maximum quality.</p>;
+
+  return (
+    <div className="tx-upgrade-section">
+      <div className="tx-upgrade-arrow">
+        Upgrade to{' '}
+        <span style={{ color: nextQ.color, fontWeight: 700 }}>{nextQ.label}</span>
+      </div>
+      <div className="tx-cost-list">
+        {upgCost.map(c => (
+          <CostRow key={c.itemId} itemId={c.itemId} needed={c.qty} owned={inventory.getQuantity(c.itemId)} />
+        ))}
+      </div>
+      <button
+        className={`tx-upgrade-btn ${upgAfford ? '' : 'tx-upgrade-btn-disabled'}`}
+        onClick={() => {
+          if (!upgAfford) return;
+          for (const c of upgCost) inventory.removeItem(c.itemId, c.qty);
+          onUpgrade();
+        }}
+        disabled={!upgAfford}
+      >
+        Upgrade
+      </button>
+    </div>
+  );
+}
+
 // ─── Detail panels ─────────────────────────────────────────────────────────
 
 function ArtefactDetail({ inst, artefacts, inventory }) {
   const art    = ARTEFACTS_BY_ID[inst.catalogueId];
   const rarity = inst.rarity ?? art?.rarity ?? 'common';
   const q      = artQuality(rarity);
-  const tier   = getTier(rarity);
-  const affixes    = inst.affixes ?? [];
-  const poolSize   = (AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? []).length;
-  const maxSlots   = Math.min(AFFIX_SLOT_COUNT[rarity] ?? 3, poolSize);
-  const emptySlots = Math.max(0, maxSlots - affixes.length);
+  const affixes  = inst.affixes ?? [];
+  const poolSize = (AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? []).length;
+  const brackets = buildBracketSlots(affixes, rarity, poolSize);
 
-  const nextRar  = ARTEFACT_NEXT_RARITY[rarity];
-  const nextQ    = nextRar ? artQuality(nextRar) : null;
-  const upgCost  = nextRar ? UPGRADE_COST[rarity] : null;
-  const upgAfford = upgCost?.every(c => inventory.getQuantity(c.itemId) >= c.qty) ?? false;
+  const totalFilled = affixes.length;
+  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const nextRar     = ARTEFACT_NEXT_RARITY[rarity];
+  const nextQ       = nextRar ? artQuality(nextRar) : null;
 
   return (
     <div className="tx-detail-panel">
       <div className="tx-detail-header">
         <div>
           <span className="tx-item-name">{art?.name ?? inst.catalogueId}</span>
-          <span className="tx-item-sub">{art?.slot} · {art?.weaponType ?? ''}</span>
+          <span className="tx-item-sub">{art?.slot}{art?.weaponType ? ` · ${art.weaponType}` : ''}</span>
         </div>
         <span className="tx-quality-badge" style={{ color: q.color, borderColor: q.color }}>{q.label}</span>
       </div>
 
-      <div className="tx-section-title">Modifiers ({affixes.length}/{maxSlots})</div>
-      <div className="tx-mod-list">
-        {affixes.map((a, i) => (
-          <AffixRow
-            key={a.id + i}
-            affix={a}
-            idx={i}
-            tier={tier}
-            inventory={inventory}
-            onHone={(idx)    => artefacts.honeAffix(inst.uid, idx)}
-            onReplace={(idx) => artefacts.replaceAffix(inst.uid, idx)}
-          />
-        ))}
-        {Array.from({ length: emptySlots }, (_, i) => (
-          <EmptySlotRow
-            key={`empty-${i}`}
-            tier={tier}
-            inventory={inventory}
-            onAdd={() => artefacts.addAffix(inst.uid)}
-          />
-        ))}
-      </div>
+      <div className="tx-section-title">Modifiers ({totalFilled}/{totalSlots})</div>
+      {brackets.map((b, bi) => (
+        <BracketSection
+          key={bi}
+          bracket={b}
+          renderFilled={(slot, i) => (
+            <AffixRow
+              key={`f-${bi}-${i}`}
+              affix={slot.item}
+              gIdx={slot.gIdx}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onHone={(idx)    => artefacts.honeAffix(inst.uid, idx)}
+              onReplace={(idx) => artefacts.replaceAffix(inst.uid, idx)}
+            />
+          )}
+          renderEmpty={(i) => (
+            <EmptySlotRow
+              key={`e-${bi}-${i}`}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onAdd={() => artefacts.addAffix(inst.uid)}
+            />
+          )}
+        />
+      ))}
 
       <div className="tx-section-title">Upgrade Quality</div>
-      {upgCost ? (
-        <div className="tx-upgrade-section">
-          <div className="tx-upgrade-arrow">
-            Upgrade to{' '}
-            <span style={{ color: nextQ.color, fontWeight: 700 }}>{nextQ.label}</span>
-          </div>
-          <div className="tx-cost-list">
-            {upgCost.map(c => (
-              <CostRow key={c.itemId} itemId={c.itemId} needed={c.qty} owned={inventory.getQuantity(c.itemId)} />
-            ))}
-          </div>
-          <button
-            className={`tx-upgrade-btn ${upgAfford ? '' : 'tx-upgrade-btn-disabled'}`}
-            onClick={() => {
-              if (!upgAfford) return;
-              for (const c of upgCost) inventory.removeItem(c.itemId, c.qty);
-              artefacts.upgradeArtefact(inst.uid);
-            }}
-            disabled={!upgAfford}
-          >
-            Upgrade
-          </button>
-        </div>
-      ) : (
-        <p className="tx-max-quality">Already at maximum quality.</p>
-      )}
+      <UpgradeSection
+        rarity={rarity}
+        nextQ={nextQ}
+        inventory={inventory}
+        onUpgrade={() => artefacts.upgradeArtefact(inst.uid)}
+      />
     </div>
   );
 }
 
-const TECH_PASSIVE_POOL_SIZE = 5; // each type has 5 passives
+const TECH_PASSIVE_POOL_SIZE = 5;
 
 function TechniqueDetail({ tech, techniques, inventory }) {
   const q        = techQuality(tech.quality);
-  const tier     = getTier(tech.quality);
-  const passives  = tech.passives ?? [];
-  const maxSlots  = Math.min(AFFIX_SLOT_COUNT[tech.quality] ?? 3, TECH_PASSIVE_POOL_SIZE);
-  const emptySlots = Math.max(0, maxSlots - passives.length);
+  const passives = tech.passives ?? [];
+  const brackets = buildBracketSlots(passives, tech.quality, TECH_PASSIVE_POOL_SIZE);
 
-  const nextQn   = TECH_NEXT_QUALITY[tech.quality];
-  const nextQ    = nextQn ? techQuality(nextQn) : null;
-  const upgCost  = nextQn ? UPGRADE_COST[tech.quality] : null;
-  const upgAfford = upgCost?.every(c => inventory.getQuantity(c.itemId) >= c.qty) ?? false;
+  const totalFilled = passives.length;
+  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const nextQn      = TECH_NEXT_QUALITY[tech.quality];
+  const nextQ       = nextQn ? techQuality(nextQn) : null;
 
   return (
     <div className="tx-detail-panel">
@@ -325,8 +386,8 @@ function TechniqueDetail({ tech, techniques, inventory }) {
       <div className="tx-stat-list">
         {tech.type === 'Attack' && (
           <>
-            {tech.arteMult   != null && <div className="tx-stat-row"><span>Arte Mult.</span><span>×{tech.arteMult.toFixed(2)}</span></div>}
-            {tech.elemBonus  != null && tech.elemBonus !== 1 && <div className="tx-stat-row"><span>Elem. Bonus</span><span>×{tech.elemBonus.toFixed(2)}</span></div>}
+            {tech.arteMult   != null && <div className="tx-stat-row"><span>Arte Mult.</span><span>x{tech.arteMult.toFixed(2)}</span></div>}
+            {tech.elemBonus  != null && tech.elemBonus !== 1 && <div className="tx-stat-row"><span>Elem. Bonus</span><span>x{tech.elemBonus.toFixed(2)}</span></div>}
           </>
         )}
         {tech.type === 'Heal' && tech.healPercent != null && (
@@ -334,7 +395,7 @@ function TechniqueDetail({ tech, techniques, inventory }) {
         )}
         {tech.type === 'Defend' && (
           <>
-            {tech.defMult      != null && <div className="tx-stat-row"><span>DEF Mult.</span><span>×{tech.defMult.toFixed(2)}</span></div>}
+            {tech.defMult      != null && <div className="tx-stat-row"><span>DEF Mult.</span><span>x{tech.defMult.toFixed(2)}</span></div>}
             {tech.buffDuration != null && <div className="tx-stat-row"><span>Duration</span><span>{tech.buffDuration}s</span></div>}
           </>
         )}
@@ -347,73 +408,61 @@ function TechniqueDetail({ tech, techniques, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives ({passives.length}/{maxSlots})</div>
-      <div className="tx-mod-list">
-        {passives.map((p, i) => (
-          <PassiveRow
-            key={p.name + i}
-            passive={p}
-            idx={i}
-            tier={tier}
-            inventory={inventory}
-            onReplace={(idx) => techniques.replacePassive(tech.id, idx)}
-          />
-        ))}
-        {Array.from({ length: emptySlots }, (_, i) => (
-          <EmptySlotRow
-            key={`empty-${i}`}
-            tier={tier}
-            inventory={inventory}
-            onAdd={() => techniques.addPassive(tech.id)}
-          />
-        ))}
-      </div>
+      <div className="tx-section-title">Passives ({totalFilled}/{totalSlots})</div>
+      {brackets.map((b, bi) => (
+        <BracketSection
+          key={bi}
+          bracket={b}
+          renderFilled={(slot, i) => (
+            <PassiveRow
+              key={`f-${bi}-${i}`}
+              passive={slot.item}
+              gIdx={slot.gIdx}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onReplace={(idx) => techniques.replacePassive(tech.id, idx)}
+            />
+          )}
+          renderEmpty={(i) => (
+            <EmptySlotRow
+              key={`e-${bi}-${i}`}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onAdd={() => techniques.addPassive(tech.id)}
+            />
+          )}
+        />
+      ))}
 
       {/* Upgrade */}
       <div className="tx-section-title">Upgrade Quality</div>
-      {upgCost ? (
-        <div className="tx-upgrade-section">
-          <div className="tx-upgrade-arrow">
-            Upgrade to{' '}
-            <span style={{ color: nextQ.color, fontWeight: 700 }}>{nextQ.label}</span>
-          </div>
-          <div className="tx-cost-list">
-            {upgCost.map(c => (
-              <CostRow key={c.itemId} itemId={c.itemId} needed={c.qty} owned={inventory.getQuantity(c.itemId)} />
-            ))}
-          </div>
-          <button
-            className={`tx-upgrade-btn ${upgAfford ? '' : 'tx-upgrade-btn-disabled'}`}
-            onClick={() => {
-              if (!upgAfford) return;
-              for (const c of upgCost) inventory.removeItem(c.itemId, c.qty);
-              techniques.upgradeTechnique(tech.id);
-            }}
-            disabled={!upgAfford}
-          >
-            Upgrade
-          </button>
-        </div>
-      ) : (
-        <p className="tx-max-quality">Already at maximum quality.</p>
-      )}
+      <UpgradeSection
+        rarity={tech.quality}
+        nextQ={nextQ}
+        inventory={inventory}
+        onUpgrade={() => techniques.upgradeTechnique(tech.id)}
+      />
     </div>
   );
 }
 
-const LAW_PASSIVE_POOL_SIZE = 10; // law passive pool has 10 entries
+const LAW_PASSIVE_POOL_SIZE = 10;
 
 function LawDetail({ law, cultivation, inventory }) {
   const q        = lawQuality(law.rarity);
-  const tier     = getTier(law.rarity);
-  const passives  = law.passives ?? [];
-  const maxSlots  = Math.min(AFFIX_SLOT_COUNT[law.rarity] ?? 3, LAW_PASSIVE_POOL_SIZE);
-  const emptySlots = Math.max(0, maxSlots - passives.length);
+  const passives = law.passives ?? [];
+  const brackets = buildBracketSlots(passives, law.rarity, LAW_PASSIVE_POOL_SIZE);
 
-  const nextRn   = LAW_NEXT_RARITY[law.rarity];
-  const nextQ    = nextRn ? lawQuality(nextRn) : null;
-  const upgCost  = nextRn ? UPGRADE_COST[law.rarity] : null;
-  const upgAfford = upgCost?.every(c => inventory.getQuantity(c.itemId) >= c.qty) ?? false;
+  const totalFilled = passives.length;
+  const totalSlots  = brackets.reduce((s, b) => s + b.slots.length, 0);
+  const nextRn      = LAW_NEXT_RARITY[law.rarity];
+  const nextQ       = nextRn ? lawQuality(nextRn) : null;
+
+  // Law multipliers use the item's base-tier mineral for Hone cost
+  const baseTier   = RARITY_TIER[law.rarity] ?? 1;
+  const baseMineral = SLOT_BRACKETS[baseTier - 1]?.mineral ?? 'black_tortoise_iron';
 
   const MULT_KEYS = ['cultivationSpeedMult', 'essenceMult', 'soulMult', 'bodyMult'];
 
@@ -436,7 +485,7 @@ function LawDetail({ law, cultivation, inventory }) {
             label={formatMultLabel(key)}
             value={law[key] ?? 0}
             multKey={key}
-            tier={tier}
+            mineral={baseMineral}
             inventory={inventory}
             onHone={(mk) => cultivation.honeLawMult(law.id, mk)}
           />
@@ -444,56 +493,42 @@ function LawDetail({ law, cultivation, inventory }) {
       </div>
 
       {/* Passives */}
-      <div className="tx-section-title">Passives ({passives.length}/{maxSlots})</div>
-      <div className="tx-mod-list">
-        {passives.map((p, i) => (
-          <PassiveRow
-            key={p.name + i}
-            passive={p}
-            idx={i}
-            tier={tier}
-            inventory={inventory}
-            onReplace={(idx) => cultivation.replaceLawPassive(law.id, idx)}
-          />
-        ))}
-        {Array.from({ length: emptySlots }, (_, i) => (
-          <EmptySlotRow
-            key={`empty-${i}`}
-            tier={tier}
-            inventory={inventory}
-            onAdd={() => cultivation.addLawPassive(law.id)}
-          />
-        ))}
-      </div>
+      <div className="tx-section-title">Passives ({totalFilled}/{totalSlots})</div>
+      {brackets.map((b, bi) => (
+        <BracketSection
+          key={bi}
+          bracket={b}
+          renderFilled={(slot, i) => (
+            <PassiveRow
+              key={`f-${bi}-${i}`}
+              passive={slot.item}
+              gIdx={slot.gIdx}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onReplace={(idx) => cultivation.replaceLawPassive(law.id, idx)}
+            />
+          )}
+          renderEmpty={(i) => (
+            <EmptySlotRow
+              key={`e-${bi}-${i}`}
+              color={b.color}
+              mineral={b.mineral}
+              inventory={inventory}
+              onAdd={() => cultivation.addLawPassive(law.id)}
+            />
+          )}
+        />
+      ))}
 
       {/* Upgrade */}
       <div className="tx-section-title">Upgrade Quality</div>
-      {upgCost ? (
-        <div className="tx-upgrade-section">
-          <div className="tx-upgrade-arrow">
-            Upgrade to{' '}
-            <span style={{ color: nextQ.color, fontWeight: 700 }}>{nextQ.label}</span>
-          </div>
-          <div className="tx-cost-list">
-            {upgCost.map(c => (
-              <CostRow key={c.itemId} itemId={c.itemId} needed={c.qty} owned={inventory.getQuantity(c.itemId)} />
-            ))}
-          </div>
-          <button
-            className={`tx-upgrade-btn ${upgAfford ? '' : 'tx-upgrade-btn-disabled'}`}
-            onClick={() => {
-              if (!upgAfford) return;
-              for (const c of upgCost) inventory.removeItem(c.itemId, c.qty);
-              cultivation.upgradeLaw(law.id);
-            }}
-            disabled={!upgAfford}
-          >
-            Upgrade
-          </button>
-        </div>
-      ) : (
-        <p className="tx-max-quality">Already at maximum quality.</p>
-      )}
+      <UpgradeSection
+        rarity={law.rarity}
+        nextQ={nextQ}
+        inventory={inventory}
+        onUpgrade={() => cultivation.upgradeLaw(law.id)}
+      />
     </div>
   );
 }
@@ -512,7 +547,6 @@ function TransmutationPanel({ inventory, artefacts, techniques, cultivation }) {
 
   const switchTab = (tab) => { setItemTab(tab); setSelected(null); };
 
-  // Resolve the selected item's data
   let selectedInst = null;
   if (selected) {
     if (itemTab === 'artefacts')  selectedInst = artefacts.owned.find(o => o.uid === selected) ?? null;
@@ -522,7 +556,6 @@ function TransmutationPanel({ inventory, artefacts, techniques, cultivation }) {
 
   return (
     <div className="tx-panel">
-      {/* Item-type tabs */}
       <div className="inv-tabs">
         {ITEM_TABS.map(t => (
           <button
@@ -535,7 +568,6 @@ function TransmutationPanel({ inventory, artefacts, techniques, cultivation }) {
         ))}
       </div>
 
-      {/* Item grid */}
       <div className="inv-grid tx-item-grid">
         {itemTab === 'artefacts' && artefacts.owned.map(inst => {
           const art    = ARTEFACTS_BY_ID[inst.catalogueId];
@@ -588,27 +620,14 @@ function TransmutationPanel({ inventory, artefacts, techniques, cultivation }) {
         })}
       </div>
 
-      {/* Detail panel */}
       {selectedInst && itemTab === 'artefacts' && (
-        <ArtefactDetail
-          inst={selectedInst}
-          artefacts={artefacts}
-          inventory={inventory}
-        />
+        <ArtefactDetail inst={selectedInst} artefacts={artefacts} inventory={inventory} />
       )}
       {selectedInst && itemTab === 'techniques' && (
-        <TechniqueDetail
-          tech={selectedInst}
-          techniques={techniques}
-          inventory={inventory}
-        />
+        <TechniqueDetail tech={selectedInst} techniques={techniques} inventory={inventory} />
       )}
       {selectedInst && itemTab === 'laws' && (
-        <LawDetail
-          law={selectedInst}
-          cultivation={cultivation}
-          inventory={inventory}
-        />
+        <LawDetail law={selectedInst} cultivation={cultivation} inventory={inventory} />
       )}
 
       {!selected && (

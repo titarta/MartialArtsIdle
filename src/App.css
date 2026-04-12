@@ -1887,10 +1887,24 @@
   padding-bottom: 4px;
 }
 
+.tx-bracket {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tx-bracket-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 0;
+}
+
 .tx-mod-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .tx-mod-row {
@@ -1923,14 +1937,13 @@
 }
 
 .tx-mod-value {
-  font-size: 0.75rem;
-  color: #4ade80;
-  font-weight: 500;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .tx-mod-desc {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
   line-height: 1.3;
 }
 
