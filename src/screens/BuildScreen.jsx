@@ -25,6 +25,7 @@ function statLabel(stat) {
 
 function formatBonus(b) {
   if (b.type === MOD.INCREASED) return `+${Math.round(b.value * 100)}% ${statLabel(b.stat)}`;
+  if (b.type === MOD.MORE)      return `×${b.value.toFixed(2)} ${statLabel(b.stat)}`;
   return `+${b.value} ${statLabel(b.stat)}`;
 }
 

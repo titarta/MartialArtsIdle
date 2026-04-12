@@ -91,10 +91,15 @@ const STAT_LABELS = {
 };
 
 function formatAffixValue(affix) {
+  const label = STAT_LABELS[affix.stat] ?? affix.stat;
   if (affix.type === MOD.INCREASED) {
-    return `+${Math.round(affix.value * 100)}% ${STAT_LABELS[affix.stat] ?? affix.stat}`;
+    return `+${Math.round(affix.value * 100)}% ${label}`;
   }
-  return `+${affix.value} ${STAT_LABELS[affix.stat] ?? affix.stat}`;
+  if (affix.type === MOD.MORE) {
+    // Stored as multiplier (e.g. 1.10) — display as ×1.10
+    return `×${affix.value.toFixed(2)} ${label}`;
+  }
+  return `+${affix.value} ${label}`;
 }
 
 function formatMultLabel(key) {
