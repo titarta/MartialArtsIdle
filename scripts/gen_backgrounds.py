@@ -197,12 +197,18 @@ SCENES = {
 
     "world_2": {
         "desc": (
-            "Combat background for an ancient desert frontier ruin. "
-            "Flat cracked sandy desert ground in the bottom quarter (clear, no rocks or ruins jutting up). "
-            "Midground: broken stone columns, eroded ancient carved walls, wind-scattered sand drifts, "
-            "bleached bones half-buried. Background: deep red-orange sunset sky over distant dunes, "
-            "a collapsed ancient tower silhouette on the horizon, heat shimmer. "
-            "Desolate, ancient, sun-scorched atmosphere. Warm reds, burnt oranges, sandy yellows. "
+            "Combat background for 'The Ancient Frontier' — a vast, once-great xianxia immortal civilization "
+            "now reduced to sun-scorched ruins on a shattered sky desert. "
+            "Flat cracked ochre desert ground in the bottom quarter (completely clear — no rocks, bones, or ruins jutting up). "
+            "Midground: half-buried colossal carved stone archways of ancient immortal architecture, "
+            "shattered qi-inscription pillars with faintly glowing golden runes still burning on cracked stone, "
+            "bleached ribcages of massive dragon-sized beasts half-swallowed by drifting sand. "
+            "Background: a vast cracked sky with deep amber-orange hues and jagged fracture lines of pale light "
+            "cutting across the horizon — as if the sky itself was shattered by an ancient war, "
+            "silhouettes of collapsed immortal towers and an enormous dragon skeleton ribcage arching across "
+            "the far distance. "
+            "Desolate grandeur — a dead empire frozen in time. "
+            "Palette: deep amber, scorched ochre, sun-bleached bone, ancient gold rune-glow, fractured pale sky. "
             f"{S}"
         ),
     },
@@ -304,13 +310,13 @@ def run_generate(scene_id):
 
 def crop_to_content(img, white_threshold=200):
     """
-    Crop away transparent bands and white/mist edges that the API bakes in.
+    1. Crop away transparent bands and white/mist edges baked in by the API.
+    2. Centre-crop the result to exactly BG_WIDTH:BG_HEIGHT (2:1) so all
+       backgrounds are resized with a consistent scale factor and no distortion.
 
-    A column/row is considered "edge filler" if it is either:
+    A column/row is "edge filler" when it is either:
       - fully transparent (alpha == 0 for every pixel), OR
-      - opaque but with average brightness > white_threshold (mist/sky haze)
-
-    Returns the cropped image (still RGBA, not yet resized).
+      - opaque but average brightness > white_threshold (mist/sky haze).
     """
     w, h = img.size
     pixels = img.load()
@@ -318,25 +324,37 @@ def crop_to_content(img, white_threshold=200):
     def col_is_content(x):
         vals = [pixels[x, y][c] for y in range(h) for c in range(3)
                 if pixels[x, y][3] > 0]
-        if not vals:
-            return False                     # fully transparent
-        return (sum(vals) / len(vals)) < white_threshold
+        return bool(vals) and (sum(vals) / len(vals)) < white_threshold
 
     def row_is_content(y):
         vals = [pixels[x, y][c] for x in range(w) for c in range(3)
                 if pixels[x, y][3] > 0]
-        if not vals:
-            return False
-        return (sum(vals) / len(vals)) < white_threshold
+        return bool(vals) and (sum(vals) / len(vals)) < white_threshold
 
-    left  = next((x for x in range(w)       if col_is_content(x)), 0)
-    right = next((x for x in range(w-1,-1,-1) if col_is_content(x)), w-1)
-    top   = next((y for y in range(h)       if row_is_content(y)), 0)
-    bot   = next((y for y in range(h-1,-1,-1) if row_is_content(y)), h-1)
+    left  = next((x for x in range(w)          if col_is_content(x)), 0)
+    right = next((x for x in range(w-1, -1, -1) if col_is_content(x)), w - 1)
+    top   = next((y for y in range(h)          if row_is_content(y)), 0)
+    bot   = next((y for y in range(h-1, -1, -1) if row_is_content(y)), h - 1)
 
-    print(f"  Content region: x={left}-{right}, y={top}-{bot} "
-          f"({right-left+1}x{bot-top+1} -> {BG_WIDTH}x{BG_HEIGHT})")
-    return img.crop((left, top, right + 1, bot + 1))
+    cropped = img.crop((left, top, right + 1, bot + 1))
+    cw, ch  = cropped.size
+    print(f"  Content region: x={left}-{right}, y={top}-{bot} ({cw}x{ch})")
+
+    # Normalise to target aspect ratio (2:1) by centre-cropping the excess axis.
+    target_ar = BG_WIDTH / BG_HEIGHT          # 2.0
+    current_ar = cw / ch
+
+    if current_ar > target_ar:               # too wide — trim left/right equally
+        new_w  = int(ch * target_ar)
+        x_off  = (cw - new_w) // 2
+        cropped = cropped.crop((x_off, 0, x_off + new_w, ch))
+    elif current_ar < target_ar:             # too tall — trim top/bottom equally
+        new_h  = int(cw / target_ar)
+        y_off  = (ch - new_h) // 2
+        cropped = cropped.crop((0, y_off, cw, y_off + new_h))
+
+    print(f"  Normalised to {target_ar:.1f}:1 -> {cropped.size[0]}x{cropped.size[1]}")
+    return cropped
 
 
 def run_finalize(scene_id, cand_n):
