@@ -20,6 +20,7 @@ import useCombat      from './hooks/useCombat';
 import useArtefacts   from './hooks/useArtefacts';
 import usePills       from './hooks/usePills';
 import { initDebug } from './debug/gameDebug';
+import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
 import './App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
   const [screenParam,   setScreenParam]   = useState(null);
 
   useEffect(() => { initAds(); }, []);
+  useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
 
   const cultivation = useCultivation();
   const inventory   = useInventory();

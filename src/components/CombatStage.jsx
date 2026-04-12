@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import SpriteAnimator from './SpriteAnimator';
 import DamageNumber from './DamageNumber';
 import { getSprites, FW, FH } from '../sprites/spriteGen';
+import { preloadEnemySprites } from '../utils/preload';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -22,13 +23,6 @@ function getSpriteScale() {
 
 // Canvas-generated sprites: 32×40, displayed at 3×
 const GEN_SCALE = 3;
-
-// Kick off a browser image fetch so the sprite is in cache before it's needed.
-function preload(src) {
-  if (!src) return;
-  const img = new Image();
-  img.src = src;
-}
 
 /**
  * Resolve enemy sprite src for a given animation.
@@ -140,20 +134,10 @@ export default function CombatStage({
     }
   }, [phase]);
 
-  // Preload player sprites once on mount — attack and hit sheets arrive in cache
-  // before the first animation fires, eliminating the first-hit flicker.
+  // Safety-net preload: if combat is entered directly (saved state, deep link)
+  // without going through WorldsScreen, ensure enemy sheets are in cache.
   useEffect(() => {
-    preload(PLAYER_IDLE_SRC);
-    preload(PLAYER_ATTACK_SRC);
-    preload(PLAYER_HIT_SRC);
-  }, []);
-
-  // Preload enemy sprites whenever the enemy changes (new fight or new region).
-  useEffect(() => {
-    if (!enemy?.sprite) return;
-    preload(enemySpriteSrc(enemy, 'idle'));
-    preload(enemySpriteSrc(enemy, 'attack'));
-    preload(enemySpriteSrc(enemy, 'hit'));
+    preloadEnemySprites(enemy?.sprite ?? null);
   }, [enemy?.sprite]);
 
   // Register the damage-number spawn callback so useCombat can trigger it.

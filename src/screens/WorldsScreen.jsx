@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WORLDS from '../data/worlds';
 import ENEMIES from '../data/enemies';
+import { preloadEnemySprites } from '../utils/preload';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -56,10 +57,22 @@ function RegionRow({ region, tab, locked, onNavigate }) {
     ? [...new Set((region.enemyPool ?? []).map(e => e.enemyId))]
     : [];
 
+  function handleClick() {
+    if (isWorld) {
+      // Preload all 3 animation sets for this region's enemies right before
+      // entering combat — they'll be in cache by the time the first hit lands.
+      const sprites = [...new Set(
+        (region.enemyPool ?? []).map(e => ENEMIES[e.enemyId]?.sprite).filter(Boolean)
+      )];
+      sprites.forEach(sprite => preloadEnemySprites(sprite));
+    }
+    onNavigate(SCREEN_MAP[tab], { region });
+  }
+
   return (
     <div
       className={`region-row${locked ? ' region-locked' : ''}${isWorld && !locked ? ' region-row-world' : ''}`}
-      onClick={!locked ? () => onNavigate(SCREEN_MAP[tab], { region }) : undefined}
+      onClick={!locked ? handleClick : undefined}
       role={!locked ? 'button' : undefined}
     >
       <div className="region-row-left">
@@ -91,6 +104,20 @@ function RegionRow({ region, tab, locked, onNavigate }) {
 function WorldCard({ world, tab, realmIndex, onNavigate }) {
   const worldLocked = realmIndex < world.minRealmIndex;
   const [open, setOpen] = useState(!worldLocked && world.id === 1);
+
+  // When the world card opens, preload attack + hit sheets for every enemy in
+  // this world. Idle is already fetched by the EnemyChip <img> on render.
+  useEffect(() => {
+    if (!open || worldLocked) return;
+    const sprites = new Set();
+    world.regions.forEach(region =>
+      (region.enemyPool ?? []).forEach(e => {
+        const sprite = ENEMIES[e.enemyId]?.sprite;
+        if (sprite) sprites.add(sprite);
+      })
+    );
+    sprites.forEach(sprite => preloadEnemySprites(sprite, ['attack', 'hit']));
+  }, [open, worldLocked, world.regions]);
 
   return (
     <div className={`world-card${worldLocked ? ' world-locked' : ''}`}>
