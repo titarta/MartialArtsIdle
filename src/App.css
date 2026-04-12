@@ -1633,76 +1633,78 @@
   flex-shrink: 0;
 }
 
-/* Technique bars */
-.technique-bars {
+/* Technique icon grid */
+.tech-icon-grid {
   display: flex;
-  flex-direction: column;
-  gap: 7px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 16px;
 }
 
-.tech-bar-slot {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 9px 12px;
+.tech-icon-slot {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-}
-
-.tech-bar-empty {
-  opacity: 0.45;
-}
-
-.tech-bar-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  width: 72px;
+  border: 2px solid;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-card);
 }
 
-.tech-bar-name {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.tech-icon-empty {
+  opacity: 0.4;
 }
 
-.tech-bar-meta {
+.tech-icon-top {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
   display: flex;
-  gap: 5px;
   align-items: center;
-  flex-shrink: 0;
-}
-
-.tech-bar-badge {
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid;
-}
-
-.tech-bar-cd {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-}
-
-.tech-bar-track {
-  height: 5px;
-  background: var(--bg-secondary);
-  border-radius: 3px;
+  justify-content: center;
   overflow: hidden;
 }
 
-.tech-bar-fill {
+/* Sprite — sits above glyph; if src 404s the glyph shows through */
+.tech-icon-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
-  border-radius: 3px;
-  /* gradient matches Soul→Essence colors */
-  background: linear-gradient(to right, #7c3aed, #0284c7);
-  width: 0%;
-  /* NO CSS transition — rAF-patched */
+  object-fit: cover;
+  image-rendering: pixelated;
+  z-index: 1;
+}
+
+/* Fallback glyph when no sprite file exists */
+.tech-icon-glyph {
+  font-size: 1.6rem;
+  line-height: 1;
+  z-index: 0;
+  user-select: none;
+}
+
+/* Clock overlay — conic-gradient patched by rAF loop, NO CSS transition */
+.tech-icon-clock {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.tech-icon-name {
+  font-size: 0.58rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  padding: 3px 4px;
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Action button */
@@ -2194,17 +2196,13 @@
     height: 12px;
   }
 
-  .tech-bar-slot {
-    padding: 10px 12px;
-    gap: 7px;
+  .tech-icon-slot {
+    width: 80px;
   }
 
-  .tech-bar-name {
-    font-size: 0.82rem;
-  }
-
-  .tech-bar-cd {
-    font-size: 0.72rem;
+  .tech-icon-name {
+    font-size: 0.64rem;
+    padding: 4px 5px;
   }
 
   /* ── Build technique slots: readable ─────────────────────────────────── */

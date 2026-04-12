@@ -1,5 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { TYPE_COLOR, getCooldown } from '../data/techniques';
+import { TYPE_COLOR } from '../data/techniques';
+
+const BASE = import.meta.env.BASE_URL;
+
+const TECH_GLYPH = {
+  Attack: '⚔',
+  Heal:   '✦',
+  Defend: '⬡',
+  Dodge:  '↯',
+};
 import { pickEnemy } from '../data/enemies';
 import REALMS from '../data/realms';
 import CombatStage from '../components/CombatStage';
@@ -113,33 +122,36 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
         </div>
       </div>
 
-      {/* ── Technique bars ───────────────────────────────────────────────── */}
-      <div className="technique-bars">
-        {[0, 1, 2].map(i => {
-          const tech  = equippedTechniques[i];
-          const color = tech ? TYPE_COLOR[tech.type] : 'rgba(255,255,255,0.12)';
-
+      {/* ── Technique icons ──────────────────────────────────────────────── */}
+      <div className="tech-icon-grid">
+        {equippedTechniques.map((tech, i) => {
+          const color = tech ? TYPE_COLOR[tech.type] : 'rgba(255,255,255,0.15)';
           return (
-            <div key={i} className={`tech-bar-slot${!tech ? ' tech-bar-empty' : ''}`}>
-              <div className="tech-bar-header">
-                <span className="tech-bar-name" style={{ color: tech ? color : 'var(--text-muted)' }}>
-                  {tech ? tech.name : `— Slot ${['I','II','III'][i]} —`}
+            <div
+              key={i}
+              className={`tech-icon-slot${!tech ? ' tech-icon-empty' : ''}`}
+              style={{ borderColor: color }}
+            >
+              <div
+                className="tech-icon-top"
+                style={{ background: tech ? `${color}28` : undefined }}
+              >
+                <img
+                  src={`${BASE}sprites/techniques/${tech?.type?.toLowerCase() ?? 'empty'}.png`}
+                  className="tech-icon-img"
+                  alt=""
+                />
+                <span className="tech-icon-glyph" style={{ color }}>
+                  {TECH_GLYPH[tech?.type] ?? '—'}
                 </span>
-                {tech && (
-                  <div className="tech-bar-meta">
-                    <span className="tech-bar-badge" style={{ color, borderColor: color }}>{tech.type}</span>
-                    <span className="tech-bar-cd">{getCooldown(tech.type, tech.quality).toFixed(1)}s</span>
-                  </div>
-                )}
+                <div
+                  className="tech-icon-clock"
+                  ref={el => { combat.cdBarRefs.current[i] = el; }}
+                />
               </div>
-              {tech && (
-                <div className="tech-bar-track">
-                  <div
-                    ref={el => { combat.cdBarRefs.current[i] = el; }}
-                    className="tech-bar-fill"
-                  />
-                </div>
-              )}
+              <span className="tech-icon-name" style={{ color }}>
+                {tech ? tech.name : `Slot ${['I','II','III'][i]}`}
+              </span>
             </div>
           );
         })}

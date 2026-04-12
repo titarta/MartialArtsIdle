@@ -85,8 +85,14 @@ export default function useCombat() {
       const el = cdBarRefs.current[i];
       if (!el) continue;
       const cd = s.cds[i], maxCd = s.maxCds[i];
-      if (!isFinite(cd) || !isFinite(maxCd) || maxCd === 0) { el.style.width = '0%'; continue; }
-      el.style.width = `${(1 - Math.min(cd / maxCd, 1)) * 100}%`;
+      if (!isFinite(cd) || !isFinite(maxCd) || maxCd === 0) {
+        el.style.background = 'transparent';
+        continue;
+      }
+      const angle = Math.min(cd / maxCd, 1) * 360;
+      el.style.background = angle <= 0
+        ? 'transparent'
+        : `conic-gradient(from -90deg, rgba(0,0,0,0.72) ${angle}deg, transparent ${angle}deg)`;
     }
   };
 
