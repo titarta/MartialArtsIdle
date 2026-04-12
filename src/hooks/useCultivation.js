@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
-import { DEFAULT_LAW, THREE_HARMONY_MANUAL } from '../data/laws';
+import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
+import { rollLawMult, pickRandomLawPassive } from '../data/affixPools';
 
 const OWNED_LAWS_KEY = 'mai_owned_laws';
 export const MAX_LAWS = 100;
@@ -56,6 +57,42 @@ export default function useCultivation() {
       const next = LAW_NEXT_RARITY[law.rarity];
       if (!next) return law;
       return { ...law, rarity: next };
+    }));
+  }, []);
+
+  /** Re-roll one law multiplier within the rarity range. */
+  const honeLawMult = useCallback((lawId, multKey) => {
+    setOwnedLaws(prev => prev.map(law => {
+      if (law.id !== lawId) return law;
+      const newVal = rollLawMult(multKey, law.rarity);
+      return { ...law, [multKey]: newVal };
+    }));
+  }, []);
+
+  /** Replace one law passive with a different one from the pool. */
+  const replaceLawPassive = useCallback((lawId, idx) => {
+    setOwnedLaws(prev => prev.map(law => {
+      if (law.id !== lawId) return law;
+      const passives     = law.passives ?? [];
+      const excludeNames = passives.map(p => p.name).filter((_, i) => i !== idx);
+      const newPassive   = pickRandomLawPassive(excludeNames);
+      if (!newPassive) return law;
+      const updated = passives.map((p, i) => (i === idx ? newPassive : p));
+      return { ...law, passives: updated };
+    }));
+  }, []);
+
+  /** Add a passive to the next empty slot (if rarity allows more). */
+  const addLawPassive = useCallback((lawId) => {
+    setOwnedLaws(prev => prev.map(law => {
+      if (law.id !== lawId) return law;
+      const passives = law.passives ?? [];
+      const maxSlots = LAW_RARITY[law.rarity]?.passiveSlots ?? 1;
+      if (passives.length >= maxSlots) return law;
+      const excludeNames = passives.map(p => p.name);
+      const newPassive   = pickRandomLawPassive(excludeNames);
+      if (!newPassive) return law;
+      return { ...law, passives: [...passives, newPassive] };
     }));
   }, []);
 
@@ -180,6 +217,9 @@ export default function useCultivation() {
     ownedLaws,
     addOwnedLaw,
     upgradeLaw,
+    honeLawMult,
+    replaceLawPassive,
+    addLawPassive,
     // Ads
     activateAdBoost,
     adBoostActive:  adBoostEndsAt > Date.now(),

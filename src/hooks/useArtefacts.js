@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react';
 import { ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
+import {
+  generateAffixes, rollAffix, pickRandomAffix,
+  AFFIX_POOL_BY_SLOT,
+} from '../data/affixPools';
 
 const SAVE_KEY = 'mai_artefacts';
 export const MAX_ARTEFACTS = 100;
@@ -44,6 +48,21 @@ const STARTER_EQUIPPED = {
   ring_2: 'start_ring_b',
 };
 
+// Backfill affixes for instances that don't have them yet (e.g. from saves
+// before the affix system was introduced).
+function ensureAffixes(owned) {
+  let changed = false;
+  const result = owned.map(o => {
+    if (o.affixes) return o;
+    const art = ARTEFACTS_BY_ID[o.catalogueId];
+    if (!art) return o;
+    const rarity = o.rarity ?? art.rarity ?? 'common';
+    changed = true;
+    return { ...o, affixes: generateAffixes(art.slot, rarity) };
+  });
+  return { result, changed };
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -59,16 +78,23 @@ function save(state) {
 }
 
 export default function useArtefacts() {
-  const [state, setState] = useState(() =>
-    load() ?? { owned: STARTER_OWNED, equipped: STARTER_EQUIPPED }
-  );
+  const [state, setState] = useState(() => {
+    const loaded = load() ?? { owned: STARTER_OWNED, equipped: STARTER_EQUIPPED };
+    const { result: owned, changed } = ensureAffixes(loaded.owned);
+    const initial = { ...loaded, owned };
+    if (changed) save(initial);
+    return initial;
+  });
 
   /** Add a dropped artefact to the owned collection. Silently ignored when full. */
   const addArtefact = useCallback((catalogueId) => {
     setState(prev => {
       if (prev.owned.length >= MAX_ARTEFACTS) return prev;
-      const uid = `art_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-      const next = { ...prev, owned: [...prev.owned, { uid, catalogueId }] };
+      const uid    = `art_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      const art    = ARTEFACTS_BY_ID[catalogueId];
+      const rarity = art?.rarity ?? 'common';
+      const affixes = generateAffixes(art?.slot ?? 'weapon', rarity);
+      const next = { ...prev, owned: [...prev.owned, { uid, catalogueId, affixes }] };
       save(next);
       return next;
     });
@@ -141,6 +167,69 @@ export default function useArtefacts() {
     });
   }, []);
 
+  /** Re-roll one affix's value within the current rarity range. */
+  const honeAffix = useCallback((uid, idx) => {
+    setState(prev => {
+      const owned = prev.owned.map(o => {
+        if (o.uid !== uid) return o;
+        const art    = ARTEFACTS_BY_ID[o.catalogueId];
+        const rarity = o.rarity ?? art?.rarity ?? 'common';
+        const pool   = AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? [];
+        const affixes = (o.affixes ?? []).map((a, i) => {
+          if (i !== idx) return a;
+          const entry = pool.find(e => e.id === a.id);
+          if (!entry) return a;
+          return rollAffix(entry, rarity);
+        });
+        return { ...o, affixes };
+      });
+      const next = { ...prev, owned };
+      save(next);
+      return next;
+    });
+  }, []);
+
+  /** Replace one affix with a random different one from the pool. */
+  const replaceAffix = useCallback((uid, idx) => {
+    setState(prev => {
+      const owned = prev.owned.map(o => {
+        if (o.uid !== uid) return o;
+        const art     = ARTEFACTS_BY_ID[o.catalogueId];
+        const rarity  = o.rarity ?? art?.rarity ?? 'common';
+        const affixes = o.affixes ?? [];
+        const excludeIds = affixes.map(a => a.id).filter((_, i) => i !== idx);
+        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', rarity, excludeIds);
+        if (!newAffix) return o;
+        const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
+        return { ...o, affixes: updated };
+      });
+      const next = { ...prev, owned };
+      save(next);
+      return next;
+    });
+  }, []);
+
+  /** Add a new affix to an empty slot (if the item still has capacity). */
+  const addAffix = useCallback((uid) => {
+    setState(prev => {
+      const owned = prev.owned.map(o => {
+        if (o.uid !== uid) return o;
+        const art      = ARTEFACTS_BY_ID[o.catalogueId];
+        const rarity   = o.rarity ?? art?.rarity ?? 'common';
+        const affixes  = o.affixes ?? [];
+        const maxSlots = rarity === 'common' ? 3 : 2;
+        if (affixes.length >= maxSlots) return o;
+        const excludeIds = affixes.map(a => a.id);
+        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', rarity, excludeIds);
+        if (!newAffix) return o;
+        return { ...o, affixes: [...affixes, newAffix] };
+      });
+      const next = { ...prev, owned };
+      save(next);
+      return next;
+    });
+  }, []);
+
   // Build the modifiers object expected by computeAllStats.
   const getStatModifiers = useCallback(() => {
     const mods = {};
@@ -153,6 +242,10 @@ export default function useArtefacts() {
       for (const bonus of getSlotBonuses(art.slot, art.rarity)) {
         (mods[bonus.stat] ??= []).push({ type: bonus.type, value: bonus.value });
       }
+      // Include per-instance affixes from transmutation
+      for (const affix of (instance.affixes ?? [])) {
+        (mods[affix.stat] ??= []).push({ type: affix.type, value: affix.value });
+      }
     }
     return mods;
   }, [state]);
@@ -162,6 +255,9 @@ export default function useArtefacts() {
     equipped:       state.equipped,
     addArtefact,
     upgradeArtefact,
+    honeAffix,
+    replaceAffix,
+    addAffix,
     equip,
     unequip,
     getEquipped,
