@@ -98,8 +98,10 @@ export default function useCombat() {
    * @param {function} onDrops           — callback([{itemId, qty}]) fired on material victory drops
    * @param {function} onTechniqueDrop   — callback(techniqueObj) fired when a technique drops
    * @param {number}   worldId           — world tier 1–6, used for technique generation
+   * @param {number}   regionBaseQi      — min-realm cost of the region; anchors enemy HP to
+   *                                       zone difficulty rather than player's current power
    */
-  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1) => {
+  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1, regionBaseQi = null) => {
     const { essence, soul, body } = stats;
     const total  = essence + soul + body;
 
@@ -108,9 +110,11 @@ export default function useCombat() {
     const eName   = enemyDef?.name ?? 'Training Dummy';
 
     const pMaxHp = Math.max(100, Math.floor((essence + body) * 12 + soul * 4));
-    const eMaxHp = Math.max(200, Math.floor(total * 10 * hpMult));
-    // eAtk scales with total player stats × enemy multiplier.
-    // Paired with the scale-independent damage formula below.
+    // HP uses the region's baseline qi so early zones always have low HP and
+    // late zones always have high HP — independent of the player's current power.
+    const hpBase = regionBaseQi ?? total;
+    const eMaxHp = Math.max(200, Math.floor(hpBase * 10 * hpMult));
+    // ATK stays player-stats-based: it measures danger TO the current player.
     const eAtk   = Math.max(10,  Math.floor(total * atkMult));
 
     const cds    = equippedTechs.map(t => t ? 0        : Infinity);

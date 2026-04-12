@@ -71,10 +71,15 @@ HP = (Essence + Body) × 12 + Soul × 4
 
 ### Enemy Stats
 ```
-Enemy HP  = (Essence + Soul + Body) × 10 × enemy_hp_mult
+Enemy HP  = region_base_qi × 10 × enemy_hp_mult
 Enemy ATK = (Essence + Soul + Body) × enemy_atk_mult
 ```
-Both scale with the player's current stats so fights feel consistent regardless of realm.
+`region_base_qi` is the realm-cost of the region's minimum realm (from `data/realms.js`).
+This anchors HP to the zone's intended difficulty: early zones always have low HP, late zones
+always have high HP, regardless of the player's current power. An over-levelled player will
+one-shot zone-1 enemies while finding zone-6 enemies appropriately challenging.
+
+Enemy ATK still scales with the player's current stats — it measures danger TO this player.
 `hp_mult` and `atk_mult` are per-enemy constants defined in `data/enemies.js`.
 
 ### Enemy Damage Formula (scale-independent)

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { TYPE_COLOR, getCooldown } from '../data/techniques';
 import { pickEnemy } from '../data/enemies';
+import REALMS from '../data/realms';
 import CombatStage from '../components/CombatStage';
 
 const AUTO_RESTART_MS = 1500;
@@ -29,6 +30,13 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
     const law = cultivation.activeLaw;
     const enemyDef = region?.enemyPool ? pickEnemy(region.enemyPool) : null;
     setStageEnemy(enemyDef);
+    // Enemy HP is anchored to the region's minimum realm cost, not the
+    // player's current qi — so zone 1 enemies always have low HP and zone 6
+    // enemies always have high HP regardless of who is fighting them.
+    const regionBaseQi = region?.minRealmIndex != null
+      ? (REALMS[region.minRealmIndex]?.cost ?? qi)
+      : qi;
+
     startFight(
       {
         essence:    Math.floor(qi * law.essenceMult),
@@ -41,6 +49,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
       inventory   ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
       techniques  ? (tech)  => techniques.addOwnedTechnique(tech) : null,
       region?.worldId ?? 1,
+      regionBaseQi,
     );
   };
 
