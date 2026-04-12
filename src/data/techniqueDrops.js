@@ -2,9 +2,9 @@
  * techniqueDrops.js — procedural Secret Technique generation for loot drops.
  *
  * Quality and element pools are biased by world tier so that later worlds
- * yield better techniques.  The DD quality rarity table from Enemies.md
- * maps directly onto technique quality tiers:
- *   Common → Iron, Uncommon → Bronze, Rare → Silver, Epic → Gold, Legendary → Transcendent
+ * yield better techniques. Rank scales with world:
+ *   World 1 → Mortal, World 2 → Earth, World 3 → Sky,
+ *   World 4 → Saint, World 5 → Emperor, World 6 → Heaven
  */
 
 import { TECHNIQUE_QUALITY } from './techniques';
@@ -37,7 +37,7 @@ const WORLD_ELEMENTS = [
 
 /** Rank of dropped techniques per world. */
 const WORLD_RANK = [
-  'Saint', 'Saint', 'Saint', 'Emperor', 'Emperor', 'Immortal',
+  'Mortal', 'Earth', 'Sky', 'Saint', 'Emperor', 'Heaven',
 ];
 
 const TYPE_WEIGHTS = { Attack: 50, Heal: 20, Defend: 15, Dodge: 15 };

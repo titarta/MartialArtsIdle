@@ -1,6 +1,6 @@
 # Secret Techniques
 
-Advanced combat skills that fire automatically during fights. Unlocked at [[Realm Progression#Saint|Saint]] realm.
+Advanced combat skills that fire automatically during fights. Available from the start — higher ranks unlock as the cultivator progresses through realms.
 
 ---
 
@@ -73,20 +73,20 @@ Damage = K * (Essence + Soul + Body + artefact_dmg_flat) * arte_mult * elem_bonu
 
 ### K Scaling (Rank × Quality)
 
-Major realm rows, quality columns:
-
-| Rank | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|
-| Saint | 1.5 | 2.0 | 2.8 | 3.8 | 5.0 |
-| Emperor | 2.5 | 3.5 | 4.8 | 6.5 | 8.5 |
-| Immortal | 4.0 | 5.5 | 7.5 | 10.0 | 13.0 |
-| *(higher)* | TBD | TBD | TBD | TBD | TBD |
+| Rank | Requires | Iron | Bronze | Silver | Gold | Transcendent |
+|---|---|---|---|---|---|---|
+| Mortal | Tempered Body | 0.5 | 0.7 | 1.0 | 1.3 | 1.8 |
+| Earth | Qi Transformation | 1.0 | 1.4 | 2.0 | 2.7 | 3.5 |
+| Sky | Separation & Reunion | 1.5 | 2.0 | 2.8 | 3.8 | 5.0 |
+| Saint | Saint | 2.0 | 2.8 | 3.8 | 5.2 | 6.8 |
+| Emperor | Void King | 2.5 | 3.5 | 4.8 | 6.5 | 8.5 |
+| Heaven | Half-Step Open Heaven | 4.0 | 5.5 | 7.5 | 10.0 | 13.0 |
 
 ---
 
 ## Requirements to Equip
 
-- Minimum **major realm** matching the technique's rank
+- Minimum **major realm** matching the technique's rank (see table above)
 - Matching **artefact type** (sword, polearm, etc.)
 - Matching **Law element** (optional for non-elemental techniques)
 - Minimum **Essence / Soul / Body** threshold (varies per technique)
@@ -112,9 +112,10 @@ Quality affects cooldown speed, K multiplier, and number of passives on the tech
 ## Discovery & Acquisition
 
 - **Dropped by mobs** — each enemy has a per-kill technique drop chance (see [[Enemies]] drop tables). Chance is rare; stronger zones have higher rates.
+- **Rank is world-gated** — World 1 drops Mortal, World 2 → Earth, World 3 → Sky, World 4 → Saint, World 5 → Emperor, World 6 → Heaven.
 - **Quality is world-gated** — the dropped technique's quality tier is rolled using the same rarity weights as material drops: World 1 yields mostly Iron/Bronze, World 6 yields mostly Transcendent.
 - **Element follows world flavour** — World 1 drops Normal/Fire/Lightning; later worlds have Void, Ancient, etc.
-- Dropped techniques are stored in the player's **owned collection** and appear in the equip modal alongside the static catalogue.
+- Dropped techniques are stored in the player's **owned collection** and appear in the equip screen.
 - Rewards from zone clears or boss fights (TBD)
 - Crafted / refined at the [[Crafting|Refining Furnace]] once obtained
 

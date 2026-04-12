@@ -157,19 +157,19 @@ Total sub-stages: **47**
 
 | Major Realm | Features Unlocked |
 |---|---|
-| Tempered Body | Combat (gold & materials), Shop |
-| Qi Transformation | Laws, law-based default attack |
+| Tempered Body | Combat (gold & materials), Shop, Secret Techniques (Mortal rank) |
+| Qi Transformation | Laws, law-based default attack, Earth-rank techniques |
 | True Element | Improved laws, law passives |
-| Separation & Reunion | — TBD |
+| Separation & Reunion | Sky-rank techniques |
 | Immortal Ascension | — TBD |
-| Saint | Secret Techniques |
+| Saint | Saint-rank techniques |
 | Saint King | — TBD |
 | Origin Returning | Alchemy (pill crafting) |
 | Origin King | — TBD |
-| Void King | Multiplier upgrades |
+| Void King | Multiplier upgrades, Emperor-rank techniques |
 | Dao Source | — TBD |
 | Emperor Realm | Artifact refining |
-| Half-Step Open Heaven | — TBD |
+| Half-Step Open Heaven | Heaven-rank techniques |
 | Open Heaven | Esoteric elements (Space, Time...) |
 
 ---
