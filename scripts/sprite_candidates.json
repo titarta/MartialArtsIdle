@@ -1,5 +1,5 @@
 {
-  "_note": "Records which candidate image was chosen for each enemy's animation run. sparring_dummy is PIL-drawn (no candidate).",
+  "_note": "Records which candidate image was chosen for each enemy's animation run.",
   "outer_sect_disciple": { "candidate": null, "note": "Generated in earlier session, candidate not recorded" },
   "wolf":                { "candidate": 2 },
   "iron_fang_wolf":      { "candidate": 3, "idle_attack_ref": "hit_frame4", "note": "idle+attack regenerated using hit frame 4 as reference for consistency" },
