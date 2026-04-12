@@ -30,10 +30,10 @@ const ENEMIES = {
     techniqueDrop: { chance: 0.02 },
   },
 
-  sparring_dummy: {
-    id:       'sparring_dummy',
-    name:     'Sparring Dummy',
-    sprite:   'sparring_dummy',
+  training_golem: {
+    id:       'training_golem',
+    name:     'Training Golem',
+    sprite:   'training_golem',
     statMult: { hp: 1.2, atk: 0.3 },   // tanky, low damage — constructs don't drop techniques
     drops: [
       { itemId: 'spirit_stone', chance: 0.50, qty: [1, 2] },

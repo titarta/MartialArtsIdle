@@ -24,7 +24,7 @@ const WORLDS = [
         ores: 'Black Tortoise Iron',
         enemyPool: [
           { enemyId: 'outer_sect_disciple', weight: 7 },
-          { enemyId: 'sparring_dummy',      weight: 3 },
+          { enemyId: 'training_golem',      weight: 3 },
         ],
       },
       {

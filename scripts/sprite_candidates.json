@@ -7,5 +7,6 @@
   "wandering_beast":     { "candidate": 2 },
   "qi_beast":            { "candidate": 0 },
   "rogue_disciple":      { "candidate": 0 },
-  "forest_spirit":       { "candidate": 2 }
+  "forest_spirit":       { "candidate": 2 },
+  "training_golem":      { "candidate": 0, "note": "stick/scarecrow design, orange lantern on chest" }
 }
