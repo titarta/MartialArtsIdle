@@ -68,7 +68,7 @@ const ENEMIES = {
   wandering_beast: {
     id:       'wandering_beast',
     name:     'Wandering Beast',
-    sprite:   null,
+    sprite:   'wandering_beast',
     statMult: { hp: 1.0, atk: 1.0 },
     drops: [
       { itemId: 'spirit_stone', chance: 0.65, qty: [1, 3] },

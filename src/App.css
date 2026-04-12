@@ -2753,6 +2753,61 @@
   color: var(--text-muted);
 }
 
+/* ── Enemy chip row (world tab region cards) ───────────────────────────────── */
+
+/* Region row in world-tab mode: info left, chips right */
+.region-row-world {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.region-row-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.enemy-chip-row {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: flex-end;
+}
+
+.enemy-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Clips the 512×128 idle sheet to show only the first 128×128 frame */
+.enemy-chip-sprite {
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.enemy-chip-sprite img {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.enemy-chip-name {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-align: center;
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Back button (shared by CombatArena / Gathering / Mining) ──────────────── */
 
 .back-btn {
