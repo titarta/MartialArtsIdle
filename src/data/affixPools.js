@@ -27,10 +27,11 @@ export const RARITY_TIER = {
 
 // ─── Per-slot affix pools ────────────────────────────────────────────────────
 // Modifier guidelines:
-//   - Primary stats (essence/soul/body) NEVER use FLAT — only INCREASED/MORE,
-//     because they're derived from Qi and law multipliers.
-//   - Combat stats (physical_damage, defense, health, etc.) use FLAT for base,
-//     with INCREASED/MORE as the powerful "important" mods.
+//   - Primary stats (essence/soul/body) and stats DERIVED from them
+//     (health, defense, elemental_defense, soul_toughness) NEVER use FLAT —
+//     only INCREASED/MORE, because they scale from Qi via law multipliers.
+//   - Stats with base 0 (physical_damage, elemental_damage, psychic_damage)
+//     and additive percentages (exploit_chance) can use FLAT.
 //   - INCREASED stores additive % (0.10 = +10%); MORE stores multiplier (1.10 = ×1.10).
 
 // Common range tables to keep entries readable
@@ -48,20 +49,20 @@ const WEAPON_POOL = [
 ];
 
 const HEAD_POOL = [
-  { id: 'h_soul_tough_flat', name: 'Soul Barrier',   stat: 'soul_toughness',   type: MOD.FLAT,      ranges: { Iron:[3,8], Bronze:[6,16], Silver:[12,32], Gold:[24,64], Transcendent:[48,128] } },
-  { id: 'h_elem_def',        name: 'Spirit Ward',    stat: 'elemental_defense',type: MOD.FLAT,      ranges: { Iron:[3,8], Bronze:[6,16], Silver:[12,32], Gold:[24,64], Transcendent:[48,128] } },
-  { id: 'h_soul_incr',       name: 'Mind Clarity',   stat: 'soul',             type: MOD.INCREASED, ranges: INCR_SMALL },
-  { id: 'h_health_incr',     name: 'Vitality',       stat: 'health',           type: MOD.INCREASED, ranges: INCR_SMALL },
-  { id: 'h_def_incr',        name: 'Hardened Mind',  stat: 'defense',          type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'h_soul_tough_incr', name: 'Soul Barrier',  stat: 'soul_toughness',   type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'h_elem_def_incr',   name: 'Spirit Ward',   stat: 'elemental_defense',type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'h_soul_incr',       name: 'Mind Clarity',  stat: 'soul',             type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'h_health_incr',     name: 'Vitality',      stat: 'health',           type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'h_def_incr',        name: 'Hardened Mind', stat: 'defense',          type: MOD.INCREASED, ranges: INCR_SMALL },
 ];
 
 const BODY_POOL = [
-  { id: 'b_def_flat',   name: 'Iron Shell',     stat: 'defense', type: MOD.FLAT,      ranges: { Iron:[5,14],  Bronze:[10,28],  Silver:[20,56],  Gold:[40,112], Transcendent:[80,224] } },
-  { id: 'b_health_flat',name: 'Life Force',     stat: 'health',  type: MOD.FLAT,      ranges: { Iron:[20,50], Bronze:[40,100], Silver:[80,200], Gold:[160,400],Transcendent:[320,800] } },
-  { id: 'b_def_incr',   name: 'Reinforced',     stat: 'defense', type: MOD.INCREASED, ranges: INCR_LARGE },
-  { id: 'b_def_more',   name: 'Steel Skin',     stat: 'defense', type: MOD.MORE,      ranges: MORE_TIER },
-  { id: 'b_health_incr',name: 'Vigor',          stat: 'health',  type: MOD.INCREASED, ranges: INCR_LARGE },
-  { id: 'b_body_incr',  name: 'Body Hardening', stat: 'body',    type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'b_def_incr',    name: 'Reinforced',     stat: 'defense',          type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'b_def_more',    name: 'Steel Skin',     stat: 'defense',          type: MOD.MORE,      ranges: MORE_TIER },
+  { id: 'b_health_incr', name: 'Vigor',          stat: 'health',           type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'b_health_more', name: 'Iron Heart',     stat: 'health',           type: MOD.MORE,      ranges: MORE_TIER },
+  { id: 'b_body_incr',   name: 'Body Hardening', stat: 'body',             type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'b_elem_def',    name: 'Elemental Shell',stat: 'elemental_defense',type: MOD.INCREASED, ranges: INCR_SMALL },
 ];
 
 const HANDS_POOL = [
@@ -73,24 +74,24 @@ const HANDS_POOL = [
 ];
 
 const WAIST_POOL = [
-  { id: 'wa_health_flat',name: 'Dantian Seal',  stat: 'health',  type: MOD.FLAT,      ranges: { Iron:[20,50], Bronze:[40,100], Silver:[80,200], Gold:[160,400], Transcendent:[320,800] } },
-  { id: 'wa_def_flat',   name: 'Belt Guard',    stat: 'defense', type: MOD.FLAT,      ranges: { Iron:[3,8],   Bronze:[6,16],   Silver:[12,32],  Gold:[24,64],   Transcendent:[48,128] } },
-  { id: 'wa_health_incr',name: 'Endurance',     stat: 'health',  type: MOD.INCREASED, ranges: INCR_LARGE },
-  { id: 'wa_body',       name: 'Core Strength', stat: 'body',    type: MOD.INCREASED, ranges: INCR_SMALL },
-  { id: 'wa_essence',    name: 'Qi Storage',    stat: 'essence', type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'wa_health_incr',name: 'Endurance',     stat: 'health',         type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'wa_def_incr',   name: 'Belt Guard',    stat: 'defense',        type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'wa_body',       name: 'Core Strength', stat: 'body',           type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'wa_essence',    name: 'Qi Storage',    stat: 'essence',        type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'wa_iron_will',  name: 'Iron Will',     stat: 'soul_toughness', type: MOD.INCREASED, ranges: INCR_SMALL },
 ];
 
 const FEET_POOL = [
-  { id: 'fe_def_flat',   name: 'Rooted Stance', stat: 'defense',          type: MOD.FLAT,      ranges: { Iron:[3,8],   Bronze:[6,16],  Silver:[12,32],  Gold:[24,64],   Transcendent:[48,128] } },
-  { id: 'fe_health_flat',name: 'Endurance',     stat: 'health',           type: MOD.FLAT,      ranges: { Iron:[15,40], Bronze:[30,80], Silver:[60,160], Gold:[120,320], Transcendent:[240,640] } },
-  { id: 'fe_def_incr',   name: 'Swift Footing', stat: 'defense',          type: MOD.INCREASED, ranges: INCR_LARGE },
-  { id: 'fe_soul_incr',  name: 'Mental Footing',stat: 'soul',             type: MOD.INCREASED, ranges: INCR_SMALL },
-  { id: 'fe_elem_def',   name: 'Spirit Steps',  stat: 'elemental_defense',type: MOD.FLAT,      ranges: { Iron:[2,6],   Bronze:[4,12],  Silver:[8,24],   Gold:[16,48],   Transcendent:[32,96] } },
+  { id: 'fe_def_incr',    name: 'Rooted',        stat: 'defense',          type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'fe_def_more',    name: 'Stalwart',      stat: 'defense',          type: MOD.MORE,      ranges: MORE_TIER },
+  { id: 'fe_health_incr', name: 'Light Step',    stat: 'health',           type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'fe_soul_incr',   name: 'Mental Footing',stat: 'soul',             type: MOD.INCREASED, ranges: INCR_SMALL },
+  { id: 'fe_elem_def',    name: 'Spirit Steps',  stat: 'elemental_defense',type: MOD.INCREASED, ranges: INCR_SMALL },
 ];
 
 const NECK_POOL = [
-  { id: 'ne_elem_def',     name: 'Warding Light',    stat: 'elemental_defense',type: MOD.FLAT,      ranges: { Iron:[3,8], Bronze:[6,16], Silver:[12,32], Gold:[24,64], Transcendent:[48,128] } },
-  { id: 'ne_soul_tough',   name: 'Soul Anchor',      stat: 'soul_toughness',   type: MOD.FLAT,      ranges: { Iron:[3,8], Bronze:[6,16], Silver:[12,32], Gold:[24,64], Transcendent:[48,128] } },
+  { id: 'ne_elem_def_i',   name: 'Warding Light',    stat: 'elemental_defense',type: MOD.INCREASED, ranges: INCR_LARGE },
+  { id: 'ne_soul_tough_m', name: 'Soul Anchor',      stat: 'soul_toughness',   type: MOD.MORE,      ranges: MORE_TIER },
   { id: 'ne_essence',      name: 'Jade Resonance',   stat: 'essence',          type: MOD.INCREASED, ranges: INCR_SMALL },
   { id: 'ne_soul',         name: 'Spiritual Link',   stat: 'soul',             type: MOD.INCREASED, ranges: INCR_SMALL },
   { id: 'ne_soul_tough_i', name: 'Mental Fortitude', stat: 'soul_toughness',   type: MOD.INCREASED, ranges: INCR_LARGE },
