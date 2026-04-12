@@ -6,6 +6,9 @@ import { ITEMS, ITEMS_BY_ID, RARITY } from '../data/items';
 import { MOD } from '../data/stats';
 import { RARITY_TIER, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
 import { findPill, PILLS, PILLS_BY_ID, RECIPES_BY_PILL } from '../data/pills';
+import { ARTEFACTS } from '../data/artefacts';
+import { generateTechnique } from '../data/techniqueDrops';
+import { generateLaw } from '../data/affixPools';
 import { ARTEFACT_NEXT_RARITY } from '../hooks/useArtefacts';
 import { TECH_NEXT_QUALITY } from '../hooks/useTechniques';
 import { LAW_NEXT_RARITY } from '../hooks/useCultivation';
@@ -710,6 +713,174 @@ function HerbSelector({ slotIndex, selectedHerbId, onSelect, inventory }) {
   );
 }
 
+// ─── RefiningPanel ───────────────────────────────────────────────────────────
+
+const REFINE_RARITIES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
+
+// Cost multiplier per rarity tier (1, 2, 4, 8, 16 — matches QUALITY mults)
+const REFINE_COST_MULT = { Iron: 1, Bronze: 2, Silver: 4, Gold: 8, Transcendent: 16 };
+
+// Base cost recipes per refine type — multiplied by REFINE_COST_MULT[rarity]
+const REFINE_BASE_COSTS = {
+  artefact: [
+    { itemId: 'black_tortoise_iron',   qty: 5 },
+    { itemId: 'crimson_flame_crystal', qty: 3 },
+  ],
+  technique: [
+    { itemId: 'black_tortoise_iron',   qty: 3 },
+    { itemId: 'soul_calming_grass',    qty: 5 },
+    { itemId: 'jade_heart_flower',     qty: 2 },
+  ],
+  law: [
+    { itemId: 'black_tortoise_iron',   qty: 3 },
+    { itemId: 'spirit_stone',          qty: 10 },
+    { itemId: 'beast_core',            qty: 3 },
+  ],
+};
+
+function getRefineCost(type, rarity) {
+  const mult = REFINE_COST_MULT[rarity] ?? 1;
+  return REFINE_BASE_COSTS[type].map(c => ({ itemId: c.itemId, qty: c.qty * mult }));
+}
+
+const REFINE_INFO = {
+  artefact: {
+    title:       'Refine Artefact',
+    description: 'Forge a random artefact from raw minerals.',
+    icon:        '⚔',
+  },
+  technique: {
+    title:       'Refine Secret Technique',
+    description: 'Inscribe a random secret technique using minerals and herbs.',
+    icon:        '✦',
+  },
+  law: {
+    title:       'Refine Cultivation Law',
+    description: 'Compile a random cultivation law using minerals and cultivation resources.',
+    icon:        '☯',
+  },
+};
+
+// Group artefacts by rarity for random picking
+const ARTEFACTS_BY_RARITY = {};
+for (const a of ARTEFACTS) {
+  (ARTEFACTS_BY_RARITY[a.rarity] ??= []).push(a);
+}
+
+// Map rarity to worldId for technique generation (1-5 tier scaling)
+const RARITY_TO_WORLD = { Iron: 1, Bronze: 2, Silver: 3, Gold: 4, Transcendent: 5 };
+
+// Rarity colors (mirror QUALITY/LAW_RARITY)
+const RARITY_COLOR = {
+  Iron: '#9ca3af', Bronze: '#cd7f32', Silver: '#c0c0c0', Gold: '#f5c842', Transcendent: '#c084fc',
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function RefineCard({ type, inventory, onRefine }) {
+  const info  = REFINE_INFO[type];
+  const [rarity, setRarity] = useState('Iron');
+  const costs = getRefineCost(type, rarity);
+  const afford = costs.every(c => inventory.getQuantity(c.itemId) >= c.qty);
+  const rColor = RARITY_COLOR[rarity];
+
+  return (
+    <div className="refine-card">
+      <div className="refine-card-header">
+        <span className="refine-card-icon">{info.icon}</span>
+        <div className="refine-card-title-block">
+          <span className="refine-card-title">{info.title}</span>
+          <span className="refine-card-desc">{info.description}</span>
+        </div>
+      </div>
+
+      {/* Rarity selector */}
+      <div className="refine-rarity-tabs">
+        {REFINE_RARITIES.map(r => {
+          const c = RARITY_COLOR[r];
+          const active = r === rarity;
+          return (
+            <button
+              key={r}
+              className={`refine-rarity-tab ${active ? 'refine-rarity-tab-active' : ''}`}
+              style={active ? { color: c, borderColor: c } : undefined}
+              onClick={() => setRarity(r)}
+            >
+              {r}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="refine-cost-list">
+        {costs.map(c => {
+          const mat  = ITEMS_BY_ID[c.itemId];
+          const have = inventory.getQuantity(c.itemId);
+          const ok   = have >= c.qty;
+          return (
+            <div key={c.itemId} className="tx-cost-row">
+              <span className="tx-cost-name">{mat?.name ?? c.itemId}</span>
+              <span className={`tx-cost-qty ${ok ? 'tx-cost-ok' : 'tx-cost-short'}`}>
+                {c.qty} <span className="tx-cost-sep">/</span> {have}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <button
+        className={`refine-btn ${afford ? '' : 'refine-btn-disabled'}`}
+        style={afford ? { color: rColor, borderColor: rColor, background: `${rColor}22` } : undefined}
+        onClick={() => afford && onRefine(type, rarity)}
+        disabled={!afford}
+      >
+        Refine {rarity}
+      </button>
+    </div>
+  );
+}
+
+function RefiningPanel({ inventory, artefacts, techniques, cultivation }) {
+  const [flashMsg, setFlashMsg] = useState(null);
+
+  const refine = (type, rarity) => {
+    const costs = getRefineCost(type, rarity);
+    if (!costs.every(c => inventory.getQuantity(c.itemId) >= c.qty)) return;
+    for (const c of costs) inventory.removeItem(c.itemId, c.qty);
+
+    let resultName = '';
+    if (type === 'artefact') {
+      const pool = ARTEFACTS_BY_RARITY[rarity] ?? [];
+      if (pool.length === 0) return;
+      const cat = pickRandom(pool);
+      artefacts.addArtefact(cat.id);
+      resultName = cat.name;
+    } else if (type === 'technique') {
+      const worldId = RARITY_TO_WORLD[rarity] ?? 1;
+      const tech = generateTechnique(worldId);
+      techniques.addOwnedTechnique(tech);
+      resultName = tech.name;
+    } else if (type === 'law') {
+      const law = generateLaw(rarity);
+      cultivation.addOwnedLaw(law);
+      resultName = law.name;
+    }
+
+    setFlashMsg(`Refined ${rarity}: ${resultName}`);
+    setTimeout(() => setFlashMsg(null), 2000);
+  };
+
+  return (
+    <div className="refining-panel">
+      <RefineCard type="artefact"  inventory={inventory} onRefine={refine} />
+      <RefineCard type="technique" inventory={inventory} onRefine={refine} />
+      <RefineCard type="law"       inventory={inventory} onRefine={refine} />
+      {flashMsg && <div className="refine-flash">{flashMsg}</div>}
+    </div>
+  );
+}
+
 /** Check if the player can afford a recipe key ("herb|herb|herb"). */
 function canAffordRecipe(key, inventory) {
   const ids = key.split('|');
@@ -920,10 +1091,12 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
       </div>
 
       {activeTab === 'refining' && (
-        <div className="prod-coming-soon">
-          <span className="prod-coming-icon">⚒</span>
-          <p>Artefact Refining — coming soon</p>
-        </div>
+        <RefiningPanel
+          inventory={inventory}
+          artefacts={artefacts}
+          techniques={techniques}
+          cultivation={cultivation}
+        />
       )}
 
       {activeTab === 'alchemy' && (

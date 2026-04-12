@@ -3431,6 +3431,126 @@
   cursor: not-allowed;
 }
 
+/* ─── Refining Panel ──────────────────────────────────────────────────────────── */
+
+.refining-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+.refine-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.refine-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.refine-card-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.refine-card-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.refine-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.refine-card-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.refine-rarity-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.refine-rarity-tab {
+  flex: 1;
+  min-width: 50px;
+  padding: 6px 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.refine-rarity-tab-active {
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 700;
+}
+
+.refine-cost-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--bg-secondary);
+  border-radius: 7px;
+  padding: 10px 12px;
+}
+
+.refine-btn {
+  width: 100%;
+  padding: 11px;
+  background: rgba(233,69,96,0.15);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.refine-btn:active { transform: scale(0.97); }
+
+.refine-btn-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.refine-flash {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
 /* ─── Recipe Book ─────────────────────────────────────────────────────────────── */
 
 .recipe-book {

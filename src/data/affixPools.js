@@ -197,8 +197,8 @@ const LAW_FLAVOURS = [
  * Generate a random law with randomized element, multipliers, and 1 passive.
  * @returns Law object matching the shape of THREE_HARMONY_MANUAL.
  */
-export function generateLaw() {
-  const rarity  = pick(LAW_RARITIES);
+export function generateLaw(forcedRarity) {
+  const rarity  = forcedRarity ?? pick(LAW_RARITIES);
   const element = pick(LAW_ELEMENTS);
   const passives = [];
   const p = pickRandomLawPassive([]);
