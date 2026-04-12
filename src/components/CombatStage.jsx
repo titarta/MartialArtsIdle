@@ -256,10 +256,8 @@ export default function CombatStage({
         )}
       </div>
 
-      {/* ── Centre ─── */}
-      <div className="stage-centre">
-        {isFighting && <span className="stage-clash">⚔</span>}
-      </div>
+      {/* ── Centre spacer ─── */}
+      <div className="stage-centre" />
 
       {/* ── Damage number particles ─── */}
       {dmgNums.map(n => (
