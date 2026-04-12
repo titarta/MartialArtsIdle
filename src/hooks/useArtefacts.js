@@ -185,7 +185,7 @@ export default function useArtefacts() {
     });
   }, []);
 
-  /** Replace one affix with a random different one from the pool, preserving its tier. */
+  /** Replace one affix with a random different one — exclusion is per-tier only. */
   const replaceAffix = useCallback((uid, idx) => {
     setState(prev => {
       const owned = prev.owned.map(o => {
@@ -195,7 +195,10 @@ export default function useArtefacts() {
         const oldAffix = affixes[idx];
         if (!oldAffix) return o;
         const tier = oldAffix.tier ?? 'Iron';
-        const excludeIds = affixes.map(a => a.id).filter((_, i) => i !== idx);
+        // Exclude only same-tier affixes (so each tier can repeat IDs from other tiers)
+        const excludeIds = affixes
+          .filter((a, i) => i !== idx && (a.tier ?? 'Iron') === tier)
+          .map(a => a.id);
         const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
         const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
@@ -207,7 +210,7 @@ export default function useArtefacts() {
     });
   }, []);
 
-  /** Add a new affix at a specific tier (Iron/Bronze/Silver/Gold/Transcendent). */
+  /** Add a new affix at a specific tier — exclusion is per-tier only. */
   const addAffix = useCallback((uid, tier = 'Iron') => {
     setState(prev => {
       const owned = prev.owned.map(o => {
@@ -217,7 +220,10 @@ export default function useArtefacts() {
         const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
         const tierCount = affixes.filter(a => (a.tier ?? 'Iron') === tier).length;
         if (tierCount >= tierMax) return o;
-        const excludeIds = affixes.map(a => a.id);
+        // Exclude only same-tier affix IDs
+        const excludeIds = affixes
+          .filter(a => (a.tier ?? 'Iron') === tier)
+          .map(a => a.id);
         const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
         return { ...o, affixes: [...affixes, newAffix] };

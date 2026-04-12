@@ -4,7 +4,7 @@ import { LAW_RARITY } from '../data/laws';
 import { TECHNIQUE_QUALITY } from '../data/techniques';
 import { ITEMS, ITEMS_BY_ID, RARITY } from '../data/items';
 import { MOD } from '../data/stats';
-import { RARITY_TIER, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
+import { RARITY_TIER } from '../data/affixPools';
 import { findPill, PILLS, PILLS_BY_ID, RECIPES_BY_PILL } from '../data/pills';
 import { ARTEFACTS } from '../data/artefacts';
 import { generateTechnique } from '../data/techniqueDrops';
@@ -33,22 +33,20 @@ function getActiveBrackets(rarity) {
 /**
  * Group items by their actual `tier` field into rarity brackets.
  * Each bracket shows all filled items of that tier, plus ONE empty slot
- * if the tier is below its limit (and the pool isn't exhausted).
+ * when the tier is below its limit. The same affix ID can repeat across
+ * different tiers (e.g. Iron Sharpness + Bronze Sharpness).
  */
-function buildBracketSlots(items, rarity, poolSize) {
+function buildBracketSlots(items, rarity) {
   const brackets = getActiveBrackets(rarity);
-  const totalFilled = items.length;
   return brackets.map(b => {
     const slots = [];
-    // Find all items in this tier with their global indices
     items.forEach((item, gIdx) => {
       const itemTier = item.tier ?? 'Iron';
       if (itemTier === b.label) {
         slots.push({ filled: true, item, gIdx });
       }
     });
-    // Show ONE empty slot if tier under limit AND pool not exhausted
-    if (slots.length < b.count && totalFilled < poolSize) {
+    if (slots.length < b.count) {
       slots.push({ filled: false });
     }
     return { ...b, slots };
@@ -307,14 +305,10 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
   const rarity = inst.rarity ?? art?.rarity ?? 'Iron';
   const q      = artQuality(rarity);
   const affixes  = inst.affixes ?? [];
-  const poolSize = (AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? []).length;
-  const brackets = buildBracketSlots(affixes, rarity, poolSize);
+  const brackets = buildBracketSlots(affixes, rarity);
 
   const totalFilled = affixes.length;
-  const totalCapacity = Math.min(
-    getActiveBrackets(rarity).reduce((s, b) => s + b.count, 0),
-    poolSize
-  );
+  const totalCapacity = getActiveBrackets(rarity).reduce((s, b) => s + b.count, 0);
   const nextRar     = ARTEFACT_NEXT_RARITY[rarity];
   const nextQ       = nextRar ? artQuality(nextRar) : null;
 
@@ -368,18 +362,13 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
   );
 }
 
-const TECH_PASSIVE_POOL_SIZE = 5;
-
 function TechniqueDetail({ tech, techniques, inventory }) {
   const q        = techQuality(tech.quality);
   const passives = tech.passives ?? [];
-  const brackets = buildBracketSlots(passives, tech.quality, TECH_PASSIVE_POOL_SIZE);
+  const brackets = buildBracketSlots(passives, tech.quality);
 
   const totalFilled = passives.length;
-  const totalCapacity = Math.min(
-    getActiveBrackets(tech.quality).reduce((s, b) => s + b.count, 0),
-    TECH_PASSIVE_POOL_SIZE
-  );
+  const totalCapacity = getActiveBrackets(tech.quality).reduce((s, b) => s + b.count, 0);
   const nextQn      = TECH_NEXT_QUALITY[tech.quality];
   const nextQ       = nextQn ? techQuality(nextQn) : null;
 
@@ -460,18 +449,13 @@ function TechniqueDetail({ tech, techniques, inventory }) {
   );
 }
 
-const LAW_PASSIVE_POOL_SIZE = 10;
-
 function LawDetail({ law, cultivation, inventory }) {
   const q        = lawQuality(law.rarity);
   const passives = law.passives ?? [];
-  const brackets = buildBracketSlots(passives, law.rarity, LAW_PASSIVE_POOL_SIZE);
+  const brackets = buildBracketSlots(passives, law.rarity);
 
   const totalFilled = passives.length;
-  const totalCapacity = Math.min(
-    getActiveBrackets(law.rarity).reduce((s, b) => s + b.count, 0),
-    LAW_PASSIVE_POOL_SIZE
-  );
+  const totalCapacity = getActiveBrackets(law.rarity).reduce((s, b) => s + b.count, 0);
   const nextRn      = LAW_NEXT_RARITY[law.rarity];
   const nextQ       = nextRn ? lawQuality(nextRn) : null;
 

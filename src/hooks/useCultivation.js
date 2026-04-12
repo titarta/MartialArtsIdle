@@ -88,7 +88,7 @@ export default function useCultivation() {
     }));
   }, []);
 
-  /** Replace one law passive with a different one, preserving its tier. */
+  /** Replace one law passive with a different one — exclusion is per-tier only. */
   const replaceLawPassive = useCallback((lawId, idx) => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
@@ -96,7 +96,9 @@ export default function useCultivation() {
       const oldPassive  = passives[idx];
       if (!oldPassive) return law;
       const tier = oldPassive.tier ?? 'Iron';
-      const excludeNames = passives.map(p => p.name).filter((_, i) => i !== idx);
+      const excludeNames = passives
+        .filter((p, i) => i !== idx && (p.tier ?? 'Iron') === tier)
+        .map(p => p.name);
       const newPassive   = pickRandomLawPassive(excludeNames);
       if (!newPassive) return law;
       const tagged = { ...newPassive, tier };
@@ -105,7 +107,7 @@ export default function useCultivation() {
     }));
   }, []);
 
-  /** Add a passive at a specific tier. */
+  /** Add a passive at a specific tier — exclusion is per-tier only. */
   const addLawPassive = useCallback((lawId, tier = 'Iron') => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
@@ -113,7 +115,9 @@ export default function useCultivation() {
       const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
       const tierCount = passives.filter(p => (p.tier ?? 'Iron') === tier).length;
       if (tierCount >= tierMax) return law;
-      const excludeNames = passives.map(p => p.name);
+      const excludeNames = passives
+        .filter(p => (p.tier ?? 'Iron') === tier)
+        .map(p => p.name);
       const newPassive   = pickRandomLawPassive(excludeNames);
       if (!newPassive) return law;
       const tagged = { ...newPassive, tier };

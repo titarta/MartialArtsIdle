@@ -92,7 +92,7 @@ export default function useTechniques() {
   }, []);
 
   /** Replace one passive at index with a different one from the pool. */
-  /** Replace passive at index with a new random one, preserving its tier. */
+  /** Replace passive at index — exclusion is per-tier only. */
   const replacePassive = useCallback((id, idx) => {
     setOwned(prev => {
       const tech = prev[id];
@@ -101,7 +101,9 @@ export default function useTechniques() {
       const oldPassive  = passives[idx];
       if (!oldPassive) return prev;
       const tier = oldPassive.tier ?? 'Iron';
-      const excludeNames = passives.map(p => p.name).filter((_, i) => i !== idx);
+      const excludeNames = passives
+        .filter((p, i) => i !== idx && (p.tier ?? 'Iron') === tier)
+        .map(p => p.name);
       const newPassive  = pickRandomPassive(tech.type, excludeNames);
       if (!newPassive) return prev;
       const tagged = { ...newPassive, tier };
@@ -110,7 +112,7 @@ export default function useTechniques() {
     });
   }, []);
 
-  /** Add a passive at a specific tier. */
+  /** Add a passive at a specific tier — exclusion is per-tier only. */
   const addPassive = useCallback((id, tier = 'Iron') => {
     setOwned(prev => {
       const tech = prev[id];
@@ -119,7 +121,9 @@ export default function useTechniques() {
       const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
       const tierCount = passives.filter(p => (p.tier ?? 'Iron') === tier).length;
       if (tierCount >= tierMax) return prev;
-      const excludeNames = passives.map(p => p.name);
+      const excludeNames = passives
+        .filter(p => (p.tier ?? 'Iron') === tier)
+        .map(p => p.name);
       const newPassive   = pickRandomPassive(tech.type, excludeNames);
       if (!newPassive) return prev;
       const tagged = { ...newPassive, tier };
