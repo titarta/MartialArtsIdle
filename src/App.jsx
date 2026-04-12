@@ -9,6 +9,7 @@ import GatheringScreen from './screens/GatheringScreen';
 import MiningScreen from './screens/MiningScreen';
 import ShopScreen from './screens/ShopScreen';
 import InventoryScreen from './screens/InventoryScreen';
+import ProductionScreen from './screens/ProductionScreen';
 import BuildScreen from './screens/BuildScreen';
 import StatsScreen from './screens/StatsScreen';
 import SettingsScreen from './screens/SettingsScreen';
@@ -61,7 +62,8 @@ function App() {
                  : null,
     build:     <BuildScreen  cultivation={cultivation} techniques={techniques} artefacts={artefacts} />,
     shop:      <ShopScreen />,
-    inventory: <InventoryScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
+    inventory:  <InventoryScreen  inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
+    production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     stats:     <StatsScreen cultivation={cultivation} artefacts={artefacts} />,
     settings:  <SettingsScreen />,
   };

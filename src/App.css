@@ -1707,6 +1707,158 @@
   -webkit-box-orient: vertical;
 }
 
+/* ─────────────────────────────────────────────
+   Production Screen
+   ───────────────────────────────────────────── */
+
+.prod-coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--text-muted);
+}
+
+.prod-coming-icon {
+  font-size: 2.4rem;
+  opacity: 0.5;
+}
+
+/* Transmutation panel */
+.tx-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tx-item-grid {
+  margin-top: 4px;
+}
+
+.tx-slot {
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+
+.tx-slot-selected {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 8px rgba(233,69,96,0.4);
+}
+
+.tx-hint {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  padding: 12px 0;
+}
+
+/* Upgrade panel */
+.tx-upgrade-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tx-upgrade-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tx-item-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.tx-item-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+  display: block;
+  margin-top: 2px;
+}
+
+.tx-quality-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tx-upgrade-arrow {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.tx-cost-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--bg-secondary);
+  border-radius: 7px;
+  padding: 10px 12px;
+}
+
+.tx-cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.tx-cost-name {
+  color: var(--text-secondary);
+}
+
+.tx-cost-qty {
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.tx-cost-sep {
+  opacity: 0.4;
+  margin: 0 2px;
+}
+
+.tx-cost-ok    { color: #4ade80; }
+.tx-cost-short { color: #f87171; }
+
+.tx-upgrade-btn {
+  width: 100%;
+  padding: 11px;
+  background: rgba(233,69,96,0.15);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.tx-upgrade-btn:active { transform: scale(0.97); }
+
+.tx-upgrade-btn-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.tx-max-quality {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
 /* Action button */
 .combat-start-btn {
   width: 100%;

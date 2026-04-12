@@ -5,9 +5,10 @@ const SCREENS = [
   { id: 'combat',    label: 'Worlds' },
   { id: 'build',     label: 'Equip'  },
   { id: 'shop',      label: 'Shop'   },
-  { id: 'inventory', label: 'Items'  },
-  { id: 'stats',     label: 'Stats'  },
-  { id: 'settings',  label: 'Config', emoji: '⚙' },
+  { id: 'inventory',  label: 'Items'  },
+  { id: 'production', label: 'Craft', emoji: '⚗' },
+  { id: 'stats',      label: 'Stats'  },
+  { id: 'settings',   label: 'Config', emoji: '⚙' },
 ];
 
 function NavBar({ currentScreen, onNavigate }) {

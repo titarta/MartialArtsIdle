@@ -5,6 +5,13 @@ import { getTechnique, TECHNIQUES } from '../data/techniques';
 const SLOT_COUNT = 3;
 export const MAX_TECHNIQUES = 100;
 
+export const TECH_NEXT_QUALITY = {
+  Iron:   'Bronze',
+  Bronze: 'Silver',
+  Silver: 'Gold',
+  Gold:   'Transcendent',
+};
+
 export default function useTechniques() {
   const [slots, setSlots] = useState(() => {
     const saved = loadTechniques();
@@ -40,6 +47,17 @@ export default function useTechniques() {
     return getTechnique(id) ?? ownedTechniques[id] ?? null;
   }, [ownedTechniques]);
 
+  /** Upgrade a technique's quality by one tier. */
+  const upgradeTechnique = useCallback((id) => {
+    setOwned(prev => {
+      const tech = prev[id];
+      if (!tech) return prev;
+      const next = TECH_NEXT_QUALITY[tech.quality];
+      if (!next) return prev;
+      return { ...prev, [id]: { ...tech, quality: next } };
+    });
+  }, []);
+
   const equip = useCallback((slotIndex, techniqueId) => {
     setSlots(prev => {
       const next = [...prev];
@@ -68,7 +86,8 @@ export default function useTechniques() {
 
   return {
     slots,
-    ownedTechniques,                          // { [id]: techniqueObj }
+    ownedTechniques,
+    upgradeTechnique,                          // { [id]: techniqueObj }
     equippedTechniques: slots.map(getTechById),
     addOwnedTechnique,
     equip,

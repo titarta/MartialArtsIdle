@@ -4,6 +4,21 @@ import { ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 const SAVE_KEY = 'mai_artefacts';
 export const MAX_ARTEFACTS = 100;
 
+// Quality progression for artefacts (rarity keys)
+export const ARTEFACT_NEXT_RARITY = {
+  common:   'uncommon',
+  uncommon: 'rare',
+  rare:     'epic',
+  epic:     'legendary',
+};
+
+// Merge catalogue data with per-instance overrides (e.g. upgraded rarity)
+function resolveInstance(o) {
+  const cat = ARTEFACTS_BY_ID[o.catalogueId];
+  if (!cat) return null;
+  return { ...cat, uid: o.uid, ...(o.rarity ? { rarity: o.rarity } : {}) };
+}
+
 // One common artefact per slot type, auto-equipped at game start.
 const STARTER_OWNED = [
   { uid: 'start_weapon', catalogueId: 'iron_sword'              },
@@ -92,13 +107,13 @@ export default function useArtefacts() {
     if (!uid) return null;
     const instance = state.owned.find(o => o.uid === uid);
     if (!instance) return null;
-    return { uid, ...ARTEFACTS_BY_ID[instance.catalogueId] };
+    return resolveInstance(instance);
   }, [state]);
 
   // All owned artefacts that can go in a given slot type, with catalogue data merged.
   const getOwnedForSlot = useCallback((slotType) => {
     return state.owned
-      .map(o => ({ uid: o.uid, ...ARTEFACTS_BY_ID[o.catalogueId] }))
+      .map(resolveInstance)
       .filter(a => a && a.slot === slotType);
   }, [state]);
 
@@ -110,6 +125,22 @@ export default function useArtefacts() {
     return null;
   }, [state]);
 
+  // Upgrade an owned artefact's quality by one tier.
+  const upgradeArtefact = useCallback((uid) => {
+    setState(prev => {
+      const owned = prev.owned.map(o => {
+        if (o.uid !== uid) return o;
+        const currentRarity = o.rarity ?? ARTEFACTS_BY_ID[o.catalogueId]?.rarity ?? 'common';
+        const nextRarity = ARTEFACT_NEXT_RARITY[currentRarity];
+        if (!nextRarity) return o;
+        return { ...o, rarity: nextRarity };
+      });
+      const next = { ...prev, owned };
+      save(next);
+      return next;
+    });
+  }, []);
+
   // Build the modifiers object expected by computeAllStats.
   const getStatModifiers = useCallback(() => {
     const mods = {};
@@ -117,7 +148,7 @@ export default function useArtefacts() {
       if (!uid) continue;
       const instance = state.owned.find(o => o.uid === uid);
       if (!instance) continue;
-      const art = ARTEFACTS_BY_ID[instance.catalogueId];
+      const art = resolveInstance(instance);
       if (!art) continue;
       for (const bonus of getSlotBonuses(art.slot, art.rarity)) {
         (mods[bonus.stat] ??= []).push({ type: bonus.type, value: bonus.value });
@@ -130,6 +161,7 @@ export default function useArtefacts() {
     owned:          state.owned,
     equipped:       state.equipped,
     addArtefact,
+    upgradeArtefact,
     equip,
     unequip,
     getEquipped,

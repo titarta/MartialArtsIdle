@@ -6,6 +6,13 @@ import { saveGame, loadGame } from '../systems/save';
 const OWNED_LAWS_KEY = 'mai_owned_laws';
 export const MAX_LAWS = 100;
 
+export const LAW_NEXT_RARITY = {
+  Iron:   'Bronze',
+  Bronze: 'Silver',
+  Silver: 'Gold',
+  Gold:   'Transcendent',
+};
+
 function loadOwnedLaws() {
   try {
     const raw = localStorage.getItem(OWNED_LAWS_KEY);
@@ -41,6 +48,15 @@ export default function useCultivation() {
       if (prev.some(l => l.id === law.id)) return prev;
       return [...prev, law];
     });
+  }, []);
+
+  const upgradeLaw = useCallback((lawId) => {
+    setOwnedLaws(prev => prev.map(law => {
+      if (law.id !== lawId) return law;
+      const next = LAW_NEXT_RARITY[law.rarity];
+      if (!next) return law;
+      return { ...law, rarity: next };
+    }));
   }, []);
 
   const [offlineEarnings, setOfflineEarnings] = useState(() => {
@@ -163,6 +179,7 @@ export default function useCultivation() {
     isLawUnlocked: realmIndex >= DEFAULT_LAW.realmRequirement,
     ownedLaws,
     addOwnedLaw,
+    upgradeLaw,
     // Ads
     activateAdBoost,
     adBoostActive:  adBoostEndsAt > Date.now(),
