@@ -16,11 +16,17 @@ export const ARTEFACT_NEXT_RARITY = {
   Gold:   'Transcendent',
 };
 
+// Migrate old rarity names from saves created before the unified naming
+const RARITY_MIGRATION = {
+  common: 'Iron', uncommon: 'Bronze', rare: 'Silver', epic: 'Gold', legendary: 'Transcendent',
+};
+
 // Merge catalogue data with per-instance overrides (e.g. upgraded rarity)
 function resolveInstance(o) {
   const cat = ARTEFACTS_BY_ID[o.catalogueId];
   if (!cat) return null;
-  return { ...cat, uid: o.uid, ...(o.rarity ? { rarity: o.rarity } : {}) };
+  const rarity = RARITY_MIGRATION[o.rarity] ?? o.rarity;
+  return { ...cat, uid: o.uid, ...(rarity ? { rarity } : {}) };
 }
 
 // One common artefact per slot type, auto-equipped at game start.
@@ -48,17 +54,26 @@ const STARTER_EQUIPPED = {
   ring_2: 'start_ring_b',
 };
 
-// Backfill affixes for instances that don't have them yet (e.g. from saves
-// before the affix system was introduced).
-function ensureAffixes(owned) {
+// Migrate old rarity values and backfill affixes on load
+function migrateAndBackfill(owned) {
   let changed = false;
   const result = owned.map(o => {
-    if (o.affixes) return o;
-    const art = ARTEFACTS_BY_ID[o.catalogueId];
-    if (!art) return o;
-    const rarity = o.rarity ?? art.rarity ?? 'Iron';
-    changed = true;
-    return { ...o, affixes: generateAffixes(art.slot, rarity) };
+    let inst = o;
+    // Migrate old rarity names
+    if (inst.rarity && RARITY_MIGRATION[inst.rarity]) {
+      inst = { ...inst, rarity: RARITY_MIGRATION[inst.rarity] };
+      changed = true;
+    }
+    // Backfill affixes
+    if (!inst.affixes) {
+      const art = ARTEFACTS_BY_ID[inst.catalogueId];
+      if (art) {
+        const rarity = inst.rarity ?? art.rarity ?? 'Iron';
+        inst = { ...inst, affixes: generateAffixes(art.slot, rarity) };
+        changed = true;
+      }
+    }
+    return inst;
   });
   return { result, changed };
 }
@@ -80,7 +95,7 @@ function save(state) {
 export default function useArtefacts() {
   const [state, setState] = useState(() => {
     const loaded = load() ?? { owned: STARTER_OWNED, equipped: STARTER_EQUIPPED };
-    const { result: owned, changed } = ensureAffixes(loaded.owned);
+    const { result: owned, changed } = migrateAndBackfill(loaded.owned);
     const initial = { ...loaded, owned };
     if (changed) save(initial);
     return initial;
