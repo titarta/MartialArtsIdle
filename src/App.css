@@ -2385,15 +2385,24 @@
 }
 
 .stage-hud-track {
-  height: 5px;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 3px;
-  overflow: hidden;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: visible;
+  position: relative;
+  /* 9-slice border-image: preserves dragon-head end-cap on left (~45px)
+     and finial end-cap on right (~30px), stretches only the trough middle.
+     Image is 218×38. Slice values in px: top right bottom left */
+  border-image-source: url('/ui/bar_frame.png');
+  border-image-slice: 6 30 6 45 fill;
+  border-image-width: 5px 12px 5px 16px;
+  border-image-repeat: stretch;
+  border-image-outset: 2px 0;
 }
 
 .stage-hud-fill {
   height: 100%;
-  border-radius: 3px;
+  position: relative;
+  z-index: 1;
   /* width patched by rAF — no transition */
 }
 
@@ -2746,9 +2755,15 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  /* ── Home screen: cap cultivation stage width on tablets ─────────────── */
+  /* ── Home screen: cultivation stage fills more width on desktop ─────── */
   .cultivation-layout {
-    max-width: 680px;
+    max-width: 860px;
+  }
+
+  /* ── Stages: wider aspect ratio on desktop so width grows, not height ── */
+  .fighter-stage,
+  .combat-stage {
+    aspect-ratio: 2 / 1;
   }
 
   /* ── Inventory grid: more columns ─────────────────────────────────────── */
@@ -2809,7 +2824,7 @@
   }
 
   .cultivation-layout {
-    max-width: 780px;
+    max-width: 980px;
   }
 
   .inv-grid {
