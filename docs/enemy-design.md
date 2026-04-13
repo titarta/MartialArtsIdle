@@ -108,9 +108,8 @@ statMult numbers and reading the names. Three levers to achieve this:
 | cavern_elder_demon | Cavern Elder Demon | — |
 | world_root_wraith | World Root Wraith | — |
 | forest_spirit | Forest Spirit | ✓ |
-| qi_beast | Qi-Sensing Beast | ✓ |
 
-> Moved from W1 — the underground root cavern background (gnarled roots through bedrock, teal crystal formations, origin qi pool) is a far stronger visual match for both enemies than the sect compound of W1.
+> forest_spirit moved from W1 — the underground root cavern background (gnarled roots through bedrock) is a far stronger visual match than the sect compound. Paired with root_sovereign in Ancient Root Grotto.
 
 ### World 5 — The Void Sea
 | ID | Name | Has Sprite |
@@ -123,6 +122,9 @@ statMult numbers and reading the names. Three levers to achieve this:
 | petrified_dao_lord | Petrified Dao Lord | — |
 | emperor_will_fragment | Emperor Will Fragment | — |
 | star_sea_drifter | Star Sea Drifter | — |
+| qi_beast | Qi-Sensing Beast | ✓ |
+
+> qi_beast moved here from W4 — its sprite (near-black coat, pulsing violet energy veins) is a direct visual match for the W5 magenta void sky and energy crack palette. Placed in Fractured Space Corridors alongside spatial_fissure_beast as two void-adapted predators.
 
 ### World 6 — The Open Heaven
 | ID | Name | Has Sprite |
@@ -173,7 +175,7 @@ statMult numbers and reading the names. Three levers to achieve this:
 |--------|------|-----------|
 | Origin Qi Spring Depths | origin_guardian, origin_crystal_golem | Spring-born elemental guardian + crystallised qi golem |
 | World Root Caverns | primordial_serpent, cavern_elder_demon | Both deep cavern creatures fused with the underground environment |
-| Ancient Root Grotto | forest_spirit, qi_beast | Root spirits dwelling in underground root hollows + qi beasts drawn to overwhelming cavern qi density |
+| Ancient Root Grotto | forest_spirit, root_sovereign | Root spirits drifting through root hollows + the sovereign whose underground network they inhabit |
 | Primordial Forest Core | root_sovereign, deep_earth_titan | Root network controller + mantle-pressure titan at the forest's core |
 | Heaven Beast Sanctuary | ancient_beast, world_root_wraith | Primordial beasts claiming territory + their ethereal root-wraith guardians |
 | Ancient Origin Altar | root_sovereign, deep_earth_titan | Powerful earth entities guarding the origin altar |
@@ -181,7 +183,7 @@ statMult numbers and reading the names. Three levers to achieve this:
 ### World 5
 | Region | Pool | Rationale |
 |--------|------|-----------|
-| Fractured Space Corridors | spatial_fissure_beast, void_elemental | Both evolved in/from spatial fractures and void energy |
+| Fractured Space Corridors | spatial_fissure_beast, qi_beast | Two void-adapted predators — one born in the fractures, one transformed by generations inside them |
 | Void Sea Shores | void_sea_leviathan, void_elemental | Void sea apex predator + elemental ambient threats at the shore |
 | Dao Inscription Ruins | dao_inscription_guardian, dao_inscription_revenant | Construct guardian + cultivator who became one with the inscriptions |
 | Source Peak Summits | star_sea_drifter, dao_inscription_revenant | Drifters pulled down by Dao source energy + Dao revenants at peak ruins |

@@ -441,20 +441,6 @@ const ENEMIES = {
     techniqueDrop: { chance: 0.04 },
   },
 
-  qi_beast: {
-    id:          'qi_beast',
-    name:        'Qi-Sensing Beast',
-    sprite:      'qi_beast',
-    description: 'A muscular predator with luminous qi-veins that glow brighter the deeper underground it hunts, drawn irresistibly to origin qi springs and crystal-filled caverns where spiritual density far exceeds anything on the surface.',
-    statMult: { hp: 1.1, atk: 1.2 },
-    drops: [
-      { itemId: 'iron_cultivation_1',   chance: 0.80, qty: [2, 5] },
-      { itemId: 'bronze_cultivation_1', chance: 0.30, qty: [1, 1] },
-      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
-    ],
-    techniqueDrop: { chance: 0.03 },
-  },
-
   // ── World 5 — The Void Sea ────────────────────────────────────────────────
   // Theme: fractured space corridors, void sea, Dao inscription ruins, Emperor tombs, sword ridge
   // statMult targets: hp 7.0–11.0, atk 6.5–11.0
@@ -481,6 +467,20 @@ const ENEMIES = {
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [6, 15] },
       { itemId: 'transcendent_cultivation_2', chance: 0.30, qty: [1, 2] },
     ],
+  },
+
+  qi_beast: {
+    id:          'qi_beast',
+    name:        'Qi-Sensing Beast',
+    sprite:      'qi_beast',
+    description: 'A sleek, near-black predator threaded with veins of pulsing violet void energy. What began as a surface qi-sensing beast has been transformed across generations in the fractured void corridors — coat darkened to near-black, its original qi-sensing ability mutated into a lethal instinct for hunting through spatial distortions.',
+    statMult: { hp: 1.1, atk: 1.2 },
+    drops: [
+      { itemId: 'iron_cultivation_1',   chance: 0.80, qty: [2, 5] },
+      { itemId: 'bronze_cultivation_1', chance: 0.30, qty: [1, 1] },
+      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.03 },
   },
 
   void_sea_leviathan: {

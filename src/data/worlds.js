@@ -287,17 +287,17 @@ const WORLDS = [
         ],
       },
       {
-        // Root spirits drift through deep root hollows; qi beasts drawn to the cavern's overwhelming qi density
+        // Root spirits and the sovereign whose underground network they inhabit — two root entities sharing the same hollow territory
         name: 'Ancient Root Grotto',
         minRealm: 'Origin Returning 3rd',
         minRealmIndex: 32,
-        enemies: 'Forest spirits, qi-sensing beasts',
+        enemies: 'Forest spirits, root sovereigns',
         drops: 'Primal Qi Core, Beast Qi Core, Void Crystal',
         herbs: 'Origin Spring Petal',
         ores: 'Void Crystal',
         enemyPool: [
-          { enemyId: 'forest_spirit', weight: 5 },
-          { enemyId: 'qi_beast',      weight: 5 },
+          { enemyId: 'forest_spirit',  weight: 5 },
+          { enemyId: 'root_sovereign', weight: 5 },
         ],
       },
       {
@@ -350,16 +350,17 @@ const WORLDS = [
     description: 'A fractured void expanse under a sky of deep magenta, split by jagged energy cracks and floating Dao inscription tablets. A solitary stone gate stands on crumbling ground at the horizon, and a yin-yang symbol drifts overhead in charged silence. The floor is cracked like old clay — the only solid surface in a space that is constantly breaking apart at the edges.',
     regions: [
       {
+        // Two void-adapted predators hunting through the same spatial distortions — one born here, one transformed by it
         name: 'Fractured Space Corridors',
         minRealm: 'Void King 1st',
         minRealmIndex: 36,
-        enemies: 'Spatial fissure beasts, void elementals',
+        enemies: 'Spatial fissure beasts, qi-sensing beasts',
         drops: 'Primal Qi Core, Void Crystal, World Stone Core',
         herbs: 'Origin Spring Petal',
         ores: 'Void Crystal, World Stone Core',
         enemyPool: [
-          { enemyId: 'spatial_fissure_beast', weight: 5 },
-          { enemyId: 'void_elemental',        weight: 5 },
+          { enemyId: 'spatial_fissure_beast', weight: 6 },
+          { enemyId: 'qi_beast',              weight: 4 },
         ],
       },
       {
