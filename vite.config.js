@@ -28,8 +28,8 @@ export default defineConfig(({ command, mode }) => {
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         },
         manifest: {
-          name: 'Martial Arts Idle',
-          short_name: 'MA Idle',
+          name: 'The Long Road to Heaven',
+          short_name: 'Long Road',
           description: 'Train. Fight. Ascend.',
           theme_color: '#1a1a2e',
           background_color: '#1a1a2e',

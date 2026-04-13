@@ -144,7 +144,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
         />
       )}
 
-      <h1>Martial Arts Idle</h1>
+      <h1>The Long Road to Heaven</h1>
       <p className="subtitle">{maxed ? 'You have reached the Peak!' : realmName}</p>
 
       <div className="cultivation-layout">
