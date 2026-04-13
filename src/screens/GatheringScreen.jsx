@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { HERBS, RARITY_COLOR } from '../data/materials';
+import { HERBS, RARITY_COLOR, ALL_MATERIALS } from '../data/materials';
 
 const BASE_GATHER_SPEED = 3; // gather points per second
 
@@ -7,9 +7,10 @@ function parseList(str) {
   return str.split(',').map(s => s.trim()).filter(s => s && !s.includes('TBD'));
 }
 
-/** Convert display name like "Soul Calming Grass" → "soul_calming_grass". */
+/** Resolve display name to snake_case inventory ID via ALL_MATERIALS reverse lookup. */
 function nameToId(name) {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const entry = Object.entries(ALL_MATERIALS).find(([, m]) => m.name === name);
+  return entry ? entry[0] : name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
 }
 
 function pickItem(list, lookup) {
