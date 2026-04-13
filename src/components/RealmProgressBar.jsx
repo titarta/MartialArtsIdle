@@ -1,5 +1,5 @@
 /**
- * Horizontal progress bar whose fill and qi label update every animation frame
+ * Vertical progress bar whose fill and qi label update every animation frame
  * by reading directly from qiRef/costRef — no React re-render needed.
  */
 import { useEffect, useRef } from 'react';
@@ -16,7 +16,7 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting })
   const fillRef    = useRef(null);
   const qiLabelRef = useRef(null);
 
-  // Drive fill width and qi label text directly — no React state needed
+  // Update fill height and qi label every frame — directly in the DOM
   useEffect(() => {
     let raf;
     const update = () => {
@@ -24,7 +24,7 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting })
       const cost = costRef.current;
       const pct  = Math.min((qi / cost) * 100, 100);
 
-      if (fillRef.current)    fillRef.current.style.width = `${pct}%`;
+      if (fillRef.current)    fillRef.current.style.height = `${pct}%`;
       if (qiLabelRef.current) qiLabelRef.current.textContent =
         `${formatQi(Math.floor(qi))} / ${formatQi(cost)}`;
 
@@ -34,6 +34,7 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting })
     return () => cancelAnimationFrame(raf);
   }, [qiRef, costRef]);
 
+  // Boosting class only changes on pointer events — fine as a React prop
   useEffect(() => {
     if (fillRef.current)
       fillRef.current.classList.toggle('realm-fill-boosted', boosting);
@@ -41,18 +42,16 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting })
 
   return (
     <div className="realm-bar">
-      <div className="realm-bar-row">
-        <span className="realm-label realm-current">{currentRealm}</span>
-        <span className="realm-label realm-next">{nextRealm}</span>
-      </div>
+      <div className="realm-label realm-next">{nextRealm}</div>
       <div className="realm-track">
         <div
           ref={fillRef}
           className="realm-fill"
-          style={{ width: `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
+          style={{ height: `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
         />
         <div ref={qiLabelRef} className="realm-qi-label" />
       </div>
+      <div className="realm-label realm-current">{currentRealm}</div>
     </div>
   );
 }
