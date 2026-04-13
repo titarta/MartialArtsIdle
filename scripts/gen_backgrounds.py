@@ -162,10 +162,12 @@ def make_seamless(img, blend_px=80):
 S = (
     "Xianxia cultivation fantasy pixel art game background. "
     "16-bit style, clean linework, limited palette, landscape orientation 512x256. "
-    "CRITICAL: the bottom quarter of the image (bottom 25%) must be a flat, "
-    "completely clear ground surface with no tall objects, no characters, "
-    "no trees or pillars crossing into it — just flat ground texture (stone, "
-    "earth, sand, etc.) so that game characters can be composited on top."
+    "CRITICAL GROUND RULE: the bottom THIRD of the image (bottom 33%, rows 170-255) "
+    "must be a wide, flat, completely unobstructed ground surface — generous in height — "
+    "with no tall objects, no characters, no trees, no pillars, no debris crossing into it. "
+    "Just flat ground texture (stone, earth, sand, tile, etc.) so that two game characters "
+    "can stand and fight on it with room to spare. The ground must feel like a proper arena floor, "
+    "not a thin strip."
 )
 
 SCENES = {
