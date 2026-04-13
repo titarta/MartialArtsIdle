@@ -159,16 +159,19 @@ ELEMENTS = {
     },
 
     "bar_frame": {
-        "size": (128, 18),
+        "size": (256, 40),
         "desc": (
             "A pixel art HP bar frame / housing for a xianxia game. "
-            "Very wide, short landscape rectangle — designed to contain a coloured fill bar inside. "
-            "Design: a carved stone or dark jade trough/channel. "
-            "The interior channel must be transparent (where the coloured HP fill will go). "
-            "Left end-cap: small dragon head in profile facing right, mouth open, 'holding' the bar. "
-            "Right end-cap: a matching tail curl or bronze finial bracket. "
-            "Top and bottom edges: thin carved stone lip, 2-3 pixels thick. "
-            "Palette: dark jade, ancient bronze, charcoal stone, faint gold edge highlight. "
+            "Wide landscape rectangle, designed to contain a coloured fill bar inside. "
+            "Generated large so detail is visible — will be scaled down in the game. "
+            "Design: a carved dark jade and ancient bronze trough/channel. "
+            "The interior channel must be clearly transparent (where the coloured HP fill will go). "
+            "Left end-cap: a small dragon head in profile facing right, mouth open as if breathing the bar. "
+            "Right end-cap: a bronze finial curl or dragon tail bracket. "
+            "Top edge: a carved stone lip with a subtle cloud-scroll engraving, 4-5 pixels thick. "
+            "Bottom edge: matching carved stone lip, 4-5 pixels thick. "
+            "The transparent interior strip runs the full width between end-caps. "
+            "Palette: dark jade green, aged bronze-gold, charcoal stone, faint gold edge highlight. "
             f"{S}"
         ),
     },

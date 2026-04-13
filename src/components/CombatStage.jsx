@@ -211,7 +211,10 @@ export default function CombatStage({
       <div className="stage-hud stage-hud-player">
         <span className="stage-hud-name">You</span>
         <div className="stage-hud-track">
-          <div ref={pHpBarRef} className="stage-hud-fill stage-hud-fill-player" style={{ width: '100%' }} />
+          <div className="hud-bar-inner">
+            <div ref={pHpBarRef} className="stage-hud-fill stage-hud-fill-player" style={{ width: '100%' }} />
+          </div>
+          <img className="hud-bar-frame-img hud-bar-frame-img-flipped" src={`${BASE}ui/bar_frame.png`} alt="" />
         </div>
         <span ref={pHpTextRef} className="stage-hud-text">—</span>
       </div>
@@ -219,8 +222,11 @@ export default function CombatStage({
       {/* ── Enemy HUD (top-right) ─── */}
       <div className="stage-hud stage-hud-enemy">
         <span className="stage-hud-name">{enemy?.name || 'Enemy'}</span>
-        <div className="stage-hud-track">
-          <div ref={eHpBarRef} className="stage-hud-fill stage-hud-fill-enemy" style={{ width: phase === 'idle' ? '100%' : undefined }} />
+        <div className="stage-hud-track stage-hud-track-enemy">
+          <div className="hud-bar-inner">
+            <div ref={eHpBarRef} className="stage-hud-fill stage-hud-fill-enemy" style={{ width: phase === 'idle' ? '100%' : undefined }} />
+          </div>
+          <img className="hud-bar-frame-img" src={`${BASE}ui/bar_frame.png`} alt="" />
         </div>
         <span ref={eHpTextRef} className="stage-hud-text">—</span>
       </div>

@@ -2389,34 +2389,40 @@
   /* Height is driven by the frame image's natural aspect ratio */
 }
 
-/* Frame image renders at full width, natural height — no stretching */
+/* Frame image renders at full width, natural height — no stretching.
+   position:relative + z-index:2 ensures it paints above the fill channel. */
 .hud-bar-frame-img {
   display: block;
   width: 100%;
   height: auto;
   image-rendering: pixelated;
   pointer-events: none;
+  position: relative;
+  z-index: 2;
 }
 
-/* Enemy bar: mirror the frame so the dragon faces inward */
+/* Player bar: flip so dragon faces right (toward center) */
 .hud-bar-frame-img-flipped {
   transform: scaleX(-1);
 }
 
-/* Inner channel: absolutely positioned over the trough inside the frame.
+/* Inner channel: sits below the frame, absolutely positioned in the trough.
    Percentages tuned to bar_frame.png (218×38):
    ~20% left = dragon head, ~14% right = finial, ~18% top/bottom = lips */
 .hud-bar-inner {
   position: absolute;
-  top: 18%;
-  bottom: 18%;
-  left: 20%;
+  top: 13%;
+  bottom: 13%;
+  left: 4%;
   right: 14%;
   overflow: hidden;
+  z-index: 1;
 }
 
-/* Enemy fill drains right→left — flip the inner channel */
+/* Enemy: horizontally mirrored inset + drain right→left */
 .stage-hud-track-enemy .hud-bar-inner {
+  left: 14%;
+  right: 4%;
   direction: rtl;
 }
 
