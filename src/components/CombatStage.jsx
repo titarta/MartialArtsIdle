@@ -13,14 +13,6 @@ const PLAYER_HIT_SRC    = `${BASE}sprites/combat/player-hit.png`;
 const PLAYER_IDLE_FW    = 128;
 const PLAYER_IDLE_FH    = 128;
 
-// Responsive scale: shrink on narrow mobile so both fighters fit the stage.
-// 128px × 1.5 = 192px per fighter × 2 + 40px padding = ~424px → overflows 375px screens.
-// 128px × 1.2 = 154px per fighter × 2 + 16px padding = ~324px → fits comfortably.
-function getSpriteScale() {
-  if (typeof window === 'undefined') return 1.5;
-  return window.innerWidth <= 430 ? 0.97 : 1.5;
-}
-
 // Canvas-generated sprites: 32×40, displayed at 3×
 const GEN_SCALE = 3;
 
@@ -61,7 +53,22 @@ export default function CombatStage({
   eHpTextRef,
 }) {
   const sprites = getSprites();
-  const spriteScale = getSpriteScale();
+
+  // Sprite scale: 75% of stage height — proportional on every device
+  const stageRef = useRef(null);
+  const [spriteScale, setSpriteScale] = useState(1.0);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const update = () => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) setSpriteScale((h * 0.75) / 128);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const [pAnim, setPAnim] = useState('idle');
   const [eAnim, setEAnim] = useState('idle');
@@ -195,6 +202,7 @@ export default function CombatStage({
 
   return (
     <div
+      ref={stageRef}
       className={`combat-stage ${isFighting ? 'stage-fighting' : ''}`}
       style={{ backgroundImage: `url(${BASE}backgrounds/world_${worldId}.png)` }}
     >

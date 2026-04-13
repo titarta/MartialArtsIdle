@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
@@ -104,6 +104,22 @@ function HomeScreen({ cultivation, pills, inventory }) {
 
   const { vfxLayer, spawnVFX } = useVFX();
 
+  // Sprite scale: always 75% of stage height — proportional on every device
+  const stageRef   = useRef(null);
+  const [spriteScale, setSpriteScale] = useState(1.0);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const update = () => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) setSpriteScale((h * 0.75) / 128);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // ── Rewarded ad: cultivation boost ─────────────────────────────────────────
   const onCultivationReward = useCallback(() => {
     activateAdBoost(AD_BOOST_DURATION_MS);
@@ -149,6 +165,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
 
       <div className="cultivation-layout">
         <div
+          ref={stageRef}
           className={`fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
           style={{ backgroundImage: `url(${BASE}backgrounds/cultivation.png)` }}
           onPointerDown={handlePointerDown}
@@ -164,7 +181,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
             frameHeight={128}
             frameCount={4}
             fps={fps}
-            scale={1.5}
+            scale={spriteScale}
           />
           <div className={`boost-label${boosting ? '' : ' boost-label-hidden'}`}>3x Cultivation!</div>
           {adBoostActive && (
