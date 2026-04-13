@@ -679,7 +679,7 @@
   justify-content: flex-end;
   padding: 0;
   flex: 1;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 2 / 1;
   background-color: var(--bg-card);
   background-size: cover;
   background-position: center bottom;
@@ -2385,24 +2385,43 @@
 }
 
 .stage-hud-track {
-  height: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  overflow: visible;
   position: relative;
-  /* 9-slice border-image: preserves dragon-head end-cap on left (~45px)
-     and finial end-cap on right (~30px), stretches only the trough middle.
-     Image is 218×38. Slice values in px: top right bottom left */
-  border-image-source: url('/ui/bar_frame.png');
-  border-image-slice: 6 30 6 45 fill;
-  border-image-width: 5px 12px 5px 16px;
-  border-image-repeat: stretch;
-  border-image-outset: 2px 0;
+  /* Height is driven by the frame image's natural aspect ratio */
+}
+
+/* Frame image renders at full width, natural height — no stretching */
+.hud-bar-frame-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+/* Enemy bar: mirror the frame so the dragon faces inward */
+.hud-bar-frame-img-flipped {
+  transform: scaleX(-1);
+}
+
+/* Inner channel: absolutely positioned over the trough inside the frame.
+   Percentages tuned to bar_frame.png (218×38):
+   ~20% left = dragon head, ~14% right = finial, ~18% top/bottom = lips */
+.hud-bar-inner {
+  position: absolute;
+  top: 18%;
+  bottom: 18%;
+  left: 20%;
+  right: 14%;
+  overflow: hidden;
+}
+
+/* Enemy fill drains right→left — flip the inner channel */
+.stage-hud-track-enemy .hud-bar-inner {
+  direction: rtl;
 }
 
 .stage-hud-fill {
   height: 100%;
-  position: relative;
-  z-index: 1;
   /* width patched by rAF — no transition */
 }
 
@@ -2410,10 +2429,6 @@
   background: linear-gradient(to right, #16a34a, #4ade80);
 }
 
-.stage-hud-enemy .stage-hud-track {
-  /* flip so the fill grows from right, drains from left */
-  direction: rtl;
-}
 
 .stage-hud-fill-enemy {
   background: linear-gradient(to left, #b91c1c, var(--accent));
@@ -2492,7 +2507,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 2 / 1;
   padding: 0 6px 12px;
   position: relative;
   overflow: hidden;
@@ -2755,15 +2770,9 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  /* ── Home screen: cultivation stage fills more width on desktop ─────── */
+  /* ── Home screen: cultivation stage on desktop ───────────────────────── */
   .cultivation-layout {
-    max-width: 860px;
-  }
-
-  /* ── Stages: wider aspect ratio on desktop so width grows, not height ── */
-  .fighter-stage,
-  .combat-stage {
-    aspect-ratio: 2 / 1;
+    max-width: 730px;
   }
 
   /* ── Inventory grid: more columns ─────────────────────────────────────── */
@@ -2824,7 +2833,7 @@
   }
 
   .cultivation-layout {
-    max-width: 980px;
+    max-width: 830px;
   }
 
   .inv-grid {
