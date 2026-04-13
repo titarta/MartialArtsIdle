@@ -2476,10 +2476,9 @@
 }
 
 .stage-result-text {
-  font-size: clamp(1.6rem, 6vw, 2.4rem);
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1rem, 4vw, 1.6rem);
+  letter-spacing: 0.05em;
   animation: stage-result-text-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
