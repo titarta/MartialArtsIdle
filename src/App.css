@@ -2780,10 +2780,9 @@
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   }
 
-  /* ── Combat screen: keep mobile proportions, just comfortably bigger ──── */
-  /* Cap the column width so stage, HP bars, and icons scale together        */
+  /* ── Combat screen: match cultivation stage width ────────────────────── */
   .combat-screen {
-    max-width: 560px;
+    max-width: 730px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -2847,7 +2846,7 @@
 
   /* ── Combat screen: slightly roomier on ultra-wide ────────────────────── */
   .combat-screen {
-    max-width: 620px;
+    max-width: 830px;
   }
 
   .hp-bar-track {
