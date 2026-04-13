@@ -14,6 +14,7 @@ const WORLDS = [
     name: 'The Mortal Lands',
     realms: 'Tempered Body → True Element',
     minRealmIndex: 0,
+    description: 'A misty sect compound framed by a ceremonial red-and-gold gate, stone inscription pillars, and weathered guardian statues. Bamboo groves rise beyond the training grounds and pale mountains dissolve into perpetual mist. The air carries the smell of chalk dust and residual qi from years of disciples\' practice.',
     regions: [
       {
         name: 'Outer Sect Training Grounds',
@@ -42,57 +43,59 @@ const WORLDS = [
         ],
       },
       {
+        // Wild beasts prowling the ravines, both drawn to the dense qi seeping up through the rock
         name: 'Qi-Vein Ravines',
         minRealm: 'Qi Transformation Early',
         minRealmIndex: 10,
-        enemies: 'Wandering beasts, qi-sensing beasts',
+        enemies: 'Wandering beasts, pack wolves',
         drops: 'Mortal Qi Residue, Beast Qi Core, Qi Fang',
         herbs: 'Qi Vein Vine, Misty Forest Bloom',
         ores: 'Qi Fang',
         enemyPool: [
-          { enemyId: 'wandering_beast', weight: 5 },
-          { enemyId: 'qi_beast',        weight: 5 },
+          { enemyId: 'wandering_beast', weight: 6 },
+          { enemyId: 'wolf',            weight: 4 },
         ],
       },
       {
+        // Wolves hunting in the mist; rogue disciples sheltering deep in the dense forest
         name: 'Misty Spirit Forest',
         minRealm: 'Qi Transformation Peak',
         minRealmIndex: 13,
-        enemies: 'Forest spirits, rogue disciples',
+        enemies: 'Pack wolves, rogue disciples',
         drops: 'Mortal Qi Residue, Beast Qi Core, Spirit Wood Core',
         herbs: 'Misty Forest Bloom',
         ores: 'Qi Fang, Spirit Wood Core',
         enemyPool: [
-          { enemyId: 'forest_spirit',  weight: 6 },
+          { enemyId: 'wolf',          weight: 6 },
           { enemyId: 'rogue_disciple', weight: 4 },
         ],
       },
       {
-        // Clifftop forests where spirits linger; rogue disciples seek seclusion here
+        // Rogue disciples seeking seclusion at the peak; bandit scouts using the high ground as a lookout
         name: "Heaven's Edge Peak",
         minRealm: 'True Element Early',
         minRealmIndex: 14,
-        enemies: 'Rogue disciples, forest spirits',
+        enemies: 'Rogue disciples, bandit scouts',
         drops: 'Beast Qi Core, Qi Fang, Spirit Wood Core',
         herbs: 'Qi Vein Vine, Misty Forest Bloom',
         ores: 'Spirit Wood Core',
         enemyPool: [
-          { enemyId: 'rogue_disciple', weight: 5 },
-          { enemyId: 'forest_spirit',  weight: 5 },
+          { enemyId: 'rogue_disciple', weight: 6 },
+          { enemyId: 'bandit_scout',   weight: 4 },
         ],
       },
       {
-        // Qi beasts drawn to storm lightning; rogue disciples surviving the plateau's qi storms
+        // Wandering beasts driven onto the plateau by the storms; rogue disciples surviving the qi surges
         name: 'Thunderstorm Plateau',
         minRealm: 'True Element Peak',
         minRealmIndex: 17,
-        enemies: 'Qi-sensing beasts, rogue disciples',
+        enemies: 'Wandering beasts, rogue disciples',
         drops: 'Beast Qi Core, Corrupted Qi Shard, Spirit Wood Core',
         herbs: 'Misty Forest Bloom',
         ores: 'Spirit Wood Core',
         enemyPool: [
-          { enemyId: 'qi_beast',       weight: 6 },
-          { enemyId: 'rogue_disciple', weight: 4 },
+          { enemyId: 'wandering_beast', weight: 6 },
+          { enemyId: 'rogue_disciple',  weight: 4 },
         ],
       },
     ],
@@ -102,6 +105,7 @@ const WORLDS = [
     name: 'The Ancient Frontier',
     realms: 'Separation & Reunion → Immortal Ascension',
     minRealmIndex: 18,
+    description: 'A vast wasteland of cracked orange earth baked to the texture of ancient pottery. Collapsed stone archways and ruined gate structures jut from the desert floor alongside enormous bleached bone remains. A massive corroded cauldron sits at the heart of the ruins — the only structure still standing intact in an otherwise dead landscape.',
     regions: [
       {
         name: 'Shattered Sky Desert',
@@ -176,6 +180,7 @@ const WORLDS = [
     name: 'The Forbidden Lands',
     realms: 'Saint → Saint King',
     minRealmIndex: 24,
+    description: 'A forbidden stone corridor lined with ancient guardian statues, their eyes alight with cold green spiritual fire. Beyond the rows of sentinels, a dark palace looms with green-lit torches burning at its sealed threshold. The air is still and heavy with the qi of the long-dead, the silence broken only by the distant resonance of ancient war seals.',
     regions: [
       {
         name: 'Saint Burial Grounds',
@@ -252,6 +257,7 @@ const WORLDS = [
     name: 'The Origin Depths',
     realms: 'Origin Returning → Origin King',
     minRealmIndex: 30,
+    description: 'A vast underground cavern lit by twin dragon-head stone pillars flanking a waterfall that cascades into a glowing origin qi pool. Teal crystal formations cluster across the cave walls, casting cool light into the dark. Ancient gnarled roots descend from the ceiling far above, and the air is thick with the overwhelming pressure of primordial earth energy.',
     regions: [
       {
         name: 'Origin Qi Spring Depths',
@@ -278,6 +284,20 @@ const WORLDS = [
         enemyPool: [
           { enemyId: 'primordial_serpent',  weight: 5 },
           { enemyId: 'cavern_elder_demon',  weight: 5 },
+        ],
+      },
+      {
+        // Root spirits drift through deep root hollows; qi beasts drawn to the cavern's overwhelming qi density
+        name: 'Ancient Root Grotto',
+        minRealm: 'Origin Returning 3rd',
+        minRealmIndex: 32,
+        enemies: 'Forest spirits, qi-sensing beasts',
+        drops: 'Primal Qi Core, Beast Qi Core, Void Crystal',
+        herbs: 'Origin Spring Petal',
+        ores: 'Void Crystal',
+        enemyPool: [
+          { enemyId: 'forest_spirit', weight: 5 },
+          { enemyId: 'qi_beast',      weight: 5 },
         ],
       },
       {
@@ -327,6 +347,7 @@ const WORLDS = [
     name: 'The Void Sea',
     realms: 'Void King → Emperor Realm',
     minRealmIndex: 36,
+    description: 'A fractured void expanse under a sky of deep magenta, split by jagged energy cracks and floating Dao inscription tablets. A solitary stone gate stands on crumbling ground at the horizon, and a yin-yang symbol drifts overhead in charged silence. The floor is cracked like old clay — the only solid surface in a space that is constantly breaking apart at the edges.',
     regions: [
       {
         name: 'Fractured Space Corridors',
@@ -415,6 +436,7 @@ const WORLDS = [
     name: 'The Open Heaven',
     realms: 'Half-Step Open Heaven → Open Heaven Layer 6',
     minRealmIndex: 45,
+    description: 'A boundless open heaven realm of blinding gold and white, where massive inscription-covered pillars rise from a seamless celestial floor into cloud banks that stretch to infinity. Cranes glide silently through the radiant haze between the pillars. The ambient pressure alone is enough to obliterate anything that has not reached the Open Heaven threshold.',
     regions: [
       {
         name: 'Heaven Pillar Ascent',

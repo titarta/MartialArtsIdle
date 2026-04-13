@@ -68,9 +68,9 @@ statMult numbers and reading the names. Three levers to achieve this:
 | wolf | Pack Wolf | ✓ |
 | bandit_scout | Bandit Scout | ✓ |
 | wandering_beast | Wandering Beast | ✓ |
-| qi_beast | Qi-Sensing Beast | ✓ |
 | rogue_disciple | Rogue Disciple | ✓ |
-| forest_spirit | Forest Spirit | ✓ |
+
+> ⚠️ W1 temporarily has 6 enemies (down from 8). forest_spirit and qi_beast moved to W4 for visual consistency with the underground root cavern background. Two new W1 enemies needed to restore the count — balancing pass pending.
 
 ### World 2 — The Ancient Frontier
 | ID | Name | Has Sprite |
@@ -107,6 +107,10 @@ statMult numbers and reading the names. Three levers to achieve this:
 | ancient_beast | Ancient Beast | — |
 | cavern_elder_demon | Cavern Elder Demon | — |
 | world_root_wraith | World Root Wraith | — |
+| forest_spirit | Forest Spirit | ✓ |
+| qi_beast | Qi-Sensing Beast | ✓ |
+
+> Moved from W1 — the underground root cavern background (gnarled roots through bedrock, teal crystal formations, origin qi pool) is a far stronger visual match for both enemies than the sect compound of W1.
 
 ### World 5 — The Void Sea
 | ID | Name | Has Sprite |
@@ -141,10 +145,10 @@ statMult numbers and reading the names. Three levers to achieve this:
 |--------|------|-----------|
 | Outer Sect Training Grounds | outer_sect_disciple, training_golem | Sect training environment |
 | Borderland Wilds | wolf, bandit_scout | Open wilderness predators + human ambushers |
-| Qi-Vein Ravines | wandering_beast, qi_beast | Beasts drawn to dense qi veins |
-| Misty Spirit Forest | forest_spirit, rogue_disciple | Nature spirits + outcasts hiding in forest |
-| Heaven's Edge Peak | rogue_disciple, forest_spirit | Clifftop forests where spirits linger; rogue disciples in mountain seclusion |
-| Thunderstorm Plateau | qi_beast, rogue_disciple | Qi beasts attracted to storm lightning; disciples surviving the qi storms |
+| Qi-Vein Ravines | wandering_beast, wolf | Wild beasts prowling ravines, both drawn to dense qi seeping up through rock |
+| Misty Spirit Forest | wolf, rogue_disciple | Wolves hunting in the mist; rogues sheltering deep in the forest |
+| Heaven's Edge Peak | rogue_disciple, bandit_scout | Rogues seeking seclusion at the peak; bandits using high ground as a lookout |
+| Thunderstorm Plateau | wandering_beast, rogue_disciple | Beasts driven onto the plateau by storms; rogues surviving the qi surges |
 
 ### World 2
 | Region | Pool | Rationale |
@@ -169,6 +173,7 @@ statMult numbers and reading the names. Three levers to achieve this:
 |--------|------|-----------|
 | Origin Qi Spring Depths | origin_guardian, origin_crystal_golem | Spring-born elemental guardian + crystallised qi golem |
 | World Root Caverns | primordial_serpent, cavern_elder_demon | Both deep cavern creatures fused with the underground environment |
+| Ancient Root Grotto | forest_spirit, qi_beast | Root spirits dwelling in underground root hollows + qi beasts drawn to overwhelming cavern qi density |
 | Primordial Forest Core | root_sovereign, deep_earth_titan | Root network controller + mantle-pressure titan at the forest's core |
 | Heaven Beast Sanctuary | ancient_beast, world_root_wraith | Primordial beasts claiming territory + their ethereal root-wraith guardians |
 | Ancient Origin Altar | root_sovereign, deep_earth_titan | Powerful earth entities guarding the origin altar |

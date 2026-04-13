@@ -89,20 +89,6 @@ const ENEMIES = {
     techniqueDrop: { chance: 0.01 },
   },
 
-  qi_beast: {
-    id:          'qi_beast',
-    name:        'Qi-Sensing Beast',
-    sprite:      'qi_beast',
-    description: 'A muscular predator with faint luminous qi-veins visible beneath its fur, drawn to areas of dense spiritual energy — including storm-charged peaks.',
-    statMult: { hp: 1.1, atk: 1.2 },
-    drops: [
-      { itemId: 'iron_cultivation_1',   chance: 0.80, qty: [2, 5] },
-      { itemId: 'bronze_cultivation_1', chance: 0.30, qty: [1, 1] },
-      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
-    ],
-    techniqueDrop: { chance: 0.03 },
-  },
-
   rogue_disciple: {
     id:          'rogue_disciple',
     name:        'Rogue Disciple',
@@ -114,20 +100,6 @@ const ENEMIES = {
       { itemId: 'bronze_mineral_1',   chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
-  },
-
-  forest_spirit: {
-    id:          'forest_spirit',
-    name:        'Forest Spirit',
-    sprite:      'forest_spirit',
-    description: 'A translucent humanoid figure woven from bark, leaves, and mist, its eyes twin ember-points of natural qi — lingering at the misty forest edges of high clifftops.',
-    statMult: { hp: 0.8, atk: 1.5 },
-    drops: [
-      { itemId: 'iron_cultivation_1',   chance: 0.70, qty: [2, 5] },
-      { itemId: 'bronze_cultivation_1', chance: 0.35, qty: [1, 2] },
-      { itemId: 'bronze_mineral_2',     chance: 0.15, qty: [1, 1] },
-    ],
-    techniqueDrop: { chance: 0.04 },
   },
 
   // ── World 2 — The Ancient Frontier ───────────────────────────────────────
@@ -453,6 +425,34 @@ const ENEMIES = {
       { itemId: 'transcendent_mineral_2',     chance: 0.35, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
+  },
+
+  forest_spirit: {
+    id:          'forest_spirit',
+    name:        'Forest Spirit',
+    sprite:      'forest_spirit',
+    description: 'A translucent humanoid figure woven from ancient bark and pale cave moss, its eyes twin ember-points of natural qi. It drifts through deep root hollows where ancient trees push their roots through bedrock — defending territory no surface cultivator has ever mapped.',
+    statMult: { hp: 0.8, atk: 1.5 },
+    drops: [
+      { itemId: 'iron_cultivation_1',   chance: 0.70, qty: [2, 5] },
+      { itemId: 'bronze_cultivation_1', chance: 0.35, qty: [1, 2] },
+      { itemId: 'bronze_mineral_2',     chance: 0.15, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.04 },
+  },
+
+  qi_beast: {
+    id:          'qi_beast',
+    name:        'Qi-Sensing Beast',
+    sprite:      'qi_beast',
+    description: 'A muscular predator with luminous qi-veins that glow brighter the deeper underground it hunts, drawn irresistibly to origin qi springs and crystal-filled caverns where spiritual density far exceeds anything on the surface.',
+    statMult: { hp: 1.1, atk: 1.2 },
+    drops: [
+      { itemId: 'iron_cultivation_1',   chance: 0.80, qty: [2, 5] },
+      { itemId: 'bronze_cultivation_1', chance: 0.30, qty: [1, 1] },
+      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.03 },
   },
 
   // ── World 5 — The Void Sea ────────────────────────────────────────────────
