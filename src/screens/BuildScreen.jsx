@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import TechniqueSlotModal from '../components/TechniqueSlotModal';
 import { LAW_RARITY } from '../data/laws';
+import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown } from '../data/techniques';
 import { QUALITY, getSlotBonuses } from '../data/artefacts';
 import { MOD } from '../data/stats';
@@ -348,14 +349,15 @@ function BuildScreen({ cultivation, techniques, artefacts }) {
             <div className="law-divider" />
 
             <div className="law-passives">
-              <span className="law-stat-label">
-                Passives ({activeLaw.passives.length}/{rarity.passiveSlots})
-              </span>
-              {activeLaw.passives.map((p) => (
-                <div key={p.name} className="law-passive">
-                  <span className="law-passive-name">{p.name}</span>
-                  <span className="law-passive-desc">{p.description}</span>
-                </div>
+              <span className="law-stat-label">Unique Modifiers</span>
+              {activeLaw.uniques && Object.entries(activeLaw.uniques).map(([tier, u]) => (
+                u && (
+                  <div key={tier} className="law-passive">
+                    <span className="law-passive-desc" style={{ color: LAW_RARITY[tier]?.color }}>
+                      {formatUniqueDescription(u.id, u.value)}
+                    </span>
+                  </div>
+                )
               ))}
             </div>
 

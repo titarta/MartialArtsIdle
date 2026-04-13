@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { computeAllStats } from '../data/stats';
+import { computeAllStats, mergeModifiers } from '../data/stats';
+import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
 
 function fmt(n) {
   if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B';
@@ -190,7 +191,16 @@ function StatsScreen({ cultivation, artefacts }) {
     return () => clearInterval(id);
   }, [qiRef, costRef]);
 
-  const { meta, primary, combat, activity } = computeAllStats(qi, activeLaw, realmIndex, artefacts?.getStatModifiers());
+  // Evaluate active law uniques for their out-of-combat stat contribution.
+  // Combat-only conditionals (like "while below 50% HP") are inactive here.
+  const lawCtx = buildContext({
+    inCombat: false, realmIndex, lawElement: activeLaw?.element,
+    isAtPeak: realmIndex >= 46,
+    equippedArtefactCount: artefacts?.owned.filter(o => Object.values(artefacts.equipped ?? {}).includes(o.uid)).length ?? 0,
+  });
+  const lawBundle = evaluateLawUniques(activeLaw, lawCtx);
+  const mergedMods = mergeModifiers(artefacts?.getStatModifiers(), lawBundle.statMods);
+  const { meta, primary, combat, activity } = computeAllStats(qi, activeLaw, realmIndex, mergedMods);
   const { soulUnlocked } = meta;
 
   const toggle = (stat) => setActive((s) => (s === stat ? null : stat));

@@ -50,6 +50,19 @@ export function computeStat(base, modifiers = []) {
  *                               Empty until items/laws grant modifiers.
  * @returns {{ meta, primary, combat, activity }}
  */
+/** Merge multiple modifier bundles into a single one. */
+export function mergeModifiers(...bundles) {
+  const merged = {};
+  for (const bundle of bundles) {
+    if (!bundle) continue;
+    for (const [stat, mods] of Object.entries(bundle)) {
+      if (!merged[stat]) merged[stat] = [];
+      merged[stat].push(...mods);
+    }
+  }
+  return merged;
+}
+
 export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
   const mods         = (id) => modifiers[id] ?? [];
   const soulUnlocked = realmIndex >= SAINT_INDEX;

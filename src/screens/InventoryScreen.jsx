@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ITEMS, RARITY } from '../data/items';
 import { QUALITY, ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 import { LAW_RARITY } from '../data/laws';
+import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown, getK } from '../data/techniques';
 import { MAX_ARTEFACTS } from '../hooks/useArtefacts';
 import { MAX_TECHNIQUES } from '../hooks/useTechniques';
@@ -308,13 +309,16 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   <span className="item-stat-value">{law.bodyMult}</span>
                 </div>
               </div>
-              {law.passives?.length > 0 && (
+              {law.uniques && Object.keys(law.uniques).length > 0 && (
                 <div className="item-stat-block">
-                  <span className="item-stat-section">Passives ({law.passives.length}/{rarity.passiveSlots})</span>
-                  {law.passives.map((p, i) => (
-                    <p key={i} className="modal-desc">
-                      <strong>{p.name}:</strong> {p.description}
-                    </p>
+                  <span className="item-stat-section">Unique Modifiers</span>
+                  {Object.entries(law.uniques).map(([tier, u]) => (
+                    u && (
+                      <p key={tier} className="modal-desc">
+                        <strong style={{ color: LAW_RARITY[tier]?.color }}>{tier}:</strong>{' '}
+                        {formatUniqueDescription(u.id, u.value)}
+                      </p>
+                    )
                   ))}
                 </div>
               )}

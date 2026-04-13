@@ -6,6 +6,7 @@ import { ITEMS, ITEMS_BY_ID, RARITY } from '../data/items';
 import { MOD } from '../data/stats';
 import { RARITY_TIER } from '../data/affixPools';
 import { findPill, PILLS, PILLS_BY_ID, RECIPES_BY_PILL } from '../data/pills';
+import { formatUniqueDescription } from '../data/lawUniques';
 import { ARTEFACTS } from '../data/artefacts';
 import { generateTechnique } from '../data/techniqueDrops';
 import { generateLaw } from '../data/affixPools';
@@ -454,14 +455,42 @@ function TechniqueDetail({ tech, techniques, inventory }) {
   );
 }
 
+function LawUniqueRow({ tier, color, mineral, entry, inventory, onHone, onReplace }) {
+  const honeCosts    = bracketCost(mineral, 'hone');
+  const replaceCosts = bracketCost(mineral, 'replace');
+  const text = entry ? formatUniqueDescription(entry.id, entry.value) : '— Empty —';
+  return (
+    <div className="tx-mod-row" style={{ borderLeft: `3px solid ${color}` }}>
+      <div className="tx-mod-left">
+        <span className="tx-mod-desc" style={{ color }}>{text}</span>
+      </div>
+      <div className="tx-mod-actions">
+        <button
+          className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(); } }}
+          title="Hone — reroll the value"
+        >
+          ⟳
+          <CostBadge costs={honeCosts} inventory={inventory} />
+        </button>
+        <button
+          className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
+          onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(); } }}
+          title="Replace — swap for a different unique modifier"
+        >
+          ↺
+          <CostBadge costs={replaceCosts} inventory={inventory} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function LawDetail({ law, cultivation, inventory }) {
   const q        = lawQuality(law.rarity);
-  const passives = law.passives ?? [];
-  const brackets = buildBracketSlots(passives, law.rarity);
-
-  const totalFilled = passives.length;
-  const totalCapacity = getActiveBrackets(law.rarity).reduce((s, b) => s + b.count, 0);
-  const nextRn      = LAW_NEXT_RARITY[law.rarity];
+  const uniques  = law.uniques ?? {};
+  const activeBrackets = getActiveBrackets(law.rarity);
+  const nextRn   = LAW_NEXT_RARITY[law.rarity];
   const nextQ       = nextRn ? lawQuality(nextRn) : null;
 
   // Law multipliers use the item's base-tier mineral for Hone cost
@@ -517,34 +546,23 @@ function LawDetail({ law, cultivation, inventory }) {
         </div>
       </div>
 
-      {/* Passives */}
-      <div className="tx-section-title">Passives ({totalFilled}/{totalCapacity})</div>
-      {brackets.map((b, bi) => (
-        <BracketSection
-          key={bi}
-          bracket={b}
-          renderFilled={(slot, i) => (
-            <PassiveRow
-              key={`f-${bi}-${i}`}
-              passive={slot.item}
-              gIdx={slot.gIdx}
-              color={b.color}
-              mineral={b.mineral}
-              inventory={inventory}
-              onReplace={(idx) => cultivation.replaceLawPassive(law.id, idx)}
-            />
-          )}
-          renderEmpty={(i) => (
-            <EmptySlotRow
-              key={`e-${bi}-${i}`}
-              color={b.color}
-              mineral={b.mineral}
-              inventory={inventory}
-              onAdd={() => cultivation.addLawPassive(law.id, b.label)}
-            />
-          )}
-        />
-      ))}
+      {/* Unique Modifiers (one per tier, up to law rarity) */}
+      <div className="tx-section-title">Unique Modifiers ({activeBrackets.length}/{activeBrackets.length})</div>
+      {activeBrackets.map((b) => {
+        const entry = uniques[b.label];
+        return (
+          <LawUniqueRow
+            key={b.label}
+            tier={b.label}
+            color={b.color}
+            mineral={b.mineral}
+            entry={entry}
+            inventory={inventory}
+            onHone={() => cultivation.honeLawUnique(law.id, b.label)}
+            onReplace={() => cultivation.replaceLawUnique(law.id, b.label)}
+          />
+        );
+      })}
 
       {/* Upgrade */}
       <div className="tx-section-title">Upgrade Quality</div>

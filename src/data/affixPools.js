@@ -7,6 +7,7 @@
  */
 
 import { MOD } from './stats';
+import { pickRandomUnique } from './lawUniques';
 
 // ─── Slot counts ──────────────────────────────────────────────────────────────
 
@@ -218,15 +219,32 @@ const LAW_FLAVOURS = [
 ];
 
 /**
- * Generate a random law with randomized element, multipliers, and 1 passive.
- * @returns Law object matching the shape of THREE_HARMONY_MANUAL.
+ * Generate a random law. Each tier up to the law's rarity gets exactly one
+ * unique modifier rolled from the LAW_UNIQUES pool (see src/data/lawUniques.js).
+ *
+ *   Iron law:         Iron unique
+ *   Bronze law:       Iron + Bronze uniques
+ *   Silver law:       Iron + Bronze + Silver
+ *   Gold law:         + Gold
+ *   Transcendent law: all 5
  */
 export function generateLaw(forcedRarity) {
   const rarity  = forcedRarity ?? pick(LAW_RARITIES);
   const element = pick(LAW_ELEMENTS);
-  const passives = [];
-  const p = pickRandomLawPassive([]);
-  if (p) passives.push(p);
+
+  const rarityTiers = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
+  const rarityIdx = rarityTiers.indexOf(rarity);
+  const unlockedTiers = rarityTiers.slice(0, rarityIdx + 1);
+
+  const uniques = {};
+  const usedIds = [];
+  for (const tier of unlockedTiers) {
+    const u = pickRandomUnique(usedIds);
+    if (u) {
+      uniques[tier] = u;
+      usedIds.push(u.id);
+    }
+  }
 
   return {
     id:                    `law_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -240,6 +258,6 @@ export function generateLaw(forcedRarity) {
     essenceMult:           rollLawMult('essenceMult', rarity),
     soulMult:              rollLawMult('soulMult', rarity),
     bodyMult:              rollLawMult('bodyMult', rarity),
-    passives,
+    uniques,
   };
 }

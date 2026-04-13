@@ -19,12 +19,10 @@ export const THREE_HARMONY_MANUAL = {
   essenceMult:          0.35,
   soulMult:             0.30,
   bodyMult:             0.35,
-  passives: [
-    {
-      name:        'Steady Breath',
-      description: 'Cultivation is not interrupted when taking damage below 10% of max DEF.',
-    },
-  ],
+  // One unique modifier per tier, up to the law's rarity (Iron = 1 unique).
+  uniques: {
+    Iron: { id: 'l_balanced_dao', value: 15 },
+  },
 };
 
 // Active law used until a swap mechanic is implemented

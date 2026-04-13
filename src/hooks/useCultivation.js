@@ -2,7 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
 import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
-import { rollLawMult, pickRandomLawPassive, TIER_SLOT_COUNT } from '../data/affixPools';
+import { rollLawMult } from '../data/affixPools';
+import { pickRandomUnique, rollUniqueValue } from '../data/lawUniques';
+import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
+import { computeStat, MOD } from '../data/stats';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -88,40 +91,27 @@ export default function useCultivation() {
     }));
   }, []);
 
-  /** Replace one law passive with a different one — exclusion is per-tier only. */
-  const replaceLawPassive = useCallback((lawId, idx) => {
+  /** Replace the unique modifier at a given tier with a different one. */
+  const replaceLawUnique = useCallback((lawId, tier) => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
-      const passives    = law.passives ?? [];
-      const oldPassive  = passives[idx];
-      if (!oldPassive) return law;
-      const tier = oldPassive.tier ?? 'Iron';
-      const excludeNames = passives
-        .filter((p, i) => i !== idx && (p.tier ?? 'Iron') === tier)
-        .map(p => p.name);
-      const newPassive   = pickRandomLawPassive(excludeNames);
-      if (!newPassive) return law;
-      const tagged = { ...newPassive, tier };
-      const updated = passives.map((p, i) => (i === idx ? tagged : p));
-      return { ...law, passives: updated };
+      const uniques = law.uniques ?? {};
+      const currentIds = Object.values(uniques).filter(Boolean).map(u => u.id);
+      const newUnique = pickRandomUnique(currentIds);
+      if (!newUnique) return law;
+      return { ...law, uniques: { ...uniques, [tier]: newUnique } };
     }));
   }, []);
 
-  /** Add a passive at a specific tier — exclusion is per-tier only. */
-  const addLawPassive = useCallback((lawId, tier = 'Iron') => {
+  /** Re-roll the value of an existing unique at a given tier. */
+  const honeLawUnique = useCallback((lawId, tier) => {
     setOwnedLaws(prev => prev.map(law => {
       if (law.id !== lawId) return law;
-      const passives  = law.passives ?? [];
-      const tierMax   = TIER_SLOT_COUNT[tier] ?? 0;
-      const tierCount = passives.filter(p => (p.tier ?? 'Iron') === tier).length;
-      if (tierCount >= tierMax) return law;
-      const excludeNames = passives
-        .filter(p => (p.tier ?? 'Iron') === tier)
-        .map(p => p.name);
-      const newPassive   = pickRandomLawPassive(excludeNames);
-      if (!newPassive) return law;
-      const tagged = { ...newPassive, tier };
-      return { ...law, passives: [...passives, tagged] };
+      const uniques = law.uniques ?? {};
+      const current = uniques[tier];
+      if (!current) return law;
+      const newValue = rollUniqueValue(current.id);
+      return { ...law, uniques: { ...uniques, [tier]: { ...current, value: newValue } } };
     }));
   }, []);
 
@@ -175,7 +165,21 @@ export default function useCultivation() {
         const lawMult = indexRef.current >= law.realmRequirement
           ? law.cultivationSpeedMult
           : 1;
-        const rate = BASE_RATE * lawMult * (boostRef.current ? BOOST_MULTIPLIER : 1) * adBoostRef.current * pillQiMultRef.current;
+        // Apply law-unique qi_speed modifiers (INCREASED, MORE, REDUCED, etc.)
+        let qiUniqueMult = 1;
+        if (law.uniques) {
+          const ctx = buildContext({
+            inCombat: false,
+            realmIndex: indexRef.current,
+            focusing: boostRef.current,
+          });
+          const bundle = evaluateLawUniques(law, ctx);
+          const qiMods = bundle.statMods.qi_speed ?? [];
+          qiUniqueMult = computeStat(1, qiMods);
+        }
+        const rate = BASE_RATE * lawMult * qiUniqueMult *
+          (boostRef.current ? BOOST_MULTIPLIER : 1) *
+          adBoostRef.current * pillQiMultRef.current;
         qiRef.current += rate * dt;
 
         if (qiRef.current >= costRef.current) {
@@ -257,8 +261,8 @@ export default function useCultivation() {
     addOwnedLaw,
     upgradeLaw,
     honeLawMult,
-    replaceLawPassive,
-    addLawPassive,
+    replaceLawUnique,
+    honeLawUnique,
     // Pill qi multiplier ref — updated by App.jsx
     pillQiMultRef,
     // Ads
