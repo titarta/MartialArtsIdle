@@ -32,6 +32,7 @@ const ENEMIES = {
     statMult: { hp: 0.7, atk: 0.6 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.90, qty: [1, 4] },
+      { itemId: 'iron_cultivation_2', chance: 0.20, qty: [1, 1] },
       { itemId: 'iron_mineral_1',     chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.02 },
@@ -45,7 +46,9 @@ const ENEMIES = {
     statMult: { hp: 1.2, atk: 0.4 },   // tanky construct, low damage
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.50, qty: [1, 2] },
-      { itemId: 'iron_mineral_1',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'iron_cultivation_2', chance: 0.20, qty: [1, 1] },
+      { itemId: 'iron_mineral_1',     chance: 0.25, qty: [1, 2] },
+      { itemId: 'iron_mineral_2',     chance: 0.15, qty: [1, 1] },
     ],
   },
 
@@ -58,7 +61,8 @@ const ENEMIES = {
     drops: [
       { itemId: 'iron_cultivation_1',   chance: 0.70, qty: [1, 3] },
       { itemId: 'bronze_cultivation_1', chance: 0.20, qty: [1, 1] },
-      { itemId: 'iron_mineral_1',       chance: 0.10, qty: [1, 1] },
+      { itemId: 'iron_mineral_1',       chance: 0.15, qty: [1, 1] },
+      { itemId: 'iron_mineral_2',       chance: 0.10, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.01 },
   },
@@ -71,6 +75,7 @@ const ENEMIES = {
     statMult: { hp: 0.8, atk: 1.1 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.85, qty: [2, 6] },
+      { itemId: 'iron_cultivation_2', chance: 0.30, qty: [1, 2] },
       { itemId: 'iron_mineral_1',     chance: 0.20, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.03 },
@@ -85,6 +90,7 @@ const ENEMIES = {
     drops: [
       { itemId: 'iron_cultivation_1',   chance: 0.65, qty: [1, 3] },
       { itemId: 'bronze_cultivation_1', chance: 0.25, qty: [1, 1] },
+      { itemId: 'iron_mineral_2',       chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.01 },
   },
@@ -97,9 +103,66 @@ const ENEMIES = {
     statMult: { hp: 1.0, atk: 1.3 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.85, qty: [2, 6] },
+      { itemId: 'iron_cultivation_2', chance: 0.25, qty: [1, 1] },
       { itemId: 'bronze_mineral_1',   chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
+  },
+
+  wolf_alpha: {
+    id:          'wolf_alpha',
+    name:        'Alpha Pack Wolf',
+    sprite:      'wolf',
+    description: 'The dominant wolf of the pack — larger and more cunning than its kin. Its qi absorption has accelerated beyond what any ordinary pack wolf achieves, its eyes glowing with a steady, predatory light.',
+    statMult: { hp: 1.1, atk: 1.3 },
+    drops: [
+      { itemId: 'bronze_cultivation_1', chance: 0.75, qty: [1, 3] },
+      { itemId: 'iron_cultivation_1',   chance: 0.40, qty: [1, 2] },
+      { itemId: 'bronze_mineral_1',     chance: 0.25, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.02 },
+  },
+
+  wandering_beast_elder: {
+    id:          'wandering_beast_elder',
+    name:        'Elder Wandering Beast',
+    sprite:      'wandering_beast',
+    description: 'An ancient wandering beast that has crossed every corner of the borderlands over decades. Its hide is layered in scar tissue from hundreds of fights, and its footsteps carry a weight that makes the ground tremble.',
+    statMult: { hp: 1.15, atk: 1.2 },
+    drops: [
+      { itemId: 'bronze_cultivation_1', chance: 0.80, qty: [2, 4] },
+      { itemId: 'iron_cultivation_1',   chance: 0.40, qty: [1, 2] },
+      { itemId: 'bronze_mineral_2',     chance: 0.20, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.02 },
+  },
+
+  bandit_captain: {
+    id:          'bandit_captain',
+    name:        'Bandit Captain',
+    sprite:      'bandit_scout',
+    description: 'The leader of a bandit cell — wearing proper armour and carrying a real sword instead of a short blade. Years of commanding ambushes have made them faster and more vicious than any of their subordinates.',
+    statMult: { hp: 1.0, atk: 1.4 },
+    drops: [
+      { itemId: 'bronze_cultivation_1', chance: 0.70, qty: [1, 3] },
+      { itemId: 'iron_cultivation_1',   chance: 0.60, qty: [2, 5] },
+      { itemId: 'bronze_mineral_1',     chance: 0.25, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.04 },
+  },
+
+  rogue_enforcer: {
+    id:          'rogue_enforcer',
+    name:        'Rogue Enforcer',
+    sprite:      'rogue_disciple',
+    description: 'A former senior disciple who leads the most dangerous rogue cells. They retain the sect\'s combat discipline despite their fall — their stances are clean, their strikes carry genuine cultivation force, and they teach forbidden techniques to those who follow them.',
+    statMult: { hp: 1.1, atk: 1.5 },
+    drops: [
+      { itemId: 'bronze_cultivation_1', chance: 0.80, qty: [2, 5] },
+      { itemId: 'iron_cultivation_1',   chance: 0.50, qty: [1, 3] },
+      { itemId: 'bronze_mineral_1',     chance: 0.30, qty: [1, 1] },
+    ],
+    techniqueDrop: { chance: 0.06 },
   },
 
   // ── World 2 — The Ancient Frontier ───────────────────────────────────────
@@ -433,12 +496,27 @@ const ENEMIES = {
     sprite:      'forest_spirit',
     description: 'A translucent humanoid figure woven from ancient bark and pale cave moss, its eyes twin ember-points of natural qi. It drifts through deep root hollows where ancient trees push their roots through bedrock — defending territory no surface cultivator has ever mapped.',
     statMult: { hp: 0.8, atk: 1.5 },
+    // NOTE: statMult is W1-tier (moved from W1 for visual fit) — balance pass pending
     drops: [
-      { itemId: 'iron_cultivation_1',   chance: 0.70, qty: [2, 5] },
-      { itemId: 'bronze_cultivation_1', chance: 0.35, qty: [1, 2] },
-      { itemId: 'bronze_mineral_2',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'transcendent_cultivation_1', chance: 0.30, qty: [1, 1] },
+      { itemId: 'iron_cultivation_1',         chance: 0.50, qty: [1, 3] },
+      { itemId: 'bronze_cultivation_1',       chance: 0.40, qty: [1, 2] },
+      { itemId: 'bronze_mineral_2',           chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
+  },
+
+  world_core_titan: {
+    id:          'world_core_titan',
+    name:        'World Core Titan',
+    sprite:      null,
+    description: 'A titan that has descended to the world\'s deepest strata — its body no longer composed of mere compressed rock but of the molten material at the planet\'s core. Veins of pure origin qi run across its surface in shifting patterns, and its presence alone generates tremors across multiple cavern layers.',
+    statMult: { hp: 7.0, atk: 6.5 },
+    drops: [
+      { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [4, 10] },
+      { itemId: 'transcendent_cultivation_2', chance: 0.30, qty: [1, 2] },
+      { itemId: 'transcendent_mineral_2',     chance: 0.35, qty: [1, 1] },
+    ],
   },
 
   // ── World 5 — The Void Sea ────────────────────────────────────────────────
@@ -558,6 +636,19 @@ const ENEMIES = {
       { itemId: 'transcendent_mineral_2',     chance: 0.40, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.05 },
+  },
+
+  emperor_will_sovereign: {
+    id:          'emperor_will_sovereign',
+    name:        'Emperor Will Sovereign',
+    sprite:      null,
+    description: 'Where a mere fragment of an Emperor\'s will haunts the tomb, a sovereign-grade manifestation claims the sword ridge itself as its battlefield. This is no splinter of memory — it is a near-complete will that has absorbed the ridge\'s centuries of battle qi, growing into something that approximates the full consciousness of its original Emperor.',
+    statMult: { hp: 10.0, atk: 11.0 },
+    drops: [
+      { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [6, 15] },
+      { itemId: 'transcendent_mineral_2',     chance: 0.45, qty: [1, 3] },
+    ],
+    techniqueDrop: { chance: 0.06 },
   },
 
   // ── World 6 — The Open Heaven ─────────────────────────────────────────────

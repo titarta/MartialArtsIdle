@@ -58,21 +58,25 @@ statMult numbers and reading the names. Three levers to achieve this:
 
 ---
 
-## Enemy Roster (48 total — 8 per world)
+## Enemy Roster (54 total — 10/8/8/10/10/8 per world)
 
-### World 1 — The Mortal Lands
-| ID | Name | Has Sprite |
-|----|------|-----------|
-| outer_sect_disciple | Outer Sect Disciple | ✓ |
-| training_golem | Training Golem | ✓ |
-| wolf | Pack Wolf | ✓ |
-| bandit_scout | Bandit Scout | ✓ |
-| wandering_beast | Wandering Beast | ✓ |
-| rogue_disciple | Rogue Disciple | ✓ |
+All variants share the same sprite as their base enemy. No new art required.
 
-> ⚠️ W1 temporarily has 6 enemies (down from 8). forest_spirit and qi_beast moved to W4 for visual consistency with the underground root cavern background. Two new W1 enemies needed to restore the count — balancing pass pending.
+### World 1 — The Mortal Lands (10 enemies)
+| ID | Name | Has Sprite | Notes |
+|----|------|-----------|-------|
+| outer_sect_disciple | Outer Sect Disciple | ✓ | |
+| training_golem | Training Golem | ✓ | |
+| wolf | Pack Wolf | ✓ | |
+| bandit_scout | Bandit Scout | ✓ | |
+| wandering_beast | Wandering Beast | ✓ | |
+| rogue_disciple | Rogue Disciple | ✓ | |
+| wolf_alpha | Alpha Pack Wolf | ✓ | shares wolf sprite — harder variant, drops bronze tier |
+| wandering_beast_elder | Elder Wandering Beast | ✓ | shares wandering_beast sprite — harder variant |
+| bandit_captain | Bandit Captain | ✓ | shares bandit_scout sprite — harder variant |
+| rogue_enforcer | Rogue Enforcer | ✓ | shares rogue_disciple sprite — harder variant |
 
-### World 2 — The Ancient Frontier
+### World 2 — The Ancient Frontier (8 enemies)
 | ID | Name | Has Sprite |
 |----|------|-----------|
 | iron_fang_wolf | Iron Fang Wolf | ✓ |
@@ -84,7 +88,7 @@ statMult numbers and reading the names. Three levers to achieve this:
 | corrupted_cultivator | Corrupted Cultivator | — |
 | blood_leviathan | Blood Sea Leviathan | — |
 
-### World 3 — The Forbidden Lands
+### World 3 — The Forbidden Lands (8 enemies)
 | ID | Name | Has Sprite |
 |----|------|-----------|
 | burial_guardian | Burial Guardian | — |
@@ -96,37 +100,40 @@ statMult numbers and reading the names. Three levers to achieve this:
 | void_rift_predator | Void Rift Predator | — |
 | rift_stalker | Rift Stalker | — |
 
-### World 4 — The Origin Depths
-| ID | Name | Has Sprite |
-|----|------|-----------|
-| origin_crystal_golem | Origin Crystal Golem | — |
-| origin_guardian | Origin Guardian | — |
-| primordial_serpent | Primordial Serpent | — |
-| root_sovereign | Root Sovereign | — |
-| deep_earth_titan | Deep Earth Titan | — |
-| ancient_beast | Ancient Beast | — |
-| cavern_elder_demon | Cavern Elder Demon | — |
-| world_root_wraith | World Root Wraith | — |
-| forest_spirit | Forest Spirit | ✓ |
+### World 4 — The Origin Depths (10 enemies)
+| ID | Name | Has Sprite | Notes |
+|----|------|-----------|-------|
+| origin_crystal_golem | Origin Crystal Golem | — | |
+| origin_guardian | Origin Guardian | — | |
+| primordial_serpent | Primordial Serpent | — | |
+| root_sovereign | Root Sovereign | — | |
+| deep_earth_titan | Deep Earth Titan | — | |
+| ancient_beast | Ancient Beast | — | |
+| cavern_elder_demon | Cavern Elder Demon | — | |
+| world_root_wraith | World Root Wraith | — | |
+| forest_spirit | Forest Spirit | ✓ | moved from W1 — visual match for underground root cavern |
+| world_core_titan | World Core Titan | — | variant of deep_earth_titan — final W4 region, better drops |
 
 > forest_spirit moved from W1 — the underground root cavern background (gnarled roots through bedrock) is a far stronger visual match than the sect compound. Paired with root_sovereign in Ancient Root Grotto.
+> world_core_titan shares no sprite yet. Same concept as deep_earth_titan but at the world's deepest strata.
 
-### World 5 — The Void Sea
-| ID | Name | Has Sprite |
-|----|------|-----------|
-| spatial_fissure_beast | Spatial Fissure Beast | — |
-| void_elemental | Void Elemental | — |
-| void_sea_leviathan | Void Sea Leviathan | — |
-| dao_inscription_guardian | Dao Inscription Guardian | — |
-| dao_inscription_revenant | Dao Inscription Revenant | — |
-| petrified_dao_lord | Petrified Dao Lord | — |
-| emperor_will_fragment | Emperor Will Fragment | — |
-| star_sea_drifter | Star Sea Drifter | — |
-| qi_beast | Qi-Sensing Beast | ✓ |
+### World 5 — The Void Sea (10 enemies)
+| ID | Name | Has Sprite | Notes |
+|----|------|-----------|-------|
+| spatial_fissure_beast | Spatial Fissure Beast | — | |
+| void_elemental | Void Elemental | — | |
+| void_sea_leviathan | Void Sea Leviathan | — | |
+| dao_inscription_guardian | Dao Inscription Guardian | — | |
+| dao_inscription_revenant | Dao Inscription Revenant | — | |
+| petrified_dao_lord | Petrified Dao Lord | — | |
+| emperor_will_fragment | Emperor Will Fragment | — | |
+| star_sea_drifter | Star Sea Drifter | — | |
+| qi_beast | Qi-Sensing Beast | ✓ | moved from W1 — violet veins match W5 magenta void palette |
+| emperor_will_sovereign | Emperor Will Sovereign | — | variant of emperor_will_fragment — near-complete will at Heaven Sword Ridge |
 
-> qi_beast moved here from W4 — its sprite (near-black coat, pulsing violet energy veins) is a direct visual match for the W5 magenta void sky and energy crack palette. Placed in Fractured Space Corridors alongside spatial_fissure_beast as two void-adapted predators.
+> qi_beast moved here from W1 — its sprite (near-black coat, pulsing violet energy veins) is a direct visual match for the W5 magenta void sky and energy crack palette. Placed in Fractured Space Corridors alongside spatial_fissure_beast as two void-adapted predators.
 
-### World 6 — The Open Heaven
+### World 6 — The Open Heaven (8 enemies)
 | ID | Name | Has Sprite |
 |----|------|-----------|
 | boundary_wraith | Boundary Wraith | — |
@@ -140,17 +147,18 @@ statMult numbers and reading the names. Three levers to achieve this:
 
 ---
 
-## Region Assignment (max 2 per region)
+## Region Assignment (max 2 per region, zero repeats)
+
+Every enemy appears in exactly one region. Variants (wolf_alpha, wandering_beast_elder, etc.) occupy the later regions of their world, replacing repeats with escalated drops.
 
 ### World 1
 | Region | Pool | Rationale |
 |--------|------|-----------|
 | Outer Sect Training Grounds | outer_sect_disciple, training_golem | Sect training environment |
 | Borderland Wilds | wolf, bandit_scout | Open wilderness predators + human ambushers |
-| Qi-Vein Ravines | wandering_beast, wolf | Wild beasts prowling ravines, both drawn to dense qi seeping up through rock |
-| Misty Spirit Forest | wolf, rogue_disciple | Wolves hunting in the mist; rogues sheltering deep in the forest |
-| Heaven's Edge Peak | rogue_disciple, bandit_scout | Rogues seeking seclusion at the peak; bandits using high ground as a lookout |
-| Thunderstorm Plateau | wandering_beast, rogue_disciple | Beasts driven onto the plateau by storms; rogues surviving the qi surges |
+| Qi-Vein Ravines | wandering_beast, rogue_disciple | Beasts prowling ravines; rogues using the terrain for ambushes |
+| Misty Spirit Forest | wolf_alpha, wandering_beast_elder | Dominant survivors of the wilderness — the hardened beasts |
+| Thunderstorm Plateau | bandit_captain, rogue_enforcer | The most dangerous human threats before leaving the mortal lands |
 
 ### World 2
 | Region | Pool | Rationale |
@@ -158,14 +166,12 @@ statMult numbers and reading the names. Three levers to achieve this:
 | Shattered Sky Desert | sand_dragon, bone_construct | Desert predator + ancient bones animated in the ruins |
 | Demon Beast Plains | iron_fang_wolf, iron_spine_boar | Plains-hardened pack hunters and mineral-fed boars |
 | Sunken Immortal City | city_guardian, immortal_shade | City's own construct + the shade of its trapped immortal residents |
-| Primal Qi Wastes | corrupted_cultivator, bone_construct | Qi-mad cultivators + ancient bone remains scattered through the wastes |
-| Blood Sea Periphery | blood_leviathan, corrupted_cultivator | Sea apex predator + qi-corrupted cultivators drawn to the blood sea |
+| Blood Sea Wastes | blood_leviathan, corrupted_cultivator | Sea apex predator + qi-mad cultivators drawn to the blood sea |
 
 ### World 3
 | Region | Pool | Rationale |
 |--------|------|-----------|
 | Saint Burial Grounds | burial_guardian, saint_corpse_soldier | Bound guardian sentinel + oath-driven corpse soldiers |
-| Primal Qi Wastes (Deep) | ancient_war_spirit, saint_bone_sovereign | Battle qi residue spirits + assembled Saint-bone sovereign |
 | Void Rift Expanse | void_rift_predator, rift_stalker | Both rift-evolved hunters of the same spatial ecosystem |
 | Nine-Death Mountain Range | saint_bone_sovereign, void_shade | Undead sovereign claiming the range + void shades haunting cursed passes |
 | Sealed War Altar | forbidden_construct, ancient_war_spirit | Construct guarding the sealed altar + war spirits bound to the altar itself |
@@ -176,9 +182,8 @@ statMult numbers and reading the names. Three levers to achieve this:
 | Origin Qi Spring Depths | origin_guardian, origin_crystal_golem | Spring-born elemental guardian + crystallised qi golem |
 | World Root Caverns | primordial_serpent, cavern_elder_demon | Both deep cavern creatures fused with the underground environment |
 | Ancient Root Grotto | forest_spirit, root_sovereign | Root spirits drifting through root hollows + the sovereign whose underground network they inhabit |
-| Primordial Forest Core | root_sovereign, deep_earth_titan | Root network controller + mantle-pressure titan at the forest's core |
-| Heaven Beast Sanctuary | ancient_beast, world_root_wraith | Primordial beasts claiming territory + their ethereal root-wraith guardians |
-| Ancient Origin Altar | root_sovereign, deep_earth_titan | Powerful earth entities guarding the origin altar |
+| Primordial Forest Core | ancient_beast, world_root_wraith | Primordial beasts claiming the forest core + their ethereal wraith guardians |
+| Ancient Origin Altar | deep_earth_titan, world_core_titan | Two titan-class entities at the deepest layer — the titan and its world-core form |
 
 ### World 5
 | Region | Pool | Rationale |
@@ -186,16 +191,13 @@ statMult numbers and reading the names. Three levers to achieve this:
 | Fractured Space Corridors | spatial_fissure_beast, qi_beast | Two void-adapted predators — one born in the fractures, one transformed by generations inside them |
 | Void Sea Shores | void_sea_leviathan, void_elemental | Void sea apex predator + elemental ambient threats at the shore |
 | Dao Inscription Ruins | dao_inscription_guardian, dao_inscription_revenant | Construct guardian + cultivator who became one with the inscriptions |
-| Source Peak Summits | star_sea_drifter, dao_inscription_revenant | Drifters pulled down by Dao source energy + Dao revenants at peak ruins |
-| Ancient Emperor Tomb | emperor_will_fragment, dao_inscription_guardian | Emperor consciousness fragments + inscription guardians sealing the tomb |
-| Heaven Sword Ridge | petrified_dao_lord, emperor_will_fragment | Dao lords petrified mid-duel on the ridge + Emperor wills haunting the battlefield |
+| Ancient Emperor Tomb | emperor_will_fragment, petrified_dao_lord | Emperor consciousness fragments + Dao lords sealed inside as the final line |
+| Heaven Sword Ridge | star_sea_drifter, emperor_will_sovereign | Star sea pulled toward Dao pressure + near-complete Emperor will claiming the ridge |
 
 ### World 6
 | Region | Pool | Rationale |
 |--------|------|-----------|
 | Heaven Pillar Ascent | heaven_pillar_guardian, boundary_wraith | Pillar construct + wraith feeding on ascending cultivators at the boundary |
 | Star Sea Approaches | open_heaven_beast, star_sea_leviathan | Open heaven native beasts + leviathans at the star sea entry |
-| Celestial Rift Expanse | celestial_sovereign, void_apex_predator | Rift guardian sovereign + void predator hunting at the rift intersection |
-| Eternal Storm Arena | eternal_storm_titan, star_sea_leviathan | Titan born of the storm + leviathan that rages within it as a natural force |
-| Cosmic Beast Grounds | open_heaven_beast, heaven_pillar_guardian | Territorial beasts + pillar guardians patrolling the beast grounds |
+| Celestial Rift Expanse | celestial_sovereign, eternal_storm_titan | Rift guardian sovereign + storm titan that inhabits the same space as a natural force |
 | Heaven's Core | open_heaven_sovereign, void_apex_predator | Dissolved sovereign energy + apex void predator at the highest point |

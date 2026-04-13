@@ -21,7 +21,7 @@ const WORLDS = [
         minRealm: 'Tempered Body L1',
         minRealmIndex: 0,
         enemies: 'Outer sect disciples, training golems',
-        drops: 'Mortal Qi Residue, Sect Iron Shard',
+        drops: 'Mortal Qi Residue, Condensed Qi Stone, Sect Iron Shard, Iron Vein Shard',
         herbs: 'Mortal Qi Grass',
         ores: 'Sect Iron Shard',
         enemyPool: [
@@ -34,7 +34,7 @@ const WORLDS = [
         minRealm: 'Tempered Body L5',
         minRealmIndex: 4,
         enemies: 'Pack wolves, bandit scouts',
-        drops: 'Mortal Qi Residue, Beast Qi Core, Sect Iron Shard',
+        drops: 'Mortal Qi Residue, Condensed Qi Stone, Sect Iron Shard',
         herbs: 'Mortal Qi Grass, Qi Vein Vine',
         ores: 'Sect Iron Shard, Qi Fang',
         enemyPool: [
@@ -43,59 +43,45 @@ const WORLDS = [
         ],
       },
       {
-        // Wild beasts prowling the ravines, both drawn to the dense qi seeping up through the rock
+        // Wandering beasts roam qi-saturated ravines; rogue disciples use the terrain for ambushes
         name: 'Qi-Vein Ravines',
         minRealm: 'Qi Transformation Early',
         minRealmIndex: 10,
-        enemies: 'Wandering beasts, pack wolves',
-        drops: 'Mortal Qi Residue, Beast Qi Core, Qi Fang',
+        enemies: 'Wandering beasts, rogue disciples',
+        drops: 'Mortal Qi Residue, Beast Qi Core, Qi Fang, Spirit Wood Core',
         herbs: 'Qi Vein Vine, Misty Forest Bloom',
-        ores: 'Qi Fang',
+        ores: 'Qi Fang, Spirit Wood Core',
         enemyPool: [
           { enemyId: 'wandering_beast', weight: 6 },
-          { enemyId: 'wolf',            weight: 4 },
+          { enemyId: 'rogue_disciple',  weight: 4 },
         ],
       },
       {
-        // Wolves hunting in the mist; rogue disciples sheltering deep in the dense forest
+        // Alpha wolves and elder beasts — the hardened survivors of the wilderness, now dominant predators
         name: 'Misty Spirit Forest',
         minRealm: 'Qi Transformation Peak',
         minRealmIndex: 13,
-        enemies: 'Pack wolves, rogue disciples',
-        drops: 'Mortal Qi Residue, Beast Qi Core, Spirit Wood Core',
+        enemies: 'Alpha pack wolves, elder wandering beasts',
+        drops: 'Beast Qi Core, Spirit Wood Core',
         herbs: 'Misty Forest Bloom',
         ores: 'Qi Fang, Spirit Wood Core',
         enemyPool: [
-          { enemyId: 'wolf',          weight: 6 },
-          { enemyId: 'rogue_disciple', weight: 4 },
+          { enemyId: 'wolf_alpha',           weight: 6 },
+          { enemyId: 'wandering_beast_elder', weight: 4 },
         ],
       },
       {
-        // Rogue disciples seeking seclusion at the peak; bandit scouts using the high ground as a lookout
-        name: "Heaven's Edge Peak",
-        minRealm: 'True Element Early',
-        minRealmIndex: 14,
-        enemies: 'Rogue disciples, bandit scouts',
-        drops: 'Beast Qi Core, Qi Fang, Spirit Wood Core',
-        herbs: 'Qi Vein Vine, Misty Forest Bloom',
-        ores: 'Spirit Wood Core',
-        enemyPool: [
-          { enemyId: 'rogue_disciple', weight: 6 },
-          { enemyId: 'bandit_scout',   weight: 4 },
-        ],
-      },
-      {
-        // Wandering beasts driven onto the plateau by the storms; rogue disciples surviving the qi surges
+        // Bandit captains and rogue enforcers — the most dangerous human threats before leaving the mortal lands
         name: 'Thunderstorm Plateau',
         minRealm: 'True Element Peak',
         minRealmIndex: 17,
-        enemies: 'Wandering beasts, rogue disciples',
+        enemies: 'Bandit captains, rogue enforcers',
         drops: 'Beast Qi Core, Corrupted Qi Shard, Spirit Wood Core',
         herbs: 'Misty Forest Bloom',
         ores: 'Spirit Wood Core',
         enemyPool: [
-          { enemyId: 'wandering_beast', weight: 6 },
-          { enemyId: 'rogue_disciple',  weight: 4 },
+          { enemyId: 'bandit_captain',  weight: 5 },
+          { enemyId: 'rogue_enforcer',  weight: 5 },
         ],
       },
     ],
@@ -147,21 +133,8 @@ const WORLDS = [
         ],
       },
       {
-        // Bone constructs from ancient ruins scattered through the wastes; corrupted qi-mad cultivators
-        name: 'Primal Qi Wastes',
-        minRealm: 'Immortal Ascension 2nd',
-        minRealmIndex: 22,
-        enemies: 'Corrupted cultivators, bone constructs',
-        drops: 'Ancient Qi Marrow, Immortal Soul Remnant, Immortal Array Jade',
-        herbs: 'Blood Reed',
-        ores: 'Immortal Array Jade',
-        enemyPool: [
-          { enemyId: 'corrupted_cultivator', weight: 6 },
-          { enemyId: 'bone_construct',       weight: 4 },
-        ],
-      },
-      {
-        name: 'Blood Sea Periphery',
+        // Blood sea apex predator + the qi-mad cultivators drawn to its shores — the deadliest pairing in the frontier
+        name: 'Blood Sea Wastes',
         minRealm: 'Immortal Ascension 3rd',
         minRealmIndex: 23,
         enemies: 'Blood sea leviathans, corrupted cultivators',
@@ -193,19 +166,6 @@ const WORLDS = [
         enemyPool: [
           { enemyId: 'burial_guardian',      weight: 5 },
           { enemyId: 'saint_corpse_soldier', weight: 5 },
-        ],
-      },
-      {
-        name: 'Primal Qi Wastes (Deep)',
-        minRealm: 'Saint Middle',
-        minRealmIndex: 25,
-        enemies: 'Ancient war spirits, saint bone sovereigns',
-        drops: 'Saint Qi Relic, Void Qi Pearl, Saint Bone Sliver',
-        herbs: 'Burial Ground Lotus',
-        ores: 'Saint Bone Sliver',
-        enemyPool: [
-          { enemyId: 'ancient_war_spirit',   weight: 5 },
-          { enemyId: 'saint_bone_sovereign', weight: 5 },
         ],
       },
       {
@@ -282,12 +242,12 @@ const WORLDS = [
         herbs: 'Origin Spring Petal',
         ores: 'Void Crystal',
         enemyPool: [
-          { enemyId: 'primordial_serpent',  weight: 5 },
-          { enemyId: 'cavern_elder_demon',  weight: 5 },
+          { enemyId: 'primordial_serpent', weight: 5 },
+          { enemyId: 'cavern_elder_demon', weight: 5 },
         ],
       },
       {
-        // Root spirits and the sovereign whose underground network they inhabit — two root entities sharing the same hollow territory
+        // Root spirits drifting through the root hollows + the sovereign whose underground network they inhabit
         name: 'Ancient Root Grotto',
         minRealm: 'Origin Returning 3rd',
         minRealmIndex: 32,
@@ -301,43 +261,31 @@ const WORLDS = [
         ],
       },
       {
+        // Ancient beasts claim the forest core as territory; world root wraiths are their ethereal guardians
         name: 'Primordial Forest Core',
         minRealm: 'Origin King 1st',
         minRealmIndex: 33,
-        enemies: 'Root sovereigns, deep earth titans',
-        drops: 'Primal Qi Core, Heaven Qi Crystal, Void Crystal',
-        herbs: 'Origin Spring Petal, Heaven Root Vine',
-        ores: 'Void Crystal',
-        enemyPool: [
-          { enemyId: 'root_sovereign',   weight: 4 },
-          { enemyId: 'deep_earth_titan', weight: 6 },
-        ],
-      },
-      {
-        // Ancient beasts claim the sanctuary as territory; world root wraiths are their ethereal guardians
-        name: 'Heaven Beast Sanctuary',
-        minRealm: 'Origin King 2nd',
-        minRealmIndex: 34,
         enemies: 'Ancient beasts, world root wraiths',
-        drops: 'Heaven Qi Crystal, Void Crystal, World Stone Core',
+        drops: 'Primal Qi Core, Heaven Qi Crystal, Void Crystal, World Stone Core',
         herbs: 'Origin Spring Petal, Heaven Root Vine',
         ores: 'Void Crystal, World Stone Core',
         enemyPool: [
-          { enemyId: 'ancient_beast',      weight: 5 },
-          { enemyId: 'world_root_wraith',  weight: 5 },
+          { enemyId: 'ancient_beast',     weight: 5 },
+          { enemyId: 'world_root_wraith', weight: 5 },
         ],
       },
       {
+        // Two titans at the deepest layer — deep earth titan and its ascended world-core form
         name: 'Ancient Origin Altar',
         minRealm: 'Origin King 3rd',
         minRealmIndex: 35,
-        enemies: 'Root sovereigns, deep earth titans',
+        enemies: 'Deep earth titans, world core titans',
         drops: 'Heaven Qi Crystal, World Stone Core',
         herbs: 'Heaven Root Vine',
         ores: 'Void Crystal, World Stone Core',
         enemyPool: [
-          { enemyId: 'root_sovereign',   weight: 5 },
           { enemyId: 'deep_earth_titan', weight: 5 },
+          { enemyId: 'world_core_titan', weight: 5 },
         ],
       },
     ],
@@ -390,44 +338,31 @@ const WORLDS = [
         ],
       },
       {
-        // Star sea drifters pulled down by Dao source energy; revenants inhabiting the peak ruins
-        name: 'Source Peak Summits',
-        minRealm: 'Dao Source 3rd',
-        minRealmIndex: 41,
-        enemies: 'Star sea drifters, dao inscription revenants',
-        drops: 'Heaven Qi Crystal, World Stone Core',
-        herbs: 'Origin Spring Petal',
-        ores: 'Void Crystal',
-        enemyPool: [
-          { enemyId: 'star_sea_drifter',         weight: 6 },
-          { enemyId: 'dao_inscription_revenant', weight: 4 },
-        ],
-      },
-      {
+        // Emperor consciousness fragments guard the tomb; petrified Dao lords sealed inside serve as the final line
         name: 'Ancient Emperor Tomb',
         minRealm: 'Emperor Realm 1st',
         minRealmIndex: 42,
-        enemies: 'Emperor will fragments, dao inscription guardians',
+        enemies: 'Emperor will fragments, petrified dao lords',
         drops: 'Heaven Qi Crystal, World Stone Core',
         herbs: 'Origin Spring Petal',
         ores: 'Void Crystal',
         enemyPool: [
-          { enemyId: 'emperor_will_fragment',    weight: 6 },
-          { enemyId: 'dao_inscription_guardian', weight: 4 },
+          { enemyId: 'emperor_will_fragment', weight: 6 },
+          { enemyId: 'petrified_dao_lord',    weight: 4 },
         ],
       },
       {
-        // Petrified Dao lords frozen mid-duel on the ridge; Emperor will fragments haunt the battlefield
+        // Star sea drifters pulled to the ridge by catastrophic Dao pressure; sovereign-grade Emperor will claims the battlefield
         name: 'Heaven Sword Ridge',
         minRealm: 'Emperor Realm 3rd',
         minRealmIndex: 44,
-        enemies: 'Petrified dao lords, emperor will fragments',
+        enemies: 'Star sea drifters, emperor will sovereigns',
         drops: 'Heaven Qi Crystal, World Stone Core',
         herbs: 'Heaven Root Vine',
         ores: 'Void Crystal',
         enemyPool: [
-          { enemyId: 'petrified_dao_lord',    weight: 5 },
-          { enemyId: 'emperor_will_fragment', weight: 5 },
+          { enemyId: 'star_sea_drifter',       weight: 5 },
+          { enemyId: 'emperor_will_sovereign', weight: 5 },
         ],
       },
     ],
@@ -454,8 +389,8 @@ const WORLDS = [
       },
       {
         name: 'Star Sea Approaches',
-        minRealm: 'Open Heaven Layer 1',
-        minRealmIndex: 46,
+        minRealm: 'Open Heaven Layer 2',
+        minRealmIndex: 47,
         enemies: 'Open heaven beasts, star sea leviathans',
         drops: 'Heaven Qi Crystal, World Stone Core',
         herbs: 'Esoteric botanicals (TBD)',
@@ -466,44 +401,17 @@ const WORLDS = [
         ],
       },
       {
+        // The sovereign commands the rift; the storm titan is a natural force inhabiting the same space
         name: 'Celestial Rift Expanse',
-        minRealm: 'Open Heaven Layer 2',
-        minRealmIndex: 47,
-        enemies: 'Celestial sovereigns, void apex predators',
-        drops: 'Heaven Qi Crystal, World Stone Core',
-        herbs: 'Esoteric botanicals (TBD)',
-        ores: 'Esoteric minerals (TBD)',
-        enemyPool: [
-          { enemyId: 'celestial_sovereign', weight: 5 },
-          { enemyId: 'void_apex_predator',  weight: 5 },
-        ],
-      },
-      {
-        // The leviathan rages inside the eternal storms as a natural force, not a visitor
-        name: 'Eternal Storm Arena',
-        minRealm: 'Open Heaven Layer 3',
-        minRealmIndex: 48,
-        enemies: 'Eternal storm titans, star sea leviathans',
-        drops: 'Heaven Qi Crystal, World Stone Core',
-        herbs: 'Esoteric botanicals (TBD)',
-        ores: 'Esoteric minerals (TBD)',
-        enemyPool: [
-          { enemyId: 'eternal_storm_titan', weight: 6 },
-          { enemyId: 'star_sea_leviathan',  weight: 4 },
-        ],
-      },
-      {
-        // Heaven pillar guardians patrol the beast grounds as territorial wardens
-        name: 'Cosmic Beast Grounds',
         minRealm: 'Open Heaven Layer 4',
         minRealmIndex: 49,
-        enemies: 'Open heaven beasts, heaven pillar guardians',
+        enemies: 'Celestial sovereigns, eternal storm titans',
         drops: 'Heaven Qi Crystal, World Stone Core',
         herbs: 'Esoteric botanicals (TBD)',
         ores: 'Esoteric minerals (TBD)',
         enemyPool: [
-          { enemyId: 'open_heaven_beast',      weight: 6 },
-          { enemyId: 'heaven_pillar_guardian', weight: 4 },
+          { enemyId: 'celestial_sovereign',  weight: 5 },
+          { enemyId: 'eternal_storm_titan',  weight: 5 },
         ],
       },
       {
