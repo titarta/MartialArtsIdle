@@ -1900,18 +1900,19 @@
 .tech-icon-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 16px;
+  justify-content: center;
 }
 
 .tech-icon-slot {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 72px;
+  width: 90px;
   position: relative;
   /* No CSS border/background — the pixel art frame handles all visuals */
-  padding: 8px 8px 6px;
+  padding: 20px 15px 17px;
 }
 
 /* Pixel art card frame overlay — covers the whole slot */
@@ -2768,7 +2769,7 @@
   }
 
   .tech-icon-slot {
-    width: 90px;
+    width: 110px;
   }
 
   .tech-icon-name {
@@ -2830,7 +2831,7 @@
   }
 
   .tech-icon-slot {
-    width: 96px;
+    width: 119px;
   }
 }
 
@@ -2964,7 +2965,7 @@
   }
 
   .tech-icon-slot {
-    width: 80px;
+    width: 94px;
   }
 
   .tech-icon-name {

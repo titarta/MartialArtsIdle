@@ -105,13 +105,12 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
 
       {/* ── Technique icons ──────────────────────────────────────────────── */}
       <div className="tech-icon-grid">
-        {equippedTechniques.map((tech, i) => {
-          const color = tech ? TYPE_COLOR[tech.type] : 'rgba(255,255,255,0.15)';
+        {equippedTechniques.filter(Boolean).map((tech, i) => {
+          const color = TYPE_COLOR[tech.type];
           return (
             <div
               key={i}
-              className={`tech-icon-slot${!tech ? ' tech-icon-empty' : ''}`}
-              style={{ borderColor: color }}
+              className="tech-icon-slot"
             >
               <div
                 className="tech-icon-top"
@@ -131,8 +130,9 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
                 />
               </div>
               <span className="tech-icon-name" style={{ color }}>
-                {tech ? tech.name : `Slot ${['I','II','III'][i]}`}
+                {tech.name}
               </span>
+              <img className="tech-icon-frame" src={`${BASE}ui/card_frame.png`} alt="" />
             </div>
           );
         })}
