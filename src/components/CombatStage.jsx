@@ -157,10 +157,16 @@ export default function CombatStage({
       const x = isEnemy
         ? `${62 + Math.random() * 16}%`
         : `${8  + Math.random() * 14}%`;
-      const y = 80 + Math.random() * 55;
-      // Scale font size by damage % of max HP — sqrt curve so small hits still visible
-      const pct = Math.min(1, value / maxHp);
-      const fontSize = Math.round(10 + Math.pow(pct, 0.5) * 10);
+      // y: 35%–70% of actual stage height so numbers stay proportional on all devices
+      const stageH = stageRef.current?.getBoundingClientRect().height ?? 200;
+      const y = Math.round(stageH * (0.35 + Math.random() * 0.35));
+      // Two-curve font size:
+      //   0–100% of enemy HP  → sqrt ramp  10–20 px  (small hits still visible)
+      //   100%–100000% HP     → log ramp   20–44 px  (overkill hits feel massive)
+      const ratio = value / maxHp; // uncapped
+      const fontSize = ratio <= 1
+        ? Math.round(10 + Math.pow(ratio, 0.5) * 10)
+        : Math.round(Math.min(44, 20 + Math.log10(ratio) * 8));
       setDmgNums(prev => [...prev, { id, value, x, y, isEnemy, fontSize }]);
       const t = setTimeout(
         () => setDmgNums(prev => prev.filter(n => n.id !== id)),
