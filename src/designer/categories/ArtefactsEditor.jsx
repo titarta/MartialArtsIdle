@@ -1,16 +1,15 @@
-import RecordEditor from './RecordEditor.jsx';
+import CardGridEditor from './CardGridEditor.jsx';
 import { ARTEFACTS } from '../../data/artefacts.js';
 import artefactsSchema from '../schemas/artefacts.js';
 
 export default function ArtefactsEditor({ edited, onChangeRecords }) {
   return (
-    <RecordEditor
+    <CardGridEditor
       baselineRecords={ARTEFACTS}
       editedRecords={edited.records || {}}
       onChangeRecords={onChangeRecords}
       schema={artefactsSchema}
       idField="id"
-      groupBy={(rec) => rec?.slot ?? 'Other'}
       displayLabel={(rec, key) => `${rec?.rarity ?? '?'} · ${rec?.name ?? key}`}
       allowAdd={true}
       newIdPlaceholder="new_artefact_id"

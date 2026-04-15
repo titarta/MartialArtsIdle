@@ -1,10 +1,10 @@
-import RecordEditor from './RecordEditor.jsx';
+import CardGridEditor from './CardGridEditor.jsx';
 import REALMS from '../../data/realms.js';
 import realmsSchema from '../schemas/realms.js';
 
 export default function RealmsEditor({ edited, onChangeRecords }) {
   return (
-    <RecordEditor
+    <CardGridEditor
       baselineRecords={REALMS}
       editedRecords={edited.records || {}}
       onChangeRecords={onChangeRecords}

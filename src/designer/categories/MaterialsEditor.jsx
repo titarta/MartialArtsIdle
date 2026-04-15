@@ -5,7 +5,7 @@
  * records.ORES).
  */
 import { useState } from 'react';
-import RecordEditor from './RecordEditor.jsx';
+import CardGridEditor from './CardGridEditor.jsx';
 import { HERBS, ORES } from '../../data/materials.js';
 import { HERB_SCHEMA, ORE_SCHEMA } from '../schemas/materials.js';
 
@@ -44,7 +44,7 @@ export default function MaterialsEditor({ edited, onChangeRecords }) {
           </button>
         ))}
       </div>
-      <RecordEditor
+      <CardGridEditor
         baselineRecords={sub.baseline}
         editedRecords={subRecords}
         onChangeRecords={onSubChange}

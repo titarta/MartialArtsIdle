@@ -16,7 +16,7 @@
 
 import { useState } from 'react';
 
-export default function SchemaForm({ schema, value, onChange, path = '' }) {
+export default function SchemaForm({ schema, value, onChange, path = '', compact = false }) {
   const v = value || {};
   const update = (key, newVal) => {
     if (newVal === undefined) {
@@ -30,7 +30,7 @@ export default function SchemaForm({ schema, value, onChange, path = '' }) {
   };
 
   return (
-    <div className="dz-form">
+    <div className={`dz-form${compact ? ' dz-form--compact' : ''}`}>
       {schema.map((f) => (
         <Field
           key={f.key}
@@ -38,13 +38,14 @@ export default function SchemaForm({ schema, value, onChange, path = '' }) {
           value={v[f.key]}
           onChange={(nv) => update(f.key, nv)}
           path={`${path}.${f.key}`}
+          compact={compact}
         />
       ))}
     </div>
   );
 }
 
-function Field({ field, value, onChange, path }) {
+function Field({ field, value, onChange, path, compact }) {
   const label = field.label || field.key;
 
   switch (field.type) {
@@ -65,7 +66,7 @@ function Field({ field, value, onChange, path }) {
 
     case 'textarea':
       return (
-        <label className="dz-form-row">
+        <label className={`dz-form-row${compact ? ' dz-form-row--wide' : ''}`}>
           <span className="dz-form-label">{label}</span>
           <textarea
             className="dz-input dz-textarea"
@@ -133,10 +134,35 @@ function Field({ field, value, onChange, path }) {
       );
     }
 
-    case 'array':
+    case 'array': {
+      if (compact) {
+        const arr = Array.isArray(value) ? value : [];
+        return (
+          <details className="dz-form-section">
+            <summary className="dz-form-section-summary">
+              {label}
+              <span className="dz-form-section-count">({arr.length})</span>
+            </summary>
+            <div className="dz-form-section-body">
+              <ArrayField field={field} value={value} onChange={onChange} path={path} compact={compact} />
+            </div>
+          </details>
+        );
+      }
       return <ArrayField field={field} value={value} onChange={onChange} path={path} />;
+    }
 
     case 'object':
+      if (compact) {
+        return (
+          <details className="dz-form-section">
+            <summary className="dz-form-section-summary">{label}</summary>
+            <div className="dz-form-section-body">
+              <SchemaForm schema={field.fields} value={value || {}} onChange={onChange} path={path} compact={compact} />
+            </div>
+          </details>
+        );
+      }
       return (
         <fieldset className="dz-form-group">
           <legend>{label}</legend>
@@ -154,7 +180,7 @@ function Field({ field, value, onChange, path }) {
   }
 }
 
-function ArrayField({ field, value, onChange }) {
+function ArrayField({ field, value, onChange, compact }) {
   const arr = Array.isArray(value) ? value : [];
   const update = (i, nv) => {
     const next = [...arr];
@@ -180,6 +206,7 @@ function ArrayField({ field, value, onChange }) {
           field={field}
           onChange={(nv) => update(i, nv)}
           onRemove={() => update(i, undefined)}
+          compact={compact}
         />
       ))}
       <button type="button" className="dz-btn dz-btn-ghost dz-add-btn" onClick={add}>
@@ -189,7 +216,7 @@ function ArrayField({ field, value, onChange }) {
   );
 }
 
-function ArrayItem({ index, item, field, onChange, onRemove }) {
+function ArrayItem({ index, item, field, onChange, onRemove, compact }) {
   if (field.itemSchema) {
     return (
       <div className="dz-array-item">
@@ -197,7 +224,7 @@ function ArrayItem({ index, item, field, onChange, onRemove }) {
           <span className="dz-array-item-index">#{index}</span>
           <button type="button" className="dz-btn-icon" onClick={onRemove} title="Remove">×</button>
         </div>
-        <SchemaForm schema={field.itemSchema} value={item || {}} onChange={onChange} />
+        <SchemaForm schema={field.itemSchema} value={item || {}} onChange={onChange} compact={compact} />
       </div>
     );
   }

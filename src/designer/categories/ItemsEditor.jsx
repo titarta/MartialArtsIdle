@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import RecordEditor from './RecordEditor.jsx';
+import CardGridEditor from './CardGridEditor.jsx';
 import { ITEMS } from '../../data/items.js';
 import itemsSchema from '../schemas/items.js';
 
@@ -22,12 +22,11 @@ export default function ItemsEditor({ edited, onChangeRecords }) {
   }, []);
 
   return (
-    <RecordEditor
+    <CardGridEditor
       baselineRecords={baseline}
       editedRecords={edited.records || {}}
       onChangeRecords={onChangeRecords}
       schema={itemsSchema}
-      groupBy={(rec) => rec?._category ?? 'Other'}
       displayLabel={(rec, key) => rec?.name ?? key}
       allowAdd={true}
       newIdPlaceholder="new_item_id"

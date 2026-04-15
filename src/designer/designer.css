@@ -998,3 +998,136 @@
 .au-upload-msg {
   font-size: 12px;
 }
+
+/* ── Card grid editor ───────────────────────────────────────────── */
+
+.dz-card-grid-editor { display: flex; flex-direction: column; gap: 12px; }
+
+.dz-card-grid-toolbar { display: flex; align-items: center; gap: 8px; }
+.dz-card-grid-toolbar .dz-input { flex: 1; max-width: 320px; }
+
+.dz-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.dz-card {
+  background: var(--dz-surface);
+  border: 1px solid var(--dz-border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.12s;
+}
+.dz-card.dz-card-dirty { border-color: var(--dz-accent); }
+
+.dz-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.12s;
+}
+.dz-card.open > .dz-card-header { border-bottom-color: var(--dz-border); }
+
+.dz-card-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dz-card-key {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--dz-text-dim);
+}
+.dz-card-chevron {
+  font-size: 10px;
+  color: var(--dz-text-dim);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.dz-card.open > .dz-card-header .dz-card-chevron { transform: rotate(90deg); }
+
+.dz-card-body { display: none; padding: 14px; flex-direction: column; gap: 10px; }
+.dz-card.open > .dz-card-body { display: flex; }
+
+.dz-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--dz-border);
+  margin-top: 4px;
+}
+
+/* ── Compact form (inside cards) ────────────────────────────────── */
+
+.dz-form--compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+/* Full-width overrides */
+.dz-form--compact .dz-form-row-inline,
+.dz-form--compact .dz-form-row--wide {
+  grid-column: 1 / -1;
+}
+
+/* Collapsible group (replaces <fieldset> in compact mode) */
+.dz-form-section {
+  grid-column: 1 / -1;
+  background: var(--dz-bg);
+  border: 1px solid var(--dz-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dz-form-section-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dz-accent);
+}
+.dz-form-section-summary::-webkit-details-marker { display: none; }
+.dz-form-section-summary::before {
+  content: '▸';
+  font-size: 10px;
+  transition: transform 0.15s;
+}
+.dz-form-section[open] > .dz-form-section-summary::before { transform: rotate(90deg); }
+.dz-form-section-count {
+  margin-left: 4px;
+  font-weight: 500;
+  color: var(--dz-text-dim);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.dz-form-section-body {
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--dz-border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .dz-form--compact { grid-template-columns: 1fr; }
+  .dz-form--compact .dz-form-row--wide,
+  .dz-form-section { grid-column: auto; }
+}
