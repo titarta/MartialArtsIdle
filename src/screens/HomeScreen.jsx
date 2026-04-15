@@ -6,9 +6,7 @@ import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import PillDrawer from '../components/PillDrawer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
-import { PILLS_BY_ID } from '../data/pills';
-import WORLDS from '../data/worlds';
-
+import { PILLS_BY_ID, ITEM_RARITY } from '../data/pills';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -24,8 +22,56 @@ function getSpriteState(boosting, adBoostActive) {
   return 1;
 }
 
+<<<<<<< HEAD
 /** Compact Qi/s readout — updated via rAF against the live rateRef so it
  *  reflects every modifier (law, boost, ad, pills) without React renders. */
+=======
+// ── Top HUD bar ─────────────────────────────────────────────────────────────
+/** Persistent bar across the top of the home screen: jade balance (left) +
+ *  settings button (right).  Lotus/jade is the in-game soft premium currency
+ *  used for selection rerolls.  Settings moved here from the nav bar. */
+function HomeTopHud({ jadeBalance, onNavigate }) {
+  return (
+    <div className="home-top-hud">
+      <div className="home-hud-jade">
+        <img
+          src={`${BASE}sprites/items/blood_lotus.png`}
+          className="home-hud-jade-icon"
+          alt=""
+          draggable="false"
+        />
+        <span className="home-hud-jade-amount">{jadeBalance ?? 0}</span>
+      </div>
+      <div className="home-hud-spacer" />
+      <button
+        className="home-hud-settings"
+        onClick={() => onNavigate('settings')}
+        aria-label="Settings"
+      >
+        ⚙
+      </button>
+    </div>
+  );
+}
+
+// ── Active pill badge ────────────────────────────────────────────────────────
+function ActivePillBadge({ active }) {
+  const { t: tGame } = useTranslation('game');
+  const pill = PILLS_BY_ID[active.pillId];
+  if (!pill) return null;
+  const remaining = Math.max(0, Math.ceil((active.expiresAt - Date.now()) / 1000));
+  const color = ITEM_RARITY[pill.rarity]?.color ?? '#aaa';
+  const pillName = tGame(`items.${pill.id}.name`, { defaultValue: pill.name });
+  return (
+    <div className="active-pill-badge" style={{ borderColor: color }}>
+      <span style={{ color }}>{pillName}</span>
+      <span className="active-pill-time">{remaining}s</span>
+    </div>
+  );
+}
+
+/** Qi/s readout — updated via rAF so it tracks every modifier without re-renders. */
+>>>>>>> 68dfdf4 (feat: idle auto-farm, feature gates, AdSense snippet, ad crash fix)
 function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
   const { t } = useTranslation('ui');
   const textRef = useRef(null);
@@ -58,68 +104,75 @@ function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
   );
 }
 
-/** Circular floating rewarded-ad button — top-right corner of the scene. */
+// ── Heavenly Qi chip — redesigned as a pill floating in the scene (top-right) ──
+/** Purple pill chip — replaces the old circular button.  Shows a pulsing dot,
+ *  a label, and an optional countdown when an ad boost is running or on CD. */
 function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
   const { t } = useTranslation('ui');
   if (maxed) return null;
 
   if (adBoostActive) {
     return (
-      <div className="hq-btn hq-btn-active" title={t('home.heavenlyQiActive')}>
-        <span className="hq-icon">✦</span>
-        <span className="hq-label">×2</span>
-        <span className="hq-sub">{adBoostRemaining}</span>
+      <div className="home-hq-chip home-hq-chip-active" title={t('home.heavenlyQiActive')}>
+        <span className="home-hq-dot" />
+        <span className="home-hq-text">×2</span>
+        <span className="home-hq-timer">{adBoostRemaining}</span>
       </div>
     );
   }
 
-  const disabled = !ad.isReady;
-  const label = ad.isCooldown
+  const isCd      = ad.isCooldown;
+  const isLoading = ad.isLoading;
+  const label = isCd
     ? formatCooldown(ad.cooldownRemaining)
-    : ad.isLoading
-    ? '…'
-    : '✦';
-  const subtitle = ad.isCooldown
-    ? t('home.cooldown')
-    : ad.isLoading
+    : isLoading
     ? t('home.channeling')
     : t('home.heavenlyQi');
 
   return (
     <button
-      className={`hq-btn${ad.isReady ? ' hq-btn-ready' : ''}${ad.isCooldown ? ' hq-btn-cd' : ''}`}
+      className={`home-hq-chip${ad.isReady ? ' home-hq-chip-ready' : ''}${isCd ? ' home-hq-chip-cd' : ''}`}
       onClick={ad.show}
-      disabled={disabled}
-      title={ad.isReady ? t('home.channelTitle') : subtitle}
+      disabled={!ad.isReady}
+      title={ad.isReady ? t('home.channelTitle') : label}
     >
-      <span className="hq-icon">{label}</span>
-      <span className="hq-sub">{subtitle}</span>
+      <span className="home-hq-dot" />
+      <span className="home-hq-text">{label}</span>
     </button>
   );
 }
 
 const HOLD_HINT_SEEN_KEY = 'mai_home_hold_hint_seen';
-const HOLD_HINT_IDLE_MS  = 60 * 1000; // re-show hint after this long without holding
+const HOLD_HINT_IDLE_MS  = 60 * 1000;
 
-const ACTIVITY_ICON  = { combat: '⚔', gathering: '🌿', mining: '⛏' };
-const ACTIVITY_LABEL = { combat: 'Fighting', gathering: 'Gathering', mining: 'Mining' };
-
-function IdleChip({ idleAssignment }) {
-  const { t: tGame } = useTranslation('game');
-  if (!idleAssignment) return null;
-  const { activity, worldIndex, regionIndex } = idleAssignment;
-  const region = WORLDS[worldIndex]?.regions?.[regionIndex];
-  if (!region) return null;
-  const regionName = tGame(`regions.${region.name}.name`, { defaultValue: region.name });
+/** Crystal placeholder — sits in the archway gap. Locked until the feature ships. */
+function CrystalPlaceholder() {
   return (
-    <div className="home-idle-chip">
-      <span className="home-idle-icon">{ACTIVITY_ICON[activity]}</span>
-      <span className="home-idle-label">{ACTIVITY_LABEL[activity]}: {regionName}</span>
+    <div className="home-crystal-anchor">
+      <div className="home-crystal-locked">
+        <span className="home-crystal-icon">◈</span>
+      </div>
     </div>
   );
 }
 
-function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelections, idleAssignment }) {
+/** Falling qi-particle stream between crystal and character. */
+function QiParticles() {
+  return (
+    <div className="home-qi-particles" aria-hidden="true">
+      {Array.from({ length: 7 }, (_, i) => (
+        <span key={i} className={`home-qi-particle home-qi-particle-${i + 1}`} />
+      ))}
+    </div>
+  );
+}
+
+// ── Main screen ──────────────────────────────────────────────────────────────
+function HomeScreen({
+  cultivation, pills, inventory,
+  selections, onOpenSelections,
+  onNavigate,
+}) {
   const { t } = useTranslation('ui');
   const {
     realmName,
@@ -140,8 +193,8 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
 
   const { vfxLayer, spawnVFX } = useVFX();
 
-  // Sprite scales with the rendered background height (cover-scale math) so
-  // the character stays proportional to the art across every screen shape.
+  // Sprite scales with the rendered background height so the character stays
+  // proportional to the art across every screen shape.
   const [spriteScale, setSpriteScale] = useState(1);
   useEffect(() => {
     const update = () => {
@@ -157,26 +210,24 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
     };
   }, []);
 
-  // ── Rewarded ad: cultivation boost ─────────────────────────────────────────
+  // ── Rewarded ad ─────────────────────────────────────────────────────────
   const onCultivationReward = useCallback(() => {
     activateAdBoost(AD_BOOST_DURATION_MS);
   }, [activateAdBoost]);
 
   const cultivationAd = useRewardedAd(onCultivationReward, 30 * 60 * 1000, 'mai_ad_cd_cultivation');
 
-  // ── Hold-hint visibility ───────────────────────────────────────────────────
-  //   Shows a small fading hint beneath the character until the player holds
-  //   for the first time. Re-appears after 60s of no holding, so returning
-  //   players still remember the interaction.
+  // ── Hold-hint ────────────────────────────────────────────────────────────
   const [showHoldHint, setShowHoldHint] = useState(() => {
     try { return !localStorage.getItem(HOLD_HINT_SEEN_KEY); } catch { return true; }
   });
 
-  // Pill drawer state
+  // ── Pill drawer ──────────────────────────────────────────────────────────
   const [pillDrawerOpen, setPillDrawerOpen] = useState(false);
   const totalOwnedPills = pills
     ? Object.keys(PILLS_BY_ID).reduce((n, id) => n + pills.getOwnedCount(id), 0)
     : 0;
+
   const idleTimerRef = useRef(null);
   const resetIdleTimer = useCallback(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
@@ -184,7 +235,7 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
   }, []);
   useEffect(() => { resetIdleTimer(); return () => clearTimeout(idleTimerRef.current); }, [resetIdleTimer]);
 
-  // ── Pointer handlers ────────────────────────────────────────────────────────
+  // ── Pointer handlers ─────────────────────────────────────────────────────
   const handlePointerDown = (e) => {
     e.preventDefault();
     startBoost();
@@ -196,10 +247,9 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
     }
     resetIdleTimer();
   };
-
   const handlePointerUp = () => { stopBoost(); resetIdleTimer(); };
 
-  // ── Ad boost countdown label ─────────────────────────────────────────────
+  // ── Ad boost countdown ───────────────────────────────────────────────────
   const adBoostRemaining = adBoostActive
     ? formatCooldown(adBoostEndsAt - Date.now())
     : null;
@@ -208,9 +258,13 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
   const spriteSrc   = `${BASE}sprites/cultivator/state${spriteState}.png`;
   const fps         = boosting ? 14 : 5;
 
+  // Jade balance — shown in the top HUD bar
+  const jadeBalance = selections?.jadeBalance ?? 0;
+
   return (
     <div className="screen home-screen">
-      {/* Full-screen background */}
+      {/* Full-screen background — center bottom so the hall floor and archway
+          sit at the same visual depth regardless of screen aspect ratio */}
       <div className="home-bg" style={{ backgroundImage: `url(${BASE}backgrounds/home.png)` }} />
 
       {/* Offline earnings modal */}
@@ -225,96 +279,103 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
         />
       )}
 
-      {/* ── Top HUD: title + Heavenly Qi button (absolute inside) ────────── */}
-      <div className="home-hud-top">
-        <img
-          className="home-title-img"
-          src={`${BASE}Title.png`}
-          alt="The Long Road to Heaven"
-        />
-        <HeavenlyQiButton
-          ad={cultivationAd}
-          adBoostActive={adBoostActive}
-          adBoostRemaining={adBoostRemaining}
-          maxed={maxed}
-        />
-      </div>
+      {/* ── Top HUD bar: jade balance + settings ─────────────────────── */}
+      <HomeTopHud jadeBalance={jadeBalance} onNavigate={onNavigate} />
 
-      {/* Spacer — pushes the bottom stack down */}
-      <div className="home-spacer" />
+      {/* ── Scene: fills all space between HUD and nav bar ───────────── */}
+      <div className="home-scene">
 
-      {/* ── Bottom stack (top-to-bottom): qi/s → hint → character → realm name → bar ── */}
-      <div className="home-hud-bottom">
+        {/* ── Cultivation zone: absolutely-positioned scene elements ─── */}
+        <div className="home-cultivation-zone">
 
-        {/* Active idle assignment — shows what's being farmed in the background */}
-        <IdleChip idleAssignment={idleAssignment} />
+          {/* Bottom vignette rendered via ::after CSS pseudo-element */}
 
-        {/* Qi/s readout — above the player's head, just above hold hint */}
-        <QiRateReadout
-          rateRef={rateRef}
-          boosting={boosting}
-          adBoostActive={adBoostActive}
-          maxed={maxed}
-        />
+          {/* Rewards badge — scene chip, top-left */}
+          {selections?.pendingCount > 0 && (
+            <div className="home-chip-tl">
+              <button className="home-sel-btn" onClick={onOpenSelections}>
+                <span className="home-sel-btn-icon">📦</span>
+                <span className="home-sel-btn-label">
+                  {selections.pendingCount} Reward{selections.pendingCount !== 1 ? 's' : ''}!
+                </span>
+              </button>
+            </div>
+          )}
 
-        {/* Hold hint — right below qi/s, fades after first hold */}
-        {!maxed && (
-          <div className={`home-hold-hint${showHoldHint ? '' : ' home-hold-hint-fade'}`}>
-            {t('home.holdToCultivate')}
-          </div>
-        )}
-
-        {/* Character — centered in flow */}
-        <div
-          className={`fighter-stage home-fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
-          style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}
-          onPointerLeave={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        >
-          {vfxLayer}
-          <SpriteAnimator
-            key={spriteState}
-            src={spriteSrc}
-            frameWidth={128}
-            frameHeight={128}
-            frameCount={4}
-            fps={fps}
-            scale={spriteScale}
-          />
-        </div>
-
-        {/* Realm / stage name — right above the bar */}
-        <div className="home-realm-name">{realmName}</div>
-
-        {/* QI progress bar */}
-        <div className="home-bar-wrap">
-          <RealmProgressBar
-            qiRef={qiRef}
-            costRef={costRef}
-            currentRealm={realmName}
-            nextRealm={nextRealmName}
-            boosting={boosting}
+          {/* Heavenly Qi pill chip — scene chip, top-right */}
+          <HeavenlyQiButton
+            ad={cultivationAd}
+            adBoostActive={adBoostActive}
+            adBoostRemaining={adBoostRemaining}
             maxed={maxed}
           />
+
+          {/* Crystal placeholder — floats in the archway gap */}
+          <CrystalPlaceholder />
+
+          {/* Qi particles drifting from crystal toward character */}
+          <QiParticles />
+
+          {/* Character + hold-hint group — grounded at scene bottom */}
+          <div className="home-char-group">
+            {!maxed && (
+              <div className={`home-hold-hint${showHoldHint ? '' : ' home-hold-hint-fade'}`}>
+                {t('home.holdToCultivate')}
+              </div>
+            )}
+            <div
+              className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${adBoostActive ? ' stage-ad-boosted' : ''}`}
+              style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+            >
+              {vfxLayer}
+              <SpriteAnimator
+                key={spriteState}
+                src={spriteSrc}
+                frameWidth={128}
+                frameHeight={128}
+                frameCount={4}
+                fps={fps}
+                scale={spriteScale}
+              />
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Bottom section: realm name + qi/s row + bar ──────────── */}
+        <div className="home-scene-bottom">
+
+          <div className="home-scene-overlay-row">
+            <div className="home-realm-name">{realmName}</div>
+            <QiRateReadout
+              rateRef={rateRef}
+              boosting={boosting}
+              adBoostActive={adBoostActive}
+              maxed={maxed}
+            />
+          </div>
+
+          <div className="home-bar-wrap">
+            <RealmProgressBar
+              qiRef={qiRef}
+              costRef={costRef}
+              currentRealm={realmName}
+              nextRealm={nextRealmName}
+              boosting={boosting}
+              maxed={maxed}
+            />
+          </div>
+
         </div>
 
       </div>
 
-      {/* ── Pending selections badge — bottom-left above nav ───────────── */}
-      {selections?.pendingCount > 0 && (
-        <div className="home-selections-float">
-          <button className="home-sel-btn" onClick={onOpenSelections}>
-            <span className="home-sel-btn-icon">✦</span>
-            <span className="home-sel-btn-label">Rewards</span>
-            <span className="home-sel-btn-count">{selections.pendingCount}</span>
-          </button>
-        </div>
-      )}
-
-      {/* ── Pills: floating bottom-right above nav ──────────────────────── */}
-      {pills && totalOwnedPills > 0 && (
+      {/* ── Pills: floating bottom-right above nav ───────────────────── */}
+      {pills && (pills.activePills.length > 0 || totalOwnedPills > 0) && (
         <div className="home-pill-float">
           <button
             className="home-pill-btn"

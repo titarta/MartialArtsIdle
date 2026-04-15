@@ -8,7 +8,7 @@ const SCREENS = [
   { id: 'character',  tKey: 'nav.character', emoji: '⚔'            },
   { id: 'collection', tKey: 'nav.collection', sprite: 'inventory'  },
   { id: 'production', tKey: 'nav.craft',      emoji: '⚗'           },
-  { id: 'settings',   tKey: 'nav.config',     emoji: '⚙'           },
+  // Settings moved to the HomeScreen HUD bar.
 ];
 
 function NavBar({ currentScreen, onNavigate, badges = {}, isUnlocked = () => true, getHint = () => null }) {

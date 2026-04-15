@@ -416,6 +416,8 @@
 }
 
 /* ── HomeScreen selection badge ─────────────────────────────────────────────── */
+
+/* Legacy class kept for compatibility — not rendered in new layout */
 .home-selections-float {
   position: absolute;
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 8px);
@@ -423,29 +425,43 @@
   z-index: 50;
 }
 
+/* Scene-relative placement — top-left of cultivation zone.
+   No safe-area offset needed here — the top HUD bar already consumes it. */
+.home-chip-tl {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  z-index: 4;
+}
+
+/* Rewards chip — amber pill, mirrors the HQ chip's style on the opposite side */
 .home-sel-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: rgba(15, 52, 96, 0.85);
-  border: 1px solid var(--accent);
+  gap: 5px;
+  padding: 5px 12px;
+  background: linear-gradient(135deg,
+    rgba(146, 64,  14, 0.85),
+    rgba(217, 119,  6, 0.85));
+  border: 1px solid #d97706;
   border-radius: 20px;
-  color: var(--text-primary);
-  font-size: 12px;
+  color: #fef3c7;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   backdrop-filter: blur(4px);
+  box-shadow: 0 0 16px rgba(217, 119, 6, 0.50);
+  animation: home-rewards-pulse 2.5s ease-in-out infinite;
+  transition: transform 0.15s;
 }
+.home-sel-btn:hover { transform: scale(1.04); }
+.home-sel-btn-icon  { font-size: 13px; }
+.home-sel-btn-label { white-space: nowrap; }
 
-.home-sel-btn-icon { color: var(--accent); font-size: 14px; }
-.home-sel-btn-label { font-weight: 500; }
-.home-sel-btn-count {
-  background: var(--accent);
-  color: #fff;
-  border-radius: 10px;
-  padding: 1px 7px;
-  font-size: 11px;
-  font-weight: 700;
+@keyframes home-rewards-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(217, 119, 6, 0.50); }
+  50%       { box-shadow: 0 0 28px rgba(217, 119, 6, 0.80); }
 }
 
 /* Character Screen tabs */
@@ -990,6 +1006,62 @@
   max-width: 100%;
 }
 
+/* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
+.home-top-hud {
+  height: calc(46px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 14px 0;
+  background: rgba(5, 2, 14, 0.92);
+  border-bottom: 1px solid rgba(30, 18, 48, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.home-hud-jade {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(245, 200, 66, 0.10);
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  border-radius: 20px;
+  padding: 4px 11px 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f5c842;
+}
+
+.home-hud-jade-icon {
+  width: 22px;
+  height: 22px;
+  image-rendering: pixelated;
+  filter: brightness(1.3);
+  pointer-events: none;
+}
+
+.home-hud-spacer { flex: 1; }
+
+.home-hud-settings {
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+.home-hud-settings:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+}
+
 /* Home screen fills the full viewport — overrides the 1100px .screen cap on
    ultra-wide monitors so the HUD centers on the actual viewport (matching
    the art-anchored character, which uses window-centered positioning). */
@@ -1014,7 +1086,7 @@
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
   z-index: -1;
   background-size: cover;
-  background-position: center center;
+  background-position: center bottom;
   background-repeat: no-repeat;
   image-rendering: auto;
   pointer-events: none;
@@ -1033,18 +1105,19 @@
     rgba(0,0,0,0)    100%);
 }
 
-/* Realm / stage name — sits directly above the QI bar inside home-hud-bottom */
+/* Realm / stage name — left side of overlay row above the QI bar */
 .home-realm-name {
-  text-align: center;
   font-family: 'Press Start 2P', 'Courier New', monospace;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: var(--gold, #f5c842);
   text-shadow:
     0 0 8px rgba(0,0,0,0.9),
     0 2px 6px rgba(0,0,0,0.8);
   letter-spacing: 0.04em;
-  padding: 6px 16px 2px;
   pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Title artwork — mobile-first, grows as viewport widens (1350×145 aspect ratio).
@@ -1071,23 +1144,6 @@
 
 /* Pills: floating bottom-right above the nav bar */
 /* Idle assignment chip — floats above the bottom HUD */
-.home-idle-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 600;
-  pointer-events: none;
-  margin-bottom: 4px;
-}
-
-.home-idle-icon { font-size: 14px; }
-.home-idle-label { opacity: 0.9; }
 
 .home-pill-float {
   position: fixed;
@@ -1131,12 +1187,12 @@
   background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 100%);
 }
 
-/* Fighter stage — flow element centred inside home-hud-bottom.
-   Width/height set by inline style (spriteScale). */
+/* Fighter stage — last flex child in home-char-group (width/height via inline style).
+   Override the default fighter-stage card appearance entirely. */
 .home-screen .home-fighter-stage {
   position: relative;
   transform: none;
-  margin: 0 auto;
+  margin: 0;
   background: none !important;
   border: none;
   border-radius: 0;
@@ -1154,11 +1210,12 @@
   box-shadow: none;
 }
 
-/* QI bar wrapper — dark backing for readability */
+/* QI bar wrapper */
 .home-bar-wrap {
   width: 100%;
   max-width: 450px;
-  padding: 8px 16px 4px;
+  padding: 4px 16px 6px;
+  margin: 0 auto;
 }
 
 /* Live Qi/s readout — lives under the QI progress bar text. Rate number is
@@ -1169,7 +1226,7 @@
   width: fit-content;
   align-items: center;
   gap: 6px;
-  margin: 4px auto 0;
+  margin: 0;
   padding: 2px 10px;
   border-radius: 14px;
   background: rgba(0, 0, 0, 0.55);
@@ -1207,7 +1264,7 @@
   color: #9cd2ff;
 }
 
-/* Hold-to-cultivate hint — flow element above the character, centred. */
+/* Hold-to-cultivate hint — first flex child in home-char-group, above character. */
 .home-hold-hint {
   display: block;
   align-self: center;
@@ -1223,8 +1280,6 @@
   opacity: 1;
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   animation: hold-hint-pulse 2s ease-in-out infinite;
-  margin-top: 4px;
-  margin-bottom: 4px;
 }
 .home-hold-hint-fade {
   opacity: 0;
@@ -1236,77 +1291,244 @@
   50%      { opacity: 1;    transform: translateY(2px); }
 }
 
-/* Heavenly Qi button — top-right inside home-hud-top (position: relative),
-   so it's always contained within the title area and never overlaps content below. */
-.hq-btn {
+/* ── Heavenly Qi chip — purple pill floating in scene, top-right ─────────── */
+/* The HUD top bar now handles safe-area-inset-top, so chips inside the
+   cultivation zone only need a small fixed top offset. */
+.home-hq-chip {
   position: absolute;
-  top: calc(18px + env(safe-area-inset-top));
-  right: 16px;
+  top: 10px;
+  right: 12px;
   z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: linear-gradient(135deg,
+    rgba(124, 58, 237, 0.78),
+    rgba(79,  70, 229, 0.78));
+  border: 1px solid #7c5cbf;
+  color: #e9d5ff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.45);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.home-hq-chip:disabled { cursor: not-allowed; opacity: 0.65; }
+.home-hq-chip-ready { animation: home-hq-pulse 1.8s ease-in-out infinite; }
+.home-hq-chip-ready:hover { transform: scale(1.04); }
+.home-hq-chip-cd {
+  background: linear-gradient(135deg,
+    rgba(50, 40, 80, 0.75),
+    rgba(40, 35, 70, 0.75));
+  border-color: rgba(100, 80, 140, 0.4);
+  color: rgba(180, 160, 220, 0.7);
+  box-shadow: none;
+}
+.home-hq-chip-active {
+  background: linear-gradient(135deg,
+    rgba(15, 40, 80, 0.85),
+    rgba(8,  20, 50, 0.85));
+  border-color: #8ccfff;
+  color: #c2e6ff;
+  box-shadow: 0 0 16px rgba(100, 180, 255, 0.45);
+  animation: home-hq-active-pulse 2.4s ease-in-out infinite;
+}
+.home-hq-text  { white-space: nowrap; }
+.home-hq-timer { font-size: 10px; opacity: 0.82; }
+
+/* Pulsing dot indicator */
+.home-hq-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a78bfa;
+  flex-shrink: 0;
+  animation: home-hq-dot-pulse 1.8s ease-in-out infinite;
+}
+.home-hq-chip-active .home-hq-dot { background: #8ccfff; }
+.home-hq-chip-cd     .home-hq-dot { background: #555; animation: none; }
+
+@keyframes home-hq-dot-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1);    }
+  50%       { opacity: 0.3; transform: scale(0.55); }
+}
+@keyframes home-hq-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(124, 58, 237, 0.45); }
+  50%       { box-shadow: 0 0 24px rgba(167, 139, 250, 0.75); }
+}
+@keyframes home-hq-active-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(100, 180, 255, 0.40); }
+  50%       { box-shadow: 0 0 26px rgba(100, 200, 255, 0.65); }
+}
+
+/* ── Scene layout (new) ──────────────────────────────────────────────────── */
+
+/* Full flex column that fills all available space above the nav bar */
+.home-scene {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+}
+
+/* Cultivation zone: the open-sky area between top HUD and bar.
+   All child content is absolutely positioned so the zone stretches
+   to fill whatever space the scene-bottom doesn't claim. */
+.home-cultivation-zone {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Soft bottom vignette — lifts character and overlays off a busy bg */
+.home-cultivation-zone::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.60) 0%,
+    rgba(0,0,0,0.20) 55%,
+    rgba(0,0,0,0)    100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Bottom section: overlay row + qi bar. Dark bg for legibility. */
+.home-scene-bottom {
+  flex-shrink: 0;
+  background: linear-gradient(to top,
+    rgba(0,0,0,0.68) 0%,
+    rgba(0,0,0,0.50) 70%,
+    rgba(0,0,0,0.20) 100%);
+  padding-bottom: 4px;
+}
+
+/* Realm name (left) and Qi/s rate (right) — sit in one row above the bar */
+.home-scene-overlay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 2px;
+  gap: 8px;
+}
+
+/* ── Crystal placeholder ─────────────────────────────────────────────────── */
+
+/* Anchored at ~46% of cultivation-zone height — aligns with the archway gap
+   in home.png when background-position is center bottom. */
+.home-crystal-anchor {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.home-crystal-locked {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%,
+    rgba(140, 200, 255, 0.14),
+    rgba(40,  80,  180, 0.07));
+  border: 1px solid rgba(160, 210, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: home-crystal-float 3.2s ease-in-out infinite,
+             home-crystal-glow  3.2s ease-in-out infinite;
+}
+
+.home-crystal-icon {
+  font-size: 22px;
+  opacity: 0.30;
+  color: #90c4ff;
+  filter: blur(0.4px);
+}
+
+@keyframes home-crystal-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+@keyframes home-crystal-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(100, 180, 255, 0.10),
+                0 0 22px rgba( 80, 140, 255, 0.06);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(100, 180, 255, 0.24),
+                0 0 36px rgba( 80, 140, 255, 0.14);
+  }
+}
+
+/* ── Qi-particle stream between crystal and character ───────────────────── */
+
+.home-qi-particles {
+  position: absolute;
+  top: calc(46% + 34px);   /* just below crystal edge */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.home-qi-particle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #b8e8ff, #4090cc);
+  opacity: 0;
+  animation: home-qi-fall 2.4s ease-in infinite;
+}
+
+/* Staggered delays and slight horizontal spread for each particle */
+.home-qi-particle-1 { animation-delay: 0.00s; margin-left: -2px; }
+.home-qi-particle-2 { animation-delay: 0.34s; margin-left:  5px; }
+.home-qi-particle-3 { animation-delay: 0.68s; margin-left: -5px; }
+.home-qi-particle-4 { animation-delay: 1.02s; margin-left:  2px; }
+.home-qi-particle-5 { animation-delay: 1.36s; margin-left: -3px; }
+.home-qi-particle-6 { animation-delay: 1.70s; margin-left:  4px; }
+.home-qi-particle-7 { animation-delay: 2.04s; margin-left: -1px; }
+
+@keyframes home-qi-fall {
+  0%   { opacity: 0;    transform: translateX(-50%) translateY(0);    }
+  12%  { opacity: 0.65; }
+  80%  { opacity: 0.40; }
+  100% { opacity: 0;    transform: translateX(-50%) translateY(88px); }
+}
+
+/* ── Character group — grounded at scene bottom ─────────────────────────── */
+
+/* Flex column so the hold-hint sits naturally above the fighter-stage. */
+.home-char-group {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0;
-  width: 64px;
-  height: 64px;
-  padding: 0;
-  border: 2px solid rgba(245, 200, 66, 0.45);
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(50, 35, 15, 0.95), rgba(20, 14, 6, 0.95));
-  color: var(--gold);
-  font-family: inherit;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, opacity 0.15s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55);
-}
-.hq-btn:disabled { cursor: not-allowed; opacity: 0.75; }
-.hq-btn .hq-icon  { font-size: 1.4rem; line-height: 1; }
-.hq-btn .hq-label { font-size: 0.7rem; font-weight: 700; line-height: 1; margin-top: 2px; }
-.hq-btn .hq-sub   { font-size: 0.55rem; opacity: 0.85; line-height: 1; margin-top: 2px; letter-spacing: 0.02em; }
-
-.hq-btn-ready {
-  border-color: var(--gold);
-  animation: hq-pulse 1.8s ease-in-out infinite;
-}
-.hq-btn-ready:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(245, 200, 66, 0.45);
-}
-.hq-btn-cd {
-  border-color: rgba(150, 120, 60, 0.45);
-  color: rgba(220, 200, 140, 0.8);
-}
-.hq-btn-active {
-  border-color: #8ccfff;
-  color: #c2e6ff;
-  background: radial-gradient(circle at 30% 30%, rgba(15, 40, 65, 0.95), rgba(8, 18, 30, 0.95));
-  box-shadow: 0 4px 14px rgba(100, 180, 255, 0.4), inset 0 0 10px rgba(140, 207, 255, 0.2);
-  animation: hq-active-pulse 2.4s ease-in-out infinite;
-}
-@keyframes hq-pulse {
-  0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 0    rgba(245, 200, 66, 0.55); }
-  50%      { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.55), 0 0 0 8px  rgba(245, 200, 66, 0);    }
-}
-@keyframes hq-active-pulse {
-  0%, 100% { box-shadow: 0 4px 14px rgba(100, 180, 255, 0.35), inset 0 0 10px rgba(140, 207, 255, 0.2); }
-  50%      { box-shadow: 0 4px 18px rgba(100, 180, 255, 0.6),  inset 0 0 14px rgba(140, 207, 255, 0.3); }
+  gap: 4px;
+  z-index: 3;
 }
 
-/* Below ~700px the title is smaller and the button drops below it */
-@media (max-width: 699px) {
-  .hq-btn {
-    width: 52px;
-    height: 52px;
-    /* 18px top-padding + ~36px title height (320px wide / 9.31 ratio) + 12px gap */
-    top: calc(env(safe-area-inset-top) + 66px);
-  }
-  .hq-btn .hq-icon  { font-size: 1.1rem; }
-  .hq-btn .hq-label { font-size: 0.62rem; }
-  .hq-btn .hq-sub   { font-size: 0.5rem; }
-}
-
-/* Cultivation Layout: fighter stage on top, progress bar below */
+/* ── Cultivation Layout: fighter stage on top, progress bar below */
 .cultivation-layout {
   display: flex;
   flex-direction: column;

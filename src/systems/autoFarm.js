@@ -152,6 +152,10 @@ function estimateDps(stats, equippedTechs) {
  *   - harvestSpeed: ADDED to BASE_GATHER_SPEED (pts/sec).
  *   - harvestLuck:  percent (0–100) chance per primary to roll a bonus duplicate.
  *
+ * Partial-gather: when the tick window is shorter than one full gather cycle,
+ * the item is yielded probabilistically (remaining/tCost chance) so rare/slow
+ * items still accumulate at the correct long-run rate.
+ *
  * @param {number} seconds
  * @param {object} region  — world region with a `gatherDrops` array field
  * @param {object} [stats] — { harvestSpeed?, harvestLuck? }; defaults to base
@@ -177,20 +181,30 @@ export function simulateGathering(seconds, region, stats = null) {
 
     const cost  = getGatherCost(primary.itemId);
     const tCost = cost / speed;
-    if (tCost > remaining) break;
-    remaining -= tCost;
 
-    // Give primary herb
-    const qty = rollQty(primary.qty ?? [1, 1])
-              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
-    result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+    if (remaining >= tCost) {
+      remaining -= tCost;
 
-    // Roll bonus drops (cultivation / QI stones)
-    for (const bd of bonusDrops) {
-      if (Math.random() < bd.chance) {
-        const bqty = rollQty(bd.qty ?? [1, 1]);
-        result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+      // Give primary herb
+      const qty = rollQty(primary.qty ?? [1, 1])
+                + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+
+      // Roll bonus drops (cultivation / QI stones)
+      for (const bd of bonusDrops) {
+        if (Math.random() < bd.chance) {
+          const bqty = rollQty(bd.qty ?? [1, 1]);
+          result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+        }
       }
+    } else {
+      // Partial gather — probabilistic yield so slow/rare items still produce
+      // at the correct long-run rate regardless of tick window size.
+      if (Math.random() < remaining / tCost) {
+        const qty = rollQty(primary.qty ?? [1, 1]);
+        result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+      }
+      break;
     }
   }
 
@@ -228,20 +242,28 @@ export function simulateMining(seconds, region, stats = null) {
 
     const cost  = getMineCost(primary.itemId);
     const tCost = cost / speed;
-    if (tCost > remaining) break;
-    remaining -= tCost;
 
-    // Give primary ore
-    const qty = rollQty(primary.qty ?? [1, 1])
-              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
-    result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+    if (remaining >= tCost) {
+      remaining -= tCost;
 
-    // Roll bonus drops (cultivation / QI stones)
-    for (const bd of bonusDrops) {
-      if (Math.random() < bd.chance) {
-        const bqty = rollQty(bd.qty ?? [1, 1]);
-        result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+      // Give primary ore
+      const qty = rollQty(primary.qty ?? [1, 1])
+                + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+
+      // Roll bonus drops (cultivation / QI stones)
+      for (const bd of bonusDrops) {
+        if (Math.random() < bd.chance) {
+          const bqty = rollQty(bd.qty ?? [1, 1]);
+          result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+        }
       }
+    } else {
+      if (Math.random() < remaining / tCost) {
+        const qty = rollQty(primary.qty ?? [1, 1]);
+        result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+      }
+      break;
     }
   }
 
