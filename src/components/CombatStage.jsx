@@ -149,11 +149,14 @@ export default function CombatStage({
 
   // Register the damage-number spawn callback so useCombat can trigger it.
   // Enemy damage (gold) spawns on the right side; player damage taken (red) on the left.
+  // Optional 4th arg `opts` carries extra info — currently { exploit: bool }
+  // which makes the number bigger, brighter, and prefixed with "EXPLOIT!".
   useEffect(() => {
     if (!spawnDamageNumberRef) return;
-    spawnDamageNumberRef.current = (value, side, maxHp = 1000) => {
+    spawnDamageNumberRef.current = (value, side, maxHp = 1000, opts = {}) => {
       const id = ++dmgId;
       const isEnemy = side === 'enemy';
+      const exploit = !!opts.exploit;
       const x = isEnemy
         ? `${62 + Math.random() * 16}%`
         : `${8  + Math.random() * 14}%`;
@@ -164,10 +167,12 @@ export default function CombatStage({
       //   0–100% of enemy HP  → sqrt ramp  10–20 px  (small hits still visible)
       //   100%–100000% HP     → log ramp   20–44 px  (overkill hits feel massive)
       const ratio = value / maxHp; // uncapped
-      const fontSize = ratio <= 1
+      let fontSize = ratio <= 1
         ? Math.round(10 + Math.pow(ratio, 0.5) * 10)
         : Math.round(Math.min(44, 20 + Math.log10(ratio) * 8));
-      setDmgNums(prev => [...prev, { id, value, x, y, isEnemy, fontSize }]);
+      // Exploit hits get a 50% size boost so they read as a clear payoff.
+      if (exploit) fontSize = Math.round(fontSize * 1.5);
+      setDmgNums(prev => [...prev, { id, value, x, y, isEnemy, fontSize, exploit }]);
       const t = setTimeout(
         () => setDmgNums(prev => prev.filter(n => n.id !== id)),
         1300,
@@ -296,6 +301,7 @@ export default function CombatStage({
           value={n.value}
           color={n.isEnemy ? 'gold' : 'red'}
           fontSize={n.fontSize}
+          exploit={n.exploit}
           style={{ left: n.x, top: n.y }}
         />
       ))}

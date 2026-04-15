@@ -2903,11 +2903,44 @@
   filter: drop-shadow(1px 1px 0px rgba(0,0,0,1)) drop-shadow(-1px -1px 4px rgba(0,0,0,0.4)) drop-shadow(0 0 6px rgba(239,68,68,0.7));
 }
 
+/* Exploit hits — bigger flash + warm white glow + a vertical "EXPLOIT!" tag.
+   Single keyframes (`dmg-exploit`) replaces the standard float so we can
+   compose the burst-scale and the upward drift on the same transform
+   property without one animation cancelling the other. */
+.damage-number-exploit {
+  filter:
+    drop-shadow(1px 1px 0px rgba(0,0,0,1))
+    drop-shadow(-1px -1px 4px rgba(0,0,0,0.5))
+    drop-shadow(0 0 6px  rgba(255, 220, 100, 0.95))
+    drop-shadow(0 0 14px rgba(255, 180, 60,  0.7));
+  animation: dmg-exploit 1250ms ease-out forwards;
+  flex-direction: column;
+  align-items: center;
+  text-shadow: 0 0 4px rgba(255, 255, 200, 0.9);
+}
+.damage-number-exploit-tag {
+  display: block;
+  margin-bottom: 2px;
+  letter-spacing: 0.06em;
+  color: #fff7c2;
+  text-shadow:
+    1px 1px 0 rgba(0, 0, 0, 0.95),
+    0 0 6px rgba(255, 220, 80, 0.8);
+}
+
 @keyframes dmg-float {
   0%   { transform: translateY(0);     opacity: 1; }
   16%  { transform: translateY(-10px); opacity: 1; }
   40%  { transform: translateY(-10px); opacity: 1; }
   100% { transform: translateY(-54px); opacity: 0; }
+}
+
+@keyframes dmg-exploit {
+  0%   { transform: translateY(0)     scale(0.6); opacity: 1; }
+  10%  { transform: translateY(-4px)  scale(1.25); opacity: 1; }
+  20%  { transform: translateY(-8px)  scale(1.10); opacity: 1; }
+  40%  { transform: translateY(-10px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(-60px) scale(1);    opacity: 0; }
 }
 
 .stage-clash {

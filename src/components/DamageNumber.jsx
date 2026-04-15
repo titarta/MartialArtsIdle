@@ -19,20 +19,35 @@ function format(value) {
 /**
  * DamageNumber — renders a damage value using Press Start 2P pixel font.
  * fontSize is computed by the caller based on damage % of enemy max HP.
+ *
+ * exploit: when true, prepends an EXPLOIT! flash above the number and
+ * applies a brighter gradient + larger drop-shadow via the
+ * `damage-number-exploit` CSS class.
  */
-export default function DamageNumber({ value, color = 'gold', fontSize = 14, style }) {
+export default function DamageNumber({ value, color = 'gold', fontSize = 14, exploit = false, style }) {
   const isGold = color === 'gold';
+  const baseColor = isGold ? '#f5c842' : '#ef4444';
+  const cls = `damage-number damage-number-${color}${exploit ? ' damage-number-exploit' : ''}`;
+
   return (
     <div
-      className={`damage-number damage-number-${color}`}
+      className={cls}
       style={{
         ...style,
         fontSize,
         fontFamily: "'Press Start 2P', monospace",
         lineHeight: 1,
-        color: isGold ? '#f5c842' : '#ef4444',
+        color: exploit ? '#fff5c2' : baseColor,
       }}
     >
+      {exploit && (
+        <span
+          className="damage-number-exploit-tag"
+          style={{ fontSize: Math.max(8, Math.round(fontSize * 0.4)) }}
+        >
+          EXPLOIT!
+        </span>
+      )}
       {format(value)}
     </div>
   );

@@ -218,7 +218,7 @@ export default function useCombat() {
                 : `${tech.name} → ${dmg.toLocaleString()} dmg`,
               kind: 'damage',
             });
-            spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp);
+            spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
           } else if (tech.type === 'Heal') {
             const heal = Math.floor(s.pMaxHp * (tech.healPercent ?? 0.25));
             s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
@@ -248,7 +248,7 @@ export default function useCombat() {
               : `Basic attack → ${dmg.toLocaleString()} dmg`,
             kind: 'damage',
           });
-          spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp);
+          spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
         }
 
         // Debug: force enemy death on every hit
