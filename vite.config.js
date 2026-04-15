@@ -33,6 +33,9 @@ export default defineConfig(({ command, mode }) => {
         workbox: {
           navigateFallback: 'index.html',
           globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+          skipWaiting: true,
+          clientsClaim: true,
+          cleanupOutdatedCaches: true,
         },
         manifest: {
           name: 'The Long Road to Heaven',
