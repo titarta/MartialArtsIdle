@@ -246,29 +246,6 @@ function HomeScreen({ cultivation, pills, inventory }) {
         />
       </div>
 
-      {/* QI bar + live rate readout — anchored just above the character. */}
-      <div
-        className="home-bar-wrap home-bar-over-char"
-        style={{
-          left: `${anchor.x}px`,
-          top:  `${anchor.y - 128 * spriteScale - 12}px`,
-        }}
-      >
-        <RealmProgressBar
-          qiRef={qiRef}
-          costRef={costRef}
-          currentRealm={realmName}
-          nextRealm={nextRealmName}
-          boosting={boosting}
-          maxed={maxed}
-        />
-        <QiRateReadout
-          rateRef={rateRef}
-          boosting={boosting}
-          adBoostActive={adBoostActive}
-          maxed={maxed}
-        />
-      </div>
 
       {/* Floating Heavenly Qi button — top-right, always accessible. */}
       <HeavenlyQiButton
@@ -323,31 +300,48 @@ function HomeScreen({ cultivation, pills, inventory }) {
       {/* Spacer — pushes HUD to the bottom */}
       <div className="home-spacer" />
 
-      {/* ── Bottom HUD: active buffs + compact pill button ──────────────── */}
+      {/* ── Bottom HUD: QI bar ────────────────────────────────────────────── */}
       <div className="home-hud-bottom">
-
-        {/* Active pill buffs — live countdowns */}
-        {pills && pills.activePills.length > 0 && (
-          <div className="active-pills-bar">
-            {pills.activePills.map((ap, i) => (
-              <ActivePillBadge key={`${ap.pillId}-${i}`} active={ap} />
-            ))}
-          </div>
-        )}
-
-        {/* Compact "Pills" button — opens the tabbed drawer */}
-        {pills && totalOwnedPills > 0 && (
-          <button
-            className="home-pill-btn"
-            onClick={() => setPillDrawerOpen(true)}
-          >
-            <span className="home-pill-btn-icon">◈</span>
-            <span className="home-pill-btn-label">Pills</span>
-            <span className="home-pill-btn-count">{totalOwnedPills}</span>
-          </button>
-        )}
-
+        <div className="home-bar-wrap">
+          <RealmProgressBar
+            qiRef={qiRef}
+            costRef={costRef}
+            currentRealm={realmName}
+            nextRealm={nextRealmName}
+            boosting={boosting}
+            maxed={maxed}
+          />
+          <QiRateReadout
+            rateRef={rateRef}
+            boosting={boosting}
+            adBoostActive={adBoostActive}
+            maxed={maxed}
+          />
+        </div>
       </div>
+
+      {/* ── Pills: floating bottom-right above nav ──────────────────────── */}
+      {pills && (pills.activePills.length > 0 || totalOwnedPills > 0) && (
+        <div className="home-pill-float">
+          {pills.activePills.length > 0 && (
+            <div className="active-pills-bar">
+              {pills.activePills.map((ap, i) => (
+                <ActivePillBadge key={`${ap.pillId}-${i}`} active={ap} />
+              ))}
+            </div>
+          )}
+          {totalOwnedPills > 0 && (
+            <button
+              className="home-pill-btn"
+              onClick={() => setPillDrawerOpen(true)}
+            >
+              <span className="home-pill-btn-icon">◈</span>
+              <span className="home-pill-btn-label">Pills</span>
+              <span className="home-pill-btn-count">{totalOwnedPills}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Pill drawer — tabs by category */}
       <PillDrawer
