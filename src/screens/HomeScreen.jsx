@@ -142,7 +142,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
   useEffect(() => {
     const update = () => {
       const scale = Math.max(window.innerWidth / HOME_BG_W, window.innerHeight / HOME_BG_H);
-      setSpriteScale((HOME_BG_H * scale * 0.21) / 192);
+      setSpriteScale((HOME_BG_H * scale * 0.21) / 128);
     };
     update();
     window.addEventListener('resize', update);
@@ -201,7 +201,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
     : null;
 
   const spriteState = getSpriteState(boosting, adBoostActive);
-  const spriteSrc   = `${BASE}sprites/cultivator_upscaled/state${spriteState}.png`;
+  const spriteSrc   = `${BASE}sprites/cultivator/state${spriteState}.png`;
   const fps         = boosting ? 14 : 5;
 
   return (
@@ -260,7 +260,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
         {/* Character — centered in flow */}
         <div
           className={`fighter-stage home-fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
-          style={{ width: `${192 * spriteScale}px`, height: `${192 * spriteScale}px` }}
+          style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
@@ -270,8 +270,8 @@ function HomeScreen({ cultivation, pills, inventory }) {
           <SpriteAnimator
             key={spriteState}
             src={spriteSrc}
-            frameWidth={192}
-            frameHeight={192}
+            frameWidth={128}
+            frameHeight={128}
             frameCount={4}
             fps={fps}
             scale={spriteScale}

@@ -730,6 +730,7 @@
   flex: none;
   z-index: 2;
   touch-action: none;
+  overflow: visible;
 }
 
 .home-screen .stage-boosted {
@@ -1120,6 +1121,7 @@
   inset: 0;
   pointer-events: none;
   z-index: 10;
+  overflow: visible;
 }
 
 .vfx-effect {
