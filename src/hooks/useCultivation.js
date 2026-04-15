@@ -179,7 +179,8 @@ export default function useCultivation() {
   const activeLawRef = useRef(activeLaw);
   useEffect(() => { activeLawRef.current = activeLaw; }, [activeLaw]);
 
-  const pillQiMultRef = useRef(1);
+  const pillQiMultRef      = useRef(1);
+  const selectionQiMultRef = useRef(1);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
   // Default 300% = the legacy 3× behavior; App.jsx writes the player's actual
   // focus mult into this ref each second.
@@ -236,7 +237,7 @@ export default function useCultivation() {
           : 1;
         const rate = BASE_RATE * lawMult * qiUniqueMult *
           boostMult *
-          adBoostRef.current * pillQiMultRef.current;
+          adBoostRef.current * pillQiMultRef.current * selectionQiMultRef.current;
         rateRef.current = rate;
         qiRef.current += rate * dt;
 
@@ -326,6 +327,8 @@ export default function useCultivation() {
     honeLawUnique,
     // Pill qi multiplier ref — updated by App.jsx
     pillQiMultRef,
+    // Selection qi speed multiplier ref — updated by App.jsx
+    selectionQiMultRef,
     // Focus multiplier ref (qi_focus_mult, in %) — updated by App.jsx every second
     focusMultRef,
     // Ads

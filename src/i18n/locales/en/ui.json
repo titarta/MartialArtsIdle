@@ -14,13 +14,25 @@
   },
 
   "nav": {
-    "home":   "Home",
-    "worlds": "Worlds",
-    "equip":  "Equip",
-    "items":  "Items",
-    "craft":  "Craft",
-    "stats":  "Stats",
-    "config": "Config"
+    "home":       "Home",
+    "worlds":     "Worlds",
+    "character":  "Character",
+    "collection": "Collection",
+    "craft":      "Craft",
+    "config":     "Config"
+  },
+
+  "character": {
+    "title":           "Character",
+    "tabEquip":        "Equip",
+    "tabStats":        "Stats",
+    "tabPerks":        "Perks",
+    "perksEmptyTitle": "No Perks Yet",
+    "perksEmptyDesc":  "Perks are rewards earned at each realm level-up and breakthrough. They will appear here once you've earned some."
+  },
+
+  "collection": {
+    "title": "Collection"
   },
 
   "home": {

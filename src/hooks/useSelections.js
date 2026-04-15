@@ -1,0 +1,225 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import REALMS from '../data/realms';
+import {
+  SELECTION_BY_ID,
+  rollOptions,
+} from '../data/selections';
+import { MOD } from '../data/stats';
+import { addJade } from '../systems/jade';
+import { spendJade, JADE_COSTS } from '../systems/jade';
+
+const PENDING_KEY = 'mai_pending_selections';
+const ACTIVE_KEY  = 'mai_active_selections';
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+
+function loadPending() {
+  try {
+    const raw = localStorage.getItem(PENDING_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function savePending(list) {
+  try { localStorage.setItem(PENDING_KEY, JSON.stringify(list)); } catch {}
+}
+
+function loadActive() {
+  try {
+    const raw = localStorage.getItem(ACTIVE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {};
+}
+
+function saveActive(obj) {
+  try { localStorage.setItem(ACTIVE_KEY, JSON.stringify(obj)); } catch {}
+}
+
+// ── Breakthrough detection ────────────────────────────────────────────────────
+
+function isBreakthrough(prevIndex, currIndex) {
+  const prev = REALMS[prevIndex];
+  const curr = REALMS[currIndex];
+  return !!prev && !!curr && prev.name !== curr.name;
+}
+
+let selCounter = 0;
+
+// ── Hook ──────────────────────────────────────────────────────────────────────
+
+export default function useSelections({ cultivation }) {
+  const [pending, setPending] = useState(loadPending);
+  const [active,  setActive]  = useState(loadActive);
+  const [jadeBalance, setJadeBalance] = useState(() => {
+    try { return parseInt(localStorage.getItem('mai_jade') || '0', 10); } catch { return 0; }
+  });
+
+  const prevRealmIndex = useRef(cultivation.realmIndex);
+
+  // Persist on change
+  useEffect(() => { savePending(pending); }, [pending]);
+  useEffect(() => { saveActive(active);   }, [active]);
+
+  // Sync jade balance display when localStorage changes
+  const refreshJade = useCallback(() => {
+    try {
+      setJadeBalance(parseInt(localStorage.getItem('mai_jade') || '0', 10));
+    } catch {}
+  }, []);
+
+  // Detect level-ups and generate selections
+  useEffect(() => {
+    const prev = prevRealmIndex.current;
+    const curr = cultivation.realmIndex;
+    if (curr === prev) return;
+    prevRealmIndex.current = curr;
+
+    const tier = isBreakthrough(prev, curr) ? 'breakthrough' : 'minor';
+    const options = rollOptions(curr, active, tier);
+    if (options.length === 0) return;
+
+    const realmLabel = REALMS[curr]
+      ? (REALMS[curr].stage
+          ? `${REALMS[curr].name} — ${REALMS[curr].stage}`
+          : REALMS[curr].name)
+      : '';
+
+    const entry = {
+      id:          `sel-${++selCounter}-${curr}`,
+      realmIndex:  curr,
+      realmLabel,
+      tier,
+      options,
+      freeRerolls: tier === 'breakthrough' ? 1 : 0,
+      rerollsUsed: 0,
+    };
+
+    // Award jade_per_breakthrough perk on breakthroughs
+    if (tier === 'breakthrough') {
+      const jadeBonus = Object.entries(active).reduce((total, [optId, stacks]) => {
+        const opt = SELECTION_BY_ID[optId];
+        if (!opt) return total;
+        return total + opt.effects
+          .filter(e => e.type === 'special' && e.key === 'jade_per_breakthrough')
+          .reduce((s, e) => s + e.value * stacks, 0);
+      }, 0);
+      if (jadeBonus > 0) {
+        addJade(Math.floor(jadeBonus));
+        refreshJade();
+      }
+    }
+
+    setPending(prev => [...prev, entry]);
+  }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Actions ───────────────────────────────────────────────────────────────
+
+  /** Player picks an option from the first pending entry. */
+  const pickOption = useCallback((selectionId, optionId) => {
+    setActive(prev => {
+      const next = { ...prev, [optionId]: (prev[optionId] ?? 0) + 1 };
+      saveActive(next);
+      return next;
+    });
+    setPending(prev => prev.filter(s => s.id !== selectionId));
+  }, []);
+
+  /** Reroll the options for a selection. Costs Jade unless free rerolls remain. */
+  const rerollOptions = useCallback((selectionId) => {
+    setPending(prev => prev.map(sel => {
+      if (sel.id !== selectionId) return sel;
+
+      const hasFree = sel.rerollsUsed < sel.freeRerolls;
+      if (!hasFree) {
+        const cost = sel.tier === 'breakthrough' ? JADE_COSTS.reroll_extra : JADE_COSTS.reroll_minor;
+        if (!spendJade(cost)) return sel; // not enough jade
+        refreshJade();
+      }
+
+      const newOptions = rollOptions(cultivation.realmIndex, active, sel.tier);
+      return {
+        ...sel,
+        options:     newOptions,
+        rerollsUsed: sel.rerollsUsed + 1,
+      };
+    }));
+  }, [cultivation.realmIndex, active, refreshJade]);
+
+  // ── Stat modifiers ────────────────────────────────────────────────────────
+
+  /**
+   * Returns a modifier bundle compatible with mergeModifiers / computeAllStats.
+   * Only stat_mod effects are included; special effects are handled per-system.
+   */
+  const getStatModifiers = useCallback(() => {
+    const bundle = {};
+    for (const [optId, stacks] of Object.entries(active)) {
+      const opt = SELECTION_BY_ID[optId];
+      if (!opt) continue;
+      for (const eff of opt.effects) {
+        if (eff.type !== 'stat_mod') continue;
+        const modType = eff.mod === 'flat'      ? MOD.FLAT
+                      : eff.mod === 'increased' ? MOD.INCREASED
+                      : eff.mod === 'more'      ? MOD.MORE
+                      : null;
+        if (!modType) continue;
+        if (!bundle[eff.stat]) bundle[eff.stat] = [];
+        // Stack the modifier: flat stacks additively, increased/more multiply by stacks
+        bundle[eff.stat].push({ type: modType, value: eff.value * stacks });
+      }
+    }
+    return bundle;
+  }, [active]);
+
+  /**
+   * Returns the combined multiplier for base qi speed from special qi_speed_mult effects.
+   * Multiply the cultivation BASE_RATE by this value.
+   * e.g. 2 stacks of +20% → returns 1.40
+   */
+  const getQiSpeedMult = useCallback(() => {
+    let mult = 1;
+    for (const [optId, stacks] of Object.entries(active)) {
+      const opt = SELECTION_BY_ID[optId];
+      if (!opt) continue;
+      for (const eff of opt.effects) {
+        if (eff.type === 'special' && eff.key === 'qi_speed_mult') {
+          mult += eff.value * stacks;
+        }
+      }
+    }
+    return mult;
+  }, [active]);
+
+  /**
+   * Returns the combined offline qi multiplier from special offline_qi_mult effects.
+   * e.g. 1 stack of +30% → returns 1.30
+   */
+  const getOfflineQiMult = useCallback(() => {
+    let mult = 1;
+    for (const [optId, stacks] of Object.entries(active)) {
+      const opt = SELECTION_BY_ID[optId];
+      if (!opt) continue;
+      for (const eff of opt.effects) {
+        if (eff.type === 'special' && eff.key === 'offline_qi_mult') {
+          mult += eff.value * stacks;
+        }
+      }
+    }
+    return mult;
+  }, [active]);
+
+  return {
+    pending,
+    active,
+    pendingCount: pending.length,
+    jadeBalance,
+    pickOption,
+    rerollOptions,
+    getStatModifiers,
+    getQiSpeedMult,
+    getOfflineQiMult,
+    refreshJade,
+  };
+}

@@ -36,6 +36,10 @@ export function wipeSave() {
   localStorage.removeItem('mai_active_law');
   localStorage.removeItem('mai_pills');
   localStorage.removeItem('mai_active_pills');
+  localStorage.removeItem('mai_seen_worlds');
+  localStorage.removeItem('mai_pending_selections');
+  localStorage.removeItem('mai_active_selections');
+  // mai_jade is intentionally NOT wiped — paid currency survives a save reset
   // mai_lang is intentionally NOT wiped — language preference survives a save reset
 }
 

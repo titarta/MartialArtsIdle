@@ -1,44 +1,37 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import languagesJson from './languages.json';
 
-import enUi   from './locales/en/ui.json';
-import enGame from './locales/en/game.json';
-import ptUi   from './locales/pt/ui.json';
-import ptGame from './locales/pt/game.json';
+// Auto-discover all locale files. Vite resolves these at build time so any
+// file under locales/<code>/*.json is automatically bundled — adding a new
+// language only requires adding the JSON files and an entry in languages.json.
+const uiModules   = import.meta.glob('./locales/*/ui.json',   { eager: true });
+const gameModules = import.meta.glob('./locales/*/game.json', { eager: true });
+
+// Build the i18next resources map from discovered files.
+const resources = {};
+for (const lang of languagesJson) {
+  const uiKey   = `./locales/${lang.code}/ui.json`;
+  const gameKey = `./locales/${lang.code}/game.json`;
+  resources[lang.code] = {
+    ui:   (uiModules[uiKey]   ?? { default: {} }).default,
+    game: (gameModules[gameKey] ?? { default: {} }).default,
+  };
+}
 
 // ── Language preference ───────────────────────────────────────────────────────
 // Stored separately from the save file so it survives a wipe.
 export const LANG_KEY = 'mai_lang';
 
-export const SUPPORTED_LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
-  // Uncomment and add locale files as translations become available:
-  // { code: 'zh', label: '中文' },
-  // { code: 'es', label: 'Español' },
-  // { code: 'fr', label: 'Français' },
-  // { code: 'de', label: 'Deutsch' },
-  // { code: 'ja', label: '日本語' },
-  // { code: 'ko', label: '한국어' },
-];
+/** All supported languages, derived from languages.json. */
+export const SUPPORTED_LANGUAGES = languagesJson;
 
 const savedLang = localStorage.getItem(LANG_KEY) || 'en';
 
 i18n
   .use(initReactI18next)
   .init({
-    resources: {
-      en: {
-        ui:   enUi,
-        game: enGame,
-      },
-      pt: {
-        ui:   ptUi,
-        game: ptGame,
-      },
-      // Add new languages here as their locale files are ready:
-      // zh: { ui: zhUi, game: zhGame },
-    },
+    resources,
     lng:          savedLang,
     fallbackLng:  'en',
     ns:           ['ui', 'game'],

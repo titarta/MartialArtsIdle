@@ -204,7 +204,7 @@ function StatRow({ label, hint, value, unit = '', locked = false }) {
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-function StatsScreen({ cultivation, artefacts }) {
+function StatsContent({ cultivation, artefacts }) {
   const { t } = useTranslation('ui');
   const { qiRef, costRef, activeLaw, realmName, realmIndex } = cultivation;
 
@@ -233,10 +233,7 @@ function StatsScreen({ cultivation, artefacts }) {
   const leave  = ()     => setActive(null);
 
   return (
-    <div className="screen stats-screen">
-      <h1>{t('stats.title')}</h1>
-      <p className="subtitle">{realmName}</p>
-
+    <>
       {/* ── Primary Stats: triangle left, detail right ── */}
       <div className="stats-primary-row">
         <div className="stat-triangle-container">
@@ -310,8 +307,8 @@ function StatsScreen({ cultivation, artefacts }) {
         <StatRow label={t('statNames.mining_speed')}     hint="from Body"               value={activity.miningSpeed} />
         <StatRow label={t('statNames.mining_luck')}      hint=""                        value={activity.miningLuck} />
       </StatGroup>
-    </div>
+    </>
   );
 }
 
-export default StatsScreen;
+export default StatsContent;

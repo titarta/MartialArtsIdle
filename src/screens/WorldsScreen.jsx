@@ -35,7 +35,7 @@ function EnemyChip({ enemyId }) {
   );
 }
 
-function RegionRow({ region, tab, locked, onNavigate }) {
+function RegionRow({ region, tab, locked, onNavigate, worldId }) {
   const { t } = useTranslation('ui');
   const { t: tGame }  = useTranslation('game');
 
@@ -65,7 +65,7 @@ function RegionRow({ region, tab, locked, onNavigate }) {
       )];
       sprites.forEach(sprite => preloadEnemySprites(sprite));
     }
-    onNavigate(SCREEN_MAP[tab], { region });
+    onNavigate(SCREEN_MAP[tab], { region, worldId, fromTab: tab });
   }
 
   return (
@@ -100,12 +100,19 @@ function RegionRow({ region, tab, locked, onNavigate }) {
   );
 }
 
-function WorldCard({ world, tab, realmIndex, onNavigate }) {
+function WorldCard({ world, tab, realmIndex, onNavigate, expandWorldId }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
   const worldLocked = realmIndex < world.minRealmIndex;
-  const [open, setOpen] = useState(!worldLocked && world.id === 1);
+  const [open, setOpen] = useState(
+    !worldLocked && (world.id === 1 || world.id === expandWorldId)
+  );
+
+  // Re-open when returning from a sub-screen with a specific expandWorldId
+  useEffect(() => {
+    if (!worldLocked && expandWorldId === world.id) setOpen(true);
+  }, [expandWorldId, world.id, worldLocked]);
 
   const worldName = tGame(`worlds.${world.id}.name`, { defaultValue: world.name });
 
@@ -152,6 +159,7 @@ function WorldCard({ world, tab, realmIndex, onNavigate }) {
               tab={tab}
               locked={realmIndex < region.minRealmIndex}
               onNavigate={onNavigate}
+              worldId={world.id}
             />
           ))}
         </div>
@@ -160,9 +168,9 @@ function WorldCard({ world, tab, realmIndex, onNavigate }) {
   );
 }
 
-function WorldsScreen({ cultivation, onNavigate }) {
+function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab }) {
   const { t } = useTranslation('ui');
-  const [tab, setTab] = useState('world');
+  const [tab, setTab] = useState(activeTab ?? 'world');
   const realmIndex = cultivation.realmIndex;
 
   const TABS = [
@@ -196,6 +204,7 @@ function WorldsScreen({ cultivation, onNavigate }) {
             tab={tab}
             realmIndex={realmIndex}
             onNavigate={onNavigate}
+            expandWorldId={expandWorldId}
           />
         ))}
       </div>

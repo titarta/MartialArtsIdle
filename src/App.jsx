@@ -8,10 +8,9 @@ import WorldsScreen from './screens/WorldsScreen';
 import GatheringScreen from './screens/GatheringScreen';
 import MiningScreen from './screens/MiningScreen';
 import ShopScreen from './screens/ShopScreen';
-import InventoryScreen from './screens/InventoryScreen';
+import CharacterScreen from './screens/CharacterScreen';
+import CollectionScreen from './screens/CollectionScreen';
 import ProductionScreen from './screens/ProductionScreen';
-import BuildScreen from './screens/BuildScreen';
-import StatsScreen from './screens/StatsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import useCultivation from './hooks/useCultivation';
 import useInventory   from './hooks/useInventory';
@@ -25,11 +24,16 @@ import { computeAllStats, mergeModifiers } from './data/stats';
 import { evaluateLawUniques, buildContext } from './systems/lawEngine';
 import { initDebug } from './debug/gameDebug';
 import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
+import useNotifications from './hooks/useNotifications';
+import useSelections from './hooks/useSelections';
+import ToastStack from './components/ToastStack';
+import SelectionModal from './components/SelectionModal';
 import './App.css';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
   const [screenParam,   setScreenParam]   = useState(null);
+  const [selectionModalOpen, setSelectionModalOpen] = useState(false);
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
@@ -40,12 +44,24 @@ function App() {
   const combat      = useCombat();
   const artefacts   = useArtefacts();
   const pills       = usePills();
+  const selections  = useSelections({ cultivation });
 
   // Keep pill qi multiplier in sync with cultivation game loop
   const pillQiMult = pills.getQiMult();
   useEffect(() => {
     cultivation.pillQiMultRef.current = pillQiMult;
   }, [pillQiMult, cultivation.pillQiMultRef]);
+
+  // Keep selection qi speed mult in sync with cultivation game loop
+  useEffect(() => {
+    if (!cultivation.selectionQiMultRef) return;
+    cultivation.selectionQiMultRef.current = selections.getQiSpeedMult();
+  }, [selections, cultivation.selectionQiMultRef]);
+
+  // Auto-open selection modal when new pending selections arrive — only on home screen
+  useEffect(() => {
+    if (selections.pendingCount > 0 && currentScreen === 'home') setSelectionModalOpen(true);
+  }, [selections.pendingCount, currentScreen]);
 
   // ── Centralised stat getter ─────────────────────────────────────────────
   // Builds the FULL computeAllStats bundle including modifier contributions
@@ -70,6 +86,7 @@ function App() {
       artefacts?.getStatModifiers?.(),
       pills?.getStatModifiers?.(),
       lawBundle.statMods,
+      selections?.getStatModifiers?.(),
     );
 
     const bundle = computeAllStats(qi, law, realmIndex, mergedMods);
@@ -89,7 +106,7 @@ function App() {
       exploitChance: bundle.combat.exploitChance,
       exploitMult:   bundle.combat.exploitMult,
     };
-  }, [cultivation, artefacts, pills]);
+  }, [cultivation, artefacts, pills, selections]);
 
   // Mirror focusMult into a ref the cultivation tick reads directly so
   // boost speed reflects equipment / pill modifiers.
@@ -108,6 +125,8 @@ function App() {
     getEquippedTechs: () => techniques.equippedTechniques,
   });
 
+  const notifications = useNotifications({ cultivation, inventory });
+
   // Keep a live ref to all hooks so debug commands always see fresh state.
   const hooksRef = useRef({});
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm };
@@ -117,15 +136,19 @@ function App() {
   const navigate = (screen, param = null) => {
     setCurrentScreen(screen);
     setScreenParam(param);
+    notifications.clearBadge(screen);
   };
 
-  const goBack = () => navigate('combat');
+  const goBack = () => navigate('combat', {
+    expandWorldId: screenParam?.worldId ?? null,
+    activeTab:     screenParam?.fromTab  ?? null,
+  });
 
   const screens = {
-    home:      <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} />,
+    home:      <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} />,
     training:  <TrainingScreen />,
     // Worlds hub — the NavBar "Worlds" tab always lands here
-    combat:    <WorldsScreen cultivation={cultivation} onNavigate={navigate} />,
+    combat:    <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
                       cultivation={cultivation}
@@ -142,12 +165,11 @@ function App() {
     mining:    screenParam?.region
                  ? <MiningScreen    region={screenParam.region} inventory={inventory} onBack={goBack} getFullStats={getFullStats} />
                  : null,
-    build:     <BuildScreen  cultivation={cultivation} techniques={techniques} artefacts={artefacts} />,
-    shop:      <ShopScreen />,
-    inventory:  <InventoryScreen  inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
+    character:  <CharacterScreen cultivation={cultivation} techniques={techniques} artefacts={artefacts} selections={selections} />,
+    shop:       <ShopScreen />,
+    collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} />,
-    stats:     <StatsScreen cultivation={cultivation} artefacts={artefacts} />,
-    settings:  <SettingsScreen />,
+    settings:   <SettingsScreen />,
   };
 
   return (
@@ -155,10 +177,25 @@ function App() {
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
+        badges={notifications.badges}
       />
       <main className="screen-container">
         {screens[currentScreen]}
       </main>
+      <ToastStack
+        toasts={notifications.toastQueue}
+        onDismiss={notifications.dismissToast}
+        onNavigate={navigate}
+      />
+      {selectionModalOpen && selections.pending[0] && (
+        <SelectionModal
+          selection={selections.pending[0]}
+          jadeBalance={selections.jadeBalance}
+          onPick={selections.pickOption}
+          onReroll={selections.rerollOptions}
+          onClose={() => setSelectionModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

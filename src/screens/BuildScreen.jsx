@@ -285,9 +285,9 @@ function TechSlotCard({ index, tech, onClick }) {
   );
 }
 
-// ── Main BuildScreen ─────────────────────────────────────────────────────────
+// ── Main BuildContent ─────────────────────────────────────────────────────────
 
-function BuildScreen({ cultivation, techniques, artefacts }) {
+function BuildContent({ cultivation, techniques, artefacts }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
@@ -323,10 +323,7 @@ function BuildScreen({ cultivation, techniques, artefacts }) {
   };
 
   return (
-    <div className="screen build-screen">
-      <h1>{t('build.title')}</h1>
-      <p className="subtitle">{t('build.subtitle')}</p>
-
+    <>
       {/* -- Law + Artefacts side by side -- */}
       <div className="build-top-row">
 
@@ -516,8 +513,8 @@ function BuildScreen({ cultivation, techniques, artefacts }) {
           onClose={() => setSelectedTechSlot(null)}
         />
       )}
-    </div>
+    </>
   );
 }
 
-export default BuildScreen;
+export default BuildContent;

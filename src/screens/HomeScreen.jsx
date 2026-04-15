@@ -115,7 +115,7 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
 const HOLD_HINT_SEEN_KEY = 'mai_home_hold_hint_seen';
 const HOLD_HINT_IDLE_MS  = 60 * 1000; // re-show hint after this long without holding
 
-function HomeScreen({ cultivation, pills, inventory }) {
+function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelections }) {
   const { t } = useTranslation('ui');
   const {
     realmName,
@@ -294,6 +294,17 @@ function HomeScreen({ cultivation, pills, inventory }) {
         </div>
 
       </div>
+
+      {/* ── Pending selections badge — bottom-left above nav ───────────── */}
+      {selections?.pendingCount > 0 && (
+        <div className="home-selections-float">
+          <button className="home-sel-btn" onClick={onOpenSelections}>
+            <span className="home-sel-btn-icon">✦</span>
+            <span className="home-sel-btn-label">Rewards</span>
+            <span className="home-sel-btn-count">{selections.pendingCount}</span>
+          </button>
+        </div>
+      )}
 
       {/* ── Pills: floating bottom-right above nav ──────────────────────── */}
       {pills && (pills.activePills.length > 0 || totalOwnedPills > 0) && (
