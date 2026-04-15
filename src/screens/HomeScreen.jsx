@@ -22,14 +22,7 @@ function getSpriteState(boosting, adBoostActive) {
   return 1;
 }
 
-<<<<<<< HEAD
-/** Compact Qi/s readout — updated via rAF against the live rateRef so it
- *  reflects every modifier (law, boost, ad, pills) without React renders. */
-=======
 // ── Top HUD bar ─────────────────────────────────────────────────────────────
-/** Persistent bar across the top of the home screen: jade balance (left) +
- *  settings button (right).  Lotus/jade is the in-game soft premium currency
- *  used for selection rerolls.  Settings moved here from the nav bar. */
 function HomeTopHud({ jadeBalance, onNavigate }) {
   return (
     <div className="home-top-hud">
@@ -71,7 +64,6 @@ function ActivePillBadge({ active }) {
 }
 
 /** Qi/s readout — updated via rAF so it tracks every modifier without re-renders. */
->>>>>>> 68dfdf4 (feat: idle auto-farm, feature gates, AdSense snippet, ad crash fix)
 function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
   const { t } = useTranslation('ui');
   const textRef = useRef(null);
