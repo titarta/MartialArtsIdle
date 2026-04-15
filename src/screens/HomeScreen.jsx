@@ -10,16 +10,9 @@ import { PILLS_BY_ID, ITEM_RARITY } from '../data/pills';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
-// home.png natural dimensions — used to anchor the character to a fixed point
-// in the ART regardless of viewport shape (so the character sits inside the
-// doorway on desktop, mobile portrait, and every aspect ratio in between).
+// home.png natural dimensions — used to compute the cover-scale sprite size.
 const HOME_BG_W = 1376;
 const HOME_BG_H = 768;
-// Normalised anchor (0..1) inside the ART where the character's feet should land.
-// 0.50 = horizontal center of the painting.
-// Higher Y = lower on screen. Tweak this to nudge the character up/down.
-const HOME_ANCHOR_X = 0.50;
-const HOME_ANCHOR_Y = 0.82;
 
 // 4 states: idle | boost | adboosted | adboosted-boost
 function getSpriteState(boosting, adBoostActive) {
@@ -133,27 +126,13 @@ function HomeScreen({ cultivation, pills, inventory }) {
 
   const { vfxLayer, spawnVFX } = useVFX();
 
-  // Anchor the character to a fixed point inside the BACKGROUND ART (not the
-  // viewport), so it lines up the same way on every screen shape. We replicate
-  // the `background-size: cover; background-position: center center` math and
-  // compute where the art anchor lands in viewport pixels.
-  const stageRef = useRef(null);
-  const [anchor, setAnchor] = useState({ x: 0, y: 0, imgH: 0 });
+  // Sprite scales with the rendered background height (cover-scale math) so
+  // the character stays proportional to the art across every screen shape.
+  const [spriteScale, setSpriteScale] = useState(1);
   useEffect(() => {
     const update = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      // cover scale = larger of (vw/imgW, vh/imgH)
-      const scale = Math.max(vw / HOME_BG_W, vh / HOME_BG_H);
-      const renderedW = HOME_BG_W * scale;
-      const renderedH = HOME_BG_H * scale;
-      const offsetX = (vw - renderedW) / 2; // center center
-      const offsetY = (vh - renderedH) / 2;
-      setAnchor({
-        x: offsetX + renderedW * HOME_ANCHOR_X,
-        y: offsetY + renderedH * HOME_ANCHOR_Y,
-        imgH: renderedH,
-      });
+      const scale = Math.max(window.innerWidth / HOME_BG_W, window.innerHeight / HOME_BG_H);
+      setSpriteScale((HOME_BG_H * scale * 0.21) / 128);
     };
     update();
     window.addEventListener('resize', update);
@@ -163,11 +142,6 @@ function HomeScreen({ cultivation, pills, inventory }) {
       window.removeEventListener('orientationchange', update);
     };
   }, []);
-
-  // Sprite scales with the RENDERED image height so the character stays the
-  // same size *relative to the art* across every screen shape.
-  // 0.21 × 1080 ≈ 225px on a standard desktop viewport.
-  const spriteScale = anchor.imgH > 0 ? (anchor.imgH * 0.21) / 128 : 1;
 
   // ── Rewarded ad: cultivation boost ─────────────────────────────────────────
   const onCultivationReward = useCallback(() => {
@@ -237,71 +211,67 @@ function HomeScreen({ cultivation, pills, inventory }) {
         />
       )}
 
-      {/* ── Top HUD: title only (stage name lives on the QI bar now) ────── */}
+      {/* ── Top HUD: title + Heavenly Qi button (absolute inside) ────────── */}
       <div className="home-hud-top">
         <img
           className="home-title-img"
           src={`${BASE}Title.png`}
           alt="The Long Road to Heaven"
         />
-      </div>
-
-
-      {/* Floating Heavenly Qi button — top-right, always accessible. */}
-      <HeavenlyQiButton
-        ad={cultivationAd}
-        adBoostActive={adBoostActive}
-        adBoostRemaining={adBoostRemaining}
-        maxed={maxed}
-      />
-
-      {/* Character stage — absolutely positioned to lock onto a fixed point
-          inside the background art (see anchor calc above). */}
-      <div
-        ref={stageRef}
-        className={`fighter-stage home-fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
-        style={{
-          left: `${anchor.x}px`,
-          top:  `${anchor.y}px`,
-          width:  `${128 * spriteScale}px`,
-          height: `${128 * spriteScale}px`,
-        }}
-        onPointerDown={handlePointerDown}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-      >
-        {vfxLayer}
-        <SpriteAnimator
-          key={spriteState}
-          src={spriteSrc}
-          frameWidth={128}
-          frameHeight={128}
-          frameCount={4}
-          fps={fps}
-          scale={spriteScale}
+        <HeavenlyQiButton
+          ad={cultivationAd}
+          adBoostActive={adBoostActive}
+          adBoostRemaining={adBoostRemaining}
+          maxed={maxed}
         />
       </div>
 
-      {/* Hold hint — sits just below the character's feet, fades after the
-          player first holds, reappears after idle (see resetIdleTimer). */}
-      {!maxed && (
-        <div
-          className={`home-hold-hint${showHoldHint ? '' : ' home-hold-hint-fade'}`}
-          style={{
-            left: `${anchor.x}px`,
-            top:  `${anchor.y + 8}px`,
-          }}
-        >
-          Hold to cultivate faster
-        </div>
-      )}
-
-      {/* Spacer — pushes HUD to the bottom */}
+      {/* Spacer — pushes the bottom stack down */}
       <div className="home-spacer" />
 
-      {/* ── Bottom HUD: QI bar ────────────────────────────────────────────── */}
+      {/* ── Bottom stack (top-to-bottom): qi/s → hint → character → realm name → bar ── */}
       <div className="home-hud-bottom">
+
+        {/* Qi/s readout — above the player's head, just above hold hint */}
+        <QiRateReadout
+          rateRef={rateRef}
+          boosting={boosting}
+          adBoostActive={adBoostActive}
+          maxed={maxed}
+        />
+
+        {/* Hold hint — right below qi/s, fades after first hold */}
+        {!maxed && (
+          <div className={`home-hold-hint${showHoldHint ? '' : ' home-hold-hint-fade'}`}>
+            Hold to cultivate faster
+          </div>
+        )}
+
+        {/* Character — centered in flow */}
+        <div
+          className={`fighter-stage home-fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
+          style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+        >
+          {vfxLayer}
+          <SpriteAnimator
+            key={spriteState}
+            src={spriteSrc}
+            frameWidth={128}
+            frameHeight={128}
+            frameCount={4}
+            fps={fps}
+            scale={spriteScale}
+          />
+        </div>
+
+        {/* Realm / stage name — right above the bar */}
+        <div className="home-realm-name">{realmName}</div>
+
+        {/* QI progress bar */}
         <div className="home-bar-wrap">
           <RealmProgressBar
             qiRef={qiRef}
@@ -311,13 +281,8 @@ function HomeScreen({ cultivation, pills, inventory }) {
             boosting={boosting}
             maxed={maxed}
           />
-          <QiRateReadout
-            rateRef={rateRef}
-            boosting={boosting}
-            adBoostActive={adBoostActive}
-            maxed={maxed}
-          />
         </div>
+
       </div>
 
       {/* ── Pills: floating bottom-right above nav ──────────────────────── */}

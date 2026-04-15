@@ -15,16 +15,18 @@ function formatQi(n) {
 }
 
 function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting, maxed }) {
-  const fillRef    = useRef(null);
-  const qiLabelRef = useRef(null);
+  const fillRef        = useRef(null);
+  const qiCurrentRef   = useRef(null);
+  const qiCostRef      = useRef(null);
 
   // Update fill width and qi label every frame — direct DOM, no React re-render
   useEffect(() => {
     let raf;
     const update = () => {
       if (maxed) {
-        if (fillRef.current)    fillRef.current.style.width = '100%';
-        if (qiLabelRef.current) qiLabelRef.current.textContent = 'Peak';
+        if (fillRef.current)      fillRef.current.style.width = '100%';
+        if (qiCurrentRef.current) qiCurrentRef.current.textContent = 'Peak';
+        if (qiCostRef.current)    qiCostRef.current.textContent = '';
         raf = requestAnimationFrame(update);
         return;
       }
@@ -33,9 +35,9 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting, m
       const cost = costRef.current;
       const pct  = Math.min((qi / cost) * 100, 100);
 
-      if (fillRef.current)    fillRef.current.style.width = `${pct}%`;
-      if (qiLabelRef.current) qiLabelRef.current.textContent =
-        `${formatQi(Math.floor(qi))} / ${formatQi(cost)}`;
+      if (fillRef.current)      fillRef.current.style.width = `${pct}%`;
+      if (qiCurrentRef.current) qiCurrentRef.current.textContent = formatQi(Math.floor(qi));
+      if (qiCostRef.current)    qiCostRef.current.textContent = formatQi(cost);
 
       raf = requestAnimationFrame(update);
     };
@@ -53,20 +55,23 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting, m
 
   return (
     <div className="realm-bar">
-      {/* Single centered stage label above the bar — no clutter at the ends. */}
-      <div className="realm-stage-title">{currentRealm}</div>
-
       {/* Frame: complete bar image, no mirroring needed */}
       <div className="realm-track">
         <img className="qi-frame" src={frameSrc} alt="" draggable="false" />
 
-        {/* Fill sits behind the frame, clipped to the transparent channel region */}
-        <div
-          ref={fillRef}
-          className="realm-fill"
-          style={{ width: maxed ? '100%' : `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
-        />
-        <div ref={qiLabelRef} className="realm-qi-label" />
+        {/* Channel wrapper — inset to match the frame's inner rectangle (6.5% / 5.5%).
+            Fill width% is relative to this constrained area, not the full image. */}
+        <div className="realm-channel">
+          <div
+            ref={fillRef}
+            className="realm-fill"
+            style={{ width: maxed ? '100%' : `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
+          />
+        </div>
+        <div className="realm-qi-label">
+          <span ref={qiCurrentRef} className="realm-qi-current" />
+          <span ref={qiCostRef}    className="realm-qi-cost" />
+        </div>
       </div>
     </div>
   );

@@ -614,11 +614,11 @@
   pointer-events: none;
 }
 
-/* Top HUD: title + realm name — soft dark gradient vignette so the title
-   reads cleanly no matter how bright the art behind it is. */
+/* Top HUD: title centred, HQ button absolute top-right so it can never
+   escape above the title area regardless of screen size. */
 .home-hud-top {
   position: relative;
-  z-index: 1;
+  z-index: 4;
   padding: 18px 16px 28px;
   background: linear-gradient(to bottom,
     rgba(0,0,0,0.78) 0%,
@@ -627,12 +627,25 @@
     rgba(0,0,0,0)    100%);
 }
 
-/* Title artwork replaces the H1 — scales to fit the available width
-   while keeping aspect ratio (Title.png is 1350×145). A soft drop-shadow
-   anchors it visually and keeps the edges legible over the art. */
+/* Realm / stage name — sits directly above the QI bar inside home-hud-bottom */
+.home-realm-name {
+  text-align: center;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: var(--gold, #f5c842);
+  text-shadow:
+    0 0 8px rgba(0,0,0,0.9),
+    0 2px 6px rgba(0,0,0,0.8);
+  letter-spacing: 0.04em;
+  padding: 6px 16px 2px;
+  pointer-events: none;
+}
+
+/* Title artwork — mobile-first, grows as viewport widens (1350×145 aspect ratio).
+   Default is narrow/mobile; each breakpoint only increases the allowed width. */
 .home-title-img {
   display: block;
-  max-width: min(560px, 92%);
+  max-width: min(320px, 88%);
   width: 100%;
   height: auto;
   margin: 0 auto 4px;
@@ -644,13 +657,11 @@
     drop-shadow(0 2px 4px rgba(0, 0, 0, 0.85))
     drop-shadow(0 6px 18px rgba(0, 0, 0, 0.65));
 }
-
-/* Shrink the title slightly on desktop/browser widths so it reads as a
-   proper header rather than dominating the top of the viewport. */
-@media (min-width: 768px) {
-  .home-title-img {
-    max-width: min(510px, 92%);
-  }
+@media (min-width: 700px) {
+  .home-title-img { max-width: min(480px, 92%); }
+}
+@media (min-width: 1024px) {
+  .home-title-img { max-width: min(560px, 92%); }
 }
 
 /* Pills: floating bottom-right above the nav bar */
@@ -696,13 +707,12 @@
   background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0) 100%);
 }
 
-/* Fighter stage — anchored to a fixed point in the background art via
-   inline style (left/top/width/height set by JS). transform places the
-   sprite's feet exactly at the anchor, so the character lands in the
-   same spot on the painting across every screen shape. */
+/* Fighter stage — flow element centred inside home-hud-bottom.
+   Width/height set by inline style (spriteScale). */
 .home-screen .home-fighter-stage {
-  position: fixed;
-  transform: translate(-50%, -100%);
+  position: relative;
+  transform: none;
+  margin: 0 auto;
   background: none !important;
   border: none;
   border-radius: 0;
@@ -711,6 +721,7 @@
   min-height: 0;
   flex: none;
   z-index: 2;
+  touch-action: none;
 }
 
 .home-screen .stage-boosted {
@@ -721,7 +732,7 @@
 /* QI bar wrapper — dark backing for readability */
 .home-bar-wrap {
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
   padding: 8px 16px 4px;
 }
 
@@ -771,11 +782,10 @@
   color: #9cd2ff;
 }
 
-/* Hold-to-cultivate hint — sits just below the character's feet, anchored
-   via inline left/top. Auto-fades after first hold and re-appears on idle. */
+/* Hold-to-cultivate hint — flow element above the character, centred. */
 .home-hold-hint {
-  position: fixed;
-  transform: translate(-50%, 0);
+  display: block;
+  align-self: center;
   z-index: 2;
   padding: 3px 12px;
   border-radius: 14px;
@@ -788,21 +798,23 @@
   opacity: 1;
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
   animation: hold-hint-pulse 2s ease-in-out infinite;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 .home-hold-hint-fade {
   opacity: 0;
-  transform: translate(-50%, 6px);
+  transform: translateY(6px);
   animation: none;
 }
 @keyframes hold-hint-pulse {
-  0%, 100% { transform: translate(-50%, 0);     opacity: 0.78; }
-  50%      { transform: translate(-50%, 2px);   opacity: 1; }
+  0%, 100% { opacity: 0.78; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(2px); }
 }
 
-/* Floating "Heavenly Qi" rewarded-ad button — top-right of the stage.
-   Three states: ready (glowing pulse), cooldown (timer), active (×2 timer). */
+/* Heavenly Qi button — top-right inside home-hud-top (position: relative),
+   so it's always contained within the title area and never overlaps content below. */
 .hq-btn {
-  position: fixed;
+  position: absolute;
   top: calc(18px + env(safe-area-inset-top));
   right: 16px;
   z-index: 4;
@@ -856,16 +868,17 @@
   50%      { box-shadow: 0 4px 18px rgba(100, 180, 255, 0.6),  inset 0 0 14px rgba(140, 207, 255, 0.3); }
 }
 
-/* Keep the ad button from overlapping the desktop title block on very small
-   viewports — nudge a bit lower on phones. */
-@media (max-width: 480px) {
+/* Below ~700px the title is smaller and the button drops below it */
+@media (max-width: 699px) {
   .hq-btn {
-    width: 56px;
-    height: 56px;
-    top: calc(12px + env(safe-area-inset-top));
-    right: 12px;
+    width: 52px;
+    height: 52px;
+    /* 18px top-padding + ~36px title height (320px wide / 9.31 ratio) + 12px gap */
+    top: calc(env(safe-area-inset-top) + 66px);
   }
-  .hq-btn .hq-icon { font-size: 1.2rem; }
+  .hq-btn .hq-icon  { font-size: 1.1rem; }
+  .hq-btn .hq-label { font-size: 0.62rem; }
+  .hq-btn .hq-sub   { font-size: 0.5rem; }
 }
 
 /* Cultivation Layout: fighter stage on top, progress bar below */
@@ -950,19 +963,28 @@
   user-select: none;
 }
 
-/* Fill bar — sits behind the frame, visible through the transparent channel.
-   Centred vertically; user will dial in exact height/offset. */
-.realm-fill {
+/* Channel wrapper — inset to the frame's inner rectangle so fill width%
+   is relative to the actual channel area (not the full image incl. dragon heads).
+   QI-Progress-Bar.png: left border ends at 6.5%, right border starts at 5.5% from right. */
+.realm-channel {
   position: absolute;
   top: 50%;
-  bottom: auto;
-  height: 22%;
   transform: translateY(-50%);
-  left: 0;
-  right: 0;
-  background: linear-gradient(to right, #b8860b, #ffd700, #b8860b);
+  height: 22%;
+  left: 10.5%;
+  right: 10.5%;
   z-index: 1;
-  /* width updated every rAF frame — no CSS transition needed */
+  overflow: hidden;
+}
+
+/* Fill bar — grows left-to-right inside the channel wrapper.
+   Width is updated every rAF frame as a % of the channel (no CSS transition). */
+.realm-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(to right, #b8860b, #ffd700, #b8860b);
 }
 
 .realm-fill-boosted {
@@ -975,14 +997,30 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  white-space: nowrap;
-  font-size: 0.55rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
   z-index: 3;
   pointer-events: none;
 }
+
+.realm-qi-current,
+.realm-qi-cost {
+  white-space: nowrap;
+  font-weight: 700;
+  color: #fff;
+  text-shadow:
+    0 0 4px rgba(0,0,0,1),
+    0 1px 6px rgba(0,0,0,0.9),
+    -1px 0 3px rgba(0,0,0,0.8),
+    1px 0 3px rgba(0,0,0,0.8);
+}
+
+/* Current qi — bright white, prominent */
+.realm-qi-current { font-size: 0.8rem;  color: #ffffff; }
+/* Max qi (cost) — cool muted tone, clearly secondary without being hard to read */
+.realm-qi-cost    { font-size: 0.75rem; color: #9ab8cc; }
 
 /* Fighter Stage */
 .fighter-stage {
