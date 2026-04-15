@@ -40,7 +40,11 @@ export default function MaterialsEditor({ edited, onChangeRecords }) {
             className={`dz-subtab ${tab === s.id ? 'active' : ''}`}
             onClick={() => setTab(s.id)}
           >
-            {s.label} <span className="dz-subtab-count">({Object.keys(all[s.id] || {}).length})</span>
+            {s.label} <span className="dz-subtab-count">({
+              // baseline items + any newly added override-only items
+              Object.keys(s.baseline).length +
+              Object.keys(all[s.id] || {}).filter(k => !s.baseline[k]).length
+            })</span>
           </button>
         ))}
       </div>
