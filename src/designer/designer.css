@@ -1108,6 +1108,7 @@
 .dz-form--compact .dz-form-row.dz-form-row--wide {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 3px;
 }
 .dz-form--compact .dz-form-row.dz-form-row--wide .dz-form-label {
