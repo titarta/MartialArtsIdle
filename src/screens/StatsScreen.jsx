@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { computeAllStats, mergeModifiers } from '../data/stats';
 import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
 
@@ -101,25 +102,47 @@ function StatCircle({ label, value, locked, glowColor, active, onEnter, onLeave,
 
 // ─── Detail panel (hover / tap) ───────────────────────────────────────────────
 function DetailPanel({ stat, qi, law, realmIndex }) {
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   const SAINT_INDEX = 24;
   const locked = stat === 'soul' && realmIndex < SAINT_INDEX;
 
+  const lawName = tGame(`laws.${law.id}.name`, { defaultValue: law.name });
+
   const configs = {
     essence: {
-      title: 'Essence', subtitle: 'Elemental Power', color: '#38bdf8',
+      title:    t('stats.essenceLabel'),
+      subtitle: t('stats.essenceSubtitle'),
+      color:    '#38bdf8',
       mult: law.essenceMult, multKey: 'essence_mult',
-      effects: ['Drives elemental attacks', 'Contributes to Defense and Elemental Defense'],
+      effects: [
+        t('stats.essenceEffects.elemental'),
+        t('stats.essenceEffects.defense'),
+      ],
     },
     soul: {
-      title: 'Soul', subtitle: 'Spiritual Power', color: '#c084fc',
+      title:    t('stats.soulLabel'),
+      subtitle: t('stats.soulSubtitle'),
+      color:    '#c084fc',
       mult: law.soulMult, multKey: 'soul_mult',
-      effects: ['Drives psychic attacks', 'Powers Secret Techniques', 'Feeds Harvest Gathering Speed'],
-      lockMsg: 'Unlocks at Saint realm',
+      effects: [
+        t('stats.soulEffects.psychic'),
+        t('stats.soulEffects.techniques'),
+        t('stats.soulEffects.harvest'),
+      ],
+      lockMsg: t('stats.soulEffects.unlock'),
     },
     body: {
-      title: 'Body', subtitle: 'Physical Power', color: '#f97316',
+      title:    t('stats.bodyLabel'),
+      subtitle: t('stats.bodySubtitle'),
+      color:    '#f97316',
       mult: law.bodyMult, multKey: 'body_mult',
-      effects: ['Drives physical attacks', 'Contributes to Defense', 'Feeds Mining Speed'],
+      effects: [
+        t('stats.bodyEffects.physical'),
+        t('stats.bodyEffects.defense'),
+        t('stats.bodyEffects.mining'),
+      ],
     },
   };
 
@@ -138,11 +161,11 @@ function DetailPanel({ stat, qi, law, realmIndex }) {
       ) : (
         <>
           <div className="sdp-formula">
-            <code className="sdp-code">Qi × {cfg.multKey}</code>
+            <code className="sdp-code">Qi × {t(`statNames.${cfg.multKey}`, { defaultValue: cfg.multKey })}</code>
             <code className="sdp-code sdp-calc">
               {fmt(qi)} × {cfg.mult} = <strong style={{ color: cfg.color }}>{fmt(val)}</strong>
             </code>
-            <span className="sdp-source">via {law.name}</span>
+            <span className="sdp-source">{t('stats.viaLaw', { law: lawName })}</span>
           </div>
           <div className="sdp-divider" />
           <ul className="sdp-effects">
@@ -165,6 +188,7 @@ function StatGroup({ title, children }) {
 }
 
 function StatRow({ label, hint, value, unit = '', locked = false }) {
+  const { t } = useTranslation('ui');
   return (
     <div className="secondary-stat-row">
       <span className="secondary-stat-label">{label}</span>
@@ -173,7 +197,7 @@ function StatRow({ label, hint, value, unit = '', locked = false }) {
         className="secondary-stat-value"
         style={locked ? { color: 'var(--text-muted)', fontWeight: 400 } : undefined}
       >
-        {locked ? 'Locked' : `${fmt(value)}${unit}`}
+        {locked ? t('common.locked') : `${fmt(value)}${unit}`}
       </span>
     </div>
   );
@@ -181,6 +205,7 @@ function StatRow({ label, hint, value, unit = '', locked = false }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 function StatsScreen({ cultivation, artefacts }) {
+  const { t } = useTranslation('ui');
   const { qiRef, costRef, activeLaw, realmName, realmIndex } = cultivation;
 
   const [qi, setQi]             = useState(Math.floor(qiRef.current + costRef.current));
@@ -209,7 +234,7 @@ function StatsScreen({ cultivation, artefacts }) {
 
   return (
     <div className="screen stats-screen">
-      <h1>Character Stats</h1>
+      <h1>{t('stats.title')}</h1>
       <p className="subtitle">{realmName}</p>
 
       {/* ── Primary Stats: triangle left, detail right ── */}
@@ -223,7 +248,7 @@ function StatsScreen({ cultivation, artefacts }) {
             onMouseLeave={leave}
             onClick={() => toggle('soul')}
           >
-            <StatCircle label="Soul" value={primary.soul} locked={!soulUnlocked} glowColor="#c084fc" active={activeStat === 'soul'}>
+            <StatCircle label={t('stats.soulLabel')} value={primary.soul} locked={!soulUnlocked} glowColor="#c084fc" active={activeStat === 'soul'}>
               <SoulSprite size={40} locked={!soulUnlocked} />
             </StatCircle>
           </div>
@@ -234,7 +259,7 @@ function StatsScreen({ cultivation, artefacts }) {
             onMouseLeave={leave}
             onClick={() => toggle('essence')}
           >
-            <StatCircle label="Essence" value={primary.essence} locked={false} glowColor="#38bdf8" active={activeStat === 'essence'}>
+            <StatCircle label={t('stats.essenceLabel')} value={primary.essence} locked={false} glowColor="#38bdf8" active={activeStat === 'essence'}>
               <EssenceSprite size={40} />
             </StatCircle>
           </div>
@@ -245,7 +270,7 @@ function StatsScreen({ cultivation, artefacts }) {
             onMouseLeave={leave}
             onClick={() => toggle('body')}
           >
-            <StatCircle label="Body" value={primary.body} locked={false} glowColor="#f97316" active={activeStat === 'body'}>
+            <StatCircle label={t('stats.bodyLabel')} value={primary.body} locked={false} glowColor="#f97316" active={activeStat === 'body'}>
               <BodySprite size={40} />
             </StatCircle>
           </div>
@@ -256,34 +281,34 @@ function StatsScreen({ cultivation, artefacts }) {
             <DetailPanel stat={activeStat} qi={qi} law={activeLaw} realmIndex={realmIndex} />
           ) : (
             <div className="sdp-placeholder">
-              <span>Tap a stat</span>
-              <span>for details</span>
+              <span>{t('stats.tapForDetails')}</span>
+              <span>{t('stats.forDetails')}</span>
             </div>
           )}
         </div>
       </div>
 
       {/* ── Combat Stats ── */}
-      <StatGroup title="Combat">
-        <StatRow label="Health"         hint="(Essence + Body) × 12"  value={combat.health} />
-        <StatRow label="Defense"        hint="Essence + Body"          value={combat.defense} />
-        <StatRow label="Elem Defense"   hint="from Essence"            value={combat.elemDef} />
-        <StatRow label="Soul Toughness" hint="from Soul"               value={combat.soulTough}    locked={!soulUnlocked} />
-        <StatRow label="Phys Damage"    hint="bonus"                   value={combat.physDmg} />
-        <StatRow label="Elem Damage"    hint="bonus"                   value={combat.elemDmg} />
-        <StatRow label="Psych Damage"   hint="bonus"                   value={combat.psychDmg}     locked={!soulUnlocked} />
-        <StatRow label="Exploit Chance" hint=""                        value={combat.exploitChance} unit="%" />
-        <StatRow label="Exploit Mult"   hint=""                        value={combat.exploitMult}   unit="%" />
+      <StatGroup title={t('stats.groupCombat')}>
+        <StatRow label={t('statNames.health')}           hint="(Essence + Body) × 12"  value={combat.health} />
+        <StatRow label={t('statNames.defense')}          hint="Essence + Body"          value={combat.defense} />
+        <StatRow label={t('statNames.elemental_defense')} hint="from Essence"           value={combat.elemDef} />
+        <StatRow label={t('statNames.soul_toughness')}   hint="from Soul"               value={combat.soulTough}    locked={!soulUnlocked} />
+        <StatRow label={t('statNames.physical_damage')}  hint="bonus"                   value={combat.physDmg} />
+        <StatRow label={t('statNames.elemental_damage')} hint="bonus"                   value={combat.elemDmg} />
+        <StatRow label={t('statNames.psychic_damage')}   hint="bonus"                   value={combat.psychDmg}     locked={!soulUnlocked} />
+        <StatRow label={t('statNames.exploit_chance')}   hint=""                        value={combat.exploitChance} unit="%" />
+        <StatRow label={t('statNames.exploit_mult')}     hint=""                        value={combat.exploitMult}   unit="%" />
       </StatGroup>
 
       {/* ── Activity Stats ── */}
-      <StatGroup title="Activity">
-        <StatRow label="Qi Speed"       hint="base × law mult"         value={activity.qiSpeed}      unit="/s" />
-        <StatRow label="Focus Mult"     hint="while boosting"          value={activity.focusMult}    unit="%" />
-        <StatRow label="Harvest Speed"  hint="from Soul"               value={activity.harvestSpeed} locked={!soulUnlocked} />
-        <StatRow label="Harvest Luck"   hint=""                        value={activity.harvestLuck} />
-        <StatRow label="Mining Speed"   hint="from Body"               value={activity.miningSpeed} />
-        <StatRow label="Mining Luck"    hint=""                        value={activity.miningLuck} />
+      <StatGroup title={t('stats.groupActivity')}>
+        <StatRow label={t('statNames.qi_speed')}         hint="base × law mult"         value={activity.qiSpeed}      unit="/s" />
+        <StatRow label={t('statNames.focus_mult')}       hint="while boosting"          value={activity.focusMult}    unit="%" />
+        <StatRow label={t('statNames.harvest_speed')}    hint="from Soul"               value={activity.harvestSpeed} locked={!soulUnlocked} />
+        <StatRow label={t('statNames.harvest_luck')}     hint=""                        value={activity.harvestLuck} />
+        <StatRow label={t('statNames.mining_speed')}     hint="from Body"               value={activity.miningSpeed} />
+        <StatRow label={t('statNames.mining_luck')}      hint=""                        value={activity.miningLuck} />
       </StatGroup>
     </div>
   );

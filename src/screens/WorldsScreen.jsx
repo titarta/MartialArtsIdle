@@ -1,31 +1,22 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import WORLDS from '../data/worlds';
 import ENEMIES from '../data/enemies';
 import { preloadEnemySprites } from '../utils/preload';
 
 const BASE = import.meta.env.BASE_URL;
 
-const TABS = [
-  { id: 'world',   label: 'World'  },
-  { id: 'gather',  label: 'Gather' },
-  { id: 'mine',    label: 'Mine'   },
-];
-
-const SCREEN_MAP = {
-  world:  'combat-arena',
-  gather: 'gathering',
-  mine:   'mining',
-};
-
 // Shows the first idle frame of an enemy sprite as a small card.
 // The idle sheet is 512×128 (4 frames). We clip to the first 128×128
 // by setting the img width to 4× the display size and anchoring left.
 function EnemyChip({ enemyId }) {
+  const { t: tGame } = useTranslation('game');
   const def = ENEMIES[enemyId];
   if (!def?.sprite) return null;
 
   const displaySize = 52;
   const sheetWidth  = displaySize * 4; // 4 frames side by side
+  const enemyName   = tGame(`enemies.${enemyId}.name`, { defaultValue: def.name });
 
   return (
     <div className="enemy-chip">
@@ -35,19 +26,22 @@ function EnemyChip({ enemyId }) {
       >
         <img
           src={`${BASE}sprites/enemies/${def.sprite}-idle.png`}
-          alt={def.name}
+          alt={enemyName}
           style={{ width: sheetWidth, height: displaySize }}
         />
       </div>
-      <span className="enemy-chip-name">{def.name}</span>
+      <span className="enemy-chip-name">{enemyName}</span>
     </div>
   );
 }
 
 function RegionRow({ region, tab, locked, onNavigate }) {
+  const { t } = useTranslation('ui');
+  const { t: tGame }  = useTranslation('game');
+
   const isWorld = tab === 'world';
   const content = isWorld
-    ? { secondary: `Drops: ${region.drops}` }
+    ? { secondary: `${t('worlds.drops')} ${region.drops}` }
     : tab === 'gather'
     ? { primary: region.herbs }
     : { primary: region.ores };
@@ -56,6 +50,11 @@ function RegionRow({ region, tab, locked, onNavigate }) {
   const enemyIds = isWorld
     ? [...new Set((region.enemyPool ?? []).map(e => e.enemyId))]
     : [];
+
+  const regionName  = locked ? '???' : tGame(`regions.${region.name}.name`, { defaultValue: region.name });
+  const minRealmLabel = tGame(`stages.${region.minRealm}.name`, { defaultValue: region.minRealm });
+
+  const SCREEN_MAP = { world: 'combat-arena', gather: 'gathering', mine: 'mining' };
 
   function handleClick() {
     if (isWorld) {
@@ -77,8 +76,8 @@ function RegionRow({ region, tab, locked, onNavigate }) {
     >
       <div className="region-row-left">
         <div className="region-row-info">
-          <span className="region-name">{locked ? '???' : region.name}</span>
-          <span className="region-min-realm">{region.minRealm}</span>
+          <span className="region-name">{regionName}</span>
+          <span className="region-min-realm">{minRealmLabel}</span>
         </div>
         {!locked && !isWorld && content.primary && (
           <div className="region-row-detail">
@@ -102,8 +101,13 @@ function RegionRow({ region, tab, locked, onNavigate }) {
 }
 
 function WorldCard({ world, tab, realmIndex, onNavigate }) {
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   const worldLocked = realmIndex < world.minRealmIndex;
   const [open, setOpen] = useState(!worldLocked && world.id === 1);
+
+  const worldName = tGame(`worlds.${world.id}.name`, { defaultValue: world.name });
 
   // When the world card opens, preload attack + hit sheets for every enemy in
   // this world. Idle is already fetched by the EnemyChip <img> on render.
@@ -127,8 +131,8 @@ function WorldCard({ world, tab, realmIndex, onNavigate }) {
         disabled={worldLocked}
       >
         <div className="world-header-left">
-          <span className="world-number">World {world.id}</span>
-          <span className="world-name">{world.name}</span>
+          <span className="world-number">{t('worlds.worldCard', { n: world.id })}</span>
+          <span className="world-name">{worldName}</span>
         </div>
         <div className="world-header-right">
           <span className="world-realms-tag">{world.realms}</span>
@@ -157,22 +161,29 @@ function WorldCard({ world, tab, realmIndex, onNavigate }) {
 }
 
 function WorldsScreen({ cultivation, onNavigate }) {
+  const { t } = useTranslation('ui');
   const [tab, setTab] = useState('world');
   const realmIndex = cultivation.realmIndex;
 
+  const TABS = [
+    { id: 'world',  tKey: 'worlds.tabWorld'  },
+    { id: 'gather', tKey: 'worlds.tabGather' },
+    { id: 'mine',   tKey: 'worlds.tabMine'   },
+  ];
+
   return (
     <div className="screen worlds-screen">
-      <h1>Worlds</h1>
+      <h1>{t('worlds.title')}</h1>
       <p className="subtitle">{cultivation.realmName}</p>
 
       <div className="worlds-tab-bar">
-        {TABS.map(t => (
+        {TABS.map(tb => (
           <button
-            key={t.id}
-            className={`worlds-tab-btn${tab === t.id ? ' active' : ''}`}
-            onClick={() => setTab(t.id)}
+            key={tb.id}
+            className={`worlds-tab-btn${tab === tb.id ? ' active' : ''}`}
+            onClick={() => setTab(tb.id)}
           >
-            {t.label}
+            {t(tb.tKey)}
           </button>
         ))}
       </div>

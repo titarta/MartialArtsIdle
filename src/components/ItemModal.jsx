@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { RARITY } from '../data/items';
 
 const BASE = import.meta.env.BASE_URL;
 
 function ItemModal({ item, quantity, onClose }) {
+  const { t }       = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   if (!item) return null;
 
   const rarity = RARITY[item.rarity];
@@ -14,16 +18,22 @@ function ItemModal({ item, quantity, onClose }) {
         <div className="modal-sprite">
           <img
             src={`${BASE}sprites/items/${item.id}.png`}
-            alt={item.name}
+            alt={tGame(`items.${item.id}.name`, { defaultValue: item.name })}
             className="modal-icon"
           />
         </div>
-        <h2 className="modal-title">{item.name}</h2>
+        <h2 className="modal-title">
+          {tGame(`items.${item.id}.name`, { defaultValue: item.name })}
+        </h2>
         <span className="modal-rarity" style={{ color: rarity.color }}>
-          {rarity.label}
+          {t(`quality.${item.rarity}`, { defaultValue: rarity.label })}
         </span>
-        <p className="modal-desc">{item.description}</p>
-        <div className="modal-qty">Owned: <strong>{quantity}</strong></div>
+        <p className="modal-desc">
+          {tGame(`items.${item.id}.desc`, { defaultValue: item.description })}
+        </p>
+        <div className="modal-qty">
+          {t('itemModal.owned', { qty: quantity })}
+        </div>
       </div>
     </div>
   );

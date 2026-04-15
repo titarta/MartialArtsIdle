@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ITEMS, RARITY } from '../data/items';
 import { QUALITY, ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 import { LAW_RARITY } from '../data/laws';
@@ -11,31 +12,10 @@ import ItemModal from '../components/ItemModal';
 
 const BASE = import.meta.env.BASE_URL;
 
-const STAT_LABEL = {
-  physical_damage:   'Physical DMG',
-  defense:           'Defense',
-  health:            'Health',
-  soul_toughness:    'Soul Toughness',
-  essence:           'Essence',
-  elemental_defense: 'Elemental DEF',
-};
-
-const MATERIAL_TABS = [
-  { key: 'herbs',       label: 'Herbs'      },
-  { key: 'minerals',    label: 'Minerals'   },
-  { key: 'cultivation', label: 'Cultivation' },
-];
-
-const ALL_TABS = [
-  ...MATERIAL_TABS,
-  { key: 'artefacts',  label: 'Artefacts'  },
-  { key: 'techniques', label: 'Techniques' },
-  { key: 'laws',       label: 'Laws'       },
-];
-
-const MATERIAL_KEYS = new Set(MATERIAL_TABS.map(t => t.key));
-
 function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   const { getQuantity } = inventory;
   const [activeTab, setActiveTab] = useState('herbs');
   const [selectedItem,      setSelectedItem]      = useState(null);
@@ -43,9 +23,20 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
   const [selectedTechnique, setSelectedTechnique] = useState(null);
   const [selectedLaw,       setSelectedLaw]       = useState(null);
 
+  const ALL_TABS = [
+    { key: 'herbs',       tKey: 'inventory.tabHerbs'      },
+    { key: 'minerals',    tKey: 'inventory.tabMinerals'   },
+    { key: 'cultivation', tKey: 'inventory.tabCultivation'},
+    { key: 'artefacts',   tKey: 'inventory.tabArtefacts'  },
+    { key: 'techniques',  tKey: 'inventory.tabTechniques' },
+    { key: 'laws',        tKey: 'inventory.tabLaws'       },
+  ];
+
+  const MATERIAL_KEYS = new Set(['herbs', 'minerals', 'cultivation']);
+
   return (
     <div className="screen inventory-screen">
-      <h1>Inventory</h1>
+      <h1>{t('inventory.title')}</h1>
 
       <div className="inv-tabs">
         {ALL_TABS.map((tab) => (
@@ -54,7 +45,7 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
             className={`inv-tab ${activeTab === tab.key ? 'inv-tab-active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
           >
-            {tab.label}
+            {t(tab.tKey)}
           </button>
         ))}
       </div>
@@ -65,6 +56,7 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
           {ITEMS[activeTab].filter(item => inventory.inventory[item.id] !== undefined).map((item) => {
             const qty    = getQuantity(item.id);
             const rarity = RARITY[item.rarity];
+            const itemName = tGame(`items.${item.id}.name`, { defaultValue: item.name });
             return (
               <button
                 key={item.id}
@@ -74,12 +66,12 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
               >
                 <img
                   src={`${BASE}sprites/items/${item.id}.png`}
-                  alt={item.name}
+                  alt={itemName}
                   className="inv-icon"
                 />
                 <span className="inv-qty">{qty}</span>
                 <span className="inv-name" style={{ color: rarity.color }}>
-                  {item.name}
+                  {itemName}
                 </span>
               </button>
             );
@@ -90,12 +82,13 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
       {/* ── Artefacts ────────────────────────────────────────────────────────── */}
       {activeTab === 'artefacts' && artefacts && (
         <>
-          <p className="inv-cap-label">{artefacts.owned.length} / {MAX_ARTEFACTS} slots</p>
+          <p className="inv-cap-label">{t('inventory.slots', { count: artefacts.owned.length, max: MAX_ARTEFACTS })}</p>
           <div className="inv-grid">
             {artefacts.owned.map((instance) => {
               const art = ARTEFACTS_BY_ID[instance.catalogueId];
               if (!art) return null;
               const q = QUALITY[art.rarity];
+              const artName = tGame(`artefacts.${art.id}.name`, { defaultValue: art.name });
               return (
                 <button
                   key={instance.uid}
@@ -104,8 +97,8 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   onClick={() => setSelectedArtefact(instance)}
                 >
                   <span className="inv-quality-gem" style={{ color: q.color }}>◆</span>
-                  <span className="inv-name" style={{ color: q.color }}>{art.name}</span>
-                  <span className="inv-slot-label">{art.slot}</span>
+                  <span className="inv-name" style={{ color: q.color }}>{artName}</span>
+                  <span className="inv-slot-label">{t(`build.slots.${art.slot}`, { defaultValue: art.slot })}</span>
                 </button>
               );
             })}
@@ -117,11 +110,12 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
       {activeTab === 'techniques' && techniques && (
         <>
           <p className="inv-cap-label">
-            {Object.keys(techniques.ownedTechniques).length} / {MAX_TECHNIQUES} slots
+            {t('inventory.slots', { count: Object.keys(techniques.ownedTechniques).length, max: MAX_TECHNIQUES })}
           </p>
           <div className="inv-grid">
             {Object.values(techniques.ownedTechniques).map((tech) => {
               const color = LAW_RARITY[tech.quality]?.color ?? '#9ca3af';
+              const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
               return (
                 <button
                   key={tech.id}
@@ -130,8 +124,8 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   onClick={() => setSelectedTechnique(tech)}
                 >
                   <span className="inv-quality-gem" style={{ color }}>◆</span>
-                  <span className="inv-name" style={{ color }}>{tech.name}</span>
-                  <span className="inv-slot-label">{tech.type}</span>
+                  <span className="inv-name" style={{ color }}>{techName}</span>
+                  <span className="inv-slot-label">{t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}</span>
                 </button>
               );
             })}
@@ -143,11 +137,12 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
       {activeTab === 'laws' && cultivation && (
         <>
           <p className="inv-cap-label">
-            {cultivation.ownedLaws.length} / {MAX_LAWS} slots
+            {t('inventory.slots', { count: cultivation.ownedLaws.length, max: MAX_LAWS })}
           </p>
           <div className="inv-grid">
             {cultivation.ownedLaws.map((law) => {
               const rarity = LAW_RARITY[law.rarity];
+              const lawName = tGame(`laws.${law.id}.name`, { defaultValue: law.name });
               return (
                 <button
                   key={law.id}
@@ -156,8 +151,8 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   onClick={() => setSelectedLaw(law)}
                 >
                   <span className="inv-quality-gem" style={{ color: rarity.color }}>◆</span>
-                  <span className="inv-name" style={{ color: rarity.color }}>{law.name}</span>
-                  <span className="inv-slot-label">{law.element}</span>
+                  <span className="inv-name" style={{ color: rarity.color }}>{lawName}</span>
+                  <span className="inv-slot-label">{t(`elements.${law.element}`, { defaultValue: law.element })}</span>
                 </button>
               );
             })}
@@ -178,19 +173,21 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
         const art    = ARTEFACTS_BY_ID[selectedArtefact.catalogueId];
         const q      = QUALITY[art.rarity];
         const bonuses = getSlotBonuses(art.slot, art.rarity);
+        const artName = tGame(`artefacts.${art.id}.name`, { defaultValue: art.name });
+        const artDesc = tGame(`artefacts.${art.id}.desc`, { defaultValue: art.description });
         return (
           <div className="modal-overlay" onClick={() => setSelectedArtefact(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <button className="modal-close" onClick={() => setSelectedArtefact(null)}>x</button>
-              <h2 className="modal-title">{art.name}</h2>
+              <h2 className="modal-title">{artName}</h2>
               <span className="modal-rarity" style={{ color: q.color }}>
-                {q.label} · {art.slot}
+                {t(`quality.${art.rarity}`, { defaultValue: q.label })} · {t(`build.slots.${art.slot}`, { defaultValue: art.slot })}
               </span>
-              <p className="modal-desc">{art.description}</p>
+              <p className="modal-desc">{artDesc}</p>
               <div className="item-stat-block">
                 {bonuses.map((b, i) => (
                   <div key={i} className="item-stat-row">
-                    <span className="item-stat-label">{STAT_LABEL[b.stat] ?? b.stat}</span>
+                    <span className="item-stat-label">{t(`statNames.${b.stat}`, { defaultValue: b.stat.replace(/_/g, ' ') })}</span>
                     <span className="item-stat-value" style={{ color: q.color }}>+{b.value}</span>
                   </div>
                 ))}
@@ -205,43 +202,45 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
         const quality = TECHNIQUE_QUALITY[tech.quality] ?? { label: tech.quality, color: '#9ca3af' };
         const typeCol = TYPE_COLOR[tech.type] ?? '#fff';
         const cd      = getCooldown(tech.type, tech.quality);
+        const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
+        const techFlavour = tGame(`techniques.${tech.id}.flavour`, { defaultValue: tech.flavour });
         return (
           <div className="modal-overlay" onClick={() => setSelectedTechnique(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <button className="modal-close" onClick={() => setSelectedTechnique(null)}>x</button>
-              <h2 className="modal-title">{tech.name}</h2>
+              <h2 className="modal-title">{techName}</h2>
               <span className="modal-rarity" style={{ color: quality.color }}>
-                {quality.label} · {tech.rank}
+                {t(`quality.${tech.quality}`, { defaultValue: quality.label })} · {t(`techniqueRanks.${tech.rank}`, { defaultValue: tech.rank })}
               </span>
               <div className="item-stat-block">
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Type</span>
-                  <span className="item-stat-value" style={{ color: typeCol }}>{tech.type}</span>
+                  <span className="item-stat-label">{t('inventory.labelType')}</span>
+                  <span className="item-stat-value" style={{ color: typeCol }}>{t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}</span>
                 </div>
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Cooldown</span>
+                  <span className="item-stat-label">{t('inventory.labelCooldown')}</span>
                   <span className="item-stat-value">{cd.toFixed(1)}s</span>
                 </div>
                 {tech.type === 'Attack' && (
                   <div className="item-stat-row">
-                    <span className="item-stat-label">Damage ×K</span>
+                    <span className="item-stat-label">{t('inventory.labelDmgMult')}</span>
                     <span className="item-stat-value">{getK(tech.rank, tech.quality)}</span>
                   </div>
                 )}
                 {tech.type === 'Heal' && (
                   <div className="item-stat-row">
-                    <span className="item-stat-label">Heal</span>
+                    <span className="item-stat-label">{t('inventory.labelHeal')}</span>
                     <span className="item-stat-value">{Math.round((tech.healPercent ?? 0.25) * 100)}% HP</span>
                   </div>
                 )}
                 {tech.type === 'Defend' && (
                   <>
                     <div className="item-stat-row">
-                      <span className="item-stat-label">DEF Mult</span>
+                      <span className="item-stat-label">{t('inventory.labelDefMult')}</span>
                       <span className="item-stat-value">×{tech.defMult}</span>
                     </div>
                     <div className="item-stat-row">
-                      <span className="item-stat-label">Duration</span>
+                      <span className="item-stat-label">{t('inventory.labelDuration')}</span>
                       <span className="item-stat-value">{tech.buffDuration}s</span>
                     </div>
                   </>
@@ -249,32 +248,35 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                 {tech.type === 'Dodge' && (
                   <>
                     <div className="item-stat-row">
-                      <span className="item-stat-label">Dodge Chance</span>
+                      <span className="item-stat-label">{t('inventory.labelDodgeChance')}</span>
                       <span className="item-stat-value">{Math.round((tech.dodgeChance ?? 0) * 100)}%</span>
                     </div>
                     <div className="item-stat-row">
-                      <span className="item-stat-label">Duration</span>
+                      <span className="item-stat-label">{t('inventory.labelDuration')}</span>
                       <span className="item-stat-value">{tech.buffDuration}s</span>
                     </div>
                   </>
                 )}
                 {tech.element && tech.element !== 'Normal' && (
                   <div className="item-stat-row">
-                    <span className="item-stat-label">Element</span>
-                    <span className="item-stat-value">{tech.element}</span>
+                    <span className="item-stat-label">{t('inventory.labelElement')}</span>
+                    <span className="item-stat-value">{t(`elements.${tech.element}`, { defaultValue: tech.element })}</span>
                   </div>
                 )}
               </div>
               {tech.passives?.length > 0 && (
                 <div className="item-stat-block">
-                  {tech.passives.map((p, i) => (
-                    <p key={i} className="modal-desc">
-                      <strong>{p.name}:</strong> {p.description}
-                    </p>
-                  ))}
+                  {tech.passives.map((p, i) => {
+                    const passiveDesc = tGame(`techniques.${tech.id}.passives.${p.name}`, { defaultValue: p.description });
+                    return (
+                      <p key={i} className="modal-desc">
+                        <strong>{p.name}:</strong> {passiveDesc}
+                      </p>
+                    );
+                  })}
                 </div>
               )}
-              {tech.flavour && <p className="modal-desc tech-item-flavour">"{tech.flavour}"</p>}
+              {techFlavour && <p className="modal-desc tech-item-flavour">"{techFlavour}"</p>}
             </div>
           </div>
         );
@@ -283,35 +285,37 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
       {selectedLaw && (() => {
         const law    = selectedLaw;
         const rarity = LAW_RARITY[law.rarity];
+        const lawName   = tGame(`laws.${law.id}.name`,   { defaultValue: law.name });
+        const lawFlavour = tGame(`laws.${law.id}.flavour`, { defaultValue: law.flavour });
         return (
           <div className="modal-overlay" onClick={() => setSelectedLaw(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <button className="modal-close" onClick={() => setSelectedLaw(null)}>x</button>
-              <h2 className="modal-title">{law.name}</h2>
+              <h2 className="modal-title">{lawName}</h2>
               <span className="modal-rarity" style={{ color: rarity.color }}>
-                {rarity.label} · {law.element}
+                {t(`quality.${law.rarity}`, { defaultValue: rarity.label })} · {t(`elements.${law.element}`, { defaultValue: law.element })}
               </span>
               <div className="item-stat-block">
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Cultivation Speed</span>
+                  <span className="item-stat-label">{t('inventory.labelCultSpeed')}</span>
                   <span className="item-stat-value">×{law.cultivationSpeedMult.toFixed(1)}</span>
                 </div>
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Essence Mult</span>
+                  <span className="item-stat-label">{t('inventory.labelEssenceMult')}</span>
                   <span className="item-stat-value">{law.essenceMult}</span>
                 </div>
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Soul Mult</span>
+                  <span className="item-stat-label">{t('inventory.labelSoulMult')}</span>
                   <span className="item-stat-value">{law.soulMult}</span>
                 </div>
                 <div className="item-stat-row">
-                  <span className="item-stat-label">Body Mult</span>
+                  <span className="item-stat-label">{t('inventory.labelBodyMult')}</span>
                   <span className="item-stat-value">{law.bodyMult}</span>
                 </div>
               </div>
               {law.uniques && Object.keys(law.uniques).length > 0 && (
                 <div className="item-stat-block">
-                  <span className="item-stat-section">Unique Modifiers</span>
+                  <span className="item-stat-section">{t('inventory.labelUniqueModifiers')}</span>
                   {Object.entries(law.uniques).map(([tier, u]) => (
                     u && (
                       <p key={tier} className="modal-desc">
@@ -322,7 +326,7 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   ))}
                 </div>
               )}
-              <p className="modal-desc tech-item-flavour">"{law.flavour}"</p>
+              <p className="modal-desc tech-item-flavour">"{lawFlavour}"</p>
             </div>
           </div>
         );

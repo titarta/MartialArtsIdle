@@ -1,4 +1,5 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
@@ -23,13 +24,15 @@ function getSpriteState(boosting, adBoostActive) {
 }
 
 function ActivePillBadge({ active }) {
+  const { t: tGame } = useTranslation('game');
   const pill = PILLS_BY_ID[active.pillId];
   if (!pill) return null;
   const remaining = Math.max(0, Math.ceil((active.expiresAt - Date.now()) / 1000));
   const color = ITEM_RARITY[pill.rarity]?.color ?? '#aaa';
+  const pillName = tGame(`items.${pill.id}.name`, { defaultValue: pill.name });
   return (
     <div className="active-pill-badge" style={{ borderColor: color }}>
-      <span style={{ color }}>{pill.name}</span>
+      <span style={{ color }}>{pillName}</span>
       <span className="active-pill-time">{remaining}s</span>
     </div>
   );
@@ -38,10 +41,11 @@ function ActivePillBadge({ active }) {
 /** Compact Qi/s readout — updated via rAF against the live rateRef so it
  *  reflects every modifier (law, boost, ad, pills) without React renders. */
 function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
+  const { t } = useTranslation('ui');
   const textRef = useRef(null);
   useEffect(() => {
     if (maxed) {
-      if (textRef.current) textRef.current.textContent = 'Peak Qi';
+      if (textRef.current) textRef.current.textContent = t('home.peakQi');
       return;
     }
     let raf;
@@ -56,7 +60,7 @@ function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
     };
     raf = requestAnimationFrame(update);
     return () => cancelAnimationFrame(raf);
-  }, [rateRef, maxed]);
+  }, [rateRef, maxed, t]);
 
   const cls = `qi-rate${boosting ? ' qi-rate-boosted' : ''}${adBoostActive ? ' qi-rate-ad' : ''}`;
   return (
@@ -70,11 +74,12 @@ function QiRateReadout({ rateRef, boosting, adBoostActive, maxed }) {
 
 /** Circular floating rewarded-ad button — top-right corner of the scene. */
 function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
+  const { t } = useTranslation('ui');
   if (maxed) return null;
 
   if (adBoostActive) {
     return (
-      <div className="hq-btn hq-btn-active" title="Heavenly Qi active">
+      <div className="hq-btn hq-btn-active" title={t('home.heavenlyQiActive')}>
         <span className="hq-icon">✦</span>
         <span className="hq-label">×2</span>
         <span className="hq-sub">{adBoostRemaining}</span>
@@ -88,14 +93,18 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     : ad.isLoading
     ? '…'
     : '✦';
-  const subtitle = ad.isCooldown ? 'Cooldown' : ad.isLoading ? 'Channeling' : 'Heavenly Qi';
+  const subtitle = ad.isCooldown
+    ? t('home.cooldown')
+    : ad.isLoading
+    ? t('home.channeling')
+    : t('home.heavenlyQi');
 
   return (
     <button
       className={`hq-btn${ad.isReady ? ' hq-btn-ready' : ''}${ad.isCooldown ? ' hq-btn-cd' : ''}`}
       onClick={ad.show}
       disabled={disabled}
-      title={ad.isReady ? 'Channel Heavenly Qi — 2× for 30 min' : subtitle}
+      title={ad.isReady ? t('home.channelTitle') : subtitle}
     >
       <span className="hq-icon">{label}</span>
       <span className="hq-sub">{subtitle}</span>
@@ -107,6 +116,7 @@ const HOLD_HINT_SEEN_KEY = 'mai_home_hold_hint_seen';
 const HOLD_HINT_IDLE_MS  = 60 * 1000; // re-show hint after this long without holding
 
 function HomeScreen({ cultivation, pills, inventory }) {
+  const { t } = useTranslation('ui');
   const {
     realmName,
     nextRealmName,
@@ -132,7 +142,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
   useEffect(() => {
     const update = () => {
       const scale = Math.max(window.innerWidth / HOME_BG_W, window.innerHeight / HOME_BG_H);
-      setSpriteScale((HOME_BG_H * scale * 0.21) / 128);
+      setSpriteScale((HOME_BG_H * scale * 0.21) / 192);
     };
     update();
     window.addEventListener('resize', update);
@@ -191,7 +201,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
     : null;
 
   const spriteState = getSpriteState(boosting, adBoostActive);
-  const spriteSrc   = `${BASE}sprites/cultivator/state${spriteState}.png`;
+  const spriteSrc   = `${BASE}sprites/cultivator_upscaled/state${spriteState}.png`;
   const fps         = boosting ? 14 : 5;
 
   return (
@@ -243,14 +253,14 @@ function HomeScreen({ cultivation, pills, inventory }) {
         {/* Hold hint — right below qi/s, fades after first hold */}
         {!maxed && (
           <div className={`home-hold-hint${showHoldHint ? '' : ' home-hold-hint-fade'}`}>
-            Hold to cultivate faster
+            {t('home.holdToCultivate')}
           </div>
         )}
 
         {/* Character — centered in flow */}
         <div
           className={`fighter-stage home-fighter-stage ${boosting ? 'stage-boosted' : ''} ${adBoostActive ? 'stage-ad-boosted' : ''}`}
-          style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
+          style={{ width: `${192 * spriteScale}px`, height: `${192 * spriteScale}px` }}
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
@@ -260,8 +270,8 @@ function HomeScreen({ cultivation, pills, inventory }) {
           <SpriteAnimator
             key={spriteState}
             src={spriteSrc}
-            frameWidth={128}
-            frameHeight={128}
+            frameWidth={192}
+            frameHeight={192}
             frameCount={4}
             fps={fps}
             scale={spriteScale}
@@ -301,7 +311,7 @@ function HomeScreen({ cultivation, pills, inventory }) {
               onClick={() => setPillDrawerOpen(true)}
             >
               <span className="home-pill-btn-icon">◈</span>
-              <span className="home-pill-btn-label">Pills</span>
+              <span className="home-pill-btn-label">{t('home.pills')}</span>
               <span className="home-pill-btn-count">{totalOwnedPills}</span>
             </button>
           )}

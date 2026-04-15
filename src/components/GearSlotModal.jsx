@@ -1,15 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { QUALITY, getSlotBonuses } from '../data/artefacts';
-
-const SLOT_DESC = {
-  head:    'Headbands, crowns, and jade hairpins. Enhances spiritual defence and focus.',
-  neck:    'Pendants and talismans. Provides soul protection and elemental resistance.',
-  body:    'Robes and battle vests. The primary defensive piece.',
-  hands:   'Bracers and gauntlets. Enhances strikes and channels elemental energy.',
-  waist:   'Sashes and belts. Stabilises the dantian and improves qi circulation.',
-  feet:    'Boots and sandals. Improves movement and dodge.',
-  ring:    'Power rings focus combat stats through the meridians.',
-  weapon:  'Weapons provide flat damage and unlock secret technique requirements.',
-};
 
 function bonusSummary(slot, rarity) {
   return getSlotBonuses(slot, rarity)
@@ -18,7 +8,10 @@ function bonusSummary(slot, rarity) {
 }
 
 function ArtefactCard({ artefact, equipped, currentSlot, onEquip, onUnequip }) {
-  const quality = QUALITY[artefact.rarity];
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
+  const quality        = QUALITY[artefact.rarity];
   const isEquippedHere = equipped === artefact.uid;
   const isEquippedElsewhere = !isEquippedHere && currentSlot !== null;
 
@@ -30,33 +23,42 @@ function ArtefactCard({ artefact, equipped, currentSlot, onEquip, onUnequip }) {
       role="button"
     >
       <div className="art-pick-header">
-        <span className="art-pick-name" style={{ color: quality.color }}>{artefact.name}</span>
-        <span className="art-pick-quality" style={{ color: quality.color }}>{quality.label}</span>
+        <span className="art-pick-name" style={{ color: quality.color }}>
+          {tGame(`artefacts.${artefact.id}.name`, { defaultValue: artefact.name })}
+        </span>
+        <span className="art-pick-quality" style={{ color: quality.color }}>
+          {t(`quality.${artefact.rarity}`, { defaultValue: quality.label })}
+        </span>
       </div>
       <span className="art-pick-bonus">{bonusSummary(artefact.slot, artefact.rarity)}</span>
-      {isEquippedHere && <span className="art-pick-tag">Equipped — tap to remove</span>}
-      {isEquippedElsewhere && <span className="art-pick-tag art-pick-tag-elsewhere">In {currentSlot}</span>}
+      {isEquippedHere      && <span className="art-pick-tag">{t('gearSlotModal.tagEquipped')}</span>}
+      {isEquippedElsewhere && (
+        <span className="art-pick-tag art-pick-tag-elsewhere">
+          {t('gearSlotModal.tagInSlot', { slot: currentSlot })}
+        </span>
+      )}
     </div>
   );
 }
 
 function GearSlotModal({ slot, artefacts, onClose }) {
+  const { t } = useTranslation('ui');
+
   if (!slot) return null;
 
-  const equipped  = artefacts.getEquipped(slot.id);        // full artefact obj or null
-  const available = artefacts.getOwnedForSlot(slot.type);  // all owned for this slot type
-  const desc      = SLOT_DESC[slot.type] ?? 'An equipment slot.';
+  const equipped  = artefacts.getEquipped(slot.id);
+  const available = artefacts.getOwnedForSlot(slot.type);
+  const desc      = t(`gearSlotModal.slotDescs.${slot.type}`, { defaultValue: '' });
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content art-pick-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>x</button>
 
-        <h2 className="modal-title">{slot.label}</h2>
+        <h2 className="modal-title">{t(`build.slots.${slot.type}`, { defaultValue: slot.label })}</h2>
         <p className="modal-desc">{desc}</p>
 
-        {/* Equipped */}
-        <p className="art-pick-section-label">Equipped</p>
+        <p className="art-pick-section-label">{t('gearSlotModal.sectionEquipped')}</p>
         {equipped ? (
           <ArtefactCard
             artefact={equipped}
@@ -66,13 +68,12 @@ function GearSlotModal({ slot, artefacts, onClose }) {
             onUnequip={() => { artefacts.unequip(slot.id); onClose(); }}
           />
         ) : (
-          <div className="art-pick-empty">Nothing equipped</div>
+          <div className="art-pick-empty">{t('gearSlotModal.nothingEquipped')}</div>
         )}
 
-        {/* Available */}
         {available.length > 0 && (
           <>
-            <p className="art-pick-section-label">Owned</p>
+            <p className="art-pick-section-label">{t('gearSlotModal.sectionOwned')}</p>
             <div className="art-pick-list">
               {available.map(a => {
                 const inSlot = artefacts.equippedInSlot(a.uid);

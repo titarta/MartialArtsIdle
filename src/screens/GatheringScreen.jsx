@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { HERBS, RARITY_COLOR, ALL_MATERIALS } from '../data/materials';
 
 const BASE_GATHER_SPEED = 3; // gather points per second
@@ -20,6 +21,9 @@ function pickItem(list, lookup) {
 }
 
 function GatheringScreen({ region, inventory, onBack, getFullStats }) {
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   const herbList = parseList(region.herbs);
 
   const [current, setCurrent]   = useState(() => pickItem(herbList, HERBS));
@@ -91,29 +95,35 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const color = RARITY_COLOR[current.rarity] ?? '#aaa';
+  const stats = getFullStats?.();
+  const speed = BASE_GATHER_SPEED + Math.max(0, stats?.harvestSpeed ?? 0);
+  const luck  = stats?.harvestLuck ?? 0;
+
+  const regionName = tGame(`regions.${region.name}.name`, { defaultValue: region.name });
+  const itemName   = tGame(`items.${nameToId(current.name)}.name`, { defaultValue: current.name });
+  const rarityLabel = t(`rarity.${current.rarity}`, { defaultValue: current.rarity });
 
   return (
     <div className="screen harvest-screen">
       <div className="harvest-header">
-        <button className="back-btn" onClick={onBack}>← Back</button>
+        <button className="back-btn" onClick={onBack}>{t('common.back')}</button>
         <div className="harvest-location">
-          <span className="harvest-activity">Gathering</span>
-          <span className="harvest-region">{region.name}</span>
+          <span className="harvest-activity">{t('gathering.activity')}</span>
+          <span className="harvest-region">{regionName}</span>
         </div>
       </div>
 
       <div className="harvest-card">
         <div className="harvest-item-row">
-          <span className="harvest-item-name" style={{ color }}>{current.name}</span>
+          <span className="harvest-item-name" style={{ color }}>{itemName}</span>
           <span className="harvest-item-rarity" style={{ color, borderColor: color }}>
-            {current.rarity}
+            {rarityLabel}
           </span>
         </div>
         <div className="harvest-cost-label">
-          Cost: {current.gatherCost} &nbsp;·&nbsp; Speed: {BASE_GATHER_SPEED + Math.max(0, getFullStats?.()?.harvestSpeed ?? 0)}/s
-          {(getFullStats?.()?.harvestLuck ?? 0) > 0 && (
-            <> &nbsp;·&nbsp; Luck: {getFullStats?.()?.harvestLuck}%</>
-          )}
+          {luck > 0
+            ? t('gathering.costSpeedLuck', { cost: current.gatherCost, speed, luck })
+            : t('gathering.costSpeed', { cost: current.gatherCost, speed })}
         </div>
         <div className="harvest-bar-track">
           <div ref={progressBarRef} className="harvest-bar-fill gather-fill" />
@@ -122,14 +132,14 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
 
       {collected.length > 0 && (
         <div className="harvest-loot">
-          <p className="harvest-loot-title">Collected this session</p>
+          <p className="harvest-loot-title">{t('gathering.collected')}</p>
           {collected.map(item => (
             <div key={item.name} className="harvest-loot-row">
               <span
                 className="harvest-loot-name"
                 style={{ color: RARITY_COLOR[item.rarity] ?? '#aaa' }}
               >
-                {item.name}
+                {tGame(`items.${nameToId(item.name)}.name`, { defaultValue: item.name })}
               </span>
               <span className="harvest-loot-count">×{item.count}</span>
             </div>

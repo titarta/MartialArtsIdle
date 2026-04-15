@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TYPE_COLOR } from '../data/techniques';
 
 const BASE = import.meta.env.BASE_URL;
@@ -26,6 +27,9 @@ const LOG_COLOR = {
 };
 
 function CombatScreen({ cultivation, techniques, combat, inventory, region = null, onBack = null, getFullStats }) {
+  const { t }        = useTranslation('ui');
+  const { t: tGame } = useTranslation('game');
+
   const { phase, enemy, log, startFight } = combat;
   const { equippedTechniques } = techniques;
 
@@ -93,13 +97,17 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
 
   const isFighting = phase === 'fighting';
 
+  const subtitle = region
+    ? tGame(`regions.${region.name}.name`, { defaultValue: region.name })
+    : cultivation.realmName;
+
   return (
     <div className="screen combat-screen">
       {onBack && (
-        <button className="back-btn" onClick={onBack}>← Back</button>
+        <button className="back-btn" onClick={onBack}>{t('common.back')}</button>
       )}
-      <h1>Combat Arena</h1>
-      <p className="subtitle">{region ? region.name : cultivation.realmName}</p>
+      <h1>{t('combat.title')}</h1>
+      <p className="subtitle">{subtitle}</p>
 
       {/* ── Fighter stage ───────────────────────────────────────────────── */}
       <CombatStage
@@ -122,6 +130,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
       <div className="tech-icon-grid">
         {equippedTechniques.filter(Boolean).map((tech, i) => {
           const color = TYPE_COLOR[tech.type];
+          const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
           return (
             <div
               key={i}
@@ -145,7 +154,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
                 />
               </div>
               <span className="tech-icon-name" style={{ color }}>
-                {tech.name}
+                {techName}
               </span>
               <img className="tech-icon-frame" src={`${BASE}ui/card_frame.png`} alt="" />
             </div>
