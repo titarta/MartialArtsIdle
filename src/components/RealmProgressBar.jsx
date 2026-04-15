@@ -1,5 +1,5 @@
 /**
- * Cultivation Qi progress bar — decorative half-bar frame mirrored in CSS.
+ * Cultivation Qi progress bar — single complete bar frame (QI-Progress-Bar.png).
  * Fill and qi label update every animation frame via direct DOM writes (no re-render).
  */
 import { useEffect, useRef } from 'react';
@@ -49,17 +49,16 @@ function RealmProgressBar({ qiRef, costRef, currentRealm, nextRealm, boosting, m
       fillRef.current.classList.toggle('realm-fill-boosted', boosting);
   }, [boosting]);
 
-  const frameSrc = `${BASE}ui/qi_bar_red.png`;
+  const frameSrc = `${BASE}ui/QI-Progress-Bar.png`;
 
   return (
     <div className="realm-bar">
       {/* Single centered stage label above the bar — no clutter at the ends. */}
       <div className="realm-stage-title">{currentRealm}</div>
 
-      {/* Frame: two mirrored halves side-by-side at width:50% each */}
+      {/* Frame: complete bar image, no mirroring needed */}
       <div className="realm-track">
-        <img className="qi-frame-left"  src={frameSrc} alt="" draggable="false" />
-        <img className="qi-frame-right" src={frameSrc} alt="" draggable="false" />
+        <img className="qi-frame" src={frameSrc} alt="" draggable="false" />
 
         {/* Fill sits behind the frame, clipped to the transparent channel region */}
         <div

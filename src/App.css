@@ -653,13 +653,16 @@
   }
 }
 
-/* QI bar anchored above the character — same viewport reference as the
-   fighter stage, so it tracks the sprite on every screen shape. */
-.home-bar-over-char {
+/* Pills: floating bottom-right above the nav bar */
+.home-pill-float {
   position: fixed;
-  transform: translate(-50%, -100%);
-  z-index: 2;
-  padding: 0;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
 }
 
 .home-screen h1 {
@@ -680,7 +683,7 @@
   min-height: 0;
 }
 
-/* Bottom HUD: ad + pills — sits above the fixed nav bar on every platform.
+/* Bottom HUD: QI bar — sits above the fixed nav bar on every platform.
    padding-bottom leaves room for the ~80px nav strip + iOS safe area so
    gameplay elements never get hidden behind it. */
 .home-hud-bottom {
@@ -929,19 +932,17 @@
   color: var(--accent);
 }
 
-/* ── Qi bar: two mirrored half-frames side-by-side ─────────────────────── */
+/* ── Qi bar: single complete frame image ────────────────────────────────── */
 .realm-track {
   position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: row;
-  /* Height is driven by the natural image aspect ratio via height:auto on imgs */
+  /* Height is driven by the natural image aspect ratio via height:auto on img */
 }
 
-/* Left half: natural orientation (dragon head on left) */
-.qi-frame-left {
+/* Complete bar frame — no mirroring or duplication needed */
+.qi-frame {
   display: block;
-  width: 50%;
+  width: 100%;
   height: auto;
   position: relative;
   z-index: 2;
@@ -949,25 +950,14 @@
   user-select: none;
 }
 
-/* Right half: horizontally mirrored (dragon head on right) */
-.qi-frame-right {
-  display: block;
-  width: 50%;
-  height: auto;
-  position: relative;
-  z-index: 2;
-  transform: scaleX(-1);
-  pointer-events: none;
-  user-select: none;
-}
-
-/* Fill bar — sits behind both frame halves, visible through the transparent channel.
-   Red bar (320x60): channel carved at rows 16–42 → top=27%, bottom=28%.
-   No left/right inset — channel extends through dragon head channel rows. */
+/* Fill bar — sits behind the frame, visible through the transparent channel.
+   Centred vertically; user will dial in exact height/offset. */
 .realm-fill {
   position: absolute;
-  top: 27%;
-  bottom: 28%;
+  top: 50%;
+  bottom: auto;
+  height: 22%;
+  transform: translateY(-50%);
   left: 0;
   right: 0;
   background: linear-gradient(to right, #b8860b, #ffd700, #b8860b);
