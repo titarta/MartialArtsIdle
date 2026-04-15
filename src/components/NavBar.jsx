@@ -11,19 +11,24 @@ const SCREENS = [
   { id: 'settings',   tKey: 'nav.config',     emoji: '⚙'           },
 ];
 
-function NavBar({ currentScreen, onNavigate, badges = {} }) {
+function NavBar({ currentScreen, onNavigate, badges = {}, isUnlocked = () => true, getHint = () => null }) {
   const { t } = useTranslation('ui');
 
   return (
     <nav className="navbar">
       {SCREENS.map((screen) => {
-        const label = t(screen.tKey);
-        const hasBadge = badges[screen.id] && currentScreen !== screen.id;
+        const label    = t(screen.tKey);
+        const unlocked = isUnlocked(screen.id);
+        const hint     = !unlocked ? getHint(screen.id) : null;
+        const hasBadge = unlocked && badges[screen.id] && currentScreen !== screen.id;
         return (
           <button
             key={screen.id}
-            className={`nav-btn ${currentScreen === screen.id ? 'active' : ''}`}
-            onClick={() => onNavigate(screen.id)}
+            className={`nav-btn ${currentScreen === screen.id ? 'active' : ''}${!unlocked ? ' nav-btn-locked' : ''}`}
+            onClick={() => unlocked && onNavigate(screen.id)}
+            disabled={!unlocked}
+            title={hint ?? undefined}
+            aria-label={hint ? `${label} — ${hint}` : label}
           >
             <div className="nav-icon-wrap">
               {screen.emoji ? (
@@ -35,7 +40,8 @@ function NavBar({ currentScreen, onNavigate, badges = {} }) {
                   className="nav-icon-img"
                 />
               )}
-              {hasBadge && <span className="nav-badge-dot" />}
+              {hasBadge   && <span className="nav-badge-dot" />}
+              {!unlocked  && <span className="nav-lock-icon">🔒</span>}
             </div>
             <span className="nav-label">{label}</span>
           </button>

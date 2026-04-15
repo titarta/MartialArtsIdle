@@ -26,7 +26,7 @@ const LOG_COLOR = {
   system:         'var(--text-muted)',
 };
 
-function CombatScreen({ cultivation, techniques, combat, inventory, region = null, onBack = null, getFullStats }) {
+function CombatScreen({ cultivation, techniques, combat, inventory, region = null, onBack = null, getFullStats, onRegionCleared = null }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
@@ -91,9 +91,10 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
   // Auto-restart after a short delay whenever a fight ends.
   useEffect(() => {
     if (phase !== 'won' && phase !== 'lost') return;
+    if (phase === 'won' && region?.name) onRegionCleared?.(region.name);
     const t = setTimeout(() => doStartRef.current(), AUTO_RESTART_MS);
     return () => clearTimeout(t);
-  }, [phase]);
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isFighting = phase === 'fighting';
 

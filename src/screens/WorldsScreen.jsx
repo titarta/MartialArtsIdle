@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import WORLDS from '../data/worlds';
 import ENEMIES from '../data/enemies';
 import { preloadEnemySprites } from '../utils/preload';
+import { isWorldUnlocked, getWorldLockHint } from '../data/featureGates';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -35,7 +36,7 @@ function EnemyChip({ enemyId }) {
   );
 }
 
-function RegionRow({ region, tab, locked, onNavigate, worldId }) {
+function RegionRow({ region, tab, locked, lockHint, onNavigate, worldId }) {
   const { t } = useTranslation('ui');
   const { t: tGame }  = useTranslation('game');
 
@@ -73,6 +74,7 @@ function RegionRow({ region, tab, locked, onNavigate, worldId }) {
       className={`region-row${locked ? ' region-locked' : ''}${isWorld && !locked ? ' region-row-world' : ''}`}
       onClick={!locked ? handleClick : undefined}
       role={!locked ? 'button' : undefined}
+      title={locked && lockHint ? lockHint : undefined}
     >
       <div className="region-row-left">
         <div className="region-row-info">
@@ -100,11 +102,13 @@ function RegionRow({ region, tab, locked, onNavigate, worldId }) {
   );
 }
 
-function WorldCard({ world, tab, realmIndex, onNavigate, expandWorldId }) {
+function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavigate, expandWorldId }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
-  const worldLocked = realmIndex < world.minRealmIndex;
+  const worldLocked = !isWorldUnlocked(worldIndex, realmIndex, clearedRegions);
+  const worldHint   = worldLocked ? getWorldLockHint(worldIndex, realmIndex, clearedRegions) : null;
+
   const [open, setOpen] = useState(
     !worldLocked && (world.id === 1 || world.id === expandWorldId)
   );
@@ -131,7 +135,10 @@ function WorldCard({ world, tab, realmIndex, onNavigate, expandWorldId }) {
   }, [open, worldLocked, world.regions]);
 
   return (
-    <div className={`world-card${worldLocked ? ' world-locked' : ''}`}>
+    <div
+      className={`world-card${worldLocked ? ' world-locked' : ''}`}
+      title={worldHint ?? undefined}
+    >
       <button
         className="world-header"
         onClick={() => !worldLocked && setOpen(o => !o)}
@@ -152,26 +159,38 @@ function WorldCard({ world, tab, realmIndex, onNavigate, expandWorldId }) {
 
       {open && !worldLocked && (
         <div className="region-list">
-          {world.regions.map(region => (
-            <RegionRow
-              key={region.name}
-              region={region}
-              tab={tab}
-              locked={realmIndex < region.minRealmIndex}
-              onNavigate={onNavigate}
-              worldId={world.id}
-            />
-          ))}
+          {world.regions.map(region => {
+            const realmLocked    = realmIndex < region.minRealmIndex;
+            // For gather/mine tabs, also require the region's combat to be cleared.
+            const activityLocked = !realmLocked && tab !== 'world'
+              && !clearedRegions.has(region.name);
+            const isLocked = realmLocked || activityLocked;
+            const lockHint = activityLocked
+              ? 'Clear this region in combat first'
+              : undefined;
+            return (
+              <RegionRow
+                key={region.name}
+                region={region}
+                tab={tab}
+                locked={isLocked}
+                lockHint={lockHint}
+                onNavigate={onNavigate}
+                worldId={world.id}
+              />
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab }) {
+function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clearedRegions }) {
   const { t } = useTranslation('ui');
   const [tab, setTab] = useState(activeTab ?? 'world');
   const realmIndex = cultivation.realmIndex;
+  const cleared    = clearedRegions ?? new Set();
 
   const TABS = [
     { id: 'world',  tKey: 'worlds.tabWorld'  },
@@ -197,12 +216,14 @@ function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab }) {
       </div>
 
       <div className="worlds-list">
-        {WORLDS.map(world => (
+        {WORLDS.map((world, worldIndex) => (
           <WorldCard
             key={world.id}
             world={world}
+            worldIndex={worldIndex}
             tab={tab}
             realmIndex={realmIndex}
+            clearedRegions={cleared}
             onNavigate={onNavigate}
             expandWorldId={expandWorldId}
           />

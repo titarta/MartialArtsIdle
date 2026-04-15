@@ -26,6 +26,8 @@ import { initDebug } from './debug/gameDebug';
 import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
 import useNotifications from './hooks/useNotifications';
 import useSelections from './hooks/useSelections';
+import useClearedRegions from './hooks/useClearedRegions';
+import useFeatureFlags from './hooks/useFeatureFlags';
 import ToastStack from './components/ToastStack';
 import SelectionModal from './components/SelectionModal';
 import './App.css';
@@ -38,13 +40,14 @@ function App() {
   useEffect(() => { initAds(); }, []);
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
 
-  const cultivation = useCultivation();
-  const inventory   = useInventory();
-  const techniques  = useTechniques();
-  const combat      = useCombat();
-  const artefacts   = useArtefacts();
-  const pills       = usePills();
-  const selections  = useSelections({ cultivation });
+  const cultivation     = useCultivation();
+  const inventory       = useInventory();
+  const techniques      = useTechniques();
+  const combat          = useCombat();
+  const artefacts       = useArtefacts();
+  const pills           = usePills();
+  const selections      = useSelections({ cultivation });
+  const { clearedRegions, clearRegion } = useClearedRegions();
 
   // Keep pill qi multiplier in sync with cultivation game loop
   const pillQiMult = pills.getQiMult();
@@ -127,6 +130,17 @@ function App() {
 
   const notifications = useNotifications({ cultivation, inventory });
 
+  const featureFlags = useFeatureFlags({
+    cultivation,
+    clearedRegions,
+    inventory,
+    onUnlock: (featureId, msg) => notifications.addToast({
+      message: msg,
+      targetScreen: featureId === 'combat' || featureId === 'gathering' || featureId === 'mining'
+        ? 'combat' : featureId,
+    }),
+  });
+
   // Keep a live ref to all hooks so debug commands always see fresh state.
   const hooksRef = useRef({});
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm };
@@ -148,7 +162,7 @@ function App() {
     home:      <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} />,
     training:  <TrainingScreen />,
     // Worlds hub — the NavBar "Worlds" tab always lands here
-    combat:    <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} />,
+    combat:    <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
                       cultivation={cultivation}
@@ -158,6 +172,7 @@ function App() {
                       region={screenParam?.region ?? null}
                       onBack={goBack}
                       getFullStats={getFullStats}
+                      onRegionCleared={clearRegion}
                     />,
     gathering: screenParam?.region
                  ? <GatheringScreen region={screenParam.region} inventory={inventory} onBack={goBack} getFullStats={getFullStats} />
@@ -178,6 +193,8 @@ function App() {
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
         badges={notifications.badges}
+        isUnlocked={featureFlags.isUnlocked}
+        getHint={featureFlags.getHint}
       />
       <main className="screen-container">
         {screens[currentScreen]}

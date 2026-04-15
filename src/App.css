@@ -114,6 +114,22 @@
   pointer-events: none;
 }
 
+/* Locked nav tab */
+.nav-btn-locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.nav-lock-icon {
+  position: absolute;
+  bottom: -4px;
+  right: -6px;
+  font-size: 9px;
+  line-height: 1;
+  pointer-events: none;
+}
+
 /* Toast stack — sits above navbar */
 .toast-stack {
   position: fixed;

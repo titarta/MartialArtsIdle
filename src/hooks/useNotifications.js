@@ -102,5 +102,9 @@ export default function useNotifications({ cultivation, inventory }) {
     setToastQueue(q => q.filter(t => t.id !== id));
   }, []);
 
-  return { badges, toastQueue, clearBadge, dismissToast };
+  const addToast = useCallback((toast) => {
+    setToastQueue(q => [...q, { id: `ext-${++toastCounter}`, ...toast }]);
+  }, []);
+
+  return { badges, toastQueue, clearBadge, dismissToast, addToast };
 }
