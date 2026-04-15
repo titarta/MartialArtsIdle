@@ -1,4 +1,17 @@
-name: Deploy to GitHub Pages
+# GitHub Pages deploy — DEV deployment.
+#
+# This workflow builds `main` with `--mode designer`, which includes the
+# admin panel (accessible at ?designer=1) and treats this URL as the dev /
+# staging environment. Shipping builds come from the `release` branch via
+# a separate pipeline (to be added when a shipping target is chosen).
+#
+# Promotion flow: when main is ready to cut a stable release, manually merge
+# main into release:
+#   git checkout release && git merge main && git push
+# From that point, release is the source of truth for Steam / mobile /
+# Electron builds until the next promotion.
+
+name: Deploy to GitHub Pages (Dev)
 
 on:
   push:
@@ -34,7 +47,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
-      - run: npm run build
+      # Build with `designer` mode so the admin panel is accessible at
+      # ?designer=1 on the deployed URL. PAT-gated, so end users visiting
+      # without a token can't commit anything.
+      - run: npm run build:designer
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
