@@ -9,6 +9,7 @@
 import ENEMIES from '../data/enemies.js';
 import { ITEMS }  from '../data/items.js';
 import WORLDS from '../data/worlds.js';
+import { ALL_MATERIALS } from '../data/materials.js';
 
 export function enemyIdOptions() {
   return Object.keys(ENEMIES).map((id) => ({ value: id, label: `${id} — ${ENEMIES[id].name}` }));
@@ -43,6 +44,46 @@ export function spriteOptions() {
 
 export function worldIdOptions() {
   return WORLDS.map((w) => ({ value: w.id, label: `${w.id} — ${w.name}` }));
+}
+
+/**
+ * Items that can be dropped by enemies: blood_core + cultivation types.
+ * Used by the enemy drops schema to restrict the itemId dropdown.
+ */
+export function combatDropItemOptions() {
+  const all = [];
+  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
+    if (mat.type === 'blood_core' || mat.type === 'cultivation') {
+      all.push({ value: id, label: `${id} — ${mat.name}` });
+    }
+  }
+  return all;
+}
+
+/**
+ * Items that can appear in gatherDrops: herbs + cultivation types.
+ */
+export function gatherDropItemOptions() {
+  const all = [];
+  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
+    if (mat.type === 'herb' || mat.type === 'cultivation') {
+      all.push({ value: id, label: `${id} — ${mat.name}` });
+    }
+  }
+  return all;
+}
+
+/**
+ * Items that can appear in mineDrops: ores + cultivation types.
+ */
+export function mineDropItemOptions() {
+  const all = [];
+  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
+    if (mat.type === 'ore' || mat.type === 'cultivation') {
+      all.push({ value: id, label: `${id} — ${mat.name}` });
+    }
+  }
+  return all;
 }
 
 export function rarityOptions() {

@@ -1,13 +1,19 @@
-import { enemyIdOptions } from '../enumSources.js';
+import { enemyIdOptions, gatherDropItemOptions, mineDropItemOptions } from '../enumSources.js';
 
 /**
  * World record schema (src/data/worlds.js default export).
  * A world has top-level fields + an array of regions, each with its own
- * enemy pool, drops, herbs, and ores.
+ * enemy pool, gather drops, and mine drops.
+ *
+ * Combat drops live in enemies.js (per-enemy). Regions no longer carry
+ * a `drops`, `herbs`, or `ores` field.
  */
-const dropRow = [
-  { key: 'itemId', type: 'string', label: 'Item id' }, // TODO: enum once items domain added
-  { key: 'chance', type: 'number', label: 'Chance', min: 0, max: 1, step: 0.01 },
+
+/** Shared drop row: { itemId, chance, qty } */
+const makeDropRow = (itemOptions) => [
+  { key: 'itemId', type: 'enum',   label: 'Item',   options: itemOptions },
+  { key: 'chance', type: 'number', label: 'Chance', min: 0, max: 1, step: 0.01,
+    help: '0..1 independent probability per gather/mine cycle.' },
   { key: 'qty',    type: 'array',  label: 'Qty range [min, max]', itemType: 'number' },
 ];
 
@@ -27,9 +33,20 @@ const regionSchema = [
         help: 'Relative weight; higher = more likely.' },
     ],
   },
-  { key: 'drops', type: 'array', label: 'Drops',  itemSchema: dropRow },
-  { key: 'herbs', type: 'array', label: 'Herbs',  itemType: 'string' },
-  { key: 'ores',  type: 'array', label: 'Ores',   itemType: 'string' },
+  {
+    key: 'gatherDrops',
+    type: 'array',
+    label: 'Gather drops',
+    help: 'Herbs + QI stone bonus drops. Herbs are primary (always given); cultivation items roll independently.',
+    itemSchema: makeDropRow(gatherDropItemOptions),
+  },
+  {
+    key: 'mineDrops',
+    type: 'array',
+    label: 'Mine drops',
+    help: 'Ores + QI stone bonus drops. Ores are primary (always given); cultivation items roll independently.',
+    itemSchema: makeDropRow(mineDropItemOptions),
+  },
 ];
 
 export default [

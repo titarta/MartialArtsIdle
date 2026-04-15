@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   PILLS, PILLS_BY_ID, ITEM_RARITY,
@@ -17,19 +17,47 @@ function DrawerPillCard({ pill, qty, onUse }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
+  const [floats, setFloats] = useState([]);
+
   const color    = ITEM_RARITY[pill.rarity]?.color ?? '#aaa';
   const pillName = tGame(`items.${pill.id}.name`, { defaultValue: pill.name });
 
   function formatPillEffect(eff) {
     const label = t(`statNamesShort.${eff.stat}`, { defaultValue: eff.stat });
     if (eff.stat === 'qi_speed' || eff.type === 'increased') {
-      return t('pillDrawer.effectPct', { pct: Math.round(eff.value * 100), stat: label, dur: pill.duration });
+      return t('pillDrawer.effectPct', { pct: Math.round(eff.value * 100), stat: label });
     }
-    return t('pillDrawer.effectFlat', { val: eff.value, stat: label, dur: pill.duration });
+    return t('pillDrawer.effectFlat', { val: eff.value, stat: label });
   }
 
+  const handleUse = useCallback(() => {
+    const deltas = onUse();
+    if (!deltas?.length) return;
+
+    const newFloats = deltas.map((d, i) => {
+      const statLabel = t(`statNamesShort.${d.stat}`, { defaultValue: d.stat });
+      const isIncreased = d.stat === 'qi_speed' || !pill.effects.find(e => e.stat === d.stat && e.type === 'flat');
+      const text = isIncreased
+        ? `+${Math.round(d.value * 100)}% ${statLabel}`
+        : `+${d.value} ${statLabel}`;
+      return { id: `${Date.now()}-${i}`, text };
+    });
+
+    setFloats(prev => [...prev, ...newFloats]);
+    setTimeout(() => {
+      setFloats(prev => prev.filter(f => !newFloats.some(n => n.id === f.id)));
+    }, 1300);
+  }, [onUse, pill.effects, t]);
+
   return (
-    <div className="pill-drawer-card" style={{ borderColor: color }}>
+    <div className="pill-drawer-card" style={{ borderColor: color, position: 'relative', overflow: 'visible' }}>
+      {/* Floating stat gain animations */}
+      {floats.map(f => (
+        <span key={f.id} className="pill-stat-float" style={{ color }}>
+          {f.text}
+        </span>
+      ))}
+
       <div className="pill-drawer-card-head">
         <span className="pill-drawer-card-name" style={{ color }}>{pillName}</span>
         <span className="pill-drawer-card-qty">×{qty}</span>
@@ -39,7 +67,9 @@ function DrawerPillCard({ pill, qty, onUse }) {
           <div key={i} className="pill-drawer-card-effect">{formatPillEffect(eff)}</div>
         ))}
       </div>
-      <button className="pill-drawer-card-use" onClick={onUse}>{t('pillDrawer.use')}</button>
+      <button className="pill-drawer-card-use" onClick={handleUse} disabled={qty <= 0}>
+        {t('pillDrawer.use')}
+      </button>
     </div>
   );
 }

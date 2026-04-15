@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS from '../data/realms';
 import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
 import { saveGame, loadGame } from '../systems/save';
-import { PILLS_BY_ID } from '../data/pills';
 import { rollLawMult } from '../data/affixPools';
 import { pickRandomUnique, rollUniqueValue } from '../data/lawUniques';
 import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
@@ -149,29 +148,17 @@ export default function useCultivation() {
       if (offlineQiMods.length > 0) offlineQiMult = computeStat(1, offlineQiMods);
     }
 
-    const baseRate = BASE_RATE * lawMult * offlineQiMult;
-
-    // Base earnings for the full offline window
-    let total = baseRate * awaySeconds;
-
-    // Add pill qi_speed contributions, prorated to how long each pill overlapped
+    // Permanent pill qi_speed bonus (always active — no expiry)
+    let pillQiSpeedBonus = 0;
     try {
-      const activePillsRaw = localStorage.getItem('mai_active_pills');
-      if (activePillsRaw) {
-        const activePills = JSON.parse(activePillsRaw);
-        for (const active of activePills) {
-          if (active.expiresAt <= saved.lastSeen) continue; // already expired before we closed
-          const pill = PILLS_BY_ID[active.pillId];
-          if (!pill) continue;
-          const pillSeconds = (Math.min(active.expiresAt, now) - saved.lastSeen) / 1000;
-          for (const eff of pill.effects) {
-            if (eff.stat === 'qi_speed') {
-              total += BASE_RATE * lawMult * offlineQiMult * eff.value * pillSeconds;
-            }
-          }
-        }
+      const permStatsRaw = localStorage.getItem('mai_permanent_pill_stats');
+      if (permStatsRaw) {
+        pillQiSpeedBonus = JSON.parse(permStatsRaw).qi_speed ?? 0;
       }
     } catch {}
+
+    const baseRate = BASE_RATE * lawMult * offlineQiMult * (1 + pillQiSpeedBonus);
+    const total = baseRate * awaySeconds;
 
     return Math.floor(total);
   });
@@ -181,6 +168,8 @@ export default function useCultivation() {
 
   const pillQiMultRef      = useRef(1);
   const selectionQiMultRef = useRef(1);
+  // Crystal flat qi/sec bonus — written by App.jsx from useQiCrystal.crystalQiBonus
+  const crystalQiBonusRef  = useRef(0);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
   // Default 300% = the legacy 3× behavior; App.jsx writes the player's actual
   // focus mult into this ref each second.
@@ -235,7 +224,7 @@ export default function useCultivation() {
         const boostMult = boostRef.current
           ? Math.max(1, (focusMultRef.current ?? 300) / 100)
           : 1;
-        const rate = BASE_RATE * lawMult * qiUniqueMult *
+        const rate = (BASE_RATE + crystalQiBonusRef.current) * lawMult * qiUniqueMult *
           boostMult *
           adBoostRef.current * pillQiMultRef.current * selectionQiMultRef.current;
         rateRef.current = rate;
@@ -329,6 +318,8 @@ export default function useCultivation() {
     pillQiMultRef,
     // Selection qi speed multiplier ref — updated by App.jsx
     selectionQiMultRef,
+    // QI Crystal flat bonus ref — updated by App.jsx from useQiCrystal
+    crystalQiBonusRef,
     // Focus multiplier ref (qi_focus_mult, in %) — updated by App.jsx every second
     focusMultRef,
     // Ads

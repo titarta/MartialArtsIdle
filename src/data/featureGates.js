@@ -28,36 +28,33 @@ const BASELINE = {
     unlockMsg: null,
   },
   combat: {
-    gate: { type: 'realm', minRealmIndex: 1 },
-    hint: 'Reach Tempered Body Layer 2',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Worlds are open. Begin your conquest.',
   },
   character: {
-    gate: { type: 'region_clear_any' },
-    hint: 'Win your first fight',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Character screen unlocked. Equip techniques and artefacts.',
   },
   gathering: {
-    gate: { type: 'region_clear_any' },
-    hint: 'Win your first fight',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Gathering unlocked. Forage herbs in cleared regions.',
   },
   mining: {
-    gate: { type: 'realm', minRealmIndex: 4 },
-    hint: 'Reach Tempered Body Layer 5',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Mining unlocked. Dig for ores in cleared regions.',
   },
   collection: {
-    gate: { type: 'item_any' },
-    hint: 'Find your first item',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Collection unlocked. Browse your acquired items.',
   },
   production: {
-    gate: { type: 'all', gates: [
-      { type: 'item_category', category: 'herbs' },
-      { type: 'item_category', category: 'minerals' },
-    ]},
-    hint: 'Gather herbs and minerals to unlock',
+    gate: { type: 'realm', minRealmIndex: 0 },
+    hint: 'Reach Tempered Body Layer 1',
     unlockMsg: 'Production unlocked. Craft pills and gear.',
   },
   settings: {

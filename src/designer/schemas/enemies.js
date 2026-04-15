@@ -1,4 +1,4 @@
-import { itemIdOptions, spriteOptions } from '../enumSources.js';
+import { combatDropItemOptions, spriteOptions } from '../enumSources.js';
 
 /**
  * Per-enemy schema. Values match the shape declared in src/data/enemies.js:
@@ -8,6 +8,9 @@ import { itemIdOptions, spriteOptions } from '../enumSources.js';
  *     drops: [{ itemId, chance, qty: [min, max] }],
  *     techniqueDrop?: { chance },
  *   }
+ *
+ * Combat drops are restricted to blood_core + cultivation (QI stone) item types.
+ * Minerals are gathering/mining-only and must NOT appear in enemy drops.
  */
 export default [
   { key: 'name',        type: 'string',   label: 'Display name' },
@@ -29,8 +32,10 @@ export default [
     key: 'drops',
     type: 'array',
     label: 'Drops',
+    help: 'Blood cores + QI stones only. Minerals must NOT be added here — they drop from mining only.',
     itemSchema: [
-      { key: 'itemId', type: 'enum',   label: 'Item',   options: itemIdOptions },
+      { key: 'itemId', type: 'enum',   label: 'Item',   options: combatDropItemOptions,
+        help: 'Only blood_core and cultivation (QI stone) items are valid combat drops.' },
       { key: 'chance', type: 'number', label: 'Chance', min: 0, max: 1, step: 0.01,
         help: '0..1 probability per kill.' },
       { key: 'qty',    type: 'array',  label: 'Qty range [min, max]', itemType: 'number' },

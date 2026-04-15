@@ -1,116 +1,134 @@
 # Materials
 
-Raw crafting resources used in **pill crafting** (alchemy) and the **[[Crafting|Refining Furnace]]**. Dropped from enemies in combat zones, purchased in the Shop, or found in the world.
-
----
-
-## Herbs
-
-Botanical materials used primarily in alchemy.
-
-| ID | Name | Rarity | Description |
-|---|---|---|---|
-| soul_calming_grass | Soul Calming Grass | Common | A pale blue herb used to treat spiritual sea injuries and stabilize consciousness during breakthroughs. |
-| jade_heart_flower | Jade Heart Flower | Uncommon | A translucent blossom that stabilizes volatile pill recipes and soothes meridian damage. |
-| netherworld_flame_mushroom | Netherworld Flame Mushroom | Uncommon | Thrives near underground fire veins; a key ingredient in flame-attribute alchemical refinements. |
-| thousand_year_ginseng | Thousand-Year Ginseng | Rare | A deeply rooted spiritual herb that accumulates vitality over centuries, used as a base in longevity elixirs. |
-| blood_lotus | Blood Lotus | Rare | Grows only in pools of demonic beast blood, prized for refining body-tempering pills. |
-| dragon_saliva_grass | Dragon Saliva Grass | Rare | Emits a faint draconic pressure; used in pills that enhance bloodline purity. |
-| purple_cloud_vine | Purple Cloud Vine | Epic | A high-altitude creeper saturated with lightning-attribute energy, essential for tribulation-resistance pills. |
-| immortal_revival_leaf | Immortal Revival Leaf | Legendary | Legendary herb said to pull cultivators back from the brink of death, requiring ten thousand years to mature. |
-
----
-
-## Minerals
-
-Ores and crystals used primarily in artefact refining.
-
-| ID | Name | Rarity | Description |
-|---|---|---|---|
-| black_tortoise_iron | Black Tortoise Iron | Common | Extraordinarily dense and durable ore ideal for defensive armors and shields. |
-| crimson_flame_crystal | Crimson Flame Crystal | Uncommon | A fire-element crystal that keeps weapons permanently heated, boosting destructive power. |
-| chaos_jade | **Chaos Jade** | Uncommon | A mottled gem that pulses with unstable energy. Used in the Refining Furnace to reroll a single artefact property without disturbing the rest. Drops from World 2+ enemies. |
-| void_stone | Void Stone | Rare | A space-attribute mineral used to craft spatial rings and dimensional arrays. Also used to Transmute artefact affixes. |
-| mithril_essence | Mithril Essence | Rare | A lightweight, magic-conductive silver ore prized for inscription work and formation plates. Key material for Imbue operations on artefacts. |
-| sealing_shard | **Sealing Shard** | Rare | A fragment of an ancient sealing formation array. Used to lock one property of any item (Artefact, Technique, or Law) against future alterations. Drops from World 3+ enemies. |
-| deep_sea_cold_iron | Deep Sea Cold Iron | Rare | Mined from abyssal ocean trenches, it infuses weapons with bone-chilling ice energy. |
-| star_metal_ore | Star Metal Ore | Epic | Meteorite-born metal that channels astral energy, favored for forging heaven-grade weapons and quality upgrades. |
-| skyfire_meteorite | Skyfire Meteorite | Epic | Contains compressed solar essence; a single fragment can serve as a forge's eternal heat source. |
-| heavenly_profound_metal | Heavenly Profound Metal | Legendary | Nearly indestructible alloy-base reserved for Transcendent-grade artefact upgrades. |
-
----
-
-## Cultivation Materials
-
-Spiritual resources that fuel cultivation directly or are used as ingredients.
-
-| ID | Name | Rarity | Description |
-|---|---|---|---|
-| spirit_stone | Spirit Stone | Common | The universal currency and cultivation fuel of the martial world, containing condensed spiritual energy. |
-| beast_core | Beast Core | Uncommon | A crystal harvested from the body of a demonic beast, holding its accumulated elemental energy. |
-| origin_crystal | Origin Crystal | Rare | A higher-order spirit stone containing primal world energy, valued at thousands of ordinary spirit stones. |
-| heaven_spirit_dew | Heaven Spirit Dew | Epic | Liquid spiritual energy that collects in ancient sacred grounds, drastically accelerating cultivation speed. |
-| elemental_essence_bead | Elemental Essence Bead | Epic | A naturally formed pearl of pure elemental power left behind by ancient beasts or natural phenomena. |
+Raw crafting resources used in **pill crafting** (alchemy), the **[[Crafting|Refining Furnace]]**, and the **[[QI Crystal]]** upgrade. Acquired from combat, gathering, and mining — each activity drops its own material types.
 
 ---
 
 ## Rarity Tiers
 
+All materials use the unified five-tier rarity system:
+
 | Tier | Color |
 |---|---|
-| Common | `#aaa` |
-| Uncommon | `#4ade80` (green) |
-| Rare | `#60a5fa` (blue) |
-| Epic | `#c084fc` (purple) |
-| Legendary | `#f59e0b` (gold) |
+| Iron | `#9ca3af` (grey) |
+| Bronze | `#cd7f32` (bronze) |
+| Silver | `#c0c0c0` (silver) |
+| Gold | `#f5c842` (gold) |
+| Transcendent | `#c084fc` (purple) |
 
 ---
 
-## Acquisition
+## Herbs
 
-| Source | Unlocked At |
-|---|---|
-| Combat drops | [[Realm Progression#Tempered Body|Tempered Body]] |
-| Shop (buy/sell) | [[Realm Progression#Tempered Body|Tempered Body]] |
-| World finds | TBD |
+Botanical materials gathered from world regions. Used in alchemy (pill crafting).
+**Drop source: Gathering only.**
 
----
-
-## Crafting Uses (Summary)
-
-Crafting uses **minerals only**. See [[Crafting]] for full cost tables.
-
-| Mineral | Primary Crafting Use |
-|---|---|
-| Black Tortoise Iron | Upgrade Iron→Bronze; Refine (low tier); Extract |
-| Crimson Flame Crystal | Upgrade Bronze→Silver; Refine (mid tier) |
-| **Chaos Jade** | Hone — targeted single-property reroll |
-| Void Stone | Upgrade Silver→Gold; Transmute |
-| Mithril Essence | Imbue — adding new properties |
-| Deep Sea Cold Iron | Seal — locking a property in place |
-| Star Metal Ore | Upgrade Gold→Transcendent; Refine (high tier) |
-| Skyfire Meteorite | Refine at epic/legendary quality |
-| Heavenly Profound Metal | Upgrade to Transcendent |
+| ID | Name | Rarity |
+|---|---|---|
+| iron_herb_1 | Mortal Qi Grass | Iron |
+| iron_herb_2 | Wild Spirit Root | Iron |
+| bronze_herb_1 | Qi Vein Vine | Bronze |
+| bronze_herb_2 | Misty Forest Bloom | Bronze |
+| silver_herb_1 | Desert Silver Lotus | Silver |
+| silver_herb_2 | Blood Reed | Silver |
+| gold_herb_1 | Burial Ground Lotus | Gold |
+| gold_herb_2 | Void Thorn Vine | Gold |
+| transcendent_herb_1 | Origin Spring Petal | Transcendent |
+| transcendent_herb_2 | Heaven Root Vine | Transcendent |
 
 ---
 
-## TODO
+## Ores / Minerals
 
-- [ ] Define material drop tables per zone/realm tier
-- [ ] Add Chaos Jade and Sealing Shard to enemy drop tables (World 2+ and World 3+ respectively)
-- [ ] Define which materials are used in which pill recipes
-- [ ] Define shop pricing per rarity tier
+Mineral resources mined from world regions. Used in artefact refining.
+**Drop source: Mining only.**
+
+| ID | Name | Rarity |
+|---|---|---|
+| iron_mineral_1 | Sect Iron Shard | Iron |
+| iron_mineral_2 | Iron Vein Shard | Iron |
+| bronze_mineral_1 | Qi Fang | Bronze |
+| bronze_mineral_2 | Spirit Wood Core | Bronze |
+| silver_mineral_1 | Iron Spine Scale | Silver |
+| silver_mineral_2 | Immortal Array Jade | Silver |
+| gold_mineral_1 | Saint Bone Sliver | Gold |
+| gold_mineral_2 | Forbidden Seal Shard | Gold |
+| transcendent_mineral_1 | Void Crystal | Transcendent |
+| transcendent_mineral_2 | World Stone Core | Transcendent |
+
+---
+
+## QI Stones (Cultivation Materials)
+
+Ambient spiritual energy condensed into stone form. Drop as **bonus drops** from all three activities (gathering, mining, and combat). Used to upgrade the **[[QI Crystal]]**.
+
+Two variants per rarity tier (placeholder names until lore is finalised).
+
+| ID | Name | Rarity | Drop sources |
+|---|---|---|---|
+| iron_cultivation_1 | Iron QI Stone 1 | Iron | All activities |
+| iron_cultivation_2 | Iron QI Stone 2 | Iron | All activities |
+| bronze_cultivation_1 | Bronze QI Stone 1 | Bronze | All activities |
+| bronze_cultivation_2 | Bronze QI Stone 2 | Bronze | All activities |
+| silver_cultivation_1 | Silver QI Stone 1 | Silver | All activities |
+| silver_cultivation_2 | Silver QI Stone 2 | Silver | All activities |
+| gold_cultivation_1 | Gold QI Stone 1 | Gold | All activities |
+| gold_cultivation_2 | Gold QI Stone 2 | Gold | All activities |
+| transcendent_cultivation_1 | Transcendent QI Stone 1 | Transcendent | All activities |
+| transcendent_cultivation_2 | Transcendent QI Stone 2 | Transcendent | All activities |
+
+---
+
+## Blood Cores
+
+Dense crystallised blood essence extracted from defeated enemies. **Combat drops only.**
+Rarity is determined by the enemy's power level, not the world number.
+
+| ID | Name | Rarity | Enemy power range |
+|---|---|---|---|
+| iron_blood_core_1 | Iron Blood Core 1 | Iron | World 1 (statMult avg ≤ 1.2) |
+| iron_blood_core_2 | Iron Blood Core 2 | Iron | World 1 |
+| bronze_blood_core_1 | Bronze Blood Core 1 | Bronze | Early World 2 (~1.5) |
+| bronze_blood_core_2 | Bronze Blood Core 2 | Bronze | Early World 2 |
+| silver_blood_core_1 | Silver Blood Core 1 | Silver | Mid World 2 (~1.5–2.5) |
+| silver_blood_core_2 | Silver Blood Core 2 | Silver | Mid World 2 |
+| gold_blood_core_1 | Gold Blood Core 1 | Gold | World 3 (~2.5–4.5) |
+| gold_blood_core_2 | Gold Blood Core 2 | Gold | World 3 |
+| transcendent_blood_core_1 | Transcendent Blood Core 1 | Transcendent | World 4–6 (> 4.0) |
+| transcendent_blood_core_2 | Transcendent Blood Core 2 | Transcendent | World 4–6 |
+
+---
+
+## Drop Rules (Summary)
+
+| Activity | Primary drops | Bonus drops |
+|---|---|---|
+| **Gathering** | Herbs (matching region tier) | QI stones (cultivation) |
+| **Mining** | Ores (matching region tier) | QI stones (cultivation) |
+| **Combat** | Blood cores (per-enemy rarity) | QI stones (cultivation) |
+
+> **Key rule:** Minerals NEVER drop from combat. Blood cores NEVER drop from gathering or mining. QI stones drop everywhere as a consistent bonus resource.
+
+---
+
+## Gather / Mine Costs (Base Speed = 3 pts/sec)
+
+| Rarity | Cost (pts) | Time (base) |
+|---|---|---|
+| Iron | 15 | ~5s |
+| Bronze | 60 | ~20s |
+| Silver | 180 | ~1 min |
+| Gold | 600 | ~3.3 min |
+| Transcendent | 1800 | ~10 min |
 
 ---
 
 ## Related
 
+- [[QI Crystal]]
 - [[Crafting]]
 - [[Items]]
 - [[Combat]]
 - [[Realm Progression]]
-- [[Reincarnation]]
-
----
-
-## Claude Commands
+- [[Worlds/Gathering]]
+- [[Worlds/Mining]]

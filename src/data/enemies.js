@@ -14,6 +14,15 @@
  *     atk — scales enemy attack damage
  *
  * drops: array of { itemId, chance 0–1, qty [min, max] }
+ *   Combat drops: blood cores (per-enemy rarity) + QI stones (cultivation materials).
+ *   Minerals are gathering/mining-only and NEVER drop from enemies.
+ *
+ * Blood core rarity by enemy power:
+ *   Iron        → statMult avg ≤ 1.2  (World 1 enemies)
+ *   Bronze      → statMult avg ~1.5   (early World 2)
+ *   Silver      → statMult avg ~1.5–2.5 (mid World 2)
+ *   Gold        → statMult avg ~2.5–4.5 (World 3)
+ *   Transcendent → statMult avg > 4.0  (World 4–6)
  *
  * See docs/enemy-design.md for distribution rules and thematic guidelines.
  */
@@ -25,6 +34,7 @@ const ENEMIES_RAW = {
   // ── World 1 — The Mortal Lands ────────────────────────────────────────────
   // Theme: mortal sect → wilderness → qi forests → storm peaks
   // statMult targets: hp 0.7–1.2, atk 0.4–1.5
+  // Blood core tier: Iron
 
   outer_sect_disciple: {
     id:          'outer_sect_disciple',
@@ -34,9 +44,9 @@ const ENEMIES_RAW = {
     statMult: { hp: 0.7, atk: 0.6 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.65, qty: [1, 3] },
-      { itemId: 'iron_mineral_2',     chance: 0.30, qty: [1, 2] },
+      { itemId: 'iron_blood_core_1',  chance: 0.30, qty: [1, 2] },
       { itemId: 'iron_cultivation_2', chance: 0.20, qty: [1, 1] },
-      { itemId: 'iron_mineral_1',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'iron_blood_core_2',  chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.02 },
   },
@@ -49,8 +59,8 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.2, atk: 0.4 },   // tanky construct, low damage
     drops: [
       { itemId: 'iron_cultivation_2', chance: 0.35, qty: [1, 2] },
-      { itemId: 'iron_mineral_1',     chance: 0.30, qty: [1, 2] },
-      { itemId: 'iron_mineral_2',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'iron_blood_core_1',  chance: 0.30, qty: [1, 2] },
+      { itemId: 'iron_blood_core_2',  chance: 0.20, qty: [1, 1] },
     ],
   },
 
@@ -61,9 +71,9 @@ const ENEMIES_RAW = {
     description: 'A lean, grey-furred wolf with faintly glowing eyes, suggesting minor qi absorption from years of roaming spirit-rich wilderness.',
     statMult: { hp: 0.9, atk: 1.0 },
     drops: [
-      { itemId: 'iron_cultivation_1',   chance: 0.70, qty: [1, 3] },
-      { itemId: 'bronze_cultivation_1', chance: 0.20, qty: [1, 1] },
-      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'iron_cultivation_1', chance: 0.70, qty: [1, 3] },
+      { itemId: 'iron_blood_core_1',  chance: 0.25, qty: [1, 2] },
+      { itemId: 'iron_blood_core_2',  chance: 0.10, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.01 },
   },
@@ -76,9 +86,9 @@ const ENEMIES_RAW = {
     statMult: { hp: 0.8, atk: 1.1 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 0.65, qty: [1, 4] },
-      { itemId: 'iron_mineral_2',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'iron_blood_core_1',  chance: 0.35, qty: [1, 2] },
       { itemId: 'iron_cultivation_2', chance: 0.30, qty: [1, 2] },
-      { itemId: 'iron_mineral_1',     chance: 0.20, qty: [1, 2] },
+      { itemId: 'iron_blood_core_2',  chance: 0.20, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -91,8 +101,8 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.0, atk: 1.0 },
     drops: [
       { itemId: 'iron_cultivation_1',   chance: 0.65, qty: [1, 3] },
-      { itemId: 'bronze_cultivation_1', chance: 0.25, qty: [1, 1] },
-      { itemId: 'bronze_mineral_1',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'iron_blood_core_1',    chance: 0.25, qty: [1, 2] },
+      { itemId: 'bronze_cultivation_1', chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.01 },
   },
@@ -106,8 +116,8 @@ const ENEMIES_RAW = {
     drops: [
       { itemId: 'iron_cultivation_2', chance: 0.50, qty: [1, 3] },
       { itemId: 'iron_cultivation_1', chance: 0.60, qty: [1, 4] },
-      { itemId: 'iron_mineral_1',     chance: 0.20, qty: [1, 2] },
-      { itemId: 'iron_mineral_2',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'iron_blood_core_1',  chance: 0.25, qty: [1, 2] },
+      { itemId: 'iron_blood_core_2',  chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -115,6 +125,7 @@ const ENEMIES_RAW = {
   // ── World 2 — The Ancient Frontier ───────────────────────────────────────
   // Theme: desert ruins, ancient beast plains, sunken immortal city, blood seas
   // statMult targets: hp 1.5–2.5, atk 1.3–2.5
+  // Blood core tier: Bronze (early W2), Silver (mid-late W2)
 
   iron_fang_wolf: {
     id:          'iron_fang_wolf',
@@ -124,8 +135,9 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.5, atk: 1.7 },
     drops: [
       { itemId: 'bronze_cultivation_1', chance: 0.80, qty: [3, 8] },
+      { itemId: 'bronze_blood_core_1',  chance: 0.30, qty: [1, 2] },
       { itemId: 'silver_cultivation_1', chance: 0.20, qty: [1, 1] },
-      { itemId: 'silver_mineral_1',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'bronze_blood_core_2',  chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.02 },
   },
@@ -138,8 +150,9 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.8, atk: 1.5 },
     drops: [
       { itemId: 'bronze_cultivation_1', chance: 0.80, qty: [4, 10] },
+      { itemId: 'bronze_blood_core_1',  chance: 0.35, qty: [1, 2] },
       { itemId: 'silver_cultivation_1', chance: 0.25, qty: [1, 1] },
-      { itemId: 'silver_mineral_1',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'bronze_blood_core_2',  chance: 0.15, qty: [1, 1] },
     ],
   },
 
@@ -151,8 +164,8 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.6, atk: 1.8 },
     drops: [
       { itemId: 'silver_cultivation_1', chance: 0.70, qty: [2, 5] },
-      { itemId: 'silver_mineral_1',     chance: 0.30, qty: [1, 1] },
-      { itemId: 'silver_mineral_2',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'silver_blood_core_1',  chance: 0.30, qty: [1, 2] },
+      { itemId: 'bronze_blood_core_2',  chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.02 },
   },
@@ -165,7 +178,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.0, atk: 1.3 },
     drops: [
       { itemId: 'silver_cultivation_1', chance: 0.65, qty: [2, 5] },
-      { itemId: 'gold_mineral_1',       chance: 0.20, qty: [1, 1] },
+      { itemId: 'silver_blood_core_1',  chance: 0.25, qty: [1, 1] },
     ],
   },
 
@@ -178,7 +191,8 @@ const ENEMIES_RAW = {
     drops: [
       { itemId: 'silver_cultivation_1', chance: 0.80, qty: [3, 7] },
       { itemId: 'silver_cultivation_2', chance: 0.25, qty: [1, 1] },
-      { itemId: 'silver_mineral_2',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'silver_blood_core_1',  chance: 0.25, qty: [1, 2] },
+      { itemId: 'silver_blood_core_2',  chance: 0.15, qty: [1, 1] },
     ],
   },
 
@@ -190,7 +204,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 1.5, atk: 2.2 },
     drops: [
       { itemId: 'silver_cultivation_2', chance: 0.80, qty: [3, 8] },
-      { itemId: 'silver_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'silver_blood_core_2',  chance: 0.30, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -204,7 +218,7 @@ const ENEMIES_RAW = {
     drops: [
       { itemId: 'silver_cultivation_1', chance: 0.85, qty: [4, 10] },
       { itemId: 'bronze_cultivation_2', chance: 0.25, qty: [1, 1] },
-      { itemId: 'silver_mineral_2',     chance: 0.15, qty: [1, 1] },
+      { itemId: 'silver_blood_core_1',  chance: 0.30, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -217,7 +231,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.5, atk: 2.3 },
     drops: [
       { itemId: 'silver_cultivation_1', chance: 0.80, qty: [5, 12] },
-      { itemId: 'silver_mineral_1',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'silver_blood_core_2',  chance: 0.35, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -225,6 +239,7 @@ const ENEMIES_RAW = {
   // ── World 3 — The Forbidden Lands ────────────────────────────────────────
   // Theme: saint burial grounds, void rifts, sealed war altars, cursed mountains
   // statMult targets: hp 2.0–4.0, atk 2.3–4.0
+  // Blood core tier: Gold
 
   burial_guardian: {
     id:          'burial_guardian',
@@ -234,7 +249,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.8, atk: 2.5 },
     drops: [
       { itemId: 'gold_cultivation_1', chance: 0.70, qty: [2, 5] },
-      { itemId: 'gold_mineral_1',     chance: 0.30, qty: [1, 1] },
+      { itemId: 'gold_blood_core_1',  chance: 0.30, qty: [1, 1] },
     ],
   },
 
@@ -246,7 +261,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 3.2, atk: 2.3 },
     drops: [
       { itemId: 'gold_cultivation_1', chance: 0.75, qty: [2, 6] },
-      { itemId: 'gold_mineral_1',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'gold_blood_core_1',  chance: 0.30, qty: [1, 1] },
     ],
   },
 
@@ -258,7 +273,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.5, atk: 3.0 },
     drops: [
       { itemId: 'gold_cultivation_1', chance: 0.80, qty: [3, 8] },
-      { itemId: 'gold_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'gold_blood_core_2',  chance: 0.25, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -271,8 +286,8 @@ const ENEMIES_RAW = {
     statMult: { hp: 3.5, atk: 2.8 },
     drops: [
       { itemId: 'gold_cultivation_1', chance: 0.80, qty: [3, 8] },
-      { itemId: 'gold_mineral_1',     chance: 0.35, qty: [1, 1] },
-      { itemId: 'gold_mineral_2',     chance: 0.20, qty: [1, 1] },
+      { itemId: 'gold_blood_core_1',  chance: 0.35, qty: [1, 1] },
+      { itemId: 'gold_blood_core_2',  chance: 0.20, qty: [1, 1] },
     ],
   },
 
@@ -284,7 +299,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.0, atk: 3.5 },
     drops: [
       { itemId: 'gold_cultivation_2', chance: 0.80, qty: [3, 8] },
-      { itemId: 'gold_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'gold_blood_core_2',  chance: 0.30, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -297,7 +312,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 4.0, atk: 2.5 },
     drops: [
       { itemId: 'gold_cultivation_2', chance: 0.80, qty: [4, 10] },
-      { itemId: 'gold_mineral_2',     chance: 0.30, qty: [1, 1] },
+      { itemId: 'gold_blood_core_2',  chance: 0.30, qty: [1, 1] },
     ],
   },
 
@@ -309,7 +324,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 2.8, atk: 3.8 },
     drops: [
       { itemId: 'gold_cultivation_2',     chance: 0.75, qty: [2, 5] },
-      { itemId: 'transcendent_mineral_1', chance: 0.15, qty: [1, 1] },
+      { itemId: 'gold_blood_core_2',      chance: 0.20, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -321,8 +336,8 @@ const ENEMIES_RAW = {
     description: 'A faster, leaner cousin of the void rift predator that stalks prey by slipping in and out of micro-rifts, never fully materialising. Only visible as a shimmer in the air until the moment it strikes.',
     statMult: { hp: 3.0, atk: 4.0 },
     drops: [
-      { itemId: 'gold_cultivation_2',     chance: 0.80, qty: [3, 7] },
-      { itemId: 'transcendent_mineral_1', chance: 0.20, qty: [1, 1] },
+      { itemId: 'gold_cultivation_2',         chance: 0.80, qty: [3, 7] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.15, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -330,6 +345,7 @@ const ENEMIES_RAW = {
   // ── World 4 — The Origin Depths ──────────────────────────────────────────
   // Theme: underground qi springs, world-root caverns, primordial forests, origin altars
   // statMult targets: hp 4.5–7.0, atk 4.0–6.5
+  // Blood core tier: Transcendent
 
   origin_crystal_golem: {
     id:          'origin_crystal_golem',
@@ -339,7 +355,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 4.5, atk: 4.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.65, qty: [1, 3] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.25, qty: [1, 1] },
     ],
   },
 
@@ -351,7 +367,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 5.0, atk: 4.5 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.70, qty: [2, 5] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.30, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.30, qty: [1, 1] },
     ],
   },
 
@@ -363,7 +379,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 5.5, atk: 5.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.80, qty: [3, 8] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.25, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -376,7 +392,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 5.5, atk: 6.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.75, qty: [2, 6] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.35, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.25, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -389,7 +405,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 6.0, atk: 4.5 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [4, 10] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.25, qty: [1, 1] },
     ],
   },
 
@@ -401,7 +417,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 7.0, atk: 5.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [4, 10] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.50, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.35, qty: [1, 2] },
     ],
   },
 
@@ -413,7 +429,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 6.5, atk: 5.5 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [5, 12] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.30, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.30, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -427,6 +443,7 @@ const ENEMIES_RAW = {
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.80, qty: [2, 6] },
       { itemId: 'transcendent_cultivation_2', chance: 0.30, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.25, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -439,7 +456,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 4.5, atk: 4.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.65, qty: [1, 3] },
-      { itemId: 'bronze_mineral_2',           chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.25, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -447,6 +464,7 @@ const ENEMIES_RAW = {
   // ── World 5 — The Void Sea ────────────────────────────────────────────────
   // Theme: fractured space corridors, void sea, Dao inscription ruins, Emperor tombs, sword ridge
   // statMult targets: hp 7.0–11.0, atk 6.5–11.0
+  // Blood core tier: Transcendent
 
   spatial_fissure_beast: {
     id:          'spatial_fissure_beast',
@@ -456,7 +474,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 7.0, atk: 6.5 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [5, 12] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.35, qty: [1, 2] },
     ],
   },
 
@@ -468,7 +486,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 8.0, atk: 7.5 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [6, 15] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.35, qty: [1, 2] },
     ],
   },
 
@@ -480,7 +498,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 7.5, atk: 7.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.80, qty: [3, 8] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_1',  chance: 0.30, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.03 },
   },
@@ -493,7 +511,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 9.0, atk: 8.0 },
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [8, 20] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.40, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.40, qty: [1, 2] },
     ],
   },
 
@@ -506,6 +524,7 @@ const ENEMIES_RAW = {
     drops: [
       { itemId: 'transcendent_cultivation_1', chance: 0.85, qty: [8, 20] },
       { itemId: 'transcendent_cultivation_2', chance: 0.35, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.30, qty: [1, 2] },
     ],
   },
 
@@ -517,7 +536,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 8.5, atk: 9.5 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.80, qty: [3, 8] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.25, qty: [1, 1] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.30, qty: [1, 1] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -530,7 +549,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 11.0, atk: 10.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.85, qty: [6, 15] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.40, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.40, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -543,7 +562,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 10.0, atk: 9.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.80, qty: [4, 10] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.35, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.04 },
   },
@@ -556,7 +575,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 9.0, atk: 11.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.85, qty: [5, 12] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.35, qty: [1, 2] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.40, qty: [1, 2] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -564,6 +583,7 @@ const ENEMIES_RAW = {
   // ── World 6 — The Open Heaven ─────────────────────────────────────────────
   // Theme: heaven pillars, star sea, celestial rifts, eternal storms, cosmic beasts
   // statMult targets: hp 14.0–28.0, atk 16.0–32.0
+  // Blood core tier: Transcendent
 
   boundary_wraith: {
     id:          'boundary_wraith',
@@ -573,7 +593,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 14.0, atk: 16.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [10, 25] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.50, qty: [1, 3] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.50, qty: [1, 3] },
     ],
   },
 
@@ -585,7 +605,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 16.0, atk: 18.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [12, 30] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.50, qty: [1, 3] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.50, qty: [1, 3] },
     ],
   },
 
@@ -597,7 +617,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 18.0, atk: 18.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [15, 40] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.55, qty: [1, 3] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.55, qty: [1, 3] },
     ],
   },
 
@@ -609,7 +629,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 20.0, atk: 20.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [20, 50] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.60, qty: [1, 3] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.60, qty: [1, 3] },
     ],
   },
 
@@ -621,7 +641,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 22.0, atk: 22.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [20, 55] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.60, qty: [2, 4] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.60, qty: [2, 4] },
     ],
   },
 
@@ -633,7 +653,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 24.0, atk: 24.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [25, 60] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.65, qty: [2, 4] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.65, qty: [2, 4] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -646,7 +666,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 20.0, atk: 28.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [25, 65] },
-      { itemId: 'transcendent_mineral_1',     chance: 0.65, qty: [2, 4] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.65, qty: [2, 4] },
     ],
     techniqueDrop: { chance: 0.05 },
   },
@@ -659,7 +679,7 @@ const ENEMIES_RAW = {
     statMult: { hp: 28.0, atk: 32.0 },
     drops: [
       { itemId: 'transcendent_cultivation_2', chance: 0.90, qty: [30, 80] },
-      { itemId: 'transcendent_mineral_2',     chance: 0.70, qty: [2, 5] },
+      { itemId: 'transcendent_blood_core_2',  chance: 0.70, qty: [2, 5] },
     ],
     techniqueDrop: { chance: 0.06 },
   },

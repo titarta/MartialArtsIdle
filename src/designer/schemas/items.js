@@ -10,6 +10,6 @@ export default [
   { key: 'rarity',      type: 'enum',     label: 'Rarity', options: rarityOptions },
   { key: 'description', type: 'textarea', label: 'Description', rows: 3 },
   { key: '_category',   type: 'enum',     label: 'Category',
-    options: ['herbs', 'minerals', 'pills', 'cultivation'],
+    options: ['herbs', 'minerals', 'bloodCores', 'pills', 'cultivation'],
     help: 'Only required for NEW items. Existing items keep their original category.' },
 ];

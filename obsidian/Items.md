@@ -6,31 +6,59 @@ Two main item categories: **Pills** and **Artefacts**.
 
 ## Pills
 
-Pills affect **cultivation** or **combat**.
+Pills provide **permanent, irreversible** base stat improvements when consumed. There is no duration — the stat bonus is added once and persists indefinitely across all sessions.
 
 ### Properties
-- Stored recipes — the player collects pill recipes over time
-- Effects can be cultivation boosts, combat buffs, healing, etc.
+
+- Crafted at the **Production** screen using 3 herbs (recipe system)
+- Consuming a pill instantly and permanently adds its stat bonuses to the character
+- A floating animation shows the gained stats on the pill card on consume
+- Pills are categorised: **Cultivation**, **Combat**, **Harvest**, **Mining**
+
+### Rarity Tiers
+
+Pills follow the Iron / Bronze / Silver / Gold / Transcendent rarity system, matching the herb tiers used to craft them.
 
 ### Cultivation Pills (examples)
 
-| ID | Name | Rarity | Effect |
+| ID | Name | Rarity | Permanent Effect |
 |---|---|---|---|
-| qi_condensation_pill | Qi Condensation Pill | Common | Accelerates qi gathering for early-realm cultivators |
-| profound_accumulation_pill | Profound Accumulation Pill | Rare | Pushes cultivators through minor-realm bottlenecks |
-| breakthrough_golden_pill | Breakthrough Golden Pill | Legendary | Shatters major-realm barriers (catastrophic if body unprepared) |
+| qi_condensation_pill | Qi Condensation Pill | Iron | +50% Qi Speed |
+| qi_gathering_pill | Qi Gathering Pill | Bronze | +100% Qi Speed |
+| profound_qi_pill | Profound Qi Pill | Silver | +200% Qi Speed |
+| qi_ascension_pill | Qi Ascension Pill | Gold | +500% Qi Speed |
+| immortal_qi_pill | Immortal Qi Pill | Transcendent | +1000% Qi Speed |
 
 ### Combat Pills (examples)
 
-| ID | Name | Rarity | Effect |
+| ID | Name | Rarity | Permanent Effect |
 |---|---|---|---|
-| *TBD* | — | — | — |
+| body_tempering_pill | Body Tempering Pill | Iron | +30 Defense |
+| iron_skin_pill | Iron Skin Pill | Bronze | +60 Defense, +100 Health |
+| combat_pill | Combat Pill | Silver | +30 Phys Dmg, +20 Elem Dmg, +80 Defense |
+
+### Harvest / Mining Pills (examples)
+
+| ID | Name | Rarity | Permanent Effect |
+|---|---|---|---|
+| spirit_calming_pill | Spirit Calming Pill | Iron | +20% Harvest Speed |
+| miners_focus_pill | Miner's Focus Pill | Iron | +20% Mining Speed |
+| heavenly_root_pill | Heavenly Root Pill | Silver | +60% Harvest Speed, +30 Harvest Luck |
+
+### Implementation Notes
+
+- **Hook:** `src/hooks/usePills.js`
+- **Persistence:** `mai_pills` (owned counts) + `mai_permanent_pill_stats` (accumulated bonuses)
+- `getStatModifiers()` returns permanent flat/increased mods for the stats system
+- `getQiMult()` returns `1 + permanentStats.qi_speed` for the cultivation rate
+- Pill drawer: `src/components/PillDrawer.jsx`
 
 ### TODO
-- [ ] Define pill tiers (align with [[Realm Progression]] quality tiers)
-- [ ] Define recipe discovery mechanic
-- [ ] Define full pill effects catalogue
-- [ ] Alchemy unlocked at [[Realm Progression#Origin Returning|Origin Returning]]
+
+- [ ] Finalise pill name lore (current names are placeholder-to-final)
+- [ ] Define recipe discovery mechanic beyond the 3-herb combo system
+- [ ] Add visual distinction for "used" pills vs newly acquired
+- [ ] Alchemy unlock is already at realm 0 (Production tab)
 
 ---
 

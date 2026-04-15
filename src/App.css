@@ -4869,6 +4869,29 @@
   background: var(--gold);
   color: #1a1511;
 }
+.pill-drawer-card-use:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Pill stat-gain float animation ─────────────────────────────────────── */
+@keyframes pillFloatUp {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0);    }
+  80%  { opacity: 1; transform: translateX(-50%) translateY(-32px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-44px); }
+}
+.pill-stat-float {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 100;
+  animation: pillFloatUp 1.3s ease-out forwards;
+}
 
 /* ─── Pill Grid (Home Screen) ────────────────────────────────────────────────── */
 

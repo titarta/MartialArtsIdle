@@ -1,32 +1,42 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ORES, RARITY_COLOR, ALL_MATERIALS } from '../data/materials';
+import { RARITY, ALL_MATERIALS, getMineCost } from '../data/materials';
 
 const BASE_MINE_SPEED = 3; // mine points per second
 
-function parseList(str) {
-  return str.split(',').map(s => s.trim()).filter(s => s && !s.includes('TBD'));
+/** Weighted random pick from a drop array (uses `chance` as weight). */
+function pickWeighted(drops) {
+  if (!drops?.length) return null;
+  const total = drops.reduce((s, d) => s + d.chance, 0);
+  let roll = Math.random() * total;
+  for (const d of drops) {
+    roll -= d.chance;
+    if (roll <= 0) return d;
+  }
+  return drops[drops.length - 1];
 }
 
-/** Resolve display name to snake_case inventory ID via ALL_MATERIALS reverse lookup. */
-function nameToId(name) {
-  const entry = Object.entries(ALL_MATERIALS).find(([, m]) => m.name === name);
-  return entry ? entry[0] : name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-}
-
-function pickItem(list, lookup) {
-  const name = list[Math.floor(Math.random() * list.length)];
-  const data = lookup[name] ?? { rarity: 'Common', mineCost: 30 };
-  return { name, ...data };
+/** Random integer in [min, max] inclusive. */
+function rollQty([min, max]) {
+  return min + Math.floor(Math.random() * (max - min + 1));
 }
 
 function MiningScreen({ region, inventory, onBack, getFullStats }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
-  const oreList = parseList(region.ores);
+  const mineDrops    = region.mineDrops ?? [];
+  // Split: primary ore drops vs bonus cultivation drops (QI stones)
+  const primaryDrops = mineDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') !== 'cultivation');
+  const bonusDrops   = mineDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') === 'cultivation');
+  const activePools  = primaryDrops.length ? primaryDrops : mineDrops;
 
-  const [current, setCurrent]    = useState(() => pickItem(oreList, ORES));
+  function buildCurrent(drop) {
+    const mat = ALL_MATERIALS[drop?.itemId] ?? {};
+    return { ...mat, itemId: drop?.itemId, mineCost: getMineCost(drop?.itemId ?? ''), qty: drop?.qty ?? [1, 1] };
+  }
+
+  const [current, setCurrent]     = useState(() => buildCurrent(pickWeighted(activePools)));
   const [collected, setCollected] = useState([]);
 
   const progressBarRef = useRef(null);
@@ -37,6 +47,7 @@ function MiningScreen({ region, inventory, onBack, getFullStats }) {
   useEffect(() => { currentRef.current = current; }, [current]);
 
   useEffect(() => {
+    if (!mineDrops.length) return;
     progressVal.current = 0;
     lastTRef.current = null;
     let raf;
@@ -48,7 +59,6 @@ function MiningScreen({ region, inventory, onBack, getFullStats }) {
       const dt = Math.min((now - lastTRef.current) / 1000, 0.1);
       lastTRef.current = now;
 
-      // Apply mining_speed (additive to BASE_MINE_SPEED) per tick.
       const stats = getFullStats?.();
       const speed = BASE_MINE_SPEED + Math.max(0, stats?.miningSpeed ?? 0);
       progressVal.current += speed * dt;
@@ -60,31 +70,48 @@ function MiningScreen({ region, inventory, onBack, getFullStats }) {
       }
 
       if (progressVal.current >= cost) {
-        const mined = { ...currentRef.current };
         progressVal.current = 0;
 
-        // Apply mining_luck: % chance per mine to receive a bonus duplicate.
         const luckPct = Math.min(100, Math.max(0, stats?.miningLuck ?? 0));
-        const qty     = 1 + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+        const gathered = [];
 
-        // Add to inventory using snake_case id
-        if (inventory) {
-          inventory.addItem(nameToId(mined.name), qty);
+        // Give primary ore (always)
+        const cur = currentRef.current;
+        const qty = rollQty(cur.qty ?? [1, 1]) + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+        if (inventory && cur.itemId) inventory.addItem(cur.itemId, qty);
+        gathered.push({ itemId: cur.itemId, name: cur.name, rarity: cur.rarity ?? 'Iron', qty });
+
+        // Roll bonus drops (cultivation / QI stones)
+        for (const bd of bonusDrops) {
+          if (Math.random() < bd.chance) {
+            const bqty = rollQty(bd.qty ?? [1, 1]);
+            const bmat = ALL_MATERIALS[bd.itemId];
+            if (inventory) inventory.addItem(bd.itemId, bqty);
+            gathered.push({ itemId: bd.itemId, name: bmat?.name ?? bd.itemId, rarity: bmat?.rarity ?? 'Iron', qty: bqty });
+          }
         }
 
-        const next = pickItem(oreList, ORES);
-        currentRef.current = next;
-        setCurrent(next);
-
+        // Update collected log
         setCollected(prev => {
-          const idx = prev.findIndex(c => c.name === mined.name);
-          if (idx >= 0) {
-            const updated = [...prev];
-            updated[idx] = { ...updated[idx], count: updated[idx].count + 1 };
-            return updated;
+          let next = [...prev];
+          for (const g of gathered) {
+            const idx = next.findIndex(c => c.itemId === g.itemId);
+            if (idx >= 0) {
+              next[idx] = { ...next[idx], count: next[idx].count + g.qty };
+            } else {
+              next = [{ itemId: g.itemId, name: g.name, rarity: g.rarity, count: g.qty }, ...next];
+            }
           }
-          return [{ name: mined.name, rarity: mined.rarity, count: 1 }, ...prev];
+          return next;
         });
+
+        // Pick next primary ore
+        const nextDrop = pickWeighted(activePools);
+        if (nextDrop) {
+          const next = buildCurrent(nextDrop);
+          currentRef.current = next;
+          setCurrent(next);
+        }
       }
     };
 
@@ -92,13 +119,13 @@ function MiningScreen({ region, inventory, onBack, getFullStats }) {
     return () => cancelAnimationFrame(raf);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const color = RARITY_COLOR[current.rarity] ?? '#aaa';
+  const color = RARITY[current.rarity]?.color ?? '#aaa';
   const stats = getFullStats?.();
   const speed = BASE_MINE_SPEED + Math.max(0, stats?.miningSpeed ?? 0);
   const luck  = stats?.miningLuck ?? 0;
 
   const regionName  = tGame(`regions.${region.name}.name`, { defaultValue: region.name });
-  const itemName    = tGame(`items.${nameToId(current.name)}.name`, { defaultValue: current.name });
+  const itemName    = tGame(`items.${current.itemId}.name`, { defaultValue: current.name ?? current.itemId ?? '' });
   const rarityLabel = t(`rarity.${current.rarity}`, { defaultValue: current.rarity });
 
   return (
@@ -132,12 +159,12 @@ function MiningScreen({ region, inventory, onBack, getFullStats }) {
         <div className="harvest-loot">
           <p className="harvest-loot-title">{t('mining.collected')}</p>
           {collected.map(item => (
-            <div key={item.name} className="harvest-loot-row">
+            <div key={item.itemId} className="harvest-loot-row">
               <span
                 className="harvest-loot-name"
-                style={{ color: RARITY_COLOR[item.rarity] ?? '#aaa' }}
+                style={{ color: RARITY[item.rarity]?.color ?? '#aaa' }}
               >
-                {tGame(`items.${nameToId(item.name)}.name`, { defaultValue: item.name })}
+                {tGame(`items.${item.itemId}.name`, { defaultValue: item.name })}
               </span>
               <span className="harvest-loot-count">×{item.count}</span>
             </div>

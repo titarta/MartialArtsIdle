@@ -6,7 +6,7 @@ import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import PillDrawer from '../components/PillDrawer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
-import { PILLS_BY_ID, ITEM_RARITY } from '../data/pills';
+import { PILLS_BY_ID } from '../data/pills';
 import WORLDS from '../data/worlds';
 
 const BASE = import.meta.env.BASE_URL;
@@ -22,21 +22,6 @@ function getSpriteState(boosting, adBoostActive) {
   if (adBoostActive)             return 3;
   if (boosting)                  return 2;
   return 1;
-}
-
-function ActivePillBadge({ active }) {
-  const { t: tGame } = useTranslation('game');
-  const pill = PILLS_BY_ID[active.pillId];
-  if (!pill) return null;
-  const remaining = Math.max(0, Math.ceil((active.expiresAt - Date.now()) / 1000));
-  const color = ITEM_RARITY[pill.rarity]?.color ?? '#aaa';
-  const pillName = tGame(`items.${pill.id}.name`, { defaultValue: pill.name });
-  return (
-    <div className="active-pill-badge" style={{ borderColor: color }}>
-      <span style={{ color }}>{pillName}</span>
-      <span className="active-pill-time">{remaining}s</span>
-    </div>
-  );
 }
 
 /** Compact Qi/s readout — updated via rAF against the live rateRef so it
@@ -190,7 +175,7 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
   // Pill drawer state
   const [pillDrawerOpen, setPillDrawerOpen] = useState(false);
   const totalOwnedPills = pills
-    ? PILLS_BY_ID && Object.keys(PILLS_BY_ID).reduce((n, id) => n + pills.getOwnedCount(id), 0)
+    ? Object.keys(PILLS_BY_ID).reduce((n, id) => n + pills.getOwnedCount(id), 0)
     : 0;
   const idleTimerRef = useRef(null);
   const resetIdleTimer = useCallback(() => {
@@ -329,25 +314,16 @@ function HomeScreen({ cultivation, pills, inventory, selections, onOpenSelection
       )}
 
       {/* ── Pills: floating bottom-right above nav ──────────────────────── */}
-      {pills && (pills.activePills.length > 0 || totalOwnedPills > 0) && (
+      {pills && totalOwnedPills > 0 && (
         <div className="home-pill-float">
-          {pills.activePills.length > 0 && (
-            <div className="active-pills-bar">
-              {pills.activePills.map((ap, i) => (
-                <ActivePillBadge key={`${ap.pillId}-${i}`} active={ap} />
-              ))}
-            </div>
-          )}
-          {totalOwnedPills > 0 && (
-            <button
-              className="home-pill-btn"
-              onClick={() => setPillDrawerOpen(true)}
-            >
-              <span className="home-pill-btn-icon">◈</span>
-              <span className="home-pill-btn-label">{t('home.pills')}</span>
-              <span className="home-pill-btn-count">{totalOwnedPills}</span>
-            </button>
-          )}
+          <button
+            className="home-pill-btn"
+            onClick={() => setPillDrawerOpen(true)}
+          >
+            <span className="home-pill-btn-icon">◈</span>
+            <span className="home-pill-btn-label">{t('home.pills')}</span>
+            <span className="home-pill-btn-count">{totalOwnedPills}</span>
+          </button>
         </div>
       )}
 

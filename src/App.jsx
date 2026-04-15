@@ -18,6 +18,7 @@ import useTechniques  from './hooks/useTechniques';
 import useCombat      from './hooks/useCombat';
 import useArtefacts   from './hooks/useArtefacts';
 import usePills       from './hooks/usePills';
+import useQiCrystal  from './hooks/useQiCrystal';
 import useAutoFarm    from './hooks/useAutoFarm';
 import WORLDS         from './data/worlds';
 import { computeAllStats, mergeModifiers } from './data/stats';
@@ -46,6 +47,7 @@ function App() {
   const combat          = useCombat();
   const artefacts       = useArtefacts();
   const pills           = usePills();
+  const crystal         = useQiCrystal({ getQuantity: inventory.getQuantity, removeItem: inventory.removeItem });
   const selections      = useSelections({ cultivation });
   const { clearedRegions, clearRegion } = useClearedRegions();
 
@@ -69,6 +71,12 @@ function App() {
     if (!cultivation.selectionQiMultRef) return;
     cultivation.selectionQiMultRef.current = selections.getQiSpeedMult();
   }, [selections, cultivation.selectionQiMultRef]);
+
+  // Keep QI crystal bonus in sync with cultivation game loop
+  useEffect(() => {
+    if (!cultivation.crystalQiBonusRef) return;
+    cultivation.crystalQiBonusRef.current = crystal.crystalQiBonus;
+  }, [crystal.crystalQiBonus, cultivation.crystalQiBonusRef]);
 
 
   // ── Centralised stat getter ─────────────────────────────────────────────

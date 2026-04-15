@@ -1,8 +1,30 @@
+/**
+ * usePills.js — Pill consumption hook (permanent stat improvements).
+ *
+ * Pills are no longer temporary buffs — consuming one permanently and
+ * irreversibly adds its stat bonuses to the character.
+ *
+ * State:
+ *   ownedPills      { [pillId]: count }  — persisted to 'mai_pills'
+ *   permanentStats  { [statId]: value }  — persisted to 'mai_permanent_pill_stats'
+ *
+ * `usePill(pillId)` returns an array of { stat, value } deltas so the UI
+ * can display a floating stat-gain animation. Returns null if the pill
+ * is not owned or does not exist.
+ *
+ * `getStatModifiers()` and `getQiMult()` maintain the same external interface
+ * as before (both now read from permanentStats instead of active pills).
+ */
+
 import { useState, useEffect, useCallback } from 'react';
 import { PILLS_BY_ID } from '../data/pills';
 
-const SAVE_KEY   = 'mai_pills';
-const ACTIVE_KEY = 'mai_active_pills';
+const SAVE_KEY = 'mai_pills';
+const PERM_KEY = 'mai_permanent_pill_stats';
+
+// Stats that contribute as INCREASED (percentage) type mods.
+// All other stats contribute as FLAT.
+const INCREASED_STATS = new Set(['harvest_speed', 'mining_speed']);
 
 function loadOwned() {
   try {
@@ -12,43 +34,27 @@ function loadOwned() {
   return {};
 }
 
-function loadActive() {
+function loadPermanentStats() {
   try {
-    const raw = localStorage.getItem(ACTIVE_KEY);
-    if (raw) {
-      const now = Date.now();
-      return JSON.parse(raw).filter(p => p.expiresAt > now);
-    }
+    const raw = localStorage.getItem(PERM_KEY);
+    if (raw) return JSON.parse(raw);
   } catch {}
-  return [];
+  return {};
 }
 
 export default function usePills() {
-  const [ownedPills, setOwnedPills]   = useState(loadOwned);
-  const [activePills, setActivePills] = useState(loadActive);
+  const [ownedPills,      setOwnedPills]      = useState(loadOwned);
+  const [permanentStats,  setPermanentStats]   = useState(loadPermanentStats);
 
   // Persist owned pills
   useEffect(() => {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(ownedPills)); } catch {}
   }, [ownedPills]);
 
-  // Persist active pills
+  // Persist permanent stats
   useEffect(() => {
-    try { localStorage.setItem(ACTIVE_KEY, JSON.stringify(activePills)); } catch {}
-  }, [activePills]);
-
-  // Auto-expire: 1s interval that filters expired pills
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActivePills(prev => {
-        const now = Date.now();
-        const filtered = prev.filter(p => p.expiresAt > now);
-        if (filtered.length !== prev.length) return filtered;
-        return prev; // no change — avoid re-render
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    try { localStorage.setItem(PERM_KEY, JSON.stringify(permanentStats)); } catch {}
+  }, [permanentStats]);
 
   const craftPill = useCallback((pillId) => {
     setOwnedPills(prev => ({
@@ -57,64 +63,67 @@ export default function usePills() {
     }));
   }, []);
 
+  /**
+   * Consume one pill permanently.
+   * @returns {Array<{stat: string, value: number}>} stat deltas for animation,
+   *          or null if pill not owned / not found.
+   */
   const usePill = useCallback((pillId) => {
     const pill = PILLS_BY_ID[pillId];
-    if (!pill) return;
+    if (!pill) return null;
+
+    let didConsume = false;
     setOwnedPills(prev => {
       const current = prev[pillId] || 0;
       if (current <= 0) return prev;
+      didConsume = true;
       return { ...prev, [pillId]: current - 1 };
     });
-    setActivePills(prev => [
-      ...prev,
-      { pillId, expiresAt: Date.now() + pill.duration * 1000 },
-    ]);
-  }, []);
+
+    if (!didConsume) return null;
+
+    // Accumulate stats permanently
+    setPermanentStats(prev => {
+      const next = { ...prev };
+      for (const eff of pill.effects) {
+        next[eff.stat] = (next[eff.stat] ?? 0) + eff.value;
+      }
+      return next;
+    });
+
+    // Return deltas for floating animation
+    return pill.effects.map(eff => ({ stat: eff.stat, value: eff.value }));
+  }, [ownedPills]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getOwnedCount = useCallback((pillId) => {
     return ownedPills[pillId] || 0;
   }, [ownedPills]);
 
   /**
-   * Returns { [stat]: [{type, value}] } for all active (non-expired) pill effects,
-   * EXCLUDING qi_speed effects (those are handled by getQiMult).
+   * Returns { [stat]: [{type, value}] } for permanent pill stats.
+   * qi_speed is excluded (handled via getQiMult).
    */
   const getStatModifiers = useCallback(() => {
-    const now = Date.now();
     const mods = {};
-    for (const active of activePills) {
-      if (active.expiresAt <= now) continue;
-      const pill = PILLS_BY_ID[active.pillId];
-      if (!pill) continue;
-      for (const eff of pill.effects) {
-        if (eff.stat === 'qi_speed') continue;
-        if (!mods[eff.stat]) mods[eff.stat] = [];
-        mods[eff.stat].push({ type: eff.type, value: eff.value });
-      }
+    for (const [stat, total] of Object.entries(permanentStats)) {
+      if (stat === 'qi_speed') continue;
+      if (!total) continue;
+      const modType = INCREASED_STATS.has(stat) ? 'increased' : 'flat';
+      mods[stat] = [{ type: modType, value: total }];
     }
     return mods;
-  }, [activePills]);
+  }, [permanentStats]);
 
   /**
-   * Returns additive qi multiplier: 1 + sum of all active qi_speed values.
+   * Returns additive qi multiplier: 1 + accumulated qi_speed value.
    */
   const getQiMult = useCallback(() => {
-    const now = Date.now();
-    let sum = 0;
-    for (const active of activePills) {
-      if (active.expiresAt <= now) continue;
-      const pill = PILLS_BY_ID[active.pillId];
-      if (!pill) continue;
-      for (const eff of pill.effects) {
-        if (eff.stat === 'qi_speed') sum += eff.value;
-      }
-    }
-    return 1 + sum;
-  }, [activePills]);
+    return 1 + (permanentStats.qi_speed ?? 0);
+  }, [permanentStats]);
 
   return {
     ownedPills,
-    activePills,
+    permanentStats,
     craftPill,
     usePill,
     getOwnedCount,

@@ -12,7 +12,7 @@
  */
 
 import REALMS from '../data/realms';
-import { HERBS, ORES, ALL_MATERIALS } from '../data/materials';
+import { ALL_MATERIALS, getGatherCost, getMineCost } from '../data/materials';
 import ENEMIES, { pickEnemy } from '../data/enemies';
 import { calcDamage, getCooldown } from '../data/techniques';
 import { generateTechnique } from '../data/techniqueDrops';
@@ -21,7 +21,7 @@ import { generateTechnique } from '../data/techniqueDrops';
 
 export const AUTO_FARM_KEY  = 'mai_auto_farm';
 const BASE_GATHER_SPEED     = 3;   // gather points/sec — must match GatheringScreen
-const BASE_MINE_SPEED       = 3;   // gather points/sec — must match MiningScreen
+const BASE_MINE_SPEED       = 3;   // mine points/sec — must match MiningScreen
 const TURN_TIME_SEC         = 1.0; // seconds per player-turn cycle (animation approximation)
 const MAX_OFFLINE_HOURS     = 8;   // cap offline simulation to prevent startup lag
 const MAX_KILLS_PER_SESSION = 100_000;
@@ -76,17 +76,21 @@ export function hasGains(gains) {
   );
 }
 
-/** Resolve display name → snake_case inventory ID. Mirrors GatheringScreen/MiningScreen. */
-function nameToId(name) {
-  const entry = Object.entries(ALL_MATERIALS).find(([, m]) => m.name === name);
-  return entry
-    ? entry[0]
-    : name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+/** Weighted random pick from a drop array (uses `chance` as weight). */
+function pickWeighted(drops) {
+  if (!drops?.length) return null;
+  const total = drops.reduce((s, d) => s + d.chance, 0);
+  let roll = Math.random() * total;
+  for (const d of drops) {
+    roll -= d.chance;
+    if (roll <= 0) return d;
+  }
+  return drops[drops.length - 1];
 }
 
-/** Parse comma-separated herb/ore string. Mirrors GatheringScreen. */
-function parseList(str) {
-  return (str ?? '').split(',').map(s => s.trim()).filter(s => s && !s.includes('TBD'));
+/** Random integer in [min, max] inclusive. */
+function rollQty([min, max]) {
+  return min + Math.floor(Math.random() * (max - min + 1));
 }
 
 // ─── Drop roll (mirrors useCombat.rollDrops) ──────────────────────────────────
@@ -140,38 +144,54 @@ function estimateDps(stats, equippedTechs) {
 /**
  * Simulate auto-gathering for `seconds` in the given region.
  *
- * Player stats applied (formerly hardcoded):
- *   - harvestSpeed: ADDED to BASE_GATHER_SPEED (pts/sec). Stat values come
- *     from soul × 0.1 + modifier stack (see stats.js computeAllStats).
- *   - harvestLuck:  treated as a percent (0–100) chance per item to roll a
- *     bonus duplicate. Capped at 100.
+ * Uses region.gatherDrops (array of { itemId, chance, qty }) instead of
+ * the old herb name string. Primary drops (herbs) are selected by weight;
+ * cultivation/bonus drops are rolled independently each cycle.
+ *
+ * Player stats applied:
+ *   - harvestSpeed: ADDED to BASE_GATHER_SPEED (pts/sec).
+ *   - harvestLuck:  percent (0–100) chance per primary to roll a bonus duplicate.
  *
  * @param {number} seconds
- * @param {object} region  — world region with a `herbs` string field
+ * @param {object} region  — world region with a `gatherDrops` array field
  * @param {object} [stats] — { harvestSpeed?, harvestLuck? }; defaults to base
  * @returns {{ [itemId]: qty }}
  */
 export function simulateGathering(seconds, region, stats = null) {
-  const herbList = parseList(region?.herbs);
-  if (!herbList.length) return {};
+  const gatherDrops = region?.gatherDrops;
+  if (!gatherDrops?.length) return {};
 
-  const speed = BASE_GATHER_SPEED + Math.max(0, stats?.harvestSpeed ?? 0);
+  const primaryDrops = gatherDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') !== 'cultivation');
+  const bonusDrops   = gatherDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') === 'cultivation');
+  const activePools  = primaryDrops.length ? primaryDrops : gatherDrops;
+
+  const speed   = BASE_GATHER_SPEED + Math.max(0, stats?.harvestSpeed ?? 0);
   const luckPct = Math.min(100, Math.max(0, stats?.harvestLuck ?? 0));
 
-  const result   = {};
-  let remaining  = Math.min(seconds, MAX_OFFLINE_HOURS * 3600);
+  const result  = {};
+  let remaining = Math.min(seconds, MAX_OFFLINE_HOURS * 3600);
 
   while (remaining > 0) {
-    const name  = herbList[Math.floor(Math.random() * herbList.length)];
-    const data  = HERBS[name] ?? { gatherCost: 30 };
-    const tCost = data.gatherCost / speed;
+    const primary = pickWeighted(activePools);
+    if (!primary) break;
 
+    const cost  = getGatherCost(primary.itemId);
+    const tCost = cost / speed;
     if (tCost > remaining) break;
     remaining -= tCost;
 
-    const id   = nameToId(name);
-    const qty  = 1 + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
-    result[id] = (result[id] ?? 0) + qty;
+    // Give primary herb
+    const qty = rollQty(primary.qty ?? [1, 1])
+              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+    result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+
+    // Roll bonus drops (cultivation / QI stones)
+    for (const bd of bonusDrops) {
+      if (Math.random() < bd.chance) {
+        const bqty = rollQty(bd.qty ?? [1, 1]);
+        result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+      }
+    }
   }
 
   return result;
@@ -184,31 +204,45 @@ export function simulateGathering(seconds, region, stats = null) {
  * Same stat semantics as simulateGathering but reads miningSpeed/miningLuck.
  *
  * @param {number} seconds
- * @param {object} region  — world region with an `ores` string field
+ * @param {object} region  — world region with a `mineDrops` array field
  * @param {object} [stats] — { miningSpeed?, miningLuck? }; defaults to base
  * @returns {{ [itemId]: qty }}
  */
 export function simulateMining(seconds, region, stats = null) {
-  const oreList  = parseList(region?.ores);
-  if (!oreList.length) return {};
+  const mineDrops = region?.mineDrops;
+  if (!mineDrops?.length) return {};
+
+  const primaryDrops = mineDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') !== 'cultivation');
+  const bonusDrops   = mineDrops.filter(d => (ALL_MATERIALS[d.itemId]?.type ?? '') === 'cultivation');
+  const activePools  = primaryDrops.length ? primaryDrops : mineDrops;
 
   const speed   = BASE_MINE_SPEED + Math.max(0, stats?.miningSpeed ?? 0);
   const luckPct = Math.min(100, Math.max(0, stats?.miningLuck ?? 0));
 
-  const result   = {};
-  let remaining  = Math.min(seconds, MAX_OFFLINE_HOURS * 3600);
+  const result  = {};
+  let remaining = Math.min(seconds, MAX_OFFLINE_HOURS * 3600);
 
   while (remaining > 0) {
-    const name  = oreList[Math.floor(Math.random() * oreList.length)];
-    const data  = ORES[name] ?? { mineCost: 30 };
-    const tCost = data.mineCost / speed;
+    const primary = pickWeighted(activePools);
+    if (!primary) break;
 
+    const cost  = getMineCost(primary.itemId);
+    const tCost = cost / speed;
     if (tCost > remaining) break;
     remaining -= tCost;
 
-    const id   = nameToId(name);
-    const qty  = 1 + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
-    result[id] = (result[id] ?? 0) + qty;
+    // Give primary ore
+    const qty = rollQty(primary.qty ?? [1, 1])
+              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+    result[primary.itemId] = (result[primary.itemId] ?? 0) + qty;
+
+    // Roll bonus drops (cultivation / QI stones)
+    for (const bd of bonusDrops) {
+      if (Math.random() < bd.chance) {
+        const bqty = rollQty(bd.qty ?? [1, 1]);
+        result[bd.itemId] = (result[bd.itemId] ?? 0) + bqty;
+      }
+    }
   }
 
   return result;

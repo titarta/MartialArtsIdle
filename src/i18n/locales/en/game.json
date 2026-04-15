@@ -1,496 +1,840 @@
 {
   "realms": {
-    "Tempered Body":        "Tempered Body",
-    "Qi Transformation":    "Qi Transformation",
-    "True Element":         "True Element",
+    "Tempered Body": "Tempered Body",
+    "Qi Transformation": "Qi Transformation",
+    "True Element": "True Element",
     "Separation & Reunion": "Separation & Reunion",
-    "Immortal Ascension":   "Immortal Ascension",
-    "Saint":                "Saint",
-    "Saint King":           "Saint King",
-    "Origin Returning":     "Origin Returning",
-    "Origin King":          "Origin King",
-    "Void King":            "Void King",
-    "Dao Source":           "Dao Source",
-    "Emperor Realm":        "Emperor Realm",
-    "Half-Step Open Heaven":"Half-Step Open Heaven",
-    "Open Heaven":          "Open Heaven"
+    "Immortal Ascension": "Immortal Ascension",
+    "Saint": "Saint",
+    "Saint King": "Saint King",
+    "Origin Returning": "Origin Returning",
+    "Origin King": "Origin King",
+    "Void King": "Void King",
+    "Dao Source": "Dao Source",
+    "Emperor Realm": "Emperor Realm",
+    "Half-Step Open Heaven": "Half-Step Open Heaven",
+    "Open Heaven": "Open Heaven"
   },
-
   "stages": {
-    "Layer 1":     "Layer 1",
-    "Layer 2":     "Layer 2",
-    "Layer 3":     "Layer 3",
-    "Layer 4":     "Layer 4",
-    "Layer 5":     "Layer 5",
-    "Layer 6":     "Layer 6",
-    "Layer 7":     "Layer 7",
-    "Layer 8":     "Layer 8",
-    "Layer 9":     "Layer 9",
-    "Layer 10":    "Layer 10",
+    "Layer 1": "Layer 1",
+    "Layer 2": "Layer 2",
+    "Layer 3": "Layer 3",
+    "Layer 4": "Layer 4",
+    "Layer 5": "Layer 5",
+    "Layer 6": "Layer 6",
+    "Layer 7": "Layer 7",
+    "Layer 8": "Layer 8",
+    "Layer 9": "Layer 9",
+    "Layer 10": "Layer 10",
     "Early Stage": "Early Stage",
-    "Middle Stage":"Middle Stage",
-    "Late Stage":  "Late Stage",
-    "Peak Stage":  "Peak Stage",
-    "1st Stage":   "1st Stage",
-    "2nd Stage":   "2nd Stage",
-    "3rd Stage":   "3rd Stage"
+    "Middle Stage": "Middle Stage",
+    "Late Stage": "Late Stage",
+    "Peak Stage": "Peak Stage",
+    "1st Stage": "1st Stage",
+    "2nd Stage": "2nd Stage",
+    "3rd Stage": "3rd Stage"
   },
-
   "worlds": {
     "1": {
-      "name":        "The Mortal Lands",
-      "realms":      "Tempered Body → True Element",
+      "name": "The Mortal Lands",
+      "realms": "Tempered Body → True Element",
       "description": "A misty sect compound framed by a ceremonial red-and-gold gate, stone inscription pillars, and weathered guardian statues. Bamboo groves rise beyond the training grounds and pale mountains dissolve into perpetual mist. The air carries the smell of chalk dust and residual qi from years of disciples' practice."
     },
     "2": {
-      "name":        "The Ancient Frontier",
-      "realms":      "Separation & Reunion → Immortal Ascension",
+      "name": "The Ancient Frontier",
+      "realms": "Separation & Reunion → Immortal Ascension",
       "description": "A vast wasteland of cracked orange earth baked to the texture of ancient pottery. Collapsed stone archways and ruined gate structures jut from the desert floor alongside enormous bleached bone remains. A massive corroded cauldron sits at the heart of the ruins — the only structure still standing intact in an otherwise dead landscape."
     },
     "3": {
-      "name":        "The Forbidden Lands",
-      "realms":      "Saint → Saint King",
+      "name": "The Forbidden Lands",
+      "realms": "Saint → Saint King",
       "description": "A forbidden stone corridor lined with ancient guardian statues, their eyes alight with cold green spiritual fire. Beyond the rows of sentinels, a dark palace looms with green-lit torches burning at its sealed threshold. The air is still and heavy with the qi of the long-dead, the silence broken only by the distant resonance of ancient war seals."
     },
     "4": {
-      "name":        "The Origin Depths",
-      "realms":      "Origin Returning → Origin King",
+      "name": "The Origin Depths",
+      "realms": "Origin Returning → Origin King",
       "description": "A vast underground cavern lit by twin dragon-head stone pillars flanking a waterfall that cascades into a glowing origin qi pool. Teal crystal formations cluster across the cave walls, casting cool light into the dark. Ancient gnarled roots descend from the ceiling far above, and the air is thick with the overwhelming pressure of primordial earth energy."
     },
     "5": {
-      "name":        "The Void Sea",
-      "realms":      "Void King → Emperor Realm",
+      "name": "The Void Sea",
+      "realms": "Void King → Emperor Realm",
       "description": "A fractured void expanse under a sky of deep magenta, split by jagged energy cracks and floating Dao inscription tablets. A solitary stone gate stands on crumbling ground at the horizon, and a yin-yang symbol drifts overhead in charged silence. The floor is cracked like old clay — the only solid surface in a space that is constantly breaking apart at the edges."
     },
     "6": {
-      "name":        "The Open Heaven",
-      "realms":      "Half-Step Open Heaven → Open Heaven Layer 6",
+      "name": "The Open Heaven",
+      "realms": "Half-Step Open Heaven → Open Heaven Layer 6",
       "description": "A boundless open heaven realm of blinding gold and white, where massive inscription-covered pillars rise from a seamless celestial floor into cloud banks that stretch to infinity. Cranes glide silently through the radiant haze between the pillars. The ambient pressure alone is enough to obliterate anything that has not reached the Open Heaven threshold."
     }
   },
-
   "regions": {
     "Outer Sect Training Grounds": "Outer Sect Training Grounds",
-    "Borderland Wilds":            "Borderland Wilds",
-    "Bandit's Crossing":           "Bandit's Crossing",
-    "Qi-Vein Ravines":             "Qi-Vein Ravines",
-    "Misty Spirit Forest":         "Misty Spirit Forest",
-    "Shattered Sky Desert":        "Shattered Sky Desert",
-    "Demon Beast Plains":          "Demon Beast Plains",
-    "Sunken Immortal City":        "Sunken Immortal City",
-    "Blood Sea Wastes":            "Blood Sea Wastes",
-    "Saint Burial Grounds":        "Saint Burial Grounds",
-    "Void Rift Expanse":           "Void Rift Expanse",
-    "Nine-Death Mountain Range":   "Nine-Death Mountain Range",
-    "Sealed War Altar":            "Sealed War Altar",
-    "Origin Qi Spring Depths":     "Origin Qi Spring Depths",
-    "World Root Caverns":          "World Root Caverns",
-    "Ancient Root Grotto":         "Ancient Root Grotto",
-    "Primordial Forest Core":      "Primordial Forest Core",
-    "Ancient Origin Altar":        "Ancient Origin Altar",
-    "Fractured Space Corridors":   "Fractured Space Corridors",
-    "Void Sea Shores":             "Void Sea Shores",
-    "Dao Inscription Ruins":       "Dao Inscription Ruins",
-    "Ancient Emperor Tomb":        "Ancient Emperor Tomb",
-    "Heaven Sword Ridge":          "Heaven Sword Ridge",
-    "Heaven Pillar Ascent":        "Heaven Pillar Ascent",
-    "Star Sea Approaches":         "Star Sea Approaches",
-    "Celestial Rift Expanse":      "Celestial Rift Expanse",
-    "Heaven's Core":               "Heaven's Core"
+    "Borderland Wilds": "Borderland Wilds",
+    "Bandit's Crossing": "Bandit's Crossing",
+    "Qi-Vein Ravines": "Qi-Vein Ravines",
+    "Misty Spirit Forest": "Misty Spirit Forest",
+    "Shattered Sky Desert": "Shattered Sky Desert",
+    "Demon Beast Plains": "Demon Beast Plains",
+    "Sunken Immortal City": "Sunken Immortal City",
+    "Blood Sea Wastes": "Blood Sea Wastes",
+    "Saint Burial Grounds": "Saint Burial Grounds",
+    "Void Rift Expanse": "Void Rift Expanse",
+    "Nine-Death Mountain Range": "Nine-Death Mountain Range",
+    "Sealed War Altar": "Sealed War Altar",
+    "Origin Qi Spring Depths": "Origin Qi Spring Depths",
+    "World Root Caverns": "World Root Caverns",
+    "Ancient Root Grotto": "Ancient Root Grotto",
+    "Primordial Forest Core": "Primordial Forest Core",
+    "Ancient Origin Altar": "Ancient Origin Altar",
+    "Fractured Space Corridors": "Fractured Space Corridors",
+    "Void Sea Shores": "Void Sea Shores",
+    "Dao Inscription Ruins": "Dao Inscription Ruins",
+    "Ancient Emperor Tomb": "Ancient Emperor Tomb",
+    "Heaven Sword Ridge": "Heaven Sword Ridge",
+    "Heaven Pillar Ascent": "Heaven Pillar Ascent",
+    "Star Sea Approaches": "Star Sea Approaches",
+    "Celestial Rift Expanse": "Celestial Rift Expanse",
+    "Heaven's Core": "Heaven's Core"
   },
-
   "enemies": {
     "outer_sect_disciple": {
-      "name":        "Outer Sect Disciple",
+      "name": "Outer Sect Disciple",
       "description": "A young cultivator in a plain white training robe, wielding a basic wooden practice sword with clumsy but eager stances."
     },
     "training_golem": {
-      "name":        "Training Golem",
+      "name": "Training Golem",
       "description": "A squat clay-and-iron automaton stamped with sect seals, built for durability over damage — its fists are blunted iron spheres."
     },
     "wolf": {
-      "name":        "Pack Wolf",
+      "name": "Pack Wolf",
       "description": "A lean, grey-furred wolf with faintly glowing eyes, suggesting minor qi absorption from years of roaming spirit-rich wilderness."
     },
     "bandit_scout": {
-      "name":        "Bandit Scout",
+      "name": "Bandit Scout",
       "description": "A wiry fighter in rough patchwork armour, carrying a short blade and moving with the practised stealth of someone who survives by ambush."
     },
     "wandering_beast": {
-      "name":        "Wandering Beast",
+      "name": "Wandering Beast",
       "description": "A large, shaggy four-limbed beast with no fixed territory, its hide scarred from years of roaming dangerous wilderness."
     },
     "rogue_disciple": {
-      "name":        "Rogue Disciple",
+      "name": "Rogue Disciple",
       "description": "A former sect member in a tattered and stained cultivation robe, bearing the scars of forbidden qi techniques and the look of someone with nothing left to lose."
     },
     "iron_fang_wolf": {
-      "name":        "Iron Fang Wolf",
+      "name": "Iron Fang Wolf",
       "description": "A massive wolf with iron-density fangs and a hide hardened by years of mineral qi absorption from roaming the ancient plains."
     },
     "iron_spine_boar": {
-      "name":        "Iron Spine Boar",
+      "name": "Iron Spine Boar",
       "description": "A stocky, aggressive boar whose dorsal quills have calcified into iron-hard spines from grazing on mineral-rich flatlands. Charges head-down with reckless force."
     },
     "sand_dragon": {
-      "name":        "Sand Dragon",
+      "name": "Sand Dragon",
       "description": "A serpentine dragon with sun-bleached, razor-edged scales that flows through desert sands like water. Ambushes prey by erupting from below, trailing a spray of sand."
     },
     "bone_construct": {
-      "name":        "Bone Construct",
+      "name": "Bone Construct",
       "description": "An animated war machine assembled from the fused bones of fallen immortals, bound together by residual battle qi and rusted array seals. Found wherever ancient dead litter the land."
     },
     "city_guardian": {
-      "name":        "City Guardian Construct",
+      "name": "City Guardian Construct",
       "description": "A towering humanoid construct of black iron and jade bearing the crest of the Sunken Immortal City, still faithfully patrolling the waterlogged halls of its long-dead charge."
     },
     "immortal_shade": {
-      "name":        "Trapped Immortal Shade",
+      "name": "Trapped Immortal Shade",
       "description": "The spectral remnant of an immortal cultivator trapped when the city sank beneath the earth. Its form flickers between solid and ghost-like, bound eternally by an unfinished vow."
     },
     "corrupted_cultivator": {
-      "name":        "Corrupted Cultivator",
+      "name": "Corrupted Cultivator",
       "description": "A former sect disciple whose qi cultivation devoured their sanity. Their robe is shredded, their meridians visibly blackened beneath the skin, their eyes blank with qi-madness."
     },
     "blood_leviathan": {
-      "name":        "Blood Sea Leviathan",
+      "name": "Blood Sea Leviathan",
       "description": "A colossal sea beast whose scales have turned deep crimson from centuries feeding in the Blood Sea. It trails caustic red vapour as it moves and strikes with its entire mass."
     },
     "burial_guardian": {
-      "name":        "Burial Guardian",
+      "name": "Burial Guardian",
       "description": "A hulking armoured soldier whose soul was bound to the burial grounds as an eternal sentinel. Its ancient armour is ornate but corroded, and it moves with the unnatural stillness of something that has not rested in centuries."
     },
     "saint_corpse_soldier": {
-      "name":        "Saint Corpse-Soldier",
+      "name": "Saint Corpse-Soldier",
       "description": "The perfectly preserved corpse of a Saint-realm warrior, still in battle armour and clutching its weapon in a death grip. Oath-binding seals glow on its chest, compelling it forward regardless of damage taken."
     },
     "void_rift_predator": {
-      "name":        "Void Rift Predator",
+      "name": "Void Rift Predator",
       "description": "A creature born inside rift tears, its body partially phased between dimensions. Strikes from unexpected angles as it slips between solid and void space."
     },
     "rift_stalker": {
-      "name":        "Rift Stalker",
+      "name": "Rift Stalker",
       "description": "A leaner, faster predator of the rift ecosystem. Hunts by tracking qi signatures through dimensional boundaries and ambushes from within the rift itself."
     },
     "saint_bone_sovereign": {
-      "name":        "Saint Bone Sovereign",
+      "name": "Saint Bone Sovereign",
       "description": "The reanimated skeleton of a Saint-realm sovereign, its authority over death qi absolute. It claims the mountain range as territory and commands lesser undead from atop the passes."
     },
     "void_shade": {
-      "name":        "Void Shade",
+      "name": "Void Shade",
       "description": "A shadow entity from the void that clings to cursed mountain passes. It has no physical form, only a silhouette of concentrated void energy that drains qi on contact."
     },
     "forbidden_construct": {
-      "name":        "Forbidden Construct",
+      "name": "Forbidden Construct",
       "description": "A towering war automaton sealed inside the altar for centuries, maintaining vigil over the sealed inscriptions. Its activation was forbidden — until you crossed the threshold."
     },
     "ancient_war_spirit": {
-      "name":        "Ancient War Spirit",
+      "name": "Ancient War Spirit",
       "description": "The bound spirit of a warrior sealed into the altar during an ancient war. Still clutching the cause it died for, its fury remains undimmed by the centuries."
     },
     "origin_guardian": {
-      "name":        "Origin Guardian",
+      "name": "Origin Guardian",
       "description": "A colossal humanoid formed from compressed origin qi, permanently stationed at the depths' entrance. Its body radiates crushing primordial pressure with every step."
     },
     "origin_crystal_golem": {
-      "name":        "Origin Crystal Golem",
+      "name": "Origin Crystal Golem",
       "description": "A golem built from crystal formations that grew inside the origin qi spring. Its strikes release bursts of raw primordial energy from the crystals embedded in its fists."
     },
     "primordial_serpent": {
-      "name":        "Primordial Serpent",
+      "name": "Primordial Serpent",
       "description": "An enormous serpent that has hunted the World Root Caverns since the age before records. Its scales have hardened to the density of world-stone over millennia of mineral absorption."
     },
     "cavern_elder_demon": {
-      "name":        "Cavern Elder Demon",
+      "name": "Cavern Elder Demon",
       "description": "A demon that has fused with the cavern over countless centuries, its body partially made of stone and root. It barely distinguishes itself from the cave walls until it moves."
     },
     "forest_spirit": {
-      "name":        "Forest Spirit",
+      "name": "Forest Spirit",
       "description": "A luminous spirit drifting through the root hollows, drawn to the concentrated world energy in the ancient roots. Normally passive — dangerous when disturbed."
     },
     "root_sovereign": {
-      "name":        "Root Sovereign",
+      "name": "Root Sovereign",
       "description": "The dominant force of the root network, a massive entity whose body is woven from the thickest roots of the world tree. Territorial to an extreme, it regards all intruders as parasites."
     },
     "ancient_beast": {
-      "name":        "Ancient Beast",
+      "name": "Ancient Beast",
       "description": "A beast so old it predates the current age of cultivation. Its instincts are sharpened to perfection and its body carries the weight of a hundred thousand years of survival."
     },
     "world_root_wraith": {
-      "name":        "World Root Wraith",
+      "name": "World Root Wraith",
       "description": "An ethereal guardian manifested from the life-force of the world tree's roots. It phases through the root network to intercept anything that threatens the forest core."
     },
     "deep_earth_titan": {
-      "name":        "Deep Earth Titan",
+      "name": "Deep Earth Titan",
       "description": "The sole guardian of the Ancient Origin Altar — an entity of such mass that its footsteps crack bedrock. No other creature survives within range of its pressure field."
     },
     "spatial_fissure_beast": {
-      "name":        "Spatial Fissure Beast",
+      "name": "Spatial Fissure Beast",
       "description": "A creature native to the fractured space corridors, its body adapted to exist in partially collapsed dimensions. It uses the fissures as hunting grounds."
     },
     "qi_beast": {
-      "name":        "Qi-Sensing Beast",
+      "name": "Qi-Sensing Beast",
       "description": "A void-adapted predator that hunts entirely by qi signature. Blind to physical camouflage, it can track a cultivator across dimensional boundaries."
     },
     "void_elemental": {
-      "name":        "Void Elemental",
+      "name": "Void Elemental",
       "description": "A pure manifestation of void energy that coalesced in the fractured corridors. It has no body, only a concentrated mass of negating force."
     },
     "void_sea_leviathan": {
-      "name":        "Void Sea Leviathan",
+      "name": "Void Sea Leviathan",
       "description": "A titanic sea beast that has adapted to the void sea's lack of water, swimming through pure spatial energy. Its mass is so great it pushes dimensional boundaries aside."
     },
     "dao_inscription_guardian": {
-      "name":        "Dao Inscription Guardian",
+      "name": "Dao Inscription Guardian",
       "description": "A construct bound to the ruins by inscription arrays, endlessly maintaining the Dao tablets it was built to protect. It attacks anything that interferes with the inscriptions."
     },
     "dao_inscription_revenant": {
-      "name":        "Dao Inscription Revenant",
+      "name": "Dao Inscription Revenant",
       "description": "The remnant of a scholar who died attempting to decode the Dao tablets. Their consciousness was absorbed into the inscription arrays and now serves as an aggressive guardian."
     },
     "emperor_will_fragment": {
-      "name":        "Emperor Will Fragment",
+      "name": "Emperor Will Fragment",
       "description": "A shard of an ancient emperor's dying will, still carrying enough authority to manifest as a semi-physical force. It attacks intruders reflexively, protecting the tomb by instinct."
     },
     "petrified_dao_lord": {
-      "name":        "Petrified Dao Lord",
+      "name": "Petrified Dao Lord",
       "description": "A Dao Lord sealed inside the emperor's tomb as a final line of defence. Its body has turned to stone but its Dao comprehension remains intact — it fights with pure principle."
     },
     "star_sea_drifter": {
-      "name":        "Star Sea Drifter",
+      "name": "Star Sea Drifter",
       "description": "An entity pulled from the star sea by the catastrophic Dao convergence at Heaven Sword Ridge. It hunts alone, disoriented and aggressive, far from its native void."
     },
     "heaven_pillar_guardian": {
-      "name":        "Heaven Pillar Guardian",
+      "name": "Heaven Pillar Guardian",
       "description": "A celestial sentinel bound to the inscription pillars of the Open Heaven realm, maintaining the boundary between realms. It does not negotiate passage."
     },
     "boundary_wraith": {
-      "name":        "Boundary Wraith",
+      "name": "Boundary Wraith",
       "description": "A wraith formed from the residual spiritual pressure of realm boundaries. It drifts at the threshold of the Open Heaven, preying on cultivators who linger at the ascent."
     },
     "open_heaven_beast": {
-      "name":        "Open Heaven Beast",
+      "name": "Open Heaven Beast",
       "description": "A beast native to the Open Heaven realm, its body saturated with heaven-grade qi from birth. Even its resting state exerts pressure comparable to a peak Emperor Realm cultivator."
     },
     "star_sea_leviathan": {
-      "name":        "Star Sea Leviathan",
+      "name": "Star Sea Leviathan",
       "description": "A leviathan from the star sea that has entered the Open Heaven realm through a collapsed boundary. Its scale dwarfs anything from the mortal world."
     },
     "celestial_sovereign": {
-      "name":        "Celestial Sovereign",
+      "name": "Celestial Sovereign",
       "description": "A sovereign of the Open Heaven realm, commanding a domain of the Celestial Rift. Its authority over spatial energy is absolute within its territory."
     },
     "eternal_storm_titan": {
-      "name":        "Eternal Storm Titan",
+      "name": "Eternal Storm Titan",
       "description": "A natural force given form by the rift's perpetual storms. It has no consciousness — only the endless violent energy of celestial weather made manifest."
     },
     "open_heaven_sovereign": {
-      "name":        "Open Heaven Sovereign",
+      "name": "Open Heaven Sovereign",
       "description": "The apex ruler of the Open Heaven realm, its Dao comprehension beyond anything achievable in the mortal world. Encountering it is the final test of ascension."
     },
     "void_apex_predator": {
-      "name":        "Void Apex Predator",
+      "name": "Void Apex Predator",
       "description": "The ultimate predator of the void, having survived the collapse of multiple realms. It hunts celestial sovereigns for sport and regards ascendant cultivators as prey."
     }
   },
-
   "items": {
-    "iron_herb_1":          { "name": "Mortal Qi Grass",       "desc": "A weed that grows wherever mortal cultivators train, soaking up residual qi from their exercises." },
-    "iron_herb_2":          { "name": "Wild Spirit Root",       "desc": "A gnarled root found in borderland wilderness, drawn to faint spiritual energy in the soil." },
-    "bronze_herb_1":        { "name": "Qi Vein Vine",           "desc": "A creeping vine that grows along underground qi veins, its leaves faintly luminescent." },
-    "bronze_herb_2":        { "name": "Misty Forest Bloom",     "desc": "A pale flower that blooms only in spirit-mist forests, pollinated by forest spirits." },
-    "silver_herb_1":        { "name": "Desert Silver Lotus",    "desc": "A silver lotus that survives in scorched desert ruins, drawing water from deep ley lines." },
-    "silver_herb_2":        { "name": "Blood Reed",             "desc": "A blood-red reed that grows at the edges of the blood sea, its sap thick with corrupted vitality." },
-    "gold_herb_1":          { "name": "Burial Ground Lotus",    "desc": "A dark lotus that blooms only above saint-grade burial sites, feeding on centuries of death qi." },
-    "gold_herb_2":          { "name": "Void Thorn Vine",        "desc": "A thorned vine that grows through rift cracks, its barbs sharp enough to pierce saint-grade defenses." },
-    "transcendent_herb_1":  { "name": "Origin Spring Petal",    "desc": "A petal shed by flowers growing at the world's origin qi springs, saturated with primordial energy." },
-    "transcendent_herb_2":  { "name": "Heaven Root Vine",       "desc": "A legendary vine whose roots reach through bedrock to the world core, channeling heaven-grade energy." },
-
-    "iron_mineral_1":          { "name": "Sect Iron Shard",      "desc": "A fragment of iron-grade material shed from sect constructs, training equipment, and the iron of mortal cultivators." },
-    "iron_mineral_2":          { "name": "Iron Vein Shard",      "desc": "A dense shard of iron ore extracted from shallow veins, used in basic transmutation." },
-    "bronze_mineral_1":        { "name": "Qi Fang",              "desc": "A fang or spine shard from a beast that grew mineral-dense through years of absorbing qi from the earth." },
-    "bronze_mineral_2":        { "name": "Spirit Wood Core",     "desc": "The hardened core from a spirit entity or ancient tree, permeated with concentrated forest qi." },
-    "silver_mineral_1":        { "name": "Iron Spine Scale",     "desc": "A scale or spine segment from iron-calibre predators of the ancient frontier, dense enough to deflect silver-grade attacks." },
-    "silver_mineral_2":        { "name": "Immortal Array Jade",  "desc": "Jade infused with formation arrays from sunken immortal ruins, still containing traces of their original inscriptions." },
-    "gold_mineral_1":          { "name": "Saint Bone Sliver",    "desc": "A sliver of bone from saint-realm corpses, radiating a cold death qi that resists refinement." },
-    "gold_mineral_2":          { "name": "Forbidden Seal Shard", "desc": "A fragment of the void seals that once contained the Forbidden Lands, crackling with restrained power." },
-    "transcendent_mineral_1":  { "name": "Void Crystal",         "desc": "A crystal grown inside rift tears, its structure formed entirely by compressed void energy." },
-    "transcendent_mineral_2":  { "name": "World Stone Core",     "desc": "An impossibly dense stone core formed at the world's deepest strata or shed by titans of the upper heaven, used only in the most advanced transmutation." },
-
-    "iron_cultivation_1":         { "name": "Mortal Qi Residue",     "desc": "Residual qi that coalesces above a defeated mortal cultivator or beast, briefly visible before dispersing — gathered quickly before it fades." },
-    "iron_cultivation_2":         { "name": "Condensed Qi Stone",    "desc": "A naturally formed stone that accumulates ambient qi over time in mortal-realm training grounds." },
-    "bronze_cultivation_1":       { "name": "Beast Qi Core",         "desc": "The dense qi nucleus found at the center of a beast that has fed on spiritual energy for years — still pulsing faintly after death." },
-    "bronze_cultivation_2":       { "name": "Corrupted Qi Shard",    "desc": "A crystallised shard of qi torn from a fallen cultivator or construct whose energy pathways had been corrupted or shattered." },
-    "silver_cultivation_1":       { "name": "Ancient Qi Marrow",     "desc": "The marrow-like qi condensate found deep within ancient frontier creatures, saturated after centuries of qi absorption in ruins and wastelands." },
-    "silver_cultivation_2":       { "name": "Immortal Soul Remnant", "desc": "A fragment of soul-force that persists after the death of an immortal-grade entity, still carrying echoes of its cultivation." },
-    "gold_cultivation_1":         { "name": "Saint Qi Relic",        "desc": "A calcified relic of saint-realm qi, recovered from burial grounds and war altars." },
-    "gold_cultivation_2":         { "name": "Void Qi Pearl",         "desc": "A small pearl formed inside void-touched predators and shades, containing compressed void-attribute energy." },
-    "transcendent_cultivation_1": { "name": "Primal Qi Core",        "desc": "The crystallised qi core of a primordial entity — condensed from millions of years of unbroken cultivation, still radiating overwhelming pressure." },
-    "transcendent_cultivation_2": { "name": "Heaven Qi Crystal",     "desc": "A crystal of pure heaven-grade qi extracted from entities that have ascended beyond mortal limitations." },
-
-    "qi_condensation_pill":  { "name": "Qi Condensation Pill",  "desc": "A cultivated pill that provides temporary buffs." },
-    "body_tempering_pill":   { "name": "Body Tempering Pill",   "desc": "A cultivated pill that provides temporary buffs." },
-    "spirit_calming_pill":   { "name": "Spirit Calming Pill",   "desc": "A cultivated pill that provides temporary buffs." },
-    "fortification_pill":    { "name": "Fortification Pill",    "desc": "A cultivated pill that provides temporary buffs." },
-    "miners_focus_pill":     { "name": "Miner's Focus Pill",    "desc": "A cultivated pill that provides temporary buffs." },
-    "qi_gathering_pill":     { "name": "Qi Gathering Pill",     "desc": "A cultivated pill that provides temporary buffs." },
-    "meridian_opening_pill": { "name": "Meridian Opening Pill", "desc": "A cultivated pill that provides temporary buffs." },
-    "flame_body_pill":       { "name": "Flame Body Pill",       "desc": "A cultivated pill that provides temporary buffs." },
-    "iron_skin_pill":        { "name": "Iron Skin Pill",        "desc": "A cultivated pill that provides temporary buffs." },
-    "earth_pulse_pill":      { "name": "Earth Pulse Pill",      "desc": "A cultivated pill that provides temporary buffs." },
-    "spirit_sight_pill":     { "name": "Spirit Sight Pill",     "desc": "A cultivated pill that provides temporary buffs." },
-    "qi_flow_pill":          { "name": "Qi Flow Pill",          "desc": "A cultivated pill that provides temporary buffs." },
-    "profound_qi_pill":      { "name": "Profound Qi Pill",      "desc": "A cultivated pill that provides temporary buffs." },
-    "dragon_blood_pill":     { "name": "Dragon Blood Pill",     "desc": "A cultivated pill that provides temporary buffs." },
-    "soul_stabilizing_pill": { "name": "Soul Stabilizing Pill", "desc": "A cultivated pill that provides temporary buffs." },
-    "vitality_pill":         { "name": "Vitality Pill",         "desc": "A cultivated pill that provides temporary buffs." },
-    "heavenly_root_pill":    { "name": "Heavenly Root Pill",    "desc": "A cultivated pill that provides temporary buffs." },
-    "deep_vein_pill":        { "name": "Deep Vein Pill",        "desc": "A cultivated pill that provides temporary buffs." },
-    "qi_surge_pill":         { "name": "Qi Surge Pill",         "desc": "A cultivated pill that provides temporary buffs." },
-    "combat_pill":           { "name": "Combat Pill",           "desc": "A cultivated pill that provides temporary buffs." },
-    "qi_ascension_pill":     { "name": "Qi Ascension Pill",     "desc": "A cultivated pill that provides temporary buffs." },
-    "true_element_pill":     { "name": "True Element Pill",     "desc": "A cultivated pill that provides temporary buffs." },
-    "heaven_marrow_pill":    { "name": "Heaven Marrow Pill",    "desc": "A cultivated pill that provides temporary buffs." },
-    "origin_gathering_pill": { "name": "Origin Gathering Pill", "desc": "A cultivated pill that provides temporary buffs." },
-    "qi_breakthrough_pill":  { "name": "Qi Breakthrough Pill",  "desc": "A cultivated pill that provides temporary buffs." },
-    "dao_heart_pill":        { "name": "Dao Heart Pill",        "desc": "A cultivated pill that provides temporary buffs." },
-    "immortal_qi_pill":      { "name": "Immortal Qi Pill",      "desc": "A cultivated pill that provides temporary buffs." },
-    "heaven_defying_pill":   { "name": "Heaven Defying Pill",   "desc": "A cultivated pill that provides temporary buffs." },
-    "dao_foundation_pill":   { "name": "Dao Foundation Pill",   "desc": "A cultivated pill that provides temporary buffs." },
-    "eternal_vigor_pill":    { "name": "Eternal Vigor Pill",    "desc": "A cultivated pill that provides temporary buffs." }
+    "iron_herb_1": {
+      "name": "Mortal Qi Grass",
+      "desc": "A weed that grows wherever mortal cultivators train, soaking up residual qi from their exercises."
+    },
+    "iron_herb_2": {
+      "name": "Wild Spirit Root",
+      "desc": "A gnarled root found in borderland wilderness, drawn to faint spiritual energy in the soil."
+    },
+    "bronze_herb_1": {
+      "name": "Qi Vein Vine",
+      "desc": "A creeping vine that grows along underground qi veins, its leaves faintly luminescent."
+    },
+    "bronze_herb_2": {
+      "name": "Misty Forest Bloom",
+      "desc": "A pale flower that blooms only in spirit-mist forests, pollinated by forest spirits."
+    },
+    "silver_herb_1": {
+      "name": "Desert Silver Lotus",
+      "desc": "A silver lotus that survives in scorched desert ruins, drawing water from deep ley lines."
+    },
+    "silver_herb_2": {
+      "name": "Blood Reed",
+      "desc": "A blood-red reed that grows at the edges of the blood sea, its sap thick with corrupted vitality."
+    },
+    "gold_herb_1": {
+      "name": "Burial Ground Lotus",
+      "desc": "A dark lotus that blooms only above saint-grade burial sites, feeding on centuries of death qi."
+    },
+    "gold_herb_2": {
+      "name": "Void Thorn Vine",
+      "desc": "A thorned vine that grows through rift cracks, its barbs sharp enough to pierce saint-grade defenses."
+    },
+    "transcendent_herb_1": {
+      "name": "Origin Spring Petal",
+      "desc": "A petal shed by flowers growing at the world's origin qi springs, saturated with primordial energy."
+    },
+    "transcendent_herb_2": {
+      "name": "Heaven Root Vine",
+      "desc": "A legendary vine whose roots reach through bedrock to the world core, channeling heaven-grade energy."
+    },
+    "iron_mineral_1": {
+      "name": "Sect Iron Shard",
+      "desc": "A fragment of iron-grade material shed from sect constructs, training equipment, and the iron of mortal cultivators."
+    },
+    "iron_mineral_2": {
+      "name": "Iron Vein Shard",
+      "desc": "A dense shard of iron ore extracted from shallow veins, used in basic transmutation."
+    },
+    "bronze_mineral_1": {
+      "name": "Qi Fang",
+      "desc": "A fang or spine shard from a beast that grew mineral-dense through years of absorbing qi from the earth."
+    },
+    "bronze_mineral_2": {
+      "name": "Spirit Wood Core",
+      "desc": "The hardened core from a spirit entity or ancient tree, permeated with concentrated forest qi."
+    },
+    "silver_mineral_1": {
+      "name": "Iron Spine Scale",
+      "desc": "A scale or spine segment from iron-calibre predators of the ancient frontier, dense enough to deflect silver-grade attacks."
+    },
+    "silver_mineral_2": {
+      "name": "Immortal Array Jade",
+      "desc": "Jade infused with formation arrays from sunken immortal ruins, still containing traces of their original inscriptions."
+    },
+    "gold_mineral_1": {
+      "name": "Saint Bone Sliver",
+      "desc": "A sliver of bone from saint-realm corpses, radiating a cold death qi that resists refinement."
+    },
+    "gold_mineral_2": {
+      "name": "Forbidden Seal Shard",
+      "desc": "A fragment of the void seals that once contained the Forbidden Lands, crackling with restrained power."
+    },
+    "transcendent_mineral_1": {
+      "name": "Void Crystal",
+      "desc": "A crystal grown inside rift tears, its structure formed entirely by compressed void energy."
+    },
+    "transcendent_mineral_2": {
+      "name": "World Stone Core",
+      "desc": "An impossibly dense stone core formed at the world's deepest strata or shed by titans of the upper heaven, used only in the most advanced transmutation."
+    },
+    "iron_cultivation_1": {
+      "name": "Iron QI Stone 1",
+      "desc": "A naturally formed stone that accumulates ambient qi over time in mortal-realm training grounds."
+    },
+    "iron_cultivation_2": {
+      "name": "Iron QI Stone 2",
+      "desc": "Residual qi that coalesces above a defeated mortal cultivator or beast, briefly visible before dispersing."
+    },
+    "bronze_cultivation_1": {
+      "name": "Bronze QI Stone 1",
+      "desc": "The dense qi nucleus found at the center of a beast that has fed on spiritual energy for years — still pulsing faintly after death."
+    },
+    "bronze_cultivation_2": {
+      "name": "Bronze QI Stone 2",
+      "desc": "A crystallised shard of qi torn from a fallen cultivator or construct whose energy pathways had been corrupted or shattered."
+    },
+    "silver_cultivation_1": {
+      "name": "Silver QI Stone 1",
+      "desc": "The marrow-like qi condensate found deep within ancient frontier creatures, saturated after centuries of qi absorption."
+    },
+    "silver_cultivation_2": {
+      "name": "Silver QI Stone 2",
+      "desc": "A fragment of soul-force that persists after the death of an immortal-grade entity, still carrying echoes of its cultivation."
+    },
+    "gold_cultivation_1": {
+      "name": "Gold QI Stone 1",
+      "desc": "A calcified relic of saint-realm qi, recovered from burial grounds and war altars."
+    },
+    "gold_cultivation_2": {
+      "name": "Gold QI Stone 2",
+      "desc": "A small pearl formed inside void-touched predators and shades, containing compressed void-attribute energy."
+    },
+    "transcendent_cultivation_1": {
+      "name": "Transcendent QI Stone 1",
+      "desc": "The crystallised qi core of a primordial entity — condensed from millions of years of unbroken cultivation."
+    },
+    "transcendent_cultivation_2": {
+      "name": "Transcendent QI Stone 2",
+      "desc": "A crystal of pure heaven-grade qi extracted from entities that have ascended beyond mortal limitations."
+    },
+    "qi_condensation_pill": {
+      "name": "Qi Condensation Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "body_tempering_pill": {
+      "name": "Body Tempering Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "spirit_calming_pill": {
+      "name": "Spirit Calming Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "fortification_pill": {
+      "name": "Fortification Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "miners_focus_pill": {
+      "name": "Miner's Focus Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "qi_gathering_pill": {
+      "name": "Qi Gathering Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "meridian_opening_pill": {
+      "name": "Meridian Opening Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "flame_body_pill": {
+      "name": "Flame Body Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "iron_skin_pill": {
+      "name": "Iron Skin Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "earth_pulse_pill": {
+      "name": "Earth Pulse Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "spirit_sight_pill": {
+      "name": "Spirit Sight Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "qi_flow_pill": {
+      "name": "Qi Flow Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "profound_qi_pill": {
+      "name": "Profound Qi Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "dragon_blood_pill": {
+      "name": "Dragon Blood Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "soul_stabilizing_pill": {
+      "name": "Soul Stabilizing Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "vitality_pill": {
+      "name": "Vitality Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "heavenly_root_pill": {
+      "name": "Heavenly Root Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "deep_vein_pill": {
+      "name": "Deep Vein Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "qi_surge_pill": {
+      "name": "Qi Surge Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "combat_pill": {
+      "name": "Combat Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "qi_ascension_pill": {
+      "name": "Qi Ascension Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "true_element_pill": {
+      "name": "True Element Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "heaven_marrow_pill": {
+      "name": "Heaven Marrow Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "origin_gathering_pill": {
+      "name": "Origin Gathering Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "qi_breakthrough_pill": {
+      "name": "Qi Breakthrough Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "dao_heart_pill": {
+      "name": "Dao Heart Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "immortal_qi_pill": {
+      "name": "Immortal Qi Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "heaven_defying_pill": {
+      "name": "Heaven Defying Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "dao_foundation_pill": {
+      "name": "Dao Foundation Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "eternal_vigor_pill": {
+      "name": "Eternal Vigor Pill",
+      "desc": "A cultivated pill that provides temporary buffs."
+    },
+    "iron_blood_core_1": {
+      "name": "Iron Blood Core 1",
+      "desc": "Placeholder — a dense iron-grade blood core extracted from a fallen enemy."
+    },
+    "iron_blood_core_2": {
+      "name": "Iron Blood Core 2",
+      "desc": "Placeholder — a crystallised iron-grade blood essence condensed from mortal cultivators."
+    },
+    "bronze_blood_core_1": {
+      "name": "Bronze Blood Core 1",
+      "desc": "Placeholder — a bronze-grade blood core pulsing with beast vitality."
+    },
+    "bronze_blood_core_2": {
+      "name": "Bronze Blood Core 2",
+      "desc": "Placeholder — a shard of condensed bronze-grade blood qi from corrupted entities."
+    },
+    "silver_blood_core_1": {
+      "name": "Silver Blood Core 1",
+      "desc": "Placeholder — a silver-grade blood core saturated with ancient frontier vitality."
+    },
+    "silver_blood_core_2": {
+      "name": "Silver Blood Core 2",
+      "desc": "Placeholder — a remnant blood crystal from an immortal-realm entity."
+    },
+    "gold_blood_core_1": {
+      "name": "Gold Blood Core 1",
+      "desc": "Placeholder — a saint-grade blood core radiating cold death qi."
+    },
+    "gold_blood_core_2": {
+      "name": "Gold Blood Core 2",
+      "desc": "Placeholder — a void-attribute blood pearl from a gold-grade predator."
+    },
+    "transcendent_blood_core_1": {
+      "name": "Transcendent Blood Core 1",
+      "desc": "Placeholder — a primordial blood core condensed from an entity beyond mortal limitations."
+    },
+    "transcendent_blood_core_2": {
+      "name": "Transcendent Blood Core 2",
+      "desc": "Placeholder — a heaven-grade blood crystal radiating overwhelming pressure."
+    }
   },
-
   "artefacts": {
-    "iron_sword":           { "name": "Iron Sword",                "desc": "A plain iron sword forged for outer sect disciples. Reliable but unremarkable." },
-    "spirit_edge_sword":    { "name": "Spirit-Edge Sword",         "desc": "A sword honed with spirit energy; the blade hums faintly when qi flows through it." },
-    "void_cleaver":         { "name": "Void Cleaver",              "desc": "Forged from void stone; each strike tears a hairline crack in the local spatial fabric." },
-    "dragon_fang_sword":    { "name": "Dragon Fang Sword",         "desc": "Crafted from a dragon beast fang; channels raw draconic pressure into every blow." },
-    "heaven_slaying_sword": { "name": "Heaven-Slaying Sword",      "desc": "A legendary blade said to have cut through the barrier between realms. The edge never dulls." },
-    "iron_polearm":         { "name": "Iron Polearm",              "desc": "A heavy iron polearm favoured by body-cultivators for its reach and stopping power." },
-    "serpent_spear":        { "name": "Serpent Spear",             "desc": "A flexible spear with a serpent-tooth tip that injects a mild spiritual venom on penetration." },
-    "mountain_breaker":     { "name": "Mountain Breaker",          "desc": "A broad-headed halberd said to have felled a small spirit mountain. Pulverises physical defence." },
-    "thunder_lance":        { "name": "Thunder Lance",             "desc": "A lance coated in compressed lightning ore; strikes detonate with a thunderclap." },
-    "divine_pillar_spear":  { "name": "Divine Pillar Spear",       "desc": "Once a pillar of a heavenly palace, reshaped into a spear. A full-power thrust tears space." },
-    "spirit_headband":         { "name": "Spirit Headband",          "desc": "A simple cloth band imbued with basic spiritual energy, aiding focus during cultivation." },
-    "jade_cultivation_crown":  { "name": "Jade Cultivation Crown",   "desc": "A carved jade circlet that stabilizes the spiritual sea and reduces breakthrough turbulence." },
-    "ghost_kings_circlet":     { "name": "Ghost King's Circlet",     "desc": "Forged from ghost iron; dulls spiritual attacks and suppresses soul-based debuffs." },
-    "heaven_forged_war_crown": { "name": "Heaven-Forged War Crown",  "desc": "A battle crown smelted in heavenly fire; greatly increases resistance to elemental damage." },
-    "crown_of_the_undying":    { "name": "Crown of the Undying",     "desc": "Said to have been worn by an Open Heaven cultivator; protects the spirit from lethal soul attacks." },
-    "cotton_spirit_robe":          { "name": "Cotton Spirit Robe",          "desc": "Lightweight robe woven with spirit thread, providing minimal but consistent qi circulation." },
-    "cloud_silk_battle_vest":      { "name": "Cloud Silk Battle Vest",      "desc": "A vest spun from high-altitude cloud silk that deflects minor physical and elemental strikes." },
-    "dragon_scale_armour":         { "name": "Dragon Scale Armour",         "desc": "Scales shed by a lesser dragon beast; hard as iron and resistant to fire and lightning." },
-    "phoenix_feather_war_robe":    { "name": "Phoenix Feather War Robe",    "desc": "Woven from phoenix down; regenerates minor damage over time and resists extreme heat." },
-    "heaven_piercing_divine_robe": { "name": "Heaven-Piercing Divine Robe", "desc": "A supreme-grade robe that shifts between softness and steel; nullifies strikes below a power threshold." },
-    "iron_bracers":          { "name": "Iron Bracers",          "desc": "Basic iron bracers that reinforce the forearms and improve blocking stability." },
-    "tiger_claw_gauntlets":  { "name": "Tiger Claw Gauntlets",  "desc": "Gauntlets styled after tiger claws; slightly increases the damage of unarmed and polearm strikes." },
-    "mithril_bracers":       { "name": "Mithril Bracers",       "desc": "Lightweight mithril bracers that conduct elemental energy through each strike." },
-    "dragon_vein_gauntlets": { "name": "Dragon Vein Gauntlets", "desc": "Gauntlets threaded with dragon-vein ore; amplify Essence-based attacks channelled through the hands." },
-    "heaven_palm_guards":    { "name": "Heaven Palm Guards",    "desc": "Ancient guards worn by a palm-technique grandmaster; dramatically amplify open-palm secret techniques." },
-    "leather_cultivation_belt": { "name": "Leather Cultivation Belt", "desc": "A sturdy belt that stabilizes the dantian and reduces qi dispersal during combat." },
-    "spirit_jade_sash":         { "name": "Spirit Jade Sash",         "desc": "A silk sash inlaid with spirit jade beads; improves qi circulation between upper and lower body." },
-    "serpent_skin_belt":        { "name": "Serpent Skin Belt",        "desc": "Crafted from the shed skin of a spiritual serpent; increases agility and resistance to poison." },
-    "golden_dragon_belt":       { "name": "Golden Dragon Belt",       "desc": "A broad belt embossed with a coiling dragon; greatly increases Body-stat conversion." },
-    "void_emperors_sash":       { "name": "Void Emperor's Sash",      "desc": "A sash woven from spatial thread; absorbs a portion of incoming damage into a void pocket." },
-    "wind_step_boots":        { "name": "Wind-Step Boots",        "desc": "Light boots enchanted for swift footwork; marginally increases dodge rate." },
-    "swiftcloud_sandals":     { "name": "Swiftcloud Sandals",     "desc": "Sandals that carry a trace of cloud energy; allow brief bursts of accelerated movement." },
-    "thunderstep_boots":      { "name": "Thunderstep Boots",      "desc": "Boots crackling with stored lightning; each step releases a low-power shock on contact." },
-    "dragon_treading_boots":  { "name": "Dragon Treading Boots",  "desc": "Forged from dragon beast bones; dramatically improves ground stability and stomp attacks." },
-    "heaven_soaring_sandals": { "name": "Heaven-Soaring Sandals", "desc": "Sandals said to let the wearer walk on air; massively boost dodge and movement-based techniques." },
-    "jade_spirit_pendant":    { "name": "Jade Spirit Pendant",    "desc": "A smoothed jade piece worn close to the heart; gently strengthens the spiritual sea." },
-    "soul_calming_necklace":  { "name": "Soul Calming Necklace",  "desc": "A string of spirit beads that suppresses soul fluctuations and mental debuffs in combat." },
-    "blood_dragon_talisman":  { "name": "Blood Dragon Talisman",  "desc": "A carved bone talisman soaked in dragon beast blood; increases raw physical resistance." },
-    "elemental_core_pendant": { "name": "Elemental Core Pendant", "desc": "Contains a compressed elemental core; amplifies the elemental affinity bonus." },
-    "heavens_eye_amulet":     { "name": "Heaven's Eye Amulet",    "desc": "A talisman housing the petrified eye of a divine beast; grants brief precognition in combat." },
-    "copper_spirit_ring": { "name": "Copper Spirit Ring", "desc": "A plain copper ring that channels a faint qi current through the meridians." },
-    "jade_focus_ring":    { "name": "Jade Focus Ring",    "desc": "A carved jade ring that sharpens elemental technique control, reducing wasted energy." },
-    "void_stone_ring":    { "name": "Void Stone Ring",    "desc": "Set with a void stone fragment; has a small storage space and boosts spatial-technique damage." },
-    "dragon_blood_ring":  { "name": "Dragon Blood Ring",  "desc": "A ring forged with dragon blood alloy; significantly boosts Essence and Body stats." },
-    "immortal_soul_ring": { "name": "Immortal Soul Ring", "desc": "A ring said to contain a sliver of an immortal's soul; dramatically boosts all three primary stats." }
+    "iron_sword": {
+      "name": "Iron Sword",
+      "desc": "A plain iron sword forged for outer sect disciples. Reliable but unremarkable."
+    },
+    "spirit_edge_sword": {
+      "name": "Spirit-Edge Sword",
+      "desc": "A sword honed with spirit energy; the blade hums faintly when qi flows through it."
+    },
+    "void_cleaver": {
+      "name": "Void Cleaver",
+      "desc": "Forged from void stone; each strike tears a hairline crack in the local spatial fabric."
+    },
+    "dragon_fang_sword": {
+      "name": "Dragon Fang Sword",
+      "desc": "Crafted from a dragon beast fang; channels raw draconic pressure into every blow."
+    },
+    "heaven_slaying_sword": {
+      "name": "Heaven-Slaying Sword",
+      "desc": "A legendary blade said to have cut through the barrier between realms. The edge never dulls."
+    },
+    "iron_polearm": {
+      "name": "Iron Polearm",
+      "desc": "A heavy iron polearm favoured by body-cultivators for its reach and stopping power."
+    },
+    "serpent_spear": {
+      "name": "Serpent Spear",
+      "desc": "A flexible spear with a serpent-tooth tip that injects a mild spiritual venom on penetration."
+    },
+    "mountain_breaker": {
+      "name": "Mountain Breaker",
+      "desc": "A broad-headed halberd said to have felled a small spirit mountain. Pulverises physical defence."
+    },
+    "thunder_lance": {
+      "name": "Thunder Lance",
+      "desc": "A lance coated in compressed lightning ore; strikes detonate with a thunderclap."
+    },
+    "divine_pillar_spear": {
+      "name": "Divine Pillar Spear",
+      "desc": "Once a pillar of a heavenly palace, reshaped into a spear. A full-power thrust tears space."
+    },
+    "spirit_headband": {
+      "name": "Spirit Headband",
+      "desc": "A simple cloth band imbued with basic spiritual energy, aiding focus during cultivation."
+    },
+    "jade_cultivation_crown": {
+      "name": "Jade Cultivation Crown",
+      "desc": "A carved jade circlet that stabilizes the spiritual sea and reduces breakthrough turbulence."
+    },
+    "ghost_kings_circlet": {
+      "name": "Ghost King's Circlet",
+      "desc": "Forged from ghost iron; dulls spiritual attacks and suppresses soul-based debuffs."
+    },
+    "heaven_forged_war_crown": {
+      "name": "Heaven-Forged War Crown",
+      "desc": "A battle crown smelted in heavenly fire; greatly increases resistance to elemental damage."
+    },
+    "crown_of_the_undying": {
+      "name": "Crown of the Undying",
+      "desc": "Said to have been worn by an Open Heaven cultivator; protects the spirit from lethal soul attacks."
+    },
+    "cotton_spirit_robe": {
+      "name": "Cotton Spirit Robe",
+      "desc": "Lightweight robe woven with spirit thread, providing minimal but consistent qi circulation."
+    },
+    "cloud_silk_battle_vest": {
+      "name": "Cloud Silk Battle Vest",
+      "desc": "A vest spun from high-altitude cloud silk that deflects minor physical and elemental strikes."
+    },
+    "dragon_scale_armour": {
+      "name": "Dragon Scale Armour",
+      "desc": "Scales shed by a lesser dragon beast; hard as iron and resistant to fire and lightning."
+    },
+    "phoenix_feather_war_robe": {
+      "name": "Phoenix Feather War Robe",
+      "desc": "Woven from phoenix down; regenerates minor damage over time and resists extreme heat."
+    },
+    "heaven_piercing_divine_robe": {
+      "name": "Heaven-Piercing Divine Robe",
+      "desc": "A supreme-grade robe that shifts between softness and steel; nullifies strikes below a power threshold."
+    },
+    "iron_bracers": {
+      "name": "Iron Bracers",
+      "desc": "Basic iron bracers that reinforce the forearms and improve blocking stability."
+    },
+    "tiger_claw_gauntlets": {
+      "name": "Tiger Claw Gauntlets",
+      "desc": "Gauntlets styled after tiger claws; slightly increases the damage of unarmed and polearm strikes."
+    },
+    "mithril_bracers": {
+      "name": "Mithril Bracers",
+      "desc": "Lightweight mithril bracers that conduct elemental energy through each strike."
+    },
+    "dragon_vein_gauntlets": {
+      "name": "Dragon Vein Gauntlets",
+      "desc": "Gauntlets threaded with dragon-vein ore; amplify Essence-based attacks channelled through the hands."
+    },
+    "heaven_palm_guards": {
+      "name": "Heaven Palm Guards",
+      "desc": "Ancient guards worn by a palm-technique grandmaster; dramatically amplify open-palm secret techniques."
+    },
+    "leather_cultivation_belt": {
+      "name": "Leather Cultivation Belt",
+      "desc": "A sturdy belt that stabilizes the dantian and reduces qi dispersal during combat."
+    },
+    "spirit_jade_sash": {
+      "name": "Spirit Jade Sash",
+      "desc": "A silk sash inlaid with spirit jade beads; improves qi circulation between upper and lower body."
+    },
+    "serpent_skin_belt": {
+      "name": "Serpent Skin Belt",
+      "desc": "Crafted from the shed skin of a spiritual serpent; increases agility and resistance to poison."
+    },
+    "golden_dragon_belt": {
+      "name": "Golden Dragon Belt",
+      "desc": "A broad belt embossed with a coiling dragon; greatly increases Body-stat conversion."
+    },
+    "void_emperors_sash": {
+      "name": "Void Emperor's Sash",
+      "desc": "A sash woven from spatial thread; absorbs a portion of incoming damage into a void pocket."
+    },
+    "wind_step_boots": {
+      "name": "Wind-Step Boots",
+      "desc": "Light boots enchanted for swift footwork; marginally increases dodge rate."
+    },
+    "swiftcloud_sandals": {
+      "name": "Swiftcloud Sandals",
+      "desc": "Sandals that carry a trace of cloud energy; allow brief bursts of accelerated movement."
+    },
+    "thunderstep_boots": {
+      "name": "Thunderstep Boots",
+      "desc": "Boots crackling with stored lightning; each step releases a low-power shock on contact."
+    },
+    "dragon_treading_boots": {
+      "name": "Dragon Treading Boots",
+      "desc": "Forged from dragon beast bones; dramatically improves ground stability and stomp attacks."
+    },
+    "heaven_soaring_sandals": {
+      "name": "Heaven-Soaring Sandals",
+      "desc": "Sandals said to let the wearer walk on air; massively boost dodge and movement-based techniques."
+    },
+    "jade_spirit_pendant": {
+      "name": "Jade Spirit Pendant",
+      "desc": "A smoothed jade piece worn close to the heart; gently strengthens the spiritual sea."
+    },
+    "soul_calming_necklace": {
+      "name": "Soul Calming Necklace",
+      "desc": "A string of spirit beads that suppresses soul fluctuations and mental debuffs in combat."
+    },
+    "blood_dragon_talisman": {
+      "name": "Blood Dragon Talisman",
+      "desc": "A carved bone talisman soaked in dragon beast blood; increases raw physical resistance."
+    },
+    "elemental_core_pendant": {
+      "name": "Elemental Core Pendant",
+      "desc": "Contains a compressed elemental core; amplifies the elemental affinity bonus."
+    },
+    "heavens_eye_amulet": {
+      "name": "Heaven's Eye Amulet",
+      "desc": "A talisman housing the petrified eye of a divine beast; grants brief precognition in combat."
+    },
+    "copper_spirit_ring": {
+      "name": "Copper Spirit Ring",
+      "desc": "A plain copper ring that channels a faint qi current through the meridians."
+    },
+    "jade_focus_ring": {
+      "name": "Jade Focus Ring",
+      "desc": "A carved jade ring that sharpens elemental technique control, reducing wasted energy."
+    },
+    "void_stone_ring": {
+      "name": "Void Stone Ring",
+      "desc": "Set with a void stone fragment; has a small storage space and boosts spatial-technique damage."
+    },
+    "dragon_blood_ring": {
+      "name": "Dragon Blood Ring",
+      "desc": "A ring forged with dragon blood alloy; significantly boosts Essence and Body stats."
+    },
+    "immortal_soul_ring": {
+      "name": "Immortal Soul Ring",
+      "desc": "A ring said to contain a sliver of an immortal's soul; dramatically boosts all three primary stats."
+    }
   },
-
   "techniques": {
     "raging_fire_slash": {
-      "name":    "Raging Fire Slash",
+      "name": "Raging Fire Slash",
       "flavour": "A blade wreathed in living fire, forged from fury alone.",
       "passives": {
         "Ignite": "Applies a burn dealing 5% dmg/s for 3s."
       }
     },
     "void_piercer": {
-      "name":    "Void Piercer",
+      "name": "Void Piercer",
       "flavour": "A thrust so precise it tears space itself.",
       "passives": {
         "Penetrating": "Ignores 20% of enemy DEF.",
-        "Momentum":    "Next attack cooldown −1s.",
-        "Focus":       "+10% critical hit chance."
+        "Momentum": "Next attack cooldown −1s.",
+        "Focus": "+10% critical hit chance."
       }
     },
     "twin_dragons_rage": {
-      "name":    "Twin Dragon's Rage",
+      "name": "Twin Dragon's Rage",
       "flavour": "Two dragons roar as one — heaven itself trembles.",
       "passives": {
-        "Dragon's Fury":  "First strike deals double damage.",
-        "Inferno":        "Burn stacks amplify dmg by 15%.",
+        "Dragon's Fury": "First strike deals double damage.",
+        "Inferno": "Burn stacks amplify dmg by 15%.",
         "Soul Resonance": "Soul contribution +50%.",
-        "Dragon Roar":    "15% chance to stun for 1s."
+        "Dragon Roar": "15% chance to stun for 1s."
       }
     },
     "mending_breath": {
-      "name":    "Mending Breath",
+      "name": "Mending Breath",
       "flavour": "A single exhale restores what years of battle have worn away.",
       "passives": {
         "Deep Breath": "+5% HP regen over 3s after heal.",
-        "Calm Mind":   "Reduces cooldowns by 10% for 5s."
+        "Calm Mind": "Reduces cooldowns by 10% for 5s."
       }
     },
     "heaven_mending_art": {
-      "name":    "Heaven Mending Art",
+      "name": "Heaven Mending Art",
       "flavour": "Even shattered meridians knit themselves whole.",
       "passives": {
         "Heaven's Will": "Can overheal up to 120% max HP.",
-        "Purify":        "Removes all debuffs on heal.",
-        "Regeneration":  "+5% HP/s for 5s after cast.",
-        "Soul Mending":  "Restores a portion of Soul stat."
+        "Purify": "Removes all debuffs on heal.",
+        "Regeneration": "+5% HP/s for 5s after cast.",
+        "Soul Mending": "Restores a portion of Soul stat."
       }
     },
     "stone_skin": {
-      "name":    "Stone Skin",
+      "name": "Stone Skin",
       "flavour": "Flesh becomes iron. Iron becomes stone.",
       "passives": {
         "Hardened": "DEF bonus lasts 2 extra seconds."
       }
     },
     "iron_fortress": {
-      "name":    "Iron Fortress",
+      "name": "Iron Fortress",
       "flavour": "A citadel of qi — no blow can shake its walls.",
       "passives": {
-        "Unbreakable":  "Cannot be reduced below 1 HP while active.",
+        "Unbreakable": "Cannot be reduced below 1 HP while active.",
         "Counterforce": "20% of blocked damage returned.",
-        "Ironclad":     "Duration +1s per hit absorbed."
+        "Ironclad": "Duration +1s per hit absorbed."
       }
     },
     "phantom_step": {
-      "name":    "Phantom Step",
+      "name": "Phantom Step",
       "flavour": "Between one heartbeat and the next — you are elsewhere.",
       "passives": {
         "Swift": "Dodge window extended by 0.5s."
       }
     },
     "shadow_walk": {
-      "name":    "Shadow Walk",
+      "name": "Shadow Walk",
       "flavour": "The shadow peels away and becomes you for a precious moment.",
       "passives": {
-        "Afterimage":  "Afterimage taunts enemy for 1s.",
+        "Afterimage": "Afterimage taunts enemy for 1s.",
         "Phase Shift": "First attack after dodge deals ×1.5 dmg."
       }
     }
   },
-
   "laws": {
     "three_harmony_manual": {
-      "name":                 "Three Harmony Manual",
-      "flavour":              "The ancient text speaks of no fire, no storm, no mountain — only the even breath between all things.",
-      "realmRequirementLabel":"Tempered Body"
+      "name": "Three Harmony Manual",
+      "flavour": "The ancient text speaks of no fire, no storm, no mountain — only the even breath between all things.",
+      "realmRequirementLabel": "Tempered Body"
     }
   }
 }
