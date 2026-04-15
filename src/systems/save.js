@@ -36,6 +36,7 @@ export function wipeSave() {
   localStorage.removeItem('mai_active_law');
   localStorage.removeItem('mai_pills');
   localStorage.removeItem('mai_active_pills');
+  // mai_lang is intentionally NOT wiped — language preference survives a save reset
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────

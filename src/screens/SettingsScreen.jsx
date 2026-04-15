@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { exportSave, importSave, wipeSave } from '../systems/save';
+import { setLanguage, SUPPORTED_LANGUAGES } from '../i18n';
 
 function SettingsScreen() {
+  const { t, i18n } = useTranslation('ui');
+
   const [showImport,  setShowImport]  = useState(false);
   const [importText,  setImportText]  = useState('');
   const [message,     setMessage]     = useState(null);
@@ -14,18 +18,18 @@ function SettingsScreen() {
 
   const handleExport = () => {
     const encoded = exportSave();
-    if (!encoded) { flash('No save data found', true); return; }
+    if (!encoded) { flash(t('settings.noSaveFound'), true); return; }
     navigator.clipboard.writeText(encoded).then(
-      () => flash('Save copied to clipboard!', false),
-      () => { setImportText(encoded); setShowImport(true); flash('Copy the text manually', false); }
+      () => flash(t('settings.copiedToClipboard'), false),
+      () => { setImportText(encoded); setShowImport(true); flash(t('settings.copyManually'), false); }
     );
   };
 
   const handleImport = () => {
-    if (!importText.trim()) { flash('Paste your save string first', true); return; }
+    if (!importText.trim()) { flash(t('settings.pasteSaveFirst'), true); return; }
     const result = importSave(importText);
     if (result.ok) {
-      flash('Save imported! Reloading…', false);
+      flash(t('settings.saveImported'), false);
       setTimeout(() => window.location.reload(), 1000);
     } else {
       flash(result.error, true);
@@ -42,11 +46,27 @@ function SettingsScreen() {
 
   return (
     <div className="screen">
-      <h1>Settings</h1>
-      <p className="subtitle">Game configuration</p>
+      <h1>{t('settings.title')}</h1>
+      <p className="subtitle">{t('settings.subtitle')}</p>
 
       <div className="save-section">
-        <h2>Save Data</h2>
+        <h2>{t('settings.language')}</h2>
+        <p className="subtitle">{t('settings.languageSubtitle')}</p>
+        <div className="save-buttons">
+          {SUPPORTED_LANGUAGES.map(lang => (
+            <button
+              key={lang.code}
+              className={`save-btn${i18n.language === lang.code ? ' save-btn-active' : ''}`}
+              onClick={() => setLanguage(lang.code)}
+            >
+              {lang.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="save-section">
+        <h2>{t('settings.saveData')}</h2>
 
         {message && (
           <div className={`save-message ${message.isError ? 'save-error' : 'save-success'}`}>
@@ -55,16 +75,16 @@ function SettingsScreen() {
         )}
 
         <div className="save-buttons">
-          <button className="save-btn" onClick={handleExport}>Export Save</button>
-          <button className="save-btn" onClick={() => setShowImport(!showImport)}>Import Save</button>
+          <button className="save-btn" onClick={handleExport}>{t('settings.exportSave')}</button>
+          <button className="save-btn" onClick={() => setShowImport(!showImport)}>{t('settings.importSave')}</button>
           {confirmWipe ? (
             <div className="wipe-confirm">
-              <span className="wipe-confirm-label">Are you sure?</span>
-              <button className="save-btn save-btn-danger" onClick={confirmDoWipe}>Yes, wipe</button>
-              <button className="save-btn" onClick={() => setConfirmWipe(false)}>Cancel</button>
+              <span className="wipe-confirm-label">{t('settings.areYouSure')}</span>
+              <button className="save-btn save-btn-danger" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
+              <button className="save-btn" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
             </div>
           ) : (
-            <button className="save-btn save-btn-danger" onClick={handleWipe}>Wipe Save</button>
+            <button className="save-btn save-btn-danger" onClick={handleWipe}>{t('settings.wipeSave')}</button>
           )}
         </div>
 
@@ -72,12 +92,12 @@ function SettingsScreen() {
           <div className="import-area">
             <textarea
               className="import-input"
-              placeholder="Paste your save string here…"
+              placeholder={t('settings.pastePlaceholder')}
               value={importText}
               onChange={(e) => setImportText(e.target.value)}
               rows={3}
             />
-            <button className="save-btn" onClick={handleImport}>Load Save</button>
+            <button className="save-btn" onClick={handleImport}>{t('settings.loadSave')}</button>
           </div>
         )}
       </div>

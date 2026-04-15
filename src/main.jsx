@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import './i18n'
 
 // Inline gate: Vite replaces import.meta.env.MODE and import.meta.env.DEV
 // with string/boolean literals at build time, so this whole expression folds

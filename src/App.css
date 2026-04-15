@@ -1484,6 +1484,11 @@
   border-color: rgba(233, 69, 96, 0.3);
 }
 
+.save-btn-active {
+  border-color: var(--jade);
+  color: var(--jade);
+}
+
 .import-area {
   margin-top: 12px;
   display: flex;
