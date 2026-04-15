@@ -1,0 +1,337 @@
+{
+  "common": {
+    "cancel":    "Cancelar",
+    "none":      "Nenhum",
+    "equipped":  "Equipado",
+    "locked":    "Bloqueado",
+    "use":       "Usar",
+    "craft":     "Criar",
+    "upgrade":   "Melhorar",
+    "unequip":   "Desequipar",
+    "back":      "← Voltar",
+    "active":    "Ativo",
+    "inSlot":    "Em {{slot}}"
+  },
+
+  "nav": {
+    "home":   "Início",
+    "worlds": "Mundos",
+    "equip":  "Equipar",
+    "items":  "Itens",
+    "craft":  "Criar",
+    "stats":  "Atributos",
+    "config": "Config"
+  },
+
+  "home": {
+    "holdToCultivate": "Segure para cultivar mais rápido",
+    "peakQi":          "Qi Máximo",
+    "qiPerSec":        "Qi/s",
+    "heavenlyQi":      "Qi Celestial",
+    "cooldown":        "Recarga",
+    "channeling":      "Canalizando",
+    "channelTitle":    "Canalizar Qi Celestial — 2× por 30 min",
+    "pills":           "Pílulas"
+  },
+
+  "offlineModal": {
+    "title":         "Bem-vindo de Volta",
+    "message":       "Enquanto você estava fora, os céus continuaram a nutrir sua fundação.",
+    "collect":       "Coletar",
+    "collectDouble": "✦ Ver Anúncio — Coletar ×2"
+  },
+
+  "settings": {
+    "title":             "Configurações",
+    "subtitle":          "Configurações do jogo",
+    "saveData":          "Dados de Salvamento",
+    "exportSave":        "Exportar Salvamento",
+    "importSave":        "Importar Salvamento",
+    "wipeSave":          "Apagar Salvamento",
+    "loadSave":          "Carregar Salvamento",
+    "yesWipe":           "Sim, apagar",
+    "areYouSure":        "Tem certeza?",
+    "noSaveFound":       "Nenhum dado de salvamento encontrado",
+    "copiedToClipboard": "Salvamento copiado para a área de transferência!",
+    "copyManually":      "Copie o texto manualmente",
+    "pasteSaveFirst":    "Cole sua string de salvamento primeiro",
+    "saveImported":      "Salvamento importado! Recarregando…",
+    "pastePlaceholder":  "Cole sua string de salvamento aqui…",
+    "language":          "Idioma",
+    "languageSubtitle":  "Selecionar idioma de exibição"
+  },
+
+  "worlds": {
+    "title":     "Mundos",
+    "tabWorld":  "Mundo",
+    "tabGather": "Coleta",
+    "tabMine":   "Minerar",
+    "worldCard": "Mundo {{n}}",
+    "drops":     "Drops:",
+    "locked":    "Bloqueado"
+  },
+
+  "combat": {
+    "title": "Arena de Combate",
+    "back":  "← Voltar"
+  },
+
+  "gathering": {
+    "activity":      "Coletando",
+    "collected":     "Coletado nesta sessão",
+    "costSpeed":     "Custo: {{cost}} · Velocidade: {{speed}}/s",
+    "costSpeedLuck": "Custo: {{cost}} · Velocidade: {{speed}}/s · Sorte: {{luck}}"
+  },
+
+  "mining": {
+    "activity":      "Minerando",
+    "collected":     "Coletado nesta sessão",
+    "costSpeed":     "Custo: {{cost}} · Velocidade: {{speed}}/s",
+    "costSpeedLuck": "Custo: {{cost}} · Velocidade: {{speed}}/s · Sorte: {{luck}}"
+  },
+
+  "inventory": {
+    "title":          "Inventário",
+    "tabHerbs":       "Ervas",
+    "tabMinerals":    "Minerais",
+    "tabCultivation": "Cultivo",
+    "tabArtefacts":   "Artefatos",
+    "tabTechniques":  "Técnicas",
+    "tabLaws":        "Leis",
+    "slots":          "{{count}} / {{max}} espaços"
+  },
+
+  "build": {
+    "title":            "Equipamento",
+    "subtitle":         "Equipamentos, leis e técnicas",
+    "cultivationLaw":   "Lei de Cultivo",
+    "artefacts":        "Artefatos",
+    "secretTechniques": "Técnicas Secretas",
+    "tapToChange":      "Toque para mudar",
+    "selectLaw":        "Selecionar Lei de Cultivo",
+    "cultSpeed":        "Vel. Cultivo",
+    "statEss":          "Ess",
+    "statSoul":         "Alma",
+    "statBody":         "Corpo",
+    "technique1":       "Técnica I",
+    "technique2":       "Técnica II",
+    "technique3":       "Técnica III",
+    "inSlot":           "Em {{slot}}",
+    "slots": {
+      "head":   "Cabeça",
+      "ring":   "Anel",
+      "neck":   "Pescoço",
+      "weapon": "Arma",
+      "body":   "Corpo",
+      "hands":  "Mãos",
+      "waist":  "Cintura",
+      "feet":   "Pés"
+    }
+  },
+
+  "production": {
+    "title":             "Produção",
+    "subtitle":          "Refinar, preparar e transmutar",
+    "tabRefining":       "Refinamento",
+    "tabBrewing":        "Preparação de Pílulas",
+    "modifiers":         "Modificadores ({{filled}}/{{capacity}})",
+    "upgradeQuality":    "Melhorar Qualidade",
+    "stats":             "Atributos",
+    "passives":          "Passivas ({{filled}}/{{capacity}})",
+    "multipliers":       "Multiplicadores",
+    "essenceMult":       "Mult. Essência",
+    "soulMult":          "Mult. Alma",
+    "bodyMult":          "Mult. Corpo",
+    "uniqueModifiers":   "Modificadores Únicos ({{active}}/{{total}})",
+    "alreadyMaxQuality": "Já está na qualidade máxima.",
+    "upgradeTo":         "Melhorar para {{quality}}",
+    "upgrade":           "Melhorar",
+    "tooltipHone":             "Afiar — aleatorizar valor",
+    "tooltipReplaceModifier":  "Substituir — trocar por um modificador diferente",
+    "tooltipReplacePassive":   "Substituir — trocar por uma passiva diferente",
+    "tooltipReplaceUnique":    "Substituir — trocar por um modificador único diferente",
+    "tooltipAddModifier":      "Adicionar — preencher com um modificador aleatório",
+    "tooltipRerollValue":      "Afiar — rolar novamente o valor",
+    "emptySlot":         "-- Espaço Vazio --",
+    "noHerbsOwned":      "Nenhuma erva possuída",
+    "selectInspect":     "Selecione um item acima para inspecionar e modificar.",
+    "slot":              "Espaço {{n}}",
+    "craftableRecipes":  "Receitas Disponíveis",
+    "noRecipes":         "Nenhuma receita disponível com as ervas atuais",
+    "select3Herbs":      "Selecione 3 ervas para ver o resultado",
+    "invalidCombination":"Combinação inválida"
+  },
+
+  "stats": {
+    "title":           "Atributos do Personagem",
+    "soulSubtitle":    "Poder Espiritual",
+    "essenceSubtitle": "Poder Elemental",
+    "bodySubtitle":    "Poder Físico",
+    "tapForDetails":   "Toque em um atributo",
+    "forDetails":      "para detalhes",
+    "soulEffects": {
+      "psychic":    "Impulsiona ataques psíquicos",
+      "techniques": "Alimenta Técnicas Secretas",
+      "harvest":    "Aumenta a Velocidade de Coleta",
+      "unlock":     "Desbloqueado no reino Santo"
+    },
+    "essenceEffects": {
+      "elemental": "Impulsiona ataques elementais",
+      "defense":   "Contribui para Defesa e Defesa Elemental"
+    },
+    "bodyEffects": {
+      "physical": "Impulsiona ataques físicos",
+      "defense":  "Contribui para Defesa",
+      "mining":   "Aumenta a Velocidade de Mineração"
+    },
+    "groupCombat":   "Combate",
+    "groupActivity": "Atividade"
+  },
+
+  "gearSlotModal": {
+    "slotDescs": {
+      "head":   "Faixas, coroas e grampos de jade. Melhora a defesa espiritual e o foco.",
+      "neck":   "Pingentes e talismãs. Fornece proteção da alma e resistência elemental.",
+      "body":   "Robes e coletes de batalha. A peça defensiva principal.",
+      "hands":  "Braçadeiras e manoplas. Melhora os golpes e canaliza energia elemental.",
+      "waist":  "Faixas e cintos. Estabiliza o dantian e melhora a circulação de qi.",
+      "feet":   "Botas e sandálias. Melhora o movimento e a esquiva.",
+      "ring":   "Anéis de poder concentram atributos de combate pelos meridianos.",
+      "weapon": "Armas fornecem dano fixo e desbloqueiam requisitos de técnicas secretas."
+    },
+    "sectionEquipped": "Equipado",
+    "sectionOwned":    "Possuído",
+    "nothingEquipped": "Nada equipado",
+    "tagEquipped":     "Equipado — toque para remover",
+    "tagInSlot":       "Em {{slot}}"
+  },
+
+  "techniqueSlotModal": {
+    "filterAll":    "Todos",
+    "filterAttack": "Ataque",
+    "filterHeal":   "Cura",
+    "filterDefend": "Defesa",
+    "filterDodge":  "Esquiva",
+    "slot1":        "Técnica I",
+    "slot2":        "Técnica II",
+    "slot3":        "Técnica III",
+    "cooldown":     "Recarga {{cd}}s",
+    "kMult":        "K ×{{k}}",
+    "healPercent":  "Cura {{pct}}% de Vida",
+    "defBuff":      "DEF ×{{mult}} / {{dur}}s",
+    "dodgeBuff":    "{{pct}}% esquiva / {{dur}}s",
+    "requiresRealm":"Requer reino {{rank}}",
+    "unequip":      "Desequipar"
+  },
+
+  "pillDrawer": {
+    "title":          "Pílulas",
+    "catCultivation": "Cultivo",
+    "catCombat":      "Combate",
+    "catHarvest":     "Coleta",
+    "catMining":      "Mineração",
+    "empty":          "Nenhuma pílula de {{category}} ainda. Prepare algumas na tela de Produção.",
+    "use":            "Usar",
+    "effectPct":      "+{{pct}}% {{stat}} ({{dur}}s)",
+    "effectFlat":     "+{{val}} {{stat}} ({{dur}}s)"
+  },
+
+  "itemModal": {
+    "owned": "Possuído: {{qty}}"
+  },
+
+  "statNames": {
+    "physical_damage":  "Dano Físico",
+    "elemental_damage": "Dano Elemental",
+    "psychic_damage":   "Dano Psíquico",
+    "defense":          "Defesa",
+    "elemental_defense":"DEF Elemental",
+    "soul_toughness":   "Resistência da Alma",
+    "health":           "Vida",
+    "essence":          "Essência",
+    "soul":             "Alma",
+    "body":             "Corpo",
+    "exploit_chance":   "Chance de Exploração",
+    "exploit_mult":     "Mult. de Exploração",
+    "cultivation_speed":"Velocidade de Cultivo",
+    "essence_mult":     "Mult. de Essência",
+    "soul_mult":        "Mult. de Alma",
+    "body_mult":        "Mult. de Corpo",
+    "harvest_speed":    "Velocidade de Coleta",
+    "harvest_luck":     "Sorte de Coleta",
+    "mining_speed":     "Velocidade de Mineração",
+    "mining_luck":      "Sorte de Mineração",
+    "focus_mult":       "Mult. de Foco",
+    "qi_speed":         "Qi/s"
+  },
+
+  "statNamesShort": {
+    "physical_damage":  "Dano Fís.",
+    "elemental_damage": "Dano Elem.",
+    "psychic_damage":   "Dano Psíq.",
+    "defense":          "Def",
+    "elemental_defense":"DEF Elem.",
+    "soul_toughness":   "Res. Alma",
+    "health":           "Vida",
+    "essence":          "Ess",
+    "soul":             "Alma",
+    "body":             "Corpo",
+    "exploit_chance":   "% Exploit.",
+    "exploit_mult":     "× Exploit.",
+    "cultivation_speed":"Vel. Cultivo",
+    "essence_mult":     "Mult. Ess.",
+    "soul_mult":        "Mult. Alma",
+    "body_mult":        "Mult. Corpo",
+    "harvest_speed":    "Vel. Coleta",
+    "harvest_luck":     "Sort. Coleta",
+    "mining_speed":     "Vel. Miner.",
+    "mining_luck":      "Sort. Miner.",
+    "focus_mult":       "Mult. Foco",
+    "qi_speed":         "Qi/s"
+  },
+
+  "quality": {
+    "Iron":         "Ferro",
+    "Bronze":       "Bronze",
+    "Silver":       "Prata",
+    "Gold":         "Ouro",
+    "Transcendent": "Transcendente"
+  },
+
+  "elements": {
+    "Normal":   "Normal",
+    "Fire":     "Fogo",
+    "Water":    "Água",
+    "Wood":     "Madeira",
+    "Metal":    "Metal",
+    "Earth":    "Terra",
+    "Thunder":  "Trovão",
+    "Wind":     "Vento",
+    "Light":    "Luz",
+    "Darkness": "Trevas"
+  },
+
+  "techniqueTypes": {
+    "Attack": "Ataque",
+    "Heal":   "Cura",
+    "Defend": "Defesa",
+    "Dodge":  "Esquiva"
+  },
+
+  "techniqueRanks": {
+    "Mortal":  "Mortal",
+    "Earth":   "Terra",
+    "Sky":     "Céu",
+    "Saint":   "Santo",
+    "Emperor": "Imperador",
+    "Heaven":  "Celestial"
+  },
+
+  "rarity": {
+    "Common":    "Comum",
+    "Uncommon":  "Incomum",
+    "Rare":      "Raro",
+    "Epic":      "Épico",
+    "Legendary": "Lendário"
+  }
+}

@@ -3,6 +3,8 @@ import { initReactI18next } from 'react-i18next';
 
 import enUi   from './locales/en/ui.json';
 import enGame from './locales/en/game.json';
+import ptUi   from './locales/pt/ui.json';
+import ptGame from './locales/pt/game.json';
 
 // ── Language preference ───────────────────────────────────────────────────────
 // Stored separately from the save file so it survives a wipe.
@@ -10,9 +12,9 @@ export const LANG_KEY = 'mai_lang';
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'en', label: 'English' },
+  { code: 'pt', label: 'Português' },
   // Uncomment and add locale files as translations become available:
   // { code: 'zh', label: '中文' },
-  // { code: 'pt', label: 'Português' },
   // { code: 'es', label: 'Español' },
   // { code: 'fr', label: 'Français' },
   // { code: 'de', label: 'Deutsch' },
@@ -29,6 +31,10 @@ i18n
       en: {
         ui:   enUi,
         game: enGame,
+      },
+      pt: {
+        ui:   ptUi,
+        game: ptGame,
       },
       // Add new languages here as their locale files are ready:
       // zh: { ui: zhUi, game: zhGame },
