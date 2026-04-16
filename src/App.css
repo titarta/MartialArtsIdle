@@ -1521,82 +1521,83 @@
 
 /* ── Key Crystal ────────────────────────────────────────────────────────── */
 
-/* Anchored at ~46% of cultivation-zone height — aligns with the archway gap
-   in home.png when background-position is center bottom. */
+/* Anchored at ~46% of cultivation-zone — aligns with archway opening. */
 .home-crystal-anchor {
   position: absolute;
   top: 46%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  pointer-events: none;
-}
-
-.home-crystal-unlocked {
-  pointer-events: auto;
-  cursor: pointer;
+  transform: translateX(-50%);
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  animation: home-crystal-float 3.2s ease-in-out infinite;
+  cursor: pointer;
 }
 
-.home-crystal-ring {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+/* Float wrapper — gentle bob. Slower (7 s) when locked. */
+.home-crystal-float {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: conic-gradient(
-    from -90deg,
-    #7c3aed calc(var(--progress) * 360deg),
-    rgba(60, 60, 100, 0.3) calc(var(--progress) * 360deg)
-  );
-  animation: home-crystal-glow 3.2s ease-in-out infinite;
+  gap: 3px;
+  animation: home-crystal-float 3.8s ease-in-out infinite;
 }
+.home-crystal-float-slow { animation-duration: 7s; }
 
-.home-crystal-ring::after {
-  content: '';
-  position: absolute;
-  inset: 4px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 32%,
-    rgba(100, 140, 220, 0.25),
-    rgba(20, 30, 60, 0.6));
-}
-
-.home-crystal-sprite {
-  position: relative;
-  z-index: 1;
-  width: 36px;
-  height: 36px;
+/* Sprite — 72 px to match mockup, triple drop-shadow glow */
+.home-crystal-img {
+  width: 72px;
+  height: auto;
   image-rendering: pixelated;
-  filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.5));
+  image-rendering: crisp-edges;
+  animation: home-crystal-glow 3s ease-in-out infinite;
 }
 
-.home-crystal-level {
-  font-size: 10px;
-  color: #c4b5fd;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-  font-weight: 600;
+/* Locked state — grey, dim, no glow animation */
+.home-crystal-locked {
+  filter: grayscale(1);
+  opacity: 0.4;
+  animation: none;
+}
+
+/* Tag below crystal ("Qi Crystal") */
+.home-crystal-tag {
+  font-size: 9px;
+  font-weight: 700;
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  border-radius: 8px;
+  padding: 1px 7px;
+}
+.home-crystal-tag-locked { color: #444; border-color: #2a2a2a; }
+
+/* Secondary text ("Lv 2 · Tap to evolve") */
+.home-crystal-evolve {
+  font-size: 9px;
+  color: rgba(167, 139, 250, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  padding: 0 5px;
 }
 
 @keyframes home-crystal-float {
   0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
+  50%      { transform: translateY(-9px); }
 }
 
 @keyframes home-crystal-glow {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(124, 58, 237, 0.15),
-                0 0 22px rgba(100, 140, 255, 0.08);
+    filter: drop-shadow(0 0 6px rgba(167, 139, 250, 1))
+            drop-shadow(0 0 18px rgba(124, 58, 237, 0.75))
+            drop-shadow(0 0 36px rgba(124, 58, 237, 0.35));
   }
   50% {
-    box-shadow: 0 0 18px rgba(124, 58, 237, 0.35),
-                0 0 36px rgba(100, 140, 255, 0.18);
+    filter: drop-shadow(0 0 10px rgba(196, 181, 253, 1))
+            drop-shadow(0 0 26px rgba(124, 58, 237, 0.95))
+            drop-shadow(0 0 55px rgba(124, 58, 237, 0.55));
   }
 }
 
@@ -1785,41 +1786,38 @@
 
 .home-qi-particles {
   position: absolute;
-  top: calc(46% + 34px);   /* just below crystal edge */
+  top: calc(46% + 102px);   /* starts just below crystal float-wrap */
   left: 50%;
   transform: translateX(-50%);
-  width: 2px;
-  height: 100px;
+  width: 70px;
+  height: 110px;
   z-index: 1;
   pointer-events: none;
+  overflow: visible;
 }
 
 .home-qi-particle {
   position: absolute;
-  top: 0;
-  left: 50%;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: radial-gradient(circle, #b8e8ff, #4090cc);
+  background: #a78bfa;
   opacity: 0;
-  animation: home-qi-fall 2.4s ease-in infinite;
+  animation: home-qi-fall 2.2s ease-in infinite;
 }
 
-/* Staggered delays and slight horizontal spread for each particle */
-.home-qi-particle-1 { animation-delay: 0.00s; margin-left: -2px; }
-.home-qi-particle-2 { animation-delay: 0.34s; margin-left:  5px; }
-.home-qi-particle-3 { animation-delay: 0.68s; margin-left: -5px; }
-.home-qi-particle-4 { animation-delay: 1.02s; margin-left:  2px; }
-.home-qi-particle-5 { animation-delay: 1.36s; margin-left: -3px; }
-.home-qi-particle-6 { animation-delay: 1.70s; margin-left:  4px; }
-.home-qi-particle-7 { animation-delay: 2.04s; margin-left: -1px; }
+/* 5 particles — staggered delays, varied positions & purple shades */
+.home-qi-p1 { left: 14px; animation-delay: 0.00s; background: #c4b5fd; }
+.home-qi-p2 { left: 28px; animation-delay: 0.44s; background: #8b5cf6; }
+.home-qi-p3 { left: 42px; animation-delay: 0.88s; background: #a78bfa; }
+.home-qi-p4 { left: 20px; animation-delay: 1.32s; background: #ddd6fe; width: 3px; height: 3px; }
+.home-qi-p5 { left: 36px; animation-delay: 1.76s; background: #7c3aed; }
 
 @keyframes home-qi-fall {
-  0%   { opacity: 0;    transform: translateX(-50%) translateY(0);    }
-  12%  { opacity: 0.65; }
-  80%  { opacity: 0.40; }
-  100% { opacity: 0;    transform: translateX(-50%) translateY(88px); }
+  0%   { opacity: 0;   transform: translateY(0)    scale(1.1); }
+  12%  { opacity: 0.9; }
+  70%  { opacity: 0.4; }
+  100% { opacity: 0;   transform: translateY(90px) scale(0.2); }
 }
 
 /* ── Character group — grounded at scene bottom ─────────────────────────── */

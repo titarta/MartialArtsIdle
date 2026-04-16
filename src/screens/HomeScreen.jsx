@@ -123,24 +123,38 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
 const HOLD_HINT_SEEN_KEY = 'mai_home_hold_hint_seen';
 const HOLD_HINT_IDLE_MS  = 60 * 1000;
 
-/** Key Crystal — hidden when locked, interactive when unlocked. */
+/** Key Crystal — locked (dim, greyscale) or unlocked (glowing, tappable). */
 function KeyCrystal({ crystal, isUnlocked, onOpen }) {
-  if (!isUnlocked) return null;
+  if (!isUnlocked) {
+    /* Locked placeholder — dim greyscale sprite, no interaction */
+    return (
+      <div className="home-crystal-anchor">
+        <div className="home-crystal-float home-crystal-float-slow">
+          <img
+            src={`${BASE}sprites/items/origin_crystal.png`}
+            className="home-crystal-img home-crystal-locked"
+            alt="Qi Crystal"
+            draggable="false"
+          />
+          <span className="home-crystal-tag home-crystal-tag-locked">🔒 Qi Crystal</span>
+        </div>
+      </div>
+    );
+  }
 
-  const { level, refinedQi, requiredForNext } = crystal;
-  const progress = requiredForNext > 0 ? refinedQi / requiredForNext : 0;
-
+  const { level } = crystal;
   return (
-    <div className="home-crystal-anchor home-crystal-unlocked" onClick={onOpen}>
-      <div className="home-crystal-ring" style={{ '--progress': progress }}>
+    <div className="home-crystal-anchor" onClick={onOpen}>
+      <div className="home-crystal-float">
         <img
           src={`${BASE}sprites/items/origin_crystal.png`}
-          className="home-crystal-sprite"
-          alt="Key Crystal"
+          className="home-crystal-img"
+          alt="Qi Crystal"
           draggable="false"
         />
+        <span className="home-crystal-tag">Qi Crystal</span>
+        <span className="home-crystal-evolve">Lv {level} · Tap to evolve</span>
       </div>
-      <span className="home-crystal-level">Lv.{level}</span>
     </div>
   );
 }
@@ -190,12 +204,12 @@ function HomePCLeftPanel({ realmName, qiRef, costRef, rateRef, boosting, adBoost
   );
 }
 
-/** Falling qi-particle stream between crystal and character. */
+/** Falling qi-particle stream between crystal and character (5 particles). */
 function QiParticles() {
   return (
     <div className="home-qi-particles" aria-hidden="true">
-      {Array.from({ length: 7 }, (_, i) => (
-        <span key={i} className={`home-qi-particle home-qi-particle-${i + 1}`} />
+      {Array.from({ length: 5 }, (_, i) => (
+        <span key={i} className={`home-qi-particle home-qi-p${i + 1}`} />
       ))}
     </div>
   );
