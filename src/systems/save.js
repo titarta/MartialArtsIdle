@@ -42,6 +42,7 @@ export function wipeSave() {
   localStorage.removeItem('mai_cleared_regions');
   localStorage.removeItem('mai_seen_features');
   localStorage.removeItem('mai_auto_farm');
+  localStorage.removeItem('mai_qi_crystal');
   // mai_jade is intentionally NOT wiped — paid currency survives a save reset
   // mai_lang is intentionally NOT wiped — language preference survives a save reset
 }
