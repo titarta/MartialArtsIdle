@@ -212,6 +212,30 @@ export function initDebug(hooksRef) {
       console.log(`[debug] +${count} random laws`);
     },
 
+    // ── Qi Crystal ────────────────────────────────────────────────────────
+
+    /** Set the crystal to a specific level. */
+    setCrystalLevel(n) {
+      g().crystal._setLevel(n);
+      console.log(`[debug] Crystal → level ${n}`);
+    },
+
+    /** Jump directly to a visual tier (1–10). */
+    setCrystalTier(t) {
+      const TIER_LEVELS = { 1:1, 2:10, 3:25, 4:50, 5:100, 6:200, 7:350, 8:500, 9:750, 10:1000 };
+      const lvl = TIER_LEVELS[t];
+      if (!lvl) { console.warn(`[debug] Invalid tier ${t} — use 1–10`); return; }
+      g().crystal._setLevel(lvl);
+      console.log(`[debug] Crystal → tier ${t} (level ${lvl})`);
+    },
+
+    /** Increment crystal level by n (default 1). */
+    crystalLevelUp(n = 1) {
+      const cur = g().crystal.level;
+      g().crystal._setLevel(cur + n);
+      console.log(`[debug] Crystal ${cur} → ${cur + n}`);
+    },
+
     // ── General ────────────────────────────────────────────────────────────
 
     /** Print a summary of the current game state. */
@@ -257,6 +281,10 @@ export function initDebug(hooksRef) {
       console.log('%cTechniques & Laws', 'font-weight: bold');
       console.log('  gd.giveTechniques(n=10, world=1) — generate n random techniques');
       console.log('  gd.giveLaws(n=10)                — generate n random laws');
+      console.log('%cQi Crystal', 'font-weight: bold');
+      console.log('  gd.setCrystalLevel(n)     — set crystal to level n');
+      console.log('  gd.setCrystalTier(t)      — jump to visual tier t (1–10)');
+      console.log('  gd.crystalLevelUp(n=1)    — increment crystal level by n');
       console.log('%cGeneral', 'font-weight: bold');
       console.log('  gd.state()                — print current game state summary');
       console.log('  gd.help()                 — show this message');

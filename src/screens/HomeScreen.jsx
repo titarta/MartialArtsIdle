@@ -133,6 +133,22 @@ function getCrystalTier(level) {
   return 1;
 }
 
+// Glow and particle colors per visual tier.
+// glowA = inner/bright,  glowB = outer/dim,  particles = 5 shades for the stream.
+const CRYSTAL_COLORS = {
+  locked: { glowA: 'rgba(80,80,100,0)',    glowB: 'rgba(50,50,70,0)',     particles: ['#555566','#444455','#666677','#333344','#777788'] },
+  1:      { glowA: 'rgba(136,153,187,0.9)',glowB: 'rgba(100,120,160,0.5)',particles: ['#8899bb','#aabbcc','#99aacc','#778899','#bbccdd'] },
+  2:      { glowA: 'rgba(68,136,187,1)',   glowB: 'rgba(50,100,150,0.55)',particles: ['#4488bb','#88bbdd','#66aacc','#3377aa','#99ccee'] },
+  3:      { glowA: 'rgba(0,187,204,1)',    glowB: 'rgba(0,150,160,0.55)', particles: ['#00bbcc','#aaffee','#00ccdd','#00aaaa','#88eeff'] },
+  4:      { glowA: 'rgba(17,85,204,1)',    glowB: 'rgba(10,60,160,0.55)', particles: ['#1155cc','#55ddff','#2266dd','#0044bb','#66ccff'] },
+  5:      { glowA: 'rgba(34,51,170,1)',    glowB: 'rgba(20,40,140,0.55)', particles: ['#2233aa','#6699ff','#3344cc','#1122bb','#7788ff'] },
+  6:      { glowA: 'rgba(102,0,204,1)',    glowB: 'rgba(80,0,160,0.55)',  particles: ['#6600cc','#9966ff','#7711dd','#5500bb','#aa88ff'] },
+  7:      { glowA: 'rgba(136,0,221,1)',    glowB: 'rgba(100,0,180,0.55)', particles: ['#8800dd','#aaddff','#9911ee','#7700cc','#bbaaff'] },
+  8:      { glowA: 'rgba(204,153,255,1)',  glowB: 'rgba(170,100,240,0.55)',particles: ['#cc99ff','#eeddff','#bb88ee','#aa77dd','#ddbfff'] },
+  9:      { glowA: 'rgba(255,204,68,1)',   glowB: 'rgba(220,160,40,0.55)',particles: ['#ffcc44','#fffacc','#ffdd66','#ffbb22','#fff0aa'] },
+  10:     { glowA: 'rgba(255,170,34,1)',   glowB: 'rgba(220,120,0,0.55)', particles: ['#ffaa22','#ffe566','#ffbb44','#ff9900','#fff0aa'] },
+};
+
 /** Key Crystal — locked (dim, greyscale) or unlocked (glowing, tappable). */
 function KeyCrystal({ crystal, isUnlocked, onOpen }) {
   if (!isUnlocked) {
@@ -153,17 +169,19 @@ function KeyCrystal({ crystal, isUnlocked, onOpen }) {
 
   const { level } = crystal;
   const tier = getCrystalTier(level);
+  const { glowA, glowB } = CRYSTAL_COLORS[tier];
   return (
     <div className="home-crystal-anchor" onClick={onOpen}>
       <div className="home-crystal-float">
+        <span className="home-crystal-tag">Qi Crystal</span>
+        <span className="home-crystal-evolve">Lv {level} · Tap to evolve</span>
         <img
           src={`${BASE}crystals/crystal_${tier}.png`}
           className="home-crystal-img"
+          style={{ '--cg-a': glowA, '--cg-b': glowB }}
           alt="Qi Crystal"
           draggable="false"
         />
-        <span className="home-crystal-tag">Qi Crystal</span>
-        <span className="home-crystal-evolve">Lv {level} · Tap to evolve</span>
       </div>
     </div>
   );
@@ -215,11 +233,12 @@ function HomePCLeftPanel({ realmName, qiRef, costRef, rateRef, boosting, adBoost
 }
 
 /** Falling qi-particle stream between crystal and character (5 particles). */
-function QiParticles() {
+function QiParticles({ colors }) {
+  const p = colors?.particles ?? ['#a78bfa','#8b5cf6','#a78bfa','#ddd6fe','#7c3aed'];
   return (
     <div className="home-qi-particles" aria-hidden="true">
       {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={`home-qi-particle home-qi-p${i + 1}`} />
+        <span key={i} className={`home-qi-particle home-qi-p${i + 1}`} style={{ background: p[i] }} />
       ))}
     </div>
   );
@@ -392,7 +411,7 @@ function HomeScreen({
           />
 
           {/* Qi particles drifting from crystal toward character */}
-          <QiParticles />
+          <QiParticles colors={isCrystalUnlocked && crystal ? CRYSTAL_COLORS[getCrystalTier(crystal.level)] : CRYSTAL_COLORS[1]} />
 
           {/* Character + hold-hint group — grounded at scene bottom */}
           <div className="home-char-group">

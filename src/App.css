@@ -1504,10 +1504,10 @@
 
 /* ── Key Crystal ────────────────────────────────────────────────────────── */
 
-/* Anchored at ~46% of cultivation-zone — aligns with archway opening. */
+/* Anchored at ~38% of cultivation-zone — aligns with archway opening. */
 .home-crystal-anchor {
   position: absolute;
-  top: 46%;
+  top: 42%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 3;
@@ -1531,8 +1531,6 @@
 .home-crystal-img {
   width: 72px;
   height: auto;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
   animation: home-crystal-glow 3s ease-in-out infinite;
 }
 
@@ -1573,14 +1571,14 @@
 
 @keyframes home-crystal-glow {
   0%, 100% {
-    filter: drop-shadow(0 0 6px rgba(167, 139, 250, 1))
-            drop-shadow(0 0 18px rgba(124, 58, 237, 0.75))
-            drop-shadow(0 0 36px rgba(124, 58, 237, 0.35));
+    filter: drop-shadow(0 0 6px var(--cg-a))
+            drop-shadow(0 0 18px var(--cg-b))
+            drop-shadow(0 0 36px var(--cg-b));
   }
   50% {
-    filter: drop-shadow(0 0 10px rgba(196, 181, 253, 1))
-            drop-shadow(0 0 26px rgba(124, 58, 237, 0.95))
-            drop-shadow(0 0 55px rgba(124, 58, 237, 0.55));
+    filter: drop-shadow(0 0 10px var(--cg-a))
+            drop-shadow(0 0 26px var(--cg-a))
+            drop-shadow(0 0 55px var(--cg-b));
   }
 }
 
@@ -1789,12 +1787,12 @@
   animation: home-qi-fall 2.2s ease-in infinite;
 }
 
-/* 5 particles — staggered delays, varied positions & purple shades */
-.home-qi-p1 { left: 14px; animation-delay: 0.00s; background: #c4b5fd; }
-.home-qi-p2 { left: 28px; animation-delay: 0.44s; background: #8b5cf6; }
-.home-qi-p3 { left: 42px; animation-delay: 0.88s; background: #a78bfa; }
-.home-qi-p4 { left: 20px; animation-delay: 1.32s; background: #ddd6fe; width: 3px; height: 3px; }
-.home-qi-p5 { left: 36px; animation-delay: 1.76s; background: #7c3aed; }
+/* 5 particles — staggered delays & varied positions (colors set inline per crystal tier) */
+.home-qi-p1 { left: 14px; animation-delay: 0.00s; }
+.home-qi-p2 { left: 28px; animation-delay: 0.44s; }
+.home-qi-p3 { left: 42px; animation-delay: 0.88s; }
+.home-qi-p4 { left: 20px; animation-delay: 1.32s; width: 3px; height: 3px; }
+.home-qi-p5 { left: 36px; animation-delay: 1.76s; }
 
 @keyframes home-qi-fall {
   0%   { opacity: 0;   transform: translateY(0)    scale(1.1); }

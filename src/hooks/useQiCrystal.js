@@ -107,19 +107,6 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
     });
   }, [getQuantity, removeItem]);
 
-  // ── Debug API ────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.__debug = window.__debug || {};
-    window.__debug.qiCrystal = {
-      getState:    () => state,
-      setLevel:    (n) => applyState({ level: n, refinedQi: 0 }),
-      feed:        (itemId, qty) => feed(itemId, qty),
-      getBonus:    () => crystalQiBonusRef.current,
-      getCostAt:   (n) => getRequiredRefinedQi(n),
-    };
-  }); // no dep array — always fresh
-
   const requiredForNext = getRequiredRefinedQi(state.level + 1);
 
   return {
@@ -129,5 +116,6 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
     crystalQiBonus:   state.level * 2,
     crystalQiBonusRef,
     feed,
+    _setLevel:        (n) => applyState({ level: n, refinedQi: 0 }),
   };
 }
