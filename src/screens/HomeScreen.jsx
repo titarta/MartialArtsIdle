@@ -352,7 +352,7 @@ function HomeScreen({
       </div>
 
       {/* ── Pills: floating bottom-right above nav ───────────────────── */}
-      {pills && (pills.activePills.length > 0 || totalOwnedPills > 0) && (
+      {pills && totalOwnedPills > 0 && (
         <div className="home-pill-float">
           <button
             className="home-pill-btn"
