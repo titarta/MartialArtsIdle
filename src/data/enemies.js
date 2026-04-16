@@ -198,9 +198,9 @@ const ENEMIES_RAW = {
 
   immortal_shade: {
     id:          'immortal_shade',
-    name:        'Trapped Immortal Shade',
+    name:        'Immortal Shade',
     sprite:      null,
-    description: 'The spectral remnant of an immortal cultivator trapped when the city sank beneath the earth. Its form flickers between solid and ghost-like, bound eternally by an unfinished vow.',
+    description: '- TBD -',
     statMult: { hp: 1.5, atk: 2.2 },
     drops: [
       { itemId: 'silver_cultivation_2', chance: 0.80, qty: [3, 8] },
@@ -243,7 +243,7 @@ const ENEMIES_RAW = {
 
   burial_guardian: {
     id:          'burial_guardian',
-    name:        'Burial Guardian',
+    name:        'Burial Automated Guardian',
     sprite:      null,
     description: 'A hulking armoured soldier whose soul was bound to the burial grounds as an eternal sentinel. Its ancient armour is ornate but corroded, and it moves with the unnatural stillness of something that has not rested in centuries.',
     statMult: { hp: 2.8, atk: 2.5 },

@@ -1,13 +1,5 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-16T21:46:47.419Z",
-  "records": {
-    "immortal_shade": {
-      "name": "Immortal Shade",
-      "description": "- TBD -"
-    },
-    "burial_guardian": {
-      "name": "Burial Automated Guardian"
-    }
-  }
+  "updatedAt": null,
+  "records": {}
 }

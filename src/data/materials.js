@@ -63,43 +63,43 @@ export const HERBS = {
 export const ORES = {
   iron_mineral_1:         { name: 'Sect Iron Shard',      rarity: 'Iron',         mineCost: 15,   description: 'A fragment of iron-grade material shed from sect constructs, training equipment, and the iron of mortal cultivators.' },
   iron_mineral_2:         { name: 'Iron Vein Shard',      rarity: 'Iron',         mineCost: 15,   description: 'A dense shard of iron ore extracted from shallow veins, used in basic transmutation.' },
-  bronze_mineral_1:       { name: 'Qi Fang',              rarity: 'Bronze',       mineCost: 60,   description: 'A fang or spine shard from a beast that grew mineral-dense through years of absorbing qi from the earth.' },
-  bronze_mineral_2:       { name: 'Spirit Wood Core',     rarity: 'Bronze',       mineCost: 60,   description: 'The hardened core from a spirit entity or ancient tree, permeated with concentrated forest qi.' },
-  silver_mineral_1:       { name: 'Iron Spine Scale',     rarity: 'Silver',       mineCost: 180,  description: 'A scale or spine segment from iron-calibre predators of the ancient frontier, dense enough to deflect silver-grade attacks.' },
-  silver_mineral_2:       { name: 'Immortal Array Jade',  rarity: 'Silver',       mineCost: 180,  description: 'Jade infused with formation arrays from sunken immortal ruins, still containing traces of their original inscriptions.' },
-  gold_mineral_1:         { name: 'Saint Bone Sliver',    rarity: 'Gold',         mineCost: 600,  description: 'A sliver of bone from saint-realm corpses, radiating a cold death qi that resists refinement.' },
-  gold_mineral_2:         { name: 'Forbidden Seal Shard', rarity: 'Gold',         mineCost: 600,  description: 'A fragment of the void seals that once contained the Forbidden Lands, crackling with restrained power.' },
-  transcendent_mineral_1: { name: 'Void Crystal',         rarity: 'Transcendent', mineCost: 1800, description: 'A crystal grown inside rift tears, its structure formed entirely by compressed void energy.' },
+  bronze_mineral_1:       { name: 'Reinforced Steel Thread', rarity: 'Bronze',       mineCost: 60,   description: '- TBD -' },
+  bronze_mineral_2:       { name: 'Ancient Quartz',          rarity: 'Bronze',       mineCost: 60,   description: '- TBD -' },
+  silver_mineral_1:       { name: 'Corrupted Silver Ore',    rarity: 'Silver',       mineCost: 180,  description: '- TBD -' },
+  silver_mineral_2:       { name: 'Ghost Jade',              rarity: 'Silver',       mineCost: 180,  description: '- TBD -' },
+  gold_mineral_1:         { name: 'Sun-forged Iron',         rarity: 'Gold',         mineCost: 600,  description: '- TBD -' },
+  gold_mineral_2:         { name: 'Void Crystal',            rarity: 'Gold',         mineCost: 600,  description: 'A crystal grown inside rift tears, its structure formed entirely by compressed void energy.' },
+  transcendent_mineral_1: { name: 'Divine Netherstone',      rarity: 'Transcendent', mineCost: 1800, description: '- TBD -' },
   transcendent_mineral_2: { name: 'World Stone Core',     rarity: 'Transcendent', mineCost: 1800, description: "An impossibly dense stone core formed at the world's deepest strata or shed by titans of the upper heaven, used only in the most advanced transmutation." },
 };
 
 // ── Blood Cores (combat drops only — no gather/mine cost) ─────────────────────
 export const BLOOD_CORES = {
-  iron_blood_core_1:         { name: 'Iron Blood Core 1',         rarity: 'Iron',         description: 'Placeholder — a dense iron-grade blood core extracted from a fallen enemy.' },
-  iron_blood_core_2:         { name: 'Iron Blood Core 2',         rarity: 'Iron',         description: 'Placeholder — a crystallised iron-grade blood essence condensed from mortal cultivators.' },
-  bronze_blood_core_1:       { name: 'Bronze Blood Core 1',       rarity: 'Bronze',       description: 'Placeholder — a bronze-grade blood core pulsing with beast vitality.' },
-  bronze_blood_core_2:       { name: 'Bronze Blood Core 2',       rarity: 'Bronze',       description: 'Placeholder — a shard of condensed bronze-grade blood qi from corrupted entities.' },
-  silver_blood_core_1:       { name: 'Silver Blood Core 1',       rarity: 'Silver',       description: 'Placeholder — a silver-grade blood core saturated with ancient frontier vitality.' },
-  silver_blood_core_2:       { name: 'Silver Blood Core 2',       rarity: 'Silver',       description: 'Placeholder — a remnant blood crystal from an immortal-realm entity.' },
-  gold_blood_core_1:         { name: 'Gold Blood Core 1',         rarity: 'Gold',         description: 'Placeholder — a saint-grade blood core radiating cold death qi.' },
-  gold_blood_core_2:         { name: 'Gold Blood Core 2',         rarity: 'Gold',         description: 'Placeholder — a void-attribute blood pearl from a gold-grade predator.' },
-  transcendent_blood_core_1: { name: 'Transcendent Blood Core 1', rarity: 'Transcendent', description: 'Placeholder — a primordial blood core condensed from an entity beyond mortal limitations.' },
-  transcendent_blood_core_2: { name: 'Transcendent Blood Core 2', rarity: 'Transcendent', description: 'Placeholder — a heaven-grade blood crystal radiating overwhelming pressure.' },
+  iron_blood_core_1:         { name: 'Weak Blood Core',       rarity: 'Iron',         description: '- TBD -' },
+  iron_blood_core_2:         { name: 'Mortal Beast Core',     rarity: 'Iron',         description: '- TBD -' },
+  bronze_blood_core_1:       { name: 'Elemental Beast Core',  rarity: 'Bronze',       description: '- TBD -' },
+  bronze_blood_core_2:       { name: 'Pure Elemental Core',   rarity: 'Bronze',       description: '- TBD -' },
+  silver_blood_core_1:       { name: 'Void Beast Core',       rarity: 'Silver',       description: '- TBD -' },
+  silver_blood_core_2:       { name: 'Spirit Core',           rarity: 'Silver',       description: '- TBD -' },
+  gold_blood_core_1:         { name: 'Ancient Beast Core',    rarity: 'Gold',         description: '- TBD -' },
+  gold_blood_core_2:         { name: 'Void-forged Core',      rarity: 'Gold',         description: '- TBD -' },
+  transcendent_blood_core_1: { name: 'Dao-inscribed Core',    rarity: 'Transcendent', description: '- TBD -' },
+  transcendent_blood_core_2: { name: 'Heavenly Dao Core',     rarity: 'Transcendent', description: '- TBD -' },
 };
 
 // ── QI Stones — cultivation materials (ID-keyed) ──────────────────────────────
 // QI stones drop from all three activities (combat, gathering, mining).
 export const CULTIVATION_MATERIALS = {
-  iron_cultivation_1:         { name: 'Iron QI Stone 1',         rarity: 'Iron',         gatherCost: 15,   mineCost: 15,   refinedQi: 5,    description: 'A naturally formed stone that accumulates ambient qi over time in mortal-realm training grounds.' },
-  iron_cultivation_2:         { name: 'Iron QI Stone 2',         rarity: 'Iron',         gatherCost: 15,   mineCost: 15,   refinedQi: 8,    description: 'Residual qi that coalesces above a defeated mortal cultivator or beast, briefly visible before dispersing.' },
-  bronze_cultivation_1:       { name: 'Bronze QI Stone 1',       rarity: 'Bronze',       gatherCost: 60,   mineCost: 60,   refinedQi: 20,   description: 'The dense qi nucleus found at the center of a beast that has fed on spiritual energy for years — still pulsing faintly after death.' },
-  bronze_cultivation_2:       { name: 'Bronze QI Stone 2',       rarity: 'Bronze',       gatherCost: 60,   mineCost: 60,   refinedQi: 30,   description: 'A crystallised shard of qi torn from a fallen cultivator or construct whose energy pathways had been corrupted or shattered.' },
-  silver_cultivation_1:       { name: 'Silver QI Stone 1',       rarity: 'Silver',       gatherCost: 180,  mineCost: 180,  refinedQi: 80,   description: 'The marrow-like qi condensate found deep within ancient frontier creatures, saturated after centuries of qi absorption.' },
-  silver_cultivation_2:       { name: 'Silver QI Stone 2',       rarity: 'Silver',       gatherCost: 180,  mineCost: 180,  refinedQi: 120,  description: 'A fragment of soul-force that persists after the death of an immortal-grade entity, still carrying echoes of its cultivation.' },
-  gold_cultivation_1:         { name: 'Gold QI Stone 1',         rarity: 'Gold',         gatherCost: 600,  mineCost: 600,  refinedQi: 300,  description: 'A calcified relic of saint-realm qi, recovered from burial grounds and war altars.' },
-  gold_cultivation_2:         { name: 'Gold QI Stone 2',         rarity: 'Gold',         gatherCost: 600,  mineCost: 600,  refinedQi: 450,  description: 'A small pearl formed inside void-touched predators and shades, containing compressed void-attribute energy.' },
-  transcendent_cultivation_1: { name: 'Transcendent QI Stone 1', rarity: 'Transcendent', gatherCost: 1800, mineCost: 1800, refinedQi: 1000, description: 'The crystallised qi core of a primordial entity — condensed from millions of years of unbroken cultivation.' },
-  transcendent_cultivation_2: { name: 'Transcendent QI Stone 2', rarity: 'Transcendent', gatherCost: 1800, mineCost: 1800, refinedQi: 1500, description: 'A crystal of pure heaven-grade qi extracted from entities that have ascended beyond mortal limitations.' },
+  iron_cultivation_1:         { name: 'Qi Stone',               rarity: 'Iron',         gatherCost: 15,   mineCost: 15,   refinedQi: 5,    description: '- TBD -' },
+  iron_cultivation_2:         { name: 'Stray Qi Stone',         rarity: 'Iron',         gatherCost: 15,   mineCost: 15,   refinedQi: 8,    description: '- TBD -' },
+  bronze_cultivation_1:       { name: 'Pulse Qi Stone',         rarity: 'Bronze',       gatherCost: 60,   mineCost: 60,   refinedQi: 20,   description: '- TBD -' },
+  bronze_cultivation_2:       { name: 'Demonheart Qi Stone',    rarity: 'Bronze',       gatherCost: 60,   mineCost: 60,   refinedQi: 30,   description: '- TBD -' },
+  silver_cultivation_1:       { name: 'Saint QI Stone',         rarity: 'Silver',       gatherCost: 180,  mineCost: 180,  refinedQi: 80,   description: '- TBD -' },
+  silver_cultivation_2:       { name: 'Condensed QI Stone',     rarity: 'Silver',       gatherCost: 180,  mineCost: 180,  refinedQi: 120,  description: '- TBD -' },
+  gold_cultivation_1:         { name: 'Dragonpulse Qi Stone',   rarity: 'Gold',         gatherCost: 600,  mineCost: 600,  refinedQi: 300,  description: '- TBD -' },
+  gold_cultivation_2:         { name: 'Void-forged QI Stone',   rarity: 'Gold',         gatherCost: 600,  mineCost: 600,  refinedQi: 450,  description: '- TBD -' },
+  transcendent_cultivation_1: { name: 'Primordial Qi Stone ',   rarity: 'Transcendent', gatherCost: 1800, mineCost: 1800, refinedQi: 1000, description: '- TBD -' },
+  transcendent_cultivation_2: { name: 'Heavenscribed Qi Stone', rarity: 'Transcendent', gatherCost: 1800, mineCost: 1800, refinedQi: 1500, description: '- TBD -' },
 };
 
 // Apply designer overrides BEFORE building ALL_MATERIALS so the flat lookup
