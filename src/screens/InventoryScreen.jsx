@@ -311,18 +311,6 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
                   <span className="item-stat-label">{t('inventory.labelCultSpeed')}</span>
                   <span className="item-stat-value">×{law.cultivationSpeedMult.toFixed(1)}</span>
                 </div>
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelEssenceMult')}</span>
-                  <span className="item-stat-value">{law.essenceMult}</span>
-                </div>
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelSoulMult')}</span>
-                  <span className="item-stat-value">{law.soulMult}</span>
-                </div>
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelBodyMult')}</span>
-                  <span className="item-stat-value">{law.bodyMult}</span>
-                </div>
               </div>
               {law.uniques && Object.keys(law.uniques).length > 0 && (
                 <div className="item-stat-block">

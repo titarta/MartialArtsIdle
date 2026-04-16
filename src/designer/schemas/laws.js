@@ -27,9 +27,6 @@ export default [
   { key: 'flavour',                type: 'textarea', label: 'Flavour text', rows: 3 },
 
   { key: 'cultivationSpeedMult',   type: 'number', label: 'Cultivation speed multiplier', step: 0.05 },
-  { key: 'essenceMult',            type: 'number', label: 'Essence multiplier', step: 0.05 },
-  { key: 'soulMult',               type: 'number', label: 'Soul multiplier', step: 0.05 },
-  { key: 'bodyMult',               type: 'number', label: 'Body multiplier', step: 0.05 },
 
   {
     key: 'uniques',

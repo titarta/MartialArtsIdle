@@ -89,10 +89,7 @@ function formatAffixValue(affix) {
 function formatMultLabel(key, t) {
   switch (key) {
     case 'cultivationSpeedMult': return t('statNames.cultivation_speed');
-    case 'essenceMult': return t('statNames.essence_mult');
-    case 'soulMult':    return t('statNames.soul_mult');
-    case 'bodyMult':    return t('statNames.body_mult');
-    default:            return key;
+    default:                     return key;
   }
 }
 
@@ -521,25 +518,6 @@ function LawDetail({ law, cultivation, inventory }) {
             onHone={(mk) => cultivation.honeLawMult(law.id, mk)}
           />
         ))}
-        {/* Primary stat multipliers — read-only (balanced by sum) */}
-        <div className="tx-mod-row">
-          <div className="tx-mod-left">
-            <span className="tx-mod-name">{t('statNames.essence_mult')}</span>
-            <span className="tx-mod-value">x{(law.essenceMult ?? 0).toFixed(2)}</span>
-          </div>
-        </div>
-        <div className="tx-mod-row">
-          <div className="tx-mod-left">
-            <span className="tx-mod-name">{t('statNames.soul_mult')}</span>
-            <span className="tx-mod-value">x{(law.soulMult ?? 0).toFixed(2)}</span>
-          </div>
-        </div>
-        <div className="tx-mod-row">
-          <div className="tx-mod-left">
-            <span className="tx-mod-name">{t('statNames.body_mult')}</span>
-            <span className="tx-mod-value">x{(law.bodyMult ?? 0).toFixed(2)}</span>
-          </div>
-        </div>
       </div>
 
       {/* Unique Modifiers (one per tier, up to law rarity) */}

@@ -169,15 +169,6 @@ export const LAW_MULT_RANGES = {
   cultivationSpeedMult: {
     Iron: [0.8, 1.2], Bronze: [0.9, 1.5], Silver: [1.0, 2.0], Gold: [1.2, 2.5], Transcendent: [1.5, 3.0],
   },
-  essenceMult: {
-    Iron: [0.1, 0.5], Bronze: [0.15, 0.65], Silver: [0.2, 0.85], Gold: [0.30, 1.2], Transcendent: [0.50, 1.8],
-  },
-  soulMult: {
-    Iron: [0.1, 0.5], Bronze: [0.15, 0.65], Silver: [0.2, 0.85], Gold: [0.30, 1.2], Transcendent: [0.50, 1.8],
-  },
-  bodyMult: {
-    Iron: [0.1, 0.5], Bronze: [0.15, 0.65], Silver: [0.2, 0.85], Gold: [0.30, 1.2], Transcendent: [0.50, 1.8],
-  },
 };
 
 export function rollLawMult(multKey, rarity) {
@@ -271,9 +262,6 @@ export function generateLaw(forcedRarity) {
     realmRequirementLabel: LAW_REALM_LABELS[rarity] ?? 'Tempered Body',
     flavour:               pick(LAW_FLAVOURS),
     cultivationSpeedMult:  rollLawMult('cultivationSpeedMult', rarity),
-    essenceMult:           rollLawMult('essenceMult', rarity),
-    soulMult:              rollLawMult('soulMult', rarity),
-    bodyMult:              rollLawMult('bodyMult', rarity),
     uniques,
   };
 }

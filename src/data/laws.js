@@ -25,9 +25,6 @@ const LAWS_RAW = {
     realmRequirementLabel:'Tempered Body',
     flavour:              'The ancient text speaks of no fire, no storm, no mountain — only the even breath between all things.',
     cultivationSpeedMult: 1.0,
-    essenceMult:          0.35,
-    soulMult:             0.30,
-    bodyMult:             0.35,
     // One unique modifier per tier, up to the law's rarity (Iron = 1 unique).
     uniques: {
       Iron: { id: 'l_balanced_dao', value: 15 },

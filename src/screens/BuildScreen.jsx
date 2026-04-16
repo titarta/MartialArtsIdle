@@ -232,7 +232,6 @@ function LawPickerModal({ ownedLaws, activeLaw, onSelect, onClose }) {
                 </div>
                 <div className="law-picker-card-stats">
                   <span>{t('build.cultSpeed')}: x{law.cultivationSpeedMult.toFixed(1)}</span>
-                  <span>{t('build.statTriple', { ess: law.essenceMult, soul: law.soulMult, body: law.bodyMult })}</span>
                 </div>
                 {isActive && <span className="law-picker-card-active-tag">{t('common.active')}</span>}
               </button>
@@ -344,21 +343,6 @@ function BuildContent({ cultivation, techniques, artefacts }) {
             <div className="law-stat-row">
               <span className="law-stat-label">{t('build.cultSpeed')}</span>
               <span className="law-stat-value">x{activeLaw.cultivationSpeedMult.toFixed(1)}</span>
-            </div>
-
-            <div className="law-divider" />
-
-            <div className="law-stat-row">
-              <span className="law-stat-label">{t('statNames.essence')}</span>
-              <span className="law-stat-value">{activeLaw.essenceMult}</span>
-            </div>
-            <div className="law-stat-row">
-              <span className="law-stat-label">{t('statNames.soul')}</span>
-              <span className="law-stat-value">{activeLaw.soulMult}</span>
-            </div>
-            <div className="law-stat-row">
-              <span className="law-stat-label">{t('statNames.body')}</span>
-              <span className="law-stat-value">{activeLaw.bodyMult}</span>
             </div>
 
             <div className="law-divider" />

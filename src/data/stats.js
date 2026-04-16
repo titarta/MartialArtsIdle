@@ -43,8 +43,13 @@ export function computeStat(base, modifiers = []) {
 /**
  * Derive every stat from the current game snapshot.
  *
- * @param {number} qi          — current raw qi (floored)
- * @param {object} law         — active law object
+ * Primary stats (Essence, Soul, Body) start at 0 and are built up entirely
+ * through modifier sources — pills, artefacts, Law passives, reincarnation.
+ * They are NOT derived from Qi; Qi is a separate resource used exclusively
+ * for realm breakthroughs. (See obsidian/Primary Stats.md.)
+ *
+ * @param {number} qi          — current raw qi (unused for stat derivation; retained for signature stability)
+ * @param {object} law         — active law object (used for cultivationSpeedMult only)
  * @param {number} realmIndex  — current realm index
  * @param {object} modifiers   — { [statId]: Modifier[] }
  *                               Empty until items/laws grant modifiers.
@@ -68,11 +73,12 @@ export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
   const soulUnlocked = realmIndex >= SAINT_INDEX;
 
   // ── Primary ────────────────────────────────────────────────────────────────
-  const essence = Math.floor(computeStat(qi * law.essenceMult, mods('essence')));
+  // Base 0; built up entirely through modifier stacks (pills, artefacts, etc.).
+  const essence = Math.floor(computeStat(0, mods('essence')));
   const soul    = soulUnlocked
-    ? Math.floor(computeStat(qi * law.soulMult, mods('soul')))
+    ? Math.floor(computeStat(0, mods('soul')))
     : 0;
-  const body    = Math.floor(computeStat(qi * law.bodyMult, mods('body')));
+  const body    = Math.floor(computeStat(0, mods('body')));
 
   // ── Combat ─────────────────────────────────────────────────────────────────
   const health      = Math.max(100, Math.floor(computeStat((essence + body) * 12 + soul * 4, mods('health'))));

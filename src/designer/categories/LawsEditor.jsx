@@ -20,9 +20,6 @@ export default function LawsEditor({ edited, onChangeRecords }) {
         rarity: 'Iron',
         realmRequirement: 0,
         cultivationSpeedMult: 1.0,
-        essenceMult: 0.34,
-        soulMult: 0.33,
-        bodyMult: 0.33,
         uniques: {},
       }}
     />

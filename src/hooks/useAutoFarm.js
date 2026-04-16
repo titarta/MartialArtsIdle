@@ -55,18 +55,20 @@ function mergeFullGains(a, b) {
 // ─── Reconstruct player stats from saved data ─────────────────────────────────
 // Used for offline simulation only — we don't have live refs at init time.
 
-function reconstructOfflineStats(savedQi, ownedLaws, activeLawId) {
+function reconstructOfflineStats(_savedQi, ownedLaws, activeLawId) {
   try {
     const allLaws   = ownedLaws ?? [];
     const activeLaw = (activeLawId && allLaws.find(l => l.id === activeLawId))
       ?? allLaws[0];
     if (!activeLaw) return null;
 
-    const qi = savedQi ?? 0;
+    // Primary stats are no longer derived from Qi — they come from modifier
+    // sources (pills, artefacts, law passives). Offline simulation has no
+    // access to those live mod stacks, so use a zero baseline.
     return {
-      essence:    Math.floor(qi * (activeLaw.essenceMult ?? 0.34)),
-      soul:       Math.floor(qi * (activeLaw.soulMult    ?? 0.33)),
-      body:       Math.floor(qi * (activeLaw.bodyMult    ?? 0.33)),
+      essence:    0,
+      soul:       0,
+      body:       0,
       lawElement: activeLaw.element ?? 'Normal',
     };
   } catch {

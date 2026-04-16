@@ -101,21 +101,17 @@ function StatCircle({ label, value, locked, glowColor, active, onEnter, onLeave,
 }
 
 // ─── Detail panel (hover / tap) ───────────────────────────────────────────────
-function DetailPanel({ stat, qi, law, realmIndex }) {
-  const { t }        = useTranslation('ui');
-  const { t: tGame } = useTranslation('game');
+function DetailPanel({ stat, value, realmIndex }) {
+  const { t } = useTranslation('ui');
 
   const SAINT_INDEX = 24;
   const locked = stat === 'soul' && realmIndex < SAINT_INDEX;
-
-  const lawName = tGame(`laws.${law.id}.name`, { defaultValue: law.name });
 
   const configs = {
     essence: {
       title:    t('stats.essenceLabel'),
       subtitle: t('stats.essenceSubtitle'),
       color:    '#38bdf8',
-      mult: law.essenceMult, multKey: 'essence_mult',
       effects: [
         t('stats.essenceEffects.elemental'),
         t('stats.essenceEffects.defense'),
@@ -125,7 +121,6 @@ function DetailPanel({ stat, qi, law, realmIndex }) {
       title:    t('stats.soulLabel'),
       subtitle: t('stats.soulSubtitle'),
       color:    '#c084fc',
-      mult: law.soulMult, multKey: 'soul_mult',
       effects: [
         t('stats.soulEffects.psychic'),
         t('stats.soulEffects.techniques'),
@@ -137,7 +132,6 @@ function DetailPanel({ stat, qi, law, realmIndex }) {
       title:    t('stats.bodyLabel'),
       subtitle: t('stats.bodySubtitle'),
       color:    '#f97316',
-      mult: law.bodyMult, multKey: 'body_mult',
       effects: [
         t('stats.bodyEffects.physical'),
         t('stats.bodyEffects.defense'),
@@ -147,7 +141,6 @@ function DetailPanel({ stat, qi, law, realmIndex }) {
   };
 
   const cfg = configs[stat];
-  const val = Math.floor(qi * cfg.mult);
 
   return (
     <div className="stat-detail-panel" style={{ '--panel-color': cfg.color }}>
@@ -161,11 +154,10 @@ function DetailPanel({ stat, qi, law, realmIndex }) {
       ) : (
         <>
           <div className="sdp-formula">
-            <code className="sdp-code">Qi × {t(`statNames.${cfg.multKey}`, { defaultValue: cfg.multKey })}</code>
             <code className="sdp-code sdp-calc">
-              {fmt(qi)} × {cfg.mult} = <strong style={{ color: cfg.color }}>{fmt(val)}</strong>
+              <strong style={{ color: cfg.color }}>{fmt(value)}</strong>
             </code>
-            <span className="sdp-source">{t('stats.viaLaw', { law: lawName })}</span>
+            <span className="sdp-source">{t('stats.fromModifiers', { defaultValue: 'From modifiers' })}</span>
           </div>
           <div className="sdp-divider" />
           <ul className="sdp-effects">
@@ -275,7 +267,7 @@ function StatsContent({ cultivation, artefacts }) {
 
         <div className="stat-detail-side">
           {activeStat ? (
-            <DetailPanel stat={activeStat} qi={qi} law={activeLaw} realmIndex={realmIndex} />
+            <DetailPanel stat={activeStat} value={primary[activeStat] ?? 0} realmIndex={realmIndex} />
           ) : (
             <div className="sdp-placeholder">
               <span>{t('stats.tapForDetails')}</span>
