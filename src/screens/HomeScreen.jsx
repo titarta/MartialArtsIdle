@@ -123,15 +123,24 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
 const HOLD_HINT_SEEN_KEY = 'mai_home_hold_hint_seen';
 const HOLD_HINT_IDLE_MS  = 60 * 1000;
 
+const CRYSTAL_TIER_THRESHOLDS = [1000, 750, 500, 350, 200, 100, 50, 25, 10, 1];
+const CRYSTAL_TIER_VALUES     = [  10,   9,   8,   7,   6,   5,  4,  3,  2, 1];
+
+function getCrystalTier(level) {
+  for (let i = 0; i < CRYSTAL_TIER_THRESHOLDS.length; i++) {
+    if (level >= CRYSTAL_TIER_THRESHOLDS[i]) return CRYSTAL_TIER_VALUES[i];
+  }
+  return 1;
+}
+
 /** Key Crystal — locked (dim, greyscale) or unlocked (glowing, tappable). */
 function KeyCrystal({ crystal, isUnlocked, onOpen }) {
   if (!isUnlocked) {
-    /* Locked placeholder — dim greyscale sprite, no interaction */
     return (
       <div className="home-crystal-anchor">
         <div className="home-crystal-float home-crystal-float-slow">
           <img
-            src={`${BASE}sprites/items/origin_crystal.png`}
+            src={`${BASE}crystals/crystal_locked.png`}
             className="home-crystal-img home-crystal-locked"
             alt="Qi Crystal"
             draggable="false"
@@ -143,11 +152,12 @@ function KeyCrystal({ crystal, isUnlocked, onOpen }) {
   }
 
   const { level } = crystal;
+  const tier = getCrystalTier(level);
   return (
     <div className="home-crystal-anchor" onClick={onOpen}>
       <div className="home-crystal-float">
         <img
-          src={`${BASE}sprites/items/origin_crystal.png`}
+          src={`${BASE}crystals/crystal_${tier}.png`}
           className="home-crystal-img"
           alt="Qi Crystal"
           draggable="false"
