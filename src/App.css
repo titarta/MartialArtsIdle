@@ -1531,6 +1531,7 @@
 .home-crystal-img {
   width: 72px;
   height: auto;
+  margin-top: 10px;
   animation: home-crystal-glow 3s ease-in-out infinite;
 }
 
@@ -1545,21 +1546,21 @@
 .home-crystal-tag {
   font-size: 9px;
   font-weight: 700;
-  color: #a78bfa;
+  color: #e2d9ff;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(124, 58, 237, 0.35);
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(167, 139, 250, 0.6);
   border-radius: 8px;
   padding: 1px 7px;
 }
-.home-crystal-tag-locked { color: #444; border-color: #2a2a2a; }
+.home-crystal-tag-locked { color: #888; border-color: #444; }
 
 /* Secondary text ("Lv 2 · Tap to evolve") */
 .home-crystal-evolve {
   font-size: 9px;
-  color: rgba(167, 139, 250, 0.7);
-  background: rgba(0, 0, 0, 0.4);
+  color: rgba(220, 210, 255, 0.95);
+  background: rgba(0, 0, 0, 0.65);
   border-radius: 5px;
   padding: 0 5px;
 }
