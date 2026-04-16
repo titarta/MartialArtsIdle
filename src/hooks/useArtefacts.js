@@ -33,6 +33,7 @@ function resolveInstance(o) {
     firstName:  o.firstName,
     secondName: o.secondName,
     upgraded:   Boolean(o.upgraded),
+    craftCount: o.craftCount ?? 0,
     // Generated name overrides the catalog name when present; fall back
     // to the catalog name for legacy instances without rolled parts.
     name:       displayName ?? cat.name,
@@ -82,6 +83,11 @@ function ensureAffixes(owned) {
       next = { ...next, firstName, secondName };
       changed = true;
     }
+    // Back-fill hidden craft counter (drives geometric cost ramp on transmutes).
+    if (typeof next.craftCount !== 'number') {
+      next = { ...next, craftCount: 0 };
+      changed = true;
+    }
     return next;
   });
   return { result, changed };
@@ -119,7 +125,7 @@ export default function useArtefacts() {
       const rarity  = art?.rarity ?? 'Iron';
       const affixes = generateAffixes(art?.slot ?? 'weapon', rarity);
       const { firstName, secondName } = generateArtefactName(rarity);
-      const instance = { uid, catalogueId, affixes, firstName, secondName, upgraded: false };
+      const instance = { uid, catalogueId, affixes, firstName, secondName, upgraded: false, craftCount: 0 };
       const next = { ...prev, owned: [...prev.owned, instance] };
       save(next);
       return next;
@@ -208,7 +214,7 @@ export default function useArtefacts() {
           if (!entry) return a;
           return rollAffix(entry, a.tier ?? 'Iron');
         });
-        return { ...o, affixes };
+        return { ...o, affixes, craftCount: (o.craftCount ?? 0) + 1 };
       });
       const next = { ...prev, owned };
       save(next);
@@ -233,7 +239,7 @@ export default function useArtefacts() {
         const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
         const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
-        return { ...o, affixes: updated };
+        return { ...o, affixes: updated, craftCount: (o.craftCount ?? 0) + 1 };
       });
       const next = { ...prev, owned };
       save(next);
@@ -257,7 +263,7 @@ export default function useArtefacts() {
           .map(a => a.id);
         const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
         if (!newAffix) return o;
-        return { ...o, affixes: [...affixes, newAffix] };
+        return { ...o, affixes: [...affixes, newAffix], craftCount: (o.craftCount ?? 0) + 1 };
       });
       const next = { ...prev, owned };
       save(next);

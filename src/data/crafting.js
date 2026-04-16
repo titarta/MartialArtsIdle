@@ -58,17 +58,36 @@ const TRANSMUTE_QTY_RAW = {
 };
 export const TRANSMUTE_QTY = mergeSingleton(TRANSMUTE_QTY_RAW, 'crafting', 'TRANSMUTE_QTY');
 
+// ── Craft-count cost scaling ──────────────────────────────────────────────────
+// Each transmutation (hone/replace/add) bumps a hidden craftCount on the
+// artefact instance. Subsequent ops on the same item cost geometrically more:
+//   multiplier = (1 + TRANSMUTE_GROWTH) ^ craftCount
+// With growth = 0.05: n=0→1x, n=10→1.63x, n=50→11.5x, n=100→131x.
+// Small ramp early, extremely costly for heavily-worked items.
+const TRANSMUTE_GROWTH_RAW = { value: 0.05 };
+export const TRANSMUTE_GROWTH = mergeSingleton(
+  TRANSMUTE_GROWTH_RAW, 'crafting', 'TRANSMUTE_GROWTH'
+).value;
+
+export function getCraftMultiplier(craftCount = 0) {
+  const n = Math.max(0, craftCount);
+  return Math.pow(1 + TRANSMUTE_GROWTH, n);
+}
+
 /**
  * Build the cost array for a single transmutation operation.
  * @param {string|null} mineralStat  — the tier's mineralStat ID
  * @param {string|null} mineralMod   — the tier's mineralMod ID
  * @param {'hone'|'replace'|'add'} op
+ * @param {number} craftCount        — hidden per-instance craft counter (0 = fresh)
  * @returns {{ itemId: string, qty: number }[]}
  */
-export function getBracketCost(mineralStat, mineralMod, op) {
-  if (op === 'hone')    return [{ itemId: mineralStat, qty: TRANSMUTE_QTY.hone    }];
-  if (op === 'replace') return [{ itemId: mineralMod,  qty: TRANSMUTE_QTY.replace }];
-  return                       [{ itemId: mineralStat, qty: TRANSMUTE_QTY.add     }];
+export function getBracketCost(mineralStat, mineralMod, op, craftCount = 0) {
+  const mult = getCraftMultiplier(craftCount);
+  const scale = (base) => Math.max(1, Math.ceil(base * mult));
+  if (op === 'hone')    return [{ itemId: mineralStat, qty: scale(TRANSMUTE_QTY.hone)    }];
+  if (op === 'replace') return [{ itemId: mineralMod,  qty: scale(TRANSMUTE_QTY.replace) }];
+  return                       [{ itemId: mineralStat, qty: scale(TRANSMUTE_QTY.add)     }];
 }
 
 // ── Item upgrade costs ────────────────────────────────────────────────────────

@@ -139,9 +139,9 @@ function CostRow({ itemId, needed, owned }) {
 
 // ─── Modifier rows ────────────────────────────────────────────────────────────
 
-function AffixRow({ affix, gIdx, color, mineralStat, mineralMod, inventory, onHone, onReplace }) {
-  const honeCosts    = bracketCost(mineralStat, mineralMod, 'hone');
-  const replaceCosts = bracketCost(mineralStat, mineralMod, 'replace');
+function AffixRow({ affix, gIdx, color, mineralStat, mineralMod, craftCount = 0, inventory, onHone, onReplace }) {
+  const honeCosts    = bracketCost(mineralStat, mineralMod, 'hone',    craftCount);
+  const replaceCosts = bracketCost(mineralStat, mineralMod, 'replace', craftCount);
   return (
     <div className="tx-mod-row" style={{ borderLeft: `3px solid ${color}` }}>
       <div className="tx-mod-left">
@@ -212,9 +212,9 @@ function MultRow({ label, value, multKey, mineralStat, inventory, onHone }) {
   );
 }
 
-function EmptySlotRow({ color, mineralStat, inventory, onAdd }) {
+function EmptySlotRow({ color, mineralStat, craftCount = 0, inventory, onAdd }) {
   const { t } = useTranslation('ui');
-  const addCosts = bracketCost(mineralStat, null, 'add');
+  const addCosts = bracketCost(mineralStat, null, 'add', craftCount);
   return (
     <div className="tx-mod-row tx-mod-row-empty" style={{ borderLeft: `3px solid ${color}` }}>
       <div className="tx-mod-left">
@@ -329,6 +329,7 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
               color={b.color}
               mineralStat={b.mineralStat}
               mineralMod={b.mineralMod}
+              craftCount={inst.craftCount ?? 0}
               inventory={inventory}
               onHone={(idx)    => artefacts.honeAffix(inst.uid, idx)}
               onReplace={(idx) => artefacts.replaceAffix(inst.uid, idx)}
@@ -339,6 +340,7 @@ function ArtefactDetail({ inst, artefacts, inventory }) {
               key={`e-${bi}-${i}`}
               color={b.color}
               mineralStat={b.mineralStat}
+              craftCount={inst.craftCount ?? 0}
               inventory={inventory}
               onAdd={() => artefacts.addAffix(inst.uid, b.label)}
             />
