@@ -2,7 +2,7 @@
 
 Elemental cultivation arts unlocked at [[Realm Progression#Qi Transformation|Qi Transformation]].
 
-Laws define **how a cultivator's raw Qi is converted into usable power**. Every stat point in Essence, Soul, and Body is derived from Qi through the multipliers the active Law provides.
+Laws define the cultivator's elemental specialisation and provide a package of passives and cultivation-speed bonuses. Primary stats (Essence, Soul, Body) are no longer derived from Qi through a Law — see [[Primary Stats]].
 
 ---
 
@@ -28,20 +28,6 @@ Laws are tied to one element. Each element flavours the default attack and passi
 | Ice | — |
 
 > Elemental combinations possible at advanced realms (TBD).
-
----
-
-## Stat Conversion
-
-A Law defines three multipliers that convert the cultivator's raw **Qi** into the three primary stats. These are the base values — other sources (pills, artefacts, reincarnation bonuses) can modify them further.
-
-| Stat | Derived From | Used For |
-|---|---|---|
-| **Essence** | `Qi × essence_mult` | Elemental attacks |
-| **Soul** | `Qi × soul_mult` | Mental / spiritual attacks |
-| **Body** | `Qi × body_mult` | Physical attacks |
-
-A law specialises in a role — a fire law might push `essence_mult` high at the expense of `body_mult`, while a stone law might favour `body_mult`.
 
 ---
 
@@ -105,7 +91,7 @@ Once acquired, any Law can be refined at the [[Crafting|Refining Furnace]].
 
 > *"The ancient text speaks of no fire, no storm, no mountain — only the even breath between all things."*
 
-A beginner's law found early in the world. Makes no elemental specialisation, instead distributing Qi evenly across all three stats. Ideal for new cultivators who haven't yet committed to a combat style.
+A beginner's law found early in the world. Makes no elemental specialisation. Ideal for new cultivators who haven't yet committed to a combat style.
 
 | Property | Value |
 |---|---|
@@ -113,14 +99,11 @@ A beginner's law found early in the world. Makes no elemental specialisation, in
 | **Rarity** | Iron |
 | **Realm Requirement** | Qi Transformation (Early Stage) |
 | **Cultivation Speed** | ×1.0 (baseline) |
-| **essence_mult** | 0.35 |
-| **soul_mult** | 0.30 |
-| **body_mult** | 0.35 |
 
 **Passive (1 slot — Iron):**
 - *Steady Breath:* Cultivation is not interrupted when taking damage below 10% of max DEF.
 
-**Character:** Low multipliers across the board, no elemental attack bonus, but a broadly useful passive and zero realm gating beyond the unlock threshold. A solid starting law that becomes obsolete once elemental or specialised laws are discovered.
+**Character:** No elemental attack bonus and only a single passive, but a broadly useful passive and zero realm gating beyond the unlock threshold. A solid starting law that becomes obsolete once elemental or specialised laws are discovered.
 
 ---
 
@@ -130,11 +113,11 @@ Full operation rules in [[Crafting]]. Quick reference for laws:
 
 | Goal | Operation | Key Materials (minerals only) |
 |---|---|---|
-| Reroll all multipliers + passives + element | **Refine** | Black Tortoise Iron × (3×tier) + Crimson Flame Crystal × tier |
-| Fix one multiplier or passive value | **Hone** | Chaos Jade × (2×tier) |
+| Reroll all passives + element + cultivation speed | **Refine** | Black Tortoise Iron × (3×tier) + Crimson Flame Crystal × tier |
+| Fix one passive value or cultivation speed | **Hone** | Chaos Jade × (2×tier) |
 | Add a missing passive | **Imbue** | Mithril Essence × (2×tier) |
 | Delete one passive | **Extract** | Black Tortoise Iron × 5 |
-| Protect one passive or multiplier | **Seal** | Deep Sea Cold Iron × 3 |
+| Protect one passive | **Seal** | Deep Sea Cold Iron × 3 |
 | Change element or passive type | **Transmute** | Void Stone × (2×tier) |
 | Gain an extra passive slot | **Upgrade** | Two bracket minerals (see [[Crafting#Upgrade Costs]]) |
 
@@ -144,7 +127,7 @@ Realm requirement is permanent and cannot be changed by any crafting operation.
 
 ## TODO
 
-- [ ] Define multiplier ranges per realm tier and rarity
+- [ ] Define cultivation-speed multiplier ranges per realm tier and rarity
 - [ ] Define full passive pool and weighting per element
 - [ ] Define elemental combination unlock conditions
 - [ ] Define law discovery rate / book drop sources

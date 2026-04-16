@@ -1,41 +1,41 @@
 # Primary Stats
 
-Three primary stats drive all gameplay systems. They are **not accumulated directly** — they are derived from the cultivator's raw **Qi** through the multipliers defined by the active [[Laws|Law]].
+Three primary stats drive all gameplay systems. They start at **0** and are built up entirely through modifier sources — pills, artefacts, [[Laws|Law]] passives, reincarnation bonuses, and so on. They are **not derived from Qi**; Qi is a separate resource used exclusively for realm breakthroughs.
 
 ```
-Essence = Qi × essence_mult   (from Law)
-Soul    = Qi × soul_mult      (from Law)
-Body    = Qi × body_mult      (from Law)
+Essence = 0 + modifiers
+Soul    = 0 + modifiers
+Body    = 0 + modifiers
 ```
 
-Other sources (pills, artefacts, reincarnation bonuses) can modify these values further on top of the base.
+See [[Stats]] for the full stacking formula and order of operations.
 
 ---
 
 ## Naming Note
 
 **Qi** is the raw cultivation resource that accumulates over time and gates realm breakthroughs.
-**Essence, Soul, Body** are the three derived combat/power stats. Keeping these names distinct avoids confusion between the resource and the stats.
+**Essence, Soul, Body** are the three combat/power stats. Keeping these names distinct avoids confusion between the resource and the stats.
 
 ---
 
 ## Essence (Elemental Power)
 
-- Derived from Qi via the Law's `essence_mult`
+- Base value 0; built up via modifier sources
 - Primary driver of **elemental attacks** (fire, water, ice, etc.)
 - Scales with Laws that have an elemental affinity
 - Contributes to **DEF** alongside Body
 
 ## Soul (Spiritual Power)
 
-- Derived from Qi via the Law's `soul_mult`
-- Unlocked at [[Realm Progression#Saint|Saint]] realm
+- Base value 0; built up via modifier sources
+- Unlocked at [[Realm Progression#Saint|Saint]] realm (locked to 0 before this)
 - Primary driver of **mental / spiritual attacks** and [[Secret Techniques]]
 - Contributes to **Intuition** (secondary stat)
 
 ## Body (Physical Power)
 
-- Derived from Qi via the Law's `body_mult`
+- Base value 0; built up via modifier sources
 - Primary driver of **physical attacks**
 - Contributes to **DEF = Essence + Body** (combo)
 
@@ -55,20 +55,20 @@ Other sources (pills, artefacts, reincarnation bonuses) can modify these values 
 ```
 [Qi]              [Law]                      [Secret Technique]
  Accumulation      Element: Fire              Requirements:
- rate              Realm req: Saint             - Artefact type
-                                                - Law element
-[Essence]          Multipliers:                 - Essence/Soul/Body lvl
- Qi × esse_mult     - essence_mult            Rank: major realm
- → Elemental atk    - soul_mult              Quality: iron→transcendent
-                    - body_mult              Type: Attack/Heal/Defend/Dodge
-[Soul]              - cultivat. speed        Attack formula:
- Qi × soul_mult                                K * (Essence + Soul + Body)
- → Mental atk      Passives (by rarity):       + artefact dmg (flat)
-                    - Iron: 1 passive           * elem bonus
-[Body]              - Bronze: 2              K = secret technique mult
- Qi × body_mult     - Silver: 3
- → Physical atk     - Gold: 4
-                    - Transcendent: 5
+ rate (spent on    Realm req: Saint             - Artefact type
+  breakthroughs)                                - Law element
+                   Passives (by rarity):        - Essence/Soul/Body lvl
+[Essence]           - Iron: 1 passive         Rank: major realm
+ 0 + modifiers      - Bronze: 2               Quality: iron→transcendent
+ → Elemental atk    - Silver: 3               Type: Attack/Heal/Defend/Dodge
+                    - Gold: 4
+[Soul]              - Transcendent: 5        Attack formula:
+ 0 + modifiers                                  K * (Essence + Soul + Body)
+ → Mental atk                                   + artefact dmg (flat)
+                                                * elem bonus
+[Body]                                        K = secret technique mult
+ 0 + modifiers
+ → Physical atk
 ```
 
 ---

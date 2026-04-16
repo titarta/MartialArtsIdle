@@ -27,7 +27,7 @@ Final Value = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (
 
 ## Special Resource: Qi
 
-Qi is the raw cultivation energy. It cannot be increased directly — only its **generation speed** can be modified. It accumulates passively over time and is the source of all three primary stats.
+Qi is the raw cultivation energy. It cannot be increased directly — only its **generation speed** can be modified. It accumulates passively over time and is **spent** on realm breakthroughs.
 
 **Generation formula:**
 ```
@@ -37,16 +37,16 @@ qi/sec = BASE_RATE × (1 + Σ increased_qi_speed%) × Π more_qi_speed × focus_
 - `BASE_RATE` = 5 qi/sec (hardcoded baseline)
 - `focus_mult` = the Qi Focus Multiplier stat (base 300%; can be modified)
 - Qi generation speed is modified via [[Laws|Law]] cultivation speed, reincarnation talent, and pills
-- Qi is **spent** on realm breakthroughs; it does not convert to stats directly but sets the ceiling for primary stat calculation
+- Qi is **spent** on realm breakthroughs; it does not convert to primary stats
 
 ---
 
 ## Primary Stats
 
-The three primary stats are derived from Qi via the active [[Laws|Law]]'s conversion multipliers. All other modifier types layer on top of this base.
+The three primary stats start at 0 and are built up entirely through modifiers (pills, artefacts, [[Laws|Law]] passives, reincarnation bonuses, etc.). They are no longer derived from Qi.
 
 ```
-Base = Qi × law_mult
+Base = 0
 Final = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (1 + Σ increased%) × Π more
 ```
 
@@ -56,7 +56,7 @@ Final = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (1 + Σ
 
 Elemental power — the cultivator's chosen element made manifest.
 
-- **Derived from:** `Qi × essence_mult` (Law)
+- **Base value:** 0 (all value comes from modifier sources)
 - **Feeds into:** Elemental Damage, DEF, Secret Technique equip thresholds
 - **Unlocked:** Qi Transformation (when a Law is equipped)
 
@@ -66,9 +66,9 @@ Elemental power — the cultivator's chosen element made manifest.
 
 Spiritual power — consciousness and will made tangible.
 
-- **Derived from:** `Qi × soul_mult` (Law)
+- **Base value:** 0 (all value comes from modifier sources)
 - **Feeds into:** Psychic Damage, Soul Toughness threshold, Secret Technique equip thresholds, Harvest Gathering Speed
-- **Unlocked:** [[Realm Progression#Saint|Saint]] realm (soul_mult = 0 before this)
+- **Unlocked:** [[Realm Progression#Saint|Saint]] realm (locked to 0 before this)
 
 ---
 
@@ -76,7 +76,7 @@ Spiritual power — consciousness and will made tangible.
 
 Physical power — the cultivated flesh, bones, and meridians.
 
-- **Derived from:** `Qi × body_mult` (Law)
+- **Base value:** 0 (all value comes from modifier sources)
 - **Feeds into:** Physical Damage, Defense, Secret Technique equip thresholds, Mining Speed
 - **Unlocked:** Tempered Body (always active)
 
@@ -265,7 +265,6 @@ Unique modifiers do not fit the standard stacking model. Each has its own rule. 
 - [ ] Define Defense / Elemental Defense / Soul Toughness base formulas (how much of Body/Essence/Soul converts)
 - [ ] Define Harvest Gathering Speed and Mining Speed base formulas (how much of Soul/Body converts)
 - [ ] Define modifier value ranges per source (Law passives, artefact slots, pills)
-- [ ] Clarify whether `#% increased base` and `base flat` apply before or after the Law conversion (they apply after — base = Qi × law_mult)
 - [ ] Define elemental % split on dual-element secret techniques (for Elemental Damage weighting)
 - [ ] Decide if Exploit Chance caps below 100% (without U5)
 
