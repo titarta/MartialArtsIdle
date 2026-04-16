@@ -228,7 +228,7 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className={`app${currentScreen === 'home' ? ' app-home' : ''}`}>
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}

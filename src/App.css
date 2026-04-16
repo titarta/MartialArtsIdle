@@ -995,6 +995,12 @@
 /* Strip screen-container padding so home art bleeds to all edges.
    Both selectors are kept: :has() for modern browsers, .sc-fullbleed
    (applied via React) for older iOS Safari that doesn't support :has(). */
+/* Lock the .app wrapper when on home so iOS can't scroll the
+   env(safe-area-inset-top) gap that body padding creates. */
+.app-home {
+  overflow: hidden;
+}
+
 .screen-container:has(.home-screen),
 .sc-fullbleed {
   /* zero top/sides so HUD starts at y=0 (covers Dynamic Island / notch) */
@@ -1004,6 +1010,12 @@
      Without this, .home-screen has no defined height and the scene collapses. */
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  /* body has padding-top: env(safe-area-inset-top) for other screens.
+     The home HUD handles its OWN safe-area offset, so without this
+     negative margin the gap doubles (~120px on iPhone 15 Pro).
+     Pulling up by exactly the body padding cancels it out. */
+  margin-top: calc(-1 * env(safe-area-inset-top));
 }
 
 /* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
