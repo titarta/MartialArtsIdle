@@ -236,7 +236,7 @@ function App() {
         isUnlocked={featureFlags.isUnlocked}
         getHint={featureFlags.getHint}
       />
-      <main className="screen-container">
+      <main className={`screen-container${currentScreen === 'home' ? ' sc-fullbleed' : ''}`}>
         {screens[currentScreen]}
       </main>
       <ToastStack

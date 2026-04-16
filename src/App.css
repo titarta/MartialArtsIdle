@@ -992,16 +992,23 @@
 
 /* ── Home Screen ──────────────────────────────────────────────────────────── */
 
-/* Strip screen-container padding so home art bleeds to all edges */
-.screen-container:has(.home-screen) {
-  padding: 0;
+/* Strip screen-container padding so home art bleeds to all edges.
+   Both selectors are kept: :has() for modern browsers, .sc-fullbleed
+   (applied via React) for older iOS Safari that doesn't support :has(). */
+.screen-container:has(.home-screen),
+.sc-fullbleed {
+  /* zero top/sides so HUD starts at y=0 (covers Dynamic Island / notch) */
+  padding: 0 0 calc(var(--nav-h) + env(safe-area-inset-bottom));
   max-width: 100%;
 }
 
 /* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
 .home-top-hud {
-  height: calc(46px + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) 14px 0;
+  /* No fixed height — let padding + content determine it.
+     padding-top = safe area (covers Dynamic Island / notch fully) + 2px gap.
+     On phones with no notch: safe area = 0 → bar is ~38px total.
+     On iPhone 15 Pro (safe area 59px): bar is ~99px total. */
+  padding: calc(env(safe-area-inset-top) + 2px) 14px 8px;
   background: rgba(5, 2, 14, 0.92);
   border-bottom: 1px solid rgba(30, 18, 48, 0.85);
   display: flex;
@@ -1061,7 +1068,12 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - var(--nav-h) - env(safe-area-inset-bottom));
+  /* height: 100% fills exactly the screen-container content box, which now
+     has padding-bottom = navbar height, so the scene never runs behind the
+     fixed nav bar. */
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   padding: 0;
   max-width: none !important;
   width: 100%;
