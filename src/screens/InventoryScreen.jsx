@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ITEMS, RARITY } from '../data/items';
+import { HERB_ITEMS, ORE_ITEMS, CULTIVATION_ITEMS, RARITY } from '../data/materials';
+
+const MATERIAL_ITEMS = {
+  herbs:       HERB_ITEMS,
+  minerals:    ORE_ITEMS,
+  cultivation: CULTIVATION_ITEMS,
+};
 import { QUALITY, ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
@@ -53,7 +59,7 @@ function InventoryScreen({ inventory, artefacts, techniques, cultivation }) {
       {/* ── Materials ────────────────────────────────────────────────────────── */}
       {MATERIAL_KEYS.has(activeTab) && (
         <div className="inv-grid">
-          {ITEMS[activeTab].filter(item => inventory.inventory[item.id] !== undefined).map((item) => {
+          {MATERIAL_ITEMS[activeTab].filter(item => inventory.inventory[item.id] !== undefined).map((item) => {
             const qty    = getQuantity(item.id);
             const rarity = RARITY[item.rarity];
             const itemName = tGame(`items.${item.id}.name`, { defaultValue: item.name });

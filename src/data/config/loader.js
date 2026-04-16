@@ -30,7 +30,6 @@ import worldsOverride       from './worlds.override.json';
 import enemiesOverride      from './enemies.override.json';
 import realmsOverride       from './realms.override.json';
 import craftingOverride     from './crafting.override.json';
-import itemsOverride        from './items.override.json';
 import pillsOverride        from './pills.override.json';
 import lawsOverride         from './laws.override.json';
 import artefactsOverride    from './artefacts.override.json';
@@ -44,7 +43,6 @@ const OVERRIDES = {
   enemies:      enemiesOverride,
   realms:       realmsOverride,
   crafting:     craftingOverride,
-  items:        itemsOverride,
   pills:        pillsOverride,
   laws:         lawsOverride,
   artefacts:    artefactsOverride,

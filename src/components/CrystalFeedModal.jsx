@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ITEMS, RARITY, getRefinedQi } from '../data/items';
+import { CULTIVATION_ITEMS, RARITY, getRefinedQi } from '../data/materials';
 
 function CrystalFeedModal({ crystal, inventory, onClose }) {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -7,7 +7,7 @@ function CrystalFeedModal({ crystal, inventory, onClose }) {
 
   const { level, refinedQi, requiredForNext, crystalQiBonus, feed } = crystal;
 
-  const availableStones = ITEMS.cultivation
+  const availableStones = CULTIVATION_ITEMS
     .map(item => ({
       ...item,
       qty: inventory.getQuantity(item.id),

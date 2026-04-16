@@ -9,10 +9,12 @@
 
 import ENEMIES from '../data/enemies';
 import { ALL_MATERIALS } from '../data/materials';
-import { ITEMS_BY_ID } from '../data/items';
+import { PILLS_BY_ID } from '../data/pills';
 import REALMS from '../data/realms';
 import { generateTechnique } from '../data/techniqueDrops';
 import { generateLaw } from '../data/affixPools';
+
+const ITEMS_BY_ID = { ...ALL_MATERIALS, ...PILLS_BY_ID };
 
 /**
  * Attach window.debug using a ref that always points to the latest hook values.
@@ -163,17 +165,10 @@ export function initDebug(hooksRef) {
     giveMaterials(qty = 1000) {
       const inv = g().inventory;
       let count = 0;
-      // items.js materials (used by inventory/crafting)
+      // All materials and pills — combined lookup built at module load.
       for (const id of Object.keys(ITEMS_BY_ID)) {
         inv.addItem(id, qty);
         count++;
-      }
-      // materials.js entries not already in items.js
-      for (const id of Object.keys(ALL_MATERIALS)) {
-        if (!ITEMS_BY_ID[id]) {
-          inv.addItem(id, qty);
-          count++;
-        }
       }
       console.log(`[debug] +${qty}× of ${count} materials`);
     },

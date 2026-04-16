@@ -1,17 +1,29 @@
 /**
- * Materials editor — two sub-tabs (Herbs / Ores) since their cost field
- * differs (gatherCost vs mineCost). Each sub-tab is its own RecordEditor
- * over a namespaced subtree of the materials override (records.HERBS or
- * records.ORES).
+ * Materials editor — four sub-tabs (Herbs / Ores / Blood Cores / QI Stones).
+ * Each sub-tab is its own CardGridEditor over a namespaced subtree of the
+ * materials override (records.HERBS, records.ORES, records.BLOOD_CORES,
+ * records.QI_STONES).
  */
 import { useState } from 'react';
 import CardGridEditor from './CardGridEditor.jsx';
-import { HERBS, ORES } from '../../data/materials.js';
-import { HERB_SCHEMA, ORE_SCHEMA } from '../schemas/materials.js';
+import {
+  HERBS,
+  ORES,
+  BLOOD_CORES,
+  CULTIVATION_MATERIALS,
+} from '../../data/materials.js';
+import {
+  HERB_SCHEMA,
+  ORE_SCHEMA,
+  BLOOD_CORE_SCHEMA,
+  QI_STONE_SCHEMA,
+} from '../schemas/materials.js';
 
 const SUB_TABS = [
-  { id: 'HERBS', label: 'Herbs', baseline: HERBS, schema: HERB_SCHEMA, newRec: { rarity: 'Common', gatherCost: 15 }, placeholder: 'New Herb Name' },
-  { id: 'ORES',  label: 'Ores',  baseline: ORES,  schema: ORE_SCHEMA,  newRec: { rarity: 'Common', mineCost:   15 }, placeholder: 'New Ore Name' },
+  { id: 'HERBS',       label: 'Herbs',       baseline: HERBS,                 schema: HERB_SCHEMA,       newRec: { rarity: 'Iron', gatherCost: 15 },                                  placeholder: 'New Herb ID' },
+  { id: 'ORES',        label: 'Ores',        baseline: ORES,                  schema: ORE_SCHEMA,        newRec: { rarity: 'Iron', mineCost: 15 },                                    placeholder: 'New Ore ID' },
+  { id: 'BLOOD_CORES', label: 'Blood Cores', baseline: BLOOD_CORES,           schema: BLOOD_CORE_SCHEMA, newRec: { rarity: 'Iron' },                                                  placeholder: 'New Blood Core ID' },
+  { id: 'QI_STONES',   label: 'QI Stones',   baseline: CULTIVATION_MATERIALS, schema: QI_STONE_SCHEMA,   newRec: { rarity: 'Iron', gatherCost: 15, mineCost: 15, refinedQi: 5 },     placeholder: 'New QI Stone ID' },
 ];
 
 export default function MaterialsEditor({ edited, onChangeRecords }) {
@@ -53,7 +65,7 @@ export default function MaterialsEditor({ edited, onChangeRecords }) {
         editedRecords={subRecords}
         onChangeRecords={onSubChange}
         schema={sub.schema}
-        displayLabel={(rec, key) => `${rec?.rarity ?? '?'} · ${key}`}
+        displayLabel={(rec, key) => `${rec?.rarity ?? '?'} · ${rec?.name ?? key}`}
         allowAdd={true}
         newIdPlaceholder={sub.placeholder}
         initialNewRecord={sub.newRec}

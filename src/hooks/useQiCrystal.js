@@ -12,7 +12,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getRefinedQi } from '../data/items';
+import { getRefinedQi } from '../data/materials';
 
 const SAVE_KEY = 'mai_qi_crystal';
 

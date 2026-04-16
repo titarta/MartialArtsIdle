@@ -7,9 +7,9 @@
  */
 
 import ENEMIES from '../data/enemies.js';
-import { ITEMS }  from '../data/items.js';
 import WORLDS from '../data/worlds.js';
 import { ALL_MATERIALS } from '../data/materials.js';
+import { PILLS } from '../data/pills.js';
 
 export function enemyIdOptions() {
   return Object.keys(ENEMIES).map((id) => ({ value: id, label: `${id} — ${ENEMIES[id].name}` }));
@@ -17,10 +17,11 @@ export function enemyIdOptions() {
 
 export function itemIdOptions() {
   const all = [];
-  for (const cat of Object.keys(ITEMS)) {
-    for (const it of ITEMS[cat]) {
-      all.push({ value: it.id, label: `${it.id} — ${it.name}` });
-    }
+  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
+    all.push({ value: id, label: `${id} — ${mat.name}` });
+  }
+  for (const pill of PILLS) {
+    all.push({ value: pill.id, label: `${pill.id} — ${pill.name}` });
   }
   return all;
 }

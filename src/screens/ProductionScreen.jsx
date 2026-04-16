@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { QUALITY, ARTEFACTS_BY_ID } from '../data/artefacts';
 import { LAW_RARITY } from '../data/laws';
 import { TECHNIQUE_QUALITY } from '../data/techniques';
-import { ITEMS, ITEMS_BY_ID, RARITY } from '../data/items';
+import { HERB_ITEMS, ALL_MATERIALS, RARITY } from '../data/materials';
 import { MOD } from '../data/stats';
 import { RARITY_TIER } from '../data/affixPools';
 import { findPill, PILLS, PILLS_BY_ID, RECIPES_BY_PILL } from '../data/pills';
+
+const ITEMS_BY_ID = { ...ALL_MATERIALS, ...PILLS_BY_ID };
 import { formatUniqueDescription } from '../data/lawUniques';
 import { ARTEFACTS } from '../data/artefacts';
 import { generateTechnique } from '../data/techniqueDrops';
@@ -708,7 +710,7 @@ function HerbSelector({ slotIndex, selectedHerbId, onSelect, inventory }) {
   const [open, setOpen] = useState(false);
 
   const ownedHerbs = useMemo(() => {
-    return ITEMS.herbs.filter(h => (inventory.getQuantity(h.id) > 0));
+    return HERB_ITEMS.filter(h => (inventory.getQuantity(h.id) > 0));
   }, [inventory]);
 
   const selectedHerb = selectedHerbId ? ITEMS_BY_ID[selectedHerbId] : null;

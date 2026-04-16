@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { RARITY } from '../data/items';
+import { RARITY } from '../data/materials';
 
 const BASE = import.meta.env.BASE_URL;
 

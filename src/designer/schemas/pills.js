@@ -24,8 +24,9 @@ const effectRow = [
 ];
 
 export default [
-  { key: 'name',     type: 'string', label: 'Display name' },
-  { key: 'rarity',   type: 'enum',   label: 'Rarity', options: rarityOptions },
-  { key: 'duration', type: 'number', label: 'Duration (seconds)', min: 1, step: 1 },
-  { key: 'effects',  type: 'array',  label: 'Effects', itemSchema: effectRow },
+  { key: 'name',        type: 'string',   label: 'Display name' },
+  { key: 'rarity',      type: 'enum',     label: 'Rarity', options: rarityOptions },
+  { key: 'duration',    type: 'number',   label: 'Duration (seconds)', min: 1, step: 1 },
+  { key: 'description', type: 'textarea', label: 'Description', rows: 3 },
+  { key: 'effects',     type: 'array',    label: 'Effects', itemSchema: effectRow },
 ];

@@ -15,9 +15,18 @@
  * Records are keyed by feature id; each record is shallow-merged onto the
  * baseline, so you can patch just `gate` without losing `hint` / `unlockMsg`.
  */
-import WORLDS        from './worlds';
-import { ITEMS }    from './items';
+import WORLDS from './worlds';
+import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS } from './materials';
+import { PILLS } from './pills';
 import { mergeRecords } from './config/loader';
+
+const ITEM_CATEGORIES = {
+  herbs:       HERB_ITEMS,
+  minerals:    ORE_ITEMS,
+  bloodCores:  BLOOD_CORE_ITEMS,
+  cultivation: CULTIVATION_ITEMS,
+  pills:       PILLS,
+};
 
 // ── Baseline ──────────────────────────────────────────────────────────────────
 
@@ -92,9 +101,9 @@ export function evaluateGate(gate, ctx) {
     case 'region_clear_any':
       return clearedRegions.size > 0;
     case 'item_any':
-      return Object.values(ITEMS).flat().some(item => getQuantity(item.id) > 0);
+      return Object.values(ITEM_CATEGORIES).some(cat => cat.some(item => getQuantity(item.id) > 0));
     case 'item_category':
-      return (ITEMS[gate.category] ?? []).some(item => getQuantity(item.id) > 0);
+      return (ITEM_CATEGORIES[gate.category] ?? []).some(item => getQuantity(item.id) > 0);
     case 'all':
       return gate.gates.every(g => evaluateGate(g, ctx));
     case 'any':

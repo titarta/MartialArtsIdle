@@ -5,7 +5,6 @@ import WorldsEditor     from './categories/WorldsEditor.jsx';
 import EnemiesEditor    from './categories/EnemiesEditor.jsx';
 import RealmsEditor     from './categories/RealmsEditor.jsx';
 import CraftingEditor   from './categories/CraftingEditor.jsx';
-import ItemsEditor      from './categories/ItemsEditor.jsx';
 import PillsEditor      from './categories/PillsEditor.jsx';
 import LawsEditor       from './categories/LawsEditor.jsx';
 import ArtefactsEditor  from './categories/ArtefactsEditor.jsx';
@@ -20,7 +19,6 @@ const EDITORS = {
   enemies:    EnemiesEditor,
   realms:     RealmsEditor,
   laws:       LawsEditor,
-  items:      ItemsEditor,
   materials:  MaterialsEditor,
   pills:      PillsEditor,
   artefacts:  ArtefactsEditor,
@@ -49,7 +47,6 @@ const CATEGORIES = [
   { id: 'realms',     label: 'Realms',      section: 'Progression',         path: 'src/data/config/realms.override.json'     },
   { id: 'laws',       label: 'Laws',        section: 'Progression',         path: 'src/data/config/laws.override.json'       },
   // ── Inventory ────────────────────────────────────────────────────────────
-  { id: 'items',      label: 'Items',       section: 'Inventory',           path: 'src/data/config/items.override.json'      },
   { id: 'materials',  label: 'Materials',   section: 'Inventory',           path: 'src/data/config/materials.override.json'  },
   { id: 'pills',      label: 'Pills',       section: 'Inventory',           path: 'src/data/config/pills.override.json'      },
   { id: 'artefacts',  label: 'Artefacts',   section: 'Inventory',           path: 'src/data/config/artefacts.override.json'  },
