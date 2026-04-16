@@ -133,6 +133,51 @@ function CrystalPlaceholder() {
   );
 }
 
+// ── PC-only left info panel ──────────────────────────────────────────────────
+
+/** Compact qi text updated via rAF — avoids a React re-render every frame. */
+function PCQiProgressText({ qiRef, costRef, maxed }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (maxed) {
+      if (ref.current) ref.current.textContent = 'Peak Qi';
+      return;
+    }
+    const fmt = (n) => {
+      if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return String(Math.floor(n));
+    };
+    let raf;
+    const tick = () => {
+      if (ref.current)
+        ref.current.textContent = `${fmt(qiRef.current)} / ${fmt(costRef.current)} Qi`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [qiRef, costRef, maxed]);
+  return <span ref={ref} className="home-pc-qi-text">—</span>;
+}
+
+/** Left panel — visible only at wide (≥ 900 px) breakpoints.
+ *  Shows cultivation stats so the player doesn't have to look at the bar. */
+function HomePCLeftPanel({ realmName, qiRef, costRef, rateRef, boosting, adBoostActive, maxed }) {
+  const { t } = useTranslation('ui');
+  return (
+    <div className="home-pc-left">
+      <div className="home-pc-section-label">Cultivation</div>
+      <div className="home-pc-realm-name">{realmName}</div>
+      <PCQiProgressText qiRef={qiRef} costRef={costRef} maxed={maxed} />
+      <QiRateReadout rateRef={rateRef} boosting={boosting} adBoostActive={adBoostActive} maxed={maxed} />
+      {!maxed && (
+        <div className="home-pc-hold-badge">{t('home.holdToCultivate')}</div>
+      )}
+    </div>
+  );
+}
+
 /** Falling qi-particle stream between crystal and character. */
 function QiParticles() {
   return (
@@ -262,10 +307,22 @@ function HomeScreen({
       {/* ── Scene: fills all space between HUD and nav bar ───────────── */}
       <div className="home-scene">
 
+        {/* Left info panel — only visible at PC widths (≥ 900 px) */}
+        <HomePCLeftPanel
+          realmName={realmName}
+          qiRef={qiRef}
+          costRef={costRef}
+          rateRef={rateRef}
+          boosting={boosting}
+          adBoostActive={adBoostActive}
+          maxed={maxed}
+        />
+
+        {/* Centre column: cultivation zone + bar */}
+        <div className="home-pc-center">
+
         {/* ── Cultivation zone: absolutely-positioned scene elements ─── */}
         <div className="home-cultivation-zone">
-
-          {/* Bottom vignette rendered via ::after CSS pseudo-element */}
 
           {/* Rewards badge — scene chip, top-left */}
           {selections?.pendingCount > 0 && (
@@ -321,11 +378,12 @@ function HomeScreen({
             </div>
           </div>
 
-        </div>
+        </div>{/* end home-cultivation-zone */}
 
         {/* ── Bottom section: realm name + qi/s row + bar ──────────── */}
         <div className="home-scene-bottom">
 
+          {/* Overlay row — hidden on PC (info lives in left panel instead) */}
           <div className="home-scene-overlay-row">
             <div className="home-realm-name">{realmName}</div>
             <QiRateReadout
@@ -349,7 +407,12 @@ function HomeScreen({
 
         </div>
 
-      </div>
+        </div>{/* end home-pc-center */}
+
+        {/* Right spacer panel — only visible at PC widths, balances the layout */}
+        <div className="home-pc-right" aria-hidden="true" />
+
+      </div>{/* end home-scene */}
 
       {/* ── Pills: floating bottom-right above nav ───────────────────── */}
       {pills && totalOwnedPills > 0 && (

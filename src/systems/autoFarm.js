@@ -41,11 +41,15 @@ export function loadAutoFarmConfig() {
     const raw = localStorage.getItem(AUTO_FARM_KEY);
     if (raw) {
       const saved = JSON.parse(raw);
-      // Merge with defaults to handle new fields added in future
+      const defaults = getDefaultConfig();
+      // Merge saved values but force every activity to disabled=false — the
+      // hook that owns the config (useAutoFarm) will re-enable activities only
+      // after verifying the target region is actually cleared.  This prevents
+      // a stale config from showing an active idle assignment on a fresh save.
       return {
-        combat:    { ...getDefaultConfig().combat,    ...saved.combat    },
-        gathering: { ...getDefaultConfig().gathering, ...saved.gathering },
-        mining:    { ...getDefaultConfig().mining,    ...saved.mining    },
+        combat:    { ...defaults.combat,    ...saved.combat,    enabled: false },
+        gathering: { ...defaults.gathering, ...saved.gathering, enabled: false },
+        mining:    { ...defaults.mining,    ...saved.mining,    enabled: false },
       };
     }
   } catch {}

@@ -1378,29 +1378,13 @@
   overflow: hidden;
 }
 
-/* Soft bottom vignette — lifts character and overlays off a busy bg */
-.home-cultivation-zone::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to top,
-    rgba(0,0,0,0.60) 0%,
-    rgba(0,0,0,0.20) 55%,
-    rgba(0,0,0,0)    100%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Bottom section: overlay row + qi bar. Dark bg for legibility. */
+/* Bottom section: overlay row + qi bar. Dark backing for legibility. */
 .home-scene-bottom {
   flex-shrink: 0;
   background: linear-gradient(to top,
-    rgba(0,0,0,0.68) 0%,
-    rgba(0,0,0,0.50) 70%,
-    rgba(0,0,0,0.20) 100%);
+    rgba(0,0,0,0.72) 0%,
+    rgba(0,0,0,0.45) 65%,
+    rgba(0,0,0,0)    100%);
   padding-bottom: 4px;
 }
 
@@ -1411,6 +1395,100 @@
   justify-content: space-between;
   padding: 6px 16px 2px;
   gap: 8px;
+}
+
+/* ── PC / wide-screen layout (≥ 900 px) ─────────────────────────────────── */
+
+/* Mobile defaults — left/right panels hidden, centre fills everything */
+.home-pc-left  { display: none; }
+.home-pc-right { display: none; }
+
+.home-pc-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+@media (min-width: 900px) {
+  /* Scene becomes a horizontal row */
+  .home-scene {
+    flex-direction: row;
+  }
+
+  /* Left info panel */
+  .home-pc-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 230px;
+    flex-shrink: 0;
+    padding: 20px 18px;
+    background: linear-gradient(90deg,
+      rgba(4, 2, 12, 0.90) 72%,
+      transparent          100%);
+    z-index: 5;
+  }
+
+  /* Right spacer (mirrors left width so the cultivation zone stays centred) */
+  .home-pc-right {
+    display: block;
+    width: 230px;
+    flex-shrink: 0;
+    background: linear-gradient(270deg,
+      rgba(4, 2, 12, 0.90) 72%,
+      transparent          100%);
+    z-index: 5;
+  }
+
+  /* On PC the left panel already shows realm + qi/s — hide the mobile row */
+  .home-scene-overlay-row { display: none; }
+
+  /* Constrain the dragon bar width on wide screens */
+  .home-bar-wrap { max-width: 420px; }
+
+  /* NavBar — condense to centred pill cluster instead of full-width stretch */
+  .navbar { justify-content: center; gap: 80px; }
+  .nav-btn { flex: 0; }
+}
+
+/* ── PC left panel content ───────────────────────────────────────────────── */
+.home-pc-section-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold, #f5c842);
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  border-bottom: 1px solid rgba(245, 200, 66, 0.20);
+  padding-bottom: 7px;
+}
+
+.home-pc-realm-name {
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 10px;
+  color: var(--gold, #f5c842);
+  line-height: 1.5;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 10px rgba(245, 200, 66, 0.30);
+}
+
+/* rAF-updated qi progress text ("68K / 100K Qi") */
+.home-pc-qi-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.01em;
+}
+
+/* Hold-to-cultivate badge in left panel */
+.home-pc-hold-badge {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.30);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 4px 10px;
+  align-self: flex-start;
+  letter-spacing: 0.01em;
 }
 
 /* ── Crystal placeholder ─────────────────────────────────────────────────── */
