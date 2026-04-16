@@ -24,7 +24,6 @@ See [[Stats]] for the full stacking formula and order of operations.
 - Base value 0; built up via modifier sources
 - Primary driver of **elemental attacks** (fire, water, ice, etc.)
 - Scales with Laws that have an elemental affinity
-- Contributes to **DEF** alongside Body
 
 ## Soul (Spiritual Power)
 
@@ -37,7 +36,7 @@ See [[Stats]] for the full stacking formula and order of operations.
 
 - Base value 0; built up via modifier sources
 - Primary driver of **physical attacks**
-- Contributes to **DEF = Essence + Body** (combo)
+- Sole source of **DEF**
 
 ---
 
@@ -46,7 +45,7 @@ See [[Stats]] for the full stacking formula and order of operations.
 | Stat | Formula |
 |---|---|
 | **Intuition** | From Soul |
-| **DEF** | Essence + Body combined |
+| **DEF** | From Body |
 
 ---
 

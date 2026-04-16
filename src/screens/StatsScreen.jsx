@@ -114,7 +114,6 @@ function DetailPanel({ stat, value, realmIndex }) {
       color:    '#38bdf8',
       effects: [
         t('stats.essenceEffects.elemental'),
-        t('stats.essenceEffects.defense'),
       ],
     },
     soul: {
@@ -280,7 +279,7 @@ function StatsContent({ cultivation, artefacts }) {
       {/* ── Combat Stats ── */}
       <StatGroup title={t('stats.groupCombat')}>
         <StatRow label={t('statNames.health')}           hint="(Essence + Body) × 12"  value={combat.health} />
-        <StatRow label={t('statNames.defense')}          hint="Essence + Body"          value={combat.defense} />
+        <StatRow label={t('statNames.defense')}          hint="from Body"              value={combat.defense} />
         <StatRow label={t('statNames.elemental_defense')} hint="from Essence"           value={combat.elemDef} />
         <StatRow label={t('statNames.soul_toughness')}   hint="from Soul"               value={combat.soulTough}    locked={!soulUnlocked} />
         <StatRow label={t('statNames.physical_damage')}  hint="bonus"                   value={combat.physDmg} />
