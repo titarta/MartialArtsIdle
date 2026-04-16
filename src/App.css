@@ -992,30 +992,18 @@
 
 /* ── Home Screen ──────────────────────────────────────────────────────────── */
 
-/* Strip screen-container padding so home art bleeds to all edges.
-   Both selectors are kept: :has() for modern browsers, .sc-fullbleed
-   (applied via React) for older iOS Safari that doesn't support :has(). */
-/* Lock the .app wrapper when on home so iOS can't scroll the
-   env(safe-area-inset-top) gap that body padding creates. */
-.app-home {
-  overflow: hidden;
-}
+/* On iOS PWA the body has padding-top for the safe area, and position-based
+   hacks (negative margin) get clipped by overflow:hidden.  The cleanest fix:
+   make .home-screen position:fixed so it fills the ENTIRE viewport directly,
+   ignoring body padding.  The HUD bar handles its own safe-area-inset-top;
+   .home-bg covers the full screen behind it.  No scroll, no clipping.        */
 
+/* Screen-container still strips its padding so the fixed child doesn't
+   create a tall empty scrollable gap in the underlying document flow. */
 .screen-container:has(.home-screen),
 .sc-fullbleed {
-  /* zero top/sides so HUD starts at y=0 (covers Dynamic Island / notch) */
-  padding: 0 0 calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding: 0;
   max-width: 100%;
-  /* Flex column so .home-screen's flex:1 resolves to the remaining height.
-     Without this, .home-screen has no defined height and the scene collapses. */
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /* body has padding-top: env(safe-area-inset-top) for other screens.
-     The home HUD handles its OWN safe-area offset, so without this
-     negative margin the gap doubles (~120px on iPhone 15 Pro).
-     Pulling up by exactly the body padding cancels it out. */
-  margin-top: calc(-1 * env(safe-area-inset-top));
 }
 
 /* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
@@ -1077,33 +1065,30 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* Home screen fills the full viewport — overrides the 1100px .screen cap on
-   ultra-wide monitors so the HUD centers on the actual viewport (matching
-   the art-anchored character, which uses window-centered positioning). */
+/* Home screen owns the FULL viewport via position:fixed.
+   This bypasses body padding, so env(safe-area-inset-top) is handled
+   exclusively by .home-top-hud's padding — no double-offset possible.
+   padding-bottom reserves space above the fixed navbar. */
 .home-screen {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  /* flex:1 fills exactly the screen-container content box, which now has
-     padding-bottom = navbar height, so the scene never runs behind the
-     fixed nav bar. min-height:0 lets the scene shrink below intrinsic size. */
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  padding: 0;
-  max-width: none !important;
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* Full-viewport background — stops at the nav bar so art isn't wasted behind it.
-   background-size: cover scales to fill the available area (top to nav top). */
-.home-bg {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  bottom: 0;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Full-viewport background — absolute within the fixed .home-screen.
+   inset:0 fills the parent (which already reserves navbar space via
+   padding-bottom), so art stops right above the nav bar. */
+.home-bg {
+  position: absolute;
+  inset: 0;
   z-index: -1;
   background-size: cover;
   background-position: center bottom;
