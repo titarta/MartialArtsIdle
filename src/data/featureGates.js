@@ -37,34 +37,55 @@ const BASELINE = {
     unlockMsg: null,
   },
   combat: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 3 },
+    hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Worlds are open. Begin your conquest.',
   },
   character: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 3 },
+    hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Character screen unlocked. Equip techniques and artefacts.',
   },
   gathering: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 10 },
+    hint: 'Reach Qi Transformation Early',
     unlockMsg: 'Gathering unlocked. Forage herbs in cleared regions.',
   },
   mining: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 7 },
+    hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Mining unlocked. Dig for ores in cleared regions.',
   },
   collection: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 3 },
+    hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Collection unlocked. Browse your acquired items.',
   },
+  // Production screen unlocks with the earliest sub-craft (transmutation).
+  // Individual sub-tabs gate independently below.
   production: {
-    gate: { type: 'realm', minRealmIndex: 0 },
-    hint: 'Reach Tempered Body Layer 1',
+    gate: { type: 'realm', minRealmIndex: 3 },
+    hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Production unlocked. Craft pills and gear.',
+  },
+  // ── Production sub-tabs ────────────────────────────────────────────────────
+  // transmutation: paired with combat (modifies artefacts / techniques / laws).
+  transmutation: {
+    gate: { type: 'realm', minRealmIndex: 3 },
+    hint: 'Reach Tempered Body Layer 4',
+    unlockMsg: 'Transmutation unlocked. Hone, replace, and upgrade your gear.',
+  },
+  // refining: paired with mining (ore-driven artefact/technique/law forging).
+  refining: {
+    gate: { type: 'realm', minRealmIndex: 7 },
+    hint: 'Reach Tempered Body Layer 8',
+    unlockMsg: 'Refining Furnace lit. Smelt minerals into new artefacts.',
+  },
+  // alchemy: paired with gathering (herb-driven pill crafting).
+  alchemy: {
+    gate: { type: 'realm', minRealmIndex: 10 },
+    hint: 'Reach Qi Transformation Early',
+    unlockMsg: 'Alchemy unlocked. Brew pills in the Refining Furnace.',
   },
   settings: {
     gate: { type: 'always' },

@@ -16,23 +16,34 @@ Defines when each navigation tab and feature is accessible to the player. Gates 
 | `all` | Every sub-gate must pass |
 | `any` | At least one sub-gate must pass |
 
-> **Current design:** All gameplay tabs use the `realm` gate type with `minRealmIndex: 0`. This means all tabs are unlocked from the very start of the game (realm index 0 = Tempered Body Layer 1). The realm gate exists so future designs can raise the threshold per tab via the designer panel without code changes.
+> **Current design:** Gameplay tabs unlock in tempo with realm progression. Early gameplay is pure cultivation (Home + Qi); combat and transmutation open at the QI Crystal realm; mining + refining come next; gathering + alchemy open at Qi Transformation. Thresholds are editable in the Designer panel without code changes.
 
 ---
 
 ## Current Gate Definitions
 
-| Tab / Feature | Gate type | Min realm index | Unlock message |
+| Tab / Feature | Gate type | Min realm index | Realm | Unlock message |
+|---|---|---|---|---|
+| Home | `always` | — | from start | — |
+| Combat | `realm` | 3 | Tempered Body L4 | Worlds are open. Begin your conquest. |
+| Character | `realm` | 3 | Tempered Body L4 | Character screen unlocked. |
+| Mining | `realm` | 7 | Tempered Body L8 | Mining unlocked. |
+| Gathering | `realm` | 10 | Qi Transformation Early | Gathering unlocked. |
+| Collection | `realm` | 3 | Tempered Body L4 | Collection unlocked. |
+| Production | `realm` | 3 | Tempered Body L4 | Production unlocked. |
+| Settings | `always` | — | from start | — |
+| Shop | `always` | — | from start | — |
+| QI Crystal | `realm` | 3 | Tempered Body L4 | The Key Crystal awakens. |
+
+### Production Sub-tabs
+
+Each Production sub-tab is gated individually and mirrors the activity that feeds it.
+
+| Sub-tab | Min realm index | Realm | Paired activity |
 |---|---|---|---|
-| Home | `always` | — | — |
-| Combat | `realm` | 0 | Worlds are open. Begin your conquest. |
-| Character | `realm` | 0 | Character screen unlocked. |
-| Gathering | `realm` | 0 | Gathering unlocked. |
-| Mining | `realm` | 0 | Mining unlocked. |
-| Collection | `realm` | 0 | Collection unlocked. |
-| Production | `realm` | 0 | Production unlocked. |
-| Settings | `always` | — | — |
-| Shop | `always` | — | — |
+| Transmutation | 3 | Tempered Body L4 | Combat (modifies artefact / technique / law drops) |
+| Refining | 7 | Tempered Body L8 | Mining (ores → artefacts, techniques, laws) |
+| Alchemy | 10 | Qi Transformation Early | Gathering (herbs → pills) |
 
 ---
 

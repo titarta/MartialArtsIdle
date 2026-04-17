@@ -7,10 +7,10 @@ A permanent cultivation upgrade on the **Home Screen** that adds flat qi/sec to 
 ## Overview
 
 - Maximum level: **10**
-- Bonus per level: **+2 flat qi/sec** (additive to the BASE_RATE of 5 qi/sec)
+- Bonus per level: **+2 flat qi/sec** (additive to the BASE_RATE of 1 qi/sec)
 - The bonus stacks with all other multipliers (law mult, boost mult, pill mult, etc.)
 
-> At level 10 the crystal adds 20 flat qi/sec — quadrupling the base cultivation rate before any multipliers.
+> At level 10 the crystal adds 20 flat qi/sec — a 21× multiplier over the base cultivation rate before any other multipliers.
 
 ---
 

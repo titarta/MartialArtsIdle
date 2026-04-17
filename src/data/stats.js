@@ -18,7 +18,7 @@ export const MOD = {
   MORE:           'more',           // multiplicative; each source stacks independently
 };
 
-const QI_BASE_RATE = 5;   // qi/sec — must match useCultivation BASE_RATE
+const QI_BASE_RATE = 1;   // qi/sec — must match useCultivation BASE_RATE
 const SAINT_INDEX  = 24;  // realm index at which Soul unlocks
 
 // Baseline primary stats the player starts with (before any modifier sources).

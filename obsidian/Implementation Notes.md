@@ -52,7 +52,7 @@ src/
 
 ```js
 // requestAnimationFrame with delta-time
-BASE_RATE = 5           // qi/sec baseline
+BASE_RATE = 1           // qi/sec baseline
 BOOST_MULTIPLIER = 3    // hold-button multiplier
 
 tick(now):

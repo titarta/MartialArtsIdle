@@ -1067,15 +1067,23 @@ function AlchemyPanel({ inventory, pills }) {
 
 // ─── ProductionScreen ─────────────────────────────────────────────────────────
 
-function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills }) {
+function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills, isUnlocked = () => true, getHint = () => null }) {
   const { t } = useTranslation('ui');
-  const [activeTab, setActiveTab] = useState('transmutation');
 
   const PROD_TABS = [
-    { key: 'refining',      tKey: 'production.tabRefining'      },
-    { key: 'alchemy',       tKey: 'production.tabAlchemy'       },
-    { key: 'transmutation', tKey: 'production.tabTransmutation' },
+    { key: 'refining',      tKey: 'production.tabRefining',      feature: 'refining'      },
+    { key: 'alchemy',       tKey: 'production.tabAlchemy',       feature: 'alchemy'       },
+    { key: 'transmutation', tKey: 'production.tabTransmutation', feature: 'transmutation' },
   ];
+
+  // Default to the first unlocked tab so a freshly-unlocked player doesn't land
+  // on a locked tab. Falls back to transmutation when everything is unlocked.
+  const firstUnlocked = PROD_TABS.find(tb => isUnlocked(tb.feature))?.key ?? 'transmutation';
+  const [activeTab, setActiveTab] = useState(firstUnlocked);
+
+  const activeUnlocked = isUnlocked(
+    PROD_TABS.find(tb => tb.key === activeTab)?.feature ?? activeTab,
+  );
 
   return (
     <div className="screen production-screen">
@@ -1083,18 +1091,24 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
       <p className="subtitle">{t('production.subtitle')}</p>
 
       <div className="inv-tabs">
-        {PROD_TABS.map(tab => (
-          <button
-            key={tab.key}
-            className={`inv-tab ${activeTab === tab.key ? 'inv-tab-active' : ''}`}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {t(tab.tKey)}
-          </button>
-        ))}
+        {PROD_TABS.map(tab => {
+          const unlocked = isUnlocked(tab.feature);
+          const hint     = !unlocked ? getHint(tab.feature) : null;
+          return (
+            <button
+              key={tab.key}
+              className={`inv-tab ${activeTab === tab.key ? 'inv-tab-active' : ''}${!unlocked ? ' inv-tab-locked' : ''}`}
+              onClick={() => unlocked && setActiveTab(tab.key)}
+              disabled={!unlocked}
+              title={hint ?? undefined}
+            >
+              {!unlocked && '🔒 '}{t(tab.tKey)}
+            </button>
+          );
+        })}
       </div>
 
-      {activeTab === 'refining' && (
+      {activeUnlocked && activeTab === 'refining' && (
         <RefiningPanel
           inventory={inventory}
           artefacts={artefacts}
@@ -1103,11 +1117,11 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
         />
       )}
 
-      {activeTab === 'alchemy' && (
+      {activeUnlocked && activeTab === 'alchemy' && (
         <AlchemyPanel inventory={inventory} pills={pills} />
       )}
 
-      {activeTab === 'transmutation' && (
+      {activeUnlocked && activeTab === 'transmutation' && (
         <TransmutationPanel
           inventory={inventory}
           artefacts={artefacts}

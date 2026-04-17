@@ -34,7 +34,7 @@ Qi is the raw cultivation energy. It cannot be increased directly — only its *
 qi/sec = BASE_RATE × (1 + Σ increased_qi_speed%) × Π more_qi_speed × focus_mult (when focusing)
 ```
 
-- `BASE_RATE` = 5 qi/sec (hardcoded baseline)
+- `BASE_RATE` = 1 qi/sec (hardcoded baseline)
 - `focus_mult` = the Qi Focus Multiplier stat (base 300%; can be modified)
 - Qi generation speed is modified via [[Laws|Law]] cultivation speed, reincarnation talent, and pills
 - Qi is **spent** on realm breakthroughs; it does not convert to primary stats

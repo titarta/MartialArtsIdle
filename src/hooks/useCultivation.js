@@ -26,7 +26,7 @@ function loadOwnedLaws() {
   return [THREE_HARMONY_MANUAL];
 }
 
-const BASE_RATE       = 5; // qi per second at 1x
+const BASE_RATE       = 1; // qi per second at 1x
 const BOOST_MULTIPLIER = 3; // legacy fallback when focusMult ref isn't wired
 const AD_BOOST_MULT   = 2; // rewarded-ad cultivation boost
 const MIN_OFFLINE_SEC = 5 * 60; // only show offline popup after 5 min away

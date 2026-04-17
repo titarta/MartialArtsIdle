@@ -37,7 +37,7 @@ The game loop runs via `requestAnimationFrame` with delta-time so rates are fram
 
 ```js
 // src/hooks/useCultivation.js
-BASE_RATE = 5        // qi/sec
+BASE_RATE = 1        // qi/sec
 BOOST_MULTIPLIER = 3 // 3x when holding boost button
 qi += BASE_RATE * (boosted ? BOOST_MULTIPLIER : 1) * dt
 ```
