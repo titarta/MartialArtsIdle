@@ -11,7 +11,6 @@
  *   - Background setInterval ticking
  */
 
-import REALMS from '../data/realms';
 import { ALL_MATERIALS, getGatherCost, getMineCost } from '../data/materials';
 import ENEMIES, { pickEnemy } from '../data/enemies';
 import { calcDamage, getCooldown } from '../data/techniques';
@@ -298,10 +297,11 @@ export function simulateCombat(seconds, region, stats, equippedTechs) {
     const enemyDef = pickEnemy(region.enemyPool);
     if (!enemyDef) { remaining -= 1; continue; }
 
-    // Enemy HP anchored to region difficulty, same formula as CombatScreen
-    const regionBaseQi = REALMS[region.minRealmIndex]?.cost ?? 100;
-    const hpMult       = enemyDef.statMult?.hp ?? 1;
-    const eHp          = Math.max(200, Math.floor(regionBaseQi * 10 * hpMult));
+    // Enemy HP anchored to region index, same formula as useCombat.
+    const regionIndex = Math.max(0, region.minRealmIndex ?? 0);
+    const hpBase      = 150 * Math.pow(1.12, regionIndex);
+    const hpMult      = enemyDef.statMult?.hp ?? 1;
+    const eHp         = Math.max(100, Math.floor(hpBase * hpMult));
 
     // Time to kill: if DPS is 0, bail out early
     if (dps <= 0) break;

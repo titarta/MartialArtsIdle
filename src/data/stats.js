@@ -21,6 +21,12 @@ export const MOD = {
 const QI_BASE_RATE = 5;   // qi/sec — must match useCultivation BASE_RATE
 const SAINT_INDEX  = 24;  // realm index at which Soul unlocks
 
+// Baseline primary stats the player starts with (before any modifier sources).
+// Keeps level-1 combat survivable: HP 120, basic atk 10, def 10.
+// Tune here to rebalance the starting power level.
+const BASE_ESSENCE = 5;
+const BASE_BODY    = 5;
+
 /**
  * Apply the stacking formula to a base value.
  * @param {number}    base
@@ -73,12 +79,14 @@ export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
   const soulUnlocked = realmIndex >= SAINT_INDEX;
 
   // ── Primary ────────────────────────────────────────────────────────────────
-  // Base 0; built up entirely through modifier stacks (pills, artefacts, etc.).
-  const essence = Math.floor(computeStat(0, mods('essence')));
+  // Starts at a small non-zero baseline (BASE_ESSENCE / BASE_BODY) so combat
+  // is survivable from turn 0. Soul stays locked at 0 until Saint realm.
+  // All further growth comes from modifier stacks (pills, artefacts, etc.).
+  const essence = Math.floor(computeStat(BASE_ESSENCE, mods('essence')));
   const soul    = soulUnlocked
     ? Math.floor(computeStat(0, mods('soul')))
     : 0;
-  const body    = Math.floor(computeStat(0, mods('body')));
+  const body    = Math.floor(computeStat(BASE_BODY, mods('body')));
 
   // ── Combat ─────────────────────────────────────────────────────────────────
   const health      = Math.max(100, Math.floor(computeStat((essence + body) * 12 + soul * 4, mods('health'))));

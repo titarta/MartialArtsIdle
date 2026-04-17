@@ -1,12 +1,15 @@
 # Primary Stats
 
-Three primary stats drive all gameplay systems. They start at **0** and are built up entirely through modifier sources — pills, artefacts, [[Laws|Law]] passives, reincarnation bonuses, and so on. They are **not derived from Qi**; Qi is a separate resource used exclusively for realm breakthroughs.
+Three primary stats drive all gameplay systems. Essence and Body start from a small non-zero baseline so the player is survivable from turn 0; Soul stays locked at 0 until the Saint realm. All further growth comes from modifier sources — pills, artefacts, [[Laws|Law]] passives, reincarnation bonuses, and so on. They are **not derived from Qi**; Qi is a separate resource used exclusively for realm breakthroughs.
 
 ```
-Essence = 0 + modifiers
-Soul    = 0 + modifiers
-Body    = 0 + modifiers
+Essence = 5 + modifiers
+Soul    = 0 + modifiers   (locked to 0 until Saint)
+Body    = 5 + modifiers
 ```
+
+Starting-player combat baseline (no pills, no artefacts): HP 120, basic attack 10 dmg, DEF 10.
+Tune starting values at `BASE_ESSENCE` / `BASE_BODY` in `src/data/stats.js`.
 
 See [[Stats]] for the full stacking formula and order of operations.
 
@@ -21,7 +24,7 @@ See [[Stats]] for the full stacking formula and order of operations.
 
 ## Essence (Elemental Power)
 
-- Base value 0; built up via modifier sources
+- Base value 5; built up via modifier sources
 - Primary driver of **elemental attacks** (fire, water, ice, etc.)
 - Scales with Laws that have an elemental affinity
 
@@ -34,7 +37,7 @@ See [[Stats]] for the full stacking formula and order of operations.
 
 ## Body (Physical Power)
 
-- Base value 0; built up via modifier sources
+- Base value 5; built up via modifier sources
 - Primary driver of **physical attacks**
 - Sole source of **DEF**
 

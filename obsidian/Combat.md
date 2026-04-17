@@ -71,16 +71,29 @@ HP = (Essence + Body) × 12 + Soul × 4
 
 ### Enemy Stats
 ```
-Enemy HP  = region_base_qi × 10 × enemy_hp_mult
-Enemy ATK = (Essence + Soul + Body) × enemy_atk_mult
+Enemy HP  = max(100, 150 × 1.12^region_index × enemy_hp_mult)
+Enemy ATK = max(10,  (Essence + Soul + Body) × enemy_atk_mult)
 ```
-`region_base_qi` is the realm-cost of the region's minimum realm (from `data/realms.js`).
-This anchors HP to the zone's intended difficulty: early zones always have low HP, late zones
-always have high HP, regardless of the player's current power. An over-levelled player will
-one-shot zone-1 enemies while finding zone-6 enemies appropriately challenging.
+`region_index` is the region's `minRealmIndex` (0–51 across the six worlds).
+The 1.12×-per-index curve gives a ~300× HP spread from W1 R1 to W6 R4, independent of
+the qi economy. Early zones always have low HP, late zones always have high HP,
+regardless of the player's current power.
 
 Enemy ATK still scales with the player's current stats — it measures danger TO this player.
 `hp_mult` and `atk_mult` are per-enemy constants defined in `data/enemies.js`.
+
+Reference HP (before `hp_mult`):
+
+| Region | Index | Base HP |
+|---|---|---|
+| W1 R1 Outer Sect Training Grounds | 0  | 150   |
+| W1 R5 Misty Spirit Forest         | 14 | 647   |
+| W2 R1 Shattered Sky Desert        | 18 | 981   |
+| W3 R1 Saint Burial Grounds        | 24 | 1 836 |
+| W4 R1 Origin Qi Spring Depths     | 30 | 3 435 |
+| W5 R1 Fractured Space Corridors   | 36 | 6 427 |
+| W6 R1 Heaven Pillar Ascent        | 45 | 16 775 |
+| W6 R4 Heaven's Core               | 51 | 31 392 |
 
 ### Enemy Damage Formula (scale-independent)
 ```

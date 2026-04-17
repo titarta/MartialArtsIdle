@@ -117,10 +117,10 @@ export default function useCombat() {
    * @param {function} onDrops           — callback([{itemId, qty}]) fired on material victory drops
    * @param {function} onTechniqueDrop   — callback(techniqueObj) fired when a technique drops
    * @param {number}   worldId           — world tier 1–6, used for technique generation
-   * @param {number}   regionBaseQi      — min-realm cost of the region; anchors enemy HP to
-   *                                       zone difficulty rather than player's current power
+   * @param {number}   regionIndex       — minRealmIndex of the region; anchors enemy HP to
+   *                                       zone difficulty on a smooth 1.12×-per-index curve
    */
-  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1, regionBaseQi = null) => {
+  const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1, regionIndex = 0) => {
     const { essence, soul, body } = stats;
     const total  = essence + soul + body;
 
@@ -129,10 +129,11 @@ export default function useCombat() {
     const eName   = enemyDef?.name ?? 'Training Dummy';
 
     const pMaxHp = Math.max(100, Math.floor((essence + body) * 12 + soul * 4));
-    // HP uses the region's baseline qi so early zones always have low HP and
-    // late zones always have high HP — independent of the player's current power.
-    const hpBase = regionBaseQi ?? total;
-    const eMaxHp = Math.max(200, Math.floor(hpBase * 10 * hpMult));
+    // Enemy HP anchored to region index, not player stats. Base 150 × 1.12^index
+    // gives W1 R1 ≈ 150, W2 R1 ≈ 980, W3 R1 ≈ 1830, W6 R4 ≈ 46k — a ~300× spread
+    // across the 52 region indices before the per-enemy hpMult is applied.
+    const hpBase = 150 * Math.pow(1.12, Math.max(0, regionIndex ?? 0));
+    const eMaxHp = Math.max(100, Math.floor(hpBase * hpMult));
     // ATK stays player-stats-based: it measures danger TO the current player.
     const eAtk   = Math.max(10,  Math.floor(total * atkMult));
 

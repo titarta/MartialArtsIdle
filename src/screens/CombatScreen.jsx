@@ -11,7 +11,6 @@ const TECH_GLYPH = {
   Dodge:  '↯',
 };
 import ENEMIES, { pickEnemy } from '../data/enemies';
-import REALMS from '../data/realms';
 import CombatStage from '../components/CombatStage';
 
 const AUTO_RESTART_MS = 1500;
@@ -39,19 +38,16 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
   // Always-fresh ref so the auto-restart timer never captures stale closures.
   const doStartRef = useRef(null);
   doStartRef.current = () => {
-    const qi  = cultivation.qiRef.current + cultivation.costRef.current;
     const law = cultivation.activeLaw;
     const forcedId = combat.debugRef?.current?.nextEnemy;
     const enemyDef = forcedId
       ? (ENEMIES[forcedId] ?? (region?.enemyPool ? pickEnemy(region.enemyPool) : null))
       : (region?.enemyPool ? pickEnemy(region.enemyPool) : null);
     setStageEnemy(enemyDef);
-    // Enemy HP is anchored to the region's minimum realm cost, not the
-    // player's current qi — so zone 1 enemies always have low HP and zone 6
-    // enemies always have high HP regardless of who is fighting them.
-    const regionBaseQi = region?.minRealmIndex != null
-      ? (REALMS[region.minRealmIndex]?.cost ?? qi)
-      : qi;
+    // Enemy HP is anchored to the region's minRealmIndex on a smooth curve
+    // (see useCombat's hpBase formula) — zone 1 enemies always have low HP,
+    // zone 6 enemies always have high HP regardless of who is fighting them.
+    const regionIndex = region?.minRealmIndex ?? 0;
 
     // Pull the full stat bundle if the caller provided one (so artefact /
     // pill / law modifiers contribute to exploit_chance + exploit_attack_mult).
@@ -81,7 +77,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
       inventory   ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
       techniques  ? (tech)  => techniques.addOwnedTechnique(tech) : null,
       region?.worldId ?? 1,
-      regionBaseQi,
+      regionIndex,
     );
   };
 
