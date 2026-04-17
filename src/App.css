@@ -1612,7 +1612,7 @@
 }
 .home-crystal-float-slow { animation-duration: 7s; }
 
-/* Sprite — 72 px to match mockup, triple drop-shadow glow */
+/* Sprite — 72 px */
 .home-crystal-img {
   width: 72px;
   height: auto;
