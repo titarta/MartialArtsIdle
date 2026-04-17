@@ -1459,7 +1459,7 @@
   position: relative;
   min-height: 0;
   overflow: visible;
-  --qi-particles-h: 110px;
+  --qi-particles-h: clamp(55px, 9svh, 90px);
 }
 
 /* Bottom section: overlay row + qi bar. Dark backing for legibility. */
