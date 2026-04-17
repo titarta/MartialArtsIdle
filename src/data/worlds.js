@@ -54,7 +54,7 @@ const WORLDS = [
         name: 'Borderland Wilds',
         minRealm: 'Tempered Body L5',
         minRealmIndex: 4,
-        enemies: 'Pack wolves',
+        enemies: 'Outer sect disciples, pack wolves',
         gatherDrops: [
           { itemId: 'iron_herb_1',        chance: 0.50, qty: [1, 3] },
           { itemId: 'iron_herb_2',        chance: 0.50, qty: [1, 3] },
@@ -66,14 +66,15 @@ const WORLDS = [
           { itemId: 'iron_cultivation_2', chance: 0.35, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'wolf', weight: 10 },
+          { enemyId: 'outer_sect_disciple', weight: 5 },
+          { enemyId: 'wolf',                weight: 5 },
         ],
       },
       {
         name: "Bandit's Crossing",
         minRealm: 'Tempered Body L8',
         minRealmIndex: 7,
-        enemies: 'Bandit scouts',
+        enemies: 'Bandit scouts, rogue disciples',
         gatherDrops: [
           { itemId: 'iron_herb_2',          chance: 0.50, qty: [1, 3] },
           { itemId: 'bronze_herb_1',        chance: 0.30, qty: [1, 2] },
@@ -87,14 +88,15 @@ const WORLDS = [
           { itemId: 'bronze_cultivation_2', chance: 0.15, qty: [1, 1] },
         ],
         enemyPool: [
-          { enemyId: 'bandit_scout', weight: 10 },
+          { enemyId: 'bandit_scout',   weight: 5 },
+          { enemyId: 'rogue_disciple', weight: 5 },
         ],
       },
       {
         name: 'Qi-Vein Ravines',
         minRealm: 'Qi Transformation Early',
         minRealmIndex: 10,
-        enemies: 'Wandering beasts',
+        enemies: 'Wandering beasts, bandit scouts',
         gatherDrops: [
           { itemId: 'bronze_herb_1',        chance: 0.55, qty: [1, 3] },
           { itemId: 'bronze_herb_2',        chance: 0.45, qty: [1, 2] },
@@ -106,14 +108,15 @@ const WORLDS = [
           { itemId: 'bronze_cultivation_2', chance: 0.35, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'wandering_beast', weight: 10 },
+          { enemyId: 'wandering_beast', weight: 5 },
+          { enemyId: 'bandit_scout',    weight: 5 },
         ],
       },
       {
         name: 'Misty Spirit Forest',
         minRealm: 'True Element Early',
         minRealmIndex: 14,
-        enemies: 'Rogue disciples',
+        enemies: 'Rogue disciples, wandering beasts',
         gatherDrops: [
           { itemId: 'bronze_herb_2',        chance: 0.55, qty: [1, 3] },
           { itemId: 'silver_herb_1',        chance: 0.25, qty: [1, 2] },
@@ -127,7 +130,8 @@ const WORLDS = [
           { itemId: 'silver_cultivation_2', chance: 0.15, qty: [1, 1] },
         ],
         enemyPool: [
-          { enemyId: 'rogue_disciple', weight: 12 },
+          { enemyId: 'rogue_disciple',  weight: 5 },
+          { enemyId: 'wandering_beast', weight: 5 },
         ],
       },
     ],
@@ -341,7 +345,7 @@ const WORLDS = [
         name: 'World Root Caverns',
         minRealm: 'Origin Returning 2nd',
         minRealmIndex: 31,
-        enemies: 'Primordial serpents, cavern elder demons',
+        enemies: 'Origin guardians, primordial serpents, cavern elder demons',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',      chance: 0.60, qty: [1, 3] },
           { itemId: 'transcendent_cultivation_1', chance: 0.40, qty: [1, 2] },
@@ -353,6 +357,7 @@ const WORLDS = [
           { itemId: 'transcendent_cultivation_2', chance: 0.15, qty: [1, 1] },
         ],
         enemyPool: [
+          { enemyId: 'origin_guardian',    weight: 5 },
           { enemyId: 'primordial_serpent', weight: 5 },
           { enemyId: 'cavern_elder_demon', weight: 5 },
         ],
@@ -361,7 +366,7 @@ const WORLDS = [
         name: 'Ancient Root Grotto',
         minRealm: 'Origin Returning 3rd',
         minRealmIndex: 32,
-        enemies: 'Forest spirits, root sovereigns',
+        enemies: 'Forest spirits, root sovereigns, cavern elder demons',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',        chance: 0.60, qty: [1, 3] },
           { itemId: 'transcendent_cultivation_1', chance: 0.40, qty: [1, 2] },
@@ -371,15 +376,16 @@ const WORLDS = [
           { itemId: 'transcendent_cultivation_1', chance: 0.40, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'forest_spirit',  weight: 5 },
-          { enemyId: 'root_sovereign', weight: 5 },
+          { enemyId: 'forest_spirit',      weight: 5 },
+          { enemyId: 'root_sovereign',     weight: 5 },
+          { enemyId: 'cavern_elder_demon', weight: 5 },
         ],
       },
       {
         name: 'Primordial Forest Core',
         minRealm: 'Origin King 1st',
         minRealmIndex: 33,
-        enemies: 'Ancient beasts, world root wraiths',
+        enemies: 'Ancient beasts, world root wraiths, forest spirits',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',        chance: 0.50, qty: [1, 3] },
           { itemId: 'transcendent_herb_2',        chance: 0.30, qty: [1, 2] },
@@ -395,13 +401,14 @@ const WORLDS = [
         enemyPool: [
           { enemyId: 'ancient_beast',     weight: 5 },
           { enemyId: 'world_root_wraith', weight: 5 },
+          { enemyId: 'forest_spirit',     weight: 5 },
         ],
       },
       {
         name: 'Ancient Origin Altar',
         minRealm: 'Origin King 3rd',
         minRealmIndex: 35,
-        enemies: 'Deep earth titan',
+        enemies: 'Deep earth titans, ancient beasts',
         gatherDrops: [
           { itemId: 'transcendent_herb_2',        chance: 0.60, qty: [1, 3] },
           { itemId: 'transcendent_cultivation_2', chance: 0.45, qty: [1, 2] },
@@ -411,7 +418,8 @@ const WORLDS = [
           { itemId: 'transcendent_cultivation_2', chance: 0.45, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'deep_earth_titan', weight: 10 },
+          { enemyId: 'deep_earth_titan', weight: 5 },
+          { enemyId: 'ancient_beast',    weight: 5 },
         ],
       },
     ],
@@ -446,7 +454,7 @@ const WORLDS = [
         name: 'Void Sea Shores',
         minRealm: 'Void King 3rd',
         minRealmIndex: 38,
-        enemies: 'Void sea leviathan',
+        enemies: 'Void sea leviathans, void elementals',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',        chance: 0.60, qty: [1, 3] },
           { itemId: 'transcendent_cultivation_1', chance: 0.45, qty: [1, 2] },
@@ -456,7 +464,8 @@ const WORLDS = [
           { itemId: 'transcendent_cultivation_1', chance: 0.45, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'void_sea_leviathan', weight: 10 },
+          { enemyId: 'void_sea_leviathan', weight: 5 },
+          { enemyId: 'void_elemental',     weight: 5 },
         ],
       },
       {
@@ -499,7 +508,7 @@ const WORLDS = [
         name: 'Heaven Sword Ridge',
         minRealm: 'Emperor Realm 3rd',
         minRealmIndex: 44,
-        enemies: 'Star sea drifter',
+        enemies: 'Star sea drifters, emperor will fragments, dao inscription revenants',
         gatherDrops: [
           { itemId: 'transcendent_herb_2',        chance: 0.65, qty: [1, 3] },
           { itemId: 'transcendent_cultivation_2', chance: 0.50, qty: [1, 2] },
@@ -509,7 +518,9 @@ const WORLDS = [
           { itemId: 'transcendent_cultivation_2', chance: 0.50, qty: [1, 2] },
         ],
         enemyPool: [
-          { enemyId: 'star_sea_drifter', weight: 10 },
+          { enemyId: 'star_sea_drifter',         weight: 5 },
+          { enemyId: 'emperor_will_fragment',    weight: 5 },
+          { enemyId: 'dao_inscription_revenant', weight: 5 },
         ],
       },
     ],
