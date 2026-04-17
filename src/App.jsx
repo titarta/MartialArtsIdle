@@ -24,7 +24,6 @@ import WORLDS         from './data/worlds';
 import { computeAllStats, mergeModifiers } from './data/stats';
 import { evaluateLawUniques, buildContext } from './systems/lawEngine';
 import { initDebug } from './debug/gameDebug';
-const DEV = import.meta.env.DEV;
 import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
 import { loadGraphics, applyGraphics } from './systems/graphics';
 import useNotifications from './hooks/useNotifications';
@@ -193,7 +192,7 @@ function App() {
   // Keep a live ref to all hooks so debug commands always see fresh state.
   const hooksRef = useRef({});
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm, crystal };
-  useEffect(() => { if (DEV) initDebug(hooksRef); }, []);
+  useEffect(() => { initDebug(hooksRef); }, []);
 
   // Navigate to a screen, optionally carrying a parameter (e.g. region data).
   const navigate = (screen, param = null) => {
