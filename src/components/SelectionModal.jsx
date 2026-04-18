@@ -12,28 +12,14 @@ const CATEGORY = {
   special:     { icon: '✦', color: '#22d3ee' },
 };
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function fmtEffect(effect) {
-  if (effect.type !== 'stat_mod') return null;
-  const prefix = effect.mod === 'more' ? '×' : '+';
-  const val    = effect.mod === 'increased'
-    ? `${Math.round(effect.value * 100)}%`
-    : effect.mod === 'more'
-    ? effect.value.toFixed(2)
-    : effect.value;
-  return `${prefix}${val} ${effect.stat.replace(/_/g, ' ')}`;
-}
-
 // ── Card ─────────────────────────────────────────────────────────────────────
 
 function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFreeReroll, canAffordReroll }) {
-  const opt      = SELECTION_BY_ID[optionId];
+  const opt    = SELECTION_BY_ID[optionId];
   if (!opt) return null;
 
-  const rarity   = SELECTION_RARITY[opt.rarity];
-  const cat      = CATEGORY[opt.category] ?? { icon: '◆', color: '#9ca3af' };
-  const effects  = opt.effects.map(fmtEffect).filter(Boolean);
+  const rarity = SELECTION_RARITY[opt.rarity];
+  const cat    = CATEGORY[opt.category] ?? { icon: '◆', color: '#9ca3af' };
 
   return (
     <div
@@ -52,11 +38,6 @@ function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFree
       <div className="augment-body">
         <p className="augment-name">{opt.name}</p>
         <p className="augment-desc">{opt.description}</p>
-        {effects.length > 0 && (
-          <div className="augment-effects">
-            {effects.map((e, i) => <span key={i} className="augment-effect-chip">{e}</span>)}
-          </div>
-        )}
         {opt.maxStacks > 1 && (
           <span className="augment-stacks">Max ×{opt.maxStacks}</span>
         )}
