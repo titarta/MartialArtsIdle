@@ -28,7 +28,7 @@ Defines when each navigation tab and feature is accessible to the player. Gates 
 | Combat | `realm` 3 | Tempered Body L4 | Worlds are open. Begin your conquest. |
 | Character | `always` | — | — |
 | Mining | `realm` 7 | Tempered Body L8 | Mining unlocked. |
-| Gathering | `realm` 10 | Qi Transformation Early | Gathering unlocked. |
+| Gathering | `realm` 7 | Tempered Body L8 | Gathering unlocked. |
 | Collection | `always` | — | — |
 | Production | `any` of item_category herbs / minerals / bloodCores | Player owns any crafting material (gathered, mined, or combat-dropped) | Production unlocked. Craft pills and gear. |
 | Settings | `always` | — | — |
@@ -43,7 +43,7 @@ Each Production sub-tab is gated individually and mirrors the activity that feed
 |---|---|---|
 | Transmutation | same as Production (`any` of crafting materials) | Combat (modifies artefact / technique / law drops) |
 | Refining | `realm` 7 | Mining (ores → artefacts, techniques, laws) |
-| Alchemy | `realm` 10 | Gathering (herbs → pills) |
+| Alchemy | `item_category: herbs` — first herb collected | Gathering (herbs → pills) |
 
 ---
 

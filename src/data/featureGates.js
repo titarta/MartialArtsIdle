@@ -47,8 +47,8 @@ const BASELINE = {
     unlockMsg: null,
   },
   gathering: {
-    gate: { type: 'realm', minRealmIndex: 10 },
-    hint: 'Reach Qi Transformation Early',
+    gate: { type: 'realm', minRealmIndex: 7 },
+    hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Gathering unlocked. Forage herbs in cleared regions.',
   },
   mining: {
@@ -92,10 +92,12 @@ const BASELINE = {
     hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Refining Furnace lit. Smelt minerals into new artefacts.',
   },
-  // alchemy: paired with gathering (herb-driven pill crafting).
+  // alchemy: paired with gathering (herb-driven pill crafting). Unlocks
+  // the first time the player collects any herb (Sect Grounds Grass /
+  // Borderland Root are the Iron-tier first picks).
   alchemy: {
-    gate: { type: 'realm', minRealmIndex: 10 },
-    hint: 'Reach Qi Transformation Early',
+    gate: { type: 'item_category', category: 'herbs' },
+    hint: 'Gather a herb to unlock',
     unlockMsg: 'Alchemy unlocked. Brew pills in the Refining Furnace.',
   },
   settings: {
