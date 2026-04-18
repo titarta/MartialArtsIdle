@@ -13,6 +13,11 @@
   image-rendering: pixelated !important;
 }
 
+.rendering-pixelated .home-bg,
+.rendering-pixelated .screen-container:not(.sc-fullbleed)::before {
+  image-rendering: pixelated;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
@@ -214,6 +219,19 @@
   padding: 20px 16px;
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
   width: 100%;
+  position: relative;
+}
+
+.screen-container:not(.sc-fullbleed)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/backgrounds/ui_screens.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }
 
 /* ── Perks list (CharacterScreen) ──────────────────────────────────────────── */
@@ -4464,6 +4482,68 @@
 }
 
 /* ── Worlds Screen ─────────────────────────────────────────────────────────── */
+
+.loot-banner {
+  background: linear-gradient(135deg, rgba(16,26,18,0.92) 0%, rgba(22,38,24,0.92) 100%);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.loot-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.loot-banner-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.loot-collect-btn {
+  background: var(--accent);
+  color: #0a0f0b;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: opacity 0.15s;
+}
+
+.loot-collect-btn:hover {
+  opacity: 0.85;
+}
+
+.loot-banner-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.loot-banner-item {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #b0b0a0);
+}
+
+.loot-banner-item-tech {
+  border-color: rgba(180,140,255,0.35);
+  color: #c084fc;
+}
 
 .worlds-tab-bar {
   display: flex;

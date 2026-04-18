@@ -4,6 +4,7 @@ import WORLDS from '../data/worlds';
 import ENEMIES from '../data/enemies';
 import { preloadEnemySprites } from '../utils/preload';
 import { isWorldUnlocked, getWorldLockHint } from '../data/featureGates';
+import { ALL_MATERIALS } from '../data/materials';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -32,6 +33,39 @@ function EnemyChip({ enemyId }) {
         />
       </div>
       <span className="enemy-chip-name">{enemyName}</span>
+    </div>
+  );
+}
+
+function LootBanner({ pendingGains, onCollect }) {
+  const items = Object.entries(pendingGains?.items ?? {}).filter(([, qty]) => qty > 0);
+  const techCount = pendingGains?.techniques?.length ?? 0;
+  if (items.length === 0 && techCount === 0) return null;
+
+  return (
+    <div className="loot-banner">
+      <div className="loot-banner-header">
+        <span className="loot-banner-title">Loot Ready</span>
+        <button className="loot-collect-btn" onClick={onCollect}>
+          Collect All
+        </button>
+      </div>
+      <div className="loot-banner-items">
+        {items.map(([id, qty]) => {
+          const mat = ALL_MATERIALS[id];
+          const name = mat?.name ?? id;
+          return (
+            <span key={id} className="loot-banner-item">
+              {name} ×{qty}
+            </span>
+          );
+        })}
+        {techCount > 0 && (
+          <span className="loot-banner-item loot-banner-item-tech">
+            +{techCount} Technique{techCount > 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -210,11 +244,19 @@ function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavig
   );
 }
 
-function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clearedRegions, idleAssignment, onSetIdle }) {
+function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clearedRegions, idleAssignment, onSetIdle,
+                        pendingGains, hasPendingGains, onCollectGains, inventory, techniques }) {
   const { t } = useTranslation('ui');
   const [tab, setTab] = useState(activeTab ?? 'world');
   const realmIndex = cultivation.realmIndex;
   const cleared    = clearedRegions ?? new Set();
+
+  function handleCollect() {
+    onCollectGains?.(gains => {
+      Object.entries(gains.items ?? {}).forEach(([id, qty]) => inventory?.addItem(id, qty));
+      gains.techniques?.forEach(tech => techniques?.addOwnedTechnique(tech));
+    });
+  }
 
   const TABS = [
     { id: 'world',  tKey: 'worlds.tabWorld'  },
@@ -226,6 +268,10 @@ function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clear
     <div className="screen worlds-screen">
       <h1>{t('worlds.title')}</h1>
       <p className="subtitle">{cultivation.realmName}</p>
+
+      {hasPendingGains && (
+        <LootBanner pendingGains={pendingGains} onCollect={handleCollect} />
+      )}
 
       <div className="worlds-tab-bar">
         {TABS.map(tb => (

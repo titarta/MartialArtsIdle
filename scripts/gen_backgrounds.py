@@ -302,11 +302,71 @@ SCENES = {
             f"{S}"
         ),
     },
+
+    "scroll_hall": {
+        "style_ref": str(Path(__file__).parent.parent / "public/backgrounds/home.png"),
+        "desc": (
+            "Interior wall of a xianxia inner-sect study chamber. "
+            "Match the exact art style, pixel density, colour palette, and architectural language "
+            "of the style reference image. "
+            "The scene is a simple, clean view of a richly decorated wooden interior wall — "
+            "no open sky, no mountains, entirely indoors. "
+            "WALL: dark aged hardwood planks with subtle wood-grain texture, "
+            "framed by the same red lacquer pillars from the reference at the far left and right edges. "
+            "SHOJI PANELS: two or three tall shoji sliding doors with white paper panes and dark wooden "
+            "lattice frames set into the wall, softly backlit by warm candlelight from behind — "
+            "casting a gentle amber glow through the paper. "
+            "HANGING SCROLLS: two or three vertical hanging scrolls (kakejiku/zhongtang) mounted on the wall "
+            "between and beside the shoji — each scroll bears bold Chinese calligraphy or a painted ink-wash "
+            "mountain scene, with wooden scroll rollers at top and bottom and decorative silk mounting borders "
+            "in deep red and gold brocade. "
+            "TOP: the same dark wooden beam ceiling from the reference, warm and low. "
+            "BOTTOM QUARTER: flat polished dark-jade floor tiles from the reference — wide, flat, "
+            "completely clear and unobstructed. "
+            "Atmosphere: quiet, scholarly, meditative — a cultivator's inner sanctum. "
+            "Palette: identical to the style reference — aged dark wood, warm amber candleglow, "
+            "deep red lacquer, ink black, muted gold silk, pale shoji paper. "
+            "16-bit pixel art style, landscape 512x256."
+        ),
+    },
+
+    "ui_screens": {
+        "style_ref": str(Path(__file__).parent.parent / "tmp/bg_gen/Gemini_Generated_Image_rxfijorxfijorxfi.png"),
+        "desc": (
+            "Interior of the same xianxia inner-sect cultivation hall as the style reference image. "
+            "Match the exact art style, pixel density, colour palette, and architectural language. "
+            "This is a simplified version of the same hall — the background for information screens "
+            "so it must have a clean, relatively uncluttered center. "
+            "LEFT and RIGHT edges: the same red lacquer dragon-carved pillars from the reference, "
+            "framing the sides. "
+            "CENTER: the back wall of the hall — dark jade stone blocks with subtle low-relief "
+            "carved cloud-scroll patterns, a single decorative bronze wall plaque or carved stone "
+            "panel at center, dim warm candlelight glow from unseen wall sconces. "
+            "TOP: the same dark wooden beam ceiling from the reference, with hanging red silk "
+            "lanterns casting warm amber light downward. "
+            "BOTTOM: the same dark polished jade floor tiles from the reference, flat and clear. "
+            "NO sky, NO moon-gate, NO mountains — we are deeper inside the hall looking at the wall. "
+            "Atmosphere: the same serene, meditative inner-sect sanctuary — just a calmer, "
+            "simpler view of the same space. "
+            "Palette: identical to the style reference — deep red, warm gold, dark jade, "
+            "charcoal shadows, ink-wash accents. "
+            "16-bit pixel art style, landscape 512x256."
+        ),
+    },
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Pipeline steps
 # ─────────────────────────────────────────────────────────────────────────────
+
+def _make_style_ref(img_path):
+    """Encode a local PNG as a PixelLab style_image / reference_images entry."""
+    path = Path(img_path)
+    b64  = base64.b64encode(path.read_bytes()).decode()
+    img  = {"type": "base64", "base64": b64, "format": "png"}
+    w, h = Image.open(path).size
+    return {"image": img, "size": {"width": w, "height": h}}
+
 
 def run_generate(scene_id):
     if scene_id not in SCENES:
@@ -318,11 +378,19 @@ def run_generate(scene_id):
     print(f"{'='*60}")
     print(f"  [1] Generating candidates for {scene_id}...")
 
-    status, r = api_post("/generate-image-v2", {
+    body = {
         "description": cfg["desc"],
         "image_size":  {"width": BG_WIDTH, "height": BG_HEIGHT},
         "no_background": False,
-    })
+    }
+
+    if "style_ref" in cfg:
+        ref = _make_style_ref(cfg["style_ref"])
+        body["style_image"]      = ref
+        body["reference_images"] = [ref]
+        print(f"  Style ref: {cfg['style_ref']}")
+
+    status, r = api_post("/generate-image-v2", body)
     if status != 202:
         raise RuntimeError(f"generate-image-v2 returned {status}: {r}")
 
@@ -331,11 +399,16 @@ def run_generate(scene_id):
     if not images:
         raise RuntimeError("No images returned")
 
+    # Auto-increment candidate number so repeated generate calls don't overwrite
+    existing = sorted(TMP_DIR.glob(f"{scene_id}_cand_*.png"))
+    next_n = len(existing)
+
     print(f"\n  Candidates saved to: {TMP_DIR}")
     for i, img in enumerate(images[:4]):
-        path = TMP_DIR / f"{scene_id}_cand_{i}.png"
+        n = next_n + i
+        path = TMP_DIR / f"{scene_id}_cand_{n}.png"
         save_image(img, path)
-        print(f"    cand_{i}: {path.name}  ({img['width']}x{img['height']})")
+        print(f"    cand_{n}: {path.name}  ({img['width']}x{img['height']})")
 
     print(f"\n  Review, then run:")
     print(f"    python gen_backgrounds.py finalize {scene_id} <0-3>")

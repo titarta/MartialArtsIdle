@@ -41,6 +41,8 @@ const MIN_OFFLINE_SEC   = 5 * 60; // skip offline calc if away less than 5 minut
 
 // ─── Empty gains shape ────────────────────────────────────────────────────────
 
+const PENDING_GAINS_KEY = 'mai_pending_gains';
+
 function emptyGains() {
   return { items: {}, techniques: [] };
 }
@@ -50,6 +52,32 @@ function mergeFullGains(a, b) {
     items:      mergeGains(a.items,      b.items),
     techniques: [...a.techniques, ...b.techniques],
   };
+}
+
+function loadPersistedGains() {
+  try {
+    const raw = localStorage.getItem(PENDING_GAINS_KEY);
+    if (!raw) return emptyGains();
+    const parsed = JSON.parse(raw);
+    return {
+      items:      parsed.items      ?? {},
+      techniques: parsed.techniques ?? [],
+    };
+  } catch {
+    return emptyGains();
+  }
+}
+
+function savePersistedGains(gains) {
+  try {
+    localStorage.setItem(PENDING_GAINS_KEY, JSON.stringify(gains));
+  } catch {}
+}
+
+function clearPersistedGains() {
+  try {
+    localStorage.removeItem(PENDING_GAINS_KEY);
+  } catch {}
 }
 
 // ─── Reconstruct player stats from saved data ─────────────────────────────────
@@ -108,12 +136,15 @@ export default function useAutoFarm({ worlds, getStats, getEquippedTechs }) {
   // ─── Pending gains ──────────────────────────────────────────────────────────
 
   const [pendingGains, setPendingGains] = useState(() => {
+    // Start from any gains the player hadn't collected before closing the app
+    const persisted = loadPersistedGains();
+
     // Compute offline gains once at init
     const saved = loadGame();
-    if (!saved?.lastSeen) return emptyGains();
+    if (!saved?.lastSeen) return persisted;
 
     const awaySeconds = (Date.now() - saved.lastSeen) / 1000;
-    if (awaySeconds < MIN_OFFLINE_SEC) return emptyGains();
+    if (awaySeconds < MIN_OFFLINE_SEC) return persisted;
 
     const cfg = loadAutoFarmConfig();
     let offline = emptyGains();
@@ -161,8 +192,11 @@ export default function useAutoFarm({ worlds, getStats, getEquippedTechs }) {
       offline = mergeFullGains(offline, gained);
     }
 
-    return offline;
+    return mergeFullGains(persisted, offline);
   });
+
+  // Persist pending gains to localStorage so they survive app close
+  useEffect(() => { savePersistedGains(pendingGains); }, [pendingGains]);
 
   // ─── Background tick (setInterval — survives hidden tabs) ──────────────────
 
@@ -261,12 +295,14 @@ export default function useAutoFarm({ worlds, getStats, getEquippedTechs }) {
     setPendingGains(prev => {
       if (!hasGains(prev)) return prev;
       try { applyFn(prev); } catch {}
+      clearPersistedGains();
       return emptyGains();
     });
   }, []);
 
   /** Discard pending gains without applying them. */
   const clearGains = useCallback(() => {
+    clearPersistedGains();
     setPendingGains(emptyGains());
   }, []);
 

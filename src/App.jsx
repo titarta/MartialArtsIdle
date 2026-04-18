@@ -148,17 +148,6 @@ function App() {
     getEquippedTechs: () => techniques.equippedTechniques,
   });
 
-  // Flush auto-farm gains into inventory every 5 seconds
-  useEffect(() => {
-    const id = setInterval(() => {
-      autoFarm.collectGains(gains => {
-        Object.entries(gains.items ?? {}).forEach(([itemId, qty]) => inventory.addItem(itemId, qty));
-        gains.techniques?.forEach(t => techniques.addOwnedTechnique(t));
-      });
-    }, 5000);
-    return () => clearInterval(id);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Derive the single active idle assignment from the config
   const idleAssignment = useMemo(() => {
     const cfg = autoFarm.autoFarmConfig;
@@ -207,7 +196,7 @@ function App() {
 
   const screens = {
     home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} />,
-    worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} />,
+    worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
                       cultivation={cultivation}
@@ -244,7 +233,7 @@ function App() {
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
-        badges={{ ...notifications.badges, home: selections.pendingCount > 0 }}
+        badges={{ ...notifications.badges, home: selections.pendingCount > 0, worlds: notifications.badges.worlds || autoFarm.hasPendingGains }}
         isUnlocked={featureFlags.isUnlocked}
         getHint={featureFlags.getHint}
       />
