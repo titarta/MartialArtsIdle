@@ -231,8 +231,16 @@ function App() {
     settings:   <SettingsScreen />,
   };
 
+  const BASE = import.meta.env.BASE_URL;
+
   return (
     <div className="app">
+      {currentScreen !== 'home' && (
+        <div
+          className="app-bg"
+          style={{ '--app-bg-url': `url(${BASE}backgrounds/default_bg.png)` }}
+        />
+      )}
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}

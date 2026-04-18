@@ -29,6 +29,18 @@
   min-height: 100dvh;
 }
 
+/* Global background — fixed behind all non-home screens */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--app-bg-url);
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
 /* Bottom Tab Bar */
 .navbar {
   display: flex;
