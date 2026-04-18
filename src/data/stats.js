@@ -24,8 +24,8 @@ const SAINT_INDEX  = 24;  // realm index at which Soul unlocks
 // Baseline primary stats the player starts with (before any modifier sources).
 // Keeps level-1 combat survivable: HP 120, basic atk 10, def 10.
 // Tune here to rebalance the starting power level.
-const BASE_ESSENCE = 5;
-const BASE_BODY    = 5;
+const BASE_ESSENCE = 20;
+const BASE_BODY    = 20;
 
 /**
  * Apply the stacking formula to a base value.

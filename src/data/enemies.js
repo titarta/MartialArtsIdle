@@ -33,7 +33,7 @@ const ENEMIES_RAW = {
 
   // ── World 1 — The Mortal Lands ────────────────────────────────────────────
   // Theme: mortal sect → wilderness → qi forests → storm peaks
-  // statMult targets: hp 0.7–1.2, atk 0.4–1.5
+  // statMult targets: hp 0.7–1.2, atk 1.2–3.9  (atk tripled for early pressure)
   // Blood core tier: Iron
 
   outer_sect_disciple: {
@@ -41,7 +41,7 @@ const ENEMIES_RAW = {
     name:        'Outer Sect Disciple',
     sprite:      'outer_sect_disciple',
     description: 'A young cultivator in a plain white training robe, wielding a basic wooden practice sword with clumsy but eager stances.',
-    statMult: { hp: 0.7, atk: 0.6 },
+    statMult: { hp: 0.7, atk: 1.8 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 1.0, qty: [1, 1] },
     ],
@@ -53,7 +53,7 @@ const ENEMIES_RAW = {
     name:        'Training Golem',
     sprite:      'training_golem',
     description: 'A squat clay-and-iron automaton stamped with sect seals, built for durability over damage — its fists are blunted iron spheres.',
-    statMult: { hp: 1.2, atk: 0.4 },   // tanky construct, low damage
+    statMult: { hp: 1.2, atk: 1.2 },   // tanky construct, low damage
     drops: [
       { itemId: 'iron_cultivation_1', chance: 1.0, qty: [1, 1] },
     ],
@@ -64,7 +64,7 @@ const ENEMIES_RAW = {
     name:        'Pack Wolf',
     sprite:      'wolf',
     description: 'A lean, grey-furred wolf with faintly glowing eyes, suggesting minor qi absorption from years of roaming spirit-rich wilderness.',
-    statMult: { hp: 0.9, atk: 1.0 },
+    statMult: { hp: 0.9, atk: 3.0 },
     drops: [
       { itemId: 'iron_blood_core_2', chance: 1.0, qty: [1, 1] },
     ],
@@ -76,7 +76,7 @@ const ENEMIES_RAW = {
     name:        'Bandit Scout',
     sprite:      'bandit_scout',
     description: 'A wiry fighter in rough patchwork armour, carrying a short blade and moving with the practised stealth of someone who survives by ambush.',
-    statMult: { hp: 0.8, atk: 1.1 },
+    statMult: { hp: 0.8, atk: 3.3 },
     drops: [
       { itemId: 'iron_cultivation_1', chance: 1.0, qty: [1, 1] },
       { itemId: 'iron_blood_core_1',  chance: 1.0, qty: [1, 1] },
@@ -89,7 +89,7 @@ const ENEMIES_RAW = {
     name:        'Wandering Beast',
     sprite:      'wandering_beast',
     description: 'A large, shaggy four-limbed beast with no fixed territory, its hide scarred from years of roaming dangerous wilderness.',
-    statMult: { hp: 1.0, atk: 1.0 },
+    statMult: { hp: 1.0, atk: 3.0 },
     drops: [
       { itemId: 'iron_blood_core_2', chance: 1.0, qty: [1, 1] },
     ],
@@ -101,7 +101,7 @@ const ENEMIES_RAW = {
     name:        'Rogue Disciple',
     sprite:      'rogue_disciple',
     description: 'A former sect member in a tattered and stained cultivation robe, bearing the scars of forbidden qi techniques and the look of someone with nothing left to lose.',
-    statMult: { hp: 1.0, atk: 1.3 },
+    statMult: { hp: 1.0, atk: 3.9 },
     drops: [
       { itemId: 'iron_cultivation_2', chance: 1.0, qty: [1, 1] },
       { itemId: 'iron_blood_core_1',  chance: 1.0, qty: [1, 1] },
