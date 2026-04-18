@@ -2620,6 +2620,58 @@
   color: var(--gold);
 }
 
+/* Combat + Utility grid — stacked on mobile, side-by-side on PC.
+   The .secondary-stats wrapper still caps width so the two columns
+   don't stretch past a readable line length. */
+.secondary-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* PC layout: centre the primary triangle, float the detail popover next
+   to it (rather than eating half the row), and split combat/utility
+   into two balanced columns. */
+@media (min-width: 900px) {
+  .stats-content {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .stats-primary-row {
+    position: relative;
+    justify-content: center;
+  }
+
+  .stat-detail-side {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 340px;
+    max-width: 40%;
+    flex: none;
+    pointer-events: none; /* popover is informational — triangle stays interactive */
+  }
+
+  .stat-detail-side .stat-detail-panel,
+  .stat-detail-side .sdp-placeholder {
+    pointer-events: auto;
+  }
+
+  .secondary-stats-grid {
+    flex-direction: row;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .secondary-stats-grid .secondary-stats {
+    flex: 1;
+    max-width: none;
+    margin-bottom: 0;
+  }
+}
+
 /* Save Section */
 .save-section {
   margin-top: 28px;

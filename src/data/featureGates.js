@@ -42,9 +42,9 @@ const BASELINE = {
     unlockMsg: 'Worlds are open. Begin your conquest.',
   },
   character: {
-    gate: { type: 'realm', minRealmIndex: 3 },
-    hint: 'Reach Tempered Body Layer 4',
-    unlockMsg: 'Character screen unlocked. Equip techniques and artefacts.',
+    gate: { type: 'always' },
+    hint: null,
+    unlockMsg: null,
   },
   gathering: {
     gate: { type: 'realm', minRealmIndex: 10 },
@@ -57,22 +57,33 @@ const BASELINE = {
     unlockMsg: 'Mining unlocked. Dig for ores in cleared regions.',
   },
   collection: {
-    gate: { type: 'realm', minRealmIndex: 3 },
-    hint: 'Reach Tempered Body Layer 4',
-    unlockMsg: 'Collection unlocked. Browse your acquired items.',
+    gate: { type: 'always' },
+    hint: null,
+    unlockMsg: null,
   },
-  // Production screen unlocks with the earliest sub-craft (transmutation).
-  // Individual sub-tabs gate independently below.
+  // Production screen unlocks as soon as the player has ANY crafting
+  // material — herbs (gathered), minerals (mined), or blood cores (combat drop).
+  // Individual sub-tabs still gate on their source activity below.
   production: {
-    gate: { type: 'realm', minRealmIndex: 3 },
-    hint: 'Reach Tempered Body Layer 4',
+    gate: { type: 'any', gates: [
+      { type: 'item_category', category: 'herbs' },
+      { type: 'item_category', category: 'minerals' },
+      { type: 'item_category', category: 'bloodCores' },
+    ] },
+    hint: 'Gather herbs, mine minerals, or collect a blood core to unlock',
     unlockMsg: 'Production unlocked. Craft pills and gear.',
   },
   // ── Production sub-tabs ────────────────────────────────────────────────────
   // transmutation: paired with combat (modifies artefacts / techniques / laws).
+  // Same material-driven gate as the parent so the default sub-tab is
+  // always reachable once the player enters Production.
   transmutation: {
-    gate: { type: 'realm', minRealmIndex: 3 },
-    hint: 'Reach Tempered Body Layer 4',
+    gate: { type: 'any', gates: [
+      { type: 'item_category', category: 'herbs' },
+      { type: 'item_category', category: 'minerals' },
+      { type: 'item_category', category: 'bloodCores' },
+    ] },
+    hint: 'Gather herbs, mine minerals, or collect a blood core to unlock',
     unlockMsg: 'Transmutation unlocked. Hone, replace, and upgrade your gear.',
   },
   // refining: paired with mining (ore-driven artefact/technique/law forging).

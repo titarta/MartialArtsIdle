@@ -97,6 +97,7 @@
     "title": "Inventory",
     "tabHerbs": "Herbs",
     "tabMinerals": "Minerals",
+    "tabBloodCores": "Blood Cores",
     "tabCultivation": "Cultivation",
     "tabArtefacts": "Artefacts",
     "tabTechniques": "Techniques",
@@ -219,7 +220,8 @@
       "mining": "Feeds Mining Speed"
     },
     "groupCombat": "Combat",
-    "groupActivity": "Activity"
+    "groupActivity": "Activity",
+    "groupUtility": "Utility"
   },
   "gearSlotModal": {
     "slotDescs": {

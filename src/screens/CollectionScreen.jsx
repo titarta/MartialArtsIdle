@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HERB_ITEMS, ORE_ITEMS, CULTIVATION_ITEMS, RARITY } from '../data/materials';
+import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS, RARITY } from '../data/materials';
 
 const MATERIAL_ITEMS = {
   herbs:       HERB_ITEMS,
   minerals:    ORE_ITEMS,
+  bloodCores:  BLOOD_CORE_ITEMS,
   cultivation: CULTIVATION_ITEMS,
 };
 import { QUALITY, ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
@@ -33,13 +34,14 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
   const ALL_TABS = [
     { key: 'herbs',       tKey: 'inventory.tabHerbs'      },
     { key: 'minerals',    tKey: 'inventory.tabMinerals'   },
+    { key: 'bloodCores',  tKey: 'inventory.tabBloodCores' },
     { key: 'cultivation', tKey: 'inventory.tabCultivation'},
     { key: 'artefacts',   tKey: 'inventory.tabArtefacts'  },
     { key: 'techniques',  tKey: 'inventory.tabTechniques' },
     { key: 'laws',        tKey: 'inventory.tabLaws'       },
   ];
 
-  const MATERIAL_KEYS = new Set(['herbs', 'minerals', 'cultivation']);
+  const MATERIAL_KEYS = new Set(['herbs', 'minerals', 'bloodCores', 'cultivation']);
 
   return (
     <div className="screen inventory-screen">

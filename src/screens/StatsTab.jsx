@@ -224,8 +224,8 @@ function StatsContent({ cultivation, artefacts }) {
   const leave  = ()     => setActive(null);
 
   return (
-    <>
-      {/* ── Primary Stats: triangle left, detail right ── */}
+    <div className="stats-content">
+      {/* ── Primary Stats: triangle centered, description as popover ── */}
       <div className="stats-primary-row">
         <div className="stat-triangle-container">
           <TriangleLines activeStat={activeStat} />
@@ -264,6 +264,9 @@ function StatsContent({ cultivation, artefacts }) {
           </div>
         </div>
 
+        {/* Detail popover — CSS positions this as a right-side panel on
+            narrow screens and as an absolute overlay next to the triangle
+            on PC (see .stat-detail-side in App.css). */}
         <div className="stat-detail-side">
           {activeStat ? (
             <DetailPanel stat={activeStat} value={primary[activeStat] ?? 0} realmIndex={realmIndex} />
@@ -276,29 +279,30 @@ function StatsContent({ cultivation, artefacts }) {
         </div>
       </div>
 
-      {/* ── Combat Stats ── */}
-      <StatGroup title={t('stats.groupCombat')}>
-        <StatRow label={t('statNames.health')}           hint="(Essence + Body) × 12"  value={combat.health} />
-        <StatRow label={t('statNames.defense')}          hint="from Body"              value={combat.defense} />
-        <StatRow label={t('statNames.elemental_defense')} hint="from Essence"           value={combat.elemDef} />
-        <StatRow label={t('statNames.soul_toughness')}   hint="from Soul"               value={combat.soulTough}    locked={!soulUnlocked} />
-        <StatRow label={t('statNames.physical_damage')}  hint="bonus"                   value={combat.physDmg} />
-        <StatRow label={t('statNames.elemental_damage')} hint="bonus"                   value={combat.elemDmg} />
-        <StatRow label={t('statNames.psychic_damage')}   hint="bonus"                   value={combat.psychDmg}     locked={!soulUnlocked} />
-        <StatRow label={t('statNames.exploit_chance')}   hint=""                        value={combat.exploitChance} unit="%" />
-        <StatRow label={t('statNames.exploit_mult')}     hint=""                        value={combat.exploitMult}   unit="%" />
-      </StatGroup>
+      {/* ── Combat + Utility stats: stacked on mobile, side by side on PC ── */}
+      <div className="secondary-stats-grid">
+        <StatGroup title={t('stats.groupCombat')}>
+          <StatRow label={t('statNames.health')}           hint="(Essence + Body) × 12"  value={combat.health} />
+          <StatRow label={t('statNames.defense')}          hint="from Body"              value={combat.defense} />
+          <StatRow label={t('statNames.elemental_defense')} hint="from Essence"           value={combat.elemDef} />
+          <StatRow label={t('statNames.soul_toughness')}   hint="from Soul"               value={combat.soulTough}    locked={!soulUnlocked} />
+          <StatRow label={t('statNames.physical_damage')}  hint="bonus"                   value={combat.physDmg} />
+          <StatRow label={t('statNames.elemental_damage')} hint="bonus"                   value={combat.elemDmg} />
+          <StatRow label={t('statNames.psychic_damage')}   hint="bonus"                   value={combat.psychDmg}     locked={!soulUnlocked} />
+          <StatRow label={t('statNames.exploit_chance')}   hint=""                        value={combat.exploitChance} unit="%" />
+          <StatRow label={t('statNames.exploit_mult')}     hint=""                        value={combat.exploitMult}   unit="%" />
+        </StatGroup>
 
-      {/* ── Activity Stats ── */}
-      <StatGroup title={t('stats.groupActivity')}>
-        <StatRow label={t('statNames.qi_speed')}         hint="base × law mult"         value={activity.qiSpeed}      unit="/s" />
-        <StatRow label={t('statNames.focus_mult')}       hint="while boosting"          value={activity.focusMult}    unit="%" />
-        <StatRow label={t('statNames.harvest_speed')}    hint="from Soul"               value={activity.harvestSpeed} locked={!soulUnlocked} />
-        <StatRow label={t('statNames.harvest_luck')}     hint=""                        value={activity.harvestLuck} />
-        <StatRow label={t('statNames.mining_speed')}     hint="from Body"               value={activity.miningSpeed} />
-        <StatRow label={t('statNames.mining_luck')}      hint=""                        value={activity.miningLuck} />
-      </StatGroup>
-    </>
+        <StatGroup title={t('stats.groupUtility')}>
+          <StatRow label={t('statNames.qi_speed')}         hint="base × law mult"         value={activity.qiSpeed}      unit="/s" />
+          <StatRow label={t('statNames.focus_mult')}       hint="while boosting"          value={activity.focusMult}    unit="%" />
+          <StatRow label={t('statNames.harvest_speed')}    hint="from Soul"               value={activity.harvestSpeed} locked={!soulUnlocked} />
+          <StatRow label={t('statNames.harvest_luck')}     hint=""                        value={activity.harvestLuck} />
+          <StatRow label={t('statNames.mining_speed')}     hint="from Body"               value={activity.miningSpeed} />
+          <StatRow label={t('statNames.mining_luck')}      hint=""                        value={activity.miningLuck} />
+        </StatGroup>
+      </div>
+    </div>
   );
 }
 

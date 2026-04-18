@@ -96,6 +96,7 @@
     "title":               "Inventário",
     "tabHerbs":            "Ervas",
     "tabMinerals":         "Minerais",
+    "tabBloodCores":       "Núcleos de Sangue",
     "tabCultivation":      "Cultivo",
     "tabArtefacts":        "Artefatos",
     "tabTechniques":       "Técnicas",
@@ -221,7 +222,8 @@
       "mining":   "Aumenta a Velocidade de Mineração"
     },
     "groupCombat":   "Combate",
-    "groupActivity": "Atividade"
+    "groupActivity": "Atividade",
+    "groupUtility":  "Utilidade"
   },
 
   "gearSlotModal": {
