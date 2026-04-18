@@ -316,14 +316,21 @@
   background: rgba(255,255,255,0.03);
   cursor: pointer;
   position: relative;
-  transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
 }
 .augment-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px) scale(1.02);
   border-color: var(--cat-color);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5), 0 0 12px color-mix(in srgb, var(--cat-color) 30%, transparent);
+  background: rgba(255,255,255,0.07);
+  box-shadow:
+    0 8px 28px rgba(0,0,0,0.6),
+    0 0 0 1px var(--cat-color),
+    0 0 20px var(--cat-color);
 }
-.augment-card:active { transform: translateY(0); }
+.augment-card:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
 
 /* Rarity border glow */
 .augment-card-common { border-color: rgba(156,163,175,0.25); }
@@ -421,9 +428,13 @@
   transition: color 0.12s, border-color 0.12s, background 0.12s;
 }
 .augment-reroll:hover:not(:disabled) {
-  color: #fff;
-  border-color: rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.1);
+  color: var(--cat-color);
+  border-color: var(--cat-color);
+  background: color-mix(in srgb, var(--cat-color) 15%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--cat-color) 40%, transparent);
+}
+.augment-reroll:active:not(:disabled) {
+  transform: scale(0.94);
 }
 .augment-reroll-disabled { opacity: 0.3; cursor: not-allowed; }
 
