@@ -156,7 +156,7 @@ function AffixRow({ affix, gIdx, color, mineralStat, mineralMod, craftCount = 0,
         {isUnique && <span className="tx-mod-unique-tag" style={{ color: rowColor }}>★ {affix.name}</span>}
         <span className="tx-mod-value" style={{ color: rowColor }}>{formatAffixValue(affix)}</span>
       </div>
-      {!isUnique && (
+      {(!isUnique || affix.tier === 'Transcendent') && (
         <div className="tx-mod-actions">
           <button
             className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}

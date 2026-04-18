@@ -43,7 +43,7 @@ No affix id may repeat anywhere on the same item. This is stricter than the prev
 
 - **On creation:** 2% chance (global constant `UNIQUE_ON_CREATION_CHANCE`) that one of the two Iron slots rolls an **artefact-unique** instead of a normal affix. Uniques are drawn from `ARTEFACT_UNIQUES` (see `src/data/uniqueModifiers.js`) filtered by the item's slot type.
 - **Transcendent slot:** the candidate pool is the normal Transcendent affixes merged with slot-matching uniques at uniform weighting — Add transmutations on a Transcendent slot can therefore roll a unique.
-- **Locked:** unique affixes cannot be honed or replaced. Replace (reroll) can never produce a unique either.
+- **Locked (Iron only):** Iron-tier uniques cannot be honed or replaced. **Transcendent uniques CAN be rerolled** — Hone keeps the unique's id and re-rolls its value, Replace draws from the merged Transcendent pool (and so may land on another unique, a different unique, or a normal affix). Replace on any NON-Transcendent affix can never produce a unique.
 - **UI:** uniques render with the magenta accent `#ff7ae6` and a ★ tag so they're distinguishable from any rarity colour.
 
 ---

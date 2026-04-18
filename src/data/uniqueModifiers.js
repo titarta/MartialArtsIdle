@@ -557,6 +557,27 @@ export function artefactUniquesBySlot(slot) {
 }
 
 /**
+ * Re-roll the value of an EXISTING artefact-unique, preserving its id.
+ * Used by the Hone transmutation on Transcendent-tier uniques.
+ */
+export function rerollArtefactUniqueValue(uniqueId, tier = 'Transcendent') {
+  const u = ARTEFACT_UNIQUES.find(x => x.id === uniqueId);
+  if (!u) return null;
+  const { min, max } = u.range;
+  const value = Math.floor(min + Math.random() * (max - min + 1));
+  return {
+    id:          u.id,
+    name:        u.name,
+    stat:        null,
+    type:        null,
+    value,
+    tier,
+    unique:      true,
+    description: (u.description ?? '').replace(/\{value\}/g, value),
+  };
+}
+
+/**
  * Roll a fresh artefact-unique affix for a given slot. Returns an affix-shaped
  * object tagged `unique: true` so the equipment / transmutation UI can render
  * it distinctly. Unique affixes carry a pre-formatted description instead of

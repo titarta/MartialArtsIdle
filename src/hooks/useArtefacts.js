@@ -5,6 +5,7 @@ import {
   AFFIX_POOL_BY_SLOT, ARTEFACT_TIER_SLOTS,
 } from '../data/affixPools';
 import { generateArtefactName, formatArtefactName } from '../data/artefactNames';
+import { rerollArtefactUniqueValue } from '../data/uniqueModifiers';
 
 const SAVE_KEY = 'mai_artefacts';
 // Bump whenever the artefact schema changes in a way existing saves can't
@@ -205,7 +206,13 @@ export default function useArtefacts() {
         const pool = AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? [];
         const affixes = (o.affixes ?? []).map((a, i) => {
           if (i !== idx) return a;
-          if (a.unique) return a; // uniques are locked
+          if (a.unique) {
+            // Only Transcendent uniques can be rerolled. Lower-tier uniques
+            // (currently Iron) stay locked.
+            if (a.tier !== 'Transcendent') return a;
+            const rerolled = rerollArtefactUniqueValue(a.id, a.tier);
+            return rerolled ?? a;
+          }
           const entry = pool.find(e => e.id === a.id);
           if (!entry) return a;
           return rollAffix(entry, a.tier ?? 'Iron');
@@ -231,13 +238,20 @@ export default function useArtefacts() {
         const affixes = o.affixes ?? [];
         const oldAffix = affixes[idx];
         if (!oldAffix) return o;
-        if (oldAffix.unique) return o; // uniques are locked
         const tier = oldAffix.tier ?? 'Iron';
+        // Non-Transcendent uniques stay locked.
+        if (oldAffix.unique && tier !== 'Transcendent') return o;
         // Item-wide exclusion — no affix id may repeat anywhere on the item.
         const excludeIds = affixes
           .filter((_, i) => i !== idx)
           .map(a => a.id);
-        const newAffix = pickRandomAffix(art?.slot ?? 'weapon', tier, excludeIds);
+        const slot = art?.slot ?? 'weapon';
+        // Transcendent uniques redraw from the merged pool (normals + uniques).
+        // Other tiers — and normal Transcendent affixes — stay on the normal
+        // pool so "can't reroll INTO a unique" still holds for non-Trans slots.
+        const newAffix = (oldAffix.unique && tier === 'Transcendent')
+          ? pickArtefactAffix(slot, tier, excludeIds)
+          : pickRandomAffix(slot, tier, excludeIds);
         if (!newAffix) return o;
         const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
         return { ...o, affixes: updated, craftCount: (o.craftCount ?? 0) + 1 };
