@@ -19,6 +19,9 @@ const LAWS_RAW = {
     id:                   'three_harmony_manual',
     name:                 'Three Harmony Manual',
     element:              'Normal',
+    // Law types control which unique pools this law can roll from. Every
+    // law also implicitly draws from the `general` pool.
+    types:                ['physical'],
     rarity:               'Iron',
     // realmIndex 0 = Tempered Body - Layer 1 (available from the start)
     realmRequirement:     0,

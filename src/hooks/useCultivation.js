@@ -101,7 +101,8 @@ export default function useCultivation() {
       if (law.id !== lawId) return law;
       const uniques = law.uniques ?? {};
       const currentIds = Object.values(uniques).filter(Boolean).map(u => u.id);
-      const newUnique = pickRandomUnique(currentIds);
+      // Pass the full law so the picker can filter by pool (law.types ∪ general).
+      const newUnique = pickRandomUnique(law, currentIds);
       if (!newUnique) return law;
       return { ...law, uniques: { ...uniques, [tier]: newUnique } };
     }));

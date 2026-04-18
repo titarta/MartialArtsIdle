@@ -31,6 +31,27 @@ Laws are tied to one element. Each element flavours the default attack and passi
 
 ---
 
+## Types & Unique Pools
+
+Each law also has a `types: [...]` array which controls **which unique-modifier pools** the law can roll from. Unique pools are balanced 3/3/3 around the three primary stats:
+
+| Anchor stat | Pools |
+|---|---|
+| Body (martial) | physical, sword, fist |
+| Essence (elemental) | fire, water, earth |
+| Soul (mystical) | spirit, void, dao |
+
+Every law additionally draws from the implicit **`general`** pool regardless of its types. Uniques with no strong thematic fit live in `general`.
+
+- Authoritative pool list: `LAW_UNIQUE_POOLS` in `src/data/lawUniques.js`.
+- Pool assignments per unique: `POOL_ASSIGNMENTS` map in the same file (~40 uniques are typed today; the other ~90 default to `general` — edit the map to curate further).
+- Generated-law element-to-types mapping: `ELEMENT_TO_TYPES` in `src/data/affixPools.js` (Fire → fire, Water/Frost/Ice → water, Earth/Stone → earth, Void → void; others → `['general']`).
+- The starter law **Three Harmony Manual** has `types: ['physical']` — thematic neutrality plus the martial pool.
+
+The designer panel now exposes a read-only **Law Uniques** viewer (Progression section) that lists every unique grouped by its pool so designers can audit coverage.
+
+---
+
 ## Cultivation Speed
 
 Each law has a **base cultivation speed multiplier** applied on top of the global rate:

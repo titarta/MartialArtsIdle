@@ -7,6 +7,7 @@ import RealmsEditor     from './categories/RealmsEditor.jsx';
 import CraftingEditor   from './categories/CraftingEditor.jsx';
 import PillsEditor      from './categories/PillsEditor.jsx';
 import LawsEditor       from './categories/LawsEditor.jsx';
+import LawUniquesViewer from './categories/LawUniquesViewer.jsx';
 import ArtefactsEditor  from './categories/ArtefactsEditor.jsx';
 import AffixPoolsEditor from './categories/AffixPoolsEditor.jsx';
 import MaterialsEditor  from './categories/MaterialsEditor.jsx';
@@ -19,6 +20,7 @@ const EDITORS = {
   enemies:    EnemiesEditor,
   realms:     RealmsEditor,
   laws:       LawsEditor,
+  lawUniques: LawUniquesViewer,
   materials:  MaterialsEditor,
   pills:      PillsEditor,
   artefacts:  ArtefactsEditor,
@@ -46,6 +48,7 @@ const CATEGORIES = [
   // ── Progression ──────────────────────────────────────────────────────────
   { id: 'realms',     label: 'Realms',      section: 'Progression',         path: 'src/data/config/realms.override.json'     },
   { id: 'laws',       label: 'Laws',        section: 'Progression',         path: 'src/data/config/laws.override.json'       },
+  { id: 'lawUniques', label: 'Law Uniques', section: 'Progression',         path: null, readOnly: true },
   // ── Inventory ────────────────────────────────────────────────────────────
   { id: 'materials',  label: 'Materials',   section: 'Inventory',           path: 'src/data/config/materials.override.json'  },
   { id: 'pills',      label: 'Pills',       section: 'Inventory',           path: 'src/data/config/pills.override.json'      },
@@ -98,6 +101,8 @@ export default function Designer() {
     if (!tokenStatus.ok) return;
     let cancelled = false;
     for (const cat of CATEGORIES) {
+      // Read-only categories have no backing override file to load.
+      if (cat.readOnly || !cat.path) continue;
       setState((s) => ({ ...s, [cat.id]: { ...s[cat.id], loading: true, error: null } }));
       getFile(pat, cat.path).then((file) => {
         if (cancelled) return;

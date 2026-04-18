@@ -341,9 +341,24 @@ const LAW_FLAVOURS = [
  *   Gold law:         + Gold
  *   Transcendent law: all 5
  */
+// Map a generated law's element to the unique-pool types it can draw from.
+// Elements we don't explicitly map to a pool fall through to just `general`.
+const ELEMENT_TO_TYPES = {
+  Fire:      ['fire'],
+  Water:     ['water'],
+  Frost:     ['water'],
+  Ice:       ['water'],
+  Earth:     ['earth'],
+  Stone:     ['earth'],
+  Void:      ['void'],
+  // Unmapped elements (Normal, Metal, Wood, Wind, Lightning, …) stay on
+  // general-only. Designer can edit law records to override.
+};
+
 export function generateLaw(forcedRarity) {
   const rarity  = forcedRarity ?? pick(LAW_RARITIES);
   const element = pick(LAW_ELEMENTS);
+  const types   = ELEMENT_TO_TYPES[element] ?? ['general'];
 
   const rarityTiers = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
   const rarityIdx = rarityTiers.indexOf(rarity);
@@ -352,7 +367,8 @@ export function generateLaw(forcedRarity) {
   const uniques = {};
   const usedIds = [];
   for (const tier of unlockedTiers) {
-    const u = pickRandomUnique(usedIds);
+    // Pass `{ types }` so the picker filters to the law's pools ∪ general.
+    const u = pickRandomUnique({ types }, usedIds);
     if (u) {
       uniques[tier] = u;
       usedIds.push(u.id);
@@ -363,6 +379,7 @@ export function generateLaw(forcedRarity) {
     id:                    `law_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     name:                  genLawName(),
     element,
+    types,
     rarity,
     realmRequirement:      0,
     realmRequirementLabel: LAW_REALM_LABELS[rarity] ?? 'Tempered Body',

@@ -1255,3 +1255,131 @@
   font-size: 11px;
   color: var(--dz-text-dim);
 }
+
+/* ── Read-only viewer (Law Uniques) ───────────────────────────────────── */
+.dz-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dz-viewer-header h2 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+}
+
+.dz-viewer-sub {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dz-text-dim);
+}
+
+.dz-viewer-sub code {
+  font-size: 11px;
+  background: var(--dz-bg-elevated, #1a1a2a);
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.dz-viewer-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--dz-border);
+}
+
+.dz-viewer-tab {
+  background: transparent;
+  color: var(--dz-text-dim);
+  border: 1px solid var(--dz-border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.dz-viewer-tab:hover {
+  color: var(--dz-text);
+  border-color: var(--dz-accent, #7aa7ff);
+}
+
+.dz-viewer-tab.active {
+  background: var(--dz-accent, #7aa7ff);
+  color: #0b0b1a;
+  border-color: var(--dz-accent, #7aa7ff);
+  font-weight: 600;
+}
+
+.dz-viewer-section {
+  border: 1px solid var(--dz-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--dz-bg-card, rgba(255,255,255,0.02));
+}
+
+.dz-viewer-section-title {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dz-accent, #7aa7ff);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dz-viewer-count {
+  font-size: 11px;
+  color: var(--dz-text-dim);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.dz-viewer-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--dz-text-dim);
+  font-style: italic;
+}
+
+.dz-viewer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dz-viewer-row {
+  display: grid;
+  grid-template-columns: 200px 70px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.dz-viewer-row:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dz-viewer-id {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--dz-accent, #7aa7ff);
+}
+
+.dz-viewer-range {
+  color: var(--dz-text-dim);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.dz-viewer-desc {
+  color: var(--dz-text);
+}

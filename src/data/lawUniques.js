@@ -139,6 +139,25 @@ const cEnemyJustSpawned = (sec) => ({ type: 'enemy_just_spawned', sec });
 const SAINT_INDEX = 24;
 const PEAK_INDEX  = 46;
 
+// ─── Pools ───────────────────────────────────────────────────────────────────
+// Every unique is tagged with exactly one `pool`. A law rolls uniques only
+// from the pools listed in its `types` array plus the `general` pool, which
+// every law can draw from regardless of type.
+//
+// The 9 typed pools are anchored to the three primary stats (Body, Essence,
+// Soul) for balance:
+//   Body    → physical, sword, fist
+//   Essence → fire, water, earth
+//   Soul    → spirit, void, dao
+// Uniques with no clear thematic fit default to `general` — the catch-all.
+
+export const LAW_UNIQUE_POOLS = [
+  'physical', 'sword', 'fist',
+  'fire', 'water', 'earth',
+  'spirit', 'void', 'dao',
+  'general',
+];
+
 // ─── Unique modifier pool ────────────────────────────────────────────────────
 
 export const LAW_UNIQUES = [
@@ -547,6 +566,73 @@ export const LAW_UNIQUES = [
     effects: [stat('buff_duration', MOD.INCREASED, rolled)] },
 ];
 
+// ─── Pool assignments ────────────────────────────────────────────────────────
+// Thematic uniques get a specific pool; everything else falls back to
+// `general` (the default assigned below). Edit this map to re-bucket — the
+// designer's Law Uniques viewer reads straight from the assigned pool.
+const POOL_ASSIGNMENTS = {
+  // Fire
+  l_burning_path:       'fire',
+  l_phoenix_path:       'fire',
+  l_nuclear_path:       'fire',
+  // Water
+  l_frozen_path:        'water',
+  l_river_flow:         'water',
+  l_qi_spring:          'water',
+  l_calm_water:         'water',
+  l_eternal_spring:     'water',
+  l_reflecting_pool:    'water',
+  // Earth
+  l_stone_path:         'earth',
+  l_unmovable_mountain: 'earth',
+  l_shell_path:         'earth',
+  l_living_fortress:    'earth',
+  l_patient_mountain:   'earth',
+  // Void
+  l_void_path:          'void',
+  l_inner_void:         'void',
+  // Physical (Body martial)
+  l_diamond_body:       'physical',
+  l_iron_marrow:        'physical',
+  l_mountain_stance:    'physical',
+  l_titan_blood:        'physical',
+  l_reincarnated_titan: 'physical',
+  l_warrior_pulse:      'physical',
+  l_berserker_resolve:  'physical',
+  l_last_stand:         'physical',
+  l_reckless:           'physical',
+  l_stubborn_path:      'physical',
+  l_bonecage:           'physical',
+  // Sword
+  l_blade_dance:        'sword',
+  l_razors_edge:        'sword',
+  l_blade_of_chaos:     'sword',
+  l_executioner_path:   'sword',
+  // Fist
+  l_swallow_strike:     'fist',
+  // Spirit
+  l_thoughtless_state:  'spirit',
+  l_quiet_mind:         'spirit',
+  l_meditation_path:    'spirit',
+  l_oath_of_silence:    'spirit',
+  l_immortal_will:      'spirit',
+  l_undying_will:       'spirit',
+  l_chained_will:       'spirit',
+  l_burdened_soul:      'spirit',
+  l_sacred_offering:    'spirit',
+  // Dao
+  l_dao_consumption:    'dao',
+  l_dao_chain:          'dao',
+  l_dao_hunger:         'dao',
+  l_balanced_dao:       'dao',
+  l_tri_harmony:        'dao',
+};
+
+// Apply pools in place — every unique gets one.
+for (const u of LAW_UNIQUES) {
+  u.pool = POOL_ASSIGNMENTS[u.id] ?? 'general';
+}
+
 export const LAW_UNIQUES_BY_ID = Object.fromEntries(LAW_UNIQUES.map(u => [u.id, u]));
 
 /** Roll a value for a given unique (Math.floor for integer display). */
@@ -557,9 +643,37 @@ export function rollUniqueValue(uniqueId) {
   return Math.floor(min + Math.random() * (max - min + 1));
 }
 
-/** Pick a random unique from the pool, excluding any ids already in use. */
-export function pickRandomUnique(excludeIds = []) {
-  const pool = LAW_UNIQUES.filter(u => !excludeIds.includes(u.id));
+/**
+ * Pick a random unique for the given law.
+ *
+ * Uniques are drawn from: (law.types ?? []) ∪ ['general'] — i.e. the law's
+ * declared pools plus the shared general pool. Any ids already assigned
+ * elsewhere on the law are excluded.
+ *
+ * Backward-compatible: when called with an array (the legacy signature),
+ * pools are ignored and all uniques are candidates. Call sites should
+ * migrate to passing the law object.
+ *
+ * @param {object|string[]} lawOrExcludeIds — full law { types?: string[] }
+ *                                            or an excludeIds array (legacy).
+ * @param {string[]} [excludeIds] — ids already on the law, skipped in the draw.
+ */
+export function pickRandomUnique(lawOrExcludeIds, excludeIds) {
+  // Legacy signature: pickRandomUnique(excludeIds)
+  let types = null;
+  let exclude;
+  if (Array.isArray(lawOrExcludeIds)) {
+    exclude = lawOrExcludeIds;
+  } else {
+    types   = lawOrExcludeIds?.types ?? null;
+    exclude = excludeIds ?? [];
+  }
+  const allowedPools = types && types.length
+    ? new Set([...types, 'general'])
+    : null; // null = no filter (legacy behaviour)
+  const pool = LAW_UNIQUES.filter(u =>
+    !exclude.includes(u.id) && (!allowedPools || allowedPools.has(u.pool ?? 'general'))
+  );
   if (pool.length === 0) return null;
   const u = pool[Math.floor(Math.random() * pool.length)];
   return { id: u.id, value: rollUniqueValue(u.id) };
