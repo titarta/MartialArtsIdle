@@ -28,6 +28,46 @@ html {
   overscroll-behavior: none;
 }
 
+/* Landscape rotation prompt — browser fallback for phones in a tab.
+   PWA manifest + Android manifest enforce portrait natively. */
+#rotate-overlay { display: none; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #rotate-overlay {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+  #rotate-overlay .rotate-icon {
+    font-size: 3rem;
+    color: var(--gold);
+    animation: rotate-hint 2s ease-in-out infinite;
+  }
+  #rotate-overlay .rotate-title {
+    font-size: 1.25rem;
+    color: var(--gold);
+  }
+  #rotate-overlay .rotate-sub {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+  #root { visibility: hidden; }
+}
+
+@keyframes rotate-hint {
+  0%, 100% { transform: rotate(-25deg); }
+  50%      { transform: rotate(25deg); }
+}
+
 body {
   min-height: 100vh;
   min-height: 100dvh;
