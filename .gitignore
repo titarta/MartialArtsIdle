@@ -27,3 +27,6 @@ tmp
 *.sln
 *.sw?
 .claude/
+
+# Discord bot
+discord/

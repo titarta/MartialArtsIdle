@@ -36,7 +36,7 @@ const BASELINE = {
     hint: null,
     unlockMsg: null,
   },
-  combat: {
+  worlds: {
     gate: { type: 'realm', minRealmIndex: 3 },
     hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Worlds are open. Begin your conquest.',
@@ -88,11 +88,6 @@ const BASELINE = {
     unlockMsg: 'Alchemy unlocked. Brew pills in the Refining Furnace.',
   },
   settings: {
-    gate: { type: 'always' },
-    hint: null,
-    unlockMsg: null,
-  },
-  shop: {
     gate: { type: 'always' },
     hint: null,
     unlockMsg: null,

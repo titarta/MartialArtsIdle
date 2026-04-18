@@ -2,12 +2,10 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import NavBar from './components/NavBar';
 import HomeScreen from './screens/HomeScreen';
 import { initAds } from './ads/adService';
-import TrainingScreen from './screens/TrainingScreen';
 import CombatScreen from './screens/CombatScreen';
 import WorldsScreen from './screens/WorldsScreen';
 import GatheringScreen from './screens/GatheringScreen';
 import MiningScreen from './screens/MiningScreen';
-import ShopScreen from './screens/ShopScreen';
 import CharacterScreen from './screens/CharacterScreen';
 import CollectionScreen from './screens/CollectionScreen';
 import ProductionScreen from './screens/ProductionScreen';
@@ -184,8 +182,8 @@ function App() {
     inventory,
     onUnlock: (featureId, msg) => notifications.addToast({
       message: msg,
-      targetScreen: featureId === 'combat' || featureId === 'gathering' || featureId === 'mining'
-        ? 'combat' : featureId,
+      targetScreen: featureId === 'worlds' || featureId === 'gathering' || featureId === 'mining'
+        ? 'worlds' : featureId,
     }),
   });
 
@@ -202,16 +200,14 @@ function App() {
     notifications.clearBadge(screen);
   };
 
-  const goBack = () => navigate('combat', {
+  const goBack = () => navigate('worlds', {
     expandWorldId: screenParam?.worldId ?? null,
     activeTab:     screenParam?.fromTab  ?? null,
   });
 
   const screens = {
-    home:      <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} />,
-    training:  <TrainingScreen />,
-    // Worlds hub — the NavBar "Worlds" tab always lands here
-    combat:    <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} />,
+    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} />,
+    worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
                       cultivation={cultivation}
@@ -230,7 +226,6 @@ function App() {
                  ? <MiningScreen    region={screenParam.region} inventory={inventory} onBack={goBack} getFullStats={getFullStats} />
                  : null,
     character:  <CharacterScreen cultivation={cultivation} techniques={techniques} artefacts={artefacts} selections={selections} />,
-    shop:       <ShopScreen />,
     collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} />,
     settings:   <SettingsScreen />,

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import BuildContent from './BuildScreen';
-import StatsContent from './StatsScreen';
+import BuildContent from './BuildTab';
+import StatsContent from './StatsTab';
 import { SELECTION_BY_ID, SELECTION_RARITY } from '../data/selections';
 
 function PerksTab({ selections }) {

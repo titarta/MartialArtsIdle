@@ -4,7 +4,7 @@ const BASE = import.meta.env.BASE_URL;
 
 const SCREENS = [
   { id: 'home',       tKey: 'nav.home'                              },
-  { id: 'combat',     tKey: 'nav.worlds'                            },
+  { id: 'worlds',     tKey: 'nav.worlds'                            },
   { id: 'character',  tKey: 'nav.character'                         },
   { id: 'collection', tKey: 'nav.collection', sprite: 'inventory'  },
   { id: 'production', tKey: 'nav.craft'                             },

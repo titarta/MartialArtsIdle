@@ -63,7 +63,7 @@ export default function useNotifications({ cultivation, inventory }) {
       ...newlyUnlocked.map(w => ({
         id: `world-${w.id}-${++toastCounter}`,
         message: `New World Unlocked: ${w.name}`,
-        targetScreen: 'combat',
+        targetScreen: 'worlds',
         targetParam: { expandWorldId: w.id },
       })),
     ]);
@@ -82,11 +82,11 @@ export default function useNotifications({ cultivation, inventory }) {
     [inventory.inventory]
   );
 
-  const badges = { combat: combatBadge, production: productionBadge };
+  const badges = { worlds: combatBadge, production: productionBadge };
 
   /** Call when the player navigates to a tab to clear its badge. */
   const clearBadge = useCallback((screen) => {
-    if (screen === 'combat') {
+    if (screen === 'worlds') {
       setSeenWorlds(prev => {
         const next = new Set(prev);
         WORLDS.forEach(w => {

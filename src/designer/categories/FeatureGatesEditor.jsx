@@ -26,7 +26,7 @@ const GATE_TYPES = [
 ];
 
 const FEATURE_ORDER = [
-  'home', 'combat', 'character', 'gathering', 'mining', 'collection', 'production', 'settings', 'shop',
+  'home', 'worlds', 'character', 'gathering', 'mining', 'collection', 'production', 'settings',
 ];
 
 const FIXED_FEATURES = new Set(['home', 'settings']);
