@@ -46,23 +46,23 @@ export const TYPE_COLOR = {
   Dodge:  '#facc15',
 };
 
-// ─── Technique catalogue (legacy — techniques are now procedurally generated) ─
-export const TECHNIQUES = [
-  { id: 'raging_fire_slash', name: 'Raging Fire Slash', type: 'Attack', rank: 'Mortal', quality: 'Iron', element: 'Fire', flavour: 'A blade wreathed in living fire, forged from fury alone.', arteMult: 1.0, elemBonus: 1.2, bonus: 0, passives: [{ name: 'Ignite', description: 'Applies a burn dealing 5% dmg/s for 3s.' }] },
-  { id: 'void_piercer', name: 'Void Piercer', type: 'Attack', rank: 'Sky', quality: 'Silver', element: 'Normal', flavour: 'A thrust so precise it tears space itself.', arteMult: 1.0, elemBonus: 1.0, bonus: 0, passives: [{ name: 'Penetrating', description: 'Ignores 20% of enemy DEF.' }, { name: 'Momentum', description: 'Next attack cooldown −1s.' }, { name: 'Focus', description: '+10% critical hit chance.' }] },
-  { id: 'twin_dragons_rage', name: "Twin Dragon's Rage", type: 'Attack', rank: 'Saint', quality: 'Gold', element: 'Fire', flavour: 'Two dragons roar as one — heaven itself trembles.', arteMult: 1.2, elemBonus: 1.3, bonus: 0, passives: [{ name: "Dragon's Fury", description: 'First strike deals double damage.' }, { name: 'Inferno', description: 'Burn stacks amplify dmg by 15%.' }, { name: 'Soul Resonance', description: 'Soul contribution +50%.' }, { name: 'Dragon Roar', description: '15% chance to stun for 1s.' }] },
-  { id: 'mending_breath', name: 'Mending Breath', type: 'Heal', rank: 'Mortal', quality: 'Bronze', element: 'Normal', flavour: 'A single exhale restores what years of battle have worn away.', healPercent: 0.25, passives: [{ name: 'Deep Breath', description: '+5% HP regen over 3s after heal.' }, { name: 'Calm Mind', description: 'Reduces cooldowns by 10% for 5s.' }] },
-  { id: 'heaven_mending_art', name: 'Heaven Mending Art', type: 'Heal', rank: 'Emperor', quality: 'Gold', element: 'Normal', flavour: 'Even shattered meridians knit themselves whole.', healPercent: 0.50, passives: [{ name: "Heaven's Will", description: 'Can overheal up to 120% max HP.' }, { name: 'Purify', description: 'Removes all debuffs on heal.' }, { name: 'Regeneration', description: '+5% HP/s for 5s after cast.' }, { name: 'Soul Mending', description: 'Restores a portion of Soul stat.' }] },
-  { id: 'stone_skin', name: 'Stone Skin', type: 'Defend', rank: 'Mortal', quality: 'Iron', element: 'Normal', flavour: 'Flesh becomes iron. Iron becomes stone.', defMult: 1.5, buffAttacks: 2, passives: [{ name: 'Hardened', description: 'Buff absorbs 1 extra hit.' }] },
-  { id: 'iron_fortress', name: 'Iron Fortress', type: 'Defend', rank: 'Earth', quality: 'Silver', element: 'Normal', flavour: "A citadel of qi — no blow can shake its walls.", defMult: 2.0, buffAttacks: 3, passives: [{ name: 'Unbreakable', description: 'Cannot be reduced below 1 HP while active.' }, { name: 'Counterforce', description: '20% of blocked damage returned.' }, { name: 'Ironclad', description: 'Buff absorbs 1 extra hit per blow taken.' }] },
-  { id: 'phantom_step', name: 'Phantom Step', type: 'Dodge', rank: 'Mortal', quality: 'Iron', element: 'Normal', flavour: 'Between one heartbeat and the next — you are elsewhere.', dodgeChance: 0.40, buffAttacks: 2, passives: [{ name: 'Swift', description: 'Buff covers 1 extra hit.' }] },
-  { id: 'shadow_walk', name: 'Shadow Walk', type: 'Dodge', rank: 'Earth', quality: 'Bronze', element: 'Normal', flavour: 'The shadow peels away and becomes you for a precious moment.', dodgeChance: 0.60, buffAttacks: 3, passives: [{ name: 'Afterimage', description: 'Afterimage taunts enemy for 1s.' }, { name: 'Phase Shift', description: 'First attack after dodge deals ×1.5 dmg.' }] },
-];
+// Techniques are always procedurally generated via generateTechnique() in
+// techniqueDrops.js. There's no hand-authored catalogue — names, elements,
+// rolled stats and passives are all rolled at drop time and then frozen on
+// the instance. Stats (dodgeChance, buffAttacks, healPercent, defMult,
+// arteMult, elemBonus, bonus) cannot be modified by transmutation; only
+// quality-upgrade and passive replace/add are permitted.
+export const TECHNIQUES = [];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function getTechnique(id) {
-  return TECHNIQUES.find(t => t.id === id) ?? null;
+/**
+ * Legacy shim. All live techniques now come from the player's owned drops,
+ * so this always returns null and the caller should fall back to the
+ * ownedTechniques map (see useTechniques.getTechById).
+ */
+export function getTechnique(_id) {
+  return null;
 }
 
 /** Effective cooldown in seconds for a given type + quality. */

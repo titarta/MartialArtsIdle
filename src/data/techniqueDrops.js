@@ -161,7 +161,10 @@ function genPassives(type, quality) {
 /**
  * Generate a random technique appropriate for the given world tier.
  * @param {number} worldId  1–6
- * @returns Technique object — shape mirrors static TECHNIQUES entries.
+ * @returns Technique object with randomly rolled name, element, type,
+ *          rank, quality, passives, and type-specific stats. All stats
+ *          are frozen at generation time — transmutation only edits
+ *          quality and passives.
  */
 export function generateTechnique(worldId) {
   const wIdx    = Math.max(0, Math.min(5, worldId - 1));
@@ -185,7 +188,7 @@ export function generateTechnique(worldId) {
     typeStats.buffAttacks = 2 + Math.floor(Math.random() * 3); // 2-4 hits
   } else if (type === 'Dodge') {
     typeStats.dodgeChance = parseFloat((0.30 + Math.random() * 0.30).toFixed(2));
-    typeStats.buffAttacks = 2 + Math.floor(Math.random() * 2); // 2-3 hits
+    typeStats.buffAttacks = 2 + Math.floor(Math.random() * 3); // 2-4 hits
   }
 
   return {
