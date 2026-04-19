@@ -4,21 +4,12 @@
 
 The player cultivates (gains Qi/energy) over time, progressing through **realms** and **sub-realms** via **breakthroughs**.
 
-## Cultivation Types
+## Cultivation Identity = Laws
 
-Types are **procedurally generated** — found via books in the world.
-
-### Variants per Cultivation Type
-
-| Property | Description |
-|---|---|
-| **Element** | Fire, Water, Stone, Air, Metal, Wood, Normal, Ice (possibly combinations at higher realms) |
-| **Tier Range** | Iron, Bronze, Silver, Gold, Transcendent |
-| **Cultivation Speed** | How fast Qi accumulates |
-| **Affinity Amount** | Bonus resonance with element |
-| **Artefact Bonus** | Bonus for specific artefact types |
-| **Strong Base** | Raw stat multiplier |
-| **Unique Passives** | Special effects (TBD) |
+The "cultivation type" concept has been folded into [[Laws]]. Each law
+defines: element, rarity tier, cultivation-speed multiplier, primary-stat
+typeMults (Essence/Body/Soul slots), unique passives, and pool-based
+damage type bonuses. See [[Laws]] for the full schema.
 
 ## Gaining Qi
 
@@ -30,16 +21,21 @@ Types are **procedurally generated** — found via books in the world.
 
 | Mode | Rate |
 |---|---|
-| Passive (idle) | 5 qi / second |
-| Boosted (hold button) | 15 qi / second (3× multiplier) |
+| Passive (idle) | `BASE_RATE = 1` qi/sec |
+| Focused (hold-to-boost) | `BASE_RATE × focusMult` (focus mult = `qi_focus_mult` stat, base **300%** = 3×; modifiable by artefacts, pills, law uniques, selections) |
 
 The game loop runs via `requestAnimationFrame` with delta-time so rates are frame-rate independent.
 
 ```js
-// src/hooks/useCultivation.js
-BASE_RATE = 1        // qi/sec
-BOOST_MULTIPLIER = 3 // 3x when holding boost button
-qi += BASE_RATE * (boosted ? BOOST_MULTIPLIER : 1) * dt
+// src/hooks/useCultivation.js (effective formula)
+qi += BASE_RATE
+    × lawCultMult                          // active law cultivation_speed_mult
+    × (1 + Σ qi_speed_increased) × Π qi_speed_more
+    × (focusing ? focusMult : 1)
+    × pillQiMult × treeQiMult × selectionQiMult
+    × (adBoost ? 2 × (1 + heavenlyQiMult) × treeHeavenlyMult : 1)
+    × dt
+  + crystalQiBonus × dt                    // QI Crystal flat add (level × 2)
 ```
 
 ## Breakthroughs

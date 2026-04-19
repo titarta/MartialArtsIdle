@@ -2,6 +2,14 @@
 
 Full catalogue of enemy types, stat profiles, technique pools, and region assignments. Every enemy in [[Worlds/World|the World map]] is derived from one of the 12 types below.
 
+> **Implementation note (2026-04):** the code path in `data/enemies.js` +
+> `useCombat.startFight` uses a simpler model than the power-roll /
+> rank / element-variant design below. Today each enemy entry has a
+> fixed `statMult: { hp, atk }` and HP is anchored to the region index
+> via `150 × 1.12^regionIndex × hp_mult` (see [[Combat#Enemy Stats]]).
+> The richer system in this doc is the **target design** — the rank,
+> power-roll, and elemental-variant tables are not yet wired in.
+
 ---
 
 ## Power Roll System

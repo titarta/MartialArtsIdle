@@ -11,9 +11,13 @@ exchange for **Reincarnation Karma**, a permanent currency spent in the
 **Eternal Tree** to unlock powerful lifelong buffs.
 
 - **Tab name:** Rebirth (new entry in the main NavBar).
-- **Unlock:** visible from the first time the player reaches **Saint Early Stage**
-  (realm index 24). Once unlocked it stays visible forever, even after reincarnating.
-- **First reincarnation:** allowed any time after unlock — the player chooses when.
+- **Tab visibility:** unlocked the first time the player reaches **Saint Early Stage**
+  (realm index 24). Once unlocked it stays visible forever, even after reincarnating
+  (gate: `karma.unlocked === highestReached >= SAINT_UNLOCK_INDEX`).
+- **The Reincarnate button itself** is additionally gated on the **current**
+  realm — `cultivation.realmIndex >= 24` — so reborn characters cannot
+  immediately rebirth again until they cultivate back up to Saint. The Eternal
+  Tree remains spendable in the meantime.
 - **Karma is awarded immediately on reaching a new realm for the first time.**
   Re-reaching a realm in a later life grants zero additional karma. Players
   can spend their karma in the Eternal Tree at any point — rebirth is not
@@ -62,40 +66,45 @@ Pending karma (what would be awarded if the player reincarnated right now)
 
 ## The Eternal Tree
 
-A 3×3 grid. Top row holds the most powerful, most expensive nodes; bottom row
-is cheap and unconditional. Middle nodes gate the top; bottom gates the middle.
-Each link is **OR**, so the player can pivot between paths to reach any top
-node via multiple middle options.
+A **5-branch radial tree** rendered in an SVG canvas (pannable + scroll-to-zoom).
+Four main branches radiate from the root with a sealed fifth branch (Yin Yang)
+that unlocks once the player has bought ≥ 2 of the four main keystones.
 
-```
-[Triple All Damage 30]  [+1000 Soul/Body/Essence 26]  [Double QI/s 28]
-        |   \                 /   |   \                    /   |
-        |    \               /    |    \                  /    |
-[Triple Focused QI 19]  [Double Heavenly QI 13]  [Triple QI-Stones 13]
-        |   \                 /   |   \                    /   |
-        |    \               /    |    \                  /    |
-[Double Pill Effects 6]  [Double Mining 4]   [Double Gathering 4]
-```
+| Branch | Theme | Direction |
+|---|---|---|
+| 🏛 **Ancestor's Legacy** | Carry-overs from past lives, offline cap, head-start | 135° |
+| ⚔ **Martial Dao** | Combat — technique slots, exploit, drop quality | 45° |
+| 🌟 **Fate's Path** | Drop-rate, rarity upgrades, preview-luck | 320° |
+| 💪 **Heavenly Will** | Cultivation Power, HP, survival | 220° |
+| ☯ **Yin Yang** *(sealed)* | Phase-based playstyle around the Taiji Manual | 270° |
 
-**Total cost = 143 karma — exactly what one peak life awards.**
+Each main branch has 4 sequential nodes + 1 keystone (5 nodes). Yin Yang has
+6 nodes. **Cross-branch connector nodes** (`cb_*`) link adjacent keystones
+with AND prereqs and grant cross-branch synergies.
+
+Authoritative definitions: `NODES` array in `src/data/reincarnationTree.js`.
+Each node is `{ id, branch, step, label, icon, desc, cost, prereqs, prereqMode, keystone? }`
+with `prereqMode ∈ { 'or', 'and', 'yyUnlock' }`.
 
 Purchases persist in `localStorage` key `mai_reincarnation_tree` and are NOT
 wiped on reincarnation. Each node is a one-time purchase. Nodes can be
-purchased at any time during a run — not only after a rebirth.
+bought at any time during a run — rebirth is not required.
 
-### Node effects
+### Sample node effects (representative — full list in code)
 
-| Node                | Effect                                                           |
-|---------------------|------------------------------------------------------------------|
-| Double Pill Effects | All permanent pill stat bonuses × 2.                             |
-| Double Mining       | Mining speed × 2 (`more` mod on `mining_speed`).                 |
-| Double Gathering    | Harvest speed × 2 (`more` mod on `harvest_speed`).               |
-| Triple Focused QI   | Hold-to-boost multiplier × 3 (`more` mod on `qi_focus_mult`).    |
-| Double Heavenly QI  | While the ad boost is active, its multiplier doubles (×2 → ×4).  |
-| Triple QI-Stones    | Crystal flat qi/s bonus × 3.                                     |
-| Triple All Damage   | Final combat damage (basic + technique + exploit) × 3.           |
-| +1000 Stats         | Flat +1000 to Essence, Body and Soul each.                       |
-| Double QI/s         | Base cultivation rate × 2 (applies after every other multiplier). |
+| Node | Branch | Cost | Effect |
+|---|---|---|---|
+| Inherited Meridians (`al_1`) | Legacy | 50 | +10% cultivation speed permanently. |
+| Ancient Roots ★ (`al_k`) | Legacy | 300 | Start each life with your previous Law in your collection. |
+| Veteran's Eye (`md_1`) | Martial | 75 | Dropped techniques arrive one quality tier higher. |
+| The Fourth Form (`md_4`) | Martial | 250 | Unlocks a 4th technique slot. |
+| Heaven's Bladework ★ (`md_k`) | Martial | 400 | Auto-upgrades highest-quality technique once per life. |
+| Lucky Star (`fp_1`) | Fate | 50 | +1% technique drop rate on all enemies. |
+| Fortune's Thread ★ (`fp_k`) | Fate | 350 | First technique drop in each world is the highest tier available. |
+| Soul Tempering (`hw_1`) | Will | 100 | +5% Cultivation Power (purchasable up to 5×). |
+| Heavenly Constitution ★ (`hw_k`) | Will | 500 | Cultivation Power growth curve permanently steepened. |
+| Taiji Manual (`yy_1`) | Yin Yang | 400 | Adds the Yin/Yang phase-cycling Taiji law to your collection. |
+| Primordial Balance ★ (`yy_k`) | Yin Yang | 800 | Taiji Manual ascends to Transcendent + 6th passive slot. |
 
 ---
 
@@ -106,12 +115,14 @@ purchased at any time during a run — not only after a rebirth.
 3. On confirm:
    - `karma.reincarnate()` bumps the life counter (karma itself was already
      granted incrementally as realms were reached).
-   - `wipeReincarnation()` snapshots the currently-active law, clears the
-     standard save-key set (same list as `wipeSave()`; `mai_jade`, `mai_lang`,
-     `mai_reincarnation`, and `mai_reincarnation_tree` are untouched), then
-     writes the active law back as the sole owned + active law.
+   - `wipeReincarnation()` snapshots the **entire** owned-laws library,
+     calls `wipeSave()` (which clears the standard set; `mai_jade`,
+     `mai_lang`, `mai_reincarnation`, and `mai_reincarnation_tree` are
+     untouched), then re-seeds `mai_owned_laws` from the snapshot.
+     `mai_active_law` is intentionally **not** restored — the reborn
+     character must re-equip a law from the persisted library.
    - `window.location.reload()` boots a fresh run — karma, tree and the
-     preserved law load back from their keys.
+     full owned-laws library load back from their keys.
 
 ---
 

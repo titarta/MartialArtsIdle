@@ -194,9 +194,15 @@ The minimum major realm required to use a law gates its overall quality:
 
 ## Acquisition
 
-Laws are **procedurally generated** — found via books in the world. Each discovered book grants a law with randomized element, multipliers, passives, and rarity within the bounds of the current realm.
+Laws are **procedurally generated** and offered exclusively through the
+**breakthrough-offered library** described in `How laws are acquired`
+above. There is no world-drop, refining, or crafting path that creates
+new laws — every law in the player's library originated from a major-realm
+breakthrough offer (or the first-law selection on the very first major
+breakthrough).
 
-Once acquired, any Law can be refined at the [[Crafting|Refining Furnace]].
+Unwanted laws can be **dismantled** back to a single mineral of matching
+rarity (see [[Crafting#Operations]]).
 
 ---
 
@@ -224,19 +230,19 @@ A beginner's law found early in the world. Makes no elemental specialisation. Id
 
 ## Crafting Summary
 
-Full operation rules in [[Crafting]]. Quick reference for laws:
+Laws no longer participate in the seven-operation crafting flow. The
+only operations available on a law are:
 
-| Goal | Operation | Key Materials (minerals only) |
+| Goal | Operation | Cost |
 |---|---|---|
-| Reroll all passives + element + cultivation speed | **Refine** | Black Tortoise Iron × (3×tier) + Crimson Flame Crystal × tier |
-| Fix one passive value or cultivation speed | **Hone** | Chaos Jade × (2×tier) |
-| Add a missing passive | **Imbue** | Mithril Essence × (2×tier) |
-| Delete one passive | **Extract** | Black Tortoise Iron × 5 |
-| Protect one passive | **Seal** | Deep Sea Cold Iron × 3 |
-| Change element or passive type | **Transmute** | Void Stone × (2×tier) |
-| Gain an extra passive slot | **Upgrade** | Two bracket minerals (see [[Crafting#Upgrade Costs]]) |
+| Bump quality tier (Iron → Bronze → … → Transcendent) | **Upgrade** | `LAW_UPGRADE_COSTS` table above |
+| Recover a mineral from an unwanted law | **Dismantle** | — (yields 1 mineral of the law's rarity) |
 
-Realm requirement is permanent and cannot be changed by any crafting operation.
+Element, passives, type multipliers, cultivation-speed multiplier, and
+realm requirement are **all frozen at acquisition time** — there is no
+way to reroll any of them. The library exists to give the player a
+*choice* between distinct law identities, not a way to mutate one law
+into another.
 
 ---
 
