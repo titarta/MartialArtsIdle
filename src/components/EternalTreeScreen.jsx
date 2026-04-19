@@ -181,14 +181,19 @@ export default function EternalTreeScreen({
         <div className="et-hud-karma"><span className="et-hud-karma-gem">◈</span>{karma}</div>
         <div className="et-hud-lives">Lives: {lives}</div>
         <div className="et-hud-spacer" />
-        <button className="et-info-btn" onClick={() => setInfoOpen(o => !o)} aria-label="Info">ℹ</button>
+        <button
+          className="et-info-btn"
+          onMouseEnter={() => setInfoOpen(true)}
+          onMouseLeave={() => setInfoOpen(false)}
+          aria-label="Info"
+        >ℹ</button>
         {canReincarnateNow && (
           <button className="et-reinc-btn" onClick={() => setShowConfirm(true)}>☸ Reincarnate</button>
         )}
         <button className="et-close-btn" onClick={onClose} aria-label="Close">✕</button>
       </div>
 
-      {/* ── Info panel ── */}
+      {/* ── Info panel — absolute overlay, never shifts canvas ── */}
       {infoOpen && (
         <div className="et-info-panel">
           <div className="et-info-cols">
@@ -204,20 +209,6 @@ export default function EternalTreeScreen({
               <div className="et-info-col-title">Progress</div>
               <ul><li>Peak: {highestReached} / 50</li><li>Full peak: {peakKarmaTotal} ◈</li><li>Full tree: {TREE_TOTAL_COST} ◈</li></ul>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Tooltip strip ── */}
-      {activeNode && (
-        <div className="et-tooltip-panel" style={{ '--branch-color': `rgb(${branchColorOf(activeNode.branch)})` }}>
-          <span className="et-tooltip-icon">{activeNode.icon}</span>
-          <div className="et-tooltip-body">
-            <div className="et-tooltip-name">{activeNode.label}
-              {activeNode.keystone && <span className="et-keystone-badge">★ Keystone</span>}
-            </div>
-            <div className="et-tooltip-desc">{activeNode.desc}</div>
-            <div className="et-tooltip-cost">{activeNode.cost} ◈ karma</div>
           </div>
         </div>
       )}
@@ -324,6 +315,36 @@ export default function EternalTreeScreen({
 
           </g>
         </svg>
+
+        {/* ── Floating tooltip card — anchored to node screen position ── */}
+        {activeNode && (() => {
+          const pos  = WORLD[activeNode.id];
+          if (!pos) return null;
+          const sx   = pos.x * scale + pan.x;
+          const sy   = pos.y * scale + pan.y;
+          const rgb  = branchColorOf(activeNode.branch);
+          const st   = nodeStateOf(activeNode);
+          const isPurchased = st === 'purchased';
+          return (
+            <div
+              className="et-node-tooltip"
+              style={{ left: sx, top: sy, '--branch-rgb': rgb }}
+            >
+              <span className="et-node-tooltip-icon">{activeNode.icon}</span>
+              <div className="et-node-tooltip-name">
+                {activeNode.label}
+                {activeNode.keystone && <span className="et-keystone-badge">★ Keystone</span>}
+              </div>
+              <div className="et-node-tooltip-desc">{activeNode.desc}</div>
+              {!isPurchased && (
+                <div className="et-node-tooltip-cost">{activeNode.cost} ◈</div>
+              )}
+              {isPurchased && (
+                <div className="et-node-tooltip-cost" style={{ color: 'rgba(100,220,140,0.85)' }}>✓ Unlocked</div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── HTML nodes — world div with same pan+scale transform ── */}
         <div className="et-world" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
