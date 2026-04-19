@@ -1,229 +1,21 @@
 /**
- * uniqueModifiers.js — Unique modifier pools for Laws, Artefacts, and Techniques.
+ * uniqueModifiers.js — Unique modifier pools for Artefacts and Techniques.
  *
- * Build-enabling rare modifiers similar to Path of Exile uniques, Slormancer
- * legendaries, and Diablo set bonuses. These modifiers are NOT yet hooked into
- * game logic — this file is the design pool for future implementation.
+ * LAW uniques live in src/data/lawUniques.js (that's the live pool consumed
+ * by the law engine). This file owns the artefact + technique pools.
  *
  * SHAPE:
- *   { id, name, tags, description, range }
+ *   { id, name, description, range, slot? (artefacts), tags? }
  *
- *   - id:          stable identifier (e.g. 'l_diamond_body')
+ *   - id:          stable identifier (e.g. 'a_keen_edge')
  *   - name:        display name
- *   - tags:        archetype tags for build classification & filtering
- *   - description: text with {value} or {value1}/{value2} placeholders
+ *   - description: text with {value} placeholders
  *   - range:       { min, max } — single rolled value range
- *                  OR { v1: {min,max}, v2: {min,max} } for multi-value mods
- *
- * POOL POWER LEVELS:
- *   - Laws       — strongest, build-defining; usually has downsides or trade-offs
- *   - Artefacts  — ~70% of law strength; more variety, fewer trade-offs
- *   - Techniques — specific to that technique's combat behavior
- *
- * ARCHETYPE TAGS:
- *   qi-glutton    body         soul         elemental     speed
- *   tank          glass-cannon sustain      crit          conversion
- *   realm-scale   condition    anti-synergy crafting      utility
- *   harvest       mining       offensive    defensive     hybrid
+ *   - slot:        (artefacts only) restricts to that equipment slot
+ *   - tags:        optional loose classification; not used by any runtime
+ *                  filter — retain or drop freely.
  */
 
-// ─── LAW UNIQUE MODIFIERS ─────────────────────────────────────────────────────
-// Build-defining. Each suggests an entire playstyle.
-
-export const LAW_UNIQUES = [
-
-  // ── Qi Glutton archetype (extreme cultivation, weak combat) ──
-  { id: 'l_limitless_vessel',     name: 'Limitless Vessel',     tags: ['qi-glutton'],        range: { min: 80,  max: 150 }, description: 'Qi cultivation speed +{value}%. Combat damage -50%.' },
-  { id: 'l_qi_overflow',          name: 'Qi Overflow',          tags: ['qi-glutton','condition'], range: { min: 1, max: 3 }, description: 'Every second of cultivation grants +{value}% damage on next combat. Resets on hit taken.' },
-  { id: 'l_patient_mountain',     name: 'Patient Mountain',     tags: ['qi-glutton','anti-synergy'], range: { min: 100, max: 200 }, description: 'Qi speed +{value}%. Cannot use techniques for 5s after combat starts.' },
-  { id: 'l_greedy_path',          name: 'Greedy Path',          tags: ['qi-glutton','anti-synergy'], range: { min: 60, max: 120 }, description: 'Cultivation Qi gain +{value}%. Realm breakthrough cost +25%.' },
-  { id: 'l_dao_hunger',           name: 'Dao Hunger',           tags: ['qi-glutton','realm-scale'], range: { min: 5, max: 15 }, description: 'Qi speed +{value}% per major realm.' },
-  { id: 'l_breath_of_eternity',   name: 'Breath of Eternity',   tags: ['qi-glutton'],        range: { min: 40, max: 80 }, description: 'Each pill consumed grants +{value}% Qi speed for its duration.' },
-  { id: 'l_qi_spring',            name: 'Qi Spring',            tags: ['qi-glutton','sustain'], range: { min: 5, max: 15 }, description: 'Restore {value}% qi/sec while standing still in combat.' },
-  { id: 'l_meditation_path',      name: 'Meditation Path',      tags: ['qi-glutton','condition'], range: { min: 30, max: 80 }, description: '+{value}% qi gain while no combat for 10s.' },
-  { id: 'l_seasoned_cultivator',  name: 'Seasoned Cultivator',  tags: ['qi-glutton','realm-scale'], range: { min: 100, max: 250 }, description: '+{value}% qi from offline earnings.' },
-  { id: 'l_eternal_breath',       name: 'Eternal Breath',       tags: ['qi-glutton'],        range: { min: 50, max: 120 }, description: 'Cultivation speed +{value}%. Cannot equip techniques.' },
-
-  // ── Body Cultivator archetype ──
-  { id: 'l_diamond_body',         name: 'Diamond Body',         tags: ['body','tank'],       range: { min: 60, max: 140 }, description: 'Body stat +{value}%. Soul stat halved.' },
-  { id: 'l_iron_marrow',          name: 'Iron Marrow',          tags: ['body','tank'],       range: { min: 30, max: 80 }, description: '+{value}% Health and +{value}% Defense. Qi speed -30%.' },
-  { id: 'l_mountain_stance',      name: 'Mountain Stance',      tags: ['body','tank','anti-synergy'], range: { min: 50, max: 120 }, description: 'Health +{value}%. Defense +{value}%. Cannot dodge.' },
-  { id: 'l_living_fortress',      name: 'Living Fortress',      tags: ['body','defensive'],  range: { min: 80, max: 200 }, description: 'Defense +{value}%. Technique cooldowns +25%.' },
-  { id: 'l_body_over_mind',       name: 'Body Over Mind',       tags: ['body','offensive'],  range: { min: 50, max: 100 }, description: '+{value}% Body. -50% Soul. Physical damage scales with Body × 1.5.' },
-  { id: 'l_titan_blood',          name: 'Titan Blood',          tags: ['body','realm-scale'], range: { min: 8, max: 20 }, description: '+{value}% max HP per realm.' },
-  { id: 'l_unbreakable_will',     name: 'Unbreakable Will',     tags: ['body','sustain'],    range: { min: 5, max: 15 }, description: 'Recover {value}% max HP per kill.' },
-  { id: 'l_reincarnated_titan',   name: 'Reincarnated Titan',   tags: ['body','tank'],       range: { min: 100, max: 250 }, description: 'Health +{value}%. Lose 1 technique slot.' },
-  { id: 'l_juggernaut_path',      name: 'Juggernaut Path',      tags: ['body','tank','condition'], range: { min: 30, max: 80 }, description: '+{value}% defense per second standing in same spot (max 5 stacks).' },
-  { id: 'l_warrior_pulse',        name: 'Warrior Pulse',        tags: ['body','offensive'],  range: { min: 20, max: 60 }, description: '+{value}% damage if Body > Essence + Soul combined.' },
-
-  // ── Soul Cultivator archetype ──
-  { id: 'l_spirit_sea',           name: 'Spirit Sea',           tags: ['soul','elemental'],  range: { min: 60, max: 140 }, description: 'Soul stat +{value}%. Body stat halved.' },
-  { id: 'l_mental_blade',         name: 'Mental Blade',         tags: ['soul','offensive'],  range: { min: 80, max: 200 }, description: 'Psychic damage +{value}%. Physical damage halved.' },
-  { id: 'l_ethereal_form',        name: 'Ethereal Form',        tags: ['soul','defensive'],  range: { min: 30, max: 70 }, description: 'Take {value}% less physical damage. Take {value}% more elemental damage.' },
-  { id: 'l_dream_walker',         name: 'Dream Walker',         tags: ['soul','qi-glutton'], range: { min: 40, max: 100 }, description: 'Cultivation speed +{value}% while in combat.' },
-  { id: 'l_soul_pierce',          name: 'Soul Pierce',          tags: ['soul','offensive'],  range: { min: 20, max: 50 }, description: 'Ignore {value}% of enemy soul toughness on attacks.' },
-  { id: 'l_astral_projection',    name: 'Astral Projection',    tags: ['soul','crit'],       range: { min: 5, max: 20 }, description: '+{value}% chance for soul attacks to deal triple damage.' },
-  { id: 'l_mind_over_matter',     name: 'Mind Over Matter',     tags: ['soul','sustain'],    range: { min: 30, max: 80 }, description: '{value}% of damage taken is removed from soul instead of HP.' },
-  { id: 'l_divine_consciousness', name: 'Divine Consciousness', tags: ['soul','realm-scale'],range: { min: 10, max: 25 }, description: '+{value}% Soul stat per Saint+ realm level.' },
-  { id: 'l_thoughtless_state',    name: 'Thoughtless State',    tags: ['soul','condition'],  range: { min: 50, max: 150 }, description: '+{value}% damage when at full HP.' },
-  { id: 'l_inner_void',           name: 'Inner Void',           tags: ['soul','elemental'],  range: { min: 40, max: 90 }, description: 'Convert {value}% of physical damage to soul damage.' },
-
-  // ── Elemental Master archetype ──
-  { id: 'l_element_tyranny',      name: 'Element Tyranny',      tags: ['elemental','offensive'], range: { min: 100, max: 250 }, description: 'Elemental damage +{value}%. Only your law\'s element works.' },
-  { id: 'l_volatile_chi',         name: 'Volatile Chi',         tags: ['elemental','glass-cannon'], range: { min: 80, max: 180 }, description: 'Elemental damage +{value}%. Take {value}% bonus elemental damage.' },
-  { id: 'l_element_conversion',   name: 'Element Conversion',   tags: ['elemental','conversion'], range: { min: 40, max: 100 }, description: 'Convert {value}% of physical damage to elemental damage of your law.' },
-  { id: 'l_elemental_symphony',   name: 'Elemental Symphony',   tags: ['elemental','condition'], range: { min: 15, max: 40 }, description: '+{value}% damage per unique element among equipped techniques.' },
-  { id: 'l_burning_path',         name: 'Burning Path',         tags: ['elemental','condition'], range: { min: 30, max: 80 }, description: 'Fire law: +{value}% damage. Each kill leaves a damaging zone.' },
-  { id: 'l_frozen_path',          name: 'Frozen Path',          tags: ['elemental','condition'], range: { min: 30, max: 80 }, description: 'Frost law: +{value}% damage. Hits slow enemies for 1s.' },
-  { id: 'l_lightning_path',       name: 'Lightning Path',       tags: ['elemental','condition'], range: { min: 30, max: 80 }, description: 'Lightning law: +{value}% damage. {value/2}% chance to chain to nearby enemies.' },
-  { id: 'l_void_path',            name: 'Void Path',            tags: ['elemental','condition'], range: { min: 30, max: 80 }, description: 'Void law: +{value}% damage. Attacks ignore 25% defense.' },
-  { id: 'l_stone_path',           name: 'Stone Path',           tags: ['elemental','tank'],  range: { min: 30, max: 80 }, description: 'Stone law: +{value}% defense. Reflects 10% physical damage.' },
-  { id: 'l_dual_element',         name: 'Dual Element',         tags: ['elemental','hybrid'], range: { min: 40, max: 100 }, description: 'Gain a second element. Both elemental damage types are +{value}% effective.' },
-
-  // ── Speed Demon archetype ──
-  { id: 'l_quickened_steps',      name: 'Quickened Steps',      tags: ['speed','glass-cannon'], range: { min: 25, max: 60 }, description: 'All cooldowns -{value}%. Max HP -25%.' },
-  { id: 'l_lightning_reflexes',   name: 'Lightning Reflexes',   tags: ['speed','glass-cannon'], range: { min: 20, max: 50 }, description: 'Dodge chance +{value}%. Defense -50%.' },
-  { id: 'l_hummingbird_heart',    name: 'Hummingbird\'s Heart', tags: ['speed','anti-synergy'], range: { min: 30, max: 70 }, description: 'Cooldowns -{value}%. Pills last 30% less.' },
-  { id: 'l_blink_path',           name: 'Blink Path',           tags: ['speed','sustain'],   range: { min: 5, max: 15 }, description: 'Each successful dodge restores {value}% HP.' },
-  { id: 'l_perpetual_motion',     name: 'Perpetual Motion',     tags: ['speed','condition'], range: { min: 5, max: 15 }, description: '+{value}% damage per second since combat started (caps at 100%).' },
-  { id: 'l_swallow_strike',       name: 'Swallow Strike',       tags: ['speed','offensive'], range: { min: 30, max: 80 }, description: 'Attack cooldowns -{value}%. Damage -25%.' },
-  { id: 'l_sonic_step',           name: 'Sonic Step',           tags: ['speed','condition'], range: { min: 20, max: 60 }, description: 'After dodging, next attack cooldown is {value}% lower.' },
-  { id: 'l_river_flow',           name: 'River Flow',           tags: ['speed','sustain'],   range: { min: 1, max: 4 }, description: 'Restore {value}% HP per cooldown reset.' },
-  { id: 'l_unyielding_pace',      name: 'Unyielding Pace',      tags: ['speed','condition'], range: { min: 30, max: 70 }, description: '+{value}% cooldown speed if no damage taken in 5s.' },
-  { id: 'l_blade_dance',          name: 'Blade Dance',          tags: ['speed','offensive'], range: { min: 5, max: 15 }, description: 'Each consecutive attack deals +{value}% damage (max 10 stacks, resets on hit taken).' },
-
-  // ── Tank archetype ──
-  { id: 'l_unmovable_mountain',   name: 'Unmovable Mountain',   tags: ['tank','anti-synergy'], range: { min: 30, max: 70 }, description: 'Damage taken -{value}%. Damage dealt -{value}%.' },
-  { id: 'l_reflecting_pool',      name: 'Reflecting Pool',      tags: ['tank','offensive'],  range: { min: 15, max: 40 }, description: '{value}% of damage taken is reflected to attacker.' },
-  { id: 'l_living_shield',        name: 'Living Shield',        tags: ['tank','conversion'], range: { min: 5, max: 15 }, description: '+{value}% of max HP added to defense.' },
-  { id: 'l_bonecage',             name: 'Bonecage',             tags: ['tank','anti-synergy'], range: { min: 50, max: 120 }, description: '+{value}% defense. Cannot dodge.' },
-  { id: 'l_aegis_eternal',        name: 'Aegis Eternal',        tags: ['tank'],              range: { min: 30, max: 70 }, description: '+{value}% damage absorption. Refreshes every 10s.' },
-  { id: 'l_shell_path',           name: 'Shell Path',           tags: ['tank','condition'],  range: { min: 50, max: 150 }, description: '+{value}% defense for first 5s of combat.' },
-  { id: 'l_immortal_will',        name: 'Immortal Will',        tags: ['tank'],              range: { min: 1, max: 5 }, description: 'Survive lethal damage with 1 HP. {value}-second cooldown.' },
-  { id: 'l_passive_resistance',   name: 'Passive Resistance',   tags: ['tank','elemental'],  range: { min: 20, max: 50 }, description: '+{value}% to all elemental defenses.' },
-  { id: 'l_perfect_form',         name: 'Perfect Form',         tags: ['tank','realm-scale'], range: { min: 5, max: 12 }, description: '+{value}% defense per major realm.' },
-  { id: 'l_stalwart_oath',        name: 'Stalwart Oath',        tags: ['tank','sustain'],    range: { min: 1, max: 3 }, description: 'Regenerate {value}% max HP per second.' },
-
-  // ── Glass Cannon archetype ──
-  { id: 'l_razors_edge',          name: 'Razor\'s Edge',        tags: ['glass-cannon','offensive'], range: { min: 60, max: 150 }, description: '+{value}% damage. -50% defense.' },
-  { id: 'l_all_in',               name: 'All In',               tags: ['glass-cannon','anti-synergy'], range: { min: 100, max: 250 }, description: 'Damage +{value}%. Health permanently locked at 50%.' },
-  { id: 'l_volatile_power',       name: 'Volatile Power',       tags: ['glass-cannon','offensive'], range: { min: 50, max: 120 }, description: 'Damage +{value}%. Take {value/4}% recoil per attack.' },
-  { id: 'l_blood_for_power',      name: 'Blood for Power',      tags: ['glass-cannon','condition'], range: { min: 20, max: 50 }, description: '+{value}% damage per 10% missing HP.' },
-  { id: 'l_overcharged',          name: 'Overcharged',          tags: ['glass-cannon','speed'], range: { min: 40, max: 100 }, description: 'Damage +{value}%. Each attack drains 1% of current HP.' },
-  { id: 'l_unstable_essence',     name: 'Unstable Essence',     tags: ['glass-cannon','elemental'], range: { min: 60, max: 140 }, description: 'Elemental damage +{value}%. {value/2}% chance to self-damage on hit.' },
-  { id: 'l_executioner_path',     name: 'Executioner Path',     tags: ['glass-cannon','offensive'], range: { min: 100, max: 300 }, description: '+{value}% damage to enemies below 30% HP.' },
-  { id: 'l_blade_of_chaos',       name: 'Blade of Chaos',       tags: ['glass-cannon','crit'], range: { min: 30, max: 80 }, description: '+{value}% crit damage. Crits cost 5% HP.' },
-  { id: 'l_sacred_offering',      name: 'Sacred Offering',      tags: ['glass-cannon','condition'], range: { min: 50, max: 150 }, description: '+{value}% damage if HP locked at 25%.' },
-  { id: 'l_nuclear_path',         name: 'Nuclear Path',         tags: ['glass-cannon','offensive'], range: { min: 200, max: 500 }, description: 'Damage +{value}%. Cannot heal.' },
-
-  // ── Sustain/Healing archetype ──
-  { id: 'l_eternal_spring',       name: 'Eternal Spring',       tags: ['sustain','anti-synergy'], range: { min: 50, max: 120 }, description: '+{value}% healing received. -25% damage dealt.' },
-  { id: 'l_vampiric_path',        name: 'Vampiric Path',        tags: ['sustain','offensive'], range: { min: 5, max: 20 }, description: '{value}% of damage dealt is restored as HP.' },
-  { id: 'l_self_renewal',         name: 'Self Renewal',         tags: ['sustain'],           range: { min: 1, max: 4 }, description: '+{value}% HP/sec out of combat.' },
-  { id: 'l_phoenix_path',         name: 'Phoenix Path',         tags: ['sustain'],           range: { min: 30, max: 80 }, description: 'Revive once with {value}% HP. 5-minute cooldown.' },
-  { id: 'l_blood_pact',           name: 'Blood Pact',           tags: ['sustain','condition'], range: { min: 20, max: 60 }, description: 'Heals are {value}% stronger when below 50% HP.' },
-  { id: 'l_qi_circulation',       name: 'Qi Circulation',       tags: ['sustain'],           range: { min: 5, max: 15 }, description: 'Heal {value}% HP per pill consumed.' },
-  { id: 'l_undying_will',         name: 'Undying Will',         tags: ['sustain'],           range: { min: 30, max: 70 }, description: '+{value}% healing effectiveness.' },
-  { id: 'l_renewal_circle',       name: 'Renewal Circle',       tags: ['sustain','condition'], range: { min: 5, max: 15 }, description: 'Heal {value}% HP every 10s in combat.' },
-  { id: 'l_blood_overflow',       name: 'Blood Overflow',       tags: ['sustain','tank'],    range: { min: 10, max: 25 }, description: 'Overheal up to {value}% bonus HP.' },
-  { id: 'l_lifeblood',            name: 'Lifeblood',            tags: ['sustain','offensive'], range: { min: 1, max: 5 }, description: '+{value}% damage per healing tick.' },
-
-  // ── Crit/Lucky archetype ──
-  { id: 'l_lucky_star',           name: 'Lucky Star',           tags: ['crit','anti-synergy'], range: { min: 20, max: 50 }, description: '+{value}% crit chance. {value/2}% chance to deal half damage.' },
-  { id: 'l_fortunes_favor',       name: 'Fortune\'s Favor',     tags: ['crit','utility','harvest','mining'], range: { min: 50, max: 150 }, description: '+{value}% harvest and mining luck. -25% defense.' },
-  { id: 'l_twin_blade',           name: 'Twin Blade',           tags: ['crit','speed'],      range: { min: 10, max: 30 }, description: '+{value}% chance to attack twice. Costs +25% qi.' },
-  { id: 'l_perfect_strike',       name: 'Perfect Strike',       tags: ['crit'],              range: { min: 30, max: 80 }, description: 'Crits deal +{value}% bonus damage.' },
-  { id: 'l_crit_storm',           name: 'Crit Storm',           tags: ['crit','condition'],  range: { min: 20, max: 60 }, description: 'After a crit, +{value}% crit chance for 5s.' },
-  { id: 'l_executioner_eye',      name: 'Executioner\'s Eye',   tags: ['crit','condition'],  range: { min: 30, max: 80 }, description: '+{value}% crit chance vs enemies above 80% HP.' },
-  { id: 'l_lethal_focus',         name: 'Lethal Focus',         tags: ['crit'],              range: { min: 1, max: 5 }, description: '+{value}% crit chance per active pill.' },
-  { id: 'l_god_of_chance',        name: 'God of Chance',        tags: ['crit','anti-synergy'], range: { min: 50, max: 150 }, description: '+{value}% crit damage. {value/3}% chance to miss.' },
-  { id: 'l_assassin_creed',       name: 'Assassin Creed',       tags: ['crit','condition'],  range: { min: 100, max: 300 }, description: '+{value}% crit damage on first attack.' },
-  { id: 'l_blood_in_water',       name: 'Blood in Water',       tags: ['crit','offensive'],  range: { min: 5, max: 15 }, description: 'Crit chance scales with missing HP %, max +{value}%.' },
-
-  // ── Conversion/Hybrid archetype ──
-  { id: 'l_body_to_soul',         name: 'Body to Soul',         tags: ['conversion','soul'], range: { min: 30, max: 80 }, description: '{value}% of body stat counts as soul.' },
-  { id: 'l_soul_to_body',         name: 'Soul to Body',         tags: ['conversion','body'], range: { min: 30, max: 80 }, description: '{value}% of soul stat counts as body.' },
-  { id: 'l_essence_echo',         name: 'Essence Echo',         tags: ['conversion','hybrid'], range: { min: 20, max: 60 }, description: 'Essence stat is duplicated for all 3 stats at {value}%.' },
-  { id: 'l_tri_harmony',          name: 'Tri-Harmony',          tags: ['conversion','hybrid','condition'], range: { min: 50, max: 150 }, description: '+{value}% all stats if Essence/Soul/Body are within 10% of each other.' },
-  { id: 'l_qi_to_damage',         name: 'Qi to Damage',         tags: ['conversion','offensive'], range: { min: 1, max: 5 }, description: '{value}% of current qi added to damage on attack.' },
-  { id: 'l_health_to_essence',    name: 'Health to Essence',    tags: ['conversion'],        range: { min: 5, max: 15 }, description: 'Convert {value}% of max HP into Essence stat.' },
-  { id: 'l_essence_to_health',    name: 'Essence to Health',    tags: ['conversion','tank'], range: { min: 5, max: 15 }, description: 'Convert {value}% of essence into max HP.' },
-  { id: 'l_defense_to_damage',    name: 'Defense to Damage',    tags: ['conversion','offensive'], range: { min: 10, max: 30 }, description: 'Add {value}% of defense as flat physical damage.' },
-  { id: 'l_qi_burn',              name: 'Qi Burn',              tags: ['conversion','glass-cannon'], range: { min: 30, max: 80 }, description: 'Each attack consumes 1% qi for +{value}% damage.' },
-  { id: 'l_dao_consumption',      name: 'Dao Consumption',      tags: ['conversion','sustain'], range: { min: 1, max: 4 }, description: 'Convert {value}% of qi/sec to HP/sec.' },
-
-  // ── Realm-scaling archetype ──
-  { id: 'l_realm_ascension',      name: 'Realm Ascension',      tags: ['realm-scale'],       range: { min: 5, max: 15 }, description: '+{value}% damage per major realm.' },
-  { id: 'l_late_bloomer',         name: 'Late Bloomer',         tags: ['realm-scale'],       range: { min: 10, max: 30 }, description: '+{value}% to all stats per realm above Saint.' },
-  { id: 'l_slow_burn',            name: 'Slow Burn',            tags: ['realm-scale','qi-glutton'], range: { min: 5, max: 20 }, description: '+{value}% qi per minute spent cultivating without breakthrough.' },
-  { id: 'l_realm_anchor',         name: 'Realm Anchor',         tags: ['realm-scale','tank'], range: { min: 20, max: 60 }, description: '+{value}% defense per realm above your enemy.' },
-  { id: 'l_dao_descent',          name: 'Dao Descent',          tags: ['realm-scale','offensive'], range: { min: 30, max: 80 }, description: '+{value}% damage to enemies of lower realm.' },
-  { id: 'l_path_of_kings',        name: 'Path of Kings',        tags: ['realm-scale'],       range: { min: 100, max: 300 }, description: 'At max realm, all stats +{value}%.' },
-  { id: 'l_first_steps',          name: 'First Steps',          tags: ['realm-scale','condition'], range: { min: 50, max: 150 }, description: '+{value}% to all stats below Qi Transformation.' },
-  { id: 'l_immortal_legacy',      name: 'Immortal Legacy',      tags: ['realm-scale','sustain'], range: { min: 5, max: 15 }, description: '+{value}% lifesteal per realm above Saint.' },
-  { id: 'l_eternal_pupil',        name: 'Eternal Pupil',        tags: ['realm-scale','utility'], range: { min: 100, max: 300 }, description: 'Each realm gives +{value}% qi/sec permanently.' },
-  { id: 'l_seeker_path',          name: 'Seeker\'s Path',       tags: ['realm-scale','crafting'], range: { min: 5, max: 15 }, description: 'Each realm reduces crafting cost by {value}%.' },
-
-  // ── Conditional/Trigger archetype ──
-  { id: 'l_predator_patience',    name: 'Predator\'s Patience', tags: ['condition','offensive'], range: { min: 50, max: 150 }, description: '+{value}% damage if no damage taken in last 10s.' },
-  { id: 'l_berserker_resolve',    name: 'Berserker\'s Resolve', tags: ['condition','glass-cannon'], range: { min: 50, max: 150 }, description: '+{value}% damage when below 50% HP.' },
-  { id: 'l_first_strike',         name: 'First Strike',         tags: ['condition','offensive'], range: { min: 100, max: 300 }, description: '+{value}% damage on first attack after combat starts.' },
-  { id: 'l_last_stand',           name: 'Last Stand',           tags: ['condition','glass-cannon'], range: { min: 100, max: 300 }, description: '+{value}% damage when below 25% HP.' },
-  { id: 'l_calm_water',           name: 'Calm Water',           tags: ['condition','tank'],  range: { min: 30, max: 80 }, description: '+{value}% defense at full HP.' },
-  { id: 'l_deadly_focus',         name: 'Deadly Focus',         tags: ['condition','crit'],  range: { min: 30, max: 80 }, description: '+{value}% crit chance for 3s after dodging.' },
-  { id: 'l_combo_artist',         name: 'Combo Artist',         tags: ['condition','offensive'], range: { min: 5, max: 15 }, description: 'Each consecutive attack +{value}% damage. Resets on miss.' },
-  { id: 'l_iron_focus',           name: 'Iron Focus',           tags: ['condition','offensive'], range: { min: 50, max: 150 }, description: '+{value}% damage if no movement in last 3s.' },
-  { id: 'l_wounded_beast',        name: 'Wounded Beast',        tags: ['condition','glass-cannon'], range: { min: 1, max: 4 }, description: '+{value}% damage per 1% missing HP.' },
-  { id: 'l_quiet_mind',           name: 'Quiet Mind',           tags: ['condition','sustain'], range: { min: 30, max: 80 }, description: 'Heal +{value}% effectiveness if no attacks made in last 3s.' },
-
-  // ── Anti-synergy/cost archetype ──
-  { id: 'l_heavy_burden',         name: 'Heavy Burden',         tags: ['anti-synergy'],      range: { min: 30, max: 80 }, description: '+{value}% all stats. Cooldowns +50%.' },
-  { id: 'l_reckless',             name: 'Reckless',             tags: ['anti-synergy','glass-cannon'], range: { min: 40, max: 100 }, description: '+{value}% damage. +{value}% damage taken.' },
-  { id: 'l_greedy_collector',     name: 'Greedy Collector',     tags: ['anti-synergy','utility'], range: { min: 50, max: 150 }, description: '+{value}% loot. -25% damage.' },
-  { id: 'l_chained_will',         name: 'Chained Will',         tags: ['anti-synergy'],      range: { min: 50, max: 100 }, description: '+{value}% all stats. Cannot consume pills.' },
-  { id: 'l_stubborn_path',        name: 'Stubborn Path',        tags: ['anti-synergy'],      range: { min: 50, max: 100 }, description: '+{value}% damage. Cannot heal.' },
-  { id: 'l_cursed_inheritance',   name: 'Cursed Inheritance',   tags: ['anti-synergy','crit'], range: { min: 100, max: 300 }, description: '+{value}% crit damage. -50% normal damage.' },
-  { id: 'l_oath_of_silence',      name: 'Oath of Silence',      tags: ['anti-synergy'],      range: { min: 30, max: 80 }, description: '+{value}% qi speed. Cannot use techniques in combat.' },
-  { id: 'l_blood_chains',         name: 'Blood Chains',         tags: ['anti-synergy','tank'], range: { min: 50, max: 100 }, description: '+{value}% defense. Cannot dodge or use mobility.' },
-  { id: 'l_sealed_path',          name: 'Sealed Path',          tags: ['anti-synergy'],      range: { min: 50, max: 100 }, description: '+{value}% Body. Cannot equip rings.' },
-  { id: 'l_burdened_soul',        name: 'Burdened Soul',        tags: ['anti-synergy','soul'], range: { min: 50, max: 150 }, description: '+{value}% Soul. Pills last 50% less.' },
-
-  // ── Crafting/Utility archetype ──
-  { id: 'l_master_smith',         name: 'Master Smith',         tags: ['crafting','utility'], range: { min: 20, max: 50 }, description: 'Crafting costs reduced by {value}%.' },
-  { id: 'l_alchemist_path',       name: 'Alchemist Path',       tags: ['crafting','utility'], range: { min: 30, max: 80 }, description: 'Pill effects +{value}%.' },
-  { id: 'l_lucky_gather',         name: 'Lucky Gather',         tags: ['harvest','utility'], range: { min: 50, max: 150 }, description: 'Harvest speed +{value}%.' },
-  { id: 'l_deep_miner',           name: 'Deep Miner',           tags: ['mining','utility'], range: { min: 50, max: 150 }, description: 'Mining speed +{value}%.' },
-  { id: 'l_pill_hoarder',         name: 'Pill Hoarder',         tags: ['utility'],           range: { min: 50, max: 150 }, description: 'Pill duration +{value}%.' },
-  { id: 'l_treasure_finder',      name: 'Treasure Finder',      tags: ['utility','harvest','mining'], range: { min: 30, max: 80 }, description: 'Harvest and mining luck +{value}%.' },
-  { id: 'l_market_savant',        name: 'Market Savant',        tags: ['utility'],           range: { min: 30, max: 80 }, description: 'Shop prices reduced by {value}%.' },
-  { id: 'l_dual_brew',            name: 'Dual Brew',            tags: ['utility','crafting'], range: { min: 1, max: 1 }, description: 'Alchemy crafts produce {value} extra pill at 50% chance.' },
-  { id: 'l_refining_master',      name: 'Refining Master',      tags: ['utility','crafting'], range: { min: 5, max: 20 }, description: 'Refining has {value}% chance to produce a higher-tier item.' },
-  { id: 'l_artisan_path',         name: 'Artisan\'s Path',      tags: ['utility','crafting'], range: { min: 20, max: 60 }, description: 'Transmutation costs reduced by {value}%.' },
-
-  // ── Hybrid/Misc archetype ──
-  { id: 'l_balanced_dao',         name: 'Balanced Dao',         tags: ['hybrid'],            range: { min: 20, max: 50 }, description: '+{value}% to all stats.' },
-  { id: 'l_dual_path',            name: 'Dual Path',            tags: ['hybrid'],            range: { min: 30, max: 80 }, description: 'Choose any 2 stats. +{value}% to both.' },
-  { id: 'l_infinite_growth',      name: 'Infinite Growth',      tags: ['hybrid','realm-scale'], range: { min: 1, max: 3 }, description: '+{value}% qi cap per minute spent in current realm.' },
-  { id: 'l_chaos_path',           name: 'Chaos Path',           tags: ['hybrid'],            range: { min: 50, max: 200 }, description: 'Random stat receives +{value}% bonus, rerolled every minute.' },
-  { id: 'l_combo_strike',         name: 'Combo Strike',         tags: ['hybrid','condition'], range: { min: 5, max: 20 }, description: 'Each technique used adds +{value}% damage to the next.' },
-  { id: 'l_eclipse_dao',          name: 'Eclipse Dao',          tags: ['hybrid','elemental'], range: { min: 50, max: 150 }, description: '+{value}% damage with opposing elements. -50% with matching.' },
-  { id: 'l_forgotten_form',       name: 'Forgotten Form',       tags: ['hybrid','condition'], range: { min: 100, max: 300 }, description: '+{value}% damage if no artefacts equipped.' },
-  { id: 'l_naked_path',           name: 'Naked Path',           tags: ['hybrid','condition'], range: { min: 200, max: 500 }, description: '+{value}% all stats with no artefacts equipped.' },
-  { id: 'l_full_arsenal',         name: 'Full Arsenal',         tags: ['hybrid','condition'], range: { min: 50, max: 150 }, description: '+{value}% damage with all 11 artefact slots filled.' },
-  { id: 'l_dao_chain',            name: 'Dao Chain',            tags: ['hybrid','condition'], range: { min: 100, max: 300 }, description: '+{value}% damage if law element matches all equipped technique elements.' },
-
-  // ── Time/Tempo archetype ──
-  { id: 'l_time_dilation',        name: 'Time Dilation',        tags: ['speed','condition'], range: { min: 30, max: 80 }, description: 'First 3s of combat: cooldowns -{value}%.' },
-  { id: 'l_eternal_battle',       name: 'Eternal Battle',       tags: ['condition','offensive'], range: { min: 1, max: 4 }, description: '+{value}% damage per second in combat (max 30 stacks).' },
-  { id: 'l_quick_kill',           name: 'Quick Kill',           tags: ['condition','offensive'], range: { min: 50, max: 150 }, description: 'Killing an enemy within 3s of spawn refunds 100% qi.' },
-  { id: 'l_slow_burn_combat',     name: 'Slow Burn Combat',     tags: ['condition','offensive'], range: { min: 5, max: 15 }, description: 'After 30s in combat, +{value}% damage permanently for the encounter.' },
-  { id: 'l_time_master',          name: 'Time Master',          tags: ['speed','utility'],   range: { min: 20, max: 50 }, description: 'All buff durations +{value}%.' },
-  { id: 'l_lingering_will',       name: 'Lingering Will',       tags: ['condition','offensive'], range: { min: 100, max: 250 }, description: 'Killing an enemy grants +{value}% damage for 5s.' },
-  { id: 'l_combat_meditation',    name: 'Combat Meditation',    tags: ['condition','qi-glutton'], range: { min: 50, max: 150 }, description: '+{value}% qi gain during combat.' },
-  { id: 'l_heart_of_battle',      name: 'Heart of Battle',      tags: ['condition','sustain'], range: { min: 1, max: 5 }, description: 'Restore {value}% HP per kill.' },
-  { id: 'l_warrior_pulse_time',   name: 'Warrior\'s Pulse',     tags: ['condition','speed'], range: { min: 5, max: 15 }, description: '+{value}% cooldown speed per kill in last 10s (max 5 stacks).' },
-  { id: 'l_endless_war',          name: 'Endless War',          tags: ['condition','offensive'], range: { min: 50, max: 150 }, description: '+{value}% damage in encounters lasting over 60s.' },
-];
 
 // ─── ARTEFACT UNIQUE MODIFIERS ────────────────────────────────────────────────
 // Slightly weaker than law uniques, more numerous, slot-themed.
@@ -546,11 +338,6 @@ export const TECHNIQUE_UNIQUES = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/** Get all law uniques matching a tag. */
-export function lawUniquesByTag(tag) {
-  return LAW_UNIQUES.filter(u => u.tags.includes(tag));
-}
-
 /** Get all artefact uniques for a slot. */
 export function artefactUniquesBySlot(slot) {
   return ARTEFACT_UNIQUES.filter(u => u.slot === slot);
@@ -617,10 +404,9 @@ export function techniqueUniquesByType(type) {
 
 /** Total counts (for design auditing). */
 export const UNIQUE_COUNTS = {
-  laws: LAW_UNIQUES.length,
   artefacts: ARTEFACT_UNIQUES.length,
   techniques: Object.values(TECHNIQUE_UNIQUES).reduce((s, arr) => s + arr.length, 0),
   total() {
-    return this.laws + this.artefacts + this.techniques;
+    return this.artefacts + this.techniques;
   },
 };

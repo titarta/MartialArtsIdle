@@ -201,7 +201,7 @@ export function primaryStatForType(type) {
 
 export const LAW_UNIQUES = [
 
-  // ── Qi-Glutton / cultivation focus ──
+  // ── Cultivation speed ──
   { id: 'l_limitless_vessel',  range: { min: 80,  max: 150 }, description: (v) => `${v}% increased Qi Cultivation Speed. 50% less Combat Damage.`,
     effects: [stat('qi_speed', MOD.INCREASED, rolled), stat('damage_all', MOD.MORE, 0.5)] },
 
@@ -232,7 +232,7 @@ export const LAW_UNIQUES = [
       stat('qi_speed', MOD.REDUCED,  rolled, { type: 'not_focusing' }),
     ] },
 
-  // ── Body / tank ──
+  // ── Body-stat & HP focus ──
   { id: 'l_diamond_body',      range: { min: 30,  max: 60  }, description: (v) => `${v}% increased Body. 50% less Soul.`,
     effects: [stat('body', MOD.INCREASED, rolled), stat('soul', MOD.MORE, 0.5)] },
 
@@ -254,7 +254,7 @@ export const LAW_UNIQUES = [
   { id: 'l_warrior_pulse',     range: { min: 20,  max: 60  }, description: (v) => `${v}% increased Damage while Body > Essence + Soul.`,
     effects: [stat('damage_all', MOD.INCREASED, rolled, cBodyGtEsSl())] },
 
-  // ── Soul ──
+  // ── Soul-stat focus ──
   { id: 'l_spirit_sea',        range: { min: 60,  max: 140 }, description: (v) => `${v}% increased Soul. 50% less Body.`,
     effects: [stat('soul', MOD.INCREASED, rolled), stat('body', MOD.MORE, 0.5)] },
 
@@ -282,7 +282,7 @@ export const LAW_UNIQUES = [
   { id: 'l_inner_void',        range: { min: 40,  max: 90  }, description: (v) => `${v}% of Physical Damage converted to Psychic Damage.`,
     effects: [conv('physical_damage', 'psychic_damage', rolled)] },
 
-  // ── Elemental ──
+  // ── Element-specific / elemental damage ──
   { id: 'l_element_tyranny',   range: { min: 100, max: 250 }, description: (v) => `${v}% more Elemental Damage. Can only equip Elemental Techniques.`,
     effects: [stat('elemental_damage', MOD.MORE, 'rolled_as_mult'), spec('only_elemental_techniques')] },
 
@@ -310,7 +310,7 @@ export const LAW_UNIQUES = [
   { id: 'l_stone_path',        range: { min: 30,  max: 80  }, description: (v) => `(Stone Law) ${v}% increased Defense. Reflect 10% of Physical Damage.`,
     effects: [stat('defense', MOD.INCREASED, rolled, { type: 'law_element_is', value: 'Stone' }), stat('reflect_phys_pct', MOD.FLAT, 10)] },
 
-  // ── Speed ──
+  // ── Cooldown / dodge / tempo ──
   { id: 'l_quickened_steps',   range: { min: 25,  max: 40  }, description: (v) => `${v}% reduced Cooldowns. 25% less Maximum Health.`,
     effects: [stat('cooldown_duration', MOD.REDUCED, rolled), stat('health', MOD.MORE, 0.75)] },
 
@@ -341,7 +341,7 @@ export const LAW_UNIQUES = [
   { id: 'l_blade_dance',       range: { min: 5,   max: 15  }, description: (v) => `Each consecutive attack deals ${v}% more Damage (max 10 stacks, resets on hit taken).`,
     effects: [stack('damage_all', MOD.MORE, rolled, 10, 'on_hit_dealt', 'on_hit_taken')] },
 
-  // ── Tank ──
+  // ── Defense & damage-reduction ──
   { id: 'l_unmovable_mountain',range: { min: 30,  max: 50  }, description: (v) => `${v}% less Damage Taken. ${v}% less Damage Dealt.`,
     effects: [stat('dmg_taken_all', MOD.MORE, 'rolled_as_less'), stat('damage_all', MOD.MORE, 'rolled_as_less')] },
 
@@ -369,7 +369,7 @@ export const LAW_UNIQUES = [
   { id: 'l_stalwart_oath',     range: { min: 10,  max: 30  }, description: (v) => `Regenerate ${v}% Maximum Health per second.`,
     effects: [regen('hp', 'rolled_as_pct')] },
 
-  // ── Glass Cannon ──
+  // ── High-damage with trade-off ──
   { id: 'l_razors_edge',       range: { min: 60,  max: 100 }, description: (v) => `${v}% increased Damage. 50% less Defense.`,
     effects: [stat('damage_all', MOD.INCREASED, rolled), stat('defense', MOD.MORE, 0.5)] },
 
@@ -397,7 +397,7 @@ export const LAW_UNIQUES = [
   { id: 'l_nuclear_path',      range: { min: 100, max: 200 }, description: (v) => `${v}% increased Damage. Cannot heal.`,
     effects: [stat('damage_all', MOD.INCREASED, rolled), spec('cannot_heal')] },
 
-  // ── Sustain ──
+  // ── Healing & HP regen ──
   { id: 'l_eternal_spring',    range: { min: 50,  max: 120 }, description: (v) => `${v}% increased Healing Received. 25% less Damage Dealt.`,
     effects: [stat('healing_received', MOD.INCREASED, rolled), stat('damage_all', MOD.MORE, 0.75)] },
 
@@ -419,7 +419,7 @@ export const LAW_UNIQUES = [
   { id: 'l_undying_will',      range: { min: 30,  max: 70  }, description: (v) => `${v}% more Healing Effectiveness.`,
     effects: [stat('healing_received', MOD.MORE, 'rolled_as_more')] },
 
-  // ── Crit / Lucky ──
+  // ── Crit chance / crit damage ──
   { id: 'l_lucky_star',        range: { min: 20,  max: 50  }, description: (v) => `${v}% increased Crit Chance. ${v}/2% chance to deal half damage.`,
     effects: [stat('crit_chance', MOD.INCREASED, rolled), spec('chance_half_damage_pct', 'rolled_half')] },
 
@@ -447,7 +447,7 @@ export const LAW_UNIQUES = [
   { id: 'l_blood_in_water',    range: { min: 5,   max: 15  }, description: (v) => `Crit Chance increased with missing Health %, up to ${v}%.`,
     effects: [stat('crit_chance', MOD.FLAT, 'rolled_scaled_by_missing_hp')] },
 
-  // ── Conversion / Hybrid ──
+  // ── Stat / resource conversions ──
   { id: 'l_body_to_soul',      range: { min: 30,  max: 80  }, description: (v) => `${v}% of Body counted as Soul.`,
     effects: [conv('body', 'soul', rolled)] },
 
@@ -469,7 +469,7 @@ export const LAW_UNIQUES = [
   { id: 'l_dao_consumption',   range: { min: 5,   max: 10  }, description: (v) => `${v}% of Qi/sec converted to Health/sec.`,
     effects: [conv('qi_speed', 'hp_regen', rolled)] },
 
-  // ── Realm-scaling ──
+  // ── Per-realm scaling ──
   { id: 'l_realm_ascension',   range: { min: 5,   max: 15  }, description: (v) => `${v}% increased Damage per major realm.`,
     effects: [stat('damage_all', MOD.INCREASED, 'rolled_per_major_realm')] },
 
@@ -494,7 +494,7 @@ export const LAW_UNIQUES = [
   { id: 'l_seekers_path',      range: { min: 3,   max: 5   }, description: (v) => `${v}% reduced Crafting Cost per realm.`,
     effects: [stat('crafting_cost', MOD.REDUCED, 'rolled_per_major_realm')] },
 
-  // ── Conditional / trigger ──
+  // ── Conditional / on-trigger effects ──
   { id: 'l_predator_patience', range: { min: 50,  max: 150 }, description: (v) => `${v}% increased Damage while no Damage taken in last 10s.`,
     effects: [stat('damage_all', MOD.INCREASED, rolled, cNoDmgFor(10))] },
 
@@ -516,7 +516,7 @@ export const LAW_UNIQUES = [
   { id: 'l_quiet_mind',        range: { min: 80,  max: 100 }, description: (v) => `${v}% more Healing Effectiveness if no Techniques used in last 3s.`,
     effects: [stat('healing_received', MOD.MORE, 'rolled_as_more', cNoTechFor(3))] },
 
-  // ── Anti-synergy / cost ──
+  // ── Bonus with explicit cost / drawback ──
   { id: 'l_heavy_burden',      range: { min: 30,  max: 80  }, description: (v) => `${v}% increased All Stats. 50% increased Cooldowns.`,
     effects: [stat('all_stats', MOD.INCREASED, rolled), stat('cooldown_duration', MOD.INCREASED, 0.5)] },
 
@@ -544,7 +544,7 @@ export const LAW_UNIQUES = [
   { id: 'l_burdened_soul',     range: { min: 50,  max: 150 }, description: (v) => `${v}% increased Soul. 50% reduced Pill Duration.`,
     effects: [stat('soul', MOD.INCREASED, rolled), stat('pill_duration', MOD.REDUCED, 0.5)] },
 
-  // ── Crafting / utility ──
+  // ── Crafting, gathering, mining & pill utility ──
   { id: 'l_master_smith',      range: { min: 10,  max: 20  }, description: (v) => `${v}% reduced Crafting Cost.`,
     effects: [stat('crafting_cost', MOD.REDUCED, rolled)] },
 
@@ -569,7 +569,7 @@ export const LAW_UNIQUES = [
   { id: 'l_artisan_path',      range: { min: 10,  max: 20  }, description: (v) => `${v}% reduced Transmutation Cost.`,
     effects: [stat('transmutation_cost', MOD.REDUCED, rolled)] },
 
-  // ── Hybrid / Misc ──
+  // ── Misc / multi-stat ──
   { id: 'l_balanced_dao',      range: { min: 10,  max: 20  }, description: (v) => `${v}% increased All Stats.`,
     effects: [stat('all_stats', MOD.INCREASED, rolled)] },
 
@@ -591,7 +591,7 @@ export const LAW_UNIQUES = [
   { id: 'l_dao_chain',         range: { min: 100, max: 200 }, description: (v) => `${v}% increased Damage while Law element matches all equipped Technique elements.`,
     effects: [stat('damage_all', MOD.INCREASED, rolled, cAllTechMatchLaw())] },
 
-  // ── Time / Tempo ──
+  // ── Timing / buff duration ──
   { id: 'l_time_dilation',     range: { min: 30,  max: 60  }, description: (v) => `${v}% reduced Cooldowns during first second of combat.`,
     effects: [stat('cooldown_duration', MOD.REDUCED, rolled, cCombatBelow(1))] },
 
