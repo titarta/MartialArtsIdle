@@ -5,7 +5,7 @@ import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_IND
  * Reincarnation tab — displays karma, the passive tree, and the
  * Reincarnate button. Unlocks at Saint Early Stage.
  */
-function ReincarnationScreen({ karma, tree, pendingKarma, lives, highestReached, peakKarmaTotal, onReincarnate }) {
+function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTotal, onReincarnate }) {
   const [confirm, setConfirm] = useState(false);
   const [hover,   setHover]   = useState(null);
 
@@ -33,29 +33,19 @@ function ReincarnationScreen({ karma, tree, pendingKarma, lives, highestReached,
           <div style={{ opacity: 0.75 }}>Full peak yields {peakKarmaTotal} karma</div>
         </div>
 
-        {pendingKarma > 0 ? (
-          <p className="subtitle" style={{ marginTop: '8px', color: '#a8e6a1' }}>
-            Reincarnating now would award <b>+{pendingKarma}</b> karma for newly-reached realms.
-          </p>
-        ) : (
-          <p className="subtitle" style={{ marginTop: '8px' }}>
-            Reach new realms before reincarnating to earn more karma.
-          </p>
-        )}
-
         <div className="save-buttons" style={{ marginTop: '8px' }}>
           {confirm ? (
             <div className="wipe-confirm">
               <span className="wipe-confirm-label">
-                Rebirth wipes all progress (QI, realms, laws, pills, inventory, artefacts, techniques).
-                Karma and the Eternal Tree survive. Continue?
+                Rebirth wipes QI, realms, pills, inventory, artefacts, techniques and other
+                laws. Your active law, Karma and the Eternal Tree survive. Continue?
               </span>
               <button className="save-btn save-btn-danger" onClick={doReincarnate}>Yes, reincarnate</button>
               <button className="save-btn" onClick={() => setConfirm(false)}>Cancel</button>
             </div>
           ) : (
             <button className="save-btn save-btn-danger" onClick={() => setConfirm(true)}>
-              Reincarnate (+{pendingKarma} karma)
+              Reincarnate
             </button>
           )}
         </div>
@@ -63,10 +53,7 @@ function ReincarnationScreen({ karma, tree, pendingKarma, lives, highestReached,
 
       <div className="save-section">
         <h2>Eternal Tree</h2>
-        <p className="subtitle">
-          Total tree cost: {TREE_TOTAL_COST} karma. Most powerful nodes sit at the top — each
-          requires any one of its connected nodes below.
-        </p>
+        <p className="subtitle">Total cost: {TREE_TOTAL_COST} karma.</p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
           {byRow.map((row, idx) => (
@@ -107,9 +94,11 @@ function ReincarnationScreen({ karma, tree, pendingKarma, lives, highestReached,
                     }}
                     title={NODE_DESCRIPTIONS[node.id]}
                   >
-                    <div style={{ fontWeight: 600, fontSize: '0.95em' }}>{node.label}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.95em' }}>
+                      {state === 'locked-prereq' ? '🔒 ' : ''}{node.label}
+                    </div>
                     <div style={{ marginTop: '4px', fontSize: '0.85em', opacity: 0.8 }}>
-                      {purchased ? 'Owned' : `${node.cost} karma`}
+                      {purchased ? '✓ Owned' : `${node.cost} karma`}
                     </div>
                     {hover === node.id && (
                       <div style={{ marginTop: '6px', fontSize: '0.75em', opacity: 0.75 }}>
@@ -122,11 +111,6 @@ function ReincarnationScreen({ karma, tree, pendingKarma, lives, highestReached,
             </div>
           ))}
         </div>
-
-        <p className="subtitle" style={{ marginTop: '12px', fontSize: '0.8em', opacity: 0.7 }}>
-          Bottom row has no prerequisites. Middle nodes need any one adjacent bottom node.
-          Top nodes need any one adjacent middle node. Hover a node for details.
-        </p>
       </div>
     </div>
   );

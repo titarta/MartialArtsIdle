@@ -51,11 +51,32 @@ export function wipeSave() {
 }
 
 /**
- * Wipe for reincarnation — same as wipeSave(): karma and tree purchases
- * live in separate keys that are already outside the wipe list.
+ * Wipe for reincarnation. Preserves karma + tree (their keys are outside
+ * the wipeSave list) and also the currently-active law — the player keeps
+ * the manual they're cultivating across rebirths, but loses any other
+ * collected laws.
  */
 export function wipeReincarnation() {
+  // Snapshot the active law BEFORE the wipe
+  let activeLaw = null;
+  let activeId  = null;
+  try {
+    const activeRaw = localStorage.getItem('mai_active_law');
+    activeId = activeRaw ? JSON.parse(activeRaw) : null;
+    const ownedRaw = localStorage.getItem('mai_owned_laws');
+    const owned    = ownedRaw ? JSON.parse(ownedRaw) : [];
+    activeLaw = owned.find(l => l.id === activeId) ?? owned[0] ?? null;
+  } catch {}
+
   wipeSave();
+
+  // Restore the active law as the sole owned law
+  if (activeLaw) {
+    try {
+      localStorage.setItem('mai_owned_laws',  JSON.stringify([activeLaw]));
+      localStorage.setItem('mai_active_law', JSON.stringify(activeLaw.id));
+    } catch {}
+  }
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────

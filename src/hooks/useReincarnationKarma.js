@@ -42,36 +42,29 @@ export default function useReincarnationKarma() {
   useEffect(() => { persist(state); }, [state]);
 
   /**
-   * Called on every realm breakthrough. Bumps highestReached if new.
-   * Does NOT award karma — that happens at reincarnation time.
+   * Called on every realm breakthrough. Awards karma immediately for any
+   * newly-reached realm (first-time-only) so the player can invest in the
+   * tree as they progress — no need to wait for a rebirth.
    */
   const noteRealmReached = useCallback((index) => {
     setState(prev => {
-      if (index <= prev.highestReached) return prev;
-      return { ...prev, highestReached: index };
-    });
-  }, []);
-
-  /**
-   * Called when the player clicks reincarnate. Awards delta karma for
-   * any newly-reached realms since the last reincarnation and increments
-   * the life counter. Returns the karma awarded.
-   */
-  const reincarnate = useCallback(() => {
-    let awarded = 0;
-    setState(prev => {
-      // Award sum of karmaForReachingIndex from (maxAwarded+1) up to highestReached
-      for (let i = prev.maxAwarded + 1; i <= prev.highestReached; i++) {
+      if (index <= prev.maxAwarded && index <= prev.highestReached) return prev;
+      let awarded = 0;
+      for (let i = prev.maxAwarded + 1; i <= index; i++) {
         awarded += karmaForReachingIndex(i);
       }
       return {
         ...prev,
-        karma:      prev.karma + awarded,
-        maxAwarded: Math.max(prev.maxAwarded, prev.highestReached),
-        lives:      prev.lives + 1,
+        karma:          prev.karma + awarded,
+        maxAwarded:     Math.max(prev.maxAwarded, index),
+        highestReached: Math.max(prev.highestReached, index),
       };
     });
-    return awarded;
+  }, []);
+
+  /** Bumps the life counter. Actual save wipe happens in App.jsx. */
+  const reincarnate = useCallback(() => {
+    setState(prev => ({ ...prev, lives: prev.lives + 1 }));
   }, []);
 
   /** Spend karma on a tree node. Returns true on success. */
@@ -85,21 +78,11 @@ export default function useReincarnationKarma() {
     return ok;
   }, []);
 
-  /** Preview how much karma the player would earn if they reincarnated now. */
-  const pendingKarma = (() => {
-    let sum = 0;
-    for (let i = state.maxAwarded + 1; i <= state.highestReached; i++) {
-      sum += karmaForReachingIndex(i);
-    }
-    return sum;
-  })();
-
   return {
     karma:           state.karma,
     highestReached:  state.highestReached,
     maxAwarded:      state.maxAwarded,
     lives:           state.lives,
-    pendingKarma,
     unlocked:        state.highestReached >= SAINT_UNLOCK_INDEX,
     peakKarmaTotal:  totalKarmaForPeak(PEAK_INDEX),
     noteRealmReached,

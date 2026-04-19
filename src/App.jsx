@@ -300,7 +300,6 @@ function App() {
     reincarnation: <ReincarnationScreen
                       karma={karma.karma}
                       tree={tree}
-                      pendingKarma={karma.pendingKarma}
                       lives={karma.lives}
                       highestReached={karma.highestReached}
                       peakKarmaTotal={karma.peakKarmaTotal}

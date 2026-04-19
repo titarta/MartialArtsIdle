@@ -14,8 +14,10 @@ exchange for **Reincarnation Karma**, a permanent currency spent in the
 - **Unlock:** visible from the first time the player reaches **Saint Early Stage**
   (realm index 24). Once unlocked it stays visible forever, even after reincarnating.
 - **First reincarnation:** allowed any time after unlock — the player chooses when.
-- **Karma is awarded per realm, first-time only.** Re-reaching a realm in a later
-  life grants zero additional karma for that realm.
+- **Karma is awarded immediately on reaching a new realm for the first time.**
+  Re-reaching a realm in a later life grants zero additional karma. Players
+  can spend their karma in the Eternal Tree at any point — rebirth is not
+  required to unlock nodes.
 
 ---
 
@@ -74,7 +76,8 @@ node via multiple middle options.
 **Total cost = 143 karma — exactly what one peak life awards.**
 
 Purchases persist in `localStorage` key `mai_reincarnation_tree` and are NOT
-wiped on reincarnation. Each node is a one-time purchase.
+wiped on reincarnation. Each node is a one-time purchase. Nodes can be
+purchased at any time during a run — not only after a rebirth.
 
 ### Node effects
 
@@ -97,12 +100,14 @@ wiped on reincarnation. Each node is a one-time purchase.
 1. Player clicks **Reincarnate** in the Rebirth tab.
 2. Confirmation modal explains what is wiped vs what survives.
 3. On confirm:
-   - `karma.reincarnate()` awards pending karma and bumps the life counter.
-   - `wipeReincarnation()` clears the standard save-key set (same list as
-     `wipeSave()`; `mai_jade`, `mai_lang`, `mai_reincarnation`, and
-     `mai_reincarnation_tree` are untouched).
-   - `window.location.reload()` boots a fresh run — karma and tree load back
-     from their preserved keys.
+   - `karma.reincarnate()` bumps the life counter (karma itself was already
+     granted incrementally as realms were reached).
+   - `wipeReincarnation()` snapshots the currently-active law, clears the
+     standard save-key set (same list as `wipeSave()`; `mai_jade`, `mai_lang`,
+     `mai_reincarnation`, and `mai_reincarnation_tree` are untouched), then
+     writes the active law back as the sole owned + active law.
+   - `window.location.reload()` boots a fresh run — karma, tree and the
+     preserved law load back from their keys.
 
 ---
 
