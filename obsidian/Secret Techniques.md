@@ -80,7 +80,7 @@ Damage = K * (Essence + Soul + Body + artefact_dmg_flat) * arte_mult * elem_bonu
 | Sky | Separation & Reunion | 1.5 | 2.0 | 2.8 | 3.8 | 5.0 |
 | Saint | Saint | 2.0 | 2.8 | 3.8 | 5.2 | 6.8 |
 | Emperor | Void King | 2.5 | 3.5 | 4.8 | 6.5 | 8.5 |
-| Heaven | Half-Step Open Heaven | 4.0 | 5.5 | 7.5 | 10.0 | 13.0 |
+| Heaven | Open Heaven | 4.0 | 5.5 | 7.5 | 10.0 | 13.0 |
 
 ---
 

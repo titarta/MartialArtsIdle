@@ -528,13 +528,13 @@ const WORLDS = [
   {
     id: 6,
     name: 'The Open Heaven',
-    realms: 'Half-Step Open Heaven → Open Heaven Layer 6',
+    realms: 'Open Heaven Layer 1 → Open Heaven Layer 6',
     minRealmIndex: 45,
     description: 'A boundless open heaven realm of blinding gold and white, where massive inscription-covered pillars rise from a seamless celestial floor into cloud banks that stretch to infinity. Cranes glide silently through the radiant haze between the pillars. The ambient pressure alone is enough to obliterate anything that has not reached the Open Heaven threshold.',
     regions: [
       {
         name: 'Heaven Pillar Ascent',
-        minRealm: 'Half-Step Open Heaven',
+        minRealm: 'Open Heaven Layer 1',
         minRealmIndex: 45,
         enemies: 'Heaven pillar guardians, boundary wraiths',
         gatherDrops: [
@@ -557,7 +557,7 @@ const WORLDS = [
       {
         name: 'Star Sea Approaches',
         minRealm: 'Open Heaven Layer 2',
-        minRealmIndex: 47,
+        minRealmIndex: 46,
         enemies: 'Open heaven beasts, star sea leviathans',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',        chance: 0.50, qty: [2, 4] },
@@ -579,7 +579,7 @@ const WORLDS = [
       {
         name: 'Celestial Rift Expanse',
         minRealm: 'Open Heaven Layer 4',
-        minRealmIndex: 49,
+        minRealmIndex: 48,
         enemies: 'Celestial sovereigns, eternal storm titans',
         gatherDrops: [
           { itemId: 'transcendent_herb_2',        chance: 0.60, qty: [2, 5] },
@@ -597,7 +597,7 @@ const WORLDS = [
       {
         name: "Heaven's Core",
         minRealm: 'Open Heaven Layer 6',
-        minRealmIndex: 51,
+        minRealmIndex: 50,
         enemies: 'Open heaven sovereigns, void apex predators',
         gatherDrops: [
           { itemId: 'transcendent_herb_1',        chance: 0.45, qty: [2, 5] },

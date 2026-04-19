@@ -70,10 +70,9 @@ Auto-save every 2 seconds → `localStorage['mai_save'] = { realmIndex, qi }`
 ```js
 { name: 'Tempered Body', stage: 'Layer 1', cost: 100 }
 // Display label built in useCultivation: "Tempered Body - Layer 1"
-// Half-Step Open Heaven has stage: '' so label is just the name
 ```
 
-**47 sub-stages** across 14 major realms. Qi display uses K/M/B/T suffix formatting (`RealmProgressBar`). Total qi to max: ~220T.
+**46 sub-stages** across 13 major realms. Qi display uses K/M/B/T suffix formatting (`RealmProgressBar`). Total qi to max: ~220T.
 
 ---
 

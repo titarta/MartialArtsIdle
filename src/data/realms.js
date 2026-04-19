@@ -78,9 +78,6 @@ const REALMS_RAW = [
   { name: 'Emperor Realm',      stage: '2nd Stage',   cost: 850_000_000_000 },
   { name: 'Emperor Realm',      stage: '3rd Stage',   cost: 1_500_000_000_000 },
 
-  // ── Half-Step Open Heaven ──────────────────────────────────────────────────
-  { name: 'Half-Step Open Heaven', stage: '',         cost: 2_500_000_000_000 },
-
   // ── Open Heaven (6 Layers) ─────────────────────────────────────────────────
   { name: 'Open Heaven',        stage: 'Layer 1',     cost: 4_000_000_000_000 },  // Low-Rank
   { name: 'Open Heaven',        stage: 'Layer 2',     cost: 7_000_000_000_000 },  // Low-Rank

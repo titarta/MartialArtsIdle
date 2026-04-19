@@ -106,13 +106,13 @@ The boundary between the mortal world and the upper heavens. Space fractures. En
 ---
 
 ### World 6 — The Open Heaven
-*Realms: Half-Step Open Heaven → Open Heaven Layer 6*
+*Realms: Open Heaven Layer 1 → Open Heaven Layer 6*
 
 The threshold of true immortality. Few cultivators ever reach this world. Enemies are Open Heaven–grade beings: spatial lords, cosmic beasts, and immortal remnants. Drops here are the rarest in the game.
 
 | Region                 | Min Realm      | Enemies                                             | Notable Drops                                   |
 | ---------------------- | -------------- | --------------------------------------------------- | ----------------------------------------------- |
-| Heaven Pillar Ascent   | Half-Step      | Ascending trial guardians, boundary wraiths         | Top-tier artefact fragments, esoteric materials |
+| Heaven Pillar Ascent   | Open Heaven L1 | Ascending trial guardians, boundary wraiths         | Top-tier artefact fragments, esoteric materials |
 | Star Sea Approaches    | Open Heaven L1 | Star sea beasts, low-rank Open Heaven wanderers     | Esoteric elemental cores                        |
 | Celestial Rift Expanse | Open Heaven L2 | Rift predators, spatial sovereign beasts            | Esoteric materials, spatial law fragments       |
 | Eternal Storm Arena    | Open Heaven L3 | Storm sovereigns, tempest-born constructs           | High-rank Open Heaven drops                     |

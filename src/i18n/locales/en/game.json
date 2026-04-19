@@ -12,7 +12,6 @@
     "Void King": "Void King",
     "Dao Source": "Dao Source",
     "Emperor Realm": "Emperor Realm",
-    "Half-Step Open Heaven": "Half-Step Open Heaven",
     "Open Heaven": "Open Heaven"
   },
   "stages": {
@@ -62,7 +61,7 @@
     },
     "6": {
       "name": "The Open Heaven",
-      "realms": "Half-Step Open Heaven → Open Heaven Layer 6",
+      "realms": "Open Heaven Layer 1 → Open Heaven Layer 6",
       "description": "A boundless open heaven realm of blinding gold and white, where massive inscription-covered pillars rise from a seamless celestial floor into cloud banks that stretch to infinity. Cranes glide silently through the radiant haze between the pillars. The ambient pressure alone is enough to obliterate anything that has not reached the Open Heaven threshold."
     }
   },

@@ -12,7 +12,6 @@
     "Void King":            "Rei do Vazio",
     "Dao Source":           "Fonte do Dao",
     "Emperor Realm":        "Reino Imperial",
-    "Half-Step Open Heaven":"Meio Passo para o Céu Aberto",
     "Open Heaven":          "Céu Aberto"
   },
 
@@ -64,7 +63,7 @@
     },
     "6": {
       "name":        "O Céu Aberto",
-      "realms":      "Meio Passo para o Céu Aberto → Céu Aberto Camada 6",
+      "realms":      "Céu Aberto Camada 1 → Céu Aberto Camada 6",
       "description": "Um reino de Céu Aberto sem limites, de ouro ofuscante e branco, onde enormes pilares cobertos de inscrições erguem-se de um chão celestial perfeito até bancos de nuvens que se estendem ao infinito. Guindastes deslizam silenciosamente pela névoa radiante entre os pilares. A pressão ambiente por si só é suficiente para obliterar qualquer coisa que não tenha atingido o limiar do Céu Aberto."
     }
   },

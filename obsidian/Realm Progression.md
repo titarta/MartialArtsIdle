@@ -20,10 +20,9 @@ Realm system based on **Martial Peak** (武炼巅峰). Each major realm has sub-
 | 10 | Void King | 1st / 2nd / 3rd Stage | — |
 | 11 | Dao Source | 1st / 2nd / 3rd Stage | — |
 | 12 | Emperor Realm | 1st / 2nd / 3rd Stage | — |
-| 13 | Half-Step Open Heaven | — | Single breakthrough |
-| 14 | Open Heaven | Layer 1–6 | Low (1-3) / Mid (4-5) / High (6) |
+| 13 | Open Heaven | Layer 1–6 | Low (1-3) / Mid (4-5) / High (6) |
 
-Total sub-stages: **47**
+Total sub-stages: **46**
 
 ---
 
@@ -134,12 +133,6 @@ Total sub-stages: **47**
 | 2nd Stage | 850,000,000,000 |
 | 3rd Stage | 1,500,000,000,000 |
 
-### Half-Step Open Heaven
-
-| Stage | Qi Cost |
-|---|---|
-| Breakthrough | 2,500,000,000,000 |
-
 ### Open Heaven (6 Layers)
 
 | Stage | Qi Cost | Tier |
@@ -187,8 +180,7 @@ Ascending **between major realms** (i.e. whenever `realm.name` changes — e.g. 
 | Void King | Multiplier upgrades, Emperor-rank techniques |
 | Dao Source | — TBD |
 | Emperor Realm | Artifact refining |
-| Half-Step Open Heaven | Heaven-rank techniques |
-| Open Heaven | Esoteric elements (Space, Time...) |
+| Open Heaven | Heaven-rank techniques, Esoteric elements (Space, Time...) |
 
 ---
 

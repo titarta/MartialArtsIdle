@@ -74,7 +74,7 @@ HP = (Essence + Body) × 12 + Soul × 4
 Enemy HP  = max(100, 150 × 1.12^region_index × enemy_hp_mult)
 Enemy ATK = max(10,  (Essence + Soul + Body) × enemy_atk_mult)
 ```
-`region_index` is the region's `minRealmIndex` (0–51 across the six worlds).
+`region_index` is the region's `minRealmIndex` (0–50 across the six worlds).
 The 1.12×-per-index curve gives a ~300× HP spread from W1 R1 to W6 R4, independent of
 the qi economy. Early zones always have low HP, late zones always have high HP,
 regardless of the player's current power.

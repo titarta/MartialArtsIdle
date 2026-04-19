@@ -18,7 +18,7 @@ export const TECHNIQUE_RANK = {
   Sky:      { label: 'Sky',      minRealmIndex: 18 },  // Separation & Reunion
   Saint:    { label: 'Saint',    minRealmIndex: 24 },  // Saint
   Emperor:  { label: 'Emperor',  minRealmIndex: 36 },  // Void King
-  Heaven:   { label: 'Heaven',   minRealmIndex: 45 },  // Half-Step Open Heaven
+  Heaven:   { label: 'Heaven',   minRealmIndex: 45 },  // Open Heaven
 };
 
 // ─── K multiplier table: rank × quality ──────────────────────────────────────
