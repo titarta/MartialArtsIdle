@@ -74,7 +74,9 @@ export default function EternalTreeScreen({
 }) {
   const canvasRef  = useRef(null);
   const dragRef    = useRef({ active: false, startX: 0, startY: 0, panX: 0, panY: 0 });
+  const scaleRef   = useRef(1);
   const [pan,         setPan]         = useState({ x: 0, y: 0 });
+  const [scale,       setScale]       = useState(1);
   const [isDragging,  setIsDragging]  = useState(false);
   const [activeNode,  setActiveNode]  = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -85,6 +87,29 @@ export default function EternalTreeScreen({
     if (!canvasRef.current) return;
     const { width, height } = canvasRef.current.getBoundingClientRect();
     setPan({ x: Math.round(width / 2), y: Math.round(height * 0.28) });
+  }, []);
+
+  // Scroll-to-zoom — wheel event must be non-passive to call preventDefault
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const handler = (e) => {
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.12 : 0.9;
+      const rect   = canvas.getBoundingClientRect();
+      const cx     = e.clientX - rect.left;
+      const cy     = e.clientY - rect.top;
+      const prev   = scaleRef.current;
+      const next   = Math.max(0.25, Math.min(3, prev * factor));
+      scaleRef.current = next;
+      setScale(next);
+      setPan(p => ({
+        x: cx - (cx - p.x) * (next / prev),
+        y: cy - (cy - p.y) * (next / prev),
+      }));
+    };
+    canvas.addEventListener('wheel', handler, { passive: false });
+    return () => canvas.removeEventListener('wheel', handler);
   }, []);
 
   // Panning
@@ -206,12 +231,21 @@ export default function EternalTreeScreen({
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        <div className="et-hint">Drag to explore · Tap a glowing node to unlock</div>
+        <div className="et-hint">Drag to pan · Scroll to zoom · Tap a glowing node to unlock</div>
 
-        <div className="et-world" style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}>
+        <div className="et-world" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
 
-          {/* SVG: edges + branch labels */}
-          <svg style={{ position:'absolute', left:0, top:0, width:0, height:0, overflow:'visible', pointerEvents:'none' }}>
+          {/* SVG for edges + labels — uses a large real viewport so the parent's
+              overflow:hidden doesn't clip to zero. All coordinates are offset
+              by SVG_O so that world-origin (0,0) maps to the SVG centre. */}
+          {(() => {
+            const SVG_O = 10000;
+            const SVG_S = SVG_O * 2;
+            return (
+          <svg
+            width={SVG_S} height={SVG_S}
+            style={{ position:'absolute', left: -SVG_O, top: -SVG_O, pointerEvents:'none', overflow:'visible' }}
+          >
             <defs>
               <filter id="et-glow-f" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="3" result="blur"/>
@@ -221,12 +255,13 @@ export default function EternalTreeScreen({
                 <feGaussianBlur stdDeviation="2" result="blur"/>
                 <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
               </filter>
-              {/* Arrow marker — uses context-stroke so it inherits the line colour */}
               <marker id="et-arrow" viewBox="0 0 10 10" refX="8" refY="5"
                 markerWidth="5" markerHeight="5" orient="auto-start-reverse">
                 <path d="M 0 1 L 9 5 L 0 9 z" fill="context-stroke" />
               </marker>
             </defs>
+            {/* Translate so world (0,0) sits at SVG centre */}
+            <g transform={`translate(${SVG_O}, ${SVG_O})`}>
 
             {EDGES.map(([srcId, tgtId]) => {
               const p1  = WORLD[srcId];
@@ -296,7 +331,11 @@ export default function EternalTreeScreen({
                 </text>
               );
             })()}
+
+            </g>
           </svg>
+            );
+          })()}
 
           {/* Root node */}
           <div className="et-node et-node-root" style={{ left: 0, top: 0 }}>
