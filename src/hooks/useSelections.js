@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import REALMS from '../data/realms';
+import REALMS, { lawOfferRaritiesForRealm } from '../data/realms';
 import {
   SELECTION_BY_ID,
   SELECTION_POOL,
@@ -8,6 +8,7 @@ import {
   rollOptions,
 } from '../data/selections';
 import { MOD } from '../data/stats';
+import { generateLaw } from '../data/affixPools';
 import { addJade } from '../systems/jade';
 import { spendJade, JADE_COSTS } from '../systems/jade';
 
@@ -46,6 +47,22 @@ function isBreakthrough(prevIndex, currIndex) {
   const prev = REALMS[prevIndex];
   const curr = REALMS[currIndex];
   return !!prev && !!curr && prev.name !== curr.name;
+}
+
+/**
+ * Roll three generator laws for a major-breakthrough law offer, drawing
+ * rarities uniformly from the realm's band (lawOfferRaritiesForRealm).
+ * Always returns exactly THREE_LAW_OFFERS distinct law objects.
+ */
+const THREE_LAW_OFFERS = 3;
+function rollLawOffers(realmIndex) {
+  const band = lawOfferRaritiesForRealm(realmIndex);
+  const offers = [];
+  for (let i = 0; i < THREE_LAW_OFFERS; i++) {
+    const rarity = band[Math.floor(Math.random() * band.length)];
+    offers.push(generateLaw(rarity, realmIndex));
+  }
+  return offers;
 }
 
 let selCounter = 0;
@@ -115,6 +132,31 @@ export default function useSelections({ cultivation }) {
     }
 
     setPending(prev => [...prev, entry]);
+
+    // ── Law track (major breakthroughs only) ──────────────────────────────
+    // Every major-realm transition also offers 3 law choices. The very
+    // first one (when the library is empty) is the unlock-the-mechanic
+    // beat and can't be skipped. Later offers are skippable.
+    if (tier === 'breakthrough') {
+      const isFirst = (cultivation.ownedLaws?.length ?? 0) === 0;
+      const lawEntry = {
+        id:          `sel-law-${++selCounter}-${curr}`,
+        kind:        'law',
+        realmIndex:  curr,
+        realmLabel,
+        tier:        'breakthrough',
+        lawOptions:  isFirst
+          // First offer always rolls pure Iron — introduces the system at
+          // the lowest tier so the player learns before the rarity band
+          // broadens.
+          ? Array.from({ length: THREE_LAW_OFFERS }, () => generateLaw('Iron', curr))
+          : rollLawOffers(curr),
+        isFirst,
+        freeRerolls: 1,
+        rerollsUsed: 0,
+      };
+      setPending(prev => [...prev, lawEntry]);
+    }
   }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -128,6 +170,42 @@ export default function useSelections({ cultivation }) {
     });
     setPending(prev => prev.filter(s => s.id !== selectionId));
   }, []);
+
+  /** Add the chosen law to the library. Never auto-equips. */
+  const pickLaw = useCallback((selectionId, lawIndex) => {
+    setPending(prev => {
+      const entry = prev.find(s => s.id === selectionId);
+      if (!entry || entry.kind !== 'law') return prev;
+      const law = entry.lawOptions?.[lawIndex];
+      if (law) cultivation.addOwnedLaw?.(law);
+      return prev.filter(s => s.id !== selectionId);
+    });
+  }, [cultivation]);
+
+  /** Skip a law offer. Blocked for the first-ever offer. */
+  const skipLaw = useCallback((selectionId) => {
+    setPending(prev => {
+      const entry = prev.find(s => s.id === selectionId);
+      if (!entry || entry.kind !== 'law' || entry.isFirst) return prev;
+      return prev.filter(s => s.id !== selectionId);
+    });
+  }, []);
+
+  /** Reroll all 3 law offers. Free first time, then JADE_COSTS.reroll_law_extra. */
+  const rerollLaw = useCallback((selectionId) => {
+    setPending(prev => prev.map(sel => {
+      if (sel.id !== selectionId || sel.kind !== 'law') return sel;
+      const hasFree = sel.rerollsUsed < sel.freeRerolls;
+      if (!hasFree) {
+        if (!spendJade(JADE_COSTS.reroll_law_extra)) return sel;
+        refreshJade();
+      }
+      const fresh = sel.isFirst
+        ? Array.from({ length: THREE_LAW_OFFERS }, () => generateLaw('Iron', sel.realmIndex))
+        : rollLawOffers(sel.realmIndex);
+      return { ...sel, lawOptions: fresh, rerollsUsed: sel.rerollsUsed + 1 };
+    }));
+  }, [refreshJade]);
 
   /** Reroll the options for a selection. Costs Jade unless free rerolls remain. */
   const rerollOptions = useCallback((selectionId) => {
@@ -261,6 +339,9 @@ export default function useSelections({ cultivation }) {
     pickOption,
     rerollOptions,
     rerollOne,
+    pickLaw,
+    skipLaw,
+    rerollLaw,
     getStatModifiers,
     getQiSpeedMult,
     getOfflineQiMult,

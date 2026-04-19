@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import REALMS, { getMajorBreakthroughRate, isMajorTransition } from '../data/realms';
 import AudioManager from '../audio/AudioManager';
-import { DEFAULT_LAW, THREE_HARMONY_MANUAL, LAW_RARITY } from '../data/laws';
+// DEFAULT_LAW / THREE_HARMONY_MANUAL no longer auto-seed the library.
+// Laws enter via major-breakthrough selections (see useSelections).
 import { saveGame, loadGame } from '../systems/save';
 import { rollLawMult } from '../data/affixPools';
 import { pickRandomUnique, rollUniqueValue } from '../data/lawUniques';
@@ -24,7 +25,10 @@ function loadOwnedLaws() {
     const raw = localStorage.getItem(OWNED_LAWS_KEY);
     if (raw) return JSON.parse(raw);
   } catch {}
-  return [THREE_HARMONY_MANUAL];
+  // Fresh saves start EMPTY. The first major-realm breakthrough fires a
+  // dedicated "First Law" selection that seeds the library. Existing
+  // saves (with a serialised mai_owned_laws key) are untouched.
+  return [];
 }
 
 const BASE_RATE       = 1; // qi per second at 1x
@@ -70,8 +74,11 @@ export default function useCultivation() {
     setActiveLawIdRaw(lawId);
   }, []);
 
-  // Derive active law from ownedLaws + activeLawId
-  const activeLaw = ownedLaws.find(l => l.id === activeLawId) || ownedLaws[0] || DEFAULT_LAW;
+  // Derive active law from ownedLaws + activeLawId.
+  // Unequipped state is legal: when the library is empty OR the player
+  // hasn't picked an active id, activeLaw is null. Combat / cultivation
+  // code handles null by falling back to small hard-coded baselines.
+  const activeLaw = ownedLaws.find(l => l.id === activeLawId) || null;
 
   const addOwnedLaw = useCallback((law) => {
     setOwnedLaws(prev => {
@@ -112,6 +119,23 @@ export default function useCultivation() {
     }));
   }, []);
 
+  /**
+   * Dismantle an owned law. Refuses if it's the currently active law
+   * (unequip it first). Returns the rarity on success so the caller
+   * can grant the matching mineral.
+   */
+  const dismantleLaw = useCallback((lawId) => {
+    if (lawId === activeLawId) return null;
+    let rarity = null;
+    setOwnedLaws(prev => {
+      const law = prev.find(l => l.id === lawId);
+      if (!law) return prev;
+      rarity = law.rarity ?? 'Iron';
+      return prev.filter(l => l.id !== lawId);
+    });
+    return rarity;
+  }, [activeLawId]);
+
   /** Re-roll the value of an existing unique at a given tier. */
   const honeLawUnique = useCallback((lawId, tier) => {
     setOwnedLaws(prev => prev.map(law => {
@@ -133,24 +157,27 @@ export default function useCultivation() {
     const realm = REALMS[saved.realmIndex];
     if (!realm || !REALMS[saved.realmIndex + 1]) return 0; // maxed
 
-    // Use the active law if available, otherwise fall back to first owned
+    // Use the active law if one is equipped; otherwise accrue offline qi
+    // at base rate (no law-driven multipliers).
     const allLaws = loadOwnedLaws();
-    let offlineLaw;
+    let offlineLaw = null;
     try {
       const activeLawIdRaw = localStorage.getItem(ACTIVE_LAW_KEY);
       const activeLawIdSaved = activeLawIdRaw ? JSON.parse(activeLawIdRaw) : null;
-      offlineLaw = (activeLawIdSaved && allLaws.find(l => l.id === activeLawIdSaved))
-        ?? allLaws[0] ?? DEFAULT_LAW;
+      offlineLaw = activeLawIdSaved
+        ? allLaws.find(l => l.id === activeLawIdSaved) ?? null
+        : null;
     } catch {
-      offlineLaw = allLaws[0] ?? DEFAULT_LAW;
+      offlineLaw = null;
     }
 
-    const lawMult = saved.realmIndex >= offlineLaw.realmRequirement
-      ? offlineLaw.cultivationSpeedMult : 1;
+    const lawMult = (offlineLaw && saved.realmIndex >= (offlineLaw.realmRequirement ?? 0))
+      ? (offlineLaw.cultivationSpeedMult ?? 1)
+      : 1;
 
     // Apply offline_qi unique modifier (Seasoned Cultivator and similar)
     let offlineQiMult = 1;
-    if (offlineLaw.uniques) {
+    if (offlineLaw?.uniques) {
       const ctx = buildContext({ inCombat: false, realmIndex: saved.realmIndex, focusing: false });
       const bundle = evaluateLawUniques(offlineLaw, ctx);
       const offlineQiMods = bundle.statMods.offline_qi ?? [];
@@ -223,12 +250,14 @@ export default function useCultivation() {
 
       if (!maxedRef.current) {
         const law = activeLawRef.current;
-        const lawMult = indexRef.current >= law.realmRequirement
-          ? law.cultivationSpeedMult
+        // Unequipped laws cultivate at base rate — no law multiplier, no
+        // unique modifiers, no realm-requirement gate.
+        const lawMult = (law && indexRef.current >= (law.realmRequirement ?? 0))
+          ? (law.cultivationSpeedMult ?? 1)
           : 1;
         // Apply law-unique qi_speed modifiers (INCREASED, MORE, REDUCED, etc.)
         let qiUniqueMult = 1;
-        if (law.uniques) {
+        if (law?.uniques) {
           const ctx = buildContext({
             inCombat: false,
             realmIndex: indexRef.current,
@@ -349,13 +378,14 @@ export default function useCultivation() {
     setRealmIndex,
     activeLaw,
     setActiveLaw,
-    isLawUnlocked: realmIndex >= activeLaw.realmRequirement,
+    isLawUnlocked: !!activeLaw && realmIndex >= (activeLaw.realmRequirement ?? 0),
     ownedLaws,
     addOwnedLaw,
     upgradeLaw,
     honeLawMult,
     replaceLawUnique,
     honeLawUnique,
+    dismantleLaw,
     // Pill qi multiplier ref — updated by App.jsx
     pillQiMultRef,
     // Selection qi speed multiplier ref — updated by App.jsx

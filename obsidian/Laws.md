@@ -106,11 +106,43 @@ Soul-anchored types (`spirit`, `void`, `dao`) cannot appear on a law generated b
 
 ### Starter law
 
-**Unyielding Fist Manual** (id `three_harmony_manual`, kept for save-compat):
-- `types: ['fist']`
-- `typeMults: { essence: 0, body: 1.20, soul: 0 }`
+Players no longer start with an equipped law. A fresh save's library is empty; the first **major-realm breakthrough** fires a "First Law" selection that offers three Iron rolls (no skip). The picked law lands in the library — the player equips it manually from the Character tab.
 
-Its basic attack is `floor(Body × 1.20)` — Essence and Soul contribute nothing. Any future law the player earns via refining will follow the rolled ranges above.
+### How laws are acquired
+
+- **No more refining.** The Production → Refining tab no longer offers a law card; `REFINE_COSTS.law` is gone.
+- **Breakthrough selections.** Every major-realm transition queues a second pending selection alongside the normal augment reward: three law rolls sampled from the realm's rarity band.
+- **Rarity band per major realm** (authoritative: `lawOfferRaritiesForRealm` in `src/data/realms.js`):
+
+  | Major realm | Offer pool |
+  |---|---|
+  | Tempered Body | Iron |
+  | Qi Transformation, True Element | Iron + Bronze |
+  | Separation & Reunion, Immortal Ascension | Bronze + Silver |
+  | Saint, Saint King, Origin Returning | Silver + Gold |
+  | Origin King, Void King, Dao Source, Emperor Realm, Open Heaven | Gold + Transcendent |
+
+- **Reroll cost.** First reroll per offer is free; subsequent rerolls cost `JADE_COSTS.reroll_law_extra = 30` (1.5× the augment `reroll_extra`).
+- **Skip** is allowed on all non-first offers.
+
+### Unequipped is a legal state
+
+`activeLaw` can be `null`. The cultivation tick, offline earnings, basic-attack formula, and stat engine all handle nullity — unequipped cultivators accrue qi at base rate with no `typeMults` applied. The BuildTab law picker exposes an "Unequip current law" action.
+
+### Reincarnation
+
+Wipes everything **except** the entire owned-law library. `activeLawId` is cleared, forcing the reborn character to pick a new equipped law from their library — the identity reset is explicit. Karma, the Eternal Tree, and the library persist across every life.
+
+### Upgrade costs (law-specific)
+
+Laws now have their own `LAW_UPGRADE_COSTS` table (in `src/data/crafting.js`) — ~1.5× heavier than the shared artefact/technique table since laws enter for free (no refining cost) and the upgrade path is the only mineral sink for them.
+
+| Current → Next | Cost |
+|---|---|
+| Iron → Bronze | 15 iron_mineral_1 + 4 bronze_mineral_1 |
+| Bronze → Silver | 12 bronze_mineral_1 + 4 silver_mineral_1 |
+| Silver → Gold | 8 silver_mineral_1 + 4 gold_mineral_1 |
+| Gold → Transcendent | 12 gold_mineral_1 + 3 transcendent_mineral_1 |
 
 ---
 

@@ -19,6 +19,10 @@ exchange for **Reincarnation Karma**, a permanent currency spent in the
   can spend their karma in the Eternal Tree at any point — rebirth is not
   required to unlock nodes.
 
+### What a rebirth does to the law library
+
+Reincarnation wipes QI, realms, pills, inventory, artefacts, techniques, and selections — but the **entire owned-law library survives**. `activeLawId` is cleared, so the reborn character is unequipped and must pick a new active law from their persisted library. That unequip moment is the intentional identity reset — every life can be a different playstyle without losing past acquisitions. Karma and the Eternal Tree also persist.
+
 ---
 
 ## Karma per realm

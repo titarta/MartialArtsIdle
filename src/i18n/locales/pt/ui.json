@@ -164,6 +164,7 @@
     "refineLawDesc":       "Compile uma lei de cultivo aleatória usando minerais e condensado de qi.",
     "refineBtn":           "Refinar {{rarity}}",
     "refinedFlash":        "Refinado {{rarity}}: {{name}}",
+    "inventoryFull":       "Inventário cheio — desmonte algo primeiro.",
     "craftedFlash":        "Criado {{name}}!",
     "craftedFloat":        "+{{count}} {{name}}",
     "modifiers":         "Modificadores ({{filled}}/{{capacity}})",

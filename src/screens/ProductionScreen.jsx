@@ -13,9 +13,10 @@ const ITEMS_BY_ID = { ...ALL_MATERIALS, ...PILLS_BY_ID };
 import { formatUniqueDescription } from '../data/lawUniques';
 import { ARTEFACTS } from '../data/artefacts';
 import { generateTechnique } from '../data/techniqueDrops';
-import { generateLaw } from '../data/affixPools';
-import { ARTEFACT_NEXT_RARITY } from '../hooks/useArtefacts';
-import { TECH_NEXT_QUALITY } from '../hooks/useTechniques';
+// generateLaw moved out of the refining flow — laws now drop from major
+// breakthroughs via useSelections.
+import { ARTEFACT_NEXT_RARITY, MAX_ARTEFACTS } from '../hooks/useArtefacts';
+import { TECH_NEXT_QUALITY, MAX_TECHNIQUES } from '../hooks/useTechniques';
 import { LAW_NEXT_RARITY } from '../hooks/useCultivation';
 import {
   SLOT_BRACKETS,
@@ -24,6 +25,7 @@ import {
   getBracketCost as bracketCost,
   UPGRADE_COSTS,
   REFINE_COSTS,
+  getUpgradeCosts,
 } from '../data/crafting';
 
 /**
@@ -267,9 +269,10 @@ function BracketSection({ bracket, renderFilled, renderEmpty }) {
 
 // ─── Upgrade section ──────────────────────────────────────────────────────────
 
-function UpgradeSection({ rarity, nextQ, inventory, onUpgrade }) {
+function UpgradeSection({ rarity, nextQ, inventory, onUpgrade, kind = 'artefact' }) {
   const { t } = useTranslation('ui');
-  const upgCost   = UPGRADE_COSTS[rarity];
+  // Laws have their own (heavier) cost table.
+  const upgCost   = getUpgradeCosts(kind, rarity);
   const upgAfford = upgCost?.every(c => inventory.getQuantity(c.itemId) >= c.qty) ?? false;
 
   if (!nextQ) return <p className="tx-max-quality">{t('production.alreadyMaxQuality')}</p>;
@@ -559,6 +562,7 @@ function LawDetail({ law, cultivation, inventory }) {
         rarity={law.rarity}
         nextQ={nextQ}
         inventory={inventory}
+        kind="law"
         onUpgrade={() => cultivation.upgradeLaw(law.id)}
       />
     </div>
@@ -781,18 +785,18 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function RefineCard({ type, inventory, onRefine }) {
+function RefineCard({ type, inventory, onRefine, inventoryFull = false }) {
   const { t } = useTranslation('ui');
   const [rarity, setRarity] = useState('Iron');
 
   const REFINE_INFO = {
     artefact:  { title: t('production.refineArtefactTitle'), description: t('production.refineArtefactDesc'), icon: REFINE_ICONS.artefact },
     technique: { title: t('production.refineTechTitle'),    description: t('production.refineTechDesc'),    icon: REFINE_ICONS.technique },
-    law:       { title: t('production.refineLawTitle'),     description: t('production.refineLawDesc'),     icon: REFINE_ICONS.law },
   };
   const info  = REFINE_INFO[type];
   const costs = getRefineCost(type, rarity);
   const afford = costs.every(c => inventory.getQuantity(c.itemId) >= c.qty);
+  const canRefine = afford && !inventoryFull;
   const rColor = RARITY_COLOR[rarity];
 
   return (
@@ -839,10 +843,11 @@ function RefineCard({ type, inventory, onRefine }) {
         })}
       </div>
       <button
-        className={`refine-btn ${afford ? '' : 'refine-btn-disabled'}`}
-        style={afford ? { color: rColor, borderColor: rColor, background: `${rColor}22` } : undefined}
-        onClick={() => afford && onRefine(type, rarity)}
-        disabled={!afford}
+        className={`refine-btn ${canRefine ? '' : 'refine-btn-disabled'}`}
+        style={canRefine ? { color: rColor, borderColor: rColor, background: `${rColor}22` } : undefined}
+        onClick={() => canRefine && onRefine(type, rarity)}
+        disabled={!canRefine}
+        title={inventoryFull ? t('production.inventoryFull', { defaultValue: 'Inventory full — dismantle something first.' }) : undefined}
       >
         {t('production.refineBtn', { rarity: t(`quality.${rarity}`, { defaultValue: rarity }) })}
       </button>
@@ -871,23 +876,24 @@ function RefiningPanel({ inventory, artefacts, techniques, cultivation }) {
       const tech = generateTechnique(worldId);
       techniques.addOwnedTechnique(tech);
       resultName = tech.name;
-    } else if (type === 'law') {
-      // Pass the player's current realm so soul-anchored types are gated
-      // out pre-Saint.
-      const law = generateLaw(rarity, cultivation.realmIndex);
-      cultivation.addOwnedLaw(law);
-      resultName = law.name;
     }
+    // Laws no longer refine — they come from major-realm breakthrough
+    // selections (see useSelections).
 
     setFlashMsg(t('production.refinedFlash', { rarity: t(`quality.${rarity}`, { defaultValue: rarity }), name: resultName }));
     setTimeout(() => setFlashMsg(null), 2000);
   };
 
+  // Cap checks — refining is refused at the cap (button grey-out +
+  // tooltip). The player must dismantle something from the Collection
+  // screen before rolling another item.
+  const artefactsFull  = (artefacts?.owned?.length ?? 0) >= MAX_ARTEFACTS;
+  const techniquesFull = Object.keys(techniques?.ownedTechniques ?? {}).length >= MAX_TECHNIQUES;
+
   return (
     <div className="refining-panel">
-      <RefineCard type="artefact"  inventory={inventory} onRefine={refine} />
-      <RefineCard type="technique" inventory={inventory} onRefine={refine} />
-      <RefineCard type="law"       inventory={inventory} onRefine={refine} />
+      <RefineCard type="artefact"  inventory={inventory} onRefine={refine} inventoryFull={artefactsFull} />
+      <RefineCard type="technique" inventory={inventory} onRefine={refine} inventoryFull={techniquesFull} />
       {flashMsg && <div className="refine-flash">{flashMsg}</div>}
     </div>
   );

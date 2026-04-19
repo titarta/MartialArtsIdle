@@ -1,5 +1,8 @@
 import { SELECTION_BY_ID, SELECTION_RARITY } from '../data/selections';
 import { JADE_COSTS } from '../systems/jade';
+import { LAW_RARITY } from '../data/laws';
+import { formatUniqueDescription } from '../data/lawUniques';
+import { MAX_LAWS } from '../hooks/useCultivation';
 
 // ── Category config ───────────────────────────────────────────────────────────
 
@@ -12,7 +15,7 @@ const CATEGORY = {
   special:     { icon: '✦', color: '#22d3ee' },
 };
 
-// ── Card ─────────────────────────────────────────────────────────────────────
+// ── Augment card (existing) ──────────────────────────────────────────────────
 
 function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFreeReroll, canAffordReroll }) {
   const opt    = SELECTION_BY_ID[optionId];
@@ -27,14 +30,11 @@ function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFree
       style={{ '--cat-color': cat.color, '--rarity-color': rarity.color }}
       onClick={() => onPick(optionId)}
     >
-      {/* Category strip */}
       <div className="augment-cat-strip">
         <span className="augment-cat-icon">{cat.icon}</span>
         <span className="augment-cat-label">{opt.category}</span>
         <span className="augment-rarity-dot" style={{ background: rarity.color }} title={rarity.label} />
       </div>
-
-      {/* Body */}
       <div className="augment-body">
         <p className="augment-name">{opt.name}</p>
         <p className="augment-desc">{opt.description}</p>
@@ -42,8 +42,6 @@ function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFree
           <span className="augment-stacks">Max ×{opt.maxStacks}</span>
         )}
       </div>
-
-      {/* Per-card reroll */}
       <button
         className={`augment-reroll${!canAffordReroll ? ' augment-reroll-disabled' : ''}`}
         onClick={e => { e.stopPropagation(); canAffordReroll && onRerollOne(index); }}
@@ -56,11 +54,168 @@ function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFree
   );
 }
 
+// ── Law card (new) ───────────────────────────────────────────────────────────
+
+/** Short one-line summary of a law's typeMults like "+120% Body". */
+function formatLawTypeMults(law) {
+  const parts = [];
+  const tm = law.typeMults ?? {};
+  for (const [stat, mult] of Object.entries(tm)) {
+    if (!mult || mult <= 0) continue;
+    const pct = Math.round((mult - 1) * 100);
+    parts.push(`+${pct}% ${stat[0].toUpperCase()}${stat.slice(1)}`);
+  }
+  return parts.length ? parts.join(' · ') : 'No stat mults';
+}
+
+function LawCard({ law, onPick, disabled }) {
+  const rarity = LAW_RARITY[law.rarity] ?? { color: '#9ca3af', label: law.rarity };
+  const types = (law.types ?? []).join(' · ');
+  const topUnique = law.uniques && Object.entries(law.uniques)[0];
+  return (
+    <div
+      className={`augment-card augment-card-${law.rarity?.toLowerCase?.() ?? 'iron'}`}
+      style={{ '--cat-color': rarity.color, '--rarity-color': rarity.color, opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
+      onClick={() => !disabled && onPick?.()}
+    >
+      <div className="augment-cat-strip">
+        <span className="augment-cat-icon">☯</span>
+        <span className="augment-cat-label">{law.rarity}</span>
+        <span className="augment-rarity-dot" style={{ background: rarity.color }} />
+      </div>
+      <div className="augment-body">
+        <p className="augment-name" style={{ color: rarity.color }}>{law.name}</p>
+        <p className="augment-desc">
+          <strong>{types || 'general'}</strong>
+        </p>
+        <p className="augment-desc">
+          ×{(law.cultivationSpeedMult ?? 1).toFixed(2)} cultivation · {formatLawTypeMults(law)}
+        </p>
+        {topUnique && (
+          <p className="augment-desc" style={{ fontStyle: 'italic', opacity: 0.85 }}>
+            {topUnique[0]}: {formatUniqueDescription(topUnique[1].id, topUnique[1].value)}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Law variant — modal body ─────────────────────────────────────────────────
+
+function LawSelectionBody({ selection, jadeBalance, onPickLaw, onSkipLaw, onRerollLaw, ownedLaws, activeLawId, onDismantleLaw }) {
+  const { id, realmLabel, lawOptions, freeRerolls, rerollsUsed, isFirst } = selection;
+  const hasFreeReroll = rerollsUsed < freeRerolls;
+  const rerollCost = hasFreeReroll ? 0 : JADE_COSTS.reroll_law_extra;
+  const canAffordReroll = hasFreeReroll || (jadeBalance ?? 0) >= rerollCost;
+
+  // Library full guard — show an inline dismantle strip that blocks the
+  // cards until the player frees a slot.
+  const libraryFull = (ownedLaws?.length ?? 0) >= MAX_LAWS;
+  // Dismantleable = any law that isn't the currently active one.
+  const dismantleable = (ownedLaws ?? []).filter(l => l.id !== activeLawId);
+
+  return (
+    <>
+      <div className="sel-header">
+        <span className="sel-breakthrough-badge">☯ {isFirst ? 'First Law' : 'Law Reward'}</span>
+        <h2 className="sel-title">{isFirst ? 'Choose your first Cultivation Law' : 'New Cultivation Law'}</h2>
+        <p className="sel-realm">{realmLabel}</p>
+      </div>
+
+      {libraryFull && (
+        <div className="wipe-confirm" style={{ marginBottom: '12px' }}>
+          <span className="wipe-confirm-label">
+            Your library is full ({MAX_LAWS}). Dismantle one to make room:
+          </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
+            {dismantleable.length === 0 ? (
+              <span className="sel-realm">Only your active law remains — equip a different one from Character first.</span>
+            ) : dismantleable.map(l => (
+              <button
+                key={l.id}
+                className="save-btn save-btn-danger"
+                onClick={() => onDismantleLaw?.(l.id)}
+                title={`Dismantle ${l.name}`}
+              >
+                {l.name} ({l.rarity})
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="augment-row">
+        {(lawOptions ?? []).map((law, i) => (
+          <LawCard
+            key={`${law.id}-${i}`}
+            law={law}
+            disabled={libraryFull}
+            onPick={() => !libraryFull && onPickLaw?.(id, i)}
+          />
+        ))}
+      </div>
+
+      <div className="save-buttons" style={{ marginTop: '12px', justifyContent: 'center', display: 'flex', gap: '10px' }}>
+        <button
+          className={`save-btn${canAffordReroll ? '' : ' save-btn-disabled'}`}
+          disabled={!canAffordReroll}
+          onClick={() => canAffordReroll && onRerollLaw?.(id)}
+          title={hasFreeReroll ? 'Reroll all offers (free)' : `Reroll all offers (${rerollCost} Jade)`}
+        >
+          ↺ Reroll {hasFreeReroll ? '(free)' : `(${rerollCost} Jade)`}
+        </button>
+        {!isFirst && (
+          <button className="save-btn" onClick={() => onSkipLaw?.(id)}>
+            Skip
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
 // ── Modal ─────────────────────────────────────────────────────────────────────
 
-function SelectionModal({ selection, jadeBalance, onPick, onRerollOne, onClose }) {
+function SelectionModal({
+  selection,
+  jadeBalance,
+  onPick,
+  onRerollOne,
+  onClose,
+  onPickLaw,
+  onSkipLaw,
+  onRerollLaw,
+  ownedLaws,
+  activeLawId,
+  onDismantleLaw,
+}) {
   if (!selection) return null;
+  const isLaw = selection.kind === 'law';
 
+  if (isLaw) {
+    return (
+      <div className="modal-overlay sel-overlay" onClick={onClose}>
+        <div
+          className="sel-modal sel-modal-breakthrough"
+          onClick={e => e.stopPropagation()}
+        >
+          <LawSelectionBody
+            selection={selection}
+            jadeBalance={jadeBalance}
+            onPickLaw={onPickLaw}
+            onSkipLaw={onSkipLaw}
+            onRerollLaw={onRerollLaw}
+            ownedLaws={ownedLaws}
+            activeLawId={activeLawId}
+            onDismantleLaw={onDismantleLaw}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Augment variant (existing behaviour).
   const { id, realmLabel, tier, options, freeRerolls, rerollsUsed } = selection;
   const hasFreeReroll   = rerollsUsed < freeRerolls;
   const rerollCost      = hasFreeReroll ? 0
@@ -74,7 +229,6 @@ function SelectionModal({ selection, jadeBalance, onPick, onRerollOne, onClose }
         className={`sel-modal${isBreakthrough ? ' sel-modal-breakthrough' : ''}`}
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="sel-header">
           {isBreakthrough && <span className="sel-breakthrough-badge">⚡ Breakthrough</span>}
           <h2 className="sel-title">
@@ -83,7 +237,6 @@ function SelectionModal({ selection, jadeBalance, onPick, onRerollOne, onClose }
           <p className="sel-realm">{realmLabel}</p>
         </div>
 
-        {/* Augment cards */}
         <div className="augment-row">
           {options.map((optId, i) => (
             <AugmentCard

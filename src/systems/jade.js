@@ -67,4 +67,7 @@ export const JADE_COSTS = {
   reroll_minor:       10,   // reroll on a minor level-up selection
   reroll_breakthrough: 0,   // first reroll on breakthrough is free (handled in hook)
   reroll_extra:       20,   // additional rerolls on breakthrough after the free one
+  // Law offers are rarer than augments and shape several realms of play,
+  // so each reroll past the free first costs more than reroll_extra.
+  reroll_law_extra:   30,
 };

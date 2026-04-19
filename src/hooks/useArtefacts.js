@@ -179,6 +179,29 @@ export default function useArtefacts() {
     return null;
   }, [state]);
 
+  /**
+   * Dismantle an owned artefact. Refuses if currently equipped.
+   * Returns the rarity on success so callers can grant the matching
+   * mineral; null if the item is missing / locked.
+   */
+  const dismantleArtefact = useCallback((uid) => {
+    let dismantledRarity = null;
+    setState(prev => {
+      // Refuse if equipped anywhere.
+      for (const equippedUid of Object.values(prev.equipped ?? {})) {
+        if (equippedUid === uid) return prev;
+      }
+      const inst = prev.owned.find(o => o.uid === uid);
+      if (!inst) return prev;
+      const art = ARTEFACTS_BY_ID[inst.catalogueId];
+      dismantledRarity = inst.rarity ?? art?.rarity ?? 'Iron';
+      const next = { ...prev, owned: prev.owned.filter(o => o.uid !== uid) };
+      save(next);
+      return next;
+    });
+    return dismantledRarity;
+  }, []);
+
   // Upgrade an owned artefact's quality by one tier.
   // Keeps the original rolled name and marks the instance as upgraded so the
   // display layer appends an "(upgraded)" suffix.
@@ -329,6 +352,7 @@ export default function useArtefacts() {
     getEquipped,
     getOwnedForSlot,
     equippedInSlot,
+    dismantleArtefact,
     getStatModifiers,
   };
 }

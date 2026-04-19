@@ -32,6 +32,13 @@ Seven operations, all using **minerals only**. Same operations apply to all thre
 | **Extract** | Remove one chosen property, freeing its slot. |
 | **Seal** | Lock one property so Refine, Hone, and Transmute cannot touch it. One Seal per item. |
 | **Transmute** | Swap one chosen property type for another from the same pool (random, same weight tier). |
+| **Dismantle** | Break a non-equipped item back down to 1 mineral of its rarity. Player-initiated, confirms for Silver+ / invested items. Refuses on equipped / active items. |
+
+### Inventory overflow policy
+
+Every item kind has a cap (`MAX_ARTEFACTS = MAX_LAWS = 100`; `MAX_TECHNIQUES`). Refine buttons grey out once the cap is reached, with an "Inventory full — dismantle something first" tooltip. The law-track selection modal also injects an inline dismantle strip when the library is full, so a breakthrough offer never silently consumes a slot you don't have. No silent auto-destruction — every overflow resolution is an explicit player action.
+
+**Arbitrage check:** dismantle always yields strictly less than the refine cost at the same rarity (e.g. Iron artefact refines for 5 iron_mineral_1, dismantles for 1), so refine→dismantle loops are strictly lossy.
 
 ---
 

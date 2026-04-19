@@ -157,6 +157,26 @@ export default function useTechniques() {
     });
   }, []);
 
+  /**
+   * Dismantle an owned technique. Refuses if it's currently equipped in
+   * any slot. Returns the quality on success (so caller can grant the
+   * matching mineral) or null if it's locked / missing.
+   */
+  const dismantleTechnique = useCallback((id) => {
+    // Equipped check — can't dismantle while slotted.
+    if (slots.includes(id)) return null;
+    let quality = null;
+    setOwned(prev => {
+      const tech = prev[id];
+      if (!tech) return prev;
+      quality = tech.quality ?? 'Iron';
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    return quality;
+  }, [slots]);
+
   return {
     slots,
     ownedTechniques,
@@ -165,6 +185,7 @@ export default function useTechniques() {
     addPassive,
     equippedTechniques: slots.map(getTechById),
     addOwnedTechnique,
+    dismantleTechnique,
     equip,
     unequip,
   };

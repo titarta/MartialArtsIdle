@@ -212,16 +212,34 @@ function InlineArtefactPicker({ slot, artefacts, onClose }) {
 function LawPickerModal({ ownedLaws, activeLaw, onSelect, onClose }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
+  const activeId = activeLaw?.id ?? null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content law-picker-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>x</button>
         <h2 className="modal-title">{t('build.selectLaw')}</h2>
+        {ownedLaws.length === 0 ? (
+          <p className="sel-realm" style={{ padding: '24px 16px' }}>
+            {t('build.noLawsOwned', { defaultValue: 'You haven\'t earned any laws yet.' })}
+          </p>
+        ) : (
         <div className="law-picker-list">
+          {activeId && (
+            <button
+              className="law-picker-card"
+              onClick={() => { onSelect(null); onClose(); }}
+            >
+              <div className="law-picker-card-header">
+                <span className="law-picker-card-name">
+                  {t('build.unequipLaw', { defaultValue: 'Unequip current law' })}
+                </span>
+              </div>
+            </button>
+          )}
           {ownedLaws.map(law => {
             const rarity = LAW_RARITY[law.rarity];
-            const isActive = law.id === activeLaw.id;
+            const isActive = law.id === activeId;
             const lawName = tGame(`laws.${law.id}.name`, { defaultValue: law.name });
             return (
               <button
@@ -239,13 +257,14 @@ function LawPickerModal({ ownedLaws, activeLaw, onSelect, onClose }) {
                   </div>
                 </div>
                 <div className="law-picker-card-stats">
-                  <span>{t('build.cultSpeed')}: x{law.cultivationSpeedMult.toFixed(1)}</span>
+                  <span>{t('build.cultSpeed')}: x{(law.cultivationSpeedMult ?? 1).toFixed(1)}</span>
                 </div>
                 {isActive && <span className="law-picker-card-active-tag">{t('common.active')}</span>}
               </button>
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );
@@ -299,9 +318,14 @@ function BuildContent({ cultivation, techniques, artefacts }) {
   const [lawPickerOpen,    setLawPickerOpen]    = useState(false);
 
   const { activeLaw, setActiveLaw, isLawUnlocked, realmIndex, ownedLaws } = cultivation;
-  const rarity = LAW_RARITY[activeLaw.rarity];
-  const lawName = tGame(`laws.${activeLaw.id}.name`, { defaultValue: activeLaw.name });
-  const lawFlavour = tGame(`laws.${activeLaw.id}.flavour`, { defaultValue: activeLaw.flavour });
+  // Unequipped state is legal — render a prompt card instead of crashing.
+  const rarity = activeLaw ? LAW_RARITY[activeLaw.rarity] : null;
+  const lawName = activeLaw
+    ? tGame(`laws.${activeLaw.id}.name`, { defaultValue: activeLaw.name })
+    : null;
+  const lawFlavour = activeLaw
+    ? tGame(`laws.${activeLaw.id}.flavour`, { defaultValue: activeLaw.flavour })
+    : null;
 
   // Gear slot hover tooltip
   const gearTooltip = useTooltipPos();
@@ -333,6 +357,18 @@ function BuildContent({ cultivation, techniques, artefacts }) {
         {/* Law card - LEFT / TOP on mobile */}
         <section className="build-section build-law-compact-section" onClick={() => setLawPickerOpen(true)}>
           <h2 className="build-section-title">{t('build.cultivationLaw')}</h2>
+          {!activeLaw ? (
+            <div className="build-law-card build-law-card-compact build-law-locked">
+              <div className="law-header">
+                <span className="law-name">{t('build.lawUnequipped', { defaultValue: 'No law equipped' })}</span>
+              </div>
+              <p className="law-flavour">
+                {ownedLaws?.length
+                  ? t('build.lawUnequippedPick',  { defaultValue: 'Tap to choose one from your library.' })
+                  : t('build.lawUnequippedEmpty', { defaultValue: 'Reach your first major realm to unlock a law.' })}
+              </p>
+            </div>
+          ) : (
           <div className={`build-law-card build-law-card-compact${!isLawUnlocked ? ' build-law-locked' : ''}`}>
             <div className="law-header">
               <span className="law-name">{lawName}</span>
@@ -350,7 +386,7 @@ function BuildContent({ cultivation, techniques, artefacts }) {
 
             <div className="law-stat-row">
               <span className="law-stat-label">{t('build.cultSpeed')}</span>
-              <span className="law-stat-value">x{activeLaw.cultivationSpeedMult.toFixed(1)}</span>
+              <span className="law-stat-value">x{(activeLaw.cultivationSpeedMult ?? 1).toFixed(1)}</span>
             </div>
 
             <div className="law-divider" />
@@ -379,6 +415,7 @@ function BuildContent({ cultivation, techniques, artefacts }) {
 
             <span className="law-tap-hint">{t('build.tapToChange')}</span>
           </div>
+          )}
         </section>
 
         {/* Artefact grid - RIGHT / BOTTOM on mobile */}

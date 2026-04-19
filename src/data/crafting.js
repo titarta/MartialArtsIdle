@@ -109,6 +109,8 @@ export function getBracketCost(mineralStat, mineralMod, op, craftCount = 0) {
 // Pattern: current-tier mineral (bulk) + next-tier mineral (gateway taste).
 // Dev panel: edit qty values to tune upgrade pacing.
 
+// Shared upgrade cost (artefacts, techniques). Kept stable to avoid
+// touching the non-law upgrade economy.
 const UPGRADE_COSTS_RAW = {
   Iron:   [ { itemId: 'iron_mineral_1',   qty: 10 }, { itemId: 'bronze_mineral_1',        qty: 3 } ],
   Bronze: [ { itemId: 'bronze_mineral_1', qty: 8  }, { itemId: 'silver_mineral_1',        qty: 3 } ],
@@ -116,6 +118,23 @@ const UPGRADE_COSTS_RAW = {
   Gold:   [ { itemId: 'gold_mineral_1',   qty: 8  }, { itemId: 'transcendent_mineral_1',  qty: 2 } ],
 };
 export const UPGRADE_COSTS = mergeSingleton(UPGRADE_COSTS_RAW, 'crafting', 'UPGRADE_COSTS');
+
+// Law-specific upgrade cost — laws drop from breakthroughs now instead
+// of being refined, so the upgrade path is the only mineral sink for
+// them. ~1.5× heavier than the shared table to respect that shift.
+const LAW_UPGRADE_COSTS_RAW = {
+  Iron:   [ { itemId: 'iron_mineral_1',   qty: 15 }, { itemId: 'bronze_mineral_1',        qty: 4 } ],
+  Bronze: [ { itemId: 'bronze_mineral_1', qty: 12 }, { itemId: 'silver_mineral_1',        qty: 4 } ],
+  Silver: [ { itemId: 'silver_mineral_1', qty: 8  }, { itemId: 'gold_mineral_1',          qty: 4 } ],
+  Gold:   [ { itemId: 'gold_mineral_1',   qty: 12 }, { itemId: 'transcendent_mineral_1',  qty: 3 } ],
+};
+export const LAW_UPGRADE_COSTS = mergeSingleton(LAW_UPGRADE_COSTS_RAW, 'crafting', 'LAW_UPGRADE_COSTS');
+
+/** Upgrade cost array for an item of the given kind + current rarity. */
+export function getUpgradeCosts(kind, rarity) {
+  if (kind === 'law') return LAW_UPGRADE_COSTS[rarity] ?? [];
+  return UPGRADE_COSTS[rarity] ?? [];
+}
 
 // ── Refine costs ──────────────────────────────────────────────────────────────
 // Cost to forge a random item of a given rarity.
@@ -149,12 +168,6 @@ const REFINE_COSTS_RAW = {
     Gold:         [ { itemId: 'gold_mineral_1',         qty: 3 }, { itemId: 'gold_cultivation_2',         qty: 3 } ],
     Transcendent: [ { itemId: 'transcendent_mineral_1', qty: 3 }, { itemId: 'transcendent_cultivation_2', qty: 3 } ],
   },
-  law: {
-    Iron:         [ { itemId: 'iron_mineral_1',         qty: 3 }, { itemId: 'iron_cultivation_1',         qty: 10 } ],
-    Bronze:       [ { itemId: 'bronze_mineral_1',       qty: 3 }, { itemId: 'bronze_cultivation_1',       qty: 5  } ],
-    Silver:       [ { itemId: 'silver_mineral_1',       qty: 3 }, { itemId: 'silver_cultivation_1',       qty: 5  } ],
-    Gold:         [ { itemId: 'gold_mineral_1',         qty: 3 }, { itemId: 'gold_cultivation_1',         qty: 3  } ],
-    Transcendent: [ { itemId: 'transcendent_mineral_1', qty: 3 }, { itemId: 'transcendent_cultivation_1', qty: 3  } ],
-  },
+  // Laws are no longer refinable — they drop from major-realm breakthroughs.
 };
 export const REFINE_COSTS = mergeSingleton(REFINE_COSTS_RAW, 'crafting', 'REFINE_COSTS');

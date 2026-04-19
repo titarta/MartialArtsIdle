@@ -150,3 +150,22 @@ export function getMineCost(itemId) {
 export function getRefinedQi(itemId) {
   return CULTIVATION_MATERIALS[itemId]?.refinedQi ?? 0;
 }
+
+/**
+ * Rarity → base mineral item id. Used by the dismantle flow so every
+ * dismantled artefact / technique / law returns a predictable mineral
+ * of matching rarity. Kept < refine cost at every tier so refine →
+ * dismantle cannot be used for mineral arbitrage.
+ */
+export const RARITY_TO_MINERAL = {
+  Iron:         'iron_mineral_1',
+  Bronze:       'bronze_mineral_1',
+  Silver:       'silver_mineral_1',
+  Gold:         'gold_mineral_1',
+  Transcendent: 'transcendent_mineral_1',
+};
+
+/** Item id of the mineral you get when dismantling something of this rarity. */
+export function mineralForRarity(rarity) {
+  return RARITY_TO_MINERAL[rarity] ?? 'iron_mineral_1';
+}

@@ -517,6 +517,18 @@ function HomeScreen({
             </div>
           )}
 
+          {/* "No law equipped" hint — surfaces only when the player has a
+              library but nothing selected as active. Tapping opens the
+              Character tab where the law picker lives. */}
+          {!cultivation.activeLaw && (cultivation.ownedLaws?.length ?? 0) > 0 && (
+            <div className="home-chip-tl" style={{ top: 'calc(var(--chip-top, 12px) + 52px)' }}>
+              <button className="home-sel-btn" onClick={() => onNavigate?.('character')}>
+                <span className="home-sel-btn-icon">☯</span>
+                <span className="home-sel-btn-label">No law equipped</span>
+              </button>
+            </div>
+          )}
+
           {/* Heavenly Qi pill chip — scene chip, top-right */}
           <HeavenlyQiButton
             ad={cultivationAd}

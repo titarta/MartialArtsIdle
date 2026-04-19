@@ -23,6 +23,7 @@ import usePills       from './hooks/usePills';
 import useQiCrystal  from './hooks/useQiCrystal';
 import useAutoFarm    from './hooks/useAutoFarm';
 import WORLDS         from './data/worlds';
+import { mineralForRarity } from './data/materials';
 import { computeAllStats, mergeModifiers } from './data/stats';
 import { evaluateLawUniques, buildContext } from './systems/lawEngine';
 import { initDebug } from './debug/gameDebug';
@@ -352,6 +353,15 @@ function App() {
           jadeBalance={selections.jadeBalance}
           onPick={selections.pickOption}
           onRerollOne={selections.rerollOne}
+          onPickLaw={selections.pickLaw}
+          onSkipLaw={selections.skipLaw}
+          onRerollLaw={selections.rerollLaw}
+          ownedLaws={cultivation.ownedLaws}
+          activeLawId={cultivation.activeLaw?.id ?? null}
+          onDismantleLaw={(lawId) => {
+            const r = cultivation.dismantleLaw(lawId);
+            if (r) inventory.addItem(mineralForRarity(r), 1);
+          }}
           onClose={() => setSelectionModalOpen(false)}
         />
       )}

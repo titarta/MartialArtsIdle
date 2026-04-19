@@ -100,7 +100,7 @@ export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
   const exploitMult    = Math.round(computeStat(150, mods('exploit_attack_mult'))); // %
 
   // ── Activity ───────────────────────────────────────────────────────────────
-  const qiSpeed      = QI_BASE_RATE * (law.cultivationSpeedMult ?? 1); // qi/sec base
+  const qiSpeed      = QI_BASE_RATE * (law?.cultivationSpeedMult ?? 1); // qi/sec base
   const focusMult    = Math.round(computeStat(300, mods('qi_focus_mult')));      // %
   const harvestSpeed = soulUnlocked
     ? Math.max(1, Math.floor(computeStat(Math.floor(soul * 0.1), mods('harvest_speed'))))

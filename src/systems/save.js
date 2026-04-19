@@ -51,32 +51,30 @@ export function wipeSave() {
 }
 
 /**
- * Wipe for reincarnation. Preserves karma + tree (their keys are outside
- * the wipeSave list) and also the currently-active law — the player keeps
- * the manual they're cultivating across rebirths, but loses any other
- * collected laws.
+ * Wipe for reincarnation. Preserves karma + tree (those keys are outside
+ * the wipeSave list) and the **entire** owned-laws library — but clears
+ * the active law so the reborn character must re-choose which manual to
+ * cultivate. The library is the permanent identity across lives; the
+ * active choice is the fresh start.
  */
 export function wipeReincarnation() {
-  // Snapshot the active law BEFORE the wipe
-  let activeLaw = null;
-  let activeId  = null;
+  // Snapshot the full library BEFORE the wipe so we can re-seed it.
+  let ownedLaws = [];
   try {
-    const activeRaw = localStorage.getItem('mai_active_law');
-    activeId = activeRaw ? JSON.parse(activeRaw) : null;
     const ownedRaw = localStorage.getItem('mai_owned_laws');
-    const owned    = ownedRaw ? JSON.parse(ownedRaw) : [];
-    activeLaw = owned.find(l => l.id === activeId) ?? owned[0] ?? null;
+    ownedLaws = ownedRaw ? JSON.parse(ownedRaw) : [];
   } catch {}
 
   wipeSave();
 
-  // Restore the active law as the sole owned law
-  if (activeLaw) {
+  // Re-seed the library (no active selection — player picks anew).
+  if (ownedLaws.length > 0) {
     try {
-      localStorage.setItem('mai_owned_laws',  JSON.stringify([activeLaw]));
-      localStorage.setItem('mai_active_law', JSON.stringify(activeLaw.id));
+      localStorage.setItem('mai_owned_laws', JSON.stringify(ownedLaws));
     } catch {}
   }
+  // mai_active_law was removed by wipeSave; leave it absent so activeLaw
+  // derives to null on next load.
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS, RARITY } from '../data/materials';
+import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS, RARITY, mineralForRarity, ALL_MATERIALS } from '../data/materials';
 
 const MATERIAL_ITEMS = {
   herbs:       HERB_ITEMS,
@@ -19,6 +19,61 @@ import { MAX_LAWS } from '../hooks/useCultivation';
 import ItemModal from '../components/ItemModal';
 
 const BASE = import.meta.env.BASE_URL;
+
+/**
+ * Shared dismantle action. Refuses when the hook rejects (equipped /
+ * active / missing). On success, grants 1 mineral of matching rarity.
+ */
+function dismantleTo(inventory, rarity) {
+  if (!rarity) return null;
+  const mineralId = mineralForRarity(rarity);
+  inventory?.addItem?.(mineralId, 1);
+  return mineralId;
+}
+
+function needsDismantleConfirm(rarity, invested) {
+  // Confirm for Silver+ rarity OR if the player has sunk any hone /
+  // replace / add into the item (craftCount > 0, for affix items).
+  const rank = { Iron: 1, Bronze: 2, Silver: 3, Gold: 4, Transcendent: 5 }[rarity] ?? 1;
+  return rank >= 3 || invested;
+}
+
+function DismantleButton({ label = 'Dismantle', rarity, invested = false, disabled, disabledReason, onDismantle }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const mineralId = rarity ? mineralForRarity(rarity) : null;
+  const mineralName = mineralId ? (ALL_MATERIALS[mineralId]?.name ?? mineralId) : '';
+  const needsConfirm = needsDismantleConfirm(rarity, invested);
+
+  if (disabled) {
+    return (
+      <button className="save-btn save-btn-danger" disabled title={disabledReason}>
+        {label}
+      </button>
+    );
+  }
+
+  if (confirmOpen) {
+    return (
+      <div className="wipe-confirm" style={{ marginTop: '8px' }}>
+        <span className="wipe-confirm-label">
+          Dismantle this <strong>{rarity}</strong> item for 1× {mineralName}?
+        </span>
+        <button className="save-btn save-btn-danger" onClick={() => { setConfirmOpen(false); onDismantle(); }}>Confirm</button>
+        <button className="save-btn" onClick={() => setConfirmOpen(false)}>Cancel</button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      className="save-btn save-btn-danger"
+      onClick={() => (needsConfirm ? setConfirmOpen(true) : onDismantle())}
+      title={`Dismantle for 1× ${mineralName}`}
+    >
+      {label} · +1 {mineralName}
+    </button>
+  );
+}
 
 function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
   const { t }        = useTranslation('ui');
@@ -205,6 +260,24 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                   </div>
                 ))}
               </div>
+              {(() => {
+                const isEquipped = !!artefacts.equippedInSlot(selectedArtefact.uid);
+                return (
+                  <DismantleButton
+                    rarity={rarity}
+                    invested={(selectedArtefact.craftCount ?? 0) > 0}
+                    disabled={isEquipped}
+                    disabledReason={isEquipped ? 'Unequip this artefact first.' : undefined}
+                    onDismantle={() => {
+                      const r = artefacts.dismantleArtefact(selectedArtefact.uid);
+                      if (r) {
+                        dismantleTo(inventory, r);
+                        setSelectedArtefact(null);
+                      }
+                    }}
+                  />
+                );
+              })()}
             </div>
           </div>
         );
@@ -290,6 +363,24 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                 </div>
               )}
               {techFlavour && <p className="modal-desc tech-item-flavour">"{techFlavour}"</p>}
+              {(() => {
+                const isEquipped = techniques.slots.includes(tech.id);
+                return (
+                  <DismantleButton
+                    rarity={tech.quality}
+                    invested={(tech.passives ?? []).some(p => p.tier && p.tier !== 'Iron')}
+                    disabled={isEquipped}
+                    disabledReason={isEquipped ? 'Unequip this technique first.' : undefined}
+                    onDismantle={() => {
+                      const r = techniques.dismantleTechnique(tech.id);
+                      if (r) {
+                        dismantleTo(inventory, r);
+                        setSelectedTechnique(null);
+                      }
+                    }}
+                  />
+                );
+              })()}
             </div>
           </div>
         );
@@ -328,6 +419,24 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                 </div>
               )}
               <p className="modal-desc tech-item-flavour">"{lawFlavour}"</p>
+              {(() => {
+                const isActive = cultivation?.activeLaw?.id === law.id;
+                return (
+                  <DismantleButton
+                    rarity={law.rarity}
+                    invested={Object.keys(law.uniques ?? {}).length > 0}
+                    disabled={isActive}
+                    disabledReason={isActive ? 'This is your active law — pick another first.' : undefined}
+                    onDismantle={() => {
+                      const r = cultivation.dismantleLaw(law.id);
+                      if (r) {
+                        dismantleTo(inventory, r);
+                        setSelectedLaw(null);
+                      }
+                    }}
+                  />
+                );
+              })()}
             </div>
           </div>
         );

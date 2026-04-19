@@ -164,6 +164,7 @@
     "refineLawDesc": "Compile a random cultivation law using minerals and qi condensate.",
     "refineBtn": "Refine {{rarity}}",
     "refinedFlash": "Refined {{rarity}}: {{name}}",
+    "inventoryFull": "Inventory full — dismantle something first.",
     "craftedFlash": "Crafted {{name}}!",
     "craftedFloat": "+{{count}} {{name}}",
     "modifiers": "Modifiers ({{filled}}/{{capacity}})",

@@ -132,4 +132,34 @@ export function getMajorBreakthroughRate(fromIndex) {
   return next.cost * pct;
 }
 
+// ── Major-realm → law-offer rarity band ──────────────────────────────────────
+// Each major realm name maps to the 2-rarity pool used when a breakthrough
+// offers law choices. Iron stops appearing once the player enters the
+// Silver band (Separation & Reunion); Transcendent first appears in the
+// Gold/Transcendent band (Origin King onwards).
+const MAJOR_TO_RARITY_BAND = {
+  'Tempered Body':        ['Iron'],
+  'Qi Transformation':    ['Iron', 'Bronze'],
+  'True Element':         ['Iron', 'Bronze'],
+  'Separation & Reunion': ['Bronze', 'Silver'],
+  'Immortal Ascension':   ['Bronze', 'Silver'],
+  'Saint':                ['Silver', 'Gold'],
+  'Saint King':           ['Silver', 'Gold'],
+  'Origin Returning':     ['Silver', 'Gold'],
+  'Origin King':          ['Gold', 'Transcendent'],
+  'Void King':            ['Gold', 'Transcendent'],
+  'Dao Source':           ['Gold', 'Transcendent'],
+  'Emperor Realm':        ['Gold', 'Transcendent'],
+  'Open Heaven':          ['Gold', 'Transcendent'],
+};
+
+/**
+ * Offer rarity pool for a law choice triggered by a major-realm
+ * breakthrough that lands the player on `realmIndex`.
+ */
+export function lawOfferRaritiesForRealm(realmIndex) {
+  const realm = REALMS[realmIndex];
+  return MAJOR_TO_RARITY_BAND[realm?.name] ?? ['Iron'];
+}
+
 export default REALMS;
