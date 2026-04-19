@@ -2,7 +2,12 @@
 
 Build-enabling rare modifiers for Laws, Artefacts, and Techniques. Designed in the spirit of Path of Exile uniques, Slormancer legendaries, and Diablo set bonuses — combinations of unique modifiers should enable distinct playstyles.
 
-> **Status:** Design pool only. Defined in `src/data/uniqueModifiers.js`. **Not yet hooked into game logic** — game will need stat formula extensions and trigger systems to make these functional.
+> **Status:** Law uniques and artefact uniques are LIVE. Law uniques live in
+> `src/data/lawUniques.js` and are evaluated each tick by `lawEngine.js`.
+> Artefact uniques live in `src/data/uniqueModifiers.js → ARTEFACT_UNIQUES`
+> and roll on Iron slots at a 2% chance per item, plus on the Transcendent
+> slot's reroll pool (see [[Artefacts]] for the integration rules).
+> Technique uniques are still presentation-only.
 
 ---
 
@@ -35,9 +40,13 @@ Modifier descriptions use the same vocabulary as normal stat modifiers:
 
 ---
 
-## Modifier Tags
+## Modifier Tags (legacy — being retired)
 
-Modifiers have descriptive tags (not structural archetypes) for filtering/searching when designing builds. These are not pool boundaries — law modifiers are a single flat pool, and any modifier may carry multiple tags.
+Tags were originally introduced for filtering/searching when designing
+builds. The "archetype" concept has since been **removed from law data**
+— laws are a single flat pool with no structural archetype, and the tag
+column on artefact / technique uniques was stripped from `uniqueModifiers.js`.
+The table below is kept for design-language reference only.
 
 | Tag            | Meaning                          |
 | -------------- | -------------------------------- |

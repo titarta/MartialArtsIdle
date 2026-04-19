@@ -6,31 +6,28 @@ A permanent cultivation upgrade on the **Home Screen** that adds flat qi/sec to 
 
 ## Overview
 
-- Maximum level: **10**
-- Bonus per level: **+2 flat qi/sec** (additive to the BASE_RATE of 1 qi/sec)
-- The bonus stacks with all other multipliers (law mult, boost mult, pill mult, etc.)
-
-> At level 10 the crystal adds 20 flat qi/sec — a 21× multiplier over the base cultivation rate before any other multipliers.
+- **No level cap.** Level scales infinitely; cost grows with the level curve below.
+- Bonus per level: **+2 flat qi/sec** (additive to the BASE_RATE of 1 qi/sec).
+- The bonus stacks with all other multipliers (law mult, boost mult, pill mult, etc.).
 
 ---
 
-## Upgrade Costs
+## Refined-QI Curve
 
-QI stones are consumed in pairs of levels per rarity tier.  
-Cost formula: `ceil(10 × within^1.5)` where `within` = position within the two-level tier (1 or 2).
+The crystal is fed QI stones, each carrying a refined-QI value. Levelling
+auto-triggers the moment accumulated refined QI crosses the next-level
+threshold, and any overflow rolls into the next bar.
 
-| Level | Material | Qty |
-|---|---|---|
-| 1 | Iron QI Stone 1 | 10 |
-| 2 | Iron QI Stone 1 | 29 |
-| 3 | Bronze QI Stone 1 | 10 |
-| 4 | Bronze QI Stone 1 | 29 |
-| 5 | Silver QI Stone 1 | 10 |
-| 6 | Silver QI Stone 1 | 29 |
-| 7 | Gold QI Stone 1 | 10 |
-| 8 | Gold QI Stone 1 | 29 |
-| 9 | Transcendent QI Stone 1 | 10 |
-| 10 | Transcendent QI Stone 1 | 29 |
+```
+required(level) = round_to_2sf( 50 × level^1.30 )
+```
+
+The exponent was lowered from 1.55 → 1.30 to keep late-level upgrades
+within reach during normal play. Sample progression: 50, 120, 210, 310,
+420, 540, 660, 790, 930, 1100, …
+
+Authoritative implementation: `getRequiredRefinedQi(level)` in
+[src/hooks/useQiCrystal.js](../src/hooks/useQiCrystal.js).
 
 ---
 

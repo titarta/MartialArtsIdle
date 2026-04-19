@@ -43,12 +43,15 @@ qi/sec = BASE_RATE × (1 + Σ increased_qi_speed%) × Π more_qi_speed × focus_
 
 ## Primary Stats
 
-The three primary stats start at 0 and are built up entirely through modifiers (pills, artefacts, [[Laws|Law]] passives, reincarnation bonuses, etc.). They are no longer derived from Qi.
-
 ```
-Base = 0
+Base values: Essence = 20, Body = 20, Soul = 0
 Final = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (1 + Σ increased%) × Π more
 ```
+
+The new compound stat **`all_primary_stats`** acts as sugar — its modifiers
+are folded into each of `essence` / `body` / `soul` at the top of
+`computeAllStats`, so a single `+25% all_primary_stats` source benefits
+every primary equally. Used by amulet (neck) artefacts.
 
 ---
 
@@ -56,9 +59,11 @@ Final = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (1 + Σ
 
 Elemental power — the cultivator's chosen element made manifest.
 
-- **Base value:** 0 (all value comes from modifier sources)
-- **Feeds into:** Elemental Damage, DEF, Secret Technique equip thresholds
-- **Unlocked:** Qi Transformation (when a Law is equipped)
+- **Base value:** 20.
+- Drives **elemental damage** (fire/water/earth) when the active law has
+  Essence-anchored `types` (multiplied by `law.typeMults.essence`).
+- Sole source of **Elemental Defense** (`elem_def = essence + modifiers`).
+- Always unlocked.
 
 ---
 
@@ -66,9 +71,13 @@ Elemental power — the cultivator's chosen element made manifest.
 
 Spiritual power — consciousness and will made tangible.
 
-- **Base value:** 0 (all value comes from modifier sources)
-- **Feeds into:** Psychic Damage, Soul Toughness threshold, Secret Technique equip thresholds, Harvest Gathering Speed
-- **Unlocked:** [[Realm Progression#Saint|Saint]] realm (locked to 0 before this)
+- **Base value:** 0.
+- Drives **psychic damage** (spirit/void/dao) when the active law has
+  Soul-anchored `types` (multiplied by `law.typeMults.soul`).
+- Sole source of **Soul Toughness** (`soul_toughness = soul + modifiers`).
+- Drives **Harvest Speed** (`floor(soul × 0.1) + modifiers`, min 1).
+- **Locked to 0** until the [[Realm Progression#Saint|Saint]] realm
+  (`SAINT_INDEX = 24`).
 
 ---
 
@@ -76,9 +85,12 @@ Spiritual power — consciousness and will made tangible.
 
 Physical power — the cultivated flesh, bones, and meridians.
 
-- **Base value:** 0 (all value comes from modifier sources)
-- **Feeds into:** Physical Damage, Defense, Secret Technique equip thresholds, Mining Speed
-- **Unlocked:** Tempered Body (always active)
+- **Base value:** 20.
+- Drives **physical damage** (physical/sword/fist) when the active law has
+  Body-anchored `types` (multiplied by `law.typeMults.body`).
+- Sole source of **Defense** (`def = body + modifiers`).
+- Drives **Mining Speed** (`floor(body × 0.1) + modifiers`, min 1).
+- Always unlocked.
 
 ---
 
@@ -88,90 +100,76 @@ Physical power — the cultivated flesh, bones, and meridians.
 
 ### Health
 
-The amount of damage the character can take before dying.
+- **Base:** `(essence + body) × 12 + soul × 4`, floored at 100.
 
-- **Base value:** TBD (fixed value per realm tier)
-- All five modifier types apply
+### Physical / Elemental / Psychic Damage
 
----
+The three **damage categories** — flat bonuses applied during damage
+resolution (calcDamage in `src/data/techniques.js` and the basic-attack
+branch in `src/hooks/useCombat.js`). Each is gated by the law's
+type-pool share:
 
-### Physical Damage
+- `physical_damage` applies when the law has body-anchored types
+  (physical / sword / fist).
+- `elemental_damage` applies when the law has essence-anchored types
+  (fire / water / earth).
+- `psychic_damage` applies when the law has soul-anchored types
+  (spirit / void / dao).
 
-Bonus damage applied to physical secret techniques and physical default attacks.
+Per-attack contribution = `damageStats[category] × (count of category-pools / total law.types)`.
 
-- **Base value:** 0 (Body is the primary driver; this stat adds on top)
-- All five modifier types apply
-- Physical secret techniques apply this in full
-- Elemental and Psychic techniques do not use this stat
+### Per-pool Damage (`dmg_<pool>`)
 
----
+Nine narrower damage stats — one per pool: `dmg_physical`, `dmg_sword`,
+`dmg_fist`, `dmg_fire`, `dmg_water`, `dmg_earth`, `dmg_spirit`,
+`dmg_void`, `dmg_dao`. Stack on top of the category bonus, scaled by
+the SAME share-math as the categories. Source-agnostic: applies to
+both basic attacks and secret techniques whenever the relevant pool
+is in `law.types`.
 
-### Elemental Damage
+### `damage_all`
 
-Bonus damage applied to elemental secret techniques and elemental default attacks.
+Whole-attack flat bonus; no share scaling, no source gate. Stacks on
+both basic attacks and secret techniques. Aggregate-stat (rolls at
+`AGGREGATE_SCALE = 0.5` of single-stat range when sourced from artefacts).
 
-- **Base value:** 0 (Essence is the primary driver; this stat adds on top)
-- All five modifier types apply
-- The percentage of a secret technique that is elemental determines how much of this stat applies (e.g. a technique that is 70% elemental uses 70% of Elemental Damage)
-- Physical and Psychic techniques do not use this stat
+### `default_attack_damage`
 
----
+Multiplier applied **only to basic attacks**, after the typeMults sum
+or the no-law fallback. Stacks multiplicatively with exploit and the
+reincarnation tree damage multiplier.
 
-### Psychic Damage
+### `secret_technique_damage`
 
-Bonus damage applied to soul-based secret techniques and soul default attacks.
-
-- **Base value:** 0 (Soul is the primary driver; this stat adds on top)
-- All five modifier types apply
-- Soul-based techniques apply this in full
-- Physical and Elemental techniques do not use this stat
-
----
+Multiplier applied **only to secret-technique damage** in `calcDamage`,
+after the K formula. Mirrors `default_attack_damage` but for the
+technique branch.
 
 ### Defense
 
-Damage reduction against **physical attacks**.
-
-- **Base value:** derived from Body (formula TBD)
-- All five modifier types apply
-- A defend-type [[Secret Techniques|Secret Technique]] applies a timed Defense buff
-
----
+`def = body + modifiers`. Reduces enemy attack damage via the
+defense-curve formula `dmg = eAtk² / (eAtk + def)`. A live `defBuff`
+multiplies it for the next N enemy attacks (charge-based, see
+[[Secret Techniques]] and [[Combat]]).
 
 ### Elemental Defense
 
-Damage reduction against **elemental attacks**.
-
-- **Base value:** derived from Essence (formula TBD)
-- All five modifier types apply
-
----
+`elem_def = essence + modifiers`. Mechanically TBD — the engine reads
+the stat but doesn't yet branch enemy damage by element category.
 
 ### Soul Toughness
 
-Damage reduction against **soul / psychic attacks**.
-
-- **Base value:** derived from Soul (formula TBD)
-- All five modifier types apply
-
----
+`soul_toughness = soul + modifiers`. Mechanically TBD; locked at 0
+until Saint via the `soul`-locked rule.
 
 ### Exploit Chance
 
-Chance for an attack to become an **exploit attack**, triggering the Exploit Attack Multiplier.
-
-- **Base value:** 0%
-- All five modifier types apply
-- On an exploit hit, total damage is multiplied by the Exploit Attack Multiplier
-
----
+Per-attack roll % (0–100) for an attack to be flagged as an exploit
+hit. Base 0; rolled additively to itself when triggered.
 
 ### Exploit Attack Multiplier
 
-The damage multiplier applied when an attack is an exploit attack.
-
-- **Base value:** 150%
-- All five modifier types apply
+Multiplier on damage when an attack is an exploit hit. Base 150%.
 
 ---
 
@@ -197,76 +195,54 @@ The multiplier applied to Qi generation while the player is actively focusing (h
 
 ---
 
-### Harvest Gathering Speed
+### Harvest Speed
 
-How fast the character collects herbs in [[Worlds/Gathering|Gathering]] zones.
+`harvest_speed = floor(soul × 0.1) + modifiers`, min 1. Locked at 0
+while Soul is locked. Adds to BASE_GATHER_SPEED in `simulateGathering`.
 
-- **Base value:** derived from Soul (formula TBD)
-- All five modifier types apply
+### Harvest Luck
 
----
-
-### Harvest Gathering Luck
-
-Shifts herb drop weights toward higher rarities.
-
-- **Base value:** 0
-- All five modifier types apply
-- Higher luck pushes Epic/Legendary weights up and Common/Uncommon weights down
-
----
+Per-cycle % chance for a primary gather drop to yield +1 quantity.
+Stored decimal (0.05 = 5pp).
 
 ### Mining Speed
 
-How fast the character extracts ores in [[Worlds/Mining|Mining]] zones.
-
-- **Base value:** derived from Body (formula TBD)
-- All five modifier types apply
-
----
+`mining_speed = floor(body × 0.1) + modifiers`, min 1. Adds to
+BASE_MINE_SPEED in `simulateMining`.
 
 ### Mining Luck
 
-Shifts ore drop weights toward higher rarities.
+Same shape as Harvest Luck but for mineral drops.
 
-- **Base value:** 0
-- All five modifier types apply
+### Heavenly QI Multiplier
+
+`heavenly_qi_mult` — only applies while the rewarded-ad qi boost is
+live. Multiplicative bonus on the boosted qi rate (`×2 × (1 + value)`).
+Stacks multiplicatively with the reincarnation tree's heavenly node
+when both are present.
+
+### Buff Effect
+
+`buff_effect` — multiplier applied to a Defend tech's `defMult` and a
+Dodge tech's `dodgeChance` **at cast time**. Doesn't touch the buff's
+attack-charge count (that's `buff_duration`).
+
+### Buff Duration
+
+`buff_duration` — scales the `buffAttacks` count of Defend / Dodge
+casts (resolved by `resolveBuffAttacks` in `useCombat`). +20% means
++20% to the cast's charge count, ceiled, min 1.
 
 ---
 
 ## Modifiers
 
-Every stat listed above can receive modifiers of the five stacking types. This section does not list per-stat modifier tables — any stat can have any of the five types applied to it. The tables below cover only the **Unique Modifiers**, which have special rules.
-
----
-
-### Unique Modifiers
-
-Unique modifiers do not fit the standard stacking model. Each has its own rule. Multiple unique modifiers of the same entry do not stack (only one copy is active unless noted).
-
-| # | Modifier | Rule |
-|---|---|---|
-| U1 | **Qi bleeds into Gathering** | 5% of Qi Generation Speed is added to Harvest Gathering Speed (flat addition) |
-| U2 | **Qi bleeds into Mining** | 5% of Qi Generation Speed is added to Mining Speed (flat addition) |
-| U3 | **Cross-defense** | `-Type- attacks use 30% of -defense type- to defend from -Type- attacks` (e.g. physical attacks partially mitigated by Elemental Defense) |
-| U4 | **Zero-stat cross-defense** | If the matching primary stat for a defense type is 0, that defense type uses 50% of another defense type instead |
-| U5 | **Guaranteed exploit** | Exploit Chance is fixed at 100%; Exploit Attack Multiplier is fixed at 130% (overrides both stats) |
-| U6 | **Healer's resilience** | Health is increased by 30% if a Heal-type [[Secret Techniques\|Secret Technique]] is equipped |
-| U7 | **Ring amplification** | Stats granted by ring artefacts are increased by 10% |
-| U8 | **Focus boost** | Qi Focus Multiplier is set to 600% (overrides base) |
-| U9 | **Balanced destruction** | All damage type stats are increased by 130%; all damage type stats use the lowest damage type value among them as their effective value |
-| U10 | **Dual elemental bonus** | Dual-element [[Secret Techniques\|Secret Techniques]] deal 20% more damage |
-
----
-
-## TODO
-
-- [ ] Define Health base value per realm tier
-- [ ] Define Defense / Elemental Defense / Soul Toughness base formulas (how much of Body/Essence/Soul converts)
-- [ ] Define Harvest Gathering Speed and Mining Speed base formulas (how much of Soul/Body converts)
-- [ ] Define modifier value ranges per source (Law passives, artefact slots, pills)
-- [ ] Define elemental % split on dual-element secret techniques (for Elemental Damage weighting)
-- [ ] Decide if Exploit Chance caps below 100% (without U5)
+Every stat above accepts all five stacking types. Affixes are emitted
+programmatically as `(slot, stat, mod_type)` tuples — see the per-slot
+allowlist in [[Artefacts]]. There is no longer a hand-curated U1–U10
+"unique modifier" rule list; all unique-flavour mechanics now live in
+the **Law Uniques** pool ([[Laws]]) and the artefact-uniques pool
+(presentation-only today, see [[Artefacts]]).
 
 ---
 

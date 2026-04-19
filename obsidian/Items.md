@@ -92,7 +92,7 @@ Weapons are the attack artefact type. They provide a **flat damage bonus** to th
 
 ## Armour
 
-Armour artefacts are worn in **seven slots**. Each slot provides defensive or utility bonuses (DEF, resistances, stat boosts). In a cultivation setting, armour takes the form of spiritual garments and accessories rather than metal plate.
+Armour artefacts are worn across **seven equippable slots** (one of each, no stacking). In a cultivation setting, armour takes the form of spiritual garments and accessories rather than metal plate.
 
 ### Armour Slots
 
@@ -182,7 +182,7 @@ Armour artefacts are worn in **seven slots**. Each slot provides defensive or ut
 
 ### Finger Armour (Rings)
 
-Rings in xianxia serve dual purposes — **power rings** boost combat stats, while **spatial rings** provide storage. Both can roll as artefacts.
+Rings are pure utility — qi/s, focus mult, harvest/mining speed and luck, and the ad-boost-only `heavenly_qi_mult`. Only **one ring** is equipped at a time.
 
 | Name | Rarity | Description |
 |---|---|---|

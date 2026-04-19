@@ -115,12 +115,16 @@ At epic/legendary quality, Refine also requires Skyfire Meteorite × tier (in ad
 
 ### Laws
 
-| Property | Refine | Hone | Imbue / Extract | Transmute |
-|---|---|---|---|---|
-| Stat multipliers (Essence/Soul/Body/Speed) | ✓ | ✓ (one multiplier) | ✗ | ✗ |
-| Passives | ✓ | ✓ (effect values) | ✓ | ✓ |
-| Element | ✓ | ✗ | ✗ | ✓ |
-| Realm requirement | ✗ | ✗ | ✗ | ✗ |
+Laws no longer go through the seven-operation crafting flow. They are
+acquired through the **breakthrough-offered library** (see [[Laws]]) and
+**dismantled** back to a mineral of matching rarity when not needed. The
+only craft-shaped operation laws still expose is **Upgrade** (quality
+tier bump using the standard mineral bracket costs).
+
+| Property | Upgrade | Other ops |
+|---|---|---|
+| Quality tier (Iron → Transcendent) | ✓ | ✗ |
+| Passives / element / multipliers | ✗ | ✗ — these are frozen at acquisition |
 
 ---
 

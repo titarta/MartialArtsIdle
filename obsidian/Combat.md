@@ -1,8 +1,11 @@
 # Combat
 
-## Implementation Status: STUB
+## Implementation Status: LIVE
 
-`src/screens/CombatScreen.jsx` — card grid with 3 placeholder buttons (Sparring, Tournament, Boss Fight). No logic implemented.
+Turn-based loop in `src/hooks/useCombat.js`. Player and enemy alternate
+turns; the player picks the highest-priority technique whose cooldown is
+ready, otherwise fires a basic attack. Turn delays are real-time gated
+on sprite animation completion.
 
 ---
 
@@ -53,20 +56,43 @@ Enemies in a zone have a **normally distributed** power level:
 ## Combat Mechanics
 
 ### Player Attack — Secret Technique
+
 ```
-Damage = K × (Essence + Soul + Body + artefact_dmg_flat) × arte_mult × elem_bonus + bonus
+base    = K × (Essence + Soul + Body + artefact_flat) × arteMult × elemBonus + bonus
++ category bonus (per damage category × law-share)
++ per-pool bonus  (per pool × law-share)
++ damage_all      (whole-attack flat, no share)
+× (1 + secret_technique_damage)
 ```
-See [[Secret Techniques]] for K table (rank × quality) and cooldowns.
+
+`elemBonus` only fires when `tech.element === lawElement` (and tech is
+not Normal). Category / pool / damage_all flats come from artefact
+affixes and law uniques (see [[Stats]] and [[Artefacts]]).
 
 ### Player Attack — Basic
+
+When a law IS equipped:
 ```
-Damage = Essence + Body
+base = Essence × tm.essence + Body × tm.body + Soul × tm.soul   // tm = law.typeMults
 ```
-Fires when no technique is ready. No cooldown — triggers immediately each player turn.
+When NO law is equipped (legal sustained state):
+```
+base = (Essence + Body) / 2
+```
+Then in BOTH paths:
+```
+damage = floor( max(5, base × (1 + default_attack_damage)) )
+       + damage_all flat
+       × (1 if not exploit else exploit_attack_mult)
+       × reincarnation tree damage multiplier
+```
+Fires every player turn whose ready-technique queue is empty. No
+cooldown of its own.
 
 ### Player HP
+
 ```
-HP = (Essence + Body) × 12 + Soul × 4
+HP = max(100, (Essence + Body) × 12 + Soul × 4)
 ```
 
 ### Enemy Stats
@@ -116,18 +142,29 @@ This formula is fully scale-independent: **hits-to-die depends only on enemy_atk
 | 4.0 | ~3 | Origin Guardian |
 
 ### Combat Stats
-- **DEF** = Essence + Body (combo)
-- **Dodge** — increased by Dodge-type [[Secret Techniques]]
+
+- **DEF** = `body + modifiers` (artefact / pill / law-unique flats and
+  multipliers all stack via the standard 5-layer formula).
+- **Defend buff** — Defend-type [[Secret Techniques]] cast applies a
+  `defBuff = { mult: defMult × (1 + buff_effect), attacksLeft: N }` for
+  the next N enemy attacks (charge-based, NOT a wall-clock timer).
+  Re-casting overwrites — no stacking.
+- **Dodge buff** — Dodge-type techniques apply
+  `dodgeBuff = { chance × (1 + buff_effect), attacksLeft: N }`. Each
+  enemy turn rolls `Math.random() < chance`; success negates damage
+  fully. Both branches consume one charge regardless of roll outcome.
+  No passive dodge stat; only the buff matters today.
+- Buff `N` (`buffAttacks`) is rolled at generation: Defend 2–4 hits,
+  Dodge 2–4 hits. The `buff_duration` stat scales N at cast time.
 
 ---
 
 ## TODO
 
-- [ ] Define zone count and difficulty scaling
-- [ ] Define enemy types per realm tier
-- [ ] Define drop tables
-- [ ] Define death penalty / respawn mechanic
-- [ ] Define how laws affect combat beyond default attack
+- [ ] Define death penalty / respawn mechanic (today: defeated → fight ends, no penalty)
+- [ ] Drop-rate tuning pass once full enemy roster lands
+- [ ] Wire `elem_def` / `soul_toughness` into enemy damage branching (engine already
+      reads the stats; nothing routes by element category yet)
 
 ---
 

@@ -6,18 +6,18 @@ Mechanical design for all equippable artefacts. For lore names and slot descript
 
 ## Slots
 
-Eight equipment slots total: one **Weapon** and seven **Armour** slots.
+Eight equipment slots total: one **Weapon**, six **Armour** pieces, and one **Ring** slot.
 
 | Slot | Role |
 |---|---|
-| **Weapon** | Damage — flat damage bonus and technique support |
-| **Head** | Soul / mental defence |
-| **Body** | Primary defensive piece — DEF and Health |
-| **Hands** | Offensive utility — enhances strikes |
-| **Waist** | Mixed utility — qi, activity speeds |
-| **Feet** | Mobility — dodge, activity speeds |
-| **Neck** | Resistances — elemental and soul protection |
-| **Finger** | Broad stat amplification (×2 rings can be worn) |
+| **Weapon** | Damage — every damage stat lives here exclusively |
+| **Head** | Defensive (HP / Def / Elem Def / Soul Tough) + Soul |
+| **Body** | Defensive + Body |
+| **Hands** | Offensive utility (exploit + per-pool luck) + activity QoL |
+| **Waist** | Defensive + Essence |
+| **Feet** | Defensive + activity speed (qi, harvest, mining) + exploit |
+| **Neck** | Primary stats + `all_primary_stats` + `buff_effect` |
+| **Ring** | Pure utility — qi/s, focus mult, harvest/mining speed/luck, heavenly_qi_mult |
 
 ---
 
@@ -81,176 +81,61 @@ Every artefact has one fixed base stat regardless of affixes. It scales with the
 
 ---
 
-## Affix Pools
+## Affix Pools — Programmatic Generation
 
-Each entry shows: **Modifier** · **Type** (from [[Stats#Stacking Types]]) · **Weight**
+Per-slot pools are no longer hand-listed. `src/data/affixPools.js` emits one
+affix entry per `(slot, stat, mod_type)` tuple at module load. Every covered
+stat appears in **all four mod types** (`flat`, `base_flat`, `% increased`,
+`% more`), giving 20–60 entries per slot before any filtering. Item-wide
+dedupe is by full id — an item *can* hold both `+15 essence` and `+25%
+essence` (different mod types) but never two `+15 essence` rolls.
 
-Weight scale: `100` = very common · `60` = moderate · `30` = uncommon · `10` = rare · `3` = very rare
+### Per-slot stat allowlist
 
-A total weight is the sum of all weights in the pool. On each affix roll, one entry is selected proportionally (no duplicates per item).
+| Slot | Stats |
+|---|---|
+| **Weapon** | `damage_all`, `physical_damage`, `elemental_damage`, `psychic_damage`, `dmg_physical`, `dmg_sword`, `dmg_fist`, `dmg_fire`, `dmg_water`, `dmg_earth`, `dmg_spirit`, `dmg_void`, `dmg_dao`, `default_attack_damage`, `secret_technique_damage` |
+| **Head** | `elemental_defense`, `defense`, `soul_toughness`, `health`, `soul` |
+| **Body** | `elemental_defense`, `defense`, `soul_toughness`, `health`, `body` |
+| **Hands** | `qi_speed`, `harvest_luck`, `mining_luck`, `elemental_defense`, `defense`, `soul_toughness`, `health`, `exploit_chance`, `exploit_attack_mult` |
+| **Waist** | `elemental_defense`, `defense`, `soul_toughness`, `health`, `essence` |
+| **Feet** | `elemental_defense`, `defense`, `soul_toughness`, `health`, `exploit_chance`, `exploit_attack_mult`, `mining_speed`, `harvest_speed`, `qi_speed` |
+| **Neck** | `essence`, `soul`, `body`, `all_primary_stats`, `buff_effect` |
+| **Ring** | `qi_speed`, `harvest_speed`, `harvest_luck`, `mining_speed`, `mining_luck`, `qi_focus_mult`, `heavenly_qi_mult` |
 
-Value ranges are given as **[Iron | Bronze | Silver | Gold | Transcendent]**. All values are rough baselines — exact numbers require gameplay balancing.
+### Value ranges (per rarity tier)
 
----
+Each `(stat, mod_type)` chooses a value family:
 
-### Weapon
+| Family | Iron | Bronze | Silver | Gold | Transcendent |
+|---|---|---|---|---|---|
+| `INCR_BASIC` (single-stat % increased) | 6–12 | 10–18 | 16–28 | 24–40 | 35–60 |
+| `INCR_LARGE` (damage % increased) | 8–15 | 14–24 | 22–36 | 32–50 | 45–75 |
+| `MORE_TIER` (% more) | 1.03–1.07 | 1.05–1.11 | 1.09–1.18 | 1.14–1.26 | 1.20–1.40 |
+| `FLAT_DMG` (damage flat) | 6–14 | 14–32 | 32–70 | 70–150 | 150–300 |
+| `FLAT_HP` (health flat) | 20–50 | 50–120 | 120–280 | 280–600 | 600–1200 |
+| `FLAT_PRIMARY` (primary stat flat) | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
+| `FLAT_PCT_POINT` (exploit / luck flat) | 1–3 | 2–5 | 4–8 | 6–12 | 10–20 |
+| `FLAT_QI` (qi_speed flat) | 0.05–0.15 | 0.15–0.30 | 0.30–0.55 | 0.55–0.90 | 0.90–1.50 |
 
-Focus: damage output, technique empowerment, exploit.
+**Aggregate scaling.** `all_primary_stats` and `damage_all` use the SAME
+family as a single-stat roll but the value is multiplied by
+`AGGREGATE_SCALE = 0.5` at roll time — so an "all primaries" roll lands
+between 1/3 and 1/1 of an equivalent single-stat roll.
 
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Physical Damage | `% increased` | 80 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Elemental Damage | `% increased` | 80 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Psychic Damage | `% increased` | 50 | 5–8% | 8–15% | 15–22% | 22–32% | 32–50% |
-| Flat Physical Damage | `+N` | 60 | 5–15 | 15–35 | 35–70 | 70–130 | 130–220 |
-| Flat Elemental Damage | `+N` | 60 | 5–15 | 15–35 | 35–70 | 70–130 | 130–220 |
-| Exploit Chance | `% increased` | 40 | 2–4% | 4–7% | 7–11% | 11–16% | 16–24% |
-| Exploit Attack Multiplier | `% increased` | 30 | 5–8% | 8–14% | 14–22% | 22–32% | 32–50% |
-| Essence flat | `+N` | 30 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Body flat | `+N` | 30 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| All Damage | `% more` | 10 | 3–5% | 5–8% | 8–12% | 12–18% | 18–25% |
-| Technique Cooldown Reduction | `% increased` | 20 | 2–4% | 4–7% | 7–11% | 11–16% | 16–22% |
-| Health | `+N` | 15 | 10–25 | 25–60 | 60–120 | 120–220 | 220–380 |
-
----
-
-### Head
-
-Focus: Soul, mental attacks, soul and elemental defence.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Soul flat | `+N` | 100 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Essence flat | `+N` | 70 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Soul Toughness | `% increased` | 80 | 4–8% | 8–14% | 14–22% | 22–32% | 32–50% |
-| Elemental Defense | `% increased` | 60 | 4–8% | 8–14% | 14–22% | 22–32% | 32–50% |
-| Health | `+N` | 80 | 10–25 | 25–60 | 60–120 | 120–220 | 220–380 |
-| DEF flat | `+N` | 60 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Qi Generation Speed | `% increased` | 40 | 2–4% | 4–8% | 8–13% | 13–20% | 20–30% |
-| Psychic Damage | `% increased` | 50 | 4–8% | 8–14% | 14–22% | 22–32% | 32–50% |
-| Elemental Damage | `% increased` | 30 | 4–7% | 7–12% | 12–18% | 18–26% | 26–40% |
-| Soul Toughness | `% more` | 10 | 3–5% | 5–8% | 8–12% | 12–18% | 18–25% |
+**Per-pool damage** (`dmg_fire`, `dmg_sword`, etc.) uses the full
+single-stat range — its conditioning (must be in `law.types`, scaled by
+share) is its balance.
 
 ---
 
-### Body
+### Per-slot pool stub
 
-Focus: DEF, Health — the primary defensive slot.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| DEF flat | `+N` | 100 | 5–12 | 12–28 | 28–55 | 55–100 | 100–170 |
-| Health | `+N` | 100 | 15–35 | 35–80 | 80–160 | 160–300 | 300–500 |
-| DEF | `% increased` | 80 | 4–8% | 8–15% | 15–24% | 24–35% | 35–55% |
-| Elemental Defense | `% increased` | 80 | 4–8% | 8–15% | 15–24% | 24–35% | 35–55% |
-| Soul Toughness | `% increased` | 80 | 4–8% | 8–15% | 15–24% | 24–35% | 35–55% |
-| Body flat | `+N` | 60 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Essence flat | `+N` | 40 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Health | `% increased` | 50 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| DEF | `% more` | 10 | 3–5% | 5–8% | 8–12% | 12–18% | 18–25% |
-| Qi Generation Speed | `% increased` | 20 | 1–3% | 3–6% | 6–10% | 10–15% | 15–22% |
-
----
-
-### Hands
-
-Focus: offensive output, exploit, strike enhancement.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Physical Damage | `% increased` | 90 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Elemental Damage | `% increased` | 80 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Body flat | `+N` | 70 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Essence flat | `+N` | 60 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Exploit Chance | `% increased` | 60 | 2–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-| Flat Physical Damage | `+N` | 50 | 4–10 | 10–24 | 24–48 | 48–90 | 90–150 |
-| DEF flat | `+N` | 40 | 2–6 | 6–14 | 14–28 | 28–50 | 50–85 |
-| Health | `+N` | 40 | 8–20 | 20–48 | 48–95 | 95–175 | 175–300 |
-| Psychic Damage | `% increased` | 30 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Exploit Attack Multiplier | `% increased` | 20 | 4–7% | 7–12% | 12–18% | 18–26% | 26–40% |
-
----
-
-### Waist
-
-Focus: mixed utility — Health, qi, activity speeds.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Health | `+N` | 90 | 12–28 | 28–65 | 65–130 | 130–240 | 240–410 |
-| DEF flat | `+N` | 80 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Body flat | `+N` | 70 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Qi Generation Speed | `% increased` | 70 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Harvest Gathering Speed | `% increased` | 60 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Mining Speed | `% increased` | 60 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Essence flat | `+N` | 40 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Soul flat | `+N` | 40 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Elemental Defense | `% increased` | 40 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Physical Damage | `% increased` | 25 | 3–6% | 6–10% | 10–15% | 15–22% | 22–33% |
-
----
-
-### Feet
-
-Focus: dodge, activity speeds, mobility.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Harvest Gathering Speed | `% increased` | 90 | 4–8% | 8–15% | 15–24% | 24–35% | 35–55% |
-| Mining Speed | `% increased` | 90 | 4–8% | 8–15% | 15–24% | 24–35% | 35–55% |
-| Dodge | `% increased` | 80 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Body flat | `+N` | 60 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| DEF flat | `+N` | 50 | 2–6 | 6–14 | 14–28 | 28–50 | 50–85 |
-| Health | `+N` | 50 | 8–20 | 20–48 | 48–95 | 95–175 | 175–300 |
-| Qi Generation Speed | `% increased` | 40 | 2–4% | 4–8% | 8–13% | 13–20% | 20–30% |
-| Harvest Gathering Luck | `% increased` | 30 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Mining Luck | `% increased` | 30 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Elemental Defense | `% increased` | 25 | 3–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-
----
-
-### Neck
-
-Focus: resistances — Elemental Defense and Soul Toughness.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Elemental Defense | `% increased` | 100 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Soul Toughness | `% increased` | 100 | 5–10% | 10–18% | 18–28% | 28–40% | 40–60% |
-| Soul flat | `+N` | 70 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Essence flat | `+N` | 60 | 3–8 | 8–18 | 18–35 | 35–60 | 60–100 |
-| Health | `+N` | 60 | 10–25 | 25–60 | 60–120 | 120–220 | 220–380 |
-| Qi Generation Speed | `% increased` | 50 | 2–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-| Psychic Damage | `% increased` | 50 | 4–8% | 8–14% | 14–22% | 22–32% | 32–50% |
-| DEF flat | `+N` | 40 | 2–6 | 6–14 | 14–28 | 28–50 | 50–85 |
-| Elemental Defense | `% more` | 10 | 3–5% | 5–8% | 8–12% | 12–18% | 18–25% |
-| Soul Toughness | `% more` | 10 | 3–5% | 5–8% | 8–12% | 12–18% | 18–25% |
-
----
-
-### Finger (Ring)
-
-The broadest affix pool in the game. Values are lower than other slots, but [[Stats#Unique Modifiers|Unique Modifier U7]] amplifies all ring stats by 10%. Two rings can be worn simultaneously.
-
-| Modifier | Type | Weight | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|---|
-| Essence flat | `+N` | 70 | 2–6 | 6–14 | 14–27 | 27–48 | 48–80 |
-| Soul flat | `+N` | 70 | 2–6 | 6–14 | 14–27 | 27–48 | 48–80 |
-| Body flat | `+N` | 70 | 2–6 | 6–14 | 14–27 | 27–48 | 48–80 |
-| Physical Damage | `% increased` | 60 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Elemental Damage | `% increased` | 60 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Psychic Damage | `% increased` | 60 | 3–6% | 6–11% | 11–17% | 17–25% | 25–38% |
-| Exploit Chance | `% increased` | 50 | 1–3% | 3–5% | 5–8% | 8–12% | 12–18% |
-| Exploit Attack Multiplier | `% increased` | 40 | 3–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-| Health | `+N` | 50 | 6–15 | 15–36 | 36–72 | 72–130 | 130–225 |
-| DEF flat | `+N` | 50 | 2–5 | 5–12 | 12–23 | 23–42 | 42–70 |
-| Qi Generation Speed | `% increased` | 50 | 2–4% | 4–7% | 7–11% | 11–16% | 16–24% |
-| Elemental Defense | `% increased` | 40 | 3–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-| Soul Toughness | `% increased` | 40 | 3–5% | 5–9% | 9–14% | 14–20% | 20–30% |
-| Harvest Gathering Speed | `% increased` | 40 | 2–4% | 4–7% | 7–11% | 11–16% | 16–24% |
-| Mining Speed | `% increased` | 40 | 2–4% | 4–7% | 7–11% | 11–16% | 16–24% |
-| Dodge | `% increased` | 35 | 2–4% | 4–7% | 7–11% | 11–16% | 16–24% |
-| All Damage | `% more` | 8 | 2–3% | 3–5% | 5–7% | 7–10% | 10–15% |
+Hand-tuned per-slot weight tables have been removed. Pool composition is
+determined entirely by the per-slot stat allowlist above × the four mod
+types × the per-rarity value families. Selection is uniform within the
+pool (post-dedupe). For exact ids see `affixPoolFor(slot)` in
+[src/data/affixPools.js](../src/data/affixPools.js).
 
 ---
 
@@ -287,12 +172,10 @@ Full operation rules in [[Crafting]]. Quick reference for artefacts:
 
 ## TODO
 
-- [ ] Define base stat scaling by realm tier (what Essence/Body flat values at each world tier)
-- [ ] Define Health base values per realm tier
-- [ ] Balance flat vs % modifier value ranges once Qi scaling is known
-- [ ] Define Dodge base value and cap
-- [ ] Decide if `% more` affixes should be rarer via drop rate or quality gate
-- [ ] Define how weapon element is assigned (always matches equipped Law? or fixed on drop?)
+- [ ] Per-pool damage UI on equipped-weapon tooltip (today they render in the
+      affix list but the equipped slot doesn't itemize "fire share")
+- [ ] Define base-stat scaling per realm tier
+- [ ] Decide if `% more` should be rarer via per-family weight bias
 
 ---
 
