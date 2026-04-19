@@ -167,50 +167,118 @@
 }
 
 /* Toast stack — top center, below safe area */
+/* ─── Toast stack ───────────────────────────────────────────────────────────── */
+
 .toast-stack {
   position: fixed;
-  top: calc(env(safe-area-inset-top) + 8px);
+  /* sit below the home HUD bar; acceptable gap on all other screens too */
+  top: calc(env(safe-area-inset-top) + 58px);
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 200;
+  z-index: 500;
   width: min(340px, calc(100vw - 32px));
   pointer-events: none;
 }
 
-.toast {
+.toast-stage {
+  position: relative;
+  /* padding-bottom reserves visual space for peek cards so nothing below clips */
+  padding-bottom: 14px;
+}
+
+/* Shared card shell */
+.toast-card {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--accent);
-  border-radius: 10px;
-  cursor: pointer;
+  gap: 10px;
+  padding: 11px 13px;
+  background: linear-gradient(145deg, #0e0e22, #13132e);
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  border-radius: 11px;
+  box-shadow:
+    0 6px 28px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+/* Top (active) card */
+.toast-card-top {
+  position: relative;
+  z-index: 3;
   pointer-events: all;
-  animation: toast-in 0.25s ease;
+  animation: toast-in 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* Peek cards — only the sliver below the top card is visible */
+.toast-peek {
+  overflow: hidden;
 }
 
 .toast-message {
   font-size: 13px;
-  color: var(--text-primary);
-  line-height: 1.3;
+  font-weight: 500;
+  color: #e8e8f0;
+  line-height: 1.4;
+  flex: 1;
 }
 
-.toast-cta {
-  font-size: 12px;
-  color: var(--accent);
-  white-space: nowrap;
-  font-weight: 700;
+.toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.toast-go {
+  font-size: 11px;
+  font-weight: 700;
+  color: #f5c842;
+  background: rgba(245, 200, 66, 0.1);
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.toast-go:hover { background: rgba(245, 200, 66, 0.2); }
+
+.toast-dismiss {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.28);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  transition: color 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.toast-dismiss:hover { color: rgba(255, 255, 255, 0.7); }
+
+/* "+N more" overflow badge */
+.toast-overflow {
+  position: absolute;
+  bottom: 0;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(245, 200, 66, 0.55);
+  background: rgba(10, 10, 22, 0.85);
+  border: 1px solid rgba(245, 200, 66, 0.18);
+  border-radius: 20px;
+  padding: 2px 9px;
+  pointer-events: none;
 }
 
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)     scale(1);    }
 }
 
 /* Screen Container */

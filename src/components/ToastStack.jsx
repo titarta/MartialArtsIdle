@@ -1,38 +1,65 @@
-import { useEffect } from 'react';
-
-const AUTO_DISMISS_MS = 4000;
-
-function Toast({ toast, onDismiss, onNavigate }) {
-  useEffect(() => {
-    const timer = setTimeout(() => onDismiss(toast.id), AUTO_DISMISS_MS);
-    return () => clearTimeout(timer);
-  }, [toast.id, onDismiss]);
-
-  function handleClick() {
-    onNavigate(toast.targetScreen, toast.targetParam ?? null);
-    onDismiss(toast.id);
-  }
-
-  return (
-    <div className="toast" onClick={handleClick} role="button" tabIndex={0}>
-      <span className="toast-message">{toast.message}</span>
-      <span className="toast-cta">Go →</span>
-    </div>
-  );
-}
+const MAX_VISIBLE = 3;
 
 function ToastStack({ toasts, onDismiss, onNavigate }) {
   if (!toasts.length) return null;
+
+  const visible  = toasts.slice(0, MAX_VISIBLE);
+  const overflow = Math.max(0, toasts.length - MAX_VISIBLE);
+  const top      = visible[0];
+
+  function handleNavigate() {
+    if (top.targetScreen) onNavigate(top.targetScreen, top.targetParam ?? null);
+    onDismiss(top.id);
+  }
+
   return (
     <div className="toast-stack">
-      {toasts.map(toast => (
-        <Toast
-          key={toast.id}
-          toast={toast}
-          onDismiss={onDismiss}
-          onNavigate={onNavigate}
-        />
-      ))}
+      <div className="toast-stage">
+
+        {/* Peek cards — absolute, rendered before top so z-index wins */}
+        {visible.slice(1).map((toast, i) => {
+          const depth = i + 1;
+          return (
+            <div
+              key={toast.id}
+              className="toast-card toast-peek"
+              style={{
+                position: 'absolute',
+                top:     `${depth * 6}px`,
+                left:    `${depth * 5}px`,
+                right:   `${depth * 5}px`,
+                zIndex:  MAX_VISIBLE - depth,
+                opacity: 1 - depth * 0.2,
+              }}
+            >
+              <span className="toast-message">{toast.message}</span>
+            </div>
+          );
+        })}
+
+        {/* Top card — in flow, defines stage height, highest z-index */}
+        <div className="toast-card toast-card-top">
+          <span className="toast-message">{top.message}</span>
+          <div className="toast-actions">
+            {top.targetScreen && (
+              <button className="toast-go" onClick={handleNavigate}>
+                View →
+              </button>
+            )}
+            <button
+              className="toast-dismiss"
+              onClick={() => onDismiss(top.id)}
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {overflow > 0 && (
+          <div className="toast-overflow">+{overflow} more</div>
+        )}
+      </div>
     </div>
   );
 }
