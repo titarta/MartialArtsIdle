@@ -10,6 +10,10 @@ import CharacterScreen from './screens/CharacterScreen';
 import CollectionScreen from './screens/CollectionScreen';
 import ProductionScreen from './screens/ProductionScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import ReincarnationScreen from './screens/ReincarnationScreen';
+import useReincarnationKarma from './hooks/useReincarnationKarma';
+import useReincarnationTree  from './hooks/useReincarnationTree';
+import { wipeReincarnation }  from './systems/save';
 import useCultivation from './hooks/useCultivation';
 import useInventory   from './hooks/useInventory';
 import useTechniques  from './hooks/useTechniques';
@@ -58,12 +62,28 @@ function App() {
   const crystal         = useQiCrystal({ getQuantity: inventory.getQuantity, removeItem: inventory.removeItem });
   const selections      = useSelections({ cultivation });
   const { clearedRegions, clearRegion } = useClearedRegions();
+  const karma           = useReincarnationKarma();
+  const tree            = useReincarnationTree({ karma: karma.karma, spendKarma: karma.spendKarma });
 
-  // Keep pill qi multiplier in sync with cultivation game loop
-  const pillQiMult = pills.getQiMult();
+  // Record every new realm reached so karma awards are first-time-only.
   useEffect(() => {
-    cultivation.pillQiMultRef.current = pillQiMult;
-  }, [pillQiMult, cultivation.pillQiMultRef]);
+    karma.noteRealmReached(cultivation.realmIndex);
+  }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep pill qi multiplier in sync with cultivation game loop.
+  // Reincarnation "Double Pill Effects" node doubles the qi_speed contribution.
+  const pillQiMult       = pills.getQiMult();
+  const treePillMult     = tree.modifiers.pillMult;
+  const effectivePillQi  = 1 + (pillQiMult - 1) * treePillMult;
+  useEffect(() => {
+    cultivation.pillQiMultRef.current = effectivePillQi;
+  }, [effectivePillQi, cultivation.pillQiMultRef]);
+
+  // Push reincarnation-tree multipliers into cultivation refs each render.
+  useEffect(() => {
+    cultivation.treeQiMultRef.current       = tree.modifiers.qiMult;
+    cultivation.treeHeavenlyMultRef.current = tree.modifiers.heavenlyMult;
+  }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef]);
 
   // Open selection modal on level-up only when already on home screen.
   // currentScreen is intentionally excluded from deps — we want this to fire
@@ -80,11 +100,12 @@ function App() {
     cultivation.selectionQiMultRef.current = selections.getQiSpeedMult();
   }, [selections, cultivation.selectionQiMultRef]);
 
-  // Keep QI crystal bonus in sync with cultivation game loop
+  // Keep QI crystal bonus in sync with cultivation game loop.
+  // Reincarnation "Triple QI-Stones Effects" node multiplies the bonus.
   useEffect(() => {
     if (!cultivation.crystalQiBonusRef) return;
-    cultivation.crystalQiBonusRef.current = crystal.crystalQiBonus;
-  }, [crystal.crystalQiBonus, cultivation.crystalQiBonusRef]);
+    cultivation.crystalQiBonusRef.current = crystal.crystalQiBonus * tree.modifiers.crystalMult;
+  }, [crystal.crystalQiBonus, tree.modifiers.crystalMult, cultivation.crystalQiBonusRef]);
 
 
   // ── Centralised stat getter ─────────────────────────────────────────────
@@ -106,11 +127,23 @@ function App() {
     });
     const lawBundle = evaluateLawUniques(law, lawCtx);
 
+    // "Double Pill Effects" node scales all permanent-pill flat/increased mods.
+    const pillMods = pills?.getStatModifiers?.() ?? {};
+    const scaledPillMods = tree.modifiers.pillMult === 1
+      ? pillMods
+      : Object.fromEntries(
+          Object.entries(pillMods).map(([stat, list]) => [
+            stat,
+            list.map(m => ({ ...m, value: m.value * tree.modifiers.pillMult })),
+          ])
+        );
+
     const mergedMods = mergeModifiers(
       artefacts?.getStatModifiers?.(),
-      pills?.getStatModifiers?.(),
+      scaledPillMods,
       lawBundle.statMods,
       selections?.getStatModifiers?.(),
+      tree?.getStatModifiers?.(),
     );
 
     const bundle = computeAllStats(qi, law, realmIndex, mergedMods);
@@ -138,8 +171,10 @@ function App() {
       // Combat-only
       exploitChance: bundle.combat.exploitChance,
       exploitMult:   bundle.combat.exploitMult,
+      // Reincarnation "Triple All Damage" — consumed by useCombat.
+      damageMult:    tree.modifiers.damageMult,
     };
-  }, [cultivation, artefacts, pills, selections]);
+  }, [cultivation, artefacts, pills, selections, tree]);
 
   // Mirror focusMult into a ref the cultivation tick reads directly so
   // boost speed reflects equipment / pill modifiers.
@@ -223,6 +258,16 @@ function App() {
     notifications.clearBadge(screen);
   };
 
+  const handleReincarnate = useCallback(() => {
+    karma.reincarnate();
+    // Give React a tick to flush the karma state to localStorage before we
+    // wipe the rest of the save + hard-reload.
+    setTimeout(() => {
+      wipeReincarnation();
+      window.location.reload();
+    }, 50);
+  }, [karma]);
+
   const goBack = () => navigate('worlds', {
     expandWorldId: screenParam?.worldId ?? null,
     activeTab:     screenParam?.fromTab  ?? null,
@@ -252,7 +297,26 @@ function App() {
     collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} />,
     settings:   <SettingsScreen />,
+    reincarnation: <ReincarnationScreen
+                      karma={karma.karma}
+                      tree={tree}
+                      pendingKarma={karma.pendingKarma}
+                      lives={karma.lives}
+                      highestReached={karma.highestReached}
+                      peakKarmaTotal={karma.peakKarmaTotal}
+                      onReincarnate={handleReincarnate}
+                    />,
   };
+
+  // Reincarnation tab stays unlocked across rebirths (tied to karma state,
+  // not realmIndex).
+  const reincarnationUnlocked = karma.unlocked;
+  const combinedIsUnlocked = (id) => id === 'reincarnation'
+    ? reincarnationUnlocked
+    : featureFlags.isUnlocked(id);
+  const combinedGetHint = (id) => id === 'reincarnation'
+    ? (reincarnationUnlocked ? null : `Reach Saint realm to unlock`)
+    : featureFlags.getHint(id);
 
   const BASE = import.meta.env.BASE_URL;
 
@@ -268,8 +332,8 @@ function App() {
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
         badges={{ ...notifications.badges, home: selections.pendingCount > 0, worlds: notifications.badges.worlds || autoFarm.hasPendingGains }}
-        isUnlocked={featureFlags.isUnlocked}
-        getHint={featureFlags.getHint}
+        isUnlocked={combinedIsUnlocked}
+        getHint={combinedGetHint}
       />
       <main className={`screen-container${currentScreen === 'home' ? ' sc-fullbleed' : ''}`}>
         {screens[currentScreen]}

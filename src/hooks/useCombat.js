@@ -222,6 +222,8 @@ export default function useCombat() {
             const exMult   = s.stats.exploitMult   ?? 150;
             const exploited = exChance > 0 && Math.random() * 100 < exChance;
             if (exploited) dmg = Math.floor(dmg * (exMult / 100));
+            // Reincarnation-tree "Triple All Damage" node.
+            dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
             s.eHp = Math.max(0, s.eHp - dmg);
             logs.push({
               msg: exploited
@@ -263,6 +265,7 @@ export default function useCombat() {
           const exMult   = s.stats.exploitMult   ?? 150;
           const exploited = exChance > 0 && Math.random() * 100 < exChance;
           if (exploited) dmg = Math.floor(dmg * (exMult / 100));
+          dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
           s.eHp = Math.max(0, s.eHp - dmg);
           logs.push({
             msg: exploited

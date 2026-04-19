@@ -8,6 +8,7 @@ const SCREENS = [
   { id: 'character',  tKey: 'nav.character'                         },
   { id: 'collection', tKey: 'nav.collection', sprite: 'inventory'  },
   { id: 'production', tKey: 'nav.craft'                             },
+  { id: 'reincarnation', tKey: 'nav.reincarnation', emoji: '☸'      },
   // Settings moved to the HomeScreen HUD bar.
 ];
 

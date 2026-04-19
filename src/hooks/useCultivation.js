@@ -177,6 +177,11 @@ export default function useCultivation() {
 
   const pillQiMultRef      = useRef(1);
   const selectionQiMultRef = useRef(1);
+  // Reincarnation-tree multipliers — written by App.jsx from useReincarnationTree.
+  // `treeQiMultRef` always multiplies cultivation rate; `treeHeavenlyMultRef`
+  // only applies while the ad (heavenly) boost is active.
+  const treeQiMultRef       = useRef(1);
+  const treeHeavenlyMultRef = useRef(1);
   // Crystal flat qi/sec bonus — written by App.jsx from useQiCrystal.crystalQiBonus
   const crystalQiBonusRef  = useRef(0);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
@@ -237,9 +242,13 @@ export default function useCultivation() {
         const boostMult = boostRef.current
           ? Math.max(1, (focusMultRef.current ?? 300) / 100)
           : 1;
+        // Heavenly QI tree node — only applies while the ad boost is live.
+        const heavenlyExtra = adBoostRef.current > 1 ? treeHeavenlyMultRef.current : 1;
         const rate = (BASE_RATE + crystalQiBonusRef.current) * lawMult * qiUniqueMult *
           boostMult *
-          adBoostRef.current * pillQiMultRef.current * selectionQiMultRef.current;
+          adBoostRef.current * heavenlyExtra *
+          pillQiMultRef.current * selectionQiMultRef.current *
+          treeQiMultRef.current;
         rateRef.current = rate;
         qiRef.current += rate * dt;
 
@@ -353,6 +362,9 @@ export default function useCultivation() {
     selectionQiMultRef,
     // QI Crystal flat bonus ref — updated by App.jsx from useQiCrystal
     crystalQiBonusRef,
+    // Reincarnation tree refs — updated by App.jsx each render
+    treeQiMultRef,
+    treeHeavenlyMultRef,
     // Focus multiplier ref (qi_focus_mult, in %) — updated by App.jsx every second
     focusMultRef,
     // Ads

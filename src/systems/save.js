@@ -46,6 +46,16 @@ export function wipeSave() {
   localStorage.removeItem('mai_achievements');
   // mai_jade is intentionally NOT wiped — paid currency survives a save reset
   // mai_lang is intentionally NOT wiped — language preference survives a save reset
+  // mai_reincarnation + mai_reincarnation_tree also survive — karma and
+  // Eternal Tree persist through a full wipe.
+}
+
+/**
+ * Wipe for reincarnation — same as wipeSave(): karma and tree purchases
+ * live in separate keys that are already outside the wipe list.
+ */
+export function wipeReincarnation() {
+  wipeSave();
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────
