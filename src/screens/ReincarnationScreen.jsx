@@ -5,11 +5,16 @@ import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_IND
  * Reincarnation tab — displays karma, the passive tree, and the
  * Reincarnate button. Unlocks at Saint Early Stage.
  */
-function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTotal, onReincarnate }) {
+function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTotal, realmIndex = 0, onReincarnate }) {
   const [confirm, setConfirm] = useState(false);
   const [hover,   setHover]   = useState(null);
 
+  // Must currently be in Saint realm (index 24) or beyond to reincarnate —
+  // not just have ever reached it. This prevents cheap post-wipe resets.
+  const canReincarnateNow = realmIndex >= SAINT_UNLOCK_INDEX;
+
   const doReincarnate = () => {
+    if (!canReincarnateNow) return;
     setConfirm(false);
     onReincarnate();
   };
@@ -44,9 +49,19 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
               <button className="save-btn" onClick={() => setConfirm(false)}>Cancel</button>
             </div>
           ) : (
-            <button className="save-btn save-btn-danger" onClick={() => setConfirm(true)}>
+            <button
+              className="save-btn save-btn-danger"
+              onClick={() => setConfirm(true)}
+              disabled={!canReincarnateNow}
+              title={canReincarnateNow ? undefined : 'Reach Saint realm in this life to reincarnate'}
+            >
               Reincarnate
             </button>
+          )}
+          {!canReincarnateNow && !confirm && (
+            <span style={{ marginLeft: '12px', fontSize: '0.9em', opacity: 0.7 }}>
+              Reach Saint realm to reincarnate
+            </span>
           )}
         </div>
       </div>

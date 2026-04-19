@@ -259,6 +259,9 @@ function App() {
   };
 
   const handleReincarnate = useCallback(() => {
+    // Safety net — the button is already disabled below Saint, but we
+    // refuse here too so any future callsite can't bypass the gate.
+    if (cultivation.realmIndex < 24) return;
     karma.reincarnate();
     // Give React a tick to flush the karma state to localStorage before we
     // wipe the rest of the save + hard-reload.
@@ -266,7 +269,7 @@ function App() {
       wipeReincarnation();
       window.location.reload();
     }, 50);
-  }, [karma]);
+  }, [karma, cultivation.realmIndex]);
 
   const goBack = () => navigate('worlds', {
     expandWorldId: screenParam?.worldId ?? null,
@@ -303,6 +306,7 @@ function App() {
                       lives={karma.lives}
                       highestReached={karma.highestReached}
                       peakKarmaTotal={karma.peakKarmaTotal}
+                      realmIndex={cultivation.realmIndex}
                       onReincarnate={handleReincarnate}
                     />,
   };
