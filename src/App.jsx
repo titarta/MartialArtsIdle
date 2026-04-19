@@ -10,7 +10,6 @@ import CharacterScreen from './screens/CharacterScreen';
 import CollectionScreen from './screens/CollectionScreen';
 import ProductionScreen from './screens/ProductionScreen';
 import SettingsScreen from './screens/SettingsScreen';
-import ReincarnationScreen from './screens/ReincarnationScreen';
 import useReincarnationKarma from './hooks/useReincarnationKarma';
 import useReincarnationTree  from './hooks/useReincarnationTree';
 import { wipeReincarnation }  from './systems/save';
@@ -277,7 +276,7 @@ function App() {
   });
 
   const screens = {
-    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} achievements={achievements} />,
+    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} achievements={achievements} reincarnationUnlocked={reincarnationUnlocked} karma={karma.karma} karmaLives={karma.lives} karmaHighestReached={karma.highestReached} karmaPeakTotal={karma.peakKarmaTotal} tree={tree} onReincarnate={handleReincarnate} />,
     worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
@@ -300,26 +299,9 @@ function App() {
     collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} />,
     settings:   <SettingsScreen />,
-    reincarnation: <ReincarnationScreen
-                      karma={karma.karma}
-                      tree={tree}
-                      lives={karma.lives}
-                      highestReached={karma.highestReached}
-                      peakKarmaTotal={karma.peakKarmaTotal}
-                      realmIndex={cultivation.realmIndex}
-                      onReincarnate={handleReincarnate}
-                    />,
   };
 
-  // Reincarnation tab stays unlocked across rebirths (tied to karma state,
-  // not realmIndex).
   const reincarnationUnlocked = karma.unlocked;
-  const combinedIsUnlocked = (id) => id === 'reincarnation'
-    ? reincarnationUnlocked
-    : featureFlags.isUnlocked(id);
-  const combinedGetHint = (id) => id === 'reincarnation'
-    ? (reincarnationUnlocked ? null : `Reach Saint realm to unlock`)
-    : featureFlags.getHint(id);
 
   const BASE = import.meta.env.BASE_URL;
 
@@ -335,8 +317,8 @@ function App() {
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
         badges={{ ...notifications.badges, home: selections.pendingCount > 0, worlds: notifications.badges.worlds || autoFarm.hasPendingGains }}
-        isUnlocked={combinedIsUnlocked}
-        getHint={combinedGetHint}
+        isUnlocked={featureFlags.isUnlocked}
+        getHint={featureFlags.getHint}
       />
       <main className={`screen-container${currentScreen === 'home' ? ' sc-fullbleed' : ''}`}>
         {screens[currentScreen]}

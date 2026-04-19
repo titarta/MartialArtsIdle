@@ -10,6 +10,7 @@ import CrystalFeedModal from '../components/CrystalFeedModal';
 import JadeShopModal from '../components/JadeShopModal';
 import AchievementsModal from '../components/AchievementsModal';
 import JourneyModal from '../components/JourneyModal';
+import ReincarnationModal from '../components/ReincarnationModal';
 import { PILLS_BY_ID } from '../data/pills';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
@@ -27,7 +28,7 @@ function getSpriteState(boosting, adBoostActive) {
 }
 
 // ── Top HUD bar ─────────────────────────────────────────────────────────────
-function HomeTopHud({ jadeBalance, onNavigate, onOpenShop, onOpenAchievements, hasNewAchievement, onOpenJourney }) {
+function HomeTopHud({ jadeBalance, onNavigate, onOpenShop, onOpenAchievements, hasNewAchievement, onOpenJourney, onOpenReincarnation, reincarnationUnlocked }) {
   return (
     <div className="home-top-hud">
       <button className="home-hud-jade" onClick={onOpenShop} aria-label="Blood Lotus Shop">
@@ -40,6 +41,15 @@ function HomeTopHud({ jadeBalance, onNavigate, onOpenShop, onOpenAchievements, h
         <span className="home-hud-jade-amount">{jadeBalance ?? 0}</span>
       </button>
       <div className="home-hud-spacer" />
+      {reincarnationUnlocked && (
+        <button
+          className="home-hud-reinc"
+          onClick={onOpenReincarnation}
+          aria-label="Reincarnation"
+        >
+          ☸
+        </button>
+      )}
       <button
         className="home-hud-journey"
         onClick={onOpenJourney}
@@ -329,6 +339,10 @@ function HomeScreen({
   onNavigate,
   crystal, isCrystalUnlocked,
   achievements,
+  reincarnationUnlocked,
+  karma, karmaLives, karmaHighestReached, karmaPeakTotal,
+  tree,
+  onReincarnate,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -400,6 +414,9 @@ function HomeScreen({
     prevUnlockedCount.current = count;
   }, [achievements?.unlockedCount]);
 
+  // ── Reincarnation modal ──────────────────────────────────────────────────
+  const [reincOpen, setReincOpen] = useState(false);
+
   // ── Crystal feed modal ───────────────────────────────────────────────────
   const [crystalModalOpen, setCrystalModalOpen] = useState(false);
 
@@ -468,6 +485,8 @@ function HomeScreen({
         onOpenJourney={() => setJourneyOpen(true)}
         onOpenAchievements={() => { setAchOpen(true); setHasNewAch(false); }}
         hasNewAchievement={hasNewAch}
+        onOpenReincarnation={() => setReincOpen(true)}
+        reincarnationUnlocked={reincarnationUnlocked}
       />
 
       {/* ── Scene: fills all space between HUD and nav bar ───────────── */}
@@ -671,6 +690,20 @@ function HomeScreen({
         <AchievementsModal
           achievements={achievements}
           onClose={() => setAchOpen(false)}
+        />
+      )}
+
+      {/* Reincarnation modal */}
+      {reincOpen && (
+        <ReincarnationModal
+          karma={karma}
+          tree={tree}
+          lives={karmaLives}
+          highestReached={karmaHighestReached}
+          peakKarmaTotal={karmaPeakTotal}
+          realmIndex={cultivation.realmIndex}
+          onReincarnate={onReincarnate}
+          onClose={() => setReincOpen(false)}
         />
       )}
     </div>

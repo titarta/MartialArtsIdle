@@ -6774,3 +6774,409 @@
   flex-shrink: 0;
   margin-left: 2px;
 }
+
+/* ── Reincarnation HUD button ─────────────────────────────────────────────── */
+.home-hud-reinc {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 4px 6px;
+  color: rgba(168, 85, 247, 0.85);
+  transition: color 0.15s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.4));
+}
+.home-hud-reinc:hover {
+  color: rgba(200, 130, 255, 1);
+  transform: scale(1.15) rotate(-20deg);
+}
+
+/* ── Reincarnation modal ──────────────────────────────────────────────────── */
+.reinc-modal {
+  background: linear-gradient(160deg, rgba(10, 8, 28, 0.98) 0%, rgba(20, 10, 40, 0.98) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 16px;
+  width: min(520px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(168, 85, 247, 0.12) inset;
+  display: flex;
+  flex-direction: column;
+  color: rgba(220, 210, 255, 0.9);
+}
+.reinc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.18);
+}
+.reinc-header-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: rgba(168, 85, 247, 0.9);
+  flex-shrink: 0;
+}
+.reinc-header-text { flex: 1; min-width: 0; }
+.reinc-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: rgba(210, 180, 255, 1);
+  line-height: 1.2;
+}
+.reinc-subtitle {
+  font-size: 0.78rem;
+  color: rgba(180, 160, 220, 0.55);
+  margin-top: 2px;
+}
+.reinc-karma-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(220, 180, 255, 1);
+  flex-shrink: 0;
+}
+.reinc-karma-gem {
+  color: rgba(168, 85, 247, 0.9);
+  font-size: 0.85rem;
+}
+.reinc-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+  padding: 0 12px;
+}
+.reinc-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(180, 160, 220, 0.5);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 14px 8px;
+  transition: color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reinc-tab-active {
+  color: rgba(210, 170, 255, 1);
+  border-bottom-color: rgba(168, 85, 247, 0.8);
+}
+.reinc-tab:hover:not(.reinc-tab-active) { color: rgba(200, 180, 240, 0.75); }
+
+/* INFO PHASE */
+.reinc-info {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.reinc-info-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.reinc-info-card {
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.reinc-info-card-lost {
+  background: rgba(180, 40, 40, 0.12);
+  border: 1px solid rgba(200, 60, 60, 0.25);
+}
+.reinc-info-card-kept {
+  background: rgba(40, 160, 80, 0.1);
+  border: 1px solid rgba(60, 200, 100, 0.22);
+}
+.reinc-info-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  color: rgba(220, 200, 255, 0.65);
+}
+.reinc-info-card-lost .reinc-info-card-title { color: rgba(255, 140, 140, 0.75); }
+.reinc-info-card-kept .reinc-info-card-title { color: rgba(100, 220, 140, 0.75); }
+.reinc-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.reinc-info-list li {
+  font-size: 0.8rem;
+  color: rgba(210, 195, 240, 0.75);
+  padding-left: 12px;
+  position: relative;
+}
+.reinc-info-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: rgba(168, 85, 247, 0.5);
+}
+.reinc-info-card-lost .reinc-info-list li::before { color: rgba(255, 120, 120, 0.6); }
+.reinc-info-card-kept .reinc-info-list li::before { color: rgba(100, 220, 140, 0.6); }
+.reinc-info-stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.reinc-stat {
+  flex: 1;
+  min-width: 120px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(168, 85, 247, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.reinc-stat-label {
+  font-size: 0.73rem;
+  color: rgba(200, 180, 240, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.reinc-stat-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: rgba(220, 195, 255, 0.95);
+}
+.reinc-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.reinc-actions-confirm { justify-content: center; }
+.reinc-btn-secondary {
+  flex: 1;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 8px;
+  color: rgba(210, 170, 255, 0.9);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reinc-btn-secondary:hover { background: rgba(168, 85, 247, 0.2); border-color: rgba(168, 85, 247, 0.55); }
+.reinc-btn-danger {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(180, 30, 60, 0.85), rgba(120, 10, 40, 0.9));
+  border: 1px solid rgba(220, 60, 80, 0.4);
+  border-radius: 8px;
+  color: rgba(255, 200, 210, 0.95);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  transition: opacity 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.reinc-btn-danger:hover { opacity: 0.88; transform: scale(1.02); }
+.reinc-locked-hint {
+  font-size: 0.8rem;
+  color: rgba(180, 160, 200, 0.5);
+  text-align: center;
+  flex: 1;
+  padding: 8px;
+}
+
+/* TREE PHASE */
+.reinc-tree-phase {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.reinc-tree-karma-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+.reinc-tree-karma-label {
+  font-size: 0.8rem;
+  color: rgba(200, 170, 240, 0.65);
+}
+.reinc-tree-karma-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(210, 170, 255, 1);
+}
+.reinc-tree-container {
+  position: relative;
+  width: 100%;
+}
+.reinc-tree-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.reinc-conn {
+  stroke: rgba(168, 85, 247, 0.18);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+.reinc-conn-partial {
+  stroke: rgba(168, 85, 247, 0.38);
+  stroke-dasharray: none;
+}
+.reinc-conn-active {
+  stroke: rgba(168, 85, 247, 0.65);
+  stroke-dasharray: none;
+  stroke-width: 2.5;
+}
+.reinc-tree-grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reinc-tree-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.reinc-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-radius: 10px;
+  border: 2px solid;
+  padding: 10px 6px;
+  min-height: 90px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+  overflow: visible;
+}
+.reinc-node:hover:not(:disabled) { transform: translateY(-2px); }
+.reinc-node-purchased {
+  background: rgba(60, 180, 100, 0.13);
+  border-color: rgba(80, 220, 120, 0.45);
+}
+.reinc-node-affordable {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(200, 140, 255, 0.55);
+  animation: reinc-node-glow 2s ease-in-out infinite;
+}
+.reinc-node-locked-cost {
+  background: rgba(60, 50, 80, 0.2);
+  border-color: rgba(120, 100, 150, 0.3);
+  opacity: 0.65;
+}
+.reinc-node-locked-prereq {
+  background: rgba(30, 25, 45, 0.3);
+  border-color: rgba(80, 70, 100, 0.25);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.reinc-node:disabled { cursor: not-allowed; }
+.reinc-node-affordable:hover:not(:disabled) { box-shadow: 0 0 18px rgba(168, 85, 247, 0.45); }
+@keyframes reinc-node-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.22); }
+  50%       { box-shadow: 0 0 18px rgba(168, 85, 247, 0.45); }
+}
+.reinc-node-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+.reinc-node-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(215, 200, 245, 0.88);
+  line-height: 1.25;
+}
+.reinc-node-cost {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(180, 150, 220, 0.6);
+}
+.reinc-node-purchased .reinc-node-cost { color: rgba(100, 220, 140, 0.75); }
+.reinc-node-affordable .reinc-node-cost { color: rgba(210, 170, 255, 0.9); }
+.reinc-node-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 10, 30, 0.97);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 7px;
+  padding: 6px 10px;
+  font-size: 0.73rem;
+  color: rgba(210, 195, 240, 0.9);
+  white-space: normal;
+  max-width: 200px;
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+  line-height: 1.4;
+}
+
+/* CONFIRM PHASE */
+.reinc-confirm {
+  padding: 24px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.reinc-confirm-icon {
+  font-size: 3rem;
+  color: rgba(168, 85, 247, 0.8);
+  animation: reinc-spin 4s linear infinite;
+}
+@keyframes reinc-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.reinc-confirm-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: rgba(220, 200, 255, 1);
+}
+.reinc-confirm-text {
+  font-size: 0.85rem;
+  color: rgba(190, 170, 220, 0.7);
+  max-width: 360px;
+  line-height: 1.5;
+}
+.reinc-confirm-cancel {
+  background: none;
+  border: none;
+  color: rgba(180, 160, 210, 0.45);
+  cursor: pointer;
+  font-size: 0.82rem;
+  text-decoration: underline;
+  padding: 4px 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.reinc-confirm-cancel:hover { color: rgba(210, 190, 240, 0.75); }
