@@ -7,10 +7,6 @@ import PillDrawer from '../components/PillDrawer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import CrystalFeedModal from '../components/CrystalFeedModal';
-import JadeShopModal from '../components/JadeShopModal';
-import AchievementsModal from '../components/AchievementsModal';
-import JourneyModal from '../components/JourneyModal';
-import EternalTreeScreen from '../components/EternalTreeScreen';
 import { PILLS_BY_ID } from '../data/pills';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
@@ -25,55 +21,6 @@ function getSpriteState(boosting, adBoostActive) {
   if (adBoostActive)             return 3;
   if (boosting)                  return 2;
   return 1;
-}
-
-// ── Top HUD bar ─────────────────────────────────────────────────────────────
-function HomeTopHud({ jadeBalance, onNavigate, onOpenShop, onOpenAchievements, hasNewAchievement, onOpenJourney, onOpenReincarnation, reincarnationUnlocked }) {
-  return (
-    <div className="home-top-hud">
-      <button className="home-hud-jade" onClick={onOpenShop} aria-label="Blood Lotus Shop">
-        <img
-          src={`${BASE}sprites/items/blood_lotus.png`}
-          className="home-hud-jade-icon"
-          alt=""
-          draggable="false"
-        />
-        <span className="home-hud-jade-amount">{jadeBalance ?? 0}</span>
-      </button>
-      <div className="home-hud-spacer" />
-      {reincarnationUnlocked && (
-        <button
-          className="home-hud-reinc"
-          onClick={onOpenReincarnation}
-          aria-label="Reincarnation"
-        >
-          ☸
-        </button>
-      )}
-      <button
-        className="home-hud-journey"
-        onClick={onOpenJourney}
-        aria-label="Cultivation Journey"
-      >
-        🗺️
-      </button>
-      <button
-        className="home-hud-trophy"
-        onClick={onOpenAchievements}
-        aria-label="Achievements"
-      >
-        🏆
-        {hasNewAchievement && <span className="home-hud-trophy-badge" />}
-      </button>
-      <button
-        className="home-hud-settings"
-        onClick={() => onNavigate('settings')}
-        aria-label="Settings"
-      >
-        ⚙
-      </button>
-    </div>
-  );
 }
 
 
@@ -338,11 +285,6 @@ function HomeScreen({
   selections, onOpenSelections,
   onNavigate,
   crystal, isCrystalUnlocked,
-  achievements,
-  reincarnationUnlocked,
-  karma, karmaLives, karmaHighestReached, karmaPeakTotal,
-  tree,
-  onReincarnate,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -398,25 +340,6 @@ function HomeScreen({
     try { return !localStorage.getItem(HOLD_HINT_SEEN_KEY); } catch { return true; }
   });
 
-  // ── Jade shop modal ──────────────────────────────────────────────────────
-  const [shopOpen, setShopOpen] = useState(false);
-
-  // ── Journey modal ────────────────────────────────────────────────────────
-  const [journeyOpen, setJourneyOpen] = useState(false);
-
-  // ── Achievements modal ───────────────────────────────────────────────────
-  const [achOpen, setAchOpen] = useState(false);
-  const [hasNewAch, setHasNewAch] = useState(false);
-  const prevUnlockedCount = useRef(achievements?.unlockedCount ?? 0);
-  useEffect(() => {
-    const count = achievements?.unlockedCount ?? 0;
-    if (count > prevUnlockedCount.current) setHasNewAch(true);
-    prevUnlockedCount.current = count;
-  }, [achievements?.unlockedCount]);
-
-  // ── Reincarnation modal ──────────────────────────────────────────────────
-  const [reincOpen, setReincOpen] = useState(false);
-
   // ── Crystal feed modal ───────────────────────────────────────────────────
   const [crystalModalOpen, setCrystalModalOpen] = useState(false);
 
@@ -456,9 +379,6 @@ function HomeScreen({
   const spriteSrc   = `${BASE}sprites/cultivator/state${spriteState}.png`;
   const fps         = boosting ? 14 : 5;
 
-  // Jade balance — shown in the top HUD bar
-  const jadeBalance = selections?.jadeBalance ?? 0;
-
   return (
     <div className="screen home-screen">
       {/* Full-screen background — center bottom so the hall floor and archway
@@ -477,19 +397,7 @@ function HomeScreen({
         />
       )}
 
-      {/* ── Top HUD bar: jade balance + settings ─────────────────────── */}
-      <HomeTopHud
-        jadeBalance={jadeBalance}
-        onNavigate={onNavigate}
-        onOpenShop={() => setShopOpen(true)}
-        onOpenJourney={() => setJourneyOpen(true)}
-        onOpenAchievements={() => { setAchOpen(true); setHasNewAch(false); }}
-        hasNewAchievement={hasNewAch}
-        onOpenReincarnation={() => setReincOpen(true)}
-        reincarnationUnlocked={reincarnationUnlocked}
-      />
-
-      {/* ── Scene: fills all space between HUD and nav bar ───────────── */}
+      {/* ── Scene: fills all space between top bar and nav bar ──────── */}
       <div className="home-scene">
 
         {/* Left info panel — only visible at PC widths (≥ 900 px) */}
@@ -660,14 +568,6 @@ function HomeScreen({
         pills={pills}
       />
 
-      {/* Jade shop modal */}
-      {shopOpen && (
-        <JadeShopModal
-          onClose={() => setShopOpen(false)}
-          onBalanceChange={() => {}}
-        />
-      )}
-
       {/* Crystal feed modal */}
       {crystalModalOpen && isCrystalUnlocked && (
         <CrystalFeedModal
@@ -677,35 +577,6 @@ function HomeScreen({
         />
       )}
 
-      {/* Journey modal */}
-      {journeyOpen && (
-        <JourneyModal
-          realmIndex={cultivation.realmIndex}
-          onClose={() => setJourneyOpen(false)}
-        />
-      )}
-
-      {/* Achievements modal */}
-      {achOpen && achievements && (
-        <AchievementsModal
-          achievements={achievements}
-          onClose={() => setAchOpen(false)}
-        />
-      )}
-
-      {/* Eternal Tree — full-screen overlay */}
-      {reincOpen && (
-        <EternalTreeScreen
-          karma={karma}
-          tree={tree}
-          lives={karmaLives}
-          highestReached={karmaHighestReached}
-          peakKarmaTotal={karmaPeakTotal}
-          realmIndex={cultivation.realmIndex}
-          onReincarnate={onReincarnate}
-          onClose={() => setReincOpen(false)}
-        />
-      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@
      2px border + 6px pad-top + 24px icon + 10px label + 6px pad-bottom = 48px.
      Used to keep background art and content from bleeding behind the nav. */
   --nav-h: 48px;
+  --top-bar-h: 48px;
 }
 
 .app {
@@ -285,6 +286,7 @@
 .screen-container {
   flex: 1;
   padding: 20px 16px;
+  padding-top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 20px);
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);
   width: 100%;
   position: relative;
@@ -1164,19 +1166,22 @@
 }
 
 /* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
-.home-top-hud {
-  /* No fixed height — let padding + content determine it.
-     padding-top = safe area (covers Dynamic Island / notch fully) + 2px gap.
-     On phones with no notch: safe area = 0 → bar is ~38px total.
-     On iPhone 15 Pro (safe area 59px): bar is ~99px total. */
+.top-bar {
+  /* Fixed at top like the navbar is fixed at bottom.
+     padding-top absorbs the safe area (Dynamic Island / notch).
+     On phones with no notch: safe area = 0 → bar is ~48px total.
+     On iPhone 15 Pro (safe area 59px): bar is ~107px total. */
   padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
   background: rgba(5, 2, 14, 0.92);
   border-bottom: 1px solid rgba(30, 18, 48, 0.85);
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
-  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
 
 .home-hud-jade {
@@ -1276,6 +1281,7 @@
   left: 0;
   right: 0;
   bottom: 0;
+  padding-top: calc(var(--top-bar-h) + env(safe-area-inset-top));
   padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
   text-align: center;
   display: flex;

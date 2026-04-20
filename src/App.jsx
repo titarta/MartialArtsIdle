@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import NavBar from './components/NavBar';
+import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
+import JadeShopModal from './components/JadeShopModal';
+import AchievementsModal from './components/AchievementsModal';
+import JourneyModal from './components/JourneyModal';
+import EternalTreeScreen from './components/EternalTreeScreen';
 import { initAds } from './ads/adService';
 import CombatScreen from './screens/CombatScreen';
 import WorldsScreen from './screens/WorldsScreen';
@@ -41,6 +46,13 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
   const [screenParam,   setScreenParam]   = useState(null);
   const [selectionModalOpen, setSelectionModalOpen] = useState(false);
+
+  // Top-bar modal state (lifted from HomeScreen so the bar works on all screens)
+  const [shopOpen,    setShopOpen]    = useState(false);
+  const [journeyOpen, setJourneyOpen] = useState(false);
+  const [achOpen,     setAchOpen]     = useState(false);
+  const [reincOpen,   setReincOpen]   = useState(false);
+  const [hasNewAch,   setHasNewAch]   = useState(false);
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
@@ -244,6 +256,13 @@ function App() {
     onUnlock: (a) => notifications.addToast({ message: `🏆 Achievement: ${a.title}` }),
   });
 
+  const prevAchCountRef = useRef(0);
+  useEffect(() => {
+    const count = achievements?.unlockedCount ?? 0;
+    if (count > prevAchCountRef.current) setHasNewAch(true);
+    prevAchCountRef.current = count;
+  }, [achievements?.unlockedCount]);
+
   // Check achievements whenever key progression metrics change.
   useEffect(() => {
     achievements.check({
@@ -309,7 +328,7 @@ function App() {
   const reincarnationUnlocked = karma.unlocked;
 
   const screens = {
-    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} achievements={achievements} reincarnationUnlocked={reincarnationUnlocked} karma={karma.karma} karmaLives={karma.lives} karmaHighestReached={karma.highestReached} karmaPeakTotal={karma.peakKarmaTotal} tree={tree} onReincarnate={handleReincarnate} />,
+    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} />,
     worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={autoFarm.setIdleActivity} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
@@ -344,6 +363,16 @@ function App() {
           style={{ '--app-bg-url': `url(${BASE}backgrounds/default_bg.png)` }}
         />
       )}
+      <TopBar
+        jadeBalance={selections.jadeBalance}
+        onNavigate={navigate}
+        onOpenShop={() => setShopOpen(true)}
+        onOpenJourney={() => setJourneyOpen(true)}
+        onOpenAchievements={() => { setAchOpen(true); setHasNewAch(false); }}
+        hasNewAchievement={hasNewAch}
+        onOpenReincarnation={() => setReincOpen(true)}
+        reincarnationUnlocked={reincarnationUnlocked}
+      />
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
@@ -375,6 +404,21 @@ function App() {
             if (r) inventory.addItem(mineralForRarity(r), 1);
           }}
           onClose={() => setSelectionModalOpen(false)}
+        />
+      )}
+      {shopOpen && <JadeShopModal onClose={() => setShopOpen(false)} onBalanceChange={() => {}} />}
+      {journeyOpen && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setJourneyOpen(false)} />}
+      {achOpen && achievements && <AchievementsModal achievements={achievements} onClose={() => setAchOpen(false)} />}
+      {reincOpen && (
+        <EternalTreeScreen
+          karma={karma.karma}
+          tree={tree}
+          lives={karma.lives}
+          highestReached={karma.highestReached}
+          peakKarmaTotal={karma.peakKarmaTotal}
+          realmIndex={cultivation.realmIndex}
+          onReincarnate={handleReincarnate}
+          onClose={() => setReincOpen(false)}
         />
       )}
     </div>
