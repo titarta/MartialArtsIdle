@@ -77,6 +77,14 @@ function SettingsScreen({ onClose }) {
   const { t, i18n } = useTranslation('ui');
   const audio = useAudio();
 
+  // Local slider state — separate from audio.settings so the slider doesn't
+  // snap back while dragging (controlled inputs fight with async state updates).
+  const [sliderVols, setSliderVols] = useState(() => ({
+    master: audio.settings.masterVol,
+    bgm:    audio.settings.bgmVol,
+    sfx:    audio.settings.sfxVol,
+  }));
+
   const [showImport,  setShowImport]  = useState(false);
   const [importText,  setImportText]  = useState('');
   const [message,     setMessage]     = useState(null);
@@ -150,9 +158,9 @@ function SettingsScreen({ onClose }) {
           {/* Audio */}
           <div className="stg-section">
             <div className="stg-section-label">Audio</div>
-            {AUDIO_CHANNELS.map(({ channel, label, volKey, muteKey }) => {
-              const muted = audio.settings[muteKey];
-              const vol   = audio.settings[volKey];
+            {AUDIO_CHANNELS.map(({ channel, label, muteKey }) => {
+              const muted   = audio.settings[muteKey];
+              const localVol = sliderVols[channel];
               return (
                 <div key={channel} className="stg-audio-row">
                   <span className="stg-audio-label">{label}</span>
@@ -160,12 +168,17 @@ function SettingsScreen({ onClose }) {
                     type="range"
                     className={`stg-audio-slider${muted ? ' stg-audio-slider-muted' : ''}`}
                     min="0" max="1" step="0.01"
-                    value={vol}
-                    onChange={e => audio.setVolume(channel, parseFloat(e.target.value))}
+                    value={localVol}
+                    onChange={e => {
+                      const val = parseFloat(e.target.value);
+                      setSliderVols(prev => ({ ...prev, [channel]: val }));
+                    }}
+                    onMouseUp={e  => audio.setVolume(channel, parseFloat(e.target.value))}
+                    onTouchEnd={e => audio.setVolume(channel, parseFloat(e.target.value))}
                     disabled={muted}
                     aria-label={`${label} volume`}
                   />
-                  <span className="stg-audio-pct">{muted ? '—' : `${Math.round(vol * 100)}%`}</span>
+                  <span className="stg-audio-pct">{muted ? '—' : `${Math.round(localVol * 100)}%`}</span>
                   <button
                     className={`stg-audio-mute${muted ? ' stg-audio-muted' : ''}`}
                     onClick={() => audio.setMuted(channel, !muted)}
