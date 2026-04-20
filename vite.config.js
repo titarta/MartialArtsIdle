@@ -67,10 +67,21 @@ export default defineConfig(({ command, mode }) => {
         registerType: 'autoUpdate',
         workbox: {
           navigateFallback: 'index.html',
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,ogg,mp3,wav}'],
           skipWaiting: true,
           clientsClaim: true,
           cleanupOutdatedCaches: true,
+          runtimeCaching: [
+            {
+              // Audio files not in the precache (uploaded after build) — cache on first fetch.
+              urlPattern: /\/audio\//,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'audio-cache',
+                expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+          ],
         },
         manifest: {
           name: 'The Long Road to Heaven',

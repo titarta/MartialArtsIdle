@@ -418,6 +418,16 @@ function App() {
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm, crystal };
   useEffect(() => { initDebug(hooksRef); }, []);
 
+  // BGM track per screen group
+  useEffect(() => {
+    const track =
+      currentScreen === 'home'         ? 'cultivation' :
+      currentScreen === 'combat-arena' ? 'combat'      :
+      currentScreen === 'worlds' || currentScreen === 'gathering' || currentScreen === 'mining'
+                                       ? 'world'       : 'menu';
+    AudioManager.playBgm(track);
+  }, [currentScreen]);
+
   // Navigate to a screen, optionally carrying a parameter (e.g. region data).
   const navigate = (screen, param = null) => {
     AudioManager.playSfx('ui_click');

@@ -70,7 +70,7 @@ function _createBgmHowl(trackId) {
     volume: 0,                    // always start silent; fade in separately
     html5:  false,                // Web Audio for reliable looping
     onloaderror: (id, err) => {
-      console.warn(`[Audio] BGM "${trackId}" failed to load:`, err);
+      console.error(`[Audio] BGM "${trackId}" failed to load (tried: ${config.src.join(', ')}):`, err);
     },
   });
 }
@@ -96,9 +96,12 @@ function _getSfxHowl(sfxId) {
     src:    config.src,
     volume: config.volume ?? 1.0,
     html5:  false,
-    preload: false,               // load on first play to avoid upfront requests for all sounds
+    preload: false,
     onloaderror: (id, err) => {
-      console.warn(`[Audio] SFX "${sfxId}" failed to load:`, err);
+      console.error(`[Audio] SFX "${sfxId}" failed to load (tried: ${config.src.join(', ')}):`, err);
+    },
+    onplayerror: (id, err) => {
+      console.error(`[Audio] SFX "${sfxId}" failed to play:`, err);
     },
   });
 
