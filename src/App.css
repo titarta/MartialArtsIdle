@@ -7525,6 +7525,7 @@
   border-color: rgba(168, 85, 247, 0.6);
   box-shadow: 0 0 28px rgba(168,85,247,0.32), 0 0 56px rgba(168,85,247,0.12);
   cursor: default;
+  transform: translate(-50%, -50%) translateZ(0);
   animation: et-root-pulse 3.5s ease-in-out infinite;
 }
 @keyframes et-root-pulse {
@@ -7677,3 +7678,82 @@
   -webkit-tap-highlight-color: transparent;
 }
 .et-confirm-ok:hover { opacity: 0.88; transform: scale(1.02); }
+
+/* ── Tree Editor Panel (?treeEdit=1) ───────────────────────────────────────── */
+.et-editor-panel {
+  position: absolute;
+  top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 12px);
+  right: 12px;
+  width: 340px;
+  max-height: calc(100% - var(--top-bar-h) - var(--nav-h) - 40px);
+  overflow-y: auto;
+  background: rgba(5, 2, 18, 0.97);
+  border: 1px solid rgba(0, 200, 255, 0.35);
+  border-radius: 12px;
+  padding: 12px 14px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: rgba(200, 230, 255, 0.9);
+  box-shadow: 0 4px 32px rgba(0,0,0,0.7), 0 0 16px rgba(0,200,255,0.1);
+}
+.et-editor-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(0, 220, 255, 1);
+  letter-spacing: 0.05em;
+}
+.et-editor-hint {
+  font-weight: 400;
+  font-size: 0.68rem;
+  color: rgba(150, 200, 255, 0.6);
+}
+.et-editor-section { display: flex; flex-direction: column; gap: 4px; }
+.et-editor-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  color: rgba(0, 200, 255, 0.8);
+  font-size: 0.73rem;
+}
+.et-editor-copy {
+  background: rgba(0, 180, 255, 0.15);
+  border: 1px solid rgba(0, 200, 255, 0.3);
+  border-radius: 5px;
+  color: rgba(0, 220, 255, 0.9);
+  cursor: pointer;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  transition: background 0.15s;
+}
+.et-editor-copy:hover { background: rgba(0, 200, 255, 0.25); }
+.et-editor-pre {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 200, 255, 0.12);
+  border-radius: 6px;
+  padding: 8px;
+  margin: 0;
+  white-space: pre;
+  overflow-x: auto;
+  font-size: 0.65rem;
+  line-height: 1.5;
+  color: rgba(180, 230, 255, 0.85);
+}
+.et-editor-reset {
+  background: rgba(255, 80, 80, 0.12);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  border-radius: 6px;
+  color: rgba(255, 140, 140, 0.9);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  align-self: flex-start;
+  transition: background 0.15s;
+}
+.et-editor-reset:hover { background: rgba(255, 80, 80, 0.22); }
+.et-node-editable { cursor: grab !important; }
+.et-node-editable:active { cursor: grabbing !important; }
