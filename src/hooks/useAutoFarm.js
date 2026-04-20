@@ -240,6 +240,14 @@ export default function useAutoFarm({ worlds, getStats }) {
    * Call with activity=null to stop all auto-farming.
    */
   const setIdleActivity = useCallback((activity, worldIndex = 0, regionIndex = 0, dualEnabled = false) => {
+    // Starting a new assignment resets progress — toggling on/off/on rapidly
+    // should not bank extra resources. Disabling keeps pending gains so the
+    // player can still collect before they're gone.
+    if (activity) {
+      clearPersistedGains();
+      setPendingGains(emptyGains());
+    }
+
     setConfigRaw((prev) => {
       const base = getDefaultConfig();
       if (!activity) return base;

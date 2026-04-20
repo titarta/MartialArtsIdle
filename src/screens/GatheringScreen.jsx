@@ -39,12 +39,14 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
   const [current, setCurrent]     = useState(() => buildCurrent(pickWeighted(activePools)));
   const [collected, setCollected] = useState([]);
 
-  const progressBarRef = useRef(null);
-  const progressVal    = useRef(0);
-  const currentRef     = useRef(current);
-  const lastTRef       = useRef(null);
+  const progressBarRef  = useRef(null);
+  const progressVal     = useRef(0);
+  const currentRef      = useRef(current);
+  const lastTRef        = useRef(null);
+  const getFullStatsRef = useRef(getFullStats);
 
   useEffect(() => { currentRef.current = current; }, [current]);
+  useEffect(() => { getFullStatsRef.current = getFullStats; }, [getFullStats]);
 
   useEffect(() => {
     if (!gatherDrops.length) return;
@@ -59,7 +61,7 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
       const dt = Math.min((now - lastTRef.current) / 1000, 0.1);
       lastTRef.current = now;
 
-      const stats = getFullStats?.();
+      const stats = getFullStatsRef.current?.();
       const speed = BASE_GATHER_SPEED + Math.max(0, stats?.harvestSpeed ?? 0);
       progressVal.current += speed * dt;
       const cost = currentRef.current.gatherCost;
@@ -70,7 +72,7 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
       }
 
       if (progressVal.current >= cost) {
-        progressVal.current = 0;
+        progressVal.current -= cost;
 
         const luckPct = Math.min(100, Math.max(0, stats?.harvestLuck ?? 0));
         const gathered = [];
@@ -155,10 +157,11 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
         </div>
       </div>
 
-      {collected.length > 0 && (
-        <div className="harvest-loot">
-          <p className="harvest-loot-title">{t('gathering.collected')}</p>
-          {collected.map(item => (
+      <div className="harvest-loot">
+        <p className="harvest-loot-title">{t('gathering.collected')}</p>
+        {collected.length === 0
+          ? <p className="harvest-loot-empty">{t('gathering.nothingYet', { defaultValue: '—' })}</p>
+          : collected.map(item => (
             <div key={item.itemId} className="harvest-loot-row">
               <span
                 className="harvest-loot-name"
@@ -168,9 +171,9 @@ function GatheringScreen({ region, inventory, onBack, getFullStats }) {
               </span>
               <span className="harvest-loot-count">×{item.count}</span>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        }
+      </div>
     </div>
   );
 }

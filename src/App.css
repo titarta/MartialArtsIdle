@@ -5629,6 +5629,11 @@
 
 /* ── Gathering / Mining screens ────────────────────────────────────────────── */
 
+.harvest-screen {
+  display: flex;
+  flex-direction: column;
+}
+
 .harvest-header {
   display: flex;
   flex-direction: column;
@@ -5716,6 +5721,9 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px 16px;
+  max-height: 42vh;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .harvest-loot-title {
@@ -5724,6 +5732,14 @@
   letter-spacing: 0.08em;
   color: var(--text-muted);
   margin-bottom: 10px;
+}
+
+.harvest-loot-empty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  text-align: center;
+  padding: 4px 0;
 }
 
 .harvest-loot-row {
