@@ -152,7 +152,7 @@ function InlineArtefactPicker({ slot, artefacts, onClose }) {
     <div className="art-inline-picker">
       <div className="art-inline-picker-header">
         <span className="art-inline-picker-title">{t('build.selectArtefactTitle', { slot: slotLabel })}</span>
-        <button className="art-inline-picker-close" onClick={onClose}>x</button>
+        <button className="art-inline-picker-close" onClick={onClose}>✕</button>
       </div>
       {available.length === 0 ? (
         <p className="art-pick-empty">{t('build.noArtefactsForSlot')}</p>
@@ -496,13 +496,16 @@ function BuildContent({ cultivation, techniques, artefacts }) {
             />
           )}
 
-          {/* Inline artefact picker */}
+          {/* Inline artefact picker — bottom sheet on mobile */}
           {selectedSlot && (
-            <InlineArtefactPicker
-              slot={selectedSlot}
-              artefacts={artefacts}
-              onClose={() => setSelectedSlot(null)}
-            />
+            <>
+              <div className="art-picker-backdrop" onClick={() => setSelectedSlot(null)} />
+              <InlineArtefactPicker
+                slot={selectedSlot}
+                artefacts={artefacts}
+                onClose={() => setSelectedSlot(null)}
+              />
+            </>
           )}
         </section>
       </div>
