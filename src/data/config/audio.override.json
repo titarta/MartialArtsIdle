@@ -1,5 +1,31 @@
 {
   "version": 1,
-  "updatedAt": null,
-  "records": {}
+  "updatedAt": "2026-04-20T18:27:35.173Z",
+  "records": {
+    "ui_click": {
+      "src": [
+        "/audio/sfx/ui_click.wav"
+      ]
+    },
+    "bgm_menu": {
+      "src": [
+        "/audio/bgm/menu.mp3"
+      ]
+    },
+    "bgm_combat": {
+      "src": [
+        "/audio/bgm/combat.mp3"
+      ]
+    },
+    "bgm_cultivation": {
+      "src": [
+        "/audio/bgm/cultivation.mp3"
+      ]
+    },
+    "bgm_world": {
+      "src": [
+        "/audio/bgm/world.mp3"
+      ]
+    }
+  }
 }
