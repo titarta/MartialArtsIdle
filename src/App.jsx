@@ -459,6 +459,7 @@ function App() {
         try {
           const cur = Number(localStorage.getItem('mai_jade') ?? 0);
           localStorage.setItem('mai_jade', String(cur + treeMods.jadeOnRebirth));
+          selections.refreshJade();
         } catch {}
       }
       if (treeMods.bankedRerollOnRebirth > 0) {
@@ -579,7 +580,7 @@ function App() {
         />
       )}
       {activeModal === 'settings' && <SettingsScreen onClose={() => setActiveModal(null)} />}
-      {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={() => {}} />}
+      {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={() => selections.refreshJade()} />}
       {activeModal === 'journey' && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
       {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}
       {activeModal === 'daily' && (
@@ -587,7 +588,7 @@ function App() {
           streak={dailyBonus.streak}
           todayReward={dailyBonus.todayReward}
           isAvailable={dailyBonus.isAvailable}
-          onCollect={() => { const n = dailyBonus.collect(); return n; }}
+          onCollect={() => { const n = dailyBonus.collect(); selections.refreshJade(); return n; }}
           onClose={() => setActiveModal(null)}
         />
       )}
