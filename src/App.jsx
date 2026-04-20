@@ -50,18 +50,24 @@ function App() {
   const [screenParam,   setScreenParam]   = useState(null);
   const [selectionModalOpen, setSelectionModalOpen] = useState(false);
 
-  // Top-bar modal state (lifted from HomeScreen so the bar works on all screens)
-  const [shopOpen,    setShopOpen]    = useState(false);
-  const [journeyOpen, setJourneyOpen] = useState(false);
-  const [achOpen,     setAchOpen]     = useState(false);
+  // Single active modal — only one top-bar popup can be open at a time.
+  // Toggling the same key closes it; opening a new key replaces the current one.
+  const [activeModal, setActiveModal] = useState(null);
   const [hasNewAch,   setHasNewAch]   = useState(false);
-  const [dailyOpen,   setDailyOpen]   = useState(false);
+
+  const openModal = useCallback((key, sideEffect) => {
+    setActiveModal(prev => {
+      if (prev === key) return null; // toggle off
+      if (sideEffect) sideEffect();
+      return key;
+    });
+  }, []);
 
   const dailyBonus = useDailyBonus();
 
   // Auto-open daily bonus popup on login if uncollected
   useEffect(() => {
-    if (dailyBonus.isAvailable) setDailyOpen(true);
+    if (dailyBonus.isAvailable) setActiveModal('daily');
   }, []);
 
   useEffect(() => { initAds(); }, []);
@@ -483,7 +489,7 @@ function App() {
   const reincarnationUnlocked = karma.unlocked;
 
   const screens = {
-    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setDailyOpen(true)} />,
+    home:   <HomeScreen cultivation={cultivation} pills={pills} inventory={inventory} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} />,
     worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} onSetIdle={(act, w, r) => autoFarm.setIdleActivity(act, w, r, !!tree.modifiers.dualAutoFarm)} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
@@ -531,10 +537,11 @@ function App() {
       <TopBar
         jadeBalance={selections.jadeBalance}
         onNavigate={navigate}
-        onOpenShop={() => setShopOpen(true)}
-        onOpenJourney={() => setJourneyOpen(true)}
-        onOpenAchievements={() => { setAchOpen(true); setHasNewAch(false); }}
+        onOpenShop={() => openModal('shop')}
+        onOpenJourney={() => openModal('journey')}
+        onOpenAchievements={() => openModal('achievements', () => setHasNewAch(false))}
         hasNewAchievement={hasNewAch}
+        activeModal={activeModal}
         onOpenReincarnation={() => navigate('reincarnation')}
         reincarnationUnlocked={reincarnationUnlocked}
       />
@@ -571,16 +578,16 @@ function App() {
           onClose={() => setSelectionModalOpen(false)}
         />
       )}
-      {shopOpen && <JadeShopModal onClose={() => setShopOpen(false)} onBalanceChange={() => {}} />}
-      {journeyOpen && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setJourneyOpen(false)} />}
-      {achOpen && achievements && <AchievementsModal achievements={achievements} onClose={() => setAchOpen(false)} />}
-      {dailyOpen && (
+      {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={() => {}} />}
+      {activeModal === 'journey' && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'daily' && (
         <DailyBonusModal
           streak={dailyBonus.streak}
           todayReward={dailyBonus.todayReward}
           isAvailable={dailyBonus.isAvailable}
           onCollect={() => { const n = dailyBonus.collect(); return n; }}
-          onClose={() => setDailyOpen(false)}
+          onClose={() => setActiveModal(null)}
         />
       )}
     </div>

@@ -9,12 +9,17 @@ export default function TopBar({
   onOpenJourney,
   onOpenAchievements,
   hasNewAchievement,
+  activeModal,
   onOpenReincarnation,
   reincarnationUnlocked,
 }) {
   return (
     <div className="top-bar">
-      <button className="home-hud-jade" onClick={onOpenShop} aria-label="Blood Lotus Shop">
+      <button
+        className={`home-hud-jade${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenShop}
+        aria-label="Blood Lotus Shop"
+      >
         <img
           src={`${BASE}sprites/items/blood_lotus.png`}
           className="home-hud-jade-icon"
@@ -33,10 +38,18 @@ export default function TopBar({
           ☸
         </button>
       )}
-      <button className="home-hud-journey" onClick={onOpenJourney} aria-label="Cultivation Journey">
+      <button
+        className={`home-hud-journey${activeModal === 'journey' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenJourney}
+        aria-label="Cultivation Journey"
+      >
         🗺️
       </button>
-      <button className="home-hud-trophy" onClick={onOpenAchievements} aria-label="Achievements">
+      <button
+        className={`home-hud-trophy${activeModal === 'achievements' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenAchievements}
+        aria-label="Achievements"
+      >
         🏆
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
