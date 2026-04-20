@@ -136,11 +136,15 @@ function App() {
     return () => clearTimeout(id);
   }, [cultivation.rebirthCultBuffRef]);
 
-  // Open selection modal on level-up only when already on home screen.
-  // currentScreen is intentionally excluded from deps — we want this to fire
-  // only when pendingCount increases, not when the player navigates to home.
+  // Auto-open selection modal only when pendingCount increases mid-session
+  // (i.e. a real level-up just happened). Skip on load so players aren't
+  // greeted by the modal immediately — the notification badge is enough.
+  const prevPendingRef = useRef(null);
   useEffect(() => {
-    if (selections.pendingCount > 0 && currentScreen === 'home') {
+    const prev = prevPendingRef.current;
+    prevPendingRef.current = selections.pendingCount;
+    if (prev === null) return; // first render — treat as load, don't open
+    if (selections.pendingCount > prev && currentScreen === 'home') {
       setSelectionModalOpen(true);
     }
   }, [selections.pendingCount]); // eslint-disable-line react-hooks/exhaustive-deps
