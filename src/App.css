@@ -7245,8 +7245,9 @@
 }
 .et-branch-item {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
   padding: 4px 2px;
   border-radius: 6px;
   cursor: pointer;
@@ -7254,11 +7255,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 .et-branch-item:hover { background: rgba(255,255,255,0.04); }
-.et-branch-item-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
 .et-branch-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
@@ -7277,12 +7273,32 @@
   box-shadow: none;
 }
 .et-branch-item-sealed .et-branch-name { color: rgba(168, 85, 247, 0.42); }
-.et-branch-desc {
-  font-size: 0.68rem;
-  color: rgba(200, 185, 235, 0.62);
-  line-height: 1.42;
-  padding-left: 15px;
+
+/* ── Branch description — floating tooltip to the right of the sidebar ── */
+.et-branch-tooltip {
+  position: fixed;
+  transform: translateY(-50%);
+  width: 200px;
+  background: rgba(10, 5, 30, 0.97);
+  border: 1px solid rgba(var(--branch-rgb), 0.35);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.74rem;
+  color: rgba(200, 185, 235, 0.78);
+  line-height: 1.48;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.65), 0 0 10px rgba(var(--branch-rgb), 0.08);
   animation: et-tooltip-fade 0.12s ease;
+}
+.et-branch-tooltip::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-left: none;
+  border-right-color: rgba(var(--branch-rgb), 0.35);
 }
 .et-card-header {
   display: flex;

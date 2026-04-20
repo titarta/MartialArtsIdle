@@ -50,10 +50,12 @@ for (const node of NODES) {
   }
 }
 
-// Custom bezier control points for edges that would otherwise cross other branches.
+// Cubic bezier overrides for edges that must route around the outer perimeter.
+// cp1 = control point near the source (heavy outward push, sets exit tangent).
+// cp2 = control point near the destination (lighter, sets arrival angle).
 const CUSTOM_CP = {
-  'fp_k-cb_pt': { x:  1400, y: -200 },
-  'hw_k-cb_pt': { x: -1400, y: -200 },
+  'fp_k-cb_pt': { cp1: { x:  1800, y:  600 }, cp2: { x:  1000, y: -1000 } },
+  'hw_k-cb_pt': { cp1: { x: -1800, y:  600 }, cp2: { x: -1000, y: -1000 } },
 };
 
 // Brief descriptions shown in the branch legend panel on hover/tap
@@ -81,7 +83,8 @@ export default function EternalTreeScreen({
   const [activeNode,    setActiveNode]    = useState(null);
   const [showConfirm,   setShowConfirm]   = useState(false);
   const [infoOpen,      setInfoOpen]      = useState(false);
-  const [hoveredBranch, setHoveredBranch] = useState(null);
+  const [hoveredBranch,    setHoveredBranch]    = useState(null);
+  const [branchTooltipPos, setBranchTooltipPos] = useState({ x: 0, y: 0 });
 
   // Centre the root on mount
   useEffect(() => {
@@ -199,38 +202,52 @@ export default function EternalTreeScreen({
           </div>
         </div>
 
-        {/* Branch legend — hover/tap for description */}
+        {/* Branch legend — hover/tap shows floating tooltip to the right */}
         <div className="et-branch-legend">
           {Object.entries(BRANCHES)
             .filter(([b]) => b !== 'cross')
             .map(([branchId, branch]) => {
-              const isYY   = branchId === 'yinyang';
-              const sealed = isYY && !yyUnlocked;
-              const active = hoveredBranch === branchId;
+              const sealed = branchId === 'yinyang' && !yyUnlocked;
+              const openTooltip = (e) => {
+                const itemRect    = e.currentTarget.getBoundingClientRect();
+                const sidebarRect = e.currentTarget.closest('.et-sidebar').getBoundingClientRect();
+                setBranchTooltipPos({ x: sidebarRect.right + 8, y: itemRect.top + itemRect.height / 2 });
+                setHoveredBranch(branchId);
+              };
               return (
                 <div
                   key={branchId}
                   className={`et-branch-item${sealed ? ' et-branch-item-sealed' : ''}`}
                   style={{ '--branch-rgb': branch.colorRgb }}
-                  onMouseEnter={() => setHoveredBranch(branchId)}
+                  onMouseEnter={openTooltip}
                   onMouseLeave={() => setHoveredBranch(null)}
-                  onClick={() => setHoveredBranch(v => v === branchId ? null : branchId)}
+                  onClick={(e) => hoveredBranch === branchId ? setHoveredBranch(null) : openTooltip(e)}
                 >
-                  <div className="et-branch-item-row">
-                    <span className="et-branch-dot" />
-                    <span className="et-branch-name">{branch.label}</span>
-                  </div>
-                  {active && (
-                    <div className="et-branch-desc">
-                      {sealed ? `🔒 ${BRANCH_DESC[branchId]}` : BRANCH_DESC[branchId]}
-                    </div>
-                  )}
+                  <span className="et-branch-dot" />
+                  <span className="et-branch-name">{branch.label}</span>
                 </div>
               );
             })
           }
         </div>
       </div>
+
+      {/* ── Branch description tooltip — floats to the right of the sidebar ── */}
+      {hoveredBranch && (
+        <div
+          className="et-branch-tooltip"
+          style={{
+            left: branchTooltipPos.x,
+            top:  branchTooltipPos.y,
+            '--branch-rgb': BRANCHES[hoveredBranch]?.colorRgb,
+          }}
+        >
+          {(hoveredBranch === 'yinyang' && !yyUnlocked)
+            ? `🔒 ${BRANCH_DESC[hoveredBranch]}`
+            : BRANCH_DESC[hoveredBranch]
+          }
+        </div>
+      )}
 
       {/* ── Info panel — absolute overlay anchored to right of sidebar ── */}
       {infoOpen && (
@@ -295,29 +312,37 @@ export default function EternalTreeScreen({
               const src     = NODES.find(n => n.id === srcId);
               const isCross = src?.branch === 'cross' || tgt?.branch === 'cross';
               const edgeKey = `${srcId}-${tgtId}`;
-              let cpx, cpy;
-              if (CUSTOM_CP[edgeKey]) {
-                cpx = CUSTOM_CP[edgeKey].x;
-                cpy = CUSTOM_CP[edgeKey].y;
-              } else {
-                const strength = isCross ? 260 : 55;
-                const mx = (p1.x + p2.x) / 2;
-                const my = (p1.y + p2.y) / 2;
-                const mLen = Math.sqrt(mx * mx + my * my) || 1;
-                cpx = mx + (mx / mLen) * strength;
-                cpy = my + (my / mLen) * strength;
-              }
+              const custom  = CUSTOM_CP[edgeKey];
 
               const START = srcId === 'root' ? 57 : src?.keystone ? 62 : src?.branch === 'cross' ? 46 : 57;
               const STOP  = tgt?.keystone    ? 62 : tgt?.branch === 'cross' ? 46 : 57;
-              const sdx = cpx - p1.x, sdy = cpy - p1.y;
-              const sLen = Math.sqrt(sdx * sdx + sdy * sdy) || 1;
-              const edx = p2.x - cpx, edy = p2.y - cpy;
-              const eLen = Math.sqrt(edx * edx + edy * edy) || 1;
-              const sx = p1.x + (sdx / sLen) * START;
-              const sy = p1.y + (sdy / sLen) * START;
-              const ex = p2.x - (edx / eLen) * STOP;
-              const ey = p2.y - (edy / eLen) * STOP;
+
+              let pathD;
+              if (custom) {
+                // Cubic bezier — independent tangents at each end.
+                // Start tangent: p1 → cp1. End tangent: cp2 → p2.
+                const { cp1, cp2 } = custom;
+                const sdx = cp1.x - p1.x, sdy = cp1.y - p1.y;
+                const sLen = Math.sqrt(sdx*sdx + sdy*sdy) || 1;
+                const edx = p2.x - cp2.x, edy = p2.y - cp2.y;
+                const eLen = Math.sqrt(edx*edx + edy*edy) || 1;
+                const sx = p1.x + (sdx/sLen) * START, sy = p1.y + (sdy/sLen) * START;
+                const ex = p2.x - (edx/eLen) * STOP,  ey = p2.y - (edy/eLen) * STOP;
+                pathD = `M ${sx} ${sy} C ${cp1.x} ${cp1.y} ${cp2.x} ${cp2.y} ${ex} ${ey}`;
+              } else {
+                // Quadratic bezier — control point pushed outward from origin.
+                const strength = isCross ? 260 : 55;
+                const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+                const mLen = Math.sqrt(mx*mx + my*my) || 1;
+                const cpx = mx + (mx/mLen) * strength, cpy = my + (my/mLen) * strength;
+                const sdx = cpx - p1.x, sdy = cpy - p1.y;
+                const sLen = Math.sqrt(sdx*sdx + sdy*sdy) || 1;
+                const edx = p2.x - cpx, edy = p2.y - cpy;
+                const eLen = Math.sqrt(edx*edx + edy*edy) || 1;
+                const sx = p1.x + (sdx/sLen) * START, sy = p1.y + (sdy/sLen) * START;
+                const ex = p2.x - (edx/eLen) * STOP,  ey = p2.y - (edy/eLen) * STOP;
+                pathD = `M ${sx} ${sy} Q ${cpx} ${cpy} ${ex} ${ey}`;
+              }
 
               const stroke =
                 effectiveSt === 'active' ? `rgba(${rgb},0.9)` :
@@ -330,7 +355,7 @@ export default function EternalTreeScreen({
                 effectiveSt === 'lit'    ? 'url(#et-glow-soft)' : undefined;
               return (
                 <path key={edgeKey}
-                  d={`M ${sx} ${sy} Q ${cpx} ${cpy} ${ex} ${ey}`}
+                  d={pathD}
                   stroke={stroke} strokeWidth={sw}
                   strokeDasharray={dash} strokeLinecap="round"
                   fill="none"
