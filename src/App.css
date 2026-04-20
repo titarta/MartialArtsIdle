@@ -1162,6 +1162,8 @@
 .sc-fullbleed {
   padding: 0;
   max-width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 /* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
@@ -7193,10 +7195,9 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .et-screen {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  padding-top: calc(var(--top-bar-h) + env(safe-area-inset-top));
-  z-index: 600;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   background: #05030e;
@@ -7204,12 +7205,21 @@
   font-family: inherit;
 }
 
-/* ── Floating card — top-left corner ── */
-.et-card {
+/* ── Left sidebar — card + branch legend stacked ── */
+.et-sidebar {
   position: absolute;
-  top: 12px;
+  top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 12px);
   left: 12px;
   z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.et-sidebar > * { pointer-events: auto; }
+
+/* ── Floating card ── */
+.et-card {
   background: rgba(8, 4, 24, 0.94);
   border: 1px solid rgba(168, 85, 247, 0.35);
   border-radius: 12px;
@@ -7219,7 +7229,60 @@
   gap: 6px;
   min-width: 150px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.6), 0 0 12px rgba(168,85,247,0.08);
-  pointer-events: auto;
+}
+
+/* ── Branch legend ── */
+.et-branch-legend {
+  background: rgba(8, 4, 24, 0.88);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 150px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.5);
+}
+.et-branch-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.et-branch-item:hover { background: rgba(255,255,255,0.04); }
+.et-branch-item-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.et-branch-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(var(--branch-rgb), 0.85);
+  box-shadow: 0 0 5px rgba(var(--branch-rgb), 0.45);
+  flex-shrink: 0;
+}
+.et-branch-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(var(--branch-rgb), 0.9);
+  white-space: nowrap;
+}
+.et-branch-item-sealed .et-branch-dot {
+  background: rgba(168, 85, 247, 0.28);
+  box-shadow: none;
+}
+.et-branch-item-sealed .et-branch-name { color: rgba(168, 85, 247, 0.42); }
+.et-branch-desc {
+  font-size: 0.68rem;
+  color: rgba(200, 185, 235, 0.62);
+  line-height: 1.42;
+  padding-left: 15px;
+  animation: et-tooltip-fade 0.12s ease;
 }
 .et-card-header {
   display: flex;
@@ -7296,7 +7359,7 @@
 /* ── Info panel — tooltip card anchored to the card ── */
 .et-info-panel {
   position: absolute;
-  top: 12px; left: 174px;
+  top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 12px); left: 174px;
   width: 280px;
   background: rgba(10, 5, 28, 0.97);
   border: 1px solid rgba(168, 85, 247, 0.35);

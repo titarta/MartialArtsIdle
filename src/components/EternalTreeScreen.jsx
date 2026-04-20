@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { NODES, BRANCHES, MAIN_KEYSTONES, TREE_TOTAL_COST, SAINT_UNLOCK_INDEX } from '../data/reincarnationTree';
 
 // ── World-space layout ────────────────────────────────────────────────────────
@@ -11,7 +11,6 @@ const BRANCH_ANGLE_DEG = {
   will:    220,
   yinyang: 270,
 };
-
 
 function degToRad(d) { return d * Math.PI / 180; }
 
@@ -30,7 +29,7 @@ const NODE_POS = {
   hw_1: [229, 216], hw_2: [209, 406], hw_3: [236, 568], hw_4: [212, 744], hw_k: [227, 926],
   fp_1: [311, 220], fp_2: [331, 396], fp_3: [307, 566], fp_4: [301, 650], fp_k: [313, 918],
   yy_1: [261, 220], yy_2: [279, 394], yy_3: [257, 564], yy_4: [281, 734], yy_k: [273, 900],
-  cb_is: [178, 648], cb_ts: [2,   754], cb_pt: [270, 1120],
+  cb_is: [178, 648], cb_ts: [2,   754], cb_pt: [90,  1120],
 };
 
 // Compute world position for every node
@@ -42,27 +41,29 @@ for (const node of NODES) {
 
 // Build edge list: [sourceId, targetId]
 const EDGES = [];
-// Root → first node of each branch (cross-branch connects via prereqs, not root)
 for (const node of NODES) {
   if (node.step === 0 && node.branch !== 'cross') {
     EDGES.push(['root', node.id]);
   }
-  // Within-branch and cross-branch edges from prereqs
   for (const prereqId of node.prereqs) {
     EDGES.push([prereqId, node.id]);
   }
 }
 
-// ── Branch label positions (halfway along branch, perpendicular offset) ──────
-function branchLabelPos(branch) {
-  const angleDeg = BRANCH_ANGLE_DEG[branch];
-  const r        = 305; // midpoint between step-0 (~215) and step-1 (~400) radii
-  const pos      = radialXY(angleDeg, r);
-  // Perpendicular offset so label doesn't sit on the line
-  const perpDeg  = angleDeg + 90;
-  const perp     = radialXY(perpDeg, 30);
-  return { x: pos.x + perp.x, y: pos.y + perp.y - 20 };
-}
+// Custom bezier control points for edges that would otherwise cross other branches.
+const CUSTOM_CP = {
+  'fp_k-cb_pt': { x:  1400, y: -200 },
+  'hw_k-cb_pt': { x: -1400, y: -200 },
+};
+
+// Brief descriptions shown in the branch legend panel on hover/tap
+const BRANCH_DESC = {
+  legacy:  'Carry knowledge and resources — start each new life with a head-start.',
+  martial: 'Stronger in every fight — better techniques, exploit power, and killing edge.',
+  fate:    'Bend luck — rarer drops, better craft rolls, and more Selections to pick from.',
+  will:    'Forge an unbreakable body — raw stats, HP, and resilience that compound each life.',
+  yinyang: 'Balanced mastery — amplifies everything once you own 2 branch keystones.',
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function EternalTreeScreen({
@@ -74,12 +75,13 @@ export default function EternalTreeScreen({
   const canvasRef  = useRef(null);
   const dragRef    = useRef({ active: false, startX: 0, startY: 0, panX: 0, panY: 0 });
   const scaleRef   = useRef(1);
-  const [pan,         setPan]         = useState({ x: 0, y: 0 });
-  const [scale,       setScale]       = useState(1);
-  const [isDragging,  setIsDragging]  = useState(false);
-  const [activeNode,  setActiveNode]  = useState(null);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [infoOpen,    setInfoOpen]    = useState(false);
+  const [pan,           setPan]           = useState({ x: 0, y: 0 });
+  const [scale,         setScale]         = useState(1);
+  const [isDragging,    setIsDragging]    = useState(false);
+  const [activeNode,    setActiveNode]    = useState(null);
+  const [showConfirm,   setShowConfirm]   = useState(false);
+  const [infoOpen,      setInfoOpen]      = useState(false);
+  const [hoveredBranch, setHoveredBranch] = useState(null);
 
   // Centre the root on mount
   useEffect(() => {
@@ -146,11 +148,10 @@ export default function EternalTreeScreen({
   };
 
   // Derived display state
-  const purchasedSet = tree.purchased;
+  const purchasedSet  = tree.purchased;
   const keystoneCount = MAIN_KEYSTONES.filter(k => purchasedSet.has(k)).length;
   const yyUnlocked    = keystoneCount >= 2;
 
-  // Edge colours: use branch colour of the target node
   const edgeStateOf = useCallback((sourceId, targetId) => {
     const srcOwned = sourceId === 'root' || purchasedSet.has(sourceId);
     const tgtOwned = purchasedSet.has(targetId);
@@ -161,7 +162,6 @@ export default function EternalTreeScreen({
 
   const nodeStateOf = useCallback((node) => {
     if (purchasedSet.has(node.id)) return 'purchased';
-    // Yin Yang branch is fully sealed until yyUnlocked
     if (node.branch === 'yinyang' && !yyUnlocked) return 'sealed';
     if (tree.isAvailable(node.id)) return tree.canBuy(node.id) ? 'affordable' : 'locked-cost';
     return 'locked-prereq';
@@ -172,32 +172,67 @@ export default function EternalTreeScreen({
   return (
     <div className="et-screen">
 
-      {/* ── Floating card — top-left ── */}
-      <div className="et-card">
-        <div className="et-card-header">
-          <span className="et-card-icon">☸</span>
-          <span className="et-card-title">Eternal Tree</span>
-          <button className="et-close-btn" onClick={onClose} aria-label="Close">✕</button>
+      {/* ── Left sidebar: card + branch legend ── */}
+      <div className="et-sidebar">
+
+        <div className="et-card">
+          <div className="et-card-header">
+            <span className="et-card-icon">☸</span>
+            <span className="et-card-title">Eternal Tree</span>
+            <button className="et-close-btn" onClick={onClose} aria-label="Close">✕</button>
+          </div>
+          <div className="et-card-stats">
+            <span className="et-card-karma"><span className="et-hud-karma-gem">◈</span>{karma}</span>
+            <span className="et-card-lives">{lives} {lives === 1 ? 'life' : 'lives'}</span>
+          </div>
+          <div className="et-card-actions">
+            <button
+              className="et-info-btn"
+              onMouseEnter={() => setInfoOpen(true)}
+              onMouseLeave={() => setInfoOpen(false)}
+              onTouchStart={() => setInfoOpen(v => !v)}
+              aria-label="Info"
+            >ℹ</button>
+            {canReincarnateNow && (
+              <button className="et-reinc-btn" onClick={() => setShowConfirm(true)}>☸ Reincarnate</button>
+            )}
+          </div>
         </div>
-        <div className="et-card-stats">
-          <span className="et-card-karma"><span className="et-hud-karma-gem">◈</span>{karma}</span>
-          <span className="et-card-lives">{lives} {lives === 1 ? 'life' : 'lives'}</span>
-        </div>
-        <div className="et-card-actions">
-          <button
-            className="et-info-btn"
-            onMouseEnter={() => setInfoOpen(true)}
-            onMouseLeave={() => setInfoOpen(false)}
-            onTouchStart={() => setInfoOpen(v => !v)}
-            aria-label="Info"
-          >ℹ</button>
-          {canReincarnateNow && (
-            <button className="et-reinc-btn" onClick={() => setShowConfirm(true)}>☸ Reincarnate</button>
-          )}
+
+        {/* Branch legend — hover/tap for description */}
+        <div className="et-branch-legend">
+          {Object.entries(BRANCHES)
+            .filter(([b]) => b !== 'cross')
+            .map(([branchId, branch]) => {
+              const isYY   = branchId === 'yinyang';
+              const sealed = isYY && !yyUnlocked;
+              const active = hoveredBranch === branchId;
+              return (
+                <div
+                  key={branchId}
+                  className={`et-branch-item${sealed ? ' et-branch-item-sealed' : ''}`}
+                  style={{ '--branch-rgb': branch.colorRgb }}
+                  onMouseEnter={() => setHoveredBranch(branchId)}
+                  onMouseLeave={() => setHoveredBranch(null)}
+                  onClick={() => setHoveredBranch(v => v === branchId ? null : branchId)}
+                >
+                  <div className="et-branch-item-row">
+                    <span className="et-branch-dot" />
+                    <span className="et-branch-name">{branch.label}</span>
+                  </div>
+                  {active && (
+                    <div className="et-branch-desc">
+                      {sealed ? `🔒 ${BRANCH_DESC[branchId]}` : BRANCH_DESC[branchId]}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          }
         </div>
       </div>
 
-      {/* ── Info panel — absolute overlay ── */}
+      {/* ── Info panel — absolute overlay anchored to right of sidebar ── */}
       {infoOpen && (
         <div className="et-info-panel">
           <div className="et-info-cols">
@@ -228,7 +263,6 @@ export default function EternalTreeScreen({
       >
         <div className="et-hint">Drag to pan · Scroll to zoom · Tap a glowing node to unlock</div>
 
-        {/* ── SVG edges — lives at canvas level, fills canvas, no overflow issue ── */}
         <svg
           style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }}
         >
@@ -246,7 +280,6 @@ export default function EternalTreeScreen({
               <path d="M 0 1 L 9 5 L 0 9 z" fill="context-stroke" />
             </marker>
           </defs>
-          {/* Pan+scale transform applied directly to SVG group — same as world div */}
           <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`}>
 
             {EDGES.map(([srcId, tgtId]) => {
@@ -259,19 +292,22 @@ export default function EternalTreeScreen({
               const isYY = tgt?.branch === 'yinyang';
               const effectiveSt = (isYY && !yyUnlocked) ? 'dim' : st;
 
-              // Quadratic bezier — control point pushed outward from origin so
-              // all edges arc away from the tree center. Cross-branch edges get
-              // a much stronger push so they route around intermediate branches.
-              const src      = NODES.find(n => n.id === srcId);
-              const isCross  = src?.branch === 'cross' || tgt?.branch === 'cross';
-              const strength = isCross ? 260 : 55;
-              const mx = (p1.x + p2.x) / 2;
-              const my = (p1.y + p2.y) / 2;
-              const mLen = Math.sqrt(mx * mx + my * my) || 1;
-              const cpx = mx + (mx / mLen) * strength;
-              const cpy = my + (my / mLen) * strength;
+              const src     = NODES.find(n => n.id === srcId);
+              const isCross = src?.branch === 'cross' || tgt?.branch === 'cross';
+              const edgeKey = `${srcId}-${tgtId}`;
+              let cpx, cpy;
+              if (CUSTOM_CP[edgeKey]) {
+                cpx = CUSTOM_CP[edgeKey].x;
+                cpy = CUSTOM_CP[edgeKey].y;
+              } else {
+                const strength = isCross ? 260 : 55;
+                const mx = (p1.x + p2.x) / 2;
+                const my = (p1.y + p2.y) / 2;
+                const mLen = Math.sqrt(mx * mx + my * my) || 1;
+                cpx = mx + (mx / mLen) * strength;
+                cpy = my + (my / mLen) * strength;
+              }
 
-              // Offset endpoints along the bezier tangent at each tip
               const START = srcId === 'root' ? 57 : src?.keystone ? 62 : src?.branch === 'cross' ? 46 : 57;
               const STOP  = tgt?.keystone    ? 62 : tgt?.branch === 'cross' ? 46 : 57;
               const sdx = cpx - p1.x, sdy = cpy - p1.y;
@@ -293,7 +329,7 @@ export default function EternalTreeScreen({
                 effectiveSt === 'active' ? 'url(#et-glow-f)' :
                 effectiveSt === 'lit'    ? 'url(#et-glow-soft)' : undefined;
               return (
-                <path key={`${srcId}-${tgtId}`}
+                <path key={edgeKey}
                   d={`M ${sx} ${sy} Q ${cpx} ${cpy} ${ex} ${ey}`}
                   stroke={stroke} strokeWidth={sw}
                   strokeDasharray={dash} strokeLinecap="round"
@@ -301,23 +337,6 @@ export default function EternalTreeScreen({
                   markerEnd="url(#et-arrow)"
                   filter={filter}
                 />
-              );
-            })}
-
-            {/* Branch arc labels */}
-            {Object.entries(BRANCH_ANGLE_DEG).map(([branch]) => {
-              const lp  = branchLabelPos(branch);
-              const rgb = branchColorOf(branch);
-              return (
-                <text key={branch}
-                  x={lp.x} y={lp.y}
-                  fill={`rgba(${rgb},0.55)`}
-                  fontSize="12" fontWeight="700"
-                  textAnchor="middle" dominantBaseline="middle"
-                  style={{ userSelect: 'none', letterSpacing: '0.04em' }}
-                >
-                  {BRANCHES[branch].label}
-                </text>
               );
             })}
 
@@ -338,7 +357,7 @@ export default function EternalTreeScreen({
           </g>
         </svg>
 
-        {/* ── Floating tooltip card — anchored to node screen position ── */}
+        {/* ── Floating tooltip — anchored to node screen position ── */}
         {activeNode && (() => {
           const pos  = WORLD[activeNode.id];
           if (!pos) return null;
@@ -368,17 +387,15 @@ export default function EternalTreeScreen({
           );
         })()}
 
-        {/* ── HTML nodes — world div with same pan+scale transform ── */}
+        {/* ── HTML nodes ── */}
         <div className="et-world" style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
 
-          {/* Root node */}
           <div className="et-node et-node-root" style={{ left: 0, top: 0 }}>
             <span className="et-node-icon">☯</span>
             <span className="et-node-label">Eternal Tree</span>
             <span className="et-node-sub">{karma} ◈</span>
           </div>
 
-          {/* Game nodes */}
           {NODES.map(node => {
             const pos   = WORLD[node.id];
             if (!pos) return null;
