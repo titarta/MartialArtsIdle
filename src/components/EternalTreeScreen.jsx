@@ -12,15 +12,6 @@ const BRANCH_ANGLE_DEG = {
   yinyang: 270,
 };
 
-// Radial distance per sequential step within a branch
-const STEP_R = [220, 390, 560, 730, 900, 1070];
-
-// Cross-branch connector positions (hardcoded, between their keystones)
-const CROSS_POS = {
-  cb_is: { angleDeg: 178,   r: 750 }, // AL★ + HW — left
-  cb_ts: { angleDeg: 2.5,   r: 750 }, // MD★ + FP★ — right
-  cb_pt: { angleDeg: 337.5, r: 700 }, // MD★ + YY — lower-right
-};
 
 function degToRad(d) { return d * Math.PI / 180; }
 
@@ -29,16 +20,24 @@ function radialXY(angleDeg, r) {
   return { x: Math.round(r * Math.cos(a)), y: Math.round(-r * Math.sin(a)) };
 }
 
+// Hand-placed positions [angleDeg, radius] — each branch confined to its sector
+// so sequential edges never cross adjacent-branch edges.
+//   Martial  18°– 85°   Will  183°–244°   Yin Yang 250°–290°
+//   Legacy   93°–172°   Fate  298°–358°
+const NODE_POS = {
+  md_1: [52,  215], md_2: [36,  408], md_3: [61,  572], md_4: [41,  748], md_k: [51,  930],
+  al_1: [126, 218], al_2: [149, 402], al_3: [121, 570], al_4: [136, 742], al_k: [128, 924],
+  hw_1: [229, 216], hw_2: [209, 406], hw_3: [236, 568], hw_4: [212, 744], hw_k: [227, 926],
+  fp_1: [311, 220], fp_2: [331, 396], fp_3: [307, 566], fp_4: [301, 650], fp_k: [313, 918],
+  yy_1: [261, 220], yy_2: [279, 394], yy_3: [257, 564], yy_4: [281, 734], yy_5: [263, 904], yy_k: [273, 1078],
+  cb_is: [178, 648], cb_ts: [2,   754], cb_pt: [327, 1220],
+};
+
 // Compute world position for every node
 const WORLD = { root: { x: 0, y: 0 } };
 for (const node of NODES) {
-  if (node.branch === 'cross') {
-    const cp = CROSS_POS[node.id];
-    WORLD[node.id] = radialXY(cp.angleDeg, cp.r);
-  } else {
-    const angleDeg = BRANCH_ANGLE_DEG[node.branch];
-    WORLD[node.id] = radialXY(angleDeg, STEP_R[node.step]);
-  }
+  const [a, r] = NODE_POS[node.id];
+  WORLD[node.id] = radialXY(a, r);
 }
 
 // Build edge list: [sourceId, targetId]
@@ -57,7 +56,7 @@ for (const node of NODES) {
 // ── Branch label positions (halfway along branch, perpendicular offset) ──────
 function branchLabelPos(branch) {
   const angleDeg = BRANCH_ANGLE_DEG[branch];
-  const r        = (STEP_R[0] + STEP_R[1]) / 2;
+  const r        = 305; // midpoint between step-0 (~215) and step-1 (~400) radii
   const pos      = radialXY(angleDeg, r);
   // Perpendicular offset so label doesn't sit on the line
   const perpDeg  = angleDeg + 90;
@@ -173,27 +172,32 @@ export default function EternalTreeScreen({
   return (
     <div className="et-screen">
 
-      {/* ── HUD ── */}
-      <div className="et-hud">
-        <span className="et-hud-icon">☸</span>
-        <div className="et-hud-title">Eternal Tree</div>
-        <div className="et-hud-divider" />
-        <div className="et-hud-karma"><span className="et-hud-karma-gem">◈</span>{karma}</div>
-        <div className="et-hud-lives">Lives: {lives}</div>
-        <div className="et-hud-spacer" />
-        <button
-          className="et-info-btn"
-          onMouseEnter={() => setInfoOpen(true)}
-          onMouseLeave={() => setInfoOpen(false)}
-          aria-label="Info"
-        >ℹ</button>
-        {canReincarnateNow && (
-          <button className="et-reinc-btn" onClick={() => setShowConfirm(true)}>☸ Reincarnate</button>
-        )}
-        <button className="et-close-btn" onClick={onClose} aria-label="Close">✕</button>
+      {/* ── Floating card — top-left ── */}
+      <div className="et-card">
+        <div className="et-card-header">
+          <span className="et-card-icon">☸</span>
+          <span className="et-card-title">Eternal Tree</span>
+          <button className="et-close-btn" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="et-card-stats">
+          <span className="et-card-karma"><span className="et-hud-karma-gem">◈</span>{karma}</span>
+          <span className="et-card-lives">{lives} {lives === 1 ? 'life' : 'lives'}</span>
+        </div>
+        <div className="et-card-actions">
+          <button
+            className="et-info-btn"
+            onMouseEnter={() => setInfoOpen(true)}
+            onMouseLeave={() => setInfoOpen(false)}
+            onTouchStart={() => setInfoOpen(v => !v)}
+            aria-label="Info"
+          >ℹ</button>
+          {canReincarnateNow && (
+            <button className="et-reinc-btn" onClick={() => setShowConfirm(true)}>☸ Reincarnate</button>
+          )}
+        </div>
       </div>
 
-      {/* ── Info panel — absolute overlay, never shifts canvas ── */}
+      {/* ── Info panel — absolute overlay ── */}
       {infoOpen && (
         <div className="et-info-panel">
           <div className="et-info-cols">
@@ -255,12 +259,29 @@ export default function EternalTreeScreen({
               const isYY = tgt?.branch === 'yinyang';
               const effectiveSt = (isYY && !yyUnlocked) ? 'dim' : st;
 
-              // Stop line at edge of target circle (r≈56 normal, r≈61 keystone)
-              const STOP = tgt?.keystone ? 62 : 57;
-              const dx = p2.x - p1.x, dy = p2.y - p1.y;
-              const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-              const ex = p2.x - (dx / dist) * STOP;
-              const ey = p2.y - (dy / dist) * STOP;
+              // Quadratic bezier — control point pushed outward from origin so
+              // all edges arc away from the tree center. Cross-branch edges get
+              // a much stronger push so they route around intermediate branches.
+              const src      = NODES.find(n => n.id === srcId);
+              const isCross  = src?.branch === 'cross' || tgt?.branch === 'cross';
+              const strength = isCross ? 260 : 55;
+              const mx = (p1.x + p2.x) / 2;
+              const my = (p1.y + p2.y) / 2;
+              const mLen = Math.sqrt(mx * mx + my * my) || 1;
+              const cpx = mx + (mx / mLen) * strength;
+              const cpy = my + (my / mLen) * strength;
+
+              // Offset endpoints along the bezier tangent at each tip
+              const START = srcId === 'root' ? 57 : src?.keystone ? 62 : src?.branch === 'cross' ? 46 : 57;
+              const STOP  = tgt?.keystone    ? 62 : tgt?.branch === 'cross' ? 46 : 57;
+              const sdx = cpx - p1.x, sdy = cpy - p1.y;
+              const sLen = Math.sqrt(sdx * sdx + sdy * sdy) || 1;
+              const edx = p2.x - cpx, edy = p2.y - cpy;
+              const eLen = Math.sqrt(edx * edx + edy * edy) || 1;
+              const sx = p1.x + (sdx / sLen) * START;
+              const sy = p1.y + (sdy / sLen) * START;
+              const ex = p2.x - (edx / eLen) * STOP;
+              const ey = p2.y - (edy / eLen) * STOP;
 
               const stroke =
                 effectiveSt === 'active' ? `rgba(${rgb},0.9)` :
@@ -272,10 +293,11 @@ export default function EternalTreeScreen({
                 effectiveSt === 'active' ? 'url(#et-glow-f)' :
                 effectiveSt === 'lit'    ? 'url(#et-glow-soft)' : undefined;
               return (
-                <line key={`${srcId}-${tgtId}`}
-                  x1={p1.x} y1={p1.y} x2={ex} y2={ey}
+                <path key={`${srcId}-${tgtId}`}
+                  d={`M ${sx} ${sy} Q ${cpx} ${cpy} ${ex} ${ey}`}
                   stroke={stroke} strokeWidth={sw}
                   strokeDasharray={dash} strokeLinecap="round"
+                  fill="none"
                   markerEnd="url(#et-arrow)"
                   filter={filter}
                 />
