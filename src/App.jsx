@@ -511,7 +511,7 @@ function App() {
     character:  <CharacterScreen cultivation={cultivation} techniques={techniques} artefacts={artefacts} selections={selections} pills={pills} />,
     collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
     production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} tree={tree} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} />,
-    settings:   <SettingsScreen />,
+    settings:   null,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
                      tree={tree}
@@ -536,10 +536,10 @@ function App() {
       )}
       <TopBar
         jadeBalance={selections.jadeBalance}
-        onNavigate={navigate}
         onOpenShop={() => openModal('shop')}
         onOpenJourney={() => openModal('journey')}
         onOpenAchievements={() => openModal('achievements', () => setHasNewAch(false))}
+        onOpenSettings={() => openModal('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
         onOpenReincarnation={() => navigate('reincarnation')}
@@ -578,6 +578,7 @@ function App() {
           onClose={() => setSelectionModalOpen(false)}
         />
       )}
+      {activeModal === 'settings' && <SettingsScreen onClose={() => setActiveModal(null)} />}
       {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={() => {}} />}
       {activeModal === 'journey' && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
       {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}

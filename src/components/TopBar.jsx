@@ -4,10 +4,10 @@ const BASE = import.meta.env.BASE_URL;
 
 export default function TopBar({
   jadeBalance,
-  onNavigate,
   onOpenShop,
   onOpenJourney,
   onOpenAchievements,
+  onOpenSettings,
   hasNewAchievement,
   activeModal,
   onOpenReincarnation,
@@ -53,7 +53,11 @@ export default function TopBar({
         🏆
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
-      <button className="home-hud-settings" onClick={() => onNavigate('settings')} aria-label="Settings">
+      <button
+        className={`home-hud-settings${activeModal === 'settings' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenSettings}
+        aria-label="Settings"
+      >
         ⚙
       </button>
     </div>

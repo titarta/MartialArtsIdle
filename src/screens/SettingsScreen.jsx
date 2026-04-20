@@ -15,7 +15,7 @@ const RESOLUTIONS = [
   { mode: 'fullscreen',   label: 'Fullscreen',     sub: 'native' },
 ];
 
-function SettingsScreen() {
+function SettingsScreen({ onClose }) {
   const { t, i18n } = useTranslation('ui');
 
   const [showImport,  setShowImport]  = useState(false);
@@ -76,116 +76,122 @@ function SettingsScreen() {
   };
 
   return (
-    <div className="screen">
-      <h1>{t('settings.title')}</h1>
-      <p className="subtitle">{t('settings.subtitle')}</p>
-
-      {isDesktop && (
-        <div className="save-section">
-          <h2>Graphics</h2>
-          <p className="subtitle">Window resolution — takes effect immediately.</p>
-          <div className="save-buttons">
-            {RESOLUTIONS.map(({ mode, label, sub }) => (
-              <button
-                key={mode}
-                className={`save-btn${resolution === mode ? ' save-btn-active' : ''}`}
-                onClick={() => applyResolution(mode)}
-              >
-                <span>{label}</span>
-                <span className="res-sub">{sub}</span>
-              </button>
-            ))}
-          </div>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="settings-modal" onClick={e => e.stopPropagation()}>
+        <div className="journey-header">
+          <span className="journey-title">⚙ {t('settings.title')}</span>
+          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
-      )}
 
-      <div className="save-section">
-        <h2>Visual Effects</h2>
-        <p className="subtitle">Particle effects and animations.</p>
-        <div className="save-buttons">
-          <button
-            className={`save-btn${graphics.vfxEnabled ? ' save-btn-active' : ''}`}
-            onClick={() => setGraphics({ ...graphics, vfxEnabled: true })}
-          >
-            <span>On</span>
-          </button>
-          <button
-            className={`save-btn${!graphics.vfxEnabled ? ' save-btn-active' : ''}`}
-            onClick={() => setGraphics({ ...graphics, vfxEnabled: false })}
-          >
-            <span>Off</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="save-section">
-        <h2>Rendering Mode</h2>
-        <p className="subtitle">How images are scaled.</p>
-        <div className="save-buttons">
-          {RENDERING_MODES.map(({ mode, label, sub }) => (
-            <button
-              key={mode}
-              className={`save-btn${graphics.renderingMode === mode ? ' save-btn-active' : ''}`}
-              onClick={() => setGraphics({ ...graphics, renderingMode: mode })}
-            >
-              <span>{label}</span>
-              <span className="res-sub">{sub}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="save-section">
-        <h2>{t('settings.language')}</h2>
-        <p className="subtitle">{t('settings.languageSubtitle')}</p>
-        <div className="save-buttons">
-          {SUPPORTED_LANGUAGES.map(lang => (
-            <button
-              key={lang.code}
-              className={`save-btn${i18n.language === lang.code ? ' save-btn-active' : ''}`}
-              onClick={() => setLanguage(lang.code)}
-            >
-              {lang.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="save-section">
-        <h2>{t('settings.saveData')}</h2>
-
-        {message && (
-          <div className={`save-message ${message.isError ? 'save-error' : 'save-success'}`}>
-            {message.text}
-          </div>
-        )}
-
-        <div className="save-buttons">
-          <button className="save-btn" onClick={handleExport}>{t('settings.exportSave')}</button>
-          <button className="save-btn" onClick={() => setShowImport(!showImport)}>{t('settings.importSave')}</button>
-          {confirmWipe ? (
-            <div className="wipe-confirm">
-              <span className="wipe-confirm-label">{t('settings.areYouSure')}</span>
-              <button className="save-btn save-btn-danger" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
-              <button className="save-btn" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+        <div className="settings-modal-body">
+          {isDesktop && (
+            <div className="save-section">
+              <h2>Graphics</h2>
+              <p className="subtitle">Window resolution — takes effect immediately.</p>
+              <div className="save-buttons">
+                {RESOLUTIONS.map(({ mode, label, sub }) => (
+                  <button
+                    key={mode}
+                    className={`save-btn${resolution === mode ? ' save-btn-active' : ''}`}
+                    onClick={() => applyResolution(mode)}
+                  >
+                    <span>{label}</span>
+                    <span className="res-sub">{sub}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : (
-            <button className="save-btn save-btn-danger" onClick={handleWipe}>{t('settings.wipeSave')}</button>
           )}
-        </div>
 
-        {showImport && (
-          <div className="import-area">
-            <textarea
-              className="import-input"
-              placeholder={t('settings.pastePlaceholder')}
-              value={importText}
-              onChange={(e) => setImportText(e.target.value)}
-              rows={3}
-            />
-            <button className="save-btn" onClick={handleImport}>{t('settings.loadSave')}</button>
+          <div className="save-section">
+            <h2>Visual Effects</h2>
+            <p className="subtitle">Particle effects and animations.</p>
+            <div className="save-buttons">
+              <button
+                className={`save-btn${graphics.vfxEnabled ? ' save-btn-active' : ''}`}
+                onClick={() => setGraphics({ ...graphics, vfxEnabled: true })}
+              >
+                <span>On</span>
+              </button>
+              <button
+                className={`save-btn${!graphics.vfxEnabled ? ' save-btn-active' : ''}`}
+                onClick={() => setGraphics({ ...graphics, vfxEnabled: false })}
+              >
+                <span>Off</span>
+              </button>
+            </div>
           </div>
-        )}
+
+          <div className="save-section">
+            <h2>Rendering Mode</h2>
+            <p className="subtitle">How images are scaled.</p>
+            <div className="save-buttons">
+              {RENDERING_MODES.map(({ mode, label, sub }) => (
+                <button
+                  key={mode}
+                  className={`save-btn${graphics.renderingMode === mode ? ' save-btn-active' : ''}`}
+                  onClick={() => setGraphics({ ...graphics, renderingMode: mode })}
+                >
+                  <span>{label}</span>
+                  <span className="res-sub">{sub}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="save-section">
+            <h2>{t('settings.language')}</h2>
+            <p className="subtitle">{t('settings.languageSubtitle')}</p>
+            <div className="save-buttons">
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <button
+                  key={lang.code}
+                  className={`save-btn${i18n.language === lang.code ? ' save-btn-active' : ''}`}
+                  onClick={() => setLanguage(lang.code)}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="save-section">
+            <h2>{t('settings.saveData')}</h2>
+
+            {message && (
+              <div className={`save-message ${message.isError ? 'save-error' : 'save-success'}`}>
+                {message.text}
+              </div>
+            )}
+
+            <div className="save-buttons">
+              <button className="save-btn" onClick={handleExport}>{t('settings.exportSave')}</button>
+              <button className="save-btn" onClick={() => setShowImport(!showImport)}>{t('settings.importSave')}</button>
+              {confirmWipe ? (
+                <div className="wipe-confirm">
+                  <span className="wipe-confirm-label">{t('settings.areYouSure')}</span>
+                  <button className="save-btn save-btn-danger" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
+                  <button className="save-btn" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+                </div>
+              ) : (
+                <button className="save-btn save-btn-danger" onClick={handleWipe}>{t('settings.wipeSave')}</button>
+              )}
+            </div>
+
+            {showImport && (
+              <div className="import-area">
+                <textarea
+                  className="import-input"
+                  placeholder={t('settings.pastePlaceholder')}
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  rows={3}
+                />
+                <button className="save-btn" onClick={handleImport}>{t('settings.loadSave')}</button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
