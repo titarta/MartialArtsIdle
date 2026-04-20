@@ -301,13 +301,17 @@ function SfxRow({ item, vol, hasSrc, srcPaths, isDirty, onVolumeChange, onUpload
  * Commits directly via the GitHub API (same as SpriteUpload).
  * Calls onUploaded([oggPath, mp3Path]) with whatever was successfully uploaded.
  */
+const WAV_BGM_WARNING_MB = 4; // warn if a WAV uploaded for BGM exceeds this
+
 function AudioUploadRow({ soundId, folder, onUploaded }) {
   const [oggFile, setOggFile] = useState(null);
   const [mp3File, setMp3File] = useState(null);
+  const [wavFile, setWavFile] = useState(null);
   const [busy,    setBusy]    = useState(false);
   const [msg,     setMsg]     = useState(null);
   const oggRef = useRef(null);
   const mp3Ref = useRef(null);
+  const wavRef = useRef(null);
 
   const basePath = `public/audio/${folder}/${soundId}`;
 
@@ -319,6 +323,10 @@ function AudioUploadRow({ soundId, folder, onUploaded }) {
         setMsg({ type: 'error', text: `${f.name}: too large (${(f.size / (1024*1024)).toFixed(1)} MiB). 10 MiB max.` });
         return;
       }
+      if (ext === 'wav' && folder === 'bgm' && f.size > WAV_BGM_WARNING_MB * 1024 * 1024) {
+        setMsg({ type: 'error', text: `WAV is uncompressed — this file is ${(f.size / (1024*1024)).toFixed(1)} MiB. Consider converting to OGG or MP3 for BGM; large files slow down loading.` });
+        return;
+      }
       setter(f);
       setMsg(null);
     };
@@ -327,101 +335,81 @@ function AudioUploadRow({ soundId, folder, onUploaded }) {
   function reset() {
     setOggFile(null);
     setMp3File(null);
+    setWavFile(null);
     setMsg(null);
     if (oggRef.current) oggRef.current.value = '';
     if (mp3Ref.current) mp3Ref.current.value = '';
+    if (wavRef.current) wavRef.current.value = '';
+  }
+
+  async function uploadOne(file, ext, label) {
+    setMsg({ type: 'info', text: `Uploading ${soundId}.${ext}…` });
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const res = await putBinaryFile(loadPat(), {
+      path:    `${basePath}.${ext}`,
+      bytes,
+      message: `design: audio — upload ${folder}/${soundId}.${ext}`,
+    });
+    if (!res.ok) throw new Error(uploadError(label, res));
+    return `/audio/${folder}/${soundId}.${ext}`;
   }
 
   async function upload() {
     const pat = loadPat();
     if (!pat) { setMsg({ type: 'error', text: 'Add a PAT in Settings first.' }); return; }
-    if (!oggFile && !mp3File) return;
+    if (!oggFile && !mp3File && !wavFile) return;
 
     setBusy(true);
     const uploaded = [];
 
-    if (oggFile) {
-      setMsg({ type: 'info', text: `Uploading ${soundId}.ogg…` });
-      const bytes = new Uint8Array(await oggFile.arrayBuffer());
-      const res = await putBinaryFile(pat, {
-        path:    `${basePath}.ogg`,
-        bytes,
-        message: `design: audio — upload ${folder}/${soundId}.ogg`,
-      });
-      if (!res.ok) {
-        setBusy(false);
-        setMsg({ type: 'error', text: uploadError('ogg', res) });
-        return;
-      }
-      uploaded.push(`/audio/${folder}/${soundId}.ogg`);
-    }
-
-    if (mp3File) {
-      setMsg({ type: 'info', text: `Uploading ${soundId}.mp3…` });
-      const bytes = new Uint8Array(await mp3File.arrayBuffer());
-      const res = await putBinaryFile(pat, {
-        path:    `${basePath}.mp3`,
-        bytes,
-        message: `design: audio — upload ${folder}/${soundId}.mp3`,
-      });
-      if (!res.ok) {
-        setBusy(false);
-        setMsg({ type: 'error', text: uploadError('mp3', res) });
-        return;
-      }
-      uploaded.push(`/audio/${folder}/${soundId}.mp3`);
+    try {
+      if (oggFile) uploaded.push(await uploadOne(oggFile, 'ogg', 'OGG'));
+      if (mp3File) uploaded.push(await uploadOne(mp3File, 'mp3', 'MP3'));
+      if (wavFile) uploaded.push(await uploadOne(wavFile, 'wav', 'WAV'));
+    } catch (err) {
+      setBusy(false);
+      setMsg({ type: 'error', text: err.message });
+      return;
     }
 
     setBusy(false);
     setMsg({ type: 'success', text: `Uploaded: ${uploaded.join(', ')}. Reload the game to hear changes.` });
 
-    // Build the src array in ogg-first order
-    const srcOgg = uploaded.find((p) => p.endsWith('.ogg'));
-    const srcMp3 = uploaded.find((p) => p.endsWith('.mp3'));
-    const src = [srcOgg, srcMp3].filter(Boolean);
+    // Prefer compressed formats: OGG → MP3 → WAV
+    const src = ['ogg', 'mp3', 'wav']
+      .map(ext => uploaded.find(p => p.endsWith(`.${ext}`)))
+      .filter(Boolean);
     onUploaded(src);
     reset();
   }
+
+  const hasFile = oggFile || mp3File || wavFile;
 
   return (
     <div className="au-upload-row">
       <div className="au-upload-inputs">
         <label className="au-upload-slot">
           <span className="au-ctrl-label">.ogg</span>
-          <input
-            ref={oggRef}
-            type="file"
-            accept=".ogg,audio/ogg"
-            disabled={busy}
-            onChange={pickFile('ogg', setOggFile)}
-          />
+          <input ref={oggRef} type="file" accept=".ogg,audio/ogg" disabled={busy} onChange={pickFile('ogg', setOggFile)} />
           {oggFile && <span className="au-file-name">{oggFile.name} · {(oggFile.size / 1024).toFixed(0)} KB</span>}
         </label>
 
         <label className="au-upload-slot">
           <span className="au-ctrl-label">.mp3</span>
-          <input
-            ref={mp3Ref}
-            type="file"
-            accept=".mp3,audio/mpeg"
-            disabled={busy}
-            onChange={pickFile('mp3', setMp3File)}
-          />
+          <input ref={mp3Ref} type="file" accept=".mp3,audio/mpeg" disabled={busy} onChange={pickFile('mp3', setMp3File)} />
           {mp3File && <span className="au-file-name">{mp3File.name} · {(mp3File.size / 1024).toFixed(0)} KB</span>}
+        </label>
+
+        <label className="au-upload-slot">
+          <span className="au-ctrl-label">.wav</span>
+          <input ref={wavRef} type="file" accept=".wav,audio/wav,audio/x-wav" disabled={busy} onChange={pickFile('wav', setWavFile)} />
+          {wavFile && <span className="au-file-name">{wavFile.name} · {(wavFile.size / 1024).toFixed(0)} KB</span>}
         </label>
       </div>
 
       <div className="au-upload-actions">
-        <button
-          className="dz-btn dz-btn-ghost"
-          onClick={reset}
-          disabled={busy || (!oggFile && !mp3File)}
-        >Clear</button>
-        <button
-          className="dz-btn dz-btn-primary"
-          onClick={upload}
-          disabled={busy || (!oggFile && !mp3File)}
-        >
+        <button className="dz-btn dz-btn-ghost" onClick={reset} disabled={busy || !hasFile}>Clear</button>
+        <button className="dz-btn dz-btn-primary" onClick={upload} disabled={busy || !hasFile}>
           {busy ? 'Uploading…' : 'Upload'}
         </button>
       </div>
