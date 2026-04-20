@@ -3,6 +3,7 @@ import NavBar from './components/NavBar';
 import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
 import JadeShopModal from './components/JadeShopModal';
+import { addJade as addJadeBalance } from './systems/jade';
 import AchievementsModal from './components/AchievementsModal';
 import JourneyModal from './components/JourneyModal';
 import DailyBonusModal from './components/DailyBonusModal';
@@ -456,11 +457,7 @@ function App() {
 
       // al_4 Bloodline Vigor — +50 jade + 1 banked Selection re-roll.
       if (treeMods.jadeOnRebirth > 0) {
-        try {
-          const cur = Number(localStorage.getItem('mai_jade') ?? 0);
-          localStorage.setItem('mai_jade', String(cur + treeMods.jadeOnRebirth));
-          selections.refreshJade();
-        } catch {}
+        addJadeBalance(treeMods.jadeOnRebirth);
       }
       if (treeMods.bankedRerollOnRebirth > 0) {
         try {
@@ -580,7 +577,7 @@ function App() {
         />
       )}
       {activeModal === 'settings' && <SettingsScreen onClose={() => setActiveModal(null)} />}
-      {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={() => selections.refreshJade()} />}
+      {activeModal === 'shop' && <JadeShopModal onClose={() => setActiveModal(null)} onBalanceChange={null} />}
       {activeModal === 'journey' && <JourneyModal realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
       {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}
       {activeModal === 'daily' && (
@@ -588,7 +585,7 @@ function App() {
           streak={dailyBonus.streak}
           todayReward={dailyBonus.todayReward}
           isAvailable={dailyBonus.isAvailable}
-          onCollect={() => { const n = dailyBonus.collect(); selections.refreshJade(); return n; }}
+          onCollect={() => dailyBonus.collect()}
           onClose={() => setActiveModal(null)}
         />
       )}

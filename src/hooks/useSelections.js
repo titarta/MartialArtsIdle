@@ -82,7 +82,13 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
   useEffect(() => { savePending(pending); }, [pending]);
   useEffect(() => { saveActive(active);   }, [active]);
 
-  // Sync jade balance display when localStorage changes
+  // Keep balance in sync — jade.js fires 'jade-changed' on every add/spend.
+  useEffect(() => {
+    const handler = (e) => setJadeBalance(e.detail);
+    window.addEventListener('jade-changed', handler);
+    return () => window.removeEventListener('jade-changed', handler);
+  }, []);
+
   const refreshJade = useCallback(() => {
     try {
       setJadeBalance(parseInt(localStorage.getItem('mai_jade') || '0', 10));

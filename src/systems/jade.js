@@ -18,9 +18,14 @@ export function getJadeBalance() {
   return 0;
 }
 
+function notifyChange(next) {
+  try { window.dispatchEvent(new CustomEvent('jade-changed', { detail: next })); } catch {}
+}
+
 export function addJade(amount) {
   const next = getJadeBalance() + Math.max(0, Math.floor(amount));
   try { localStorage.setItem(JADE_KEY, String(next)); } catch {}
+  notifyChange(next);
   return next;
 }
 
@@ -33,6 +38,7 @@ export function spendJade(amount) {
   const balance = getJadeBalance();
   if (balance < cost) return false;
   try { localStorage.setItem(JADE_KEY, String(balance - cost)); } catch {}
+  notifyChange(balance - cost);
   return true;
 }
 
