@@ -33,31 +33,37 @@ const ITEM_CATEGORIES = {
 const BASELINE = {
   home: {
     gate: { type: 'always' },
+    desc: null,
     hint: null,
     unlockMsg: null,
   },
   worlds: {
     gate: { type: 'realm', minRealmIndex: 3 },
+    desc: 'Explore regions across multiple worlds, fight enemies in combat, and dispatch idle workers to gather herbs or mine ores.',
     hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'Worlds are open. Begin your conquest.',
   },
   character: {
     gate: { type: 'always' },
+    desc: null,
     hint: null,
     unlockMsg: null,
   },
   gathering: {
     gate: { type: 'realm', minRealmIndex: 7 },
+    desc: 'Dispatch an idle worker to harvest herbs from cleared regions. Materials fuel alchemy and crafting.',
     hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Gathering unlocked. Forage herbs in cleared regions.',
   },
   mining: {
     gate: { type: 'realm', minRealmIndex: 7 },
+    desc: 'Dispatch an idle worker to extract ores from cleared regions. Materials fuel refining and forging.',
     hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Mining unlocked. Dig for ores in cleared regions.',
   },
   collection: {
     gate: { type: 'always' },
+    desc: null,
     hint: null,
     unlockMsg: null,
   },
@@ -70,6 +76,7 @@ const BASELINE = {
       { type: 'item_category', category: 'minerals' },
       { type: 'item_category', category: 'bloodCores' },
     ] },
+    desc: 'Craft cultivation pills, transmute and upgrade gear, and smelt raw materials into powerful equipment.',
     hint: 'Gather herbs, mine minerals, or collect a blood core to unlock',
     unlockMsg: 'Production unlocked. Craft pills and gear.',
   },
@@ -83,12 +90,14 @@ const BASELINE = {
       { type: 'item_category', category: 'minerals' },
       { type: 'item_category', category: 'bloodCores' },
     ] },
+    desc: 'Upgrade, replace, and transmute your artefacts, technique slots, and law bindings using gathered materials.',
     hint: 'Gather herbs, mine minerals, or collect a blood core to unlock',
     unlockMsg: 'Transmutation unlocked. Hone, replace, and upgrade your gear.',
   },
   // refining: paired with mining (ore-driven artefact/technique/law forging).
   refining: {
     gate: { type: 'realm', minRealmIndex: 7 },
+    desc: 'Feed raw minerals into the Refining Furnace to forge powerful artefacts and high-grade equipment.',
     hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Refining Furnace lit. Smelt minerals into new artefacts.',
   },
@@ -97,16 +106,19 @@ const BASELINE = {
   // Borderland Root are the Iron-tier first picks).
   alchemy: {
     gate: { type: 'item_category', category: 'herbs' },
+    desc: 'Brew cultivation pills in the furnace that grant passive bonuses to combat strength and training speed.',
     hint: 'Gather a herb to unlock',
     unlockMsg: 'Alchemy unlocked. Brew pills in the Refining Furnace.',
   },
   settings: {
     gate: { type: 'always' },
+    desc: null,
     hint: null,
     unlockMsg: null,
   },
   qi_crystal: {
     gate: { type: 'realm', minRealmIndex: 3 },
+    desc: 'A crystallised vessel of refined Qi. Feed it QI stones to permanently boost your cultivation speed.',
     hint: 'Reach Tempered Body Layer 4',
     unlockMsg: 'The Qi Crystal awakens. Feed it QI stones to boost your cultivation.',
   },

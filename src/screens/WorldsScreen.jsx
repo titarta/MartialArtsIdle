@@ -5,6 +5,7 @@ import WORLDS from '../data/worlds';
 import ENEMIES from '../data/enemies';
 import { preloadEnemySprites } from '../utils/preload';
 import { isWorldUnlocked, getWorldLockHint } from '../data/featureGates';
+import LockTooltip from '../components/LockTooltip';
 import { ALL_MATERIALS } from '../data/materials';
 
 const BASE = import.meta.env.BASE_URL;
@@ -236,10 +237,7 @@ function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavig
   }, [open, worldLocked, world.regions]);
 
   return (
-    <div
-      className={`world-card${worldLocked ? ' world-locked' : ''}`}
-      title={worldHint ?? undefined}
-    >
+    <div className={`world-card${worldLocked ? ' world-locked' : ''}`}>
       <button
         className="world-header"
         onClick={() => { if (worldLocked) return; AudioManager.playSfx('ui_click'); setOpen(o => !o); }}
@@ -257,6 +255,10 @@ function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavig
           }
         </div>
       </button>
+
+      {worldLocked && (
+        <LockTooltip desc={world.description} hint={worldHint} position="below" />
+      )}
 
       {open && !worldLocked && (
         <div className="region-list">

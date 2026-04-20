@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
+import LockTooltip from '../components/LockTooltip';
 import { useTranslation } from 'react-i18next';
 import { QUALITY, ARTEFACTS_BY_ID } from '../data/artefacts';
 import { formatArtefactName } from '../data/artefactNames';
@@ -1206,7 +1207,7 @@ function AlchemyPanel({ inventory, pills, tree }) {
 
 // ─── ProductionScreen ─────────────────────────────────────────────────────────
 
-function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills, tree, isUnlocked = () => true, getHint = () => null }) {
+function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills, tree, isUnlocked = () => true, getHint = () => null, getDesc = () => null }) {
   const { t } = useTranslation('ui');
 
   const PROD_TABS = [
@@ -1233,15 +1234,15 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
         {PROD_TABS.map(tab => {
           const unlocked = isUnlocked(tab.feature);
           const hint     = !unlocked ? getHint(tab.feature) : null;
+          const desc     = !unlocked ? getDesc(tab.feature) : null;
           return (
             <button
               key={tab.key}
               className={`inv-tab ${activeTab === tab.key ? 'inv-tab-active' : ''}${!unlocked ? ' inv-tab-locked' : ''}`}
               onClick={() => unlocked && setActiveTab(tab.key)}
-              disabled={!unlocked}
-              title={hint ?? undefined}
             >
               {!unlocked && '🔒 '}{t(tab.tKey)}
+              {!unlocked && <LockTooltip desc={desc} hint={hint} position="below" />}
             </button>
           );
         })}

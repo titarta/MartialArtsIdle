@@ -75,6 +75,7 @@ export default function useFeatureFlags({ cultivation, clearedRegions, inventory
 
   const isUnlocked  = (featureId) => unlocked.has(featureId);
   const getHint     = (featureId) => FEATURE_GATES[featureId]?.hint ?? null;
+  const getDesc     = (featureId) => FEATURE_GATES[featureId]?.desc ?? null;
 
-  return { isUnlocked, getHint, unlocked };
+  return { isUnlocked, getHint, getDesc, unlocked };
 }

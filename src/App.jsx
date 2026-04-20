@@ -517,7 +517,7 @@ function App() {
                     />,
     character:  <CharacterScreen cultivation={cultivation} techniques={techniques} artefacts={artefacts} selections={selections} pills={pills} />,
     collection: <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />,
-    production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} tree={tree} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} />,
+    production: <ProductionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} pills={pills} tree={tree} isUnlocked={featureFlags.isUnlocked} getHint={featureFlags.getHint} getDesc={featureFlags.getDesc} />,
     settings:   null,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
@@ -558,6 +558,7 @@ function App() {
         badges={{ ...notifications.badges, home: selections.pendingCount > 0, worlds: notifications.badges.worlds || autoFarm.hasPendingGains }}
         isUnlocked={featureFlags.isUnlocked}
         getHint={featureFlags.getHint}
+        getDesc={featureFlags.getDesc}
       />
       <main className={`screen-container${(currentScreen === 'home' || currentScreen === 'reincarnation') ? ' sc-fullbleed' : ''}`}>
         {screens[currentScreen]}
