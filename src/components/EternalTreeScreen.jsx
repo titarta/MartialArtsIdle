@@ -1,5 +1,13 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { NODES, BRANCHES, MAIN_KEYSTONES, TREE_TOTAL_COST, SAINT_UNLOCK_INDEX } from '../data/reincarnationTree';
+
+const EDIT_MODE = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('treeEdit');
+
+function worldToPolar(x, y) {
+  const deg = Math.round(((Math.atan2(-y, x) * 180 / Math.PI) + 360) % 360);
+  const r   = Math.round(Math.sqrt(x * x + y * y));
+  return [deg, r];
+}
 
 // ── World-space layout ────────────────────────────────────────────────────────
 // Five branches radiate from (0,0). Yin Yang hangs straight down (sealed).
@@ -86,6 +94,18 @@ export default function EternalTreeScreen({
   const [hoveredBranch,    setHoveredBranch]    = useState(null);
   const [branchTooltipPos, setBranchTooltipPos] = useState({ x: 0, y: 0 });
 
+  // ── Editor state (only meaningful when EDIT_MODE) ─────────────────────────
+  const editorDragRef = useRef({ active: false });
+  const [editPos, setEditPos] = useState(() => {
+    if (!EDIT_MODE) return {};
+    return Object.fromEntries(NODES.map(n => [n.id, { ...WORLD[n.id] }]));
+  });
+  const [editCP, setEditCP] = useState(() => {
+    if (!EDIT_MODE) return {};
+    return JSON.parse(JSON.stringify(CUSTOM_CP));
+  });
+  const [copied, setCopied] = useState(null);
+
   // Centre the root on mount
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -104,7 +124,7 @@ export default function EternalTreeScreen({
       const cx     = e.clientX - rect.left;
       const cy     = e.clientY - rect.top;
       const prev   = scaleRef.current;
-      const next   = Math.max(0.5, Math.min(2, prev * factor));
+      const next   = Math.max(0.5, Math.min(1.75, prev * factor));
       scaleRef.current = next;
       setScale(next);
       setPan(p => ({
@@ -116,23 +136,66 @@ export default function EternalTreeScreen({
     return () => canvas.removeEventListener('wheel', handler);
   }, []);
 
-  // Panning
+  // Panning (+ editor drag)
   const onPointerDown = useCallback((e) => {
+    if (EDIT_MODE) {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (rect) {
+        const wx = (e.clientX - rect.left - pan.x) / scale;
+        const wy = (e.clientY - rect.top  - pan.y) / scale;
+        // CP handles (priority over nodes)
+        for (const [edgeKey, cps] of Object.entries(editCP)) {
+          for (const which of ['cp1', 'cp2']) {
+            const cp = cps[which];
+            if (Math.hypot(wx - cp.x, wy - cp.y) < 60) {
+              editorDragRef.current = { active: true, type: 'cp', id: edgeKey, which, startX: e.clientX, startY: e.clientY, startWx: cp.x, startWy: cp.y };
+              e.currentTarget.setPointerCapture(e.pointerId);
+              return;
+            }
+          }
+        }
+        // Nodes
+        for (const node of NODES) {
+          const pos = editPos[node.id];
+          if (!pos) continue;
+          if (Math.hypot(wx - pos.x, wy - pos.y) < 70) {
+            editorDragRef.current = { active: true, type: 'node', id: node.id, startX: e.clientX, startY: e.clientY, startWx: pos.x, startWy: pos.y };
+            e.currentTarget.setPointerCapture(e.pointerId);
+            return;
+          }
+        }
+      }
+    }
     if (e.target.closest('.et-node')) return;
     dragRef.current = { active: true, startX: e.clientX, startY: e.clientY, panX: pan.x, panY: pan.y };
     setIsDragging(true);
     e.currentTarget.setPointerCapture(e.pointerId);
-  }, [pan]);
+  }, [pan, scale, editPos, editCP]);
 
   const onPointerMove = useCallback((e) => {
+    if (EDIT_MODE && editorDragRef.current.active) {
+      const d  = editorDragRef.current;
+      const dx = Math.round((e.clientX - d.startX) / scale);
+      const dy = Math.round((e.clientY - d.startY) / scale);
+      if (d.type === 'node') {
+        setEditPos(prev => ({ ...prev, [d.id]: { x: d.startWx + dx, y: d.startWy + dy } }));
+      } else {
+        setEditCP(prev => ({
+          ...prev,
+          [d.id]: { ...prev[d.id], [d.which]: { x: d.startWx + dx, y: d.startWy + dy } },
+        }));
+      }
+      return;
+    }
     if (!dragRef.current.active) return;
     setPan({
       x: dragRef.current.panX + (e.clientX - dragRef.current.startX),
       y: dragRef.current.panY + (e.clientY - dragRef.current.startY),
     });
-  }, []);
+  }, [scale]);
 
   const onPointerUp = useCallback(() => {
+    editorDragRef.current.active = false;
     dragRef.current.active = false;
     setIsDragging(false);
   }, []);
