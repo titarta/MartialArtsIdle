@@ -357,11 +357,11 @@ function BuildContent({ cultivation, techniques, artefacts }) {
 
   return (
     <>
-      {/* -- Law + Artefacts side by side -- */}
-      <div className="build-top-row">
+      {/* -- Law | Artefacts | Techniques — stacks on mobile, 3-col grid on desktop -- */}
+      <div className="build-layout">
 
-        {/* Law card - LEFT / TOP on mobile */}
-        <section className="build-section build-law-compact-section" onClick={() => setLawPickerOpen(true)}>
+        {/* Law card */}
+        <section className="build-section build-law-section" onClick={() => setLawPickerOpen(true)}>
           <h2 className="build-section-title">{t('build.cultivationLaw')}</h2>
           {!activeLaw ? (
             <div className="build-law-card build-law-card-compact build-law-locked">
@@ -508,22 +508,22 @@ function BuildContent({ cultivation, techniques, artefacts }) {
             </>
           )}
         </section>
-      </div>
 
-      {/* -- Secret Techniques -- */}
-      <section className="build-section">
-        <h2 className="build-section-title">{t('build.secretTechniques')}</h2>
-        <div className="card-grid">
-          {[0, 1, 2].map(i => (
-            <TechSlotCard
-              key={i}
-              index={i}
-              tech={techniques.equippedTechniques[i]}
-              onClick={() => setSelectedTechSlot(i)}
-            />
-          ))}
-        </div>
-      </section>
+        {/* Secret Techniques */}
+        <section className="build-section build-tech-section">
+          <h2 className="build-section-title">{t('build.secretTechniques')}</h2>
+          <div className="card-grid build-tech-grid">
+            {[0, 1, 2].map(i => (
+              <TechSlotCard
+                key={i}
+                index={i}
+                tech={techniques.equippedTechniques[i]}
+                onClick={() => setSelectedTechSlot(i)}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* Law picker modal */}
       {lawPickerOpen && (
