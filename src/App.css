@@ -977,19 +977,6 @@
   cursor: pointer;
 }
 
-.build-law-card {
-  background: rgba(10, 8, 28, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
 /* Body silhouette gear layout — 3 cols × 5 rows */
 .gear-body-layout {
   display: grid;
@@ -1181,15 +1168,17 @@
 
 /* Law Card */
 .build-law-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: rgba(10, 8, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 392px;
+  height: auto;
   overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .build-law-locked {
