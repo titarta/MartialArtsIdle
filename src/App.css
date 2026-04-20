@@ -4692,34 +4692,157 @@
 
 /* ── Offline Earnings Modal ───────────────────────────────────────────────── */
 
-.offline-modal {
+.offline-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  padding: 20px;
+  animation: fade-in 0.22s ease-out;
+}
+
+.offline-card {
+  position: relative;
+  background: linear-gradient(160deg, rgba(6, 18, 36, 0.99), rgba(10, 28, 56, 0.99));
+  border: 1px solid rgba(80, 160, 220, 0.35);
+  border-radius: 18px;
+  padding: 28px 22px 22px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.75), 0 0 32px rgba(60, 140, 220, 0.1);
+  animation: modal-pop 0.22s ease-out;
+}
+
+.offline-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   text-align: center;
 }
 
+.offline-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(60, 140, 220, 0.12);
+  border: 1px solid rgba(80, 160, 220, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(60, 140, 220, 0.2);
+  margin-bottom: 2px;
+}
+
+.offline-icon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.offline-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: rgba(180, 220, 255, 1);
+  margin: 0;
+}
+
 .offline-flavour {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  font-size: 0.75rem;
+  color: rgba(140, 180, 220, 0.6);
   font-style: italic;
   line-height: 1.5;
-  margin: 12px 0;
+  margin: 0;
+}
+
+.offline-reward-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(60, 140, 220, 0.07);
+  border: 1px solid rgba(80, 160, 220, 0.2);
+  border-radius: 12px;
+  padding: 14px 32px;
+  width: 100%;
+}
+
+.offline-reward-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(120, 170, 220, 0.55);
 }
 
 .offline-amount {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  color: var(--gold);
-  margin: 16px 0;
-  text-shadow: 0 0 16px rgba(245,200,66,0.4);
+  color: rgba(160, 220, 255, 1);
+  text-shadow: 0 0 20px rgba(80, 160, 255, 0.55), 0 0 6px rgba(80, 160, 255, 0.35);
+  line-height: 1.1;
+}
+
+.offline-reward-unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(120, 180, 230, 0.55);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .offline-actions {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
+}
+
+.offline-collect-btn {
+  width: 100%;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(40, 110, 200, 0.9), rgba(20, 70, 150, 0.95));
+  border: 1px solid rgba(80, 160, 240, 0.5);
+  border-radius: 10px;
+  color: rgba(200, 230, 255, 1);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.03em;
+}
+
+.offline-collect-btn:active {
+  opacity: 0.85;
+  transform: scale(0.98);
 }
 
 .offline-double-btn {
-  max-width: 100%;
+  width: 100%;
+  padding: 11px 20px;
+  background: linear-gradient(135deg, rgba(245, 200, 66, 0.1), rgba(192, 132, 252, 0.1));
+  border: 1px solid rgba(245, 200, 66, 0.35);
+  border-radius: 10px;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s, opacity 0.15s;
+}
+
+.offline-double-btn:active {
+  border-color: var(--gold);
+  opacity: 0.85;
 }
 
 .wipe-confirm {
