@@ -9,6 +9,7 @@ import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import CrystalFeedModal from '../components/CrystalFeedModal';
 import DailyBonusWidget from '../components/DailyBonusWidget';
 import { PILLS_BY_ID } from '../data/pills';
+import FEATURE_GATES from '../data/featureGates';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -188,6 +189,8 @@ const CRYSTAL_COLORS = {
 
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tappable). */
 function KeyCrystal({ crystal, isUnlocked, onOpen, particleColors }) {
+  const unlockHint = FEATURE_GATES.qi_crystal?.hint ?? 'Reach a higher realm';
+
   if (!isUnlocked) {
     return (
       <div className="home-crystal-anchor">
@@ -201,11 +204,16 @@ function KeyCrystal({ crystal, isUnlocked, onOpen, particleColors }) {
           />
         </div>
         <QiParticles colors={particleColors} />
+        <div className="crystal-tooltip crystal-tooltip-locked">
+          <div className="ctt-title">🔒 Qi Crystal</div>
+          <div className="ctt-desc">A crystallised vessel of refined Qi. Permanently boosts your cultivation speed.</div>
+          <div className="ctt-unlock">Unlocks: {unlockHint}</div>
+        </div>
       </div>
     );
   }
 
-  const { level } = crystal;
+  const { level, crystalQiBonus } = crystal;
   const tier = getCrystalTier(level);
   const { glowA, glowB } = CRYSTAL_COLORS[tier];
   return (
@@ -221,6 +229,14 @@ function KeyCrystal({ crystal, isUnlocked, onOpen, particleColors }) {
         />
       </div>
       <QiParticles colors={particleColors} />
+      <div className="crystal-tooltip">
+        <div className="ctt-title">Qi Crystal · Lv {level}</div>
+        <div className="ctt-desc">A crystallised vessel of refined Qi. Feed it QI stones to level it up and increase your cultivation speed.</div>
+        <div className="ctt-bonus">
+          <span className="ctt-gem">◆</span> Current bonus: <strong>+{crystalQiBonus} Qi/s</strong>
+        </div>
+        <div className="ctt-hint">Tap to feed and evolve</div>
+      </div>
     </div>
   );
 }

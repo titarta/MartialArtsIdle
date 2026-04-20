@@ -1989,6 +1989,81 @@
   cursor: pointer;
 }
 
+/* ── Qi Crystal tooltip ── */
+.crystal-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 210px;
+  background: rgba(15, 10, 30, 0.96);
+  border: 1px solid rgba(139, 92, 246, 0.45);
+  border-radius: 10px;
+  padding: 10px 12px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(100, 60, 200, 0.35);
+}
+
+.home-crystal-anchor:hover .crystal-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.crystal-tooltip-locked {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.ctt-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #e0d8ff;
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+
+.crystal-tooltip-locked .ctt-title {
+  color: rgba(200, 190, 220, 0.6);
+}
+
+.ctt-desc {
+  font-size: 11px;
+  color: rgba(196, 181, 253, 0.65);
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.ctt-bonus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #c4b5fd;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.ctt-gem {
+  font-size: 9px;
+  color: #a78bfa;
+}
+
+.ctt-hint {
+  font-size: 10px;
+  color: rgba(167, 139, 250, 0.45);
+  font-style: italic;
+}
+
+.ctt-unlock {
+  font-size: 11px;
+  color: rgba(251, 191, 36, 0.8);
+  font-weight: 600;
+}
+
 /* Crystal + character stack — bottom-anchored, gap = particles height */
 .home-crystal-char-stack {
   position: absolute;
