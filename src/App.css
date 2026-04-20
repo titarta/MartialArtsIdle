@@ -5191,6 +5191,63 @@
     grid-template-columns: 1fr;
   }
 
+  /* ── Character tabs: shrink to content, don't stretch across 1100px ──── */
+  .char-tab-bar {
+    justify-content: flex-start;
+  }
+
+  .char-tab-btn {
+    flex: 0 0 auto;
+    padding: 8px 28px;
+  }
+
+  /* ── Art picker: centred modal on desktop (not inline box) ───────────── */
+  .art-picker-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+  }
+
+  .art-inline-picker {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    width: min(460px, 90vw);
+    max-height: 75vh;
+    overflow-y: auto;
+    margin: 0;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .art-inline-picker-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .art-inline-picker-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-primary);
+  }
+
+  .art-inline-picker-close {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+  }
+
+  .art-inline-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
   /* ── Home screen: cultivation stage on desktop ───────────────────────── */
   .cultivation-layout {
     max-width: 730px;
