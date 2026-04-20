@@ -5,15 +5,66 @@ import { setLanguage, SUPPORTED_LANGUAGES } from '../i18n';
 import { loadGraphics, applyGraphics, saveGraphics } from '../systems/graphics';
 
 const RENDERING_MODES = [
-  { mode: 'auto',       label: 'Auto',       sub: 'smooth' },
-  { mode: 'pixelated',  label: 'Pixelated',  sub: 'crisp' },
+  { mode: 'auto',      label: 'Smooth',    sub: 'bilinear',  icon: '〜' },
+  { mode: 'pixelated', label: 'Crisp',     sub: 'pixelated', icon: '▦' },
 ];
 
 const RESOLUTIONS = [
-  { mode: 'mobile',       label: 'Mobile',        sub: '420 × 860' },
-  { mode: 'windowed720p', label: 'Windowed 720p',  sub: '1280 × 720' },
-  { mode: 'fullscreen',   label: 'Fullscreen',     sub: 'native' },
+  { mode: 'mobile',       label: 'Mobile',      sub: '420 × 860' },
+  { mode: 'windowed720p', label: '720p',         sub: '1280 × 720' },
+  { mode: 'fullscreen',   label: 'Fullscreen',   sub: 'native' },
 ];
+
+function SegmentedControl({ options, value, onChange }) {
+  return (
+    <div className="stg-segment">
+      {options.map(o => (
+        <button
+          key={o.value}
+          className={`stg-segment-btn${value === o.value ? ' stg-segment-active' : ''}`}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function OptionGrid({ options, value, onChange }) {
+  return (
+    <div className="stg-option-grid">
+      {options.map(o => (
+        <button
+          key={o.mode}
+          className={`stg-option-card${value === o.mode ? ' stg-option-active' : ''}`}
+          onClick={() => onChange(o.mode)}
+        >
+          {o.icon && <span className="stg-option-icon">{o.icon}</span>}
+          <span className="stg-option-label">{o.label}</span>
+          <span className="stg-option-sub">{o.sub}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ActionRow({ icon, label, sublabel, onClick, danger, disabled }) {
+  return (
+    <button
+      className={`stg-action-row${danger ? ' stg-action-danger' : ''}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <span className="stg-action-icon">{icon}</span>
+      <span className="stg-action-body">
+        <span className="stg-action-label">{label}</span>
+        {sublabel && <span className="stg-action-sub">{sublabel}</span>}
+      </span>
+      <span className="stg-action-chevron">›</span>
+    </button>
+  );
+}
 
 function SettingsScreen({ onClose }) {
   const { t, i18n } = useTranslation('ui');
@@ -35,7 +86,6 @@ function SettingsScreen({ onClose }) {
   };
 
   const [graphics, setGraphicsState] = useState(loadGraphics);
-
   const setGraphics = (next) => {
     setGraphicsState(next);
     saveGraphics(next);
@@ -67,8 +117,6 @@ function SettingsScreen({ onClose }) {
     }
   };
 
-  const handleWipe = () => setConfirmWipe(true);
-
   const confirmDoWipe = () => {
     setConfirmWipe(false);
     wipeSave();
@@ -78,75 +126,64 @@ function SettingsScreen({ onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="settings-modal" onClick={e => e.stopPropagation()}>
-        <div className="journey-header">
-          <span className="journey-title">⚙ {t('settings.title')}</span>
+
+        {/* ── Header ── */}
+        <div className="stg-header">
+          <div className="stg-title">
+            <span className="stg-title-icon">⚙</span>
+            {t('settings.title')}
+          </div>
           <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
+        {/* ── Body ── */}
         <div className="settings-modal-body">
-          {isDesktop && (
-            <div className="save-section">
-              <h2>Graphics</h2>
-              <p className="subtitle">Window resolution — takes effect immediately.</p>
-              <div className="save-buttons">
-                {RESOLUTIONS.map(({ mode, label, sub }) => (
-                  <button
-                    key={mode}
-                    className={`save-btn${resolution === mode ? ' save-btn-active' : ''}`}
-                    onClick={() => applyResolution(mode)}
-                  >
-                    <span>{label}</span>
-                    <span className="res-sub">{sub}</span>
-                  </button>
-                ))}
+
+          {/* Visual effects */}
+          <div className="stg-section">
+            <div className="stg-section-label">Visual Effects</div>
+            <div className="stg-row">
+              <div className="stg-row-info">
+                <span className="stg-row-title">Particles &amp; Animations</span>
               </div>
+              <SegmentedControl
+                options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]}
+                value={graphics.vfxEnabled}
+                onChange={v => setGraphics({ ...graphics, vfxEnabled: v })}
+              />
+            </div>
+          </div>
+
+          {/* Rendering mode */}
+          <div className="stg-section">
+            <div className="stg-section-label">Rendering Mode</div>
+            <OptionGrid
+              options={RENDERING_MODES}
+              value={graphics.renderingMode}
+              onChange={mode => setGraphics({ ...graphics, renderingMode: mode })}
+            />
+          </div>
+
+          {/* Resolution — desktop only */}
+          {isDesktop && (
+            <div className="stg-section">
+              <div className="stg-section-label">Window Resolution</div>
+              <OptionGrid
+                options={RESOLUTIONS}
+                value={resolution}
+                onChange={applyResolution}
+              />
             </div>
           )}
 
-          <div className="save-section">
-            <h2>Visual Effects</h2>
-            <p className="subtitle">Particle effects and animations.</p>
-            <div className="save-buttons">
-              <button
-                className={`save-btn${graphics.vfxEnabled ? ' save-btn-active' : ''}`}
-                onClick={() => setGraphics({ ...graphics, vfxEnabled: true })}
-              >
-                <span>On</span>
-              </button>
-              <button
-                className={`save-btn${!graphics.vfxEnabled ? ' save-btn-active' : ''}`}
-                onClick={() => setGraphics({ ...graphics, vfxEnabled: false })}
-              >
-                <span>Off</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="save-section">
-            <h2>Rendering Mode</h2>
-            <p className="subtitle">How images are scaled.</p>
-            <div className="save-buttons">
-              {RENDERING_MODES.map(({ mode, label, sub }) => (
-                <button
-                  key={mode}
-                  className={`save-btn${graphics.renderingMode === mode ? ' save-btn-active' : ''}`}
-                  onClick={() => setGraphics({ ...graphics, renderingMode: mode })}
-                >
-                  <span>{label}</span>
-                  <span className="res-sub">{sub}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="save-section">
-            <h2>{t('settings.language')}</h2>
-            <p className="subtitle">{t('settings.languageSubtitle')}</p>
-            <div className="save-buttons">
+          {/* Language */}
+          <div className="stg-section">
+            <div className="stg-section-label">{t('settings.language')}</div>
+            <div className="stg-lang-row">
               {SUPPORTED_LANGUAGES.map(lang => (
                 <button
                   key={lang.code}
-                  className={`save-btn${i18n.language === lang.code ? ' save-btn-active' : ''}`}
+                  className={`stg-lang-btn${i18n.language === lang.code ? ' stg-lang-active' : ''}`}
                   onClick={() => setLanguage(lang.code)}
                 >
                   {lang.label}
@@ -155,42 +192,71 @@ function SettingsScreen({ onClose }) {
             </div>
           </div>
 
-          <div className="save-section">
-            <h2>{t('settings.saveData')}</h2>
+          {/* Save data */}
+          <div className="stg-section">
+            <div className="stg-section-label">{t('settings.saveData')}</div>
 
             {message && (
-              <div className={`save-message ${message.isError ? 'save-error' : 'save-success'}`}>
+              <div className={`stg-flash ${message.isError ? 'stg-flash-error' : 'stg-flash-ok'}`}>
                 {message.text}
               </div>
             )}
 
-            <div className="save-buttons">
-              <button className="save-btn" onClick={handleExport}>{t('settings.exportSave')}</button>
-              <button className="save-btn" onClick={() => setShowImport(!showImport)}>{t('settings.importSave')}</button>
-              {confirmWipe ? (
-                <div className="wipe-confirm">
-                  <span className="wipe-confirm-label">{t('settings.areYouSure')}</span>
-                  <button className="save-btn save-btn-danger" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
-                  <button className="save-btn" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
-                </div>
-              ) : (
-                <button className="save-btn save-btn-danger" onClick={handleWipe}>{t('settings.wipeSave')}</button>
-              )}
+            <div className="stg-action-list">
+              <ActionRow
+                icon="📤"
+                label={t('settings.exportSave')}
+                sublabel="Copy save code to clipboard"
+                onClick={handleExport}
+              />
+              <ActionRow
+                icon="📥"
+                label={t('settings.importSave')}
+                sublabel="Paste a save code to restore"
+                onClick={() => setShowImport(v => !v)}
+              />
             </div>
 
             {showImport && (
-              <div className="import-area">
+              <div className="stg-import-area">
                 <textarea
-                  className="import-input"
+                  className="stg-import-input"
                   placeholder={t('settings.pastePlaceholder')}
                   value={importText}
-                  onChange={(e) => setImportText(e.target.value)}
+                  onChange={e => setImportText(e.target.value)}
                   rows={3}
                 />
-                <button className="save-btn" onClick={handleImport}>{t('settings.loadSave')}</button>
+                <button className="stg-import-btn" onClick={handleImport}>
+                  {t('settings.loadSave')}
+                </button>
               </div>
             )}
           </div>
+
+          {/* Danger zone */}
+          <div className="stg-section stg-section-last">
+            <div className="stg-section-label stg-label-danger">Danger Zone</div>
+            <div className="stg-action-list">
+              {confirmWipe ? (
+                <div className="stg-wipe-confirm">
+                  <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
+                  <div className="stg-wipe-btns">
+                    <button className="stg-wipe-yes" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
+                    <button className="stg-wipe-cancel" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+                  </div>
+                </div>
+              ) : (
+                <ActionRow
+                  icon="🗑"
+                  label={t('settings.wipeSave')}
+                  sublabel="Permanently delete all progress"
+                  onClick={() => setConfirmWipe(true)}
+                  danger
+                />
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
