@@ -67,13 +67,15 @@ export default defineConfig(({ command, mode }) => {
         registerType: 'autoUpdate',
         workbox: {
           navigateFallback: 'index.html',
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,ogg,mp3,wav}'],
+          // Precache SFX (small) but not BGM (4-5 MB each — too large for precache).
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}', 'audio/sfx/*.{ogg,mp3,wav}'],
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB for SFX
           skipWaiting: true,
           clientsClaim: true,
           cleanupOutdatedCaches: true,
           runtimeCaching: [
             {
-              // Audio files not in the precache (uploaded after build) — cache on first fetch.
+              // BGM streams and any audio not in precache — network first, cache on fetch.
               urlPattern: /\/audio\//,
               handler: 'CacheFirst',
               options: {
