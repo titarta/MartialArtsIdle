@@ -51,6 +51,10 @@ function _applySfx(id, cfg) {
   };
 }
 
+function sfx(stem, ...exts) {
+  return exts.map(e => `${BASE}audio/sfx/${stem}.${e}`);
+}
+
 // ── Background music ─────────────────────────────────────────────────────────
 
 const _BGM_BASE = {
