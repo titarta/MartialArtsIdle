@@ -468,11 +468,17 @@ export default function useCombat() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  const stopFight = useCallback(() => {
+    stateRef.current.phase = 'idle';
+    setPhase('idle');
+  }, []);
+
   return {
     phase,
     enemy,
     log,
     stateRef,
+    stopFight,
     debugRef,
     startFight,
     pHpBarRef,

@@ -29,7 +29,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
-  const { phase, enemy, log, startFight } = combat;
+  const { phase, enemy, log, startFight, stopFight } = combat;
   const { equippedTechniques } = techniques;
 
   // Tracks the enemy def currently shown in the stage (updates on each fight start).
@@ -88,9 +88,9 @@ function CombatScreen({ cultivation, techniques, combat, inventory, region = nul
     );
   };
 
-  // Auto-start the first fight when the screen mounts.
+  // Auto-start the first fight when the screen mounts; stop on unmount.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { doStartRef.current(); }, []);
+  useEffect(() => { doStartRef.current(); return () => stopFight(); }, []);
 
   // Auto-restart after a short delay whenever a fight ends.
   useEffect(() => {
