@@ -156,6 +156,21 @@ function RegionRow({ region, tab, locked, lockHint, combatLocked, onNavigate, wo
         {combatLocked && (
           <div className="region-combat-gate">⚔ Clear combat first</div>
         )}
+        {isLastIdle && hasPendingGains && pendingGains && (
+          <div className="region-pending-summary">
+            {[
+              ...Object.entries(pendingGains.items ?? {})
+                .filter(([, qty]) => qty > 0)
+                .map(([id, qty]) => {
+                  const mat = ALL_MATERIALS[id];
+                  return `${mat?.name ?? id} ×${qty}`;
+                }),
+              ...(pendingGains.techniques?.length > 0
+                ? [`+${pendingGains.techniques.length} Technique${pendingGains.techniques.length > 1 ? 's' : ''}`]
+                : []),
+            ].join(' · ')}
+          </div>
+        )}
       </div>
 
       {!locked && isWorld && enemyIds.length > 0 && (

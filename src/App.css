@@ -5546,6 +5546,18 @@
   background: rgba(233, 69, 96, 0.1);
 }
 
+/* ── Pending gains summary line ── */
+.region-pending-summary {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: #4ade80;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 /* ── Combat-gate badge on locked gather/mine regions ── */
 .region-combat-gate {
   display: inline-flex;
