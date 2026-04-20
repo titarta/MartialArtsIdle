@@ -104,7 +104,7 @@ export default function EternalTreeScreen({
       const cx     = e.clientX - rect.left;
       const cy     = e.clientY - rect.top;
       const prev   = scaleRef.current;
-      const next   = Math.max(0.25, Math.min(3, prev * factor));
+      const next   = Math.max(0.5, Math.min(2, prev * factor));
       scaleRef.current = next;
       setScale(next);
       setPan(p => ({
