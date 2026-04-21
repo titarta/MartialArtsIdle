@@ -112,10 +112,15 @@ export default function useAutoFarm({ worlds, getStats }) {
   // Live refs so the tick always uses fresh values without re-subscribing
   const getStatsRef      = useRef(getStats);
   const configRef        = useRef(config);
-  const pendingGainsRef  = useRef(pendingGains);
+  const pendingGainsRef  = useRef(null); // null is fine — effect below syncs it after every render
   useEffect(() => { getStatsRef.current     = getStats;     }, [getStats]);
   useEffect(() => { configRef.current       = config;       }, [config]);
-  useEffect(() => { pendingGainsRef.current = pendingGains; }, [pendingGains]);
+  // No deps array: pendingGains in a deps literal would be a TDZ reference (useState
+  // is declared below this block). The closure body is safe — it only reads pendingGains
+  // when the effect fires (after render), by which time the variable is fully initialised.
+  // Running after every render is equivalent to [pendingGains] for a cheap ref-sync.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { pendingGainsRef.current = pendingGains; });
 
   // ─── Pending gains ──────────────────────────────────────────────────────────
 

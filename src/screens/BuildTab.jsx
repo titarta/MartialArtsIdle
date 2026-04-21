@@ -1,3 +1,4 @@
+// @refresh reset
 import { useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import TechniqueSlotModal from '../components/TechniqueSlotModal';

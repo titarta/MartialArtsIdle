@@ -1,3 +1,4 @@
+// @refresh reset
 import { useState, useMemo, useRef } from 'react';
 import LockTooltip from '../components/LockTooltip';
 import { useTranslation } from 'react-i18next';
@@ -755,56 +756,7 @@ function formatEffect(eff) {
   return `+${eff.value} ${label}`;
 }
 
-function HerbSelector({ slotIndex, selectedHerbId, onSelect, inventory }) {
-  const { t }        = useTranslation('ui');
-  const { t: tGame } = useTranslation('game');
-  const [open, setOpen] = useState(false);
-
-  const ownedHerbs = useMemo(() => {
-    return HERB_ITEMS.filter(h => (inventory.getQuantity(h.id) > 0));
-  }, [inventory]);
-
-  const selectedHerb = selectedHerbId ? ITEMS_BY_ID[selectedHerbId] : null;
-  const rarityColor = selectedHerb ? (RARITY[selectedHerb.rarity]?.color ?? '#aaa') : 'var(--text-muted)';
-
-  return (
-    <div className="alchemy-slot">
-      <button
-        className="alchemy-slot-btn"
-        style={{ borderColor: selectedHerb ? rarityColor : 'var(--border)' }}
-        onClick={() => setOpen(!open)}
-      >
-        {selectedHerb ? (
-          <span style={{ color: rarityColor }}>{tGame(`items.${selectedHerb.id}.name`, { defaultValue: selectedHerb.name })}</span>
-        ) : (
-          <span style={{ color: 'var(--text-muted)' }}>{t('production.slot', { n: slotIndex + 1 })}</span>
-        )}
-      </button>
-      {open && (
-        <div className="herb-selector">
-          {ownedHerbs.length === 0 && (
-            <div className="herb-selector-empty">{t('production.noHerbsOwned')}</div>
-          )}
-          {ownedHerbs.map(h => {
-            const hColor = RARITY[h.rarity]?.color ?? '#aaa';
-            const qty = inventory.getQuantity(h.id);
-            const hName = tGame(`items.${h.id}.name`, { defaultValue: h.name });
-            return (
-              <button
-                key={h.id}
-                className="herb-selector-item"
-                onClick={() => { onSelect(h.id); setOpen(false); }}
-              >
-                <span style={{ color: hColor }}>{hName}</span>
-                <span className="herb-selector-qty">x{qty}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
+// HerbSelector replaced by inline herb picker in AlchemyPanel.
 
 // ─── RefiningPanel ───────────────────────────────────────────────────────────
 
@@ -985,82 +937,46 @@ function canAffordRecipe(key, inventory) {
   return true;
 }
 
-function CraftableRecipes({ inventory, pills, onFillSlots }) {
+// ─── RecipeBrowser — flat scrollable list, no accordion ─────────────────────
+
+function RecipeBrowser({ inventory, pills, onFillSlots }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
-  const [expanded, setExpanded] = useState(null); // pill id or null
 
   const craftable = useMemo(() => {
-    const result = [];
+    const rows = [];
     for (const pill of PILLS) {
       if (!pills.isDiscovered(pill.id)) continue;
       const recipes = RECIPES_BY_PILL[pill.id] ?? [];
-      const affordable = recipes.filter(key => canAffordRecipe(key, inventory));
-      if (affordable.length > 0) {
-        result.push({ pill, recipes: affordable });
+      for (const key of recipes) {
+        if (canAffordRecipe(key, inventory)) rows.push({ pill, key });
       }
     }
-    return result;
+    return rows;
   }, [inventory, pills]);
 
-  if (craftable.length === 0) {
-    return (
-      <div className="recipe-book">
-        <div className="recipe-book-title">{t('production.craftableRecipes')}</div>
-        <p className="recipe-book-empty">{t('production.noRecipes')}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="recipe-book">
-      <div className="recipe-book-title">{t('production.craftableRecipes')}</div>
-      {craftable.map(({ pill, recipes }) => {
-        const color = RARITY[pill.rarity]?.color ?? '#aaa';
-        const isOpen = expanded === pill.id;
-        return (
-          <div key={pill.id} className="recipe-pill-group">
-            <button
-              className="recipe-pill-header"
-              onClick={() => setExpanded(isOpen ? null : pill.id)}
-            >
-              <div className="recipe-pill-header-left">
-                <span className="recipe-pill-name" style={{ color }}>{tGame(`items.${pill.id}.name`, { defaultValue: pill.name })}</span>
-                <span className="recipe-pill-effects-inline">
-                  {pill.effects.map((eff, i) => (
-                    <span key={i} className="recipe-pill-effect">{formatEffect(eff)}</span>
-                  ))}
-                </span>
-              </div>
-              <span className="recipe-pill-chevron">{isOpen ? '▾' : '▸'}</span>
+    <div className="recipe-browser">
+      <div className="tx-section-title">{t('production.craftableRecipes')}</div>
+      <div className="recipe-browser-list">
+        {craftable.length === 0 ? (
+          <p className="recipe-browser-empty">{t('production.noRecipes')}</p>
+        ) : craftable.map(({ pill, key }) => {
+          const herbs      = key.split('|');
+          const herbNames  = herbs.map(id => {
+            const h = ITEMS_BY_ID[id];
+            return h ? tGame(`items.${h.id}.name`, { defaultValue: h.name }) : id;
+          });
+          const color    = RARITY[pill.rarity]?.color ?? '#aaa';
+          const pillName = tGame(`items.${pill.id}.name`, { defaultValue: pill.name });
+          return (
+            <button key={key} className="recipe-flat-row" onClick={() => onFillSlots(herbs)}>
+              <span className="recipe-flat-herbs">{herbNames.join(' + ')}</span>
+              <span className="recipe-flat-pill" style={{ color }}>→ {pillName}</span>
             </button>
-            {isOpen && (
-              <div className="recipe-list">
-                {recipes.map(key => {
-                  const herbs = key.split('|');
-                  const herbNames = herbs.map(id => {
-                    const h = ITEMS_BY_ID[id];
-                    return h ? tGame(`items.${h.id}.name`, { defaultValue: h.name }) : id;
-                  });
-                  return (
-                    <button
-                      key={key}
-                      className="recipe-row"
-                      onClick={() => onFillSlots(herbs)}
-                    >
-                      {herbNames.map((name, i) => (
-                        <span key={i} className="recipe-herb">
-                          {name}{i < 2 ? ' + ' : ''}
-                        </span>
-                      ))}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -1070,23 +986,42 @@ const CRAFT_QTY_OPTIONS = [1, 5, 10];
 function AlchemyPanel({ inventory, pills, tree }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
-  const [slots, setSlots] = useState([null, null, null]);
-  const [craftQty, setCraftQty] = useState(1);
-  const [floatMsgs, setFloatMsgs] = useState([]);
+
+  const [slots,      setSlots]      = useState([null, null, null]);
+  const [activeSlot, setActiveSlot] = useState(0);
+  const [craftQty,   setCraftQty]   = useState(1);
+  const [floatMsgs,  setFloatMsgs]  = useState([]);
   const floatIdRef = useRef(0);
 
-  const setSlot = (index, herbId) => {
-    setSlots(prev => {
-      const next = [...prev];
-      next[index] = herbId;
-      return next;
-    });
+  const ownedHerbs = useMemo(
+    () => HERB_ITEMS.filter(h => inventory.getQuantity(h.id) > 0),
+    [inventory],
+  );
+
+  // Assign a herb to the active slot, then auto-advance to the next empty slot.
+  const assignHerb = (herbId) => {
+    const newSlots = [...slots];
+    newSlots[activeSlot] = herbId;
+    setSlots(newSlots);
+    for (let i = 1; i <= 3; i++) {
+      const candidate = (activeSlot + i) % 3;
+      if (newSlots[candidate] === null) { setActiveSlot(candidate); return; }
+    }
+    setActiveSlot((activeSlot + 1) % 3);
   };
 
-  const allFilled = slots[0] && slots[1] && slots[2];
-  const resultPill = allFilled ? findPill(slots[0], slots[1], slots[2]) : null;
+  const clearSlot = (index) => {
+    setSlots(prev => { const n = [...prev]; n[index] = null; return n; });
+    setActiveSlot(index);
+  };
 
-  // Max number of copies the player can afford given current slot contents.
+  const fillSlots = (herbs) =>
+    setSlots([herbs[0] ?? null, herbs[1] ?? null, herbs[2] ?? null]);
+
+  const allFilled  = slots[0] && slots[1] && slots[2];
+  const resultPill = allFilled ? findPill(slots[0], slots[1], slots[2]) : null;
+  const rarityColor = resultPill ? (RARITY[resultPill.rarity]?.color ?? '#aaa') : null;
+
   const maxAffordable = useMemo(() => {
     if (!allFilled) return 0;
     const needed = {};
@@ -1099,21 +1034,16 @@ function AlchemyPanel({ inventory, pills, tree }) {
   }, [slots, allFilled, inventory]);
 
   const effectiveQty = Math.min(craftQty, maxAffordable);
-  const canCraft = allFilled && resultPill && effectiveQty >= 1;
+  const canCraft     = allFilled && resultPill && effectiveQty >= 1;
 
   const handleCraft = () => {
     if (!canCraft) return;
     const n = effectiveQty;
     const needed = {};
     for (const id of slots) needed[id] = (needed[id] || 0) + 1;
-    for (const [id, qty] of Object.entries(needed)) {
-      inventory.removeItem(id, qty * n);
-    }
+    for (const [id, qty] of Object.entries(needed)) inventory.removeItem(id, qty * n);
     pills.craftPill(resultPill.id, n);
 
-    // fp_1 Lucky Star — 10% chance per brew to grant 1 bonus copy of the
-    // SAME pill (cheap interpretation since tier-laddering pills doesn't
-    // map cleanly to the recipe table).
     const luckChance = tree?.modifiers?.craftRarityUpChance ?? 0;
     if (luckChance > 0) {
       let bonus = 0;
@@ -1122,62 +1052,102 @@ function AlchemyPanel({ inventory, pills, tree }) {
     }
 
     const msgId = ++floatIdRef.current;
-    const text = t('production.craftedFloat', {
+    const text  = t('production.craftedFloat', {
       count: n,
-      name: tGame(`items.${resultPill.id}.name`, { defaultValue: resultPill.name }),
+      name:  tGame(`items.${resultPill.id}.name`, { defaultValue: resultPill.name }),
     });
     const color = RARITY[resultPill.rarity]?.color ?? '#aaa';
     setFloatMsgs(prev => [...prev, { id: msgId, text, color }]);
-    setTimeout(() => {
-      setFloatMsgs(prev => prev.filter(m => m.id !== msgId));
-    }, 1300);
+    setTimeout(() => setFloatMsgs(prev => prev.filter(m => m.id !== msgId)), 1300);
   };
-
-  const rarityColor = resultPill ? (RARITY[resultPill.rarity]?.color ?? '#aaa') : null;
 
   return (
     <div className="alchemy-panel">
-      <div className="alchemy-triangle">
-        <div className="alchemy-triangle-top">
-          <HerbSelector slotIndex={0} selectedHerbId={slots[0]} onSelect={(id) => setSlot(0, id)} inventory={inventory} />
+
+      {/* ── Workspace: slot targets (left) + herb picker (right) ── */}
+      <div className="alchemy-workspace">
+        <div className="alchemy-slots-col">
+          {[0, 1, 2].map(i => {
+            const herb  = slots[i] ? ITEMS_BY_ID[slots[i]] : null;
+            const color = herb ? (RARITY[herb.rarity]?.color ?? '#aaa') : null;
+            return (
+              <button
+                key={i}
+                className={`alchemy-slot-btn${activeSlot === i ? ' alchemy-slot-active' : ''}`}
+                style={color ? { borderColor: color } : undefined}
+                onClick={() => setActiveSlot(i)}
+              >
+                <span className="alchemy-slot-label" style={color ? { color } : undefined}>
+                  {herb
+                    ? tGame(`items.${herb.id}.name`, { defaultValue: herb.name })
+                    : t('production.slot', { n: i + 1 })}
+                </span>
+                {herb && (
+                  <span
+                    className="alchemy-slot-clear"
+                    role="button"
+                    onClick={e => { e.stopPropagation(); clearSlot(i); }}
+                  >×</span>
+                )}
+              </button>
+            );
+          })}
         </div>
-        <div className="alchemy-furnace">
+
+        <div className="alchemy-herb-picker">
+          {ownedHerbs.length === 0 ? (
+            <div className="alchemy-herb-empty">{t('production.noHerbsOwned')}</div>
+          ) : ownedHerbs.map(h => {
+            const color = RARITY[h.rarity]?.color ?? '#aaa';
+            return (
+              <button key={h.id} className="alchemy-herb-opt" onClick={() => assignHerb(h.id)}>
+                <span className="alchemy-herb-name" style={{ color }}>
+                  {tGame(`items.${h.id}.name`, { defaultValue: h.name })}
+                </span>
+                <span className="alchemy-herb-qty">×{inventory.getQuantity(h.id)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Furnace + result strip ── */}
+      <div className="alchemy-result">
+        <span className="alchemy-furnace" aria-hidden="true">
           🔥
           {floatMsgs.map(m => (
-            <span key={m.id} className="alchemy-float-msg" style={{ color: m.color }}>
-              {m.text}
-            </span>
+            <span key={m.id} className="alchemy-float-msg" style={{ color: m.color }}>{m.text}</span>
           ))}
-        </div>
-        <div className="alchemy-triangle-bottom">
-          <HerbSelector slotIndex={1} selectedHerbId={slots[1]} onSelect={(id) => setSlot(1, id)} inventory={inventory} />
-          <HerbSelector slotIndex={2} selectedHerbId={slots[2]} onSelect={(id) => setSlot(2, id)} inventory={inventory} />
-        </div>
-      </div>
-
-      <div className="alchemy-result">
-        {allFilled && resultPill && pills.isDiscovered(resultPill.id) && (
-          <div className="alchemy-result-pill">
-            <span className="alchemy-result-name" style={{ color: rarityColor }}>{tGame(`items.${resultPill.id}.name`, { defaultValue: resultPill.name })}</span>
-            <span className="alchemy-result-rarity" style={{ color: rarityColor }}>({t(`rarity.${resultPill.rarity}`, { defaultValue: resultPill.rarity })})</span>
-            <div className="alchemy-result-effects">
-              {resultPill.effects.map((eff, i) => (
-                <span key={i} className="alchemy-result-effect">{formatEffect(eff)}</span>
-              ))}
+        </span>
+        <div className="alchemy-result-body">
+          {allFilled && resultPill && pills.isDiscovered(resultPill.id) && (
+            <div className="alchemy-result-pill">
+              <span className="alchemy-result-name" style={{ color: rarityColor }}>
+                {tGame(`items.${resultPill.id}.name`, { defaultValue: resultPill.name })}
+              </span>
+              <span className="alchemy-result-rarity" style={{ color: rarityColor }}>
+                ({t(`rarity.${resultPill.rarity}`, { defaultValue: resultPill.rarity })})
+              </span>
+              <div className="alchemy-result-effects">
+                {resultPill.effects.map((eff, i) => (
+                  <span key={i} className="alchemy-result-effect">{formatEffect(eff)}</span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-        {allFilled && resultPill && !pills.isDiscovered(resultPill.id) && (
-          <div className="alchemy-result-unknown">{t('production.unknownRecipe')}</div>
-        )}
-        {allFilled && !resultPill && (
-          <div className="alchemy-result-invalid">{t('production.invalidCombination')}</div>
-        )}
-        {!allFilled && (
-          <div className="alchemy-result-hint">{t('production.select3Herbs')}</div>
-        )}
+          )}
+          {allFilled && resultPill && !pills.isDiscovered(resultPill.id) && (
+            <div className="alchemy-result-unknown">{t('production.unknownRecipe')}</div>
+          )}
+          {allFilled && !resultPill && (
+            <div className="alchemy-result-invalid">{t('production.invalidCombination')}</div>
+          )}
+          {!allFilled && (
+            <div className="alchemy-result-hint">{t('production.select3Herbs')}</div>
+          )}
+        </div>
       </div>
 
+      {/* ── Craft controls ── */}
       <div className="alchemy-craft-row">
         <div className="alchemy-qty-selector" role="group">
           {CRAFT_QTY_OPTIONS.map(opt => (
@@ -1186,9 +1156,7 @@ function AlchemyPanel({ inventory, pills, tree }) {
               className={`alchemy-qty-btn ${craftQty === opt ? 'alchemy-qty-btn-active' : ''}`}
               onClick={() => setCraftQty(opt)}
               type="button"
-            >
-              ×{opt}
-            </button>
+            >×{opt}</button>
           ))}
         </div>
         <button
@@ -1200,7 +1168,8 @@ function AlchemyPanel({ inventory, pills, tree }) {
         </button>
       </div>
 
-      <CraftableRecipes inventory={inventory} pills={pills} onFillSlots={(herbs) => setSlots(herbs)} />
+      {/* ── Recipe browser ── */}
+      <RecipeBrowser inventory={inventory} pills={pills} onFillSlots={fillSlots} />
     </div>
   );
 }

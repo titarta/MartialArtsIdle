@@ -1,3 +1,4 @@
+// @refresh reset
 import { useState } from 'react';
 import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_INDEX } from '../data/reincarnationTree';
 
