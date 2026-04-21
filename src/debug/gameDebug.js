@@ -54,6 +54,20 @@ export function initDebug(hooksRef) {
       console.log(`[debug] Qi filled — one tick from breakthrough`);
     },
 
+    /**
+     * Multiply the qi/s rate by n. Call with 1 to reset.
+     * @param {number} n  Multiplier (e.g. 10 = ten times faster, 1 = normal)
+     */
+    setQiRate(n = 1) {
+      const mult = Math.max(0, Number(n));
+      g().cultivation.debugQiMultRef.current = mult;
+      if (mult === 1) {
+        console.log('[debug] Qi rate — reset to normal');
+      } else {
+        console.log(`[debug] Qi rate ×${mult} (call gd.setQiRate(1) to reset)`);
+      }
+    },
+
     // ── Combat ─────────────────────────────────────────────────────────────
 
     /**
@@ -266,6 +280,7 @@ export function initDebug(hooksRef) {
       console.log('  gd.setRealm(n)           — jump to realm index n');
       console.log('  gd.addQi(amount)          — add qi instantly');
       console.log('  gd.fillQi()               — fill qi to just before breakthrough');
+      console.log('  gd.setQiRate(n=1)         — multiply qi/s by n (1 resets to normal)');
       console.log('%cCombat', 'font-weight: bold');
       console.log('  gd.godMode(on?)           — toggle/set player invincibility');
       console.log('  gd.oneShot(on?)           — toggle/set enemy one-shot mode');

@@ -99,9 +99,8 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
     if (curr === prev) return;
     prevRealmIndex.current = curr;
 
-    const tier = isBreakthrough(prev, curr) ? 'breakthrough' : 'minor';
-    const options = rollOptions(curr, active, tier, optionCount);
-    if (options.length === 0) return;
+    const isMajor = isBreakthrough(prev, curr);
+    const tier    = isMajor ? 'breakthrough' : 'minor';
 
     const realmLabel = REALMS[curr]
       ? (REALMS[curr].stage
@@ -109,18 +108,9 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
           : REALMS[curr].name)
       : '';
 
-    const entry = {
-      id:          `sel-${++selCounter}-${curr}`,
-      realmIndex:  curr,
-      realmLabel,
-      tier,
-      options,
-      freeRerolls: tier === 'breakthrough' ? 1 : 0,
-      rerollsUsed: 0,
-    };
-
-    // Award blood_lotus_per_breakthrough perk on breakthroughs
-    if (tier === 'breakthrough') {
+    if (isMajor) {
+      // Major breakthrough: law selection is the sole reward — no regular perk card.
+      // Still award any blood_lotus_per_breakthrough bonuses from active perks.
       const bloodLotusBonus = Object.entries(active).reduce((total, [optId, stacks]) => {
         const opt = SELECTION_BY_ID[optId];
         if (!opt) return total;
@@ -132,15 +122,7 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
         addBloodLotus(Math.floor(bloodLotusBonus));
         refreshBloodLotus();
       }
-    }
 
-    setPending(prev => [...prev, entry]);
-
-    // ── Law track (major breakthroughs only) ──────────────────────────────
-    // Every major-realm transition also offers 3 law choices. The very
-    // first one (when the library is empty) is the unlock-the-mechanic
-    // beat and can't be skipped. Later offers are skippable.
-    if (tier === 'breakthrough') {
       const isFirst = (cultivation.ownedLaws?.length ?? 0) === 0;
       const lawEntry = {
         id:          `sel-law-${++selCounter}-${curr}`,
@@ -159,6 +141,20 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
         rerollsUsed: 0,
       };
       setPending(prev => [...prev, lawEntry]);
+    } else {
+      // Minor realm stage: regular perk selection.
+      const options = rollOptions(curr, active, tier, optionCount);
+      if (options.length === 0) return;
+      const entry = {
+        id:          `sel-${++selCounter}-${curr}`,
+        realmIndex:  curr,
+        realmLabel,
+        tier,
+        options,
+        freeRerolls: 0,
+        rerollsUsed: 0,
+      };
+      setPending(prev => [...prev, entry]);
     }
   }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 

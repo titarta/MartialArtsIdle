@@ -228,6 +228,8 @@ export default function useCultivation() {
   // al_k Living Memory — extra cultivation-rate multiplier active while a
   // post-rebirth buff is live (1-hour ×2 buff). 1 means inactive.
   const rebirthCultBuffRef = useRef(1);
+  // Debug-only multiplier — set via gd.setQiRate(n) in the browser console.
+  const debugQiMultRef = useRef(1);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
   // Default 300% = the legacy 3× behavior; App.jsx writes the player's actual
   // focus mult into this ref each second.
@@ -298,7 +300,8 @@ export default function useCultivation() {
           boostMult *
           adBoostRef.current * heavenlyTree * heavenlyArt *
           pillQiMultRef.current * selectionQiMultRef.current *
-          treeQiMultRef.current * rebirthCultBuffRef.current;
+          treeQiMultRef.current * rebirthCultBuffRef.current *
+          debugQiMultRef.current;
         rateRef.current = rate;
         qiRef.current += rate * dt;
 
@@ -431,6 +434,8 @@ export default function useCultivation() {
     rebirthCultBuffRef,
     // Focus multiplier ref (qi_focus_mult, in %) — updated by App.jsx every second
     focusMultRef,
+    // Debug qi rate multiplier — written by gd.setQiRate()
+    debugQiMultRef,
     // Ads
     activateAdBoost,
     adBoostActive:  adBoostEndsAt > Date.now(),
