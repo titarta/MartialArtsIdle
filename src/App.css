@@ -546,11 +546,10 @@ html, body, * {
   box-shadow: 0 0 32px rgba(192, 132, 252, 0.15);
 }
 
-/* Law selection modal — gold tint on the header tile only (modal itself is
-   transparent so a box-shadow there would show as a bare glowing rectangle) */
+/* Law selection modal — subtle gold ambient on the header only (no border so
+   it doesn't read as a fourth card on mobile) */
 .sel-modal-law .sel-header {
-  border: 1px solid rgba(245, 200, 66, 0.28);
-  box-shadow: 0 0 24px rgba(245, 200, 66, 0.10);
+  box-shadow: 0 0 24px rgba(245, 200, 66, 0.12);
 }
 
 .sel-breakthrough-badge {
