@@ -75,7 +75,7 @@ function LawCard({ law, onPick, disabled }) {
   return (
     <div
       className={`augment-card law-card augment-card-${law.rarity?.toLowerCase?.() ?? 'iron'}`}
-      style={{ '--cat-color': rarity.color, '--rarity-color': rarity.color, opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
+      style={{ '--cat-color': '#c9972a', '--rarity-color': rarity.color, opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
       onClick={() => !disabled && onPick?.()}
     >
       <div className="augment-cat-strip">

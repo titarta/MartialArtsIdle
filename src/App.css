@@ -573,38 +573,59 @@ html, body, * {
 }
 
 /* ── Law cards ───────────────────────────────────────────────────────────────
-   Shared base for all law rarity cards. Warmer dark background distinguishes
-   them from perk (augment) cards at a glance.                               */
-.law-card {
-  background: rgba(14, 11, 5, 0.88);
-}
+   All law cards share a gold identity: amber strip (--cat-color fixed in JSX),
+   a gold top-accent border, warm-tinted background, and a slow sheen.
+   Higher rarities escalate the same vocabulary — faster sheen, brighter glow. */
 
-/* Gold sheen animation for Gold and Transcendent tiers */
 @keyframes law-sheen {
   0%   { background-position: -200% center; }
   100% { background-position:  200% center; }
 }
 
-.augment-card-gold.law-card {
+.law-card {
+  border-top: 2px solid rgba(245, 200, 66, 0.45);
   background: linear-gradient(
     135deg,
-    rgba(14, 11, 5, 0.90) 0%,
-    rgba(60, 45, 5, 0.60) 50%,
-    rgba(14, 11, 5, 0.90) 100%
+    rgba(28, 20, 5, 0.92) 0%,
+    rgba(20, 14, 4, 0.88) 50%,
+    rgba(28, 20, 5, 0.92) 100%
   );
   background-size: 200% 200%;
-  animation: law-sheen 4s linear infinite;
+  animation: law-sheen 8s linear infinite;
+}
+
+.augment-card-bronze.law-card {
+  border-top-color: rgba(205, 127, 50, 0.65);
+  animation-duration: 6s;
+}
+
+.augment-card-silver.law-card {
+  border-top-color: rgba(192, 192, 192, 0.65);
+  animation-duration: 5s;
+}
+
+.augment-card-gold.law-card {
+  border-top-color: rgba(245, 200, 66, 0.80);
+  background: linear-gradient(
+    135deg,
+    rgba(28, 20, 5, 0.92) 0%,
+    rgba(65, 48, 6, 0.65) 50%,
+    rgba(28, 20, 5, 0.92) 100%
+  );
+  background-size: 200% 200%;
+  animation-duration: 4s;
 }
 
 .augment-card-transcendent.law-card {
+  border-top-color: rgba(192, 132, 252, 0.80);
   background: linear-gradient(
     135deg,
-    rgba(10, 5, 20, 0.90) 0%,
-    rgba(50, 20, 70, 0.60) 50%,
-    rgba(10, 5, 20, 0.90) 100%
+    rgba(10, 5, 20, 0.92) 0%,
+    rgba(55, 22, 75, 0.65) 50%,
+    rgba(10, 5, 20, 0.92) 100%
   );
   background-size: 200% 200%;
-  animation: law-sheen 3s linear infinite;
+  animation-duration: 3s;
 }
 
 .sel-header {
