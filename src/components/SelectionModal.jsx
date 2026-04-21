@@ -74,7 +74,7 @@ function LawCard({ law, onPick, disabled }) {
   const topUnique = law.uniques && Object.entries(law.uniques)[0];
   return (
     <div
-      className={`augment-card augment-card-${law.rarity?.toLowerCase?.() ?? 'iron'}`}
+      className={`augment-card law-card augment-card-${law.rarity?.toLowerCase?.() ?? 'iron'}`}
       style={{ '--cat-color': rarity.color, '--rarity-color': rarity.color, opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}
       onClick={() => !disabled && onPick?.()}
     >
@@ -118,7 +118,7 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
   return (
     <>
       <div className="sel-header">
-        <span className="sel-breakthrough-badge">☯ {isFirst ? 'First Law' : 'Law Reward'}</span>
+        <span className="sel-breakthrough-badge sel-breakthrough-badge-law">☯ {isFirst ? 'First Law' : 'Law Reward'}</span>
         <h2 className="sel-title">{isFirst ? 'Choose your first Cultivation Law' : 'New Cultivation Law'}</h2>
         <p className="sel-realm">{realmLabel}</p>
       </div>
@@ -197,7 +197,7 @@ function SelectionModal({
     return (
       <div className="modal-overlay sel-overlay" onClick={onClose}>
         <div
-          className="sel-modal sel-modal-breakthrough"
+          className="sel-modal sel-modal-law"
           onClick={e => e.stopPropagation()}
         >
           <LawSelectionBody
