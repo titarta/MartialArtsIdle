@@ -1809,6 +1809,10 @@ html, body, * {
   color: #ffe8a0;
   box-shadow: 0 0 12px rgba(255, 220, 120, 0.45);
 }
+.qi-rate-gated {
+  color: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255, 60, 60, 0.35);
+}
 .qi-rate-badge {
   display: inline-block;
   padding: 0 6px;

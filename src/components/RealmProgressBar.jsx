@@ -55,7 +55,7 @@ function RealmProgressBar({ qiRef, costRef, rateRef, gateRef, currentRealm, next
       const isGated = !!gate;
       if (isGated && gateLabelRef.current) {
         const r = rateRef ? rateRef.current : gate.current;
-        gateLabelRef.current.textContent = `⛔ Qi/s ${formatRate(r)} / ${formatRate(gate.required)}`;
+        gateLabelRef.current.textContent = `${formatRate(r)} / ${formatRate(gate.required)}  Qi/s`;
       }
       if (isGated !== gatedFlag) {
         gatedFlag = isGated;

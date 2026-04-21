@@ -66,9 +66,11 @@ function QiRateReadout({ rateRef, focusMultRef, boosting, adBoostActive, maxed }
   );
 }
 
-/** Current / target qi — single chip updated via rAF. */
-function QiProgressChip({ qiRef, costRef, maxed }) {
+/** Current / target qi — single chip updated via rAF.
+ *  During a major-realm gate, switches to showing Qi/s current / required. */
+function QiProgressChip({ qiRef, costRef, gateRef, rateRef, maxed }) {
   const textRef = useRef(null);
+  const divRef  = useRef(null);
   useEffect(() => {
     const fmt = (n) => {
       if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
@@ -76,20 +78,33 @@ function QiProgressChip({ qiRef, costRef, maxed }) {
       if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
       return String(Math.floor(n));
     };
+    const fmtRate = (n) => {
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      if (n >= 10)  return n.toFixed(0);
+      return n.toFixed(1);
+    };
     let raf;
     const update = () => {
+      const gate = gateRef?.current;
+      if (divRef.current)  divRef.current.classList.toggle('qi-rate-gated', !!gate);
       if (textRef.current) {
-        textRef.current.textContent = maxed
-          ? 'Peak Qi'
-          : `${fmt(qiRef.current)} / ${fmt(costRef.current)}`;
+        if (maxed) {
+          textRef.current.textContent = 'Peak Qi';
+        } else if (gate) {
+          const r = rateRef ? rateRef.current : gate.current;
+          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}  Qi/s`;
+        } else {
+          textRef.current.textContent = `${fmt(qiRef.current)} / ${fmt(costRef.current)}`;
+        }
       }
       raf = requestAnimationFrame(update);
     };
     raf = requestAnimationFrame(update);
     return () => cancelAnimationFrame(raf);
-  }, [qiRef, costRef, maxed]);
+  }, [qiRef, costRef, gateRef, rateRef, maxed]);
   return (
-    <div className="qi-rate">
+    <div ref={divRef} className="qi-rate">
       <span ref={textRef}>—</span>
     </div>
   );
@@ -546,7 +561,7 @@ function HomeScreen({
           {/* Overlay row — hidden on PC (info lives in left panel instead) */}
           <div className="home-scene-overlay-row">
             <div className="home-overlay-half">
-              <QiProgressChip qiRef={qiRef} costRef={costRef} maxed={maxed} />
+              <QiProgressChip qiRef={qiRef} costRef={costRef} gateRef={gateRef} rateRef={rateRef} maxed={maxed} />
             </div>
             <div className="home-overlay-half">
               <QiRateReadout
