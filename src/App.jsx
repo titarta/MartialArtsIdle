@@ -153,20 +153,23 @@ function App() {
     return () => clearTimeout(id);
   }, [cultivation.rebirthCultBuffRef]);
 
+  // Ref updated every render so effects always see the latest breakthrough state
+  // without needing it as a dep (avoids stale-closure false-negatives).
+  const majorBreakthroughRef = useRef(null);
+  majorBreakthroughRef.current = cultivation.majorBreakthrough;
+
   // Auto-open selection modal only when pendingCount increases mid-session
   // (i.e. a real level-up just happened). Skip on load so players aren't
   // greeted by the modal immediately — the notification badge is enough.
-  // Law entries come from major breakthroughs; the BreakthroughBanner fires
-  // onOpenSelections in its onDone callback once the animation finishes, so
-  // we must NOT auto-open here for those — only open for minor perk cards.
+  // Major breakthroughs: BreakthroughBanner.onDone opens the modal after the
+  // animation; suppress here by checking the ref (guaranteed fresh at effect time).
   const prevPendingRef = useRef(null);
   useEffect(() => {
     const prev = prevPendingRef.current;
     prevPendingRef.current = selections.pendingCount;
     if (prev === null) return; // first render — treat as load, don't open
     if (selections.pendingCount > prev && currentScreen === 'home') {
-      const newItem = selections.pending[selections.pending.length - 1];
-      if (newItem?.kind !== 'law') {
+      if (!majorBreakthroughRef.current) {
         setSelectionModalOpen(true);
       }
     }
