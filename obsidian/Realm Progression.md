@@ -155,8 +155,8 @@ Total sub-stages: **46**
 Ascending **between major realms** (i.e. whenever `realm.name` changes — e.g. Tempered Body → Qi Transformation, Peak Qi Transformation → Early True Element) requires the player to sustain a minimum **qi/s** rate. Sub-stage transitions within the same major realm have no gate.
 
 - **Rule:** required qi/s = `nextRealm.cost × base × decay^ord`
-  - `base = 1%` (0.01)
-  - `decay = 0.55` multiplicatively per successive major gate
+  - `base = 0.25%` (0.0025)
+  - `decay = 0.5` multiplicatively per successive major gate
   - `ord = 0, 1, 2, …` — the 0-based ordinal of the major transition
 - **Intent:** early gates squeeze hardest (force investment in qi-rate sources before the first realm wall); later gates soften automatically because costs already dwarf what players can realistically accumulate per second.
 - **Behaviour when gated:**

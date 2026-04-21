@@ -98,8 +98,8 @@ const REALMS = mergeArrayByIndex(REALMS_RAW, 'realms');
 // NEXT realm's qi cost and decays with each successive major transition — the
 // early gates squeeze hardest, late realms soften because the cost is already
 // enormous.
-export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.01;   // 1% at the first gate
-export const MAJOR_BREAKTHROUGH_DECAY    = 0.55;   // multiplicative per major gate
+export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.0025; // 0.25% at the first gate
+export const MAJOR_BREAKTHROUGH_DECAY    = 0.5;    // multiplicative per major gate
 
 /** Is the transition `fromIndex → fromIndex+1` a major-realm change? */
 export function isMajorTransition(fromIndex) {
