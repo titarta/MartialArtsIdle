@@ -1,5 +1,5 @@
 // SKU IDs must match exactly what you create in Google Play Console / App Store Connect:
-//   jade_60, jade_330, jade_980, jade_1980, jade_3280, jade_6480
+//   blood_lotus_60, blood_lotus_330, blood_lotus_980, blood_lotus_1980, blood_lotus_3280, blood_lotus_6480
 
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';

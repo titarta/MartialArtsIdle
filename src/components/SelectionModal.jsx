@@ -1,5 +1,5 @@
 import { SELECTION_BY_ID, SELECTION_RARITY } from '../data/selections';
-import { JADE_COSTS } from '../systems/jade';
+import { BLOOD_LOTUS_COSTS } from '../systems/bloodLotus';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
 import { MAX_LAWS } from '../hooks/useCultivation';
@@ -46,7 +46,7 @@ function AugmentCard({ optionId, index, onPick, onRerollOne, rerollCost, hasFree
         className={`augment-reroll${!canAffordReroll ? ' augment-reroll-disabled' : ''}`}
         onClick={e => { e.stopPropagation(); canAffordReroll && onRerollOne(index); }}
         disabled={!canAffordReroll}
-        title={hasFreeReroll ? 'Reroll (free)' : `Reroll (${rerollCost} Jade)`}
+        title={hasFreeReroll ? 'Reroll (free)' : `Reroll (${rerollCost} Blood Lotus)`}
       >
         ↺{hasFreeReroll ? '' : ` ${rerollCost}`}
       </button>
@@ -103,11 +103,11 @@ function LawCard({ law, onPick, disabled }) {
 
 // ── Law variant — modal body ─────────────────────────────────────────────────
 
-function LawSelectionBody({ selection, jadeBalance, onPickLaw, onSkipLaw, onRerollLaw, ownedLaws, activeLawId, onDismantleLaw }) {
+function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, onRerollLaw, ownedLaws, activeLawId, onDismantleLaw }) {
   const { id, realmLabel, lawOptions, freeRerolls, rerollsUsed, isFirst } = selection;
   const hasFreeReroll = rerollsUsed < freeRerolls;
-  const rerollCost = hasFreeReroll ? 0 : JADE_COSTS.reroll_law_extra;
-  const canAffordReroll = hasFreeReroll || (jadeBalance ?? 0) >= rerollCost;
+  const rerollCost = hasFreeReroll ? 0 : BLOOD_LOTUS_COSTS.reroll_law_extra;
+  const canAffordReroll = hasFreeReroll || (bloodLotusBalance ?? 0) >= rerollCost;
 
   // Library full guard — show an inline dismantle strip that blocks the
   // cards until the player frees a slot.
@@ -161,9 +161,9 @@ function LawSelectionBody({ selection, jadeBalance, onPickLaw, onSkipLaw, onRero
           className={`save-btn${canAffordReroll ? '' : ' save-btn-disabled'}`}
           disabled={!canAffordReroll}
           onClick={() => canAffordReroll && onRerollLaw?.(id)}
-          title={hasFreeReroll ? 'Reroll all offers (free)' : `Reroll all offers (${rerollCost} Jade)`}
+          title={hasFreeReroll ? 'Reroll all offers (free)' : `Reroll all offers (${rerollCost} Blood Lotus)`}
         >
-          ↺ Reroll {hasFreeReroll ? '(free)' : `(${rerollCost} Jade)`}
+          ↺ Reroll {hasFreeReroll ? '(free)' : `(${rerollCost} Blood Lotus)`}
         </button>
         {!isFirst && (
           <button className="save-btn" onClick={() => onSkipLaw?.(id)}>
@@ -179,7 +179,7 @@ function LawSelectionBody({ selection, jadeBalance, onPickLaw, onSkipLaw, onRero
 
 function SelectionModal({
   selection,
-  jadeBalance,
+  bloodLotusBalance,
   onPick,
   onRerollOne,
   onClose,
@@ -202,7 +202,7 @@ function SelectionModal({
         >
           <LawSelectionBody
             selection={selection}
-            jadeBalance={jadeBalance}
+            bloodLotusBalance={bloodLotusBalance}
             onPickLaw={onPickLaw}
             onSkipLaw={onSkipLaw}
             onRerollLaw={onRerollLaw}
@@ -219,8 +219,8 @@ function SelectionModal({
   const { id, realmLabel, tier, options, freeRerolls, rerollsUsed } = selection;
   const hasFreeReroll   = rerollsUsed < freeRerolls;
   const rerollCost      = hasFreeReroll ? 0
-    : tier === 'breakthrough' ? JADE_COSTS.reroll_extra : JADE_COSTS.reroll_minor;
-  const canAffordReroll = hasFreeReroll || (jadeBalance ?? 0) >= rerollCost;
+    : tier === 'breakthrough' ? BLOOD_LOTUS_COSTS.reroll_extra : BLOOD_LOTUS_COSTS.reroll_minor;
+  const canAffordReroll = hasFreeReroll || (bloodLotusBalance ?? 0) >= rerollCost;
   const isBreakthrough  = tier === 'breakthrough';
 
   return (

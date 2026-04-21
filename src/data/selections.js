@@ -350,14 +350,14 @@ const POOL_RAW = [
     effects: [{ type: 'special', key: 'rare_drop_chance', value: 0.08 }],
   },
   {
-    id: 'jade_affinity',
-    name: 'Jade Affinity',
-    description: 'Earn +5 Jade per realm breakthrough',
+    id: 'blood_lotus_affinity',
+    name: 'Blood Lotus Affinity',
+    description: 'Earn +5 Blood Lotus per realm breakthrough',
     category: 'economy',
     rarity: 'rare',
     minRealmIndex: 0,
     maxStacks: 5,
-    effects: [{ type: 'special', key: 'jade_per_breakthrough', value: 5 }],
+    effects: [{ type: 'special', key: 'blood_lotus_per_breakthrough', value: 5 }],
   },
 
   // ── Special ─────────────────────────────────────────────────────────────────

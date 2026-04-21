@@ -9,8 +9,7 @@ import {
 } from '../data/selections';
 import { MOD } from '../data/stats';
 import { generateLaw } from '../data/affixPools';
-import { addJade } from '../systems/jade';
-import { spendJade, JADE_COSTS } from '../systems/jade';
+import { addBloodLotus, spendBloodLotus, getBloodLotusBalance, BLOOD_LOTUS_COSTS } from '../systems/bloodLotus';
 
 const PENDING_KEY = 'mai_pending_selections';
 const ACTIVE_KEY  = 'mai_active_selections';
@@ -72,8 +71,8 @@ let selCounter = 0;
 export default function useSelections({ cultivation, optionCount = 3 }) {
   const [pending, setPending] = useState(loadPending);
   const [active,  setActive]  = useState(loadActive);
-  const [jadeBalance, setJadeBalance] = useState(() => {
-    try { return parseInt(localStorage.getItem('mai_jade') || '0', 10); } catch { return 0; }
+  const [bloodLotusBalance, setBloodLotusBalance] = useState(() => {
+    try { return getBloodLotusBalance(); } catch { return 0; }
   });
 
   const prevRealmIndex = useRef(cultivation.realmIndex);
@@ -82,17 +81,15 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
   useEffect(() => { savePending(pending); }, [pending]);
   useEffect(() => { saveActive(active);   }, [active]);
 
-  // Keep balance in sync — jade.js fires 'jade-changed' on every add/spend.
+  // Keep balance in sync — bloodLotus.js fires 'blood-lotus-changed' on every add/spend.
   useEffect(() => {
-    const handler = (e) => setJadeBalance(e.detail);
-    window.addEventListener('jade-changed', handler);
-    return () => window.removeEventListener('jade-changed', handler);
+    const handler = (e) => setBloodLotusBalance(e.detail);
+    window.addEventListener('blood-lotus-changed', handler);
+    return () => window.removeEventListener('blood-lotus-changed', handler);
   }, []);
 
-  const refreshJade = useCallback(() => {
-    try {
-      setJadeBalance(parseInt(localStorage.getItem('mai_jade') || '0', 10));
-    } catch {}
+  const refreshBloodLotus = useCallback(() => {
+    try { setBloodLotusBalance(getBloodLotusBalance()); } catch {}
   }, []);
 
   // Detect level-ups and generate selections
@@ -122,18 +119,18 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
       rerollsUsed: 0,
     };
 
-    // Award jade_per_breakthrough perk on breakthroughs
+    // Award blood_lotus_per_breakthrough perk on breakthroughs
     if (tier === 'breakthrough') {
-      const jadeBonus = Object.entries(active).reduce((total, [optId, stacks]) => {
+      const bloodLotusBonus = Object.entries(active).reduce((total, [optId, stacks]) => {
         const opt = SELECTION_BY_ID[optId];
         if (!opt) return total;
         return total + opt.effects
-          .filter(e => e.type === 'special' && e.key === 'jade_per_breakthrough')
+          .filter(e => e.type === 'special' && e.key === 'blood_lotus_per_breakthrough')
           .reduce((s, e) => s + e.value * stacks, 0);
       }, 0);
-      if (jadeBonus > 0) {
-        addJade(Math.floor(jadeBonus));
-        refreshJade();
+      if (bloodLotusBonus > 0) {
+        addBloodLotus(Math.floor(bloodLotusBonus));
+        refreshBloodLotus();
       }
     }
 
@@ -197,32 +194,32 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
     });
   }, []);
 
-  /** Reroll all 3 law offers. Free first time, then JADE_COSTS.reroll_law_extra. */
+  /** Reroll all 3 law offers. Free first time, then BLOOD_LOTUS_COSTS.reroll_law_extra. */
   const rerollLaw = useCallback((selectionId) => {
     setPending(prev => prev.map(sel => {
       if (sel.id !== selectionId || sel.kind !== 'law') return sel;
       const hasFree = sel.rerollsUsed < sel.freeRerolls;
       if (!hasFree) {
-        if (!spendJade(JADE_COSTS.reroll_law_extra)) return sel;
-        refreshJade();
+        if (!spendBloodLotus(BLOOD_LOTUS_COSTS.reroll_law_extra)) return sel;
+        refreshBloodLotus();
       }
       const fresh = sel.isFirst
         ? Array.from({ length: THREE_LAW_OFFERS }, () => generateLaw('Iron', sel.realmIndex))
         : rollLawOffers(sel.realmIndex);
       return { ...sel, lawOptions: fresh, rerollsUsed: sel.rerollsUsed + 1 };
     }));
-  }, [refreshJade]);
+  }, [refreshBloodLotus]);
 
-  /** Reroll the options for a selection. Costs Jade unless free rerolls remain. */
+  /** Reroll the options for a selection. Costs Blood Lotus unless free rerolls remain. */
   const rerollOptions = useCallback((selectionId) => {
     setPending(prev => prev.map(sel => {
       if (sel.id !== selectionId) return sel;
 
       const hasFree = sel.rerollsUsed < sel.freeRerolls;
       if (!hasFree) {
-        const cost = sel.tier === 'breakthrough' ? JADE_COSTS.reroll_extra : JADE_COSTS.reroll_minor;
-        if (!spendJade(cost)) return sel; // not enough jade
-        refreshJade();
+        const cost = sel.tier === 'breakthrough' ? BLOOD_LOTUS_COSTS.reroll_extra : BLOOD_LOTUS_COSTS.reroll_minor;
+        if (!spendBloodLotus(cost)) return sel; // not enough Blood Lotus
+        refreshBloodLotus();
       }
 
       const newOptions = rollOptions(cultivation.realmIndex, active, sel.tier, optionCount);
@@ -232,7 +229,7 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
         rerollsUsed: sel.rerollsUsed + 1,
       };
     }));
-  }, [cultivation.realmIndex, active, refreshJade]);
+  }, [cultivation.realmIndex, active, refreshBloodLotus]);
 
   // ── Stat modifiers ────────────────────────────────────────────────────────
 
@@ -304,9 +301,9 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
 
       const hasFree = sel.rerollsUsed < sel.freeRerolls;
       if (!hasFree) {
-        const cost = sel.tier === 'breakthrough' ? JADE_COSTS.reroll_extra : JADE_COSTS.reroll_minor;
-        if (!spendJade(cost)) return sel;
-        refreshJade();
+        const cost = sel.tier === 'breakthrough' ? BLOOD_LOTUS_COSTS.reroll_extra : BLOOD_LOTUS_COSTS.reroll_minor;
+        if (!spendBloodLotus(cost)) return sel;
+        refreshBloodLotus();
       }
 
       const weights = sel.tier === 'breakthrough' ? BREAKTHROUGH_WEIGHTS : MINOR_WEIGHTS;
@@ -335,13 +332,13 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
       newOptions[optionIndex] = replacement;
       return { ...sel, options: newOptions, rerollsUsed: sel.rerollsUsed + 1 };
     }));
-  }, [cultivation.realmIndex, active, refreshJade]);
+  }, [cultivation.realmIndex, active, refreshBloodLotus]);
 
   return {
     pending,
     active,
     pendingCount: pending.length,
-    jadeBalance,
+    bloodLotusBalance,
     pickOption,
     rerollOptions,
     rerollOne,
@@ -351,6 +348,6 @@ export default function useSelections({ cultivation, optionCount = 3 }) {
     getStatModifiers,
     getQiSpeedMult,
     getOfflineQiMult,
-    refreshJade,
+    refreshBloodLotus,
   };
 }

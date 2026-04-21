@@ -77,7 +77,7 @@ export const NODES = [
   {
     id: 'al_4', branch: 'legacy', step: 3,
     label: 'Bloodline Vigor', icon: '🩸',
-    desc: 'Each new life starts with +50 jade and one banked free Selection re-roll.',
+    desc: 'Each new life starts with +50 Blood Lotus and one banked free Selection re-roll.',
     cost: 6, prereqs: ['al_3'], prereqMode: 'and',
   },
   {

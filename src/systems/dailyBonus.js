@@ -2,10 +2,10 @@
  * dailyBonus.js — Daily login reward system.
  *
  * 7-day repeating cycle. Missing a day resets the streak to Day 1.
- * Balance is awarded in Blood Lotus (jade) via addJade().
+ * Balance is awarded in Blood Lotus via addBloodLotus().
  */
 
-import { addJade } from './jade';
+import { addBloodLotus } from './bloodLotus';
 
 const KEY = 'mai_daily_bonus';
 
@@ -70,6 +70,6 @@ export function collectDailyBonus() {
   const state = getDailyBonusState();
   if (!state.isAvailable) return 0;
   save({ lastCollected: todayStr(), streak: state.streak });
-  addJade(state.todayReward);
+  addBloodLotus(state.todayReward);
   return state.todayReward;
 }

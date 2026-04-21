@@ -93,7 +93,7 @@ export default function useReincarnationTree({ karma, spendKarma, lives = 0 } = 
       cultivSpeedMult:    purchased.has('al_1') ? 1.25 : 1,   // al_1 +25% qi/s
       keepRecipes:        purchased.has('al_2'),              // al_2 carry recipes
       offlineCapHours:    purchased.has('al_3') ? 16 : 8,     // al_3 8→16h
-      jadeOnRebirth:      purchased.has('al_4') ? 50 : 0,     // al_4 +50 jade
+      bloodLotusOnRebirth: purchased.has('al_4') ? 50 : 0,    // al_4 +50 Blood Lotus
       bankedRerollOnRebirth: purchased.has('al_4') ? 1 : 0,
       cultBuffOnRebirthSec:  purchased.has('al_k') ? 3600 : 0, // al_k 1h ×2 buff
 

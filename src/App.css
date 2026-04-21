@@ -728,7 +728,7 @@
   gap: 8px;
 }
 
-.sel-jade-balance {
+.sel-blood-lotus-balance {
   font-size: 12px;
   color: var(--text-muted);
 }
@@ -1440,7 +1440,7 @@
   overflow: hidden;
 }
 
-/* ── Top HUD bar — jade balance (left) + settings (right) ────────────────── */
+/* ── Top HUD bar — Blood Lotus balance (left) + settings (right) ────────────────── */
 .top-bar {
   /* Fixed at top like the navbar is fixed at bottom.
      padding-top absorbs the safe area (Dynamic Island / notch).
@@ -1459,7 +1459,7 @@
   z-index: 700;
 }
 
-.home-hud-jade {
+.home-hud-blood-lotus {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -1473,9 +1473,9 @@
   cursor: pointer;
   transition: background 0.15s;
 }
-.home-hud-jade:hover { background: rgba(245, 200, 66, 0.20); }
+.home-hud-blood-lotus:hover { background: rgba(245, 200, 66, 0.20); }
 
-.home-hud-jade-icon {
+.home-hud-blood-lotus-icon {
   width: 22px;
   height: 22px;
   image-rendering: pixelated;
@@ -3457,8 +3457,8 @@
 }
 
 .save-btn-active {
-  border-color: var(--jade);
-  color: var(--jade);
+  border-color: var(--blood-lotus);
+  color: var(--blood-lotus);
 }
 
 .save-btn .res-sub {
@@ -7302,7 +7302,7 @@
 /* ── Jade Shop Card ──────────────────────────────────────────────────────── */
 
 /* Floating card — anchored below the HUD, no overlay */
-.jade-shop-card {
+.blood-lotus-shop-card {
   position: fixed;
   top: 52px; /* just below the top HUD bar */
   left: 8px;
@@ -7318,35 +7318,35 @@
   flex-direction: column;
   gap: 14px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  animation: jade-shop-in 0.18s ease-out;
+  animation: blood-lotus-shop-in 0.18s ease-out;
 }
 
-@keyframes jade-shop-in {
+@keyframes blood-lotus-shop-in {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.jade-shop-header {
+.blood-lotus-shop-header {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.jade-shop-icon {
+.blood-lotus-shop-icon {
   width: 32px;
   height: 32px;
   image-rendering: pixelated;
   filter: brightness(1.3);
 }
 
-.jade-shop-title {
+.blood-lotus-shop-title {
   flex: 1;
   font-size: 18px;
   font-weight: 700;
   color: #f5c842;
 }
 
-.jade-shop-close {
+.blood-lotus-shop-close {
   background: none;
   border: none;
   color: #888;
@@ -7354,9 +7354,9 @@
   cursor: pointer;
   padding: 4px 8px;
 }
-.jade-shop-close:hover { color: #fff; }
+.blood-lotus-shop-close:hover { color: #fff; }
 
-.jade-shop-success {
+.blood-lotus-shop-success {
   background: rgba(80, 200, 120, 0.15);
   border: 1px solid rgba(80, 200, 120, 0.4);
   border-radius: 8px;
@@ -7366,7 +7366,7 @@
   text-align: center;
 }
 
-.jade-shop-error {
+.blood-lotus-shop-error {
   background: rgba(220, 80, 80, 0.15);
   border: 1px solid rgba(220, 80, 80, 0.4);
   border-radius: 8px;
@@ -7376,13 +7376,13 @@
   text-align: center;
 }
 
-.jade-shop-grid {
+.blood-lotus-shop-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.jade-shop-item {
+.blood-lotus-shop-item {
   position: relative;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(245, 200, 66, 0.2);
@@ -7395,14 +7395,14 @@
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
-.jade-shop-item:hover:not(:disabled) {
+.blood-lotus-shop-item:hover:not(:disabled) {
   background: rgba(245, 200, 66, 0.08);
   border-color: rgba(245, 200, 66, 0.5);
 }
-.jade-shop-item:disabled { opacity: 0.5; cursor: default; }
-.jade-shop-item-pending { opacity: 0.7; }
+.blood-lotus-shop-item:disabled { opacity: 0.5; cursor: default; }
+.blood-lotus-shop-item-pending { opacity: 0.7; }
 
-.jade-shop-badge {
+.blood-lotus-shop-badge {
   position: absolute;
   top: -8px;
   left: 50%;
@@ -7416,33 +7416,33 @@
   white-space: nowrap;
 }
 
-.jade-shop-item-icon {
+.blood-lotus-shop-item-icon {
   width: 36px;
   height: 36px;
   image-rendering: pixelated;
   filter: brightness(1.3);
 }
 
-.jade-shop-item-amount {
+.blood-lotus-shop-item-amount {
   font-size: 20px;
   font-weight: 800;
   color: #f5c842;
 }
 
-.jade-shop-item-label {
+.blood-lotus-shop-item-label {
   font-size: 11px;
   color: #aaa;
   text-align: center;
 }
 
-.jade-shop-item-price {
+.blood-lotus-shop-item-price {
   margin-top: 4px;
   font-size: 14px;
   font-weight: 700;
   color: #fff;
 }
 
-.jade-shop-restore {
+.blood-lotus-shop-restore {
   background: none;
   border: 1px solid rgba(255,255,255,0.15);
   border-radius: 8px;
@@ -7452,7 +7452,7 @@
   cursor: pointer;
   transition: color 0.15s;
 }
-.jade-shop-restore:hover { color: #ccc; }
+.blood-lotus-shop-restore:hover { color: #ccc; }
 
 /* ─── Achievements HUD button ───────────────────────────────────────────────── */
 
@@ -9371,3 +9371,6 @@
   transition: background 0.15s;
 }
 .et-editor-save:hover { background: rgba(0, 200, 100, 0.28); }
+
+
+

@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import NavBar from './components/NavBar';
 import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
-import JadeShopModal from './components/JadeShopModal';
-import { addJade as addJadeBalance } from './systems/jade';
+import BloodLotusShopModal from './components/BloodLotusShopModal';
+import { addBloodLotus as addBloodLotusBalance } from './systems/bloodLotus';
 import AchievementsModal from './components/AchievementsModal';
 import JourneyModal from './components/JourneyModal';
 import DailyBonusModal from './components/DailyBonusModal';
@@ -467,9 +467,9 @@ function App() {
         try { localStorage.setItem('mai_discovered_pills', recipeSnapshot); } catch {}
       }
 
-      // al_4 Bloodline Vigor — +50 jade + 1 banked Selection re-roll.
-      if (treeMods.jadeOnRebirth > 0) {
-        addJadeBalance(treeMods.jadeOnRebirth);
+      // al_4 Bloodline Vigor — +50 Blood Lotus + 1 banked Selection re-roll.
+      if (treeMods.bloodLotusOnRebirth > 0) {
+        addBloodLotusBalance(treeMods.bloodLotusOnRebirth);
       }
       if (treeMods.bankedRerollOnRebirth > 0) {
         try {
@@ -542,7 +542,7 @@ function App() {
         />
       )}
       <TopBar
-        jadeBalance={selections.jadeBalance}
+        bloodLotusBalance={selections.bloodLotusBalance}
         onOpenShop={() => openModal('shop')}
         onOpenJourney={() => openModal('journey')}
         onOpenAchievements={() => openModal('achievements', () => setHasNewAch(false))}
@@ -573,7 +573,7 @@ function App() {
       {selectionModalOpen && selections.pending[0] && currentScreen === 'home' && (
         <SelectionModal
           selection={selections.pending[0]}
-          jadeBalance={selections.jadeBalance}
+          bloodLotusBalance={selections.bloodLotusBalance}
           onPick={selections.pickOption}
           onRerollOne={selections.rerollOne}
           onPickLaw={selections.pickLaw}
@@ -589,7 +589,7 @@ function App() {
         />
       )}
       {activeModal === 'settings'     && <SettingsScreen onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
-      {activeModal === 'shop'         && <JadeShopModal  onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} onBalanceChange={null} />}
+      {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} onBalanceChange={null} />}
       {activeModal === 'journey'      && <JourneyModal   realmIndex={cultivation.realmIndex} onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
       {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
       {activeModal === 'daily' && (

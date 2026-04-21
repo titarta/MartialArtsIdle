@@ -3,7 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 const BASE = import.meta.env.BASE_URL;
 
 export default function TopBar({
-  jadeBalance,
+  bloodLotusBalance,
   onOpenShop,
   onOpenJourney,
   onOpenAchievements,
@@ -18,17 +18,17 @@ export default function TopBar({
   return (
     <div className="top-bar">
       <button
-        className={`home-hud-jade${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-blood-lotus${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenShop}
         aria-label="Blood Lotus Shop"
       >
         <img
           src={`${BASE}sprites/items/blood_lotus.png`}
-          className="home-hud-jade-icon"
+          className="home-hud-blood-lotus-icon"
           alt=""
           draggable="false"
         />
-        <span className="home-hud-jade-amount">{jadeBalance ?? 0}</span>
+        <span className="home-hud-blood-lotus-amount">{bloodLotusBalance ?? 0}</span>
       </button>
       {realmName && (
         <div className="topbar-realm">
