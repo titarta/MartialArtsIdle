@@ -444,12 +444,15 @@ function HomeScreen({
           <BreakthroughBanner
             key={majorBreakthrough?.id ?? 'none'}
             event={majorBreakthrough}
-            onDone={clearMajorBreakthrough}
+            onDone={() => {
+              clearMajorBreakthrough();
+              if (selections?.pendingCount > 0) onOpenSelections?.();
+            }}
           />
 
           {/* ── Top-left chip stack — priority order: rewards → no law → idle ── */}
           <div className="home-chips-tl">
-            {selections?.pendingCount > 0 && (
+            {selections?.pendingCount > 0 && !majorBreakthrough && (
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>
                 <span className="home-sel-btn-label">

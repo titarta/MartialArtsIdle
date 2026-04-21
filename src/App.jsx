@@ -156,24 +156,21 @@ function App() {
   // Auto-open selection modal only when pendingCount increases mid-session
   // (i.e. a real level-up just happened). Skip on load so players aren't
   // greeted by the modal immediately — the notification badge is enough.
-  // On major breakthroughs the banner animation plays for 2600ms, so delay
-  // the modal until the animation finishes rather than popping over it.
-  const prevPendingRef    = useRef(null);
-  const selModalTimerRef  = useRef(null);
+  // Law entries come from major breakthroughs; the BreakthroughBanner fires
+  // onOpenSelections in its onDone callback once the animation finishes, so
+  // we must NOT auto-open here for those — only open for minor perk cards.
+  const prevPendingRef = useRef(null);
   useEffect(() => {
     const prev = prevPendingRef.current;
     prevPendingRef.current = selections.pendingCount;
     if (prev === null) return; // first render — treat as load, don't open
     if (selections.pendingCount > prev && currentScreen === 'home') {
-      if (cultivation.majorBreakthrough) {
-        clearTimeout(selModalTimerRef.current);
-        selModalTimerRef.current = setTimeout(() => setSelectionModalOpen(true), 2600);
-      } else {
+      const newItem = selections.pending[selections.pending.length - 1];
+      if (newItem?.kind !== 'law') {
         setSelectionModalOpen(true);
       }
     }
   }, [selections.pendingCount]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => () => clearTimeout(selModalTimerRef.current), []);
 
   // Keep selection qi speed mult in sync with cultivation game loop
   useEffect(() => {
