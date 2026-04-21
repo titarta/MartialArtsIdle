@@ -597,7 +597,8 @@ function App() {
         onDismiss={notifications.dismissToast}
         onNavigate={navigate}
       />
-      {selectionModalOpen && selections.pending[0] && currentScreen === 'home' && (
+      {selectionModalOpen && selections.pending[0] && currentScreen === 'home' &&
+       !(cultivation.majorBreakthrough && selections.pending[0]?.kind === 'law') && (
         <SelectionModal
           selection={selections.pending[0]}
           bloodLotusBalance={selections.bloodLotusBalance}
