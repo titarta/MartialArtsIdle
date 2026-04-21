@@ -1,3 +1,11 @@
+/* ─── Hide scrollbars globally — scrolling still works ───────────────────── */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─── Graphics settings ──────────────────────────────────────────────────── */
 
 .vfx-disabled .home-qi-particles,
