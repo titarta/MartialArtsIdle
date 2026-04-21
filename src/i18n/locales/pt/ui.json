@@ -65,7 +65,7 @@
 
   "worlds": {
     "title":     "Mundos",
-    "tabWorld":  "Mundo",
+    "tabCombat": "Combate",
     "tabGather": "Coleta",
     "tabMine":   "Minerar",
     "worldCard": "Mundo {{n}}",

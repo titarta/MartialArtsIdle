@@ -73,7 +73,7 @@ function LootBanner({ pendingGains, onCollect }) {
   );
 }
 
-const TAB_ACTIVITY = { world: 'combat', gather: 'gathering', mine: 'mining' };
+const TAB_ACTIVITY = { combat: 'combat', gather: 'gathering', mine: 'mining' };
 const ACTIVITY_ICON = { combat: '⚔', gathering: '🌿', mining: '⛏' };
 
 function RegionRow({ region, tab, locked, lockHint, combatLocked, onNavigate, worldId,
@@ -82,7 +82,7 @@ function RegionRow({ region, tab, locked, lockHint, combatLocked, onNavigate, wo
   const { t } = useTranslation('ui');
   const { t: tGame }  = useTranslation('game');
 
-  const isWorld = tab === 'world';
+  const isWorld = tab === 'combat';
 
   // Deduplicate enemy IDs (a pool may have the same enemy at different weights).
   const enemyIds = isWorld
@@ -268,12 +268,12 @@ function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavig
         <div className="region-list">
           {world.regions.map((region, regionIndex) => {
             const realmLocked    = realmIndex < region.minRealmIndex;
-            const activityLocked = !realmLocked && tab !== 'world'
+            const activityLocked = !realmLocked && tab !== 'combat'
               && !clearedRegions.has(region.name);
             const isLocked   = realmLocked || activityLocked;
             const lockHint   = activityLocked ? 'Clear this region in combat first' : undefined;
             const activity   = TAB_ACTIVITY[tab];
-            const canIdle    = !realmLocked && clearedRegions.has(region.name) && tab !== 'world';
+            const canIdle    = !realmLocked && clearedRegions.has(region.name) && tab !== 'combat';
             const isIdling   = idleAssignment?.activity === activity
                             && idleAssignment?.worldIndex === worldIndex
                             && idleAssignment?.regionIndex === regionIndex;
@@ -310,7 +310,7 @@ function WorldCard({ world, worldIndex, tab, realmIndex, clearedRegions, onNavig
 function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clearedRegions, idleAssignment, lastIdleAssignment, onSetIdle,
                         pendingGains, hasPendingGains, onCollectGains, inventory, techniques }) {
   const { t } = useTranslation('ui');
-  const [tab, setTab] = useState(activeTab ?? 'world');
+  const [tab, setTab] = useState(activeTab ?? 'combat');
   const realmIndex = cultivation.realmIndex;
   const cleared    = clearedRegions ?? new Set();
 
@@ -328,10 +328,10 @@ function WorldsScreen({ cultivation, onNavigate, expandWorldId, activeTab, clear
 
       <div className="worlds-tab-bar">
         <button
-          className={`worlds-tab-btn worlds-tab-combat${tab === 'world' ? ' active' : ''}`}
-          onClick={() => setTab('world')}
+          className={`worlds-tab-btn worlds-tab-combat${tab === 'combat' ? ' active' : ''}`}
+          onClick={() => setTab('combat')}
         >
-          ⚔ {t('worlds.tabWorld')}
+          ⚔ {t('worlds.tabCombat')}
         </button>
         <div className="worlds-tab-resource-row">
           <button

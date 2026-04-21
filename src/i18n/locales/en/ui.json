@@ -71,7 +71,7 @@
   },
   "worlds": {
     "title": "Worlds",
-    "tabWorld": "World",
+    "tabCombat": "Combat",
     "tabGather": "Gather",
     "tabMine": "Mine",
     "worldCard": "World {{n}}",
