@@ -213,6 +213,10 @@ export default function useCultivation() {
   const treeHeavenlyMultRef = useRef(1);
   // Crystal flat qi/sec bonus — written by App.jsx from useQiCrystal.crystalQiBonus
   const crystalQiBonusRef  = useRef(0);
+  // Artefact-derived qi_speed multiplier — written by App.jsx from the
+  // merged artefact bundle (FLAT/BASE_FLAT/INCREASED/MORE collapsed through
+  // the five-layer formula with base=1). 1 = inactive.
+  const artefactQiMultRef  = useRef(1);
   // Heavenly QI multiplier from artefacts (and any future modifier source).
   // Decimal: 0.30 = +30% on top of the ad boost. Only applies while the ad
   // boost is live. Stacks multiplicatively with the reincarnation tree node.
@@ -290,6 +294,7 @@ export default function useCultivation() {
         const heavenlyTree = adBoostRef.current > 1 ? treeHeavenlyMultRef.current : 1;
         const heavenlyArt  = adBoostRef.current > 1 ? (1 + heavenlyQiMultRef.current) : 1;
         const rate = (BASE_RATE + crystalQiBonusRef.current) * lawMult * qiUniqueMult *
+          artefactQiMultRef.current *
           boostMult *
           adBoostRef.current * heavenlyTree * heavenlyArt *
           pillQiMultRef.current * selectionQiMultRef.current *
@@ -415,6 +420,8 @@ export default function useCultivation() {
     selectionQiMultRef,
     // QI Crystal flat bonus ref — updated by App.jsx from useQiCrystal
     crystalQiBonusRef,
+    // Artefact qi_speed aggregate ref — updated by App.jsx each second
+    artefactQiMultRef,
     // Artefact heavenly_qi_mult ref — updated by App.jsx from getFullStats
     heavenlyQiMultRef,
     // Reincarnation tree refs — updated by App.jsx each render

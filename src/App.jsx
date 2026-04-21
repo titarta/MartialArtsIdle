@@ -232,6 +232,13 @@ function App() {
       return out;
     };
     const scaledArtefactMods = scaleArtefactBundle(artefacts?.getStatModifiers?.() ?? {});
+    // Collapse artefact-only qi_speed mods into a single multiplier fed to
+    // the cultivation tick. Law-unique qi_speed is handled inside cultivation
+    // directly, so it is NOT included here (double-count guard).
+    const artefactQiMods = scaledArtefactMods.qi_speed ?? [];
+    const artefactQiMult = artefactQiMods.length > 0
+      ? computeStat(1, artefactQiMods)
+      : 1;
 
     // cb_is Inherited Strength — +25% to the active law's typeMults. Mutates
     // a shallow clone so the real law definition isn't touched.
@@ -315,6 +322,9 @@ function App() {
       buffEffectMult:   collapsePct('buff_effect'),
       // Heavenly QI multiplier (artefact rings) — only applies during ad boost.
       heavenlyQiMult:   collapsePct('heavenly_qi_mult'),
+      // Artefact-derived qi_speed aggregate — mirrored to useCultivation so
+      // affix rolls affect the live cultivation rate.
+      artefactQiMult,
       // Reincarnation tree exposures consumed by autoFarm / combat / selections.
       maxOfflineHours:        tree.modifiers.offlineCapHours,
       cooldownMult:           tree.modifiers.cooldownMult ?? 1,
@@ -345,9 +355,12 @@ function App() {
       if (cultivation.heavenlyQiMultRef) {
         cultivation.heavenlyQiMultRef.current = full.heavenlyQiMult ?? 0;
       }
+      if (cultivation.artefactQiMultRef) {
+        cultivation.artefactQiMultRef.current = full.artefactQiMult ?? 1;
+      }
     }, 1000);
     return () => clearInterval(id);
-  }, [cultivation.focusMultRef, cultivation.heavenlyQiMultRef, getFullStats]);
+  }, [cultivation.focusMultRef, cultivation.heavenlyQiMultRef, cultivation.artefactQiMultRef, getFullStats]);
 
   // Auto-farm — stat getter reads live refs so the hook never triggers re-renders
   const autoFarm = useAutoFarm({
