@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { QUALITY, getSlotBonuses } from '../data/artefacts';
 import { AFFIX_UNIQUE_COLOR, formatAffixValue } from '../data/affixDisplay';
@@ -16,7 +17,10 @@ export default function ArtefactTooltip({ artefact, affixes, style }) {
   const baseBonuses = getSlotBonuses(artefact.slot, artefact.rarity);
   const artName = artefact.name;
 
-  return (
+  // Portal to document.body so ancestors using `transform` / `filter` (the
+  // mobile bottom-sheet picker) don't trap a position:fixed tooltip inside
+  // their containing block.
+  const content = (
     <div className="art-tooltip" style={style}>
       <span className="art-tooltip-name" style={{ color: quality?.color }}>{artName}</span>
       <span className="art-tooltip-quality" style={{ color: quality?.color }}>
@@ -44,6 +48,7 @@ export default function ArtefactTooltip({ artefact, affixes, style }) {
       )}
     </div>
   );
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : content;
 }
 
 /**
