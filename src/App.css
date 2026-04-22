@@ -860,7 +860,7 @@ html, body, * {
 .home-sel-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   padding: 5px 12px;
   background: linear-gradient(135deg,
     rgba(146, 64,  14, 0.85),
@@ -878,7 +878,7 @@ html, body, * {
   transition: transform 0.15s;
 }
 .home-sel-btn:hover { transform: scale(1.04); }
-.home-sel-btn-icon  { font-size: 13px; }
+.home-sel-btn-icon  { font-size: 12px; }
 .home-sel-btn-label { white-space: nowrap; }
 
 /* Law chip — muted teal variant so it reads as lower urgency than rewards */
@@ -899,13 +899,13 @@ html, body, * {
 .home-idle-chip {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 6px;
+  padding: 5px 12px;
   background: linear-gradient(135deg, rgba(20, 80, 30, 0.82), rgba(30, 100, 50, 0.82));
   border: 1px solid rgba(80, 200, 100, 0.40);
   border-radius: 20px;
   color: rgba(180, 255, 190, 0.92);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -914,7 +914,7 @@ html, body, * {
   transition: transform 0.15s;
 }
 .home-idle-chip:hover { transform: scale(1.04); }
-.home-idle-chip-icon  { font-size: 11px; }
+.home-idle-chip-icon  { font-size: 12px; }
 .home-idle-chip-label { white-space: nowrap; }
 
 /* Character Screen tabs */
@@ -1958,13 +1958,13 @@ html, body, * {
 .daily-widget {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+  gap: 6px;
+  padding: 5px 12px;
   border-radius: 20px;
   background: linear-gradient(135deg, rgba(160, 60, 80, 0.72), rgba(100, 20, 40, 0.78));
   border: 1px solid rgba(220, 80, 100, 0.45);
   color: rgba(255, 200, 210, 0.92);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -1978,9 +1978,9 @@ html, body, * {
   box-shadow: 0 0 18px rgba(220, 60, 80, 0.55);
 }
 .daily-widget:hover { transform: scale(1.04); }
-.daily-widget-icon { width: 13px; height: 13px; object-fit: contain; flex-shrink: 0; }
+.daily-widget-icon { width: 12px; height: 12px; object-fit: contain; flex-shrink: 0; }
 .daily-widget-text { white-space: nowrap; }
-.daily-widget-day  { font-size: 9px; opacity: 0.72; white-space: nowrap; }
+.daily-widget-day  { font-size: 10px; opacity: 0.72; white-space: nowrap; }
 .daily-widget-badge {
   position: absolute;
   top: -3px; right: -3px;
