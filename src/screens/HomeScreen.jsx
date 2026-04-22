@@ -337,6 +337,7 @@ function HomeScreen({
   crystal, isCrystalUnlocked,
   dailyBonus, onOpenDailyBonus,
   lastIdleAssignment,
+  openCrystal,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -394,6 +395,7 @@ function HomeScreen({
 
   // ── Crystal feed modal ───────────────────────────────────────────────────
   const [crystalModalOpen, setCrystalModalOpen] = useState(false);
+  useEffect(() => { if (openCrystal && isCrystalUnlocked) setCrystalModalOpen(true); }, [openCrystal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Pill drawer ──────────────────────────────────────────────────────────
   const [pillDrawerOpen, setPillDrawerOpen] = useState(false);
