@@ -105,6 +105,8 @@ export function simulateGathering(seconds, region, stats = null) {
   const tierUpChance = stats?.gatherMineRarityUpChance ?? 0;
   const capped       = Math.min(seconds, (stats?.maxOfflineHours ?? MAX_OFFLINE_HOURS) * 3600);
   const totalW       = activePools.reduce((s, d) => s + d.chance, 0);
+  // Artefact `all_loot_bonus` — scales every yielded qty uniformly.
+  const lootMult     = 1 + Math.max(0, stats?.allLootBonusPct ?? 0);
 
   const result = {};
   let cyclesPerSec = 0; // accumulated for bonus-drop rate
@@ -123,8 +125,9 @@ export function simulateGathering(seconds, region, stats = null) {
     if (cycles === 0) continue;
 
     for (let i = 0; i < cycles; i++) {
-      const qty = rollQty(drop.qty ?? [1, 1])
-                + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      let qty = rollQty(drop.qty ?? [1, 1])
+              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      qty = Math.max(1, Math.floor(qty * lootMult));
       let dropId = drop.itemId;
       if (killBumpRemaining > 0) {
         dropId = nextRarityItemId(dropId);
@@ -189,6 +192,7 @@ export function simulateMining(seconds, region, stats = null) {
   const tierUpChance = stats?.gatherMineRarityUpChance ?? 0;
   const capped       = Math.min(seconds, (stats?.maxOfflineHours ?? MAX_OFFLINE_HOURS) * 3600);
   const totalW       = activePools.reduce((s, d) => s + d.chance, 0);
+  const lootMult     = 1 + Math.max(0, stats?.allLootBonusPct ?? 0);
 
   const result = {};
   let cyclesPerSec = 0;
@@ -204,8 +208,9 @@ export function simulateMining(seconds, region, stats = null) {
     if (cycles === 0) continue;
 
     for (let i = 0; i < cycles; i++) {
-      const qty = rollQty(drop.qty ?? [1, 1])
-                + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      let qty = rollQty(drop.qty ?? [1, 1])
+              + (luckPct > 0 && Math.random() * 100 < luckPct ? 1 : 0);
+      qty = Math.max(1, Math.floor(qty * lootMult));
       let dropId = drop.itemId;
       if (killBumpRemaining > 0) {
         dropId = nextRarityItemId(dropId);

@@ -195,7 +195,16 @@ export default function useCultivation() {
       }
     } catch {}
 
-    const baseRate = BASE_RATE * lawMult * offlineQiMult * (1 + pillQiSpeedBonus);
+    // Artefact `offline_qi_mult` (a_visionary_mind). Stored under its own
+    // localStorage snapshot so offline calc (which runs before React mounts)
+    // can still read it — see App.jsx where it mirrors the scalar.
+    let artefactOfflineMult = 1;
+    try {
+      const raw = localStorage.getItem('mai_artefact_offline_snapshot');
+      if (raw) artefactOfflineMult = JSON.parse(raw).offlineQiMult ?? 1;
+    } catch {}
+
+    const baseRate = BASE_RATE * lawMult * offlineQiMult * artefactOfflineMult * (1 + pillQiSpeedBonus);
     const total = baseRate * awaySeconds;
 
     return Math.floor(total);

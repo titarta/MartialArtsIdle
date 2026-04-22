@@ -6,6 +6,7 @@ import {
 } from '../data/affixPools';
 import { generateArtefactName, formatArtefactName } from '../data/artefactNames';
 import { rerollArtefactUniqueValue } from '../data/uniqueModifiers';
+import { evaluateArtefactUniques } from '../systems/artefactEngine';
 
 const SAVE_KEY = 'mai_artefacts';
 // Bump whenever the artefact schema changes in a way existing saves can't
@@ -316,28 +317,60 @@ export default function useArtefacts() {
     });
   }, []);
 
-  // Build the modifiers object expected by computeAllStats.
-  const getStatModifiers = useCallback(() => {
-    const mods = {};
+  // Collect the equipped artefact instances once so both stat and flag
+  // builders iterate the same working set.
+  const collectEquippedInstances = useCallback(() => {
+    const out = [];
     for (const [, uid] of Object.entries(state.equipped)) {
       if (!uid) continue;
       const instance = state.owned.find(o => o.uid === uid);
-      if (!instance) continue;
+      if (instance) out.push(instance);
+    }
+    return out;
+  }, [state]);
+
+  // Build the modifiers object expected by computeAllStats.
+  //
+  // Three contribution layers are merged:
+  //   1. Slot bonuses (type-based catalogue defaults)
+  //   2. Normal (non-unique) affixes from transmutation
+  //   3. Unique affixes resolved through artefactEngine → declarative effects
+  //
+  // Layer 3 means equipped unique affixes now actually influence stats — the
+  // old filter (`if (affix.unique) continue;`) is gone for entries that have
+  // a corresponding entry in ARTEFACT_UNIQUE_EFFECTS.
+  const getStatModifiers = useCallback(() => {
+    const mods = {};
+    const equippedInstances = collectEquippedInstances();
+    for (const instance of equippedInstances) {
       const art = resolveInstance(instance);
       if (!art) continue;
       for (const bonus of getSlotBonuses(art.slot, art.rarity)) {
         (mods[bonus.stat] ??= []).push({ type: bonus.type, value: bonus.value });
       }
-      // Include per-instance affixes from transmutation. Uniques are
-      // presentation-only for now — they carry a description but no
-      // (stat, type, value) triple, so skip them here.
       for (const affix of (instance.affixes ?? [])) {
         if (affix.unique || !affix.stat) continue;
         (mods[affix.stat] ??= []).push({ type: affix.type, value: affix.value });
       }
     }
+    // Layer 3: unique affix effects.
+    const { statMods } = evaluateArtefactUniques(equippedInstances);
+    for (const [stat, list] of Object.entries(statMods)) {
+      (mods[stat] ??= []).push(...list);
+    }
     return mods;
-  }, [state]);
+  }, [collectEquippedInstances]);
+
+  /**
+   * Flag bag produced by unique affixes. Combat / cultivation / autofarm
+   * screens read this to drive conditional effects (executeBonus, phoenix
+   * revive, first-attack crit, loot bonus, etc.).
+   */
+  const getUniqueFlags = useCallback(() => {
+    const equippedInstances = collectEquippedInstances();
+    const { artefactFlags } = evaluateArtefactUniques(equippedInstances);
+    return artefactFlags;
+  }, [collectEquippedInstances]);
 
   return {
     owned:          state.owned,
@@ -354,5 +387,6 @@ export default function useArtefacts() {
     equippedInSlot,
     dismantleArtefact,
     getStatModifiers,
+    getUniqueFlags,
   };
 }

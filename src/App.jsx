@@ -212,7 +212,11 @@ function App() {
     // hw_4 Soul Crucible — multiply every pill-derived mod value by 1.25.
     // Multiplies the raw flat / increased / more values themselves so the
     // scaling shows up as a simple post-roll boost on the existing pill mods.
-    const pillMult = tree?.modifiers?.pillEffectMult ?? 1;
+    // Artefact uniques (a_alchemist_hands / a_sage_belt / a_alchemy_ring)
+    // stack multiplicatively with the tree bonus.
+    const artefactMods = artefacts?.getStatModifiers?.() ?? {};
+    const artefactPillPct = (artefactMods.pill_effect_mult ?? []).reduce((s, m) => s + (m.value ?? 0), 0);
+    const pillMult = (tree?.modifiers?.pillEffectMult ?? 1) * (1 + artefactPillPct);
     const scalePillBundle = (mods) => {
       if (!mods || pillMult === 1) return mods ?? {};
       const out = {};
@@ -242,7 +246,39 @@ function App() {
       }
       return out;
     };
-    const scaledArtefactMods = scaleArtefactBundle(artefacts?.getStatModifiers?.() ?? {});
+    const scaledArtefactMods = scaleArtefactBundle(artefactMods);
+
+    // ── Realm / body-conversion late-bound unique stat mods ───────────────
+    // A handful of artefact uniques express their stat contribution as a
+    // function of the player's realm or another primary stat. They live as
+    // flags on the engine output but we need the realmIndex (only known
+    // here) to expand them into concrete modifiers. We push the resulting
+    // entries directly into the scaledArtefactMods bundle so they flow
+    // through the usual merge path below.
+    const artefactFlagsNow = artefacts?.getUniqueFlags?.() ?? {};
+    const majorRealm = Math.floor(realmIndex / 3);
+    const pushScaledMod = (stat, value) => {
+      if (!value) return;
+      (scaledArtefactMods[stat] ??= []).push({ type: 'increased', value });
+    };
+    if (artefactFlagsNow.allStatsPerRealmPct) {
+      const v = (artefactFlagsNow.allStatsPerRealmPct / 100) * realmIndex;
+      pushScaledMod('all_primary_stats', v);
+    }
+    if (artefactFlagsNow.allStatsPerMajorRealmPct) {
+      const v = (artefactFlagsNow.allStatsPerMajorRealmPct / 100) * majorRealm;
+      pushScaledMod('all_primary_stats', v);
+    }
+    if (artefactFlagsNow.bodyToEssencePct) {
+      // body → essence conversion (a_essence_belt). Snapshot the existing
+      // body increased-sum as the conversion base. Approximates a true
+      // cross-stat conversion via a flat essence bonus.
+      const bodyBase = 20; // matches BASE_BODY in stats.js
+      pushScaledMod('essence', (artefactFlagsNow.bodyToEssencePct / 100));
+      // Compensate by reducing body by the same fraction.
+      (scaledArtefactMods.body ??= []).push({ type: 'increased', value: -(artefactFlagsNow.bodyToEssencePct / 100) });
+      void bodyBase;
+    }
     // Collapse artefact-only qi_speed mods into a single multiplier fed to
     // the cultivation tick. Law-unique qi_speed is handled inside cultivation
     // directly, so it is NOT included here (double-count guard).
@@ -318,11 +354,14 @@ function App() {
         default_attack_damage:  collapsePct('default_attack_damage'),
         pools:                  poolDamage,
       },
-      // Activity stats — needed by autoFarm + Gathering/Mining screens
+      // Activity stats — needed by autoFarm + Gathering/Mining screens.
+      // Artefact `loot_luck` (a_lucky_ring) boosts both luck pools equally
+      // so one ring covers gather + mine; `all_loot_bonus` (a_seer_locket)
+      // feeds into qty multipliers downstream via getAllLootBonus below.
       harvestSpeed: bundle.activity.harvestSpeed,
-      harvestLuck:  bundle.activity.harvestLuck,
+      harvestLuck:  bundle.activity.harvestLuck   + collapseFlat('loot_luck'),
       miningSpeed:  bundle.activity.miningSpeed,
-      miningLuck:   bundle.activity.miningLuck,
+      miningLuck:   bundle.activity.miningLuck    + collapseFlat('loot_luck'),
       focusMult:    bundle.activity.focusMult,
       // Combat-only
       exploitChance: bundle.combat.exploitChance,
@@ -336,6 +375,31 @@ function App() {
       buffDurationMult: 1 + collapsePct('buff_duration'),
       // Scales magnitude (defMult / dodgeChance) at cast time.
       buffEffectMult:   collapsePct('buff_effect'),
+      // ── Artefact-derived extras ───────────────────────────────────────
+      critChance:             collapseFlat('crit_chance'),            // 0–100
+      critDamagePct:          collapseFlat('crit_damage'),            // % over 100
+      lifestealPct:           collapseFlat('lifesteal'),              // 0–100
+      dodgeChancePct:         collapseFlat('dodge_chance'),           // 0–100
+      dodgeFatalChancePct:    collapseFlat('dodge_fatal_chance'),     // 0–100
+      ignoreDefensePct:       collapseFlat('ignore_defense_pct'),     // 0–100
+      ignoreDefenseChancePct: collapseFlat('ignore_defense_chance'),  // 0–100
+      reflectPct:             collapseFlat('reflect_pct'),            // 0–100
+      healingReceivedPct:     collapsePct('healing_received'),        // 0–1 (30% → 0.30)
+      cooldownReductionPct:   Math.min(0.8, collapsePct('cooldown_reduction_all')
+                                         + collapsePct('technique_cd_reduction')
+                                         + collapsePct('attack_cd_reduction')),
+      freeCastChancePct:      collapseFlat('tech_free_cast_chance'),  // 0–100
+      critTwiceChancePct:     collapseFlat('crit_twice_chance'),      // 0–100
+      hpRegenInCombatPct:     collapsePct('hp_regen_in_combat'),      // fraction of maxHP / sec
+      hpRegenOutCombatPct:    collapsePct('hp_regen_out_combat'),     // fraction of maxHP / sec
+      offlineQiMult:          1 + collapsePct('offline_qi_mult'),     // 1 + 0.30 = 1.30
+      pillEffectArtefactMult: 1 + collapsePct('pill_effect_mult'),    // stacked with tree in App
+      craftingCostReduction:  Math.min(0.75, collapsePct('crafting_cost_reduction')),
+      allLootBonusPct:        collapsePct('all_loot_bonus'),          // 0–1
+      lootLuckPct:            collapseFlat('loot_luck'),              // 0–100
+      // Raw flag bag from artefactEngine (merged with other sources below
+      // so combat only needs to look at one place).
+      artefactFlags:          artefacts?.getUniqueFlags?.() ?? {},
       // Heavenly QI multiplier (artefact rings) — only applies during ad boost.
       heavenlyQiMult:   collapsePct('heavenly_qi_mult'),
       // Artefact-derived qi_speed aggregate — mirrored to useCultivation so
@@ -355,6 +419,9 @@ function App() {
       // it explicitly when it consumes a bump (see useAutoFarm tick).
       huntBumpsPendingRef:    combat.huntBumpsPendingRef,
       damageMult:             tree.modifiers.damageMult ?? 1,
+      // Context useCombat needs to evaluate artefact conditional flags.
+      realmIndex,
+      equippedArtefactCount:  Object.values(artefacts?.equipped ?? {}).filter(Boolean).length,
     };
   }, [cultivation, artefacts, pills, selections, tree]);
 
@@ -374,6 +441,13 @@ function App() {
       if (cultivation.artefactQiMultRef) {
         cultivation.artefactQiMultRef.current = full.artefactQiMult ?? 1;
       }
+      // Mirror the artefact offline-qi multiplier to localStorage so that
+      // useCultivation's offline bootstrap (runs before React mounts) can
+      // still read it. Small snapshot, written once a second.
+      try {
+        localStorage.setItem('mai_artefact_offline_snapshot',
+          JSON.stringify({ offlineQiMult: full.offlineQiMult ?? 1 }));
+      } catch {}
     }, 1000);
     return () => clearInterval(id);
   }, [cultivation.focusMultRef, cultivation.heavenlyQiMultRef, cultivation.artefactQiMultRef, getFullStats]);
