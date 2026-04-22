@@ -571,10 +571,13 @@ function App() {
   return (
     <div className="app" style={{ '--screen-bg-url': `url(${BASE}backgrounds/ui_screens.png)` }}>
       {currentScreen !== 'home' && (
-        <div
-          className="app-bg"
-          style={{ '--app-bg-url': `url(${BASE}backgrounds/default_bg.png)` }}
-        />
+        <>
+          <div
+            className="app-bg"
+            style={{ '--app-bg-url': `url(${BASE}backgrounds/default_bg.png)` }}
+          />
+          <div className="app-vignette" />
+        </>
       )}
       <TopBar
         bloodLotusBalance={selections.bloodLotusBalance}

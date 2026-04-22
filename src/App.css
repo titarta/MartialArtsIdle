@@ -64,6 +64,17 @@ html, body, * {
   pointer-events: none;
 }
 
+/* Top + bottom vignette for non-home screens — sits above the blurred bg, below content */
+.app-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0) 26%),
+    linear-gradient(to top,    rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 22%);
+}
+
 /* Bottom Tab Bar */
 .navbar {
   display: flex;
@@ -2079,6 +2090,17 @@ html, body, * {
   min-height: 0;
   position: relative;
   padding-bottom: 10px;
+}
+.home-scene::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 6;
 }
 .home-scene::after {
   content: '';
