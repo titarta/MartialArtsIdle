@@ -795,32 +795,47 @@ html, body, * {
 .augment-reroll {
   align-self: center;
   margin: 0 0 8px;
-  padding: 3px 9px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 12px;
+  background: rgba(245, 200, 66, 0.10);
+  border: 1px solid rgba(245, 200, 66, 0.32);
   border-radius: 20px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(245, 200, 66, 0.72);
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   cursor: pointer;
-  transition: color 0.12s, border-color 0.12s, background 0.12s;
+  transition: color 0.15s, border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .augment-reroll:hover:not(:disabled) {
-  color: var(--cat-color);
-  border-color: var(--cat-color);
-  background: color-mix(in srgb, var(--cat-color) 15%, transparent);
-  box-shadow: 0 0 8px color-mix(in srgb, var(--cat-color) 40%, transparent);
+  color: #f5c842;
+  border-color: rgba(245, 200, 66, 0.65);
+  background: rgba(245, 200, 66, 0.18);
+  box-shadow: 0 0 10px rgba(245, 200, 66, 0.28);
 }
 .augment-reroll:active:not(:disabled) {
   transform: scale(0.94);
 }
-.augment-reroll-disabled { opacity: 0.3; cursor: not-allowed; }
+/* Free reroll — jade tint signals no cost */
+.augment-reroll-free {
+  background: rgba(20, 170, 150, 0.12);
+  border-color: rgba(45, 180, 160, 0.38);
+  color: rgba(167, 243, 232, 0.75);
+}
+.augment-reroll-free:hover:not(:disabled) {
+  color: #a7f3e8;
+  border-color: rgba(45, 180, 160, 0.65);
+  background: rgba(20, 170, 150, 0.22);
+  box-shadow: 0 0 10px rgba(20, 170, 150, 0.28);
+}
+.augment-reroll-disabled { opacity: 0.28; cursor: not-allowed; }
 
 /* ── Footer ─────────────────────────────────────────────────────────────────── */
 .sel-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .sel-blood-lotus-balance {
@@ -829,16 +844,56 @@ html, body, * {
 }
 
 .sel-skip-btn {
-  padding: 6px 14px;
+  padding: 7px 18px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: 13px;
+  font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.12s, color 0.12s;
+  transition: border-color 0.15s, color 0.15s;
 }
-.sel-skip-btn:hover { border-color: rgba(255,255,255,0.25); color: #fff; }
+.sel-skip-btn:hover {
+  border-color: rgba(255,255,255,0.28);
+  color: var(--text-secondary);
+}
+.sel-skip-btn:active { transform: scale(0.96); }
+
+/* Law selection — reroll button (amber gradient, matches home reward chip aesthetic) */
+.sel-reroll-btn {
+  padding: 7px 20px;
+  background: linear-gradient(135deg, rgba(146, 64, 14, 0.55), rgba(180, 100, 0, 0.55));
+  border: 1px solid rgba(217, 119, 6, 0.60);
+  border-radius: 10px;
+  color: #fde68a;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.sel-reroll-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(180, 80, 15, 0.75), rgba(217, 130, 0, 0.75));
+  border-color: rgba(245, 160, 30, 0.85);
+  box-shadow: 0 0 14px rgba(217, 119, 6, 0.38);
+  transform: translateY(-1px);
+}
+.sel-reroll-btn:active:not(:disabled) { transform: scale(0.96); }
+/* Free reroll — jade gradient (cultivation energy, no cost) */
+.sel-reroll-btn-free {
+  background: linear-gradient(135deg, rgba(12, 70, 70, 0.65), rgba(15, 100, 90, 0.65));
+  border-color: rgba(45, 180, 160, 0.55);
+  color: #a7f3e8;
+}
+.sel-reroll-btn-free:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(15, 90, 85, 0.80), rgba(20, 120, 110, 0.80));
+  border-color: rgba(45, 180, 160, 0.80);
+  box-shadow: 0 0 14px rgba(20, 170, 150, 0.32);
+  transform: translateY(-1px);
+}
+.sel-reroll-btn-disabled { opacity: 0.30; cursor: not-allowed; }
 
 /* ── HomeScreen selection badge ─────────────────────────────────────────────── */
 
