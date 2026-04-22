@@ -229,6 +229,7 @@ function BuildContent({ cultivation, techniques, artefacts }) {
   const [lawPickerOpen,    setLawPickerOpen]    = useState(false);
 
   const { activeLaw, setActiveLaw, isLawUnlocked, realmIndex, ownedLaws } = cultivation;
+  const noLaws = !(ownedLaws?.length);
   // Unequipped state is legal — render a prompt card instead of crashing.
   const rarity = activeLaw ? LAW_RARITY[activeLaw.rarity] : null;
   const lawName = activeLaw
@@ -266,17 +267,27 @@ function BuildContent({ cultivation, techniques, artefacts }) {
       <div className="build-layout">
 
         {/* Law card */}
-        <section className="build-section build-law-section" onClick={() => setLawPickerOpen(true)}>
+        <section
+          className={`build-section build-law-section${noLaws ? ' build-law-section-locked' : ''}`}
+          onClick={noLaws ? undefined : () => setLawPickerOpen(true)}
+        >
           <h2 className="build-section-title">{t('build.cultivationLaw')}</h2>
-          {!activeLaw ? (
+          {noLaws ? (
+            <div className="build-law-card build-law-card-compact build-law-gate">
+              <div className="law-header">
+                <span className="law-name">🔒 {t('build.cultivationLaw')}</span>
+              </div>
+              <p className="law-flavour">
+                {t('build.lawGateHint', { defaultValue: 'Complete Tempered Body to receive your first Law at the major realm breakthrough.' })}
+              </p>
+            </div>
+          ) : !activeLaw ? (
             <div className="build-law-card build-law-card-compact build-law-locked">
               <div className="law-header">
                 <span className="law-name">{t('build.lawUnequipped', { defaultValue: 'No law equipped' })}</span>
               </div>
               <p className="law-flavour">
-                {ownedLaws?.length
-                  ? t('build.lawUnequippedPick',  { defaultValue: 'Tap to choose one from your library.' })
-                  : t('build.lawUnequippedEmpty', { defaultValue: 'Reach your first major realm to unlock a law.' })}
+                {t('build.lawUnequippedPick', { defaultValue: 'Tap to choose one from your library.' })}
               </p>
             </div>
           ) : (

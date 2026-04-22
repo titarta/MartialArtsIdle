@@ -1353,6 +1353,18 @@ html, body, * {
   opacity: 0.55;
 }
 
+.build-law-section-locked {
+  cursor: default;
+  pointer-events: none;
+}
+
+.build-law-gate {
+  opacity: 0.40;
+  filter: grayscale(0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .law-header {
   display: flex;
   flex-direction: column;
