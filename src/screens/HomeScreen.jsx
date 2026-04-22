@@ -410,6 +410,10 @@ function HomeScreen({
   }, []);
   useEffect(() => { resetIdleTimer(); return () => clearTimeout(idleTimerRef.current); }, [resetIdleTimer]);
 
+  // Release hold state whenever a breakthrough fires — the modal that follows
+  // would steal the pointer and stopBoost() would never be called otherwise.
+  useEffect(() => { if (majorBreakthrough) stopBoost(); }, [majorBreakthrough]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── Pointer handlers ─────────────────────────────────────────────────────
   const handlePointerDown = (e) => {
     e.preventDefault();
