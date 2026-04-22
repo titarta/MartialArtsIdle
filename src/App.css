@@ -1355,13 +1355,16 @@ html, body, * {
 
 .build-law-section-locked {
   cursor: default;
-  pointer-events: none;
+}
+.build-law-section-locked:hover .lock-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
 }
 
 .build-law-gate {
   opacity: 0.40;
   filter: grayscale(0.5);
-  cursor: not-allowed;
   pointer-events: none;
 }
 

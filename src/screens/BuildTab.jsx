@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import TechniqueSlotModal from '../components/TechniqueSlotModal';
 import ArtefactTooltip, { useTooltipPos } from '../components/ArtefactTooltip';
+import LockTooltip from '../components/LockTooltip';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown } from '../data/techniques';
@@ -272,14 +273,18 @@ function BuildContent({ cultivation, techniques, artefacts }) {
           onClick={noLaws ? undefined : () => setLawPickerOpen(true)}
         >
           <h2 className="build-section-title">{t('build.cultivationLaw')}</h2>
+          {noLaws && (
+            <LockTooltip
+              desc="Laws amplify your cultivation speed and grant unique modifiers."
+              hint="Complete Tempered Body — claim your first Law at the major realm breakthrough."
+              position="below"
+            />
+          )}
           {noLaws ? (
             <div className="build-law-card build-law-card-compact build-law-gate">
               <div className="law-header">
                 <span className="law-name">🔒 {t('build.cultivationLaw')}</span>
               </div>
-              <p className="law-flavour">
-                {t('build.lawGateHint', { defaultValue: 'Complete Tempered Body to receive your first Law at the major realm breakthrough.' })}
-              </p>
             </div>
           ) : !activeLaw ? (
             <div className="build-law-card build-law-card-compact build-law-locked">
