@@ -262,42 +262,56 @@ function KeyCrystal({ crystal, isUnlocked, onOpen, particleColors }) {
 
 // ── PC-only left info panel ──────────────────────────────────────────────────
 
-/** Compact qi text updated via rAF — avoids a React re-render every frame. */
-function PCQiProgressText({ qiRef, costRef, maxed }) {
-  const ref = useRef(null);
+/** Compact qi text updated via rAF — avoids a React re-render every frame.
+ *  During a major-realm gate, switches to showing Qi/s current / required. */
+function PCQiProgressText({ qiRef, costRef, gateRef, rateRef, maxed }) {
+  const textRef = useRef(null);
+  const divRef  = useRef(null);
   useEffect(() => {
-    if (maxed) {
-      if (ref.current) ref.current.textContent = 'Peak Qi';
-      return;
-    }
     const fmt = (n) => {
       if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
       if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
       if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
       return String(Math.floor(n));
     };
+    const fmtRate = (n) => {
+      if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      if (n >= 10)  return n.toFixed(0);
+      return n.toFixed(1);
+    };
     let raf;
     const tick = () => {
-      if (ref.current)
-        ref.current.textContent = `${fmt(qiRef.current)} / ${fmt(costRef.current)} Qi`;
+      const gate = gateRef?.current;
+      if (divRef.current)  divRef.current.classList.toggle('qi-rate-gated', !!gate);
+      if (textRef.current) {
+        if (maxed) {
+          textRef.current.textContent = 'Peak Qi';
+        } else if (gate) {
+          const r = rateRef ? rateRef.current : gate.current;
+          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}  Qi/s`;
+        } else {
+          textRef.current.textContent = `${fmt(qiRef.current)} / ${fmt(costRef.current)} Qi`;
+        }
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [qiRef, costRef, maxed]);
-  return <div className="qi-rate"><span ref={ref}>—</span></div>;
+  }, [qiRef, costRef, gateRef, rateRef, maxed]);
+  return <div ref={divRef} className="qi-rate"><span ref={textRef}>—</span></div>;
 }
 
 /** Left panel — visible only at wide (≥ 900 px) breakpoints.
  *  Shows cultivation stats so the player doesn't have to look at the bar. */
-function HomePCLeftPanel({ realmName, realmStage, qiRef, costRef, rateRef, focusMultRef, boosting, adBoostActive, maxed }) {
+function HomePCLeftPanel({ realmName, realmStage, qiRef, costRef, rateRef, gateRef, focusMultRef, boosting, adBoostActive, maxed }) {
   const { t } = useTranslation('ui');
   return (
     <div className="home-pc-left">
       <div className="home-pc-section-label">Cultivation</div>
       <div className="home-pc-realm-name">{realmName.split(' - ')[0]}</div>
       {realmStage && <div className="home-pc-realm-stage">{realmStage}</div>}
-      <PCQiProgressText qiRef={qiRef} costRef={costRef} maxed={maxed} />
+      <PCQiProgressText qiRef={qiRef} costRef={costRef} gateRef={gateRef} rateRef={rateRef} maxed={maxed} />
       <QiRateReadout rateRef={rateRef} focusMultRef={focusMultRef} boosting={boosting} adBoostActive={adBoostActive} maxed={maxed} />
     </div>
   );
@@ -446,6 +460,7 @@ function HomeScreen({
           focusMultRef={focusMultRef}
           costRef={costRef}
           rateRef={rateRef}
+          gateRef={gateRef}
           boosting={boosting}
           adBoostActive={adBoostActive}
           maxed={maxed}
@@ -578,10 +593,7 @@ function HomeScreen({
             <RealmProgressBar
               qiRef={qiRef}
               costRef={costRef}
-              rateRef={rateRef}
               gateRef={gateRef}
-              currentRealm={realmName}
-              nextRealm={nextRealmName}
               boosting={boosting}
               maxed={maxed}
               realmIndex={cultivation.realmIndex}
