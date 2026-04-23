@@ -91,7 +91,7 @@ function ReserveChip({ rarity, qty, rqi, dim }) {
   );
 }
 
-function CrystalFeedModal({ crystal, inventory, onClose }) {
+function CrystalFeedModal({ crystal, inventory, onClose, onEvolve }) {
   const { level, refinedQi, requiredForNext, crystalQiBonus, feedMultiple } = crystal;
 
   // ── Available stones (recomputed every render; cheap) ──────────────────────
@@ -172,8 +172,12 @@ function CrystalFeedModal({ crystal, inventory, onClose }) {
   // ── Feed action ────────────────────────────────────────────────────────────
   const handleRefine = () => {
     if (plan.length === 0) return;
-    feedMultiple(plan);
+    const result = feedMultiple(plan);
     setFeedAmount(0);
+    if (result?.tierChanged && onEvolve) {
+      onEvolve({ previousTier: result.previousTier, newTier: result.newTier, newLevel: result.newLevel });
+      onClose?.();
+    }
   };
 
   // ── Progress bar ───────────────────────────────────────────────────────────

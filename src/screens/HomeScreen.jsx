@@ -192,6 +192,60 @@ function getCrystalTier(level) {
   return 1;
 }
 
+// Evocative labels for each evolved tier — shown on the evolution overlay.
+const CRYSTAL_TIER_NAMES = {
+  2:  'Veined Shard',
+  3:  'Azure Heart',
+  4:  'Cobalt Prism',
+  5:  'Sapphire Bloom',
+  6:  'Amethyst Sigil',
+  7:  'Violet Lotus',
+  8:  'Lilac Radiance',
+  9:  'Dawnfire Crystal',
+  10: 'Sunflare Relic',
+};
+
+/**
+ * Full-screen celebration overlay that fires when the Qi Crystal's visual tier
+ * advances. Mirrors BreakthroughBanner's auto-dismiss pattern — keyed on the
+ * event id so every evolution remounts and replays.
+ */
+function CrystalEvolutionOverlay({ event, onDone }) {
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+  useEffect(() => {
+    if (!event) return undefined;
+    const id = setTimeout(() => onDoneRef.current?.(), 3200);
+    return () => clearTimeout(id);
+  }, [event]);
+  if (!event) return null;
+  const { glowA, glowB } = CRYSTAL_COLORS[event.newTier] ?? CRYSTAL_COLORS[1];
+  const oldSrc = event.previousTier > 0
+    ? `${BASE}crystals/crystal_${event.previousTier}.png`
+    : `${BASE}crystals/crystal_locked.png`;
+  const newSrc = `${BASE}crystals/crystal_${event.newTier}.png`;
+  const tierName = CRYSTAL_TIER_NAMES[event.newTier] ?? `Tier ${event.newTier}`;
+  return (
+    <div
+      className="crystal-evolve-overlay"
+      aria-live="assertive"
+      style={{ '--ce-a': glowA, '--ce-b': glowB }}
+    >
+      <div className="crystal-evolve-flash" />
+      <div className="crystal-evolve-stack">
+        <img src={oldSrc} className="crystal-evolve-old"  alt="" draggable="false" />
+        <img src={newSrc} className="crystal-evolve-new"  alt="" draggable="false" />
+        <div className="crystal-evolve-burst" />
+      </div>
+      <div className="crystal-evolve-card">
+        <div className="crystal-evolve-kicker">Evolution</div>
+        <div className="crystal-evolve-name">{tierName}</div>
+        <div className="crystal-evolve-sub">Tier {event.newTier} · Level {event.newLevel}</div>
+      </div>
+    </div>
+  );
+}
+
 // Glow and particle colors per visual tier.
 // glowA = inner/bright,  glowB = outer/dim,  particles = 5 shades for the stream.
 const CRYSTAL_COLORS = {
@@ -403,6 +457,16 @@ function HomeScreen({
   // ── Crystal feed modal ───────────────────────────────────────────────────
   const [crystalModalOpen, setCrystalModalOpen] = useState(false);
   useEffect(() => { if (openCrystal && isCrystalUnlocked) setCrystalModalOpen(true); }, [openCrystal]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Crystal evolution overlay ────────────────────────────────────────────
+  // `event` is null when idle; set to {id, previousTier, newTier, newLevel}
+  // when the modal reports a tier crossing. Incrementing id ensures remount.
+  const [crystalEvolution, setCrystalEvolution] = useState(null);
+  const evolutionIdRef = useRef(0);
+  const handleCrystalEvolve = useCallback((info) => {
+    evolutionIdRef.current += 1;
+    setCrystalEvolution({ id: evolutionIdRef.current, ...info });
+  }, []);
 
   const idleTimerRef = useRef(null);
   const resetIdleTimer = useCallback(() => {
@@ -631,8 +695,16 @@ function HomeScreen({
           crystal={crystal}
           inventory={inventory}
           onClose={() => setCrystalModalOpen(false)}
+          onEvolve={handleCrystalEvolve}
         />
       )}
+
+      {/* Crystal evolution celebration — fires on visual-tier change. */}
+      <CrystalEvolutionOverlay
+        key={crystalEvolution?.id ?? 'none'}
+        event={crystalEvolution}
+        onDone={() => setCrystalEvolution(null)}
+      />
 
     </div>
   );

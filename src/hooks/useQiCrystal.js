@@ -19,6 +19,23 @@ import { getRefinedQi } from '../data/materials';
 const SAVE_KEY = 'mai_qi_crystal';
 
 /**
+ * Visual tier thresholds — the level at which the crystal evolves to a new
+ * sprite (tier 2 = L10, tier 3 = L25, …). Kept in sync with the copies in
+ * HomeScreen.jsx and CrystalFeedModal.jsx.
+ */
+const CRYSTAL_TIER_THRESHOLDS = [1000, 750, 500, 350, 200, 100, 50, 25, 10, 1];
+const CRYSTAL_TIER_VALUES     = [  10,   9,   8,   7,   6,   5,  4,  3,  2, 1];
+
+/** Visual tier (1–10) for a given crystal level. Level 0 returns 0. */
+export function getCrystalTier(level) {
+  if (level <= 0) return 0;
+  for (let i = 0; i < CRYSTAL_TIER_THRESHOLDS.length; i++) {
+    if (level >= CRYSTAL_TIER_THRESHOLDS[i]) return CRYSTAL_TIER_VALUES[i];
+  }
+  return 1;
+}
+
+/**
  * Refined QI required to reach the given level.
  * Gentle growth curve — exponent 1.30, base halved from 50 → 25 so early
  * upgrades stay brisk and high-level costs don't require indefinite grinding.
@@ -115,10 +132,16 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
    * Used by the redesigned feed modal that lets the player set an RQI target
    * and auto-consumes stones (cheapest-first) to hit it.
    *
+   * Stops auto-leveling at the FIRST visual-tier boundary crossed, so the
+   * player always gets a dramatic evolution moment for each tier. Any RQI not
+   * spent stays in `refinedQi` as partial progress for the next refine.
+   *
    * @param {Array<{id: string, qty: number}>} plan
+   * @returns {{ tierChanged: boolean, previousTier: number, newTier: number, newLevel: number }}
    */
   const feedMultiple = useCallback((plan) => {
-    if (!Array.isArray(plan) || plan.length === 0) return;
+    const empty = { tierChanged: false, previousTier: 0, newTier: 0, newLevel: 0 };
+    if (!Array.isArray(plan) || plan.length === 0) return empty;
 
     // Remove items from inventory and tally the RQI gain
     let totalRqi = 0;
@@ -131,24 +154,31 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
       removeItem?.(id, used);
       totalRqi += used * rqi;
     }
-    if (totalRqi <= 0) return;
+    if (totalRqi <= 0) return empty;
 
-    setState(prev => {
-      let { level, refinedQi } = prev;
-      refinedQi += totalRqi;
-      while (true) {
-        const needed = getRequiredRefinedQi(level + 1);
-        if (refinedQi >= needed) {
-          refinedQi -= needed;
-          level += 1;
-        } else break;
+    // Compute the transition eagerly from current state so the return value is
+    // populated before this function returns (setState updaters are not
+    // guaranteed to run synchronously).
+    let level     = state.level;
+    let refinedQi = state.refinedQi + totalRqi;
+    const startTier = getCrystalTier(level);
+    const result = { ...empty };
+    while (true) {
+      const needed = getRequiredRefinedQi(level + 1);
+      if (refinedQi < needed) break;
+      refinedQi -= needed;
+      level += 1;
+      if (getCrystalTier(level) !== startTier) {
+        result.tierChanged  = true;
+        result.previousTier = startTier;
+        result.newTier      = getCrystalTier(level);
+        result.newLevel     = level;
+        break;
       }
-      const next = { level, refinedQi };
-      crystalQiBonusRef.current = (level * (level + 3)) / 2;
-      saveState(next);
-      return next;
-    });
-  }, [getQuantity, removeItem]);
+    }
+    applyState({ level, refinedQi });
+    return result;
+  }, [state.level, state.refinedQi, getQuantity, removeItem, applyState]);
 
   const requiredForNext = getRequiredRefinedQi(state.level + 1);
 
