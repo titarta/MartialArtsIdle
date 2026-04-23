@@ -9,8 +9,6 @@
  * level N is N·(N+3)/2 qi/sec. Per-level gains scale 2, 3, 4, 5, … to keep
  * upgrades feeling meaningful at high levels.
  * No level cap — cost scales infinitely.
- *
- * Debug commands are exposed on window.__debug.qiCrystal.
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';

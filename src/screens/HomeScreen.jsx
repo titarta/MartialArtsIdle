@@ -468,6 +468,13 @@ function HomeScreen({
     setCrystalEvolution({ id: evolutionIdRef.current, ...info });
   }, []);
 
+  // Debug bridge — gd.crystalEvolve(newTier, previousTier?) fires this event.
+  useEffect(() => {
+    const handler = (e) => handleCrystalEvolve(e.detail ?? {});
+    window.addEventListener('mai:crystal-evolve', handler);
+    return () => window.removeEventListener('mai:crystal-evolve', handler);
+  }, [handleCrystalEvolve]);
+
   const idleTimerRef = useRef(null);
   const resetIdleTimer = useCallback(() => {
     if (idleTimerRef.current) clearTimeout(idleTimerRef.current);

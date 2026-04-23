@@ -251,6 +251,27 @@ export function initDebug(hooksRef) {
       console.log(`[debug] Crystal ${cur} → ${cur + n}`);
     },
 
+    /**
+     * Fire the crystal evolution overlay directly (for animation iteration).
+     * Must be on the Home screen for the overlay to render.
+     * @param {number} newTier       Target visual tier (1–10).
+     * @param {number} [previousTier=newTier-1]  Previous tier (defaults to newTier − 1).
+     * @param {number} [newLevel]    Displayed level on the overlay card.
+     */
+    crystalEvolve(newTier, previousTier, newLevel) {
+      const TIER_LEVELS = { 1:1, 2:10, 3:25, 4:50, 5:100, 6:200, 7:350, 8:500, 9:750, 10:1000 };
+      if (!TIER_LEVELS[newTier]) {
+        console.warn(`[debug] Invalid tier ${newTier} — use 1–10`);
+        return;
+      }
+      const prev = previousTier ?? Math.max(0, newTier - 1);
+      const lvl  = newLevel      ?? TIER_LEVELS[newTier];
+      window.dispatchEvent(new CustomEvent('mai:crystal-evolve', {
+        detail: { previousTier: prev, newTier, newLevel: lvl },
+      }));
+      console.log(`[debug] Crystal evolution overlay — tier ${prev} → ${newTier} (lv ${lvl})`);
+    },
+
     // ── General ────────────────────────────────────────────────────────────
 
     /** Print a summary of the current game state. */
@@ -301,6 +322,7 @@ export function initDebug(hooksRef) {
       console.log('  gd.setCrystalLevel(n)     — set crystal to level n');
       console.log('  gd.setCrystalTier(t)      — jump to visual tier t (1–10)');
       console.log('  gd.crystalLevelUp(n=1)    — increment crystal level by n');
+      console.log('  gd.crystalEvolve(newTier, prevTier?, lvl?) — fire evolution overlay (home screen only)');
       console.log('%cGeneral', 'font-weight: bold');
       console.log('  gd.state()                — print current game state summary');
       console.log('  gd.help()                 — show this message');
