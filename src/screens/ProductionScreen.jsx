@@ -119,43 +119,8 @@ function CostRow({ itemId, needed, owned }) {
 
 // ─── Modifier rows ────────────────────────────────────────────────────────────
 
-function AffixRow({ affix, gIdx, color, mineralStat, mineralMod, craftCount = 0, inventory, onHone, onReplace }) {
-  const isUnique = !!affix.unique;
-  const rowColor = isUnique ? UNIQUE_COLOR : color;
-  const honeCosts    = bracketCost(mineralStat, mineralMod, 'hone',    craftCount);
-  const replaceCosts = bracketCost(mineralStat, mineralMod, 'replace', craftCount);
-  return (
-    <div
-      className={`tx-mod-row${isUnique ? ' tx-mod-row-unique' : ''}`}
-      style={{ borderLeft: `3px solid ${rowColor}` }}
-    >
-      <div className="tx-mod-left">
-        {isUnique && <span className="tx-mod-unique-tag" style={{ color: rowColor }}>★ {affix.name}</span>}
-        <span className="tx-mod-value" style={{ color: rowColor }}>{formatAffixValue(affix)}</span>
-      </div>
-      {(!isUnique || affix.tier === 'Transcendent') && (
-        <div className="tx-mod-actions">
-          <button
-            className={`tx-craft-btn ${canAfford(honeCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-            onClick={() => { if (canAfford(honeCosts, inventory)) { spend(honeCosts, inventory); onHone(gIdx); } }}
-            title="Hone — randomize value"
-          >
-            ⟳
-            <CostBadge costs={honeCosts} inventory={inventory} />
-          </button>
-          <button
-            className={`tx-craft-btn ${canAfford(replaceCosts, inventory) ? '' : 'tx-craft-btn-disabled'}`}
-            onClick={() => { if (canAfford(replaceCosts, inventory)) { spend(replaceCosts, inventory); onReplace(gIdx); } }}
-            title="Replace — swap for a different modifier"
-          >
-            ↺
-            <CostBadge costs={replaceCosts} inventory={inventory} />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+// AffixRow removed in stage 14 — it was used only by the deleted
+// ArtefactDetail panel (stage 13). Techniques still use PassiveRow below.
 
 function PassiveRow({ passive, gIdx, color, mineralMod, inventory, onReplace }) {
   const replaceCosts = bracketCost(null, mineralMod, 'replace');

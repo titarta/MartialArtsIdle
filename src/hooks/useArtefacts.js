@@ -1,11 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ARTEFACTS_BY_ID, getSlotBonuses } from '../data/artefacts';
-import {
-  generateAffixes, rollAffix, pickRandomAffix, pickArtefactAffix,
-  AFFIX_POOL_BY_SLOT, ARTEFACT_TIER_SLOTS,
-} from '../data/affixPools';
+import { generateAffixes, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
 import { generateArtefactName, formatArtefactName } from '../data/artefactNames';
-import { rerollArtefactUniqueValue } from '../data/uniqueModifiers';
 import { evaluateArtefactUniques } from '../systems/artefactEngine';
 import { rollElementAndSet, getSetBonusModifiers } from '../data/artefactSets';
 import {
@@ -19,13 +15,9 @@ const SAVE_KEY = 'mai_artefacts';
 const ARTEFACT_SCHEMA_VERSION = 2;
 export const MAX_ARTEFACTS = 100;
 
-// Quality progression for artefacts (rarity keys)
-export const ARTEFACT_NEXT_RARITY = {
-  Iron:   'Bronze',
-  Bronze: 'Silver',
-  Silver: 'Gold',
-  Gold:   'Transcendent',
-};
+// Legacy rarity-bump table removed in stage 14 of the overhaul — artefacts
+// no longer change rarity. Upgrade ladder (+0..+20) lives in
+// src/data/artefactUpgrades.js.
 
 function resolveInstance(o) {
   const cat = ARTEFACTS_BY_ID[o.catalogueId];
@@ -238,24 +230,6 @@ export default function useArtefacts() {
     return dismantledRarity;
   }, []);
 
-  // Upgrade an owned artefact's quality by one tier.
-  // Keeps the original rolled name and marks the instance as upgraded so the
-  // display layer appends an "(upgraded)" suffix.
-  const upgradeArtefact = useCallback((uid) => {
-    setState(prev => {
-      const owned = prev.owned.map(o => {
-        if (o.uid !== uid) return o;
-        const currentRarity = o.rarity ?? ARTEFACTS_BY_ID[o.catalogueId]?.rarity ?? 'Iron';
-        const nextRarity = ARTEFACT_NEXT_RARITY[currentRarity];
-        if (!nextRarity) return o;
-        return { ...o, rarity: nextRarity, upgraded: true };
-      });
-      const next = { ...prev, owned };
-      save(next);
-      return next;
-    });
-  }, []);
-
   /**
    * Bump an artefact's upgrade level by one. Rolls a bonus addition into
    * `affixBonuses` at milestone levels (every 4 levels up to the rarity
@@ -304,101 +278,9 @@ export default function useArtefacts() {
     return upgradeCost(o.upgradeLevel ?? 0, rarity);
   }, [state.owned]);
 
-  /** Re-roll one affix's value. Unique affixes are locked and can't be honed. */
-  const honeAffix = useCallback((uid, idx) => {
-    setState(prev => {
-      const owned = prev.owned.map(o => {
-        if (o.uid !== uid) return o;
-        const art  = ARTEFACTS_BY_ID[o.catalogueId];
-        const pool = AFFIX_POOL_BY_SLOT[art?.slot ?? 'weapon'] ?? [];
-        const affixes = (o.affixes ?? []).map((a, i) => {
-          if (i !== idx) return a;
-          if (a.unique) {
-            // Only Transcendent uniques can be rerolled. Lower-tier uniques
-            // (currently Iron) stay locked.
-            if (a.tier !== 'Transcendent') return a;
-            const rerolled = rerollArtefactUniqueValue(a.id, a.tier);
-            return rerolled ?? a;
-          }
-          const entry = pool.find(e => e.id === a.id);
-          if (!entry) return a;
-          return rollAffix(entry, a.tier ?? 'Iron');
-        });
-        return { ...o, affixes, craftCount: (o.craftCount ?? 0) + 1 };
-      });
-      const next = { ...prev, owned };
-      save(next);
-      return next;
-    });
-  }, []);
-
-  /**
-   * Replace one affix with a different one from the NORMAL pool.
-   * Uniqueness is enforced item-wide (no id can repeat anywhere). Unique
-   * affixes can't be replaced, and replace never rolls into a unique.
-   */
-  const replaceAffix = useCallback((uid, idx) => {
-    setState(prev => {
-      const owned = prev.owned.map(o => {
-        if (o.uid !== uid) return o;
-        const art     = ARTEFACTS_BY_ID[o.catalogueId];
-        const affixes = o.affixes ?? [];
-        const oldAffix = affixes[idx];
-        if (!oldAffix) return o;
-        const tier = oldAffix.tier ?? 'Iron';
-        // Non-Transcendent uniques stay locked.
-        if (oldAffix.unique && tier !== 'Transcendent') return o;
-        // Item-wide exclusion — no affix id may repeat anywhere on the item.
-        const excludeIds = affixes
-          .filter((_, i) => i !== idx)
-          .map(a => a.id);
-        const slot = art?.slot ?? 'weapon';
-        // Transcendent uniques redraw from the merged pool (normals + uniques).
-        // Other tiers — and normal Transcendent affixes — stay on the normal
-        // pool so "can't reroll INTO a unique" still holds for non-Trans slots.
-        const newAffix = (oldAffix.unique && tier === 'Transcendent')
-          ? pickArtefactAffix(slot, tier, excludeIds)
-          : pickRandomAffix(slot, tier, excludeIds);
-        if (!newAffix) return o;
-        const updated = affixes.map((a, i) => (i === idx ? newAffix : a));
-        return { ...o, affixes: updated, craftCount: (o.craftCount ?? 0) + 1 };
-      });
-      const next = { ...prev, owned };
-      save(next);
-      return next;
-    });
-  }, []);
-
-  /**
-   * Add a new affix at a specific tier. Item-wide dedupe. On the Transcendent
-   * tier the pool is merged with artefact uniques (uniform weighting) so Add
-   * there can produce a unique.
-   */
-  const addAffix = useCallback((uid, tier = 'Iron') => {
-    setState(prev => {
-      const owned = prev.owned.map(o => {
-        if (o.uid !== uid) return o;
-        const art       = ARTEFACTS_BY_ID[o.catalogueId];
-        const affixes   = o.affixes ?? [];
-        const tierMax   = ARTEFACT_TIER_SLOTS[tier] ?? 0;
-        const tierCount = affixes.filter(a => (a.tier ?? 'Iron') === tier).length;
-        if (tierCount >= tierMax) return o;
-        const excludeIds = affixes.map(a => a.id);
-        const slot = art?.slot ?? 'weapon';
-        // Dynamically import to avoid pulling pickArtefactAffix when not needed,
-        // but keep the hook small — just call pickRandomAffix for non-Trans and
-        // the merged picker for Transcendent.
-        const newAffix = tier === 'Transcendent'
-          ? pickArtefactAffix(slot, tier, excludeIds)
-          : pickRandomAffix(slot, tier, excludeIds);
-        if (!newAffix) return o;
-        return { ...o, affixes: [...affixes, newAffix], craftCount: (o.craftCount ?? 0) + 1 };
-      });
-      const next = { ...prev, owned };
-      save(next);
-      return next;
-    });
-  }, []);
+  // honeAffix / replaceAffix / addAffix removed in stage 14 — affixes are
+  // now locked at drop time (see obsidian/Artefacts.md). Upgrade growth
+  // happens through levelUpArtefact instead.
 
   // Collect the equipped artefact instances once so both stat and flag
   // builders iterate the same working set.
@@ -471,12 +353,8 @@ export default function useArtefacts() {
     owned:          state.owned,
     equipped:       state.equipped,
     addArtefact,
-    upgradeArtefact,
     levelUpArtefact,
     getUpgradeCost,
-    honeAffix,
-    replaceAffix,
-    addAffix,
     equip,
     unequip,
     getEquipped,
