@@ -14,7 +14,7 @@
  */
 
 import { MOD } from './stats';
-import { pickRandomUnique, primaryStatForType } from './lawUniques';
+import { pickRandomUnique } from './lawUniques';
 import { rollArtefactUnique, ARTEFACT_UNIQUES } from './uniqueModifiers';
 import { mergeSingleton } from './config/loader';
 
@@ -469,39 +469,9 @@ const ELEMENT_TO_TYPES = {
   // general-only. Designer can edit law records to override.
 };
 
-// Per-category default-attack multiplier roll ranges, by law rarity.
-// The roll is the TOTAL multiplier for a primary stat the law covers, not a
-// per-type increment. A law with `types: ['fire']` rolls once in the Essence
-// slot; a law with `types: ['fire', 'water']` also rolls just once (both
-// types anchor to Essence, so they share the slot). Categories the law
-// doesn't cover default to 0.
-export const LAW_TYPE_MULT_RANGES = {
-  Iron:         [1.10, 1.30],
-  Bronze:       [1.20, 1.60],
-  Silver:       [1.40, 2.00],
-  Gold:         [1.70, 2.60],
-  Transcendent: [2.20, 3.50],
-};
-
-/**
- * Roll per-primary-stat multipliers for a law given its `types` and rarity.
- * Each covered category gets one roll in the rarity's range; uncovered
- * categories are 0 so the default-attack formula collapses their term.
- */
-export function rollLawTypeMults(types, rarity) {
-  const [min, max] = LAW_TYPE_MULT_RANGES[rarity] ?? LAW_TYPE_MULT_RANGES.Iron;
-  const covered = new Set();
-  for (const t of types ?? []) {
-    const stat = primaryStatForType(t);
-    if (stat) covered.add(stat);
-  }
-  const roll = () => Math.round((min + Math.random() * (max - min)) * 100) / 100;
-  return {
-    essence: covered.has('essence') ? roll() : 0,
-    body:    covered.has('body')    ? roll() : 0,
-    soul:    covered.has('soul')    ? roll() : 0,
-  };
-}
+// typeMults removed in Stage 4 of the Damage & Element Overhaul —
+// basic-attack damage is now scaled by realm index alone. The previous
+// LAW_TYPE_MULT_RANGES table and rollLawTypeMults helper are gone.
 
 export function generateLaw(forcedRarity, realmIndex = Infinity) {
   const rarity  = forcedRarity ?? pick(LAW_RARITIES);
@@ -534,7 +504,6 @@ export function generateLaw(forcedRarity, realmIndex = Infinity) {
     name:                  genLawName(),
     element,
     types,
-    typeMults:             rollLawTypeMults(types, rarity),
     rarity,
     realmRequirement:      0,
     realmRequirementLabel: LAW_REALM_LABELS[rarity] ?? 'Tempered Body',

@@ -219,7 +219,7 @@ export const NODES = [
   {
     id: 'cb_is', branch: 'cross', step: 0,
     label: 'Inherited Strength', icon: '🔗',
-    desc: "The active law's typeMults are permanently increased by +25%.",
+    desc: '+25% basic-attack damage.',
     cost: 4, prereqs: ['al_k', 'hw_1'], prereqMode: 'and',
   },
   {

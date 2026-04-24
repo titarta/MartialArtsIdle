@@ -25,8 +25,7 @@ export const PHASE_TECHNIQUE_LAW = {
   id:                   PHASE_TECHNIQUE_ID,
   name:                 'Phase Technique',
   element:              'Phase',
-  types:                ['physical', 'sword', 'fist', 'fire', 'water', 'earth', 'spirit', 'void', 'dao'],
-  typeMults:            { essence: 3.50, body: 3.50, soul: 3.50 },
+  types:                ['fire', 'water', 'earth', 'wood', 'metal', 'general'],
   rarity:               'Transcendent',
   realmRequirement:     0,
   realmRequirementLabel:'None — granted by Eternal Tree',
@@ -45,13 +44,10 @@ const LAWS_RAW = {
   three_harmony_manual: {
     id:                   'three_harmony_manual',
     name:                 'Unyielding Fist Manual',
-    element:              'Normal',
-    // Law types drive both the unique-pool filter and the per-primary-stat
-    // default-attack multipliers (see typeMults below). Fist anchors to Body.
-    types:                ['fist'],
-    // Per-category default-attack multipliers. Only Body is covered here,
-    // so the default attack becomes floor(B * 1.20).
-    typeMults:            { essence: 0, body: 1.20, soul: 0 },
+    element:              'metal',
+    // Law types drive only the unique-pool filter now (damage routing is
+    // per-technique). The starter law draws from the metal + general pools.
+    types:                ['metal'],
     rarity:               'Iron',
     // realmIndex 0 = Tempered Body - Layer 1 (available from the start)
     realmRequirement:     0,
@@ -65,7 +61,7 @@ const LAWS_RAW = {
 };
 
 // Phase Technique is added to the LAWS map so the rest of the engine
-// (typeMults reads, unique evaluation, equip flow) finds it by id.
+// (unique evaluation, equip flow) finds it by id.
 const LAWS_WITH_PHASE = { ...LAWS_RAW, [PHASE_TECHNIQUE_ID]: PHASE_TECHNIQUE_LAW };
 export const LAWS = mergeRecords(LAWS_WITH_PHASE, 'laws');
 

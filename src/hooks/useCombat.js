@@ -337,22 +337,13 @@ export default function useCombat() {
         const logs = [];
 
         // Basic attack always fires — techniques layer on top when ready.
-        // Law typeMults scale each primary stat individually. Uncovered
-        // categories are 0 so stats the law doesn't anchor contribute
-        // nothing to the basic attack. With no law equipped at all
-        // (fresh life / between picks) fall back to (body + essence) / 2
-        // so combat is functional without an active law.
+        // Placeholder formula (Stage 4 of the Damage & Element Overhaul):
+        // scales purely off realmIndex while the replacement stat axis is
+        // designed. See obsidian/Primary Stats.md#Placeholder formulas.
         {
-          const law = s.stats.law;
-          let dmg;
-          if (!law) {
-            dmg = (s.stats.body + s.stats.essence) / 2;
-          } else {
-            const tm = law.typeMults ?? { essence: 0, body: 0, soul: 0 };
-            dmg = s.stats.essence * (tm.essence ?? 0)
-                + s.stats.body    * (tm.body    ?? 0)
-                + s.stats.soul    * (tm.soul    ?? 0);
-          }
+          const K_BASIC = 10;
+          const realmIdx = s.stats.realmIndex ?? 0;
+          let dmg = K_BASIC * (realmIdx + 1);
           // Universal damage_all flat (artefacts / law uniques).
           dmg += s.stats.damageStats?.damage_all ?? 0;
           // Source multiplier: default_attack_damage applies only to basic

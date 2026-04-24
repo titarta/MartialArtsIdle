@@ -48,18 +48,6 @@ function AugmentCard({ optionId, onPick }) {
 
 // ── Law card (new) ───────────────────────────────────────────────────────────
 
-/** Short one-line summary of a law's typeMults like "+120% Body". */
-function formatLawTypeMults(law) {
-  const parts = [];
-  const tm = law.typeMults ?? {};
-  for (const [stat, mult] of Object.entries(tm)) {
-    if (!mult || mult <= 0) continue;
-    const pct = Math.round((mult - 1) * 100);
-    parts.push(`+${pct}% ${stat[0].toUpperCase()}${stat.slice(1)}`);
-  }
-  return parts.length ? parts.join(' · ') : 'No stat mults';
-}
-
 function LawCard({ law, onPick, disabled }) {
   const rarity = LAW_RARITY[law.rarity] ?? { color: '#9ca3af', label: law.rarity };
   const types = (law.types ?? []).join(' · ');
@@ -81,7 +69,7 @@ function LawCard({ law, onPick, disabled }) {
           <strong>{types || 'general'}</strong>
         </p>
         <p className="augment-desc">
-          ×{(law.cultivationSpeedMult ?? 1).toFixed(2)} cultivation · {formatLawTypeMults(law)}
+          ×{(law.cultivationSpeedMult ?? 1).toFixed(2)} cultivation
         </p>
         {topUnique && (
           <p className="augment-desc" style={{ fontStyle: 'italic', opacity: 0.85 }}>

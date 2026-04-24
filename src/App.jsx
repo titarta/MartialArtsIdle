@@ -287,16 +287,11 @@ function App() {
       ? computeStat(1, artefactQiMods)
       : 1;
 
-    // cb_is Inherited Strength — +25% to the active law's typeMults. Mutates
-    // a shallow clone so the real law definition isn't touched.
-    const typeMultsBonus = tree?.modifiers?.typeMultsBonus ?? 0;
-    const lawForCompute = (typeMultsBonus > 0 && law?.typeMults)
-      ? { ...law, typeMults: {
-          essence: (law.typeMults.essence ?? 0) * (1 + typeMultsBonus),
-          body:    (law.typeMults.body    ?? 0) * (1 + typeMultsBonus),
-          soul:    (law.typeMults.soul    ?? 0) * (1 + typeMultsBonus),
-        } }
-      : law;
+    // typeMults removed in Stage 4 of the Damage & Element Overhaul —
+    // basic-attack damage is scaled purely by realm index now (see
+    // useCombat's placeholder formula). The cb_is reincarnation node
+    // has been retired alongside it.
+    const lawForCompute = law;
 
     const mergedMods = mergeModifiers(
       scaledArtefactMods,
@@ -340,8 +335,7 @@ function App() {
       body:       bundle.primary.body,
       lawElement: law?.element ?? 'Normal',
       // Full active law — calcDamage reads law.types to split damage
-      // between categories (physical / elemental). Pass the cb_is-scaled
-      // clone so the +25% typeMults bonus reaches combat.
+      // between categories (physical / elemental).
       law: lawForCompute,
       // Flat damage bonuses + pool-specific bonuses + the source-gated
       // multipliers, all consumed by calcDamage and useCombat's basic-attack.

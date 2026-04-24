@@ -113,8 +113,9 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
           soul:          full.soul,
           body:          full.body,
           lawElement:    full.lawElement,
-          // Full law + category damage stats are required for the basic
-          // attack's typeMults and for calcDamage's category split.
+          // Full law + category damage stats are required for calcDamage's
+          // per-technique damage-category split. Basic attack ignores the
+          // law now (realm-scaled placeholder formula).
           law:           full.law,
           damageStats:   full.damageStats,
           exploitChance: full.exploitChance,

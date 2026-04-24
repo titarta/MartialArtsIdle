@@ -127,7 +127,7 @@ export default function useReincarnationTree({ karma, spendKarma, lives = 0 } = 
       artefactValueMult:  purchased.has('yy_k') ? 1.10 : 1,   // yy_k +10% to all artefact affix values
 
       // ── Cross-Branch Connectors ───────────────────────────────────
-      typeMultsBonus:     purchased.has('cb_is') ? 0.25 : 0,  // cb_is +25% to law typeMults
+      // cb_is now contributes via default_attack_damage (see getStatModifiers).
       regionKillBonus:    purchased.has('cb_ts'),             // cb_ts 10-kill +1 rarity gather/mine
       phaseTechniqueOwned:purchased.has('cb_pt'),             // cb_pt grants the Phase Technique law
     };
@@ -164,6 +164,11 @@ export default function useReincarnationTree({ karma, spendKarma, lives = 0 } = 
       hpMods.push({ type: 'more', value: modifiers.hpMoreFromLives });
     }
     if (hpMods.length) mods.health = hpMods;
+
+    // cb_is Inherited Strength — +25% basic-attack damage (post-Stage 4).
+    if (purchased.has('cb_is')) {
+      mods.default_attack_damage = [{ type: 'flat', value: 0.25 }];
+    }
 
     return mods;
   }, [modifiers, purchased]);
