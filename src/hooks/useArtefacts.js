@@ -8,6 +8,9 @@ import { generateArtefactName, formatArtefactName } from '../data/artefactNames'
 import { rerollArtefactUniqueValue } from '../data/uniqueModifiers';
 import { evaluateArtefactUniques } from '../systems/artefactEngine';
 import { rollElementAndSet } from '../data/artefactSets';
+import {
+  MAX_UPGRADE_BY_RARITY, effectiveAffixValue, upgradeCost, rollUpgradeBonus, isBonusLevel,
+} from '../data/artefactUpgrades';
 
 const SAVE_KEY = 'mai_artefacts';
 // Bump whenever the artefact schema changes in a way existing saves can't
@@ -44,6 +47,10 @@ function resolveInstance(o) {
     // Element + set membership (rolled at drop time, frozen afterwards).
     element:    o.element ?? null,
     setIds:     Array.isArray(o.setIds) ? o.setIds : [],
+    // Upgrade ladder (+0 .. +MAX). affixBonuses[i] adds to affix i's value
+    // before the per-level multiplier is applied.
+    upgradeLevel: o.upgradeLevel ?? 0,
+    affixBonuses: (o.affixBonuses && typeof o.affixBonuses === 'object') ? o.affixBonuses : {},
     // Generated name overrides the catalog name when present; fall back
     // to the catalog name for legacy instances without rolled parts.
     name:       displayName ?? cat.name,
@@ -84,6 +91,16 @@ function ensureAffixes(owned) {
       const rarity = next.rarity ?? art.rarity ?? 'Iron';
       const { element, setIds } = rollElementAndSet(rarity);
       next = { ...next, element, setIds };
+      changed = true;
+    }
+    // Back-fill upgrade state (Stage 9). All pre-existing drops start at +0
+    // with no bonuses — players retrofit via the new upgrade flow.
+    if (typeof next.upgradeLevel !== 'number') {
+      next = { ...next, upgradeLevel: 0 };
+      changed = true;
+    }
+    if (!next.affixBonuses || typeof next.affixBonuses !== 'object') {
+      next = { ...next, affixBonuses: {} };
       changed = true;
     }
     return next;
@@ -136,7 +153,11 @@ export default function useArtefacts() {
       const affixes = generateAffixes(art?.slot ?? 'weapon', rarity);
       const { firstName, secondName } = generateArtefactName(rarity);
       const { element, setIds } = rollElementAndSet(rarity);
-      const instance = { uid, catalogueId, affixes, firstName, secondName, element, setIds, upgraded: false, craftCount: 0 };
+      const instance = {
+        uid, catalogueId, affixes, firstName, secondName, element, setIds,
+        upgradeLevel: 0, affixBonuses: {},
+        upgraded: false, craftCount: 0,
+      };
       const next = { ...prev, owned: [...prev.owned, instance] };
       save(next);
       return next;
@@ -234,6 +255,54 @@ export default function useArtefacts() {
       return next;
     });
   }, []);
+
+  /**
+   * Bump an artefact's upgrade level by one. Rolls a bonus addition into
+   * `affixBonuses` at milestone levels (every 4 levels up to the rarity
+   * cap — see artefactUpgrades.BONUS_LEVELS). Material payment is the
+   * caller's responsibility (see `getUpgradeCost` for the ladder).
+   *
+   * @returns {object|null} the new instance, or null if at cap / unknown uid.
+   */
+  const levelUpArtefact = useCallback((uid) => {
+    let resultInstance = null;
+    setState(prev => {
+      const owned = prev.owned.map(o => {
+        if (o.uid !== uid) return o;
+        const rarity = o.rarity ?? ARTEFACTS_BY_ID[o.catalogueId]?.rarity ?? 'Iron';
+        const cap    = MAX_UPGRADE_BY_RARITY[rarity] ?? 0;
+        const cur    = o.upgradeLevel ?? 0;
+        if (cur >= cap) return o;
+        const nextLevel = cur + 1;
+        let affixBonuses = { ...(o.affixBonuses ?? {}) };
+        if (isBonusLevel(nextLevel)) {
+          const slot = ARTEFACTS_BY_ID[o.catalogueId]?.slot ?? 'weapon';
+          const roll = rollUpgradeBonus(o.affixes ?? [], rarity, AFFIX_POOL_BY_SLOT, slot);
+          if (roll) {
+            affixBonuses[roll.affixIndex] = (affixBonuses[roll.affixIndex] ?? 0) + roll.bonus;
+          }
+        }
+        const updated = { ...o, upgradeLevel: nextLevel, affixBonuses };
+        resultInstance = updated;
+        return updated;
+      });
+      const next = { ...prev, owned };
+      save(next);
+      return next;
+    });
+    return resultInstance;
+  }, []);
+
+  /**
+   * Cost (item list) for the next upgrade level of an artefact, or null if
+   * at cap. Caller pays via useInventory.removeItem.
+   */
+  const getUpgradeCost = useCallback((uid) => {
+    const o = state.owned.find(x => x.uid === uid);
+    if (!o) return null;
+    const rarity = o.rarity ?? ARTEFACTS_BY_ID[o.catalogueId]?.rarity ?? 'Iron';
+    return upgradeCost(o.upgradeLevel ?? 0, rarity);
+  }, [state.owned]);
 
   /** Re-roll one affix's value. Unique affixes are locked and can't be honed. */
   const honeAffix = useCallback((uid, idx) => {
@@ -362,9 +431,15 @@ export default function useArtefacts() {
       for (const bonus of getSlotBonuses(art.slot, art.rarity)) {
         (mods[bonus.stat] ??= []).push({ type: bonus.type, value: bonus.value });
       }
-      for (const affix of (instance.affixes ?? [])) {
+      const level    = instance.upgradeLevel ?? 0;
+      const bonuses  = instance.affixBonuses ?? {};
+      const affixArr = instance.affixes ?? [];
+      for (let i = 0; i < affixArr.length; i++) {
+        const affix = affixArr[i];
         if (affix.unique || !affix.stat) continue;
-        (mods[affix.stat] ??= []).push({ type: affix.type, value: affix.value });
+        const bonus = bonuses[i] ?? 0;
+        const value = effectiveAffixValue(affix, level, bonus);
+        (mods[affix.stat] ??= []).push({ type: affix.type, value });
       }
     }
     // Layer 3: unique affix effects.
@@ -391,6 +466,8 @@ export default function useArtefacts() {
     equipped:       state.equipped,
     addArtefact,
     upgradeArtefact,
+    levelUpArtefact,
+    getUpgradeCost,
     honeAffix,
     replaceAffix,
     addAffix,
