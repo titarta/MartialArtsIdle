@@ -58,10 +58,9 @@ const LAWS_RAW = {
     realmRequirementLabel:'Tempered Body',
     flavour:              "A drill-book of Tempered Body strikes — the disciple's first hundred blows, repeated until the bones remember them.",
     cultivationSpeedMult: 1.0,
-    // One unique modifier per tier, up to the law's rarity (Iron = 1 unique).
-    uniques: {
-      Iron: { id: 'l_balanced_dao', value: 15 },
-    },
+    // Stage 2 of the overhaul wiped the unique pool — starter law ships
+    // with no uniques pending the new 5-element pool refill.
+    uniques: {},
   },
 };
 
