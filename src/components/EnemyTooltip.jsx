@@ -83,14 +83,24 @@ export default function EnemyTooltip({ enemyDef, regionIndex, style }) {
             );
           })}
           {enemyDef.techniqueDrop && (
-            <div className="enemy-tooltip-drop-row">
-              <span className="enemy-tooltip-drop-name" style={{ color: '#22d3ee' }}>
-                Technique Scroll
-              </span>
-              <span className="enemy-tooltip-drop-chance">
-                {Math.round(enemyDef.techniqueDrop.chance * 100)}%
-              </span>
-            </div>
+            <>
+              <div className="enemy-tooltip-drop-row">
+                <span className="enemy-tooltip-drop-name" style={{ color: '#22d3ee' }}>
+                  Technique Scroll
+                </span>
+                <span className="enemy-tooltip-drop-chance">
+                  {Math.round(enemyDef.techniqueDrop.chance * 100)}%
+                </span>
+              </div>
+              <div className="enemy-tooltip-drop-row">
+                <span className="enemy-tooltip-drop-name" style={{ color: '#facc15' }}>
+                  Artefact
+                </span>
+                <span className="enemy-tooltip-drop-chance">
+                  {Math.round(enemyDef.techniqueDrop.chance * 2.0 * 100)}%
+                </span>
+              </div>
+            </>
           )}
         </div>
       )}

@@ -6,8 +6,9 @@ import { pickRandomArtefact } from '../data/artefactDrops';
 import { ARTEFACTS_BY_ID } from '../data/artefacts';
 
 // Artefacts drop using the same per-enemy `techniqueDrop.chance`, scaled up
-// slightly so they feel marginally more common than Secret Technique scrolls.
-const ARTEFACT_DROP_MULT = 1.5;
+// so they feel distinctly more common than Secret Technique scrolls — per the
+// post-overhaul drop design (tech ~5% / artefact ~10% average).
+const ARTEFACT_DROP_MULT = 2.0;
 
 function fmtHp(n) {
   if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
