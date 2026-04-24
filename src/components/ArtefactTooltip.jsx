@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { QUALITY } from '../data/artefacts';
 import { AFFIX_UNIQUE_COLOR, formatAffixValue } from '../data/affixDisplay';
 import { ARTEFACT_SETS } from '../data/artefactSets';
-import { effectiveAffixValue } from '../data/artefactUpgrades';
+import { effectiveAffixValue, bonusCount, bonusSum } from '../data/artefactUpgrades';
 
 /**
  * Shared artefact tooltip — renders the item name, quality badge, derived
@@ -59,9 +59,11 @@ export default function ArtefactTooltip({ artefact, affixes, style, element, set
       {affixes && affixes.length > 0 && (
         <div className="art-tooltip-section art-tooltip-affixes">
           {affixes.map((a, i) => {
-            const bonus = bonuses[i] ?? 0;
-            const effValue = level > 0 || bonus > 0
-              ? effectiveAffixValue(a, level, bonus)
+            const entry    = bonuses[i];
+            const sum      = bonusSum(entry);
+            const count    = bonusCount(entry);
+            const effValue = level > 0 || sum !== 0
+              ? effectiveAffixValue(a, level, entry)
               : a.value;
             const display = { ...a, value: effValue };
             return (
@@ -71,6 +73,7 @@ export default function ArtefactTooltip({ artefact, affixes, style, element, set
                 style={a.unique ? { color: AFFIX_UNIQUE_COLOR } : undefined}
               >
                 {a.unique && '★ '}{formatAffixValue(display)}
+                {count > 0 && <span style={{ opacity: 0.7, marginLeft: 6 }}>(+{count})</span>}
               </span>
             );
           })}

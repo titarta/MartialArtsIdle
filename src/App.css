@@ -4909,8 +4909,8 @@ html, body, * {
   background: rgba(var(--ui-bg-panel-rgb), 0.95);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 16px;
-  padding: 28px 24px;
-  max-width: 320px;
+  padding: 28px 28px;
+  max-width: 400px;
   width: 100%;
   text-align: center;
   position: relative;
@@ -5227,11 +5227,11 @@ html, body, * {
   background: rgba(var(--ui-bg-panel-rgb), 0.97);
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  max-width: 220px;
+  max-width: 280px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
 }
 

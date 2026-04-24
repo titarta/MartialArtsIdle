@@ -41,25 +41,34 @@ export const AFFIX_PCT_FLAT_STATS = new Set([
   'buff_effect', 'buff_duration',
 ]);
 
+/** Cap a numeric value at 2 decimal places and trim trailing zeros. */
+function fmt2(n) {
+  if (typeof n !== 'number' || !isFinite(n)) return n;
+  return Number(n.toFixed(2));
+}
+
 /**
  * Format a single affix / bonus line. Works for both artefact slot-bonuses
  * (uniform shape `{ stat, type, value }`) and transmutation affixes (same
  * shape, plus optional `unique: true` / `description`).
+ *
+ * All numeric outputs are capped at 2 decimal places (after any
+ * level-multiplier scaling the caller has applied).
  */
 export function formatAffixValue(affix) {
   if (affix.unique) return affix.description ?? affix.name ?? '';
   const label = AFFIX_STAT_LABELS[affix.stat] ?? affix.stat;
   if (affix.type === MOD.INCREASED) {
-    return `+${Math.round(affix.value * 100)}% ${label}`;
+    return `+${fmt2(affix.value * 100)}% ${label}`;
   }
   if (affix.type === MOD.MORE) {
-    return `×${affix.value.toFixed(2)} ${label}`;
+    return `×${fmt2(affix.value)} ${label}`;
   }
   // FLAT / BASE_FLAT
   const isPct = AFFIX_PCT_FLAT_STATS.has(affix.stat);
   const v = isPct
-    ? `${(affix.value * 100).toFixed(1).replace(/\.0$/, '')}%`
-    : (affix.stat === 'qi_speed' ? affix.value.toFixed(2) : affix.value);
+    ? `${fmt2(affix.value * 100)}%`
+    : fmt2(affix.value);
   const prefix = affix.type === MOD.BASE_FLAT ? '+ base' : '+';
   return `${prefix} ${v} ${label}`;
 }

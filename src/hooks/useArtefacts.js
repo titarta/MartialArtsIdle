@@ -94,6 +94,19 @@ function ensureAffixes(owned) {
     if (!next.affixBonuses || typeof next.affixBonuses !== 'object') {
       next = { ...next, affixBonuses: {} };
       changed = true;
+    } else {
+      // Back-fill: legacy saves stored affixBonuses[i] as a number (sum).
+      // Stage 17 switched to an array of per-milestone rolls so the UI can
+      // display "+N" for count. Wrap numbers as [number] on first load.
+      let migrated = false;
+      const next2 = { ...next.affixBonuses };
+      for (const [idx, v] of Object.entries(next2)) {
+        if (typeof v === 'number') {
+          next2[idx] = [v];
+          migrated = true;
+        }
+      }
+      if (migrated) { next = { ...next, affixBonuses: next2 }; changed = true; }
     }
     return next;
   });
@@ -253,7 +266,12 @@ export default function useArtefacts() {
           const slot = ARTEFACTS_BY_ID[o.catalogueId]?.slot ?? 'weapon';
           const roll = rollUpgradeBonus(o.affixes ?? [], rarity, AFFIX_POOL_BY_SLOT, slot);
           if (roll) {
-            affixBonuses[roll.affixIndex] = (affixBonuses[roll.affixIndex] ?? 0) + roll.bonus;
+            const prev = affixBonuses[roll.affixIndex];
+            const arr  = Array.isArray(prev)
+              ? [...prev]
+              : (typeof prev === 'number' && prev !== 0 ? [prev] : []);
+            arr.push(roll.bonus);
+            affixBonuses[roll.affixIndex] = arr;
           }
         }
         const updated = { ...o, upgradeLevel: nextLevel, affixBonuses };

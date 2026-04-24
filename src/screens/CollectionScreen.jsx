@@ -5,7 +5,7 @@ import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS, RARITY, min
 import { QUALITY, ARTEFACTS_BY_ID } from '../data/artefacts';
 import { formatArtefactName } from '../data/artefactNames';
 import { formatAffixValue, AFFIX_UNIQUE_COLOR } from '../data/affixDisplay';
-import { effectiveAffixValue } from '../data/artefactUpgrades';
+import { effectiveAffixValue, bonusCount } from '../data/artefactUpgrades';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown, getK } from '../data/techniques';
@@ -321,10 +321,11 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
               {affixes.length > 0 && (
                 <div className="item-stat-block">
                   {affixes.map((a, i) => {
-                    const bonus = affixBonuses[i] ?? 0;
-                    const effValue = effectiveAffixValue(a, level, bonus);
-                    const display = { ...a, value: effValue };
-                    const line = formatAffixValue(display);
+                    const entry    = affixBonuses[i];
+                    const count    = bonusCount(entry);
+                    const effValue = effectiveAffixValue(a, level, entry);
+                    const display  = { ...a, value: effValue };
+                    const line     = formatAffixValue(display);
                     return (
                       <div
                         key={i}
@@ -334,9 +335,9 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                         <span className="item-stat-label">
                           {a.unique && '★ '}{line}
                         </span>
-                        {bonus > 0 && (
+                        {count > 0 && (
                           <span className="item-stat-value" style={{ opacity: 0.6, fontSize: 11 }}>
-                            (bonus +{bonus.toFixed(3).replace(/\.?0+$/, '')})
+                            +{count}
                           </span>
                         )}
                       </div>

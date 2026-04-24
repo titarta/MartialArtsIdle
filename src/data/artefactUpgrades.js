@@ -35,9 +35,27 @@ export function isBonusLevel(level) {
 }
 
 /**
+ * Bonus entry shape. In the stage-9 implementation this was a plain number
+ * (the sum); in stage-17 we switched to an array of per-milestone rolls so
+ * the UI can display "+N" for the count of bonus rolls that landed on the
+ * affix. Both shapes are still recognised for back-compat.
+ */
+export function bonusSum(entry) {
+  if (Array.isArray(entry)) return entry.reduce((s, v) => s + (v ?? 0), 0);
+  if (typeof entry === 'number') return entry;
+  return 0;
+}
+
+export function bonusCount(entry) {
+  if (Array.isArray(entry)) return entry.length;
+  if (typeof entry === 'number' && entry > 0) return 1;
+  return 0;
+}
+
+/**
  * Apply the level multiplier (and optional bonus additive) to a raw affix
- * value. `value` is the originally rolled affix value; `bonus` is the
- * additive roll layered on at milestones; `level` is the current +N.
+ * value. `bonus` is either a numeric sum (legacy) or the array of bonus
+ * rolls (stage-17 onward); either way we reduce it to a sum here.
  *
  * MORE-type affixes store `1 + Δ` instead of `Δ`, so the scale is applied
  * to the delta only — otherwise a level multiplier would inflate the
@@ -45,7 +63,8 @@ export function isBonusLevel(level) {
  */
 export function effectiveAffixValue(affix, level = 0, bonus = 0) {
   const mult = upgradeValueMult(level);
-  const raw  = (affix?.value ?? 0) + (bonus ?? 0);
+  const sum  = bonusSum(bonus);
+  const raw  = (affix?.value ?? 0) + sum;
   if (affix?.type === 'more') {
     return 1 + (raw - 1) * mult;
   }
