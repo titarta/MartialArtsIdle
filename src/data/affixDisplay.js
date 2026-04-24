@@ -41,6 +41,20 @@ export const AFFIX_PCT_FLAT_STATS = new Set([
   'buff_effect', 'buff_duration',
 ]);
 
+// Subset of AFFIX_PCT_FLAT_STATS whose stat-engine contract is 0–100 scale
+// (the engine rounds `exploitChance = Math.round(computeStat(0, mods))`
+// directly, so a stored 0.05 collapses to 0). Artefact affixes roll these
+// as decimals (matching INCREASED semantics), so we scale ×100 at projection
+// time when pushing into the stat modifier bundle.
+//
+// The complement (default_attack_damage, secret_technique_damage, buff_*,
+// heavenly_qi_mult) is consumed as a 0–1 fraction and must stay decimal.
+export const AFFIX_PCT_POINT_STATS = new Set([
+  'qi_focus_mult',
+  'harvest_luck', 'mining_luck',
+  'exploit_chance', 'exploit_attack_mult',
+]);
+
 /** Cap a numeric value at 2 decimal places and trim trailing zeros. */
 function fmt2(n) {
   if (typeof n !== 'number' || !isFinite(n)) return n;

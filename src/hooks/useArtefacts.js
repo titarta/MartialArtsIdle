@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ARTEFACTS_BY_ID } from '../data/artefacts';
 import { generateAffixes, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
+import { AFFIX_PCT_POINT_STATS } from '../data/affixDisplay';
 import { generateArtefactName, formatArtefactName } from '../data/artefactNames';
 import { evaluateArtefactUniques } from '../systems/artefactEngine';
 import { rollElementAndSet, getSetBonusModifiers } from '../data/artefactSets';
@@ -337,7 +338,15 @@ export default function useArtefacts() {
         const affix = affixArr[i];
         if (affix.unique || !affix.stat) continue;
         const bonus = bonuses[i] ?? 0;
-        const value = effectiveAffixValue(affix, level, bonus);
+        let value = effectiveAffixValue(affix, level, bonus);
+        // Affixes roll FLAT / BASE_FLAT on pct-point stats as decimals
+        // (matching INCREASED semantics and the tooltip's "× 100%" format),
+        // but the stat engine for these stats expects a 0–100 scale. Scale
+        // at projection so 0.054 exploit_chance reaches the engine as 5.4.
+        if ((affix.type === 'flat' || affix.type === 'base_flat')
+            && AFFIX_PCT_POINT_STATS.has(affix.stat)) {
+          value = value * 100;
+        }
         (mods[affix.stat] ??= []).push({ type: affix.type, value });
       }
     }
