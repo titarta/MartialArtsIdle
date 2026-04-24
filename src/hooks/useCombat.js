@@ -220,8 +220,9 @@ export default function useCombat() {
    */
   const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1, regionIndex = 0, onArtefactDrop = null) => {
     if (stateRef.current.phase === 'fighting') return;
-    const { essence, soul, body } = stats;
-    const total  = essence + soul + body;
+    // Primary-stat layer retired in stage 15 — pMaxHp flows through the
+    // `health` stat bundle now (stats.js placeholder formula).
+    const total  = 0;
 
     const hpMult  = enemyDef?.statMult?.hp  ?? 1;
     const atkMult = enemyDef?.statMult?.atk ?? 1;
@@ -231,7 +232,7 @@ export default function useCombat() {
     // DAMAGE_TYPE_BY_ID map missed (e.g. designer-added enemies).
     const eDmgType = enemyDef?.damageType ?? 'physical';
 
-    const pMaxHp = Math.max(100, Math.floor((essence + body) * 12 + soul * 4));
+    const pMaxHp = stats?.health ?? 100;
     // Enemy HP anchored to region index, not player stats. Base 150 × 1.12^index
     // gives W1 R1 ≈ 150, W2 R1 ≈ 980, W3 R1 ≈ 1830, W6 R4 ≈ 46k — a ~300× spread
     // across the 52 region indices before the per-enemy hpMult is applied.

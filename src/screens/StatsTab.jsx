@@ -305,8 +305,10 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
     selectionModBundle,
     treeModBundle,
   );
-  const { meta, primary, combat, activity } = computeAllStats(qi, activeLaw, realmIndex, mergedMods);
-  const { soulUnlocked } = meta;
+  const { combat, activity } = computeAllStats(qi, activeLaw, realmIndex, mergedMods);
+  // Primary-stat layer retired in stage 15 — keep a stub so legacy code
+  // paths that still reference `primary.*` don't explode on old saves.
+  const primary = { essence: 0, soul: 0, body: 0 };
 
   const toggle = (stat) => setActive((s) => (s === stat ? null : stat));
   const enter  = (stat) => setActive(stat);
@@ -322,17 +324,16 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
   ];
 
   function mkBd(statId, baseVal, baseLabel, total, unit = '') {
-    const isPrimary = statId === 'essence' || statId === 'body' || statId === 'soul';
     const sources = SOURCE_BUNDLES.map(({ name, bundle }) => ({
       name,
-      mods: isPrimary
-        ? [...(bundle[statId] ?? []), ...(bundle.all_primary_stats ?? [])]
-        : (bundle[statId] ?? []),
+      mods: bundle[statId] ?? [],
     }));
     return { base: baseLabel ? { label: baseLabel, value: baseVal } : null, sources, total, unit };
   }
 
-  const healthBase = (primary.essence + primary.body) * 12 + primary.soul * 4;
+  const healthBase = Math.max(100, realmIndex * 200);
+  const defenseBase = realmIndex * 5;
+  const elemDefBase = realmIndex * 5;
 
   const qiSpeedBreakdown = {
     base: { label: 'Base', value: 1 },
@@ -343,79 +344,32 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
     unit: '/s',
   };
 
+  // Silence unused-var warnings from remaining triangle helpers we no
+  // longer render (they stay imported in case the design pass brings them
+  // back in a different form).
+  void activeStat; void enter; void leave; void toggle;
+
   return (
     <div className="stats-content">
-      {/* ── Primary Stats: triangle centered, description as popover ── */}
-      <div className="stats-primary-row">
-        <div className="stat-triangle-container">
-          <TriangleLines activeStat={activeStat} />
-
-          <div
-            className="stat-circle-wrap stat-wrap-soul"
-            onMouseEnter={() => enter('soul')}
-            onMouseLeave={leave}
-            onClick={() => toggle('soul')}
-          >
-            <StatCircle label={t('stats.soulLabel')} value={primary.soul} locked={!soulUnlocked} glowColor="#c084fc" active={activeStat === 'soul'}>
-              <SoulSprite size={40} locked={!soulUnlocked} />
-            </StatCircle>
-          </div>
-
-          <div
-            className="stat-circle-wrap stat-wrap-essence"
-            onMouseEnter={() => enter('essence')}
-            onMouseLeave={leave}
-            onClick={() => toggle('essence')}
-          >
-            <StatCircle label={t('stats.essenceLabel')} value={primary.essence} locked={false} glowColor="#38bdf8" active={activeStat === 'essence'}>
-              <EssenceSprite size={40} />
-            </StatCircle>
-          </div>
-
-          <div
-            className="stat-circle-wrap stat-wrap-body"
-            onMouseEnter={() => enter('body')}
-            onMouseLeave={leave}
-            onClick={() => toggle('body')}
-          >
-            <StatCircle label={t('stats.bodyLabel')} value={primary.body} locked={false} glowColor="#f97316" active={activeStat === 'body'}>
-              <BodySprite size={40} />
-            </StatCircle>
-          </div>
-        </div>
-
-        {/* Detail popover — CSS positions this as a right-side panel on
-            narrow screens and as an absolute overlay next to the triangle
-            on PC (see .stat-detail-side in App.css). */}
-        <div className="stat-detail-side">
-          {activeStat ? (
-            <DetailPanel stat={activeStat} value={primary[activeStat] ?? 0} realmIndex={realmIndex} />
-          ) : (
-            <div className="sdp-placeholder">
-              <span>{t('stats.tapForDetails')}</span>
-              <span>{t('stats.forDetails')}</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Primary-stat triangle removed in stage 15 of the overhaul. */}
 
       {/* ── Combat + Utility stats: stacked on mobile, side by side on PC ── */}
       <div className="secondary-stats-grid">
         <StatGroup title={t('stats.groupCombat')}>
           <StatRow
-            label={t('statNames.health')}            hint="(Essence + Body) × 12"
+            label={t('statNames.health')}            hint="max(100, realm × 200)"
             value={combat.health}
-            breakdown={mkBd('health', healthBase, `Primary stats (${fmt(healthBase)})`, combat.health)}
+            breakdown={mkBd('health', healthBase, `Base (${fmt(healthBase)})`, combat.health)}
           />
           <StatRow
-            label={t('statNames.defense')}           hint="from Body"
+            label={t('statNames.defense')}           hint="realm × 5"
             value={combat.defense}
-            breakdown={mkBd('defense', primary.body, `Body (${primary.body})`, combat.defense)}
+            breakdown={mkBd('defense', defenseBase, `Base (${defenseBase})`, combat.defense)}
           />
           <StatRow
-            label={t('statNames.elemental_defense')} hint="from Essence"
+            label={t('statNames.elemental_defense')} hint="realm × 5"
             value={combat.elemDef}
-            breakdown={mkBd('elemental_defense', primary.essence, `Essence (${primary.essence})`, combat.elemDef)}
+            breakdown={mkBd('elemental_defense', elemDefBase, `Base (${elemDefBase})`, combat.elemDef)}
           />
           <StatRow
             label={t('statNames.physical_damage')}  hint="bonus"
@@ -451,9 +405,9 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
             breakdown={mkBd('qi_focus_mult', 300, 'Base (300%)', activity.focusMult, '%')}
           />
           <StatRow
-            label={t('statNames.harvest_speed')}    hint="from Soul"
-            value={activity.harvestSpeed} locked={!soulUnlocked}
-            breakdown={mkBd('harvest_speed', Math.floor(primary.soul * 0.1), `Soul/10 (${Math.floor(primary.soul * 0.1)})`, activity.harvestSpeed)}
+            label={t('statNames.harvest_speed')}    hint=""
+            value={activity.harvestSpeed}
+            breakdown={mkBd('harvest_speed', 1, 'Base (1)', activity.harvestSpeed)}
           />
           <StatRow
             label={t('statNames.harvest_luck')}     hint=""
@@ -461,9 +415,9 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
             breakdown={mkBd('harvest_luck', 0, null, activity.harvestLuck)}
           />
           <StatRow
-            label={t('statNames.mining_speed')}     hint="from Body"
+            label={t('statNames.mining_speed')}     hint=""
             value={activity.miningSpeed}
-            breakdown={mkBd('mining_speed', Math.floor(primary.body * 0.1), `Body/10 (${Math.floor(primary.body * 0.1)})`, activity.miningSpeed)}
+            breakdown={mkBd('mining_speed', 1, 'Base (1)', activity.miningSpeed)}
           />
           <StatRow
             label={t('statNames.mining_luck')}      hint=""

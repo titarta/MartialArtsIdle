@@ -147,12 +147,14 @@ export default function useReincarnationTree({ karma, spendKarma, lives = 0 } = 
       mods.exploit_chance = [{ type: 'flat', value: modifiers.exploitChanceFlat }];
     }
 
-    // hw_1 Soul Tempering — +20% all_primary_stats.
-    // hw_k Heavenly Constitution — +25% MORE all_primary_stats.
-    const apsMods = [];
-    if (purchased.has('hw_1')) apsMods.push({ type: 'increased', value: 0.20 });
-    if (purchased.has('hw_k')) apsMods.push({ type: 'more',      value: 1.25 });
-    if (apsMods.length) mods.all_primary_stats = apsMods;
+    // hw_1 Soul Tempering — formerly +20% all primary stats. Primary-stat
+    // layer retired in stage 15; the node now grants +20% damage_all.
+    // hw_k Heavenly Constitution — formerly +25% MORE all primary stats;
+    // now +25% MORE damage_all.
+    const dmgMods = [];
+    if (purchased.has('hw_1')) dmgMods.push({ type: 'increased', value: 0.20 });
+    if (purchased.has('hw_k')) dmgMods.push({ type: 'more',      value: 1.25 });
+    if (dmgMods.length) (mods.damage_all ??= []).push(...dmgMods);
 
     // hw_2 Iron Will — +50% max HP.
     // hw_k Heavenly Constitution — +25% MORE Health.

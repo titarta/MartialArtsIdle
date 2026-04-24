@@ -546,9 +546,6 @@ const STAT_DISPLAY = {
   harvest_luck:         'Harvest Luck',
   mining_luck:          'Mining Luck',
   elemental_defense:    'Elemental Defense',
-  essence:              'Essence',
-  soul:                 'Soul',
-  body:                 'Body',
   exploit_chance:       'Exploit Chance',
   exploit_attack_mult:  'Exploit Multiplier',
 };

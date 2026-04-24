@@ -14,11 +14,6 @@ export const AFFIX_STAT_LABELS = {
   defense:                'Defense',
   elemental_defense:      'Elemental Defense',
   health:                 'Health',
-  // Primary
-  essence:                'Essence',
-  soul:                   'Soul',
-  body:                   'Body',
-  all_primary_stats:      'All Primary Stats',
   // Combat utility
   exploit_chance:         'Exploit Chance',
   exploit_attack_mult:    'Exploit Multiplier',

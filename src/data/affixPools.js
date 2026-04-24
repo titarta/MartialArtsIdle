@@ -100,11 +100,8 @@ const AGGREGATE_SCALE = 0.5;
 //   decimalFlat → if true, FLAT/BASE_FLAT rolls store decimal (no Math.floor)
 //   aggregate   → if true, all rolled values are scaled by AGGREGATE_SCALE
 const STAT_META = {
-  // Primary stats
-  essence:                 { incr: 'INCR_BASIC', flat: 'FLAT_PRIMARY' },
-  body:                    { incr: 'INCR_BASIC', flat: 'FLAT_PRIMARY' },
-  soul:                    { incr: 'INCR_BASIC', flat: 'FLAT_PRIMARY' },
-  all_primary_stats:       { incr: 'INCR_BASIC', flat: 'FLAT_PRIMARY', aggregate: true },
+  // Primary stats removed in stage 15 of the overhaul — essence / soul /
+  // body / all_primary_stats are no longer valid stat ids.
   // Defensive stats
   health:                  { incr: 'INCR_BASIC', flat: 'FLAT_HP' },
   defense:                 { incr: 'INCR_BASIC', flat: 'FLAT_PRIMARY' },
@@ -140,14 +137,14 @@ const SLOT_STATS = {
     'damage_all', 'physical_damage', 'elemental_damage',
     'default_attack_damage', 'secret_technique_damage',
   ],
-  head:   ['elemental_defense', 'defense', 'health', 'soul'],
-  body:   ['elemental_defense', 'defense', 'health', 'body'],
+  head:   ['elemental_defense', 'defense', 'health'],
+  body:   ['elemental_defense', 'defense', 'health'],
   hands:  ['qi_speed', 'harvest_luck', 'mining_luck', 'elemental_defense',
            'defense', 'health', 'exploit_chance', 'exploit_attack_mult'],
-  waist:  ['elemental_defense', 'defense', 'health', 'essence'],
+  waist:  ['elemental_defense', 'defense', 'health'],
   feet:   ['elemental_defense', 'defense', 'health',
            'exploit_chance', 'exploit_attack_mult', 'mining_speed', 'harvest_speed', 'qi_speed'],
-  neck:   ['essence', 'soul', 'body', 'all_primary_stats', 'buff_effect'],
+  neck:   ['damage_all', 'defense', 'elemental_defense', 'health', 'buff_effect'],
   ring:   ['qi_speed', 'harvest_speed', 'harvest_luck', 'mining_speed', 'mining_luck',
            'qi_focus_mult', 'heavenly_qi_mult'],
 };

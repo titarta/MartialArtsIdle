@@ -109,9 +109,8 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
     const full = getFullStats?.();
     const playerStats = full
       ? {
-          essence:       full.essence,
-          soul:          full.soul,
-          body:          full.body,
+          health:        full.health,
+          essence:       0, soul: 0, body: 0,
           lawElement:    full.lawElement,
           // Full law + category damage stats are required for calcDamage's
           // per-technique damage-category split. Basic attack ignores the
@@ -124,10 +123,8 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
           buffEffectMult:   full.buffEffectMult,
         }
       : {
-          // Stats decoupled from Qi — fallback uses zero baseline.
-          essence:    0,
-          soul:       0,
-          body:       0,
+          health:     100,
+          essence:    0, soul: 0, body: 0,
           lawElement: law?.element ?? null,
           law,
         };

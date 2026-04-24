@@ -261,24 +261,12 @@ function App() {
       if (!value) return;
       (scaledArtefactMods[stat] ??= []).push({ type: 'increased', value });
     };
-    if (artefactFlagsNow.allStatsPerRealmPct) {
-      const v = (artefactFlagsNow.allStatsPerRealmPct / 100) * realmIndex;
-      pushScaledMod('all_primary_stats', v);
-    }
-    if (artefactFlagsNow.allStatsPerMajorRealmPct) {
-      const v = (artefactFlagsNow.allStatsPerMajorRealmPct / 100) * majorRealm;
-      pushScaledMod('all_primary_stats', v);
-    }
-    if (artefactFlagsNow.bodyToEssencePct) {
-      // body → essence conversion (a_essence_belt). Snapshot the existing
-      // body increased-sum as the conversion base. Approximates a true
-      // cross-stat conversion via a flat essence bonus.
-      const bodyBase = 20; // matches BASE_BODY in stats.js
-      pushScaledMod('essence', (artefactFlagsNow.bodyToEssencePct / 100));
-      // Compensate by reducing body by the same fraction.
-      (scaledArtefactMods.body ??= []).push({ type: 'increased', value: -(artefactFlagsNow.bodyToEssencePct / 100) });
-      void bodyBase;
-    }
+    // allStatsPerRealmPct / allStatsPerMajorRealmPct / bodyToEssencePct
+    // artefact flags pointed at the retired primary-stat layer — they're
+    // no-ops after stage 15. The flag keys remain so pre-stage-15 save
+    // data deserializes without errors; a later cleanup pass will remove
+    // the unique-effect definitions that emit them.
+    void majorRealm;
     // Collapse artefact-only qi_speed mods into a single multiplier fed to
     // the cultivation tick. Law-unique qi_speed is handled inside cultivation
     // directly, so it is NOT included here (double-count guard).
@@ -323,10 +311,13 @@ function App() {
     // simply don't feed into damage anymore.
 
     return {
-      // Combat-shaped (existing fields)
-      essence:    bundle.primary.essence,
-      soul:       bundle.primary.soul,
-      body:       bundle.primary.body,
+      // Primary stats (essence/soul/body) retired in stage 15 — zeroed here
+      // for consumers (calcDamage signature, etc.) that still destructure
+      // them. Future cleanup drops them from this bundle entirely.
+      essence:    0,
+      soul:       0,
+      body:       0,
+      health:     bundle.combat.health,
       lawElement: law?.element ?? null,
       // Full active law — calcDamage still reads law.element for the
       // elem-match bonus. law.types drives unique-pool selection only.

@@ -29,9 +29,9 @@ export { RARITY as ITEM_RARITY };
 
 const PILL_DEFS_RAW = [
   // ── Iron (+3 primary, +5 damage, +5 defense, +40 health) ──────────────────
-  { id: 'iron_essence_pill', name: 'Iron Essence Pill', rarity: 'Iron', effects: [{ stat: 'essence', type: 'flat', value: 3 }] },
-  { id: 'iron_soul_pill',    name: 'Iron Soul Pill',    rarity: 'Iron', effects: [{ stat: 'soul',    type: 'flat', value: 3 }] },
-  { id: 'iron_body_pill',    name: 'Iron Body Pill',    rarity: 'Iron', effects: [{ stat: 'body',    type: 'flat', value: 3 }] },
+  { id: 'iron_essence_pill', name: 'Iron Essence Pill', rarity: 'Iron', effects: [{ stat: 'health', type: 'flat', value: 10 }] },
+  { id: 'iron_soul_pill',    name: 'Iron Soul Pill',    rarity: 'Iron', effects: [{ stat: 'health', type: 'flat', value: 10 }] },
+  { id: 'iron_body_pill',    name: 'Iron Body Pill',    rarity: 'Iron', effects: [{ stat: 'health', type: 'flat', value: 10 }] },
   { id: 'iron_fist_pill',    name: 'Iron Fist Pill',    rarity: 'Iron', effects: [{ stat: 'physical_damage',  type: 'flat', value: 5 }] },
   { id: 'iron_ember_pill',   name: 'Iron Ember Pill',   rarity: 'Iron', effects: [{ stat: 'elemental_damage', type: 'flat', value: 5 }] },
   { id: 'iron_skin_pill',    name: 'Iron Skin Pill',    rarity: 'Iron', effects: [{ stat: 'defense',           type: 'flat', value: 5 }] },
@@ -39,9 +39,9 @@ const PILL_DEFS_RAW = [
   { id: 'iron_vigor_pill',   name: 'Iron Vigor Pill',   rarity: 'Iron', effects: [{ stat: 'health',            type: 'flat', value: 40 }] },
 
   // ── Bronze (+6 primary, +10 damage, +10 defense, +100 health) ─────────────
-  { id: 'bronze_essence_pill', name: 'Bronze Essence Pill', rarity: 'Bronze', effects: [{ stat: 'essence', type: 'flat', value: 6 }] },
-  { id: 'bronze_soul_pill',    name: 'Bronze Soul Pill',    rarity: 'Bronze', effects: [{ stat: 'soul',    type: 'flat', value: 6 }] },
-  { id: 'bronze_body_pill',    name: 'Bronze Body Pill',    rarity: 'Bronze', effects: [{ stat: 'body',    type: 'flat', value: 6 }] },
+  { id: 'bronze_essence_pill', name: 'Bronze Essence Pill', rarity: 'Bronze', effects: [{ stat: 'health', type: 'flat', value: 30 }] },
+  { id: 'bronze_soul_pill',    name: 'Bronze Soul Pill',    rarity: 'Bronze', effects: [{ stat: 'health', type: 'flat', value: 30 }] },
+  { id: 'bronze_body_pill',    name: 'Bronze Body Pill',    rarity: 'Bronze', effects: [{ stat: 'health', type: 'flat', value: 30 }] },
   { id: 'bronze_fist_pill',    name: 'Bronze Fist Pill',    rarity: 'Bronze', effects: [{ stat: 'physical_damage',  type: 'flat', value: 10 }] },
   { id: 'bronze_ember_pill',   name: 'Bronze Ember Pill',   rarity: 'Bronze', effects: [{ stat: 'elemental_damage', type: 'flat', value: 10 }] },
   { id: 'bronze_skin_pill',    name: 'Bronze Skin Pill',    rarity: 'Bronze', effects: [{ stat: 'defense',           type: 'flat', value: 10 }] },
@@ -49,9 +49,9 @@ const PILL_DEFS_RAW = [
   { id: 'bronze_vigor_pill',   name: 'Bronze Vigor Pill',   rarity: 'Bronze', effects: [{ stat: 'health',            type: 'flat', value: 100 }] },
 
   // ── Silver (+12 primary, +20 damage, +20 defense, +250 health) ────────────
-  { id: 'silver_essence_pill', name: 'Silver Essence Pill', rarity: 'Silver', effects: [{ stat: 'essence', type: 'flat', value: 12 }] },
-  { id: 'silver_soul_pill',    name: 'Silver Soul Pill',    rarity: 'Silver', effects: [{ stat: 'soul',    type: 'flat', value: 12 }] },
-  { id: 'silver_body_pill',    name: 'Silver Body Pill',    rarity: 'Silver', effects: [{ stat: 'body',    type: 'flat', value: 12 }] },
+  { id: 'silver_essence_pill', name: 'Silver Essence Pill', rarity: 'Silver', effects: [{ stat: 'health', type: 'flat', value: 75 }] },
+  { id: 'silver_soul_pill',    name: 'Silver Soul Pill',    rarity: 'Silver', effects: [{ stat: 'health', type: 'flat', value: 75 }] },
+  { id: 'silver_body_pill',    name: 'Silver Body Pill',    rarity: 'Silver', effects: [{ stat: 'health', type: 'flat', value: 75 }] },
   { id: 'silver_fist_pill',    name: 'Silver Fist Pill',    rarity: 'Silver', effects: [{ stat: 'physical_damage',  type: 'flat', value: 20 }] },
   { id: 'silver_ember_pill',   name: 'Silver Ember Pill',   rarity: 'Silver', effects: [{ stat: 'elemental_damage', type: 'flat', value: 20 }] },
   { id: 'silver_skin_pill',    name: 'Silver Skin Pill',    rarity: 'Silver', effects: [{ stat: 'defense',           type: 'flat', value: 20 }] },
@@ -59,9 +59,9 @@ const PILL_DEFS_RAW = [
   { id: 'silver_vigor_pill',   name: 'Silver Vigor Pill',   rarity: 'Silver', effects: [{ stat: 'health',            type: 'flat', value: 250 }] },
 
   // ── Gold (+25 primary, +40 damage, +40 defense, +600 health) ──────────────
-  { id: 'gold_essence_pill', name: 'Gold Essence Pill', rarity: 'Gold', effects: [{ stat: 'essence', type: 'flat', value: 25 }] },
-  { id: 'gold_soul_pill',    name: 'Gold Soul Pill',    rarity: 'Gold', effects: [{ stat: 'soul',    type: 'flat', value: 25 }] },
-  { id: 'gold_body_pill',    name: 'Gold Body Pill',    rarity: 'Gold', effects: [{ stat: 'body',    type: 'flat', value: 25 }] },
+  { id: 'gold_essence_pill', name: 'Gold Essence Pill', rarity: 'Gold', effects: [{ stat: 'health', type: 'flat', value: 200 }] },
+  { id: 'gold_soul_pill',    name: 'Gold Soul Pill',    rarity: 'Gold', effects: [{ stat: 'health', type: 'flat', value: 200 }] },
+  { id: 'gold_body_pill',    name: 'Gold Body Pill',    rarity: 'Gold', effects: [{ stat: 'health', type: 'flat', value: 200 }] },
   { id: 'gold_fist_pill',    name: 'Gold Fist Pill',    rarity: 'Gold', effects: [{ stat: 'physical_damage',  type: 'flat', value: 40 }] },
   { id: 'gold_ember_pill',   name: 'Gold Ember Pill',   rarity: 'Gold', effects: [{ stat: 'elemental_damage', type: 'flat', value: 40 }] },
   { id: 'gold_skin_pill',    name: 'Gold Skin Pill',    rarity: 'Gold', effects: [{ stat: 'defense',           type: 'flat', value: 40 }] },
@@ -70,9 +70,7 @@ const PILL_DEFS_RAW = [
 
   // ── Transcendent (premium: all-primary, utility, big bundles) ─────────────
   { id: 'transcendent_essence_pill', name: 'Transcendent Essence Pill', rarity: 'Transcendent', effects: [
-    { stat: 'essence', type: 'flat', value: 50 },
-    { stat: 'soul',    type: 'flat', value: 50 },
-    { stat: 'body',    type: 'flat', value: 50 },
+    { stat: 'health', type: 'flat', value: 600 },
   ]},
   { id: 'exploit_mastery_pill', name: 'Exploit Mastery Pill', rarity: 'Transcendent', effects: [
     { stat: 'exploit_chance',       type: 'flat', value: 5 },
@@ -112,10 +110,6 @@ export const PILL_CATEGORY_LABEL = {
 };
 
 const STAT_TO_CATEGORY = {
-  // Primary stats — drive combat output.
-  essence:              'combat',
-  soul:                 'combat',
-  body:                 'combat',
   // Damage
   physical_damage:      'combat',
   elemental_damage:     'combat',

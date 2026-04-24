@@ -100,10 +100,6 @@ export function rarityOptions() {
  * into gameplay. Adding a new stat to gameplay = add it here.
  */
 export const STAT_IDS = [
-  // Primary
-  'essence',
-  'soul',
-  'body',
   'health',
   // Combat damage
   'physical_damage',
@@ -126,9 +122,6 @@ export const STAT_IDS = [
 
 /** Human-readable label for each stat (used in dropdowns). */
 export const STAT_LABEL = {
-  essence:             'Essence',
-  soul:                'Soul',
-  body:                'Body',
   health:              'Health',
   physical_damage:     'Physical Damage',
   elemental_damage:    'Elemental Damage',

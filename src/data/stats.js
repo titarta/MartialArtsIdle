@@ -19,13 +19,10 @@ export const MOD = {
 };
 
 const QI_BASE_RATE = 1;   // qi/sec — must match useCultivation BASE_RATE
-const SAINT_INDEX  = 24;  // realm index at which Soul unlocks
 
-// Baseline primary stats the player starts with (before any modifier sources).
-// Keeps level-1 combat survivable: HP 120, basic atk 10, def 10.
-// Tune here to rebalance the starting power level.
-const BASE_ESSENCE = 20;
-const BASE_BODY    = 20;
+// Primary-stat layer (Essence / Soul / Body) removed in stage 15 of the
+// Damage & Element Overhaul. Placeholder formulas below key off realmIndex
+// alone — see obsidian/Primary Stats.md#Placeholder formulas.
 
 /**
  * Apply the stacking formula to a base value.
@@ -49,17 +46,15 @@ export function computeStat(base, modifiers = []) {
 /**
  * Derive every stat from the current game snapshot.
  *
- * Primary stats (Essence, Soul, Body) start at 0 and are built up entirely
- * through modifier sources — pills, artefacts, Law passives, reincarnation.
- * They are NOT derived from Qi; Qi is a separate resource used exclusively
- * for realm breakthroughs. (See obsidian/Primary Stats.md.)
+ * Primary stats (Essence, Soul, Body) are gone — every derived stat now
+ * keys off realmIndex + explicit modifier stacks. See obsidian/Primary
+ * Stats.md for the deprecation note.
  *
  * @param {number} qi          — current raw qi (unused for stat derivation; retained for signature stability)
  * @param {object} law         — active law object (used for cultivationSpeedMult only)
  * @param {number} realmIndex  — current realm index
  * @param {object} modifiers   — { [statId]: Modifier[] }
- *                               Empty until items/laws grant modifiers.
- * @returns {{ meta, primary, combat, activity }}
+ * @returns {{ meta, combat, activity }}
  */
 /** Merge multiple modifier bundles into a single one. */
 export function mergeModifiers(...bundles) {
@@ -75,50 +70,30 @@ export function mergeModifiers(...bundles) {
 }
 
 export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
-  // Sugar: `all_primary_stats` flows into each of essence/body/soul. Done
-  // here (not at the modifier merge layer) so artefact / pill / unique
-  // sources all benefit equally without needing to know about the alias.
-  const allPrimary = modifiers.all_primary_stats ?? [];
-  const mods = (id) => {
-    if (id === 'essence' || id === 'body' || id === 'soul') {
-      return [...(modifiers[id] ?? []), ...allPrimary];
-    }
-    return modifiers[id] ?? [];
-  };
-  const soulUnlocked = realmIndex >= SAINT_INDEX;
+  const mods = (id) => modifiers[id] ?? [];
 
-  // ── Primary ────────────────────────────────────────────────────────────────
-  // Starts at a small non-zero baseline (BASE_ESSENCE / BASE_BODY) so combat
-  // is survivable from turn 0. Soul stays locked at 0 until Saint realm.
-  // All further growth comes from modifier stacks (pills, artefacts, etc.).
-  const essence = Math.floor(computeStat(BASE_ESSENCE, mods('essence')));
-  const soul    = soulUnlocked
-    ? Math.floor(computeStat(0, mods('soul')))
-    : 0;
-  const body    = Math.floor(computeStat(BASE_BODY, mods('body')));
+  const r = Math.max(0, realmIndex ?? 0);
 
   // ── Combat ─────────────────────────────────────────────────────────────────
-  const health      = Math.max(100, Math.floor(computeStat((essence + body) * 12 + soul * 4, mods('health'))));
-  const physDmg     = Math.floor(computeStat(0,             mods('physical_damage')));
-  const elemDmg     = Math.floor(computeStat(0,             mods('elemental_damage')));
-  const defense     = Math.floor(computeStat(body, mods('defense')));
-  const elemDef     = Math.floor(computeStat(essence,        mods('elemental_defense')));
-  const exploitChance  = Math.round(computeStat(0,   mods('exploit_chance')));   // 0–100
-  const exploitMult    = Math.round(computeStat(150, mods('exploit_attack_mult'))); // %
+  // Placeholder formulas — see obsidian/Primary Stats.md.
+  const health        = Math.max(100, Math.floor(computeStat(Math.max(100, r * 200), mods('health'))));
+  const physDmg       = Math.floor(computeStat(0, mods('physical_damage')));
+  const elemDmg       = Math.floor(computeStat(0, mods('elemental_damage')));
+  const defense       = Math.floor(computeStat(r * 5,  mods('defense')));
+  const elemDef       = Math.floor(computeStat(r * 5,  mods('elemental_defense')));
+  const exploitChance = Math.round(computeStat(0,   mods('exploit_chance')));
+  const exploitMult   = Math.round(computeStat(150, mods('exploit_attack_mult')));
 
   // ── Activity ───────────────────────────────────────────────────────────────
-  const qiSpeed      = QI_BASE_RATE * (law?.cultivationSpeedMult ?? 1); // qi/sec base
-  const focusMult    = Math.round(computeStat(300, mods('qi_focus_mult')));      // %
-  const harvestSpeed = soulUnlocked
-    ? Math.max(1, Math.floor(computeStat(Math.floor(soul * 0.1), mods('harvest_speed'))))
-    : 0;
+  const qiSpeed      = QI_BASE_RATE * (law?.cultivationSpeedMult ?? 1);
+  const focusMult    = Math.round(computeStat(300, mods('qi_focus_mult')));
+  const harvestSpeed = Math.max(1, Math.floor(computeStat(1, mods('harvest_speed'))));
   const harvestLuck  = Math.floor(computeStat(0, mods('harvest_luck')));
-  const miningSpeed  = Math.max(1, Math.floor(computeStat(Math.floor(body * 0.1), mods('mining_speed'))));
+  const miningSpeed  = Math.max(1, Math.floor(computeStat(1, mods('mining_speed'))));
   const miningLuck   = Math.floor(computeStat(0, mods('mining_luck')));
 
   return {
-    meta:     { soulUnlocked },
-    primary:  { essence, soul, body },
+    meta:     { soulUnlocked: true },  // kept true so legacy UI guards pass
     combat:   { health, physDmg, elemDmg, defense, elemDef, exploitChance, exploitMult },
     activity: { qiSpeed, focusMult, harvestSpeed, harvestLuck, miningSpeed, miningLuck },
   };
