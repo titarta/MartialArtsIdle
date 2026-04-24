@@ -8,6 +8,7 @@
  */
 
 import { TECHNIQUE_QUALITY } from './techniques';
+import { ELEMENTS } from './elements';
 
 // ─── World-tier tables ────────────────────────────────────────────────────────
 
@@ -22,17 +23,18 @@ export const WORLD_QUALITY_WEIGHTS = [
 ];
 
 /**
- * Dominant elements per world. Normal appears multiple times in early worlds
- * to lower the chance of an element match — keeping elementless techniques
- * common in World 1 where most players won't have elemental Laws yet.
+ * Dominant elements per world. Post-Stage-7 every technique is tagged with
+ * one of the five elements (see obsidian/Elements.md). Early worlds bias
+ * toward metal/earth (the "plain" elements) so a law's element match is
+ * still statistically uncommon at low realms; later worlds open up.
  */
 const WORLD_ELEMENTS = [
-  ['Normal', 'Normal', 'Normal', 'Fire', 'Lightning'],             // World 1
-  ['Normal', 'Normal', 'Fire', 'Frost', 'Shadow'],                 // World 2
-  ['Normal', 'Shadow', 'Void', 'Lightning'],                       // World 3
-  ['Normal', 'Fire', 'Void'],                                      // World 4
-  ['Void', 'Void', 'Normal'],                                      // World 5
-  ['Normal', 'Fire', 'Frost', 'Lightning', 'Wind', 'Void'],        // World 6
+  ['metal', 'metal', 'earth', 'fire'],                             // World 1
+  ['metal', 'earth', 'fire', 'water'],                             // World 2
+  ['metal', 'earth', 'fire', 'water', 'wood'],                     // World 3
+  ['fire', 'water', 'wood', 'metal', 'earth'],                     // World 4
+  ['fire', 'water', 'wood', 'metal', 'earth'],                     // World 5
+  ['fire', 'water', 'wood', 'metal', 'earth'],                     // World 6
 ];
 
 /** Rank of dropped techniques per world. */
@@ -45,15 +47,11 @@ const TYPE_WEIGHTS = { Attack: 50, Heal: 20, Defend: 15, Dodge: 15 };
 // ─── Name generation ──────────────────────────────────────────────────────────
 
 const ELEM_WORDS = {
-  Normal:    ['Iron', 'Stone', 'Mountain', 'Steel', ''],
-  Fire:      ['Flame', 'Blazing', 'Inferno', 'Scorching'],
-  Lightning: ['Thunder', 'Storm', 'Lightning', 'Crackling'],
-  Frost:     ['Frost', 'Glacial', 'Ice', 'Frozen'],
-  Shadow:    ['Shadow', 'Dark', 'Umbra', 'Eclipse'],
-  Void:      ['Void', 'Spatial', 'Rift'],
-  Wind:      ['Wind', 'Gale', 'Tempest'],
-  Ancient:   ['Ancient', 'Primordial', 'Archaic'],
-  Blood:     ['Blood', 'Crimson', 'Scarlet'],
+  fire:  ['Flame', 'Blazing', 'Inferno', 'Scorching', 'Ember'],
+  water: ['Tidal', 'Frost', 'Glacial', 'Torrent', 'River'],
+  earth: ['Stone', 'Mountain', 'Granite', 'Tremor', 'Dune'],
+  wood:  ['Thorn', 'Ivy', 'Verdant', 'Root', 'Grove'],
+  metal: ['Iron', 'Steel', 'Razor', 'Bladed', 'Sovereign'],
 };
 
 const TYPE_WORDS = {
@@ -176,9 +174,9 @@ export function generateTechnique(worldId) {
   const typeStats = {};
   if (type === 'Attack') {
     typeStats.arteMult  = 1.0;
-    typeStats.elemBonus = element !== 'Normal'
-      ? parseFloat((1.0 + Math.random() * 0.3).toFixed(2))
-      : 1.0;
+    // Every technique now carries an element — elem-match is always
+    // live if the player equips a same-element law.
+    typeStats.elemBonus = parseFloat((1.0 + Math.random() * 0.3).toFixed(2));
     typeStats.bonus = 0;
     // damageType routes the single flat-bucket bonus in calcDamage
     // (post-Stage-5). Independent of `element`, which is a content tag.

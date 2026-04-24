@@ -16,7 +16,7 @@ export default function LawsEditor({ edited, onChangeRecords }) {
       initialNewRecord={{
         id: 'new_law',
         name: 'New Law',
-        element: 'Normal',
+        element: 'metal',
         rarity: 'Iron',
         realmRequirement: 0,
         cultivationSpeedMult: 1.0,

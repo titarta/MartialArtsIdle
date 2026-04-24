@@ -128,7 +128,7 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
           essence:    0,
           soul:       0,
           body:       0,
-          lawElement: law?.element ?? 'Normal',
+          lawElement: law?.element ?? null,
           law,
         };
 

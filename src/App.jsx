@@ -327,7 +327,7 @@ function App() {
       essence:    bundle.primary.essence,
       soul:       bundle.primary.soul,
       body:       bundle.primary.body,
-      lawElement: law?.element ?? 'Normal',
+      lawElement: law?.element ?? null,
       // Full active law — calcDamage still reads law.element for the
       // elem-match bonus. law.types drives unique-pool selection only.
       law: lawForCompute,

@@ -325,16 +325,11 @@
     "Transcendent": "Transcendent"
   },
   "elements": {
-    "Normal": "Normal",
-    "Fire": "Fire",
-    "Water": "Water",
-    "Wood": "Wood",
-    "Metal": "Metal",
-    "Earth": "Earth",
-    "Thunder": "Thunder",
-    "Wind": "Wind",
-    "Light": "Light",
-    "Darkness": "Darkness"
+    "fire":  "Fire",
+    "water": "Water",
+    "earth": "Earth",
+    "wood":  "Wood",
+    "metal": "Metal"
   },
   "techniqueTypes": {
     "Attack": "Attack",

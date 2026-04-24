@@ -334,16 +334,11 @@
   },
 
   "elements": {
-    "Normal":   "Normal",
-    "Fire":     "Fogo",
-    "Water":    "Água",
-    "Wood":     "Madeira",
-    "Metal":    "Metal",
-    "Earth":    "Terra",
-    "Thunder":  "Trovão",
-    "Wind":     "Vento",
-    "Light":    "Luz",
-    "Darkness": "Trevas"
+    "fire":  "Fogo",
+    "water": "Água",
+    "earth": "Terra",
+    "wood":  "Madeira",
+    "metal": "Metal"
   },
 
   "techniqueTypes": {

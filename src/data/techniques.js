@@ -96,12 +96,12 @@ export function getK(rank, quality) {
  * @param {number} artefactFlat
  * @param {{physical:number, elemental:number}|null} damageStats
  */
-export function calcDamage(tech, essence, soul, body, lawOrElement = 'Normal', artefactFlat = 0, damageStats = null) {
+export function calcDamage(tech, essence, soul, body, lawOrElement = null, artefactFlat = 0, damageStats = null) {
   const law = (lawOrElement && typeof lawOrElement === 'object') ? lawOrElement : null;
-  const lawElement = law?.element ?? (typeof lawOrElement === 'string' ? lawOrElement : 'Normal');
+  const lawElement = law?.element ?? (typeof lawOrElement === 'string' ? lawOrElement : null);
 
   const K = getK(tech.rank, tech.quality);
-  const elemMatch = tech.element !== 'Normal' && tech.element === lawElement;
+  const elemMatch = !!tech.element && tech.element === lawElement;
   const elemBonus = elemMatch ? (tech.elemBonus ?? 1.0) : 1.0;
   let dmg = K * (essence + soul + body + artefactFlat)
           * (tech.arteMult ?? 1.0)

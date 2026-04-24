@@ -10,7 +10,7 @@ import { rarityOptions } from '../enumSources.js';
  * lawUniques.js (not editable here in MVP).
  */
 
-const ELEMENTS = ['Normal', 'Fire', 'Water', 'Earth', 'Metal', 'Wood', 'Wind', 'Lightning', 'Void'];
+import { ELEMENTS } from '../../data/elements';
 
 const uniqueRef = [
   { key: 'id',    type: 'string', label: 'Unique id', help: 'Reference to a LAW_UNIQUE id (e.g. l_balanced_dao). Not validated yet.' },

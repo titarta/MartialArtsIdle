@@ -55,7 +55,7 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
         {tech.type === 'Dodge' && (
           <span>{t('techniqueSlotModal.dodgeBuff', { pct: Math.round((tech.dodgeChance ?? 0) * 100), hits: tech.buffAttacks })}</span>
         )}
-        {tech.element !== 'Normal' && (
+        {tech.element && tech.element !== 'Normal' && (
           <span className="tech-element">
             {t(`elements.${tech.element}`, { defaultValue: tech.element })}
           </span>

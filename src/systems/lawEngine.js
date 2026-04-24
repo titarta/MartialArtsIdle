@@ -127,7 +127,7 @@ function resolveValue(spec, rolledValue, ctx) {
     return (rolledValue / 100) * (missing * 10);
   }
   if (spec === 'rolled_per_unique_tech_element') {
-    const elems = new Set((ctx.techElements || []).filter(e => e && e !== 'Normal'));
+    const elems = new Set((ctx.techElements || []).filter(Boolean));
     return (rolledValue / 100) * elems.size;
   }
   if (spec === 'rolled_pct_current_qi') {
