@@ -8,6 +8,7 @@ import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown } from '../data/techniques';
 import { QUALITY } from '../data/artefacts';
+import { ARTEFACT_SETS, countEquippedSets } from '../data/artefactSets';
 
 // col/row are 1-indexed CSS grid positions (3 columns, 5 rows)
 const GEAR_SLOTS = [
@@ -407,6 +408,32 @@ function BuildContent({ cultivation, techniques, artefacts }) {
               );
             })}
           </div>
+
+          {/* Active-sets summary. 2-piece = minor bonus active, 4-piece =
+              minor + major. Set bonuses themselves are placeholder until a
+              later overhaul stage wires them into the stat engine. */}
+          {(() => {
+            const setCounts = countEquippedSets(artefacts.equipped, artefacts.owned);
+            const active    = Object.entries(setCounts).filter(([, n]) => n >= 2);
+            if (!active.length) return null;
+            return (
+              <div className="active-sets-panel" style={{ marginTop: 8, padding: 8, fontSize: 12 }}>
+                <div style={{ opacity: 0.7, marginBottom: 4 }}>
+                  {t('build.activeSets', { defaultValue: 'Active sets' })}
+                </div>
+                {active.map(([sid, n]) => {
+                  const s   = ARTEFACT_SETS[sid];
+                  const tag = n >= 4 ? '4-piece' : '2-piece';
+                  return (
+                    <div key={sid} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>◆ {s?.name ?? sid}</span>
+                      <span style={{ opacity: 0.8 }}>{tag} ({n})</span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {/* Gear hover tooltip */}
           {gearTooltip.pos && hoveredArt && (

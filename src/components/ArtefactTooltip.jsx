@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { QUALITY, getSlotBonuses } from '../data/artefacts';
 import { AFFIX_UNIQUE_COLOR, formatAffixValue } from '../data/affixDisplay';
+import { ARTEFACT_SETS } from '../data/artefactSets';
 
 /**
  * Shared artefact tooltip — renders the item name, quality badge, derived
@@ -10,22 +11,41 @@ import { AFFIX_UNIQUE_COLOR, formatAffixValue } from '../data/affixDisplay';
  * Collection tab, and the Transmutation panel so hover previews stay in
  * sync across screens.
  */
-export default function ArtefactTooltip({ artefact, affixes, style }) {
+export default function ArtefactTooltip({ artefact, affixes, style, element, setIds, upgradeLevel }) {
   const { t } = useTranslation('ui');
   if (!artefact) return null;
   const quality = QUALITY[artefact.rarity];
   const baseBonuses = getSlotBonuses(artefact.slot, artefact.rarity);
   const artName = artefact.name;
+  // Prefer prop-level fields so call sites can pass instance data without
+  // having to graft it onto the `artefact` object. Fall back to artefact.*
+  // for older wirings.
+  const elem   = element   ?? artefact.element;
+  const sets   = setIds    ?? artefact.setIds;
+  const level  = upgradeLevel ?? artefact.upgradeLevel ?? 0;
 
   // Portal to document.body so ancestors using `transform` / `filter` (the
   // mobile bottom-sheet picker) don't trap a position:fixed tooltip inside
   // their containing block.
   const content = (
     <div className="art-tooltip" style={style}>
-      <span className="art-tooltip-name" style={{ color: quality?.color }}>{artName}</span>
+      <span className="art-tooltip-name" style={{ color: quality?.color }}>
+        {artName}{level > 0 && <span style={{ marginLeft: 6 }}>+{level}</span>}
+      </span>
       <span className="art-tooltip-quality" style={{ color: quality?.color }}>
         {t(`quality.${artefact.rarity}`, { defaultValue: quality?.label })}
+        {elem && <> · {t(`elements.${elem}`, { defaultValue: elem })}</>}
       </span>
+      {Array.isArray(sets) && sets.length > 0 && (
+        <div className="art-tooltip-section" style={{ opacity: 0.85 }}>
+          {sets.map(sid => {
+            const s = ARTEFACT_SETS[sid];
+            return s
+              ? <span key={sid} className="art-tooltip-line">◆ {s.name}</span>
+              : <span key={sid} className="art-tooltip-line">◆ {sid}</span>;
+          })}
+        </div>
+      )}
       {baseBonuses.length > 0 && (
         <div className="art-tooltip-section">
           {baseBonuses.map((b, i) => (

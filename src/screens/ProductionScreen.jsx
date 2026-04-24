@@ -673,6 +673,9 @@ function TransmutationPanel({ inventory, artefacts, techniques, cultivation }) {
           <ArtefactTooltip
             artefact={{ ...cat, rarity, name }}
             affixes={inst.affixes ?? []}
+            element={inst.element}
+            setIds={inst.setIds}
+            upgradeLevel={inst.upgradeLevel ?? 0}
             style={{ position: 'fixed', left: artTooltip.pos.x, top: artTooltip.pos.y, zIndex: 100 }}
           />
         );

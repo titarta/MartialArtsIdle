@@ -9,6 +9,7 @@ import { formatUniqueDescription } from '../data/lawUniques';
 import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown, getK } from '../data/techniques';
 import { MAX_ARTEFACTS } from '../hooks/useArtefacts';
 import { MAX_UPGRADE_BY_RARITY } from '../data/artefactUpgrades';
+import { ARTEFACT_SETS } from '../data/artefactSets';
 import { MAX_TECHNIQUES } from '../hooks/useTechniques';
 import { MAX_LAWS } from '../hooks/useCultivation';
 import ItemModal from '../components/ItemModal';
@@ -270,6 +271,9 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
           <ArtefactTooltip
             artefact={{ ...cat, rarity, name }}
             affixes={inst.affixes ?? []}
+            element={inst.element}
+            setIds={inst.setIds}
+            upgradeLevel={inst.upgradeLevel ?? 0}
             style={{ position: 'fixed', left: artTooltip.pos.x, top: artTooltip.pos.y, zIndex: 100 }}
           />
         );
@@ -317,6 +321,27 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                   </div>
                 ))}
               </div>
+
+              {/* ── Set membership ──────────────────────────────────────── */}
+              {Array.isArray(live.setIds) && live.setIds.length > 0 && (
+                <div className="item-stat-block" style={{ marginTop: 8 }}>
+                  <div className="item-stat-row" style={{ opacity: 0.85 }}>
+                    <span className="item-stat-label">{t('collection.setLabel', { defaultValue: 'Set' })}</span>
+                  </div>
+                  {live.setIds.map(sid => {
+                    const s = ARTEFACT_SETS[sid];
+                    if (!s) return null;
+                    return (
+                      <div key={sid} className="item-stat-row" style={{ paddingLeft: 12 }}>
+                        <span className="item-stat-label">◆ {s.name}</span>
+                        <span className="item-stat-value" style={{ opacity: 0.7 }}>
+                          {t(`elements.${s.element}`, { defaultValue: s.element })}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* ── Upgrade panel ───────────────────────────────────────── */}
               <div className="item-stat-block" style={{ marginTop: 12, padding: 10, border: `1px solid ${q.color}55`, borderRadius: 6 }}>
