@@ -285,6 +285,105 @@ export function initDebug(hooksRef) {
       console.log(`[debug] Crystal evolution overlay — tier ${prev} → ${newTier} (lv ${lvl}, variant=${variant ?? 'shatter'})`);
     },
 
+    // ── Theme ──────────────────────────────────────────────────────────────
+
+    /**
+     * Shift the UI theme (purple family + chrome tints + dark backgrounds)
+     * by an arbitrary hue / saturation / lightness offset. Mutates every
+     * --ui-* CSS variable on the document root. Leaves sprites, rarity
+     * palettes, gold accents, damage types and other semantic colours
+     * alone.
+     *
+     *   gd.themeShift(90)           → shift hue 90° (teal/green UI)
+     *   gd.themeShift(0, 0.2)       → mute the purple to near-grey
+     *   gd.themeShift(0, 0)         → pure monochrome (no colour, just greys)
+     *   gd.themeShift(55, 0.4, -5)  → sober dark-gold
+     *   gd.themeShift(180, 1, 10)   → gold/amber UI, noticeably lighter
+     *   gd.themeShift()             → reset all overrides
+     *
+     * @param {number} [hue=0]         Hue rotation in degrees (any integer).
+     * @param {number} [satScale=1]    Saturation multiplier. 0 = monochrome,
+     *                                 1 = unchanged, >1 = more vivid.
+     * @param {number} [lightOffset=0] Lightness % offset added to every shade.
+     *                                 Range roughly -20 … +20.
+     */
+    themeShift(hue = 0, satScale = 1, lightOffset = 0) {
+      const root = document.documentElement;
+      // Clear any leftover filter from an earlier (whole-app) hueShift call.
+      const app  = document.querySelector('.app');
+      if (app) app.style.filter = '';
+
+      // Solid-hex shades — each stored as [H, S, L] from its base hex.
+      const hexShades = {
+        '--ui-purple-darker': [263, 69,  42],
+        '--ui-purple-deep':   [262, 83,  58],
+        '--ui-purple-strong': [271, 91,  65],
+        '--ui-purple-soft':   [250, 95,  76],
+        '--ui-purple-light':  [252, 95,  85],
+        '--ui-purple-wash':   [252, 100, 93],
+        '--ui-purple-pale':   [270, 100, 92],
+      };
+
+      // RGB triples used in rgba() — stored as [H, S, L] so we can recompute
+      // fresh R/G/B channel values after the transform.
+      const rgbShades = {
+        '--ui-purple-rgb':         [258, 90,   66],  // #8b5cf6
+        '--ui-purple-deep-rgb':    [262, 83,   58],  // #7c3aed
+        '--ui-purple-strong-rgb':  [271, 91,   65],  // #a855f7
+        '--ui-purple-soft-rgb':    [250, 95,   76],  // #a78bfa
+        '--ui-purple-light-rgb':   [252, 95,   85],  // #c4b5fd
+        '--ui-hover-rgb':          [251, 100,  89],  // rgb(220,200,255)
+        '--ui-label-rgb':          [260, 39,   75],  // rgb(180,160,220)
+        '--ui-muted-rgb':          [249, 17,   68],  // rgb(160,155,190)
+        '--ui-shadow-rgb':         [256, 78,   35],  // rgb(60,20,160)
+        '--ui-bg-deep-rgb':        [255, 75,    3],  // rgb(5,2,14) — nav bg
+        '--ui-bg-panel-rgb':       [252, 56,    7],  // rgb(10,8,28) — panel bg
+        '--ui-border-rgb':         [264, 45,   13],  // rgb(30,18,48) — divider
+      };
+
+      const isReset = hue === 0 && satScale === 1 && lightOffset === 0;
+      if (isReset) {
+        for (const name of Object.keys(hexShades)) root.style.removeProperty(name);
+        for (const name of Object.keys(rgbShades)) root.style.removeProperty(name);
+        console.log('[debug] Theme → reset');
+        return;
+      }
+
+      // HSL → RGB (channels 0–255). h in degrees, s/l in percent.
+      const hslToRgb = (h, s, l) => {
+        s /= 100; l /= 100;
+        const k = n => (n + h / 30) % 12;
+        const a = s * Math.min(l, 1 - l);
+        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+        return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+      };
+      const mod360   = h => ((h % 360) + 360) % 360;
+      const clampPct = v => Math.max(0, Math.min(100, v));
+
+      for (const [name, [h, s, l]] of Object.entries(hexShades)) {
+        const newS = clampPct(s * satScale);
+        const newL = clampPct(l + lightOffset);
+        root.style.setProperty(name, `hsl(${mod360(h + hue)}, ${newS}%, ${newL}%)`);
+      }
+      for (const [name, [h, s, l]] of Object.entries(rgbShades)) {
+        const newS = clampPct(s * satScale);
+        const newL = clampPct(l + lightOffset);
+        const [r, g, b] = hslToRgb(mod360(h + hue), newS, newL);
+        root.style.setProperty(name, `${r}, ${g}, ${b}`);
+      }
+
+      const sign = n => (n >= 0 ? `+${n}` : `${n}`);
+      console.log(`[debug] Theme → hue ${hue}° · sat ×${satScale} · light ${sign(lightOffset)}%  (call gd.themeShift() to reset)`);
+    },
+
+    /**
+     * Back-compat shortcut — pure hue rotation at default saturation/lightness.
+     * Delegates to themeShift(deg, 1, 0).
+     */
+    hueShift(deg = 0) {
+      return this.themeShift(deg, 1, 0);
+    },
+
     // ── General ────────────────────────────────────────────────────────────
 
     /** Print a summary of the current game state. */
@@ -337,6 +436,9 @@ export function initDebug(hooksRef) {
       console.log('  gd.crystalLevelUp(n=1)    — increment crystal level by n');
       console.log('  gd.crystalEvolve(newTier, prevTier?, lvl?, variant?) — fire evolution overlay (home screen only)');
       console.log('  gd.crystalFx(intensity=1)         — tune evolution flash intensity (0 = off)');
+      console.log('%cTheme', 'font-weight: bold');
+      console.log('  gd.themeShift(hue=0, sat=1, light=0) — full UI recolor preview');
+      console.log('  gd.hueShift(deg=0)        — shortcut: pure hue rotation');
       console.log('%cGeneral', 'font-weight: bold');
       console.log('  gd.state()                — print current game state summary');
       console.log('  gd.help()                 — show this message');

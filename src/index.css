@@ -10,6 +10,72 @@
   --gold: #f5c842;
   --border: #2a2a4a;
 
+  /* ── UI Purple family ─────────────────────────────────────────────────
+     The hero colour of the game's UI chrome: borders, glows, active
+     states, hover emphasis. Everything that "reads as the game's colour".
+
+     These are SEPARATE from palette/rarity purples in `data/*.js`
+     (Transcendent = #c084fc, Epic rarity, psychic damage, Yin-Yang node,
+     etc.) which are intentional semantic colours and must stay literal.
+     Do not migrate those to these vars.
+
+     Naming convention (dark → light):
+       -deep    dark/pressed, emphasised outlines, active
+       -strong  loud callouts, strong accent
+       (base)   default chrome tone (used via --ui-purple-rgb in rgba)
+       -soft    secondary accents, softer glow
+       -light   highlights, emphasis text, tooltip name glow
+       -wash    pale uppercase labels, subtle backgrounds
+       -pale    palest ultra-soft backgrounds, very diffuse tints                                            */
+
+  /* BRIGHT PURPLE — the main glow/accent hue. Used as solid hex OR as the
+     rgb channel inside rgba() for translucent fills, glows, shadows.       */
+  --ui-purple-rgb:         139,  92, 246;  /* base — equivalent of #8b5cf6 */
+  --ui-purple-deep-rgb:    124,  58, 237;  /* rgb form of #7c3aed  */
+  --ui-purple-strong-rgb:  168,  85, 247;  /* rgb form of #a855f7  */
+  --ui-purple-soft-rgb:    167, 139, 250;  /* rgb form of #a78bfa  */
+  --ui-purple-light-rgb:   196, 181, 253;  /* rgb form of #c4b5fd  */
+
+  /* Discrete shades (dark → light) used as solid colors */
+  --ui-purple-darker:  #5b21b6;   /* darkest — gradient starts */
+  --ui-purple-deep:    #7c3aed;   /* pressed, emphasised outlines */
+  --ui-purple-strong:  #a855f7;   /* loud callouts, strong accents */
+  --ui-purple-soft:    #a78bfa;   /* secondary accents, softer glow */
+  --ui-purple-light:   #c4b5fd;   /* highlights, emphasis text */
+  --ui-purple-wash:    #e0d8ff;   /* pale label / uppercase text */
+  --ui-purple-pale:    #e9d5ff;   /* ultra-soft backgrounds */
+
+  /* ── UI chrome tints ──────────────────────────────────────────────────
+     These are the "atmosphere" colours that make the UI read as purple
+     even when not using the bright --ui-purple-*. Store as rgb triples
+     so alpha varies per usage via rgba(). */
+
+  /* Hover / pale interactive text (220, 200, 255 — pale lavender) */
+  --ui-hover-rgb:      220, 200, 255;
+
+  /* Secondary text / labels / captions (180, 160, 220 — lavender-grey) */
+  --ui-label-rgb:      180, 160, 220;
+
+  /* Muted / disabled text (160, 155, 190 — desaturated purple-grey) */
+  --ui-muted-rgb:      160, 155, 190;
+
+  /* Deep purple shadow for tooltip/modal drop-shadows (60, 20, 160) */
+  --ui-shadow-rgb:      60,  20, 160;
+
+  /* ── UI surface backgrounds (near-black with purple tint) ─────────────
+     Dark atmospheric backgrounds. The purple cast is subtle at opacity
+     0.85–1.0, but it's what makes the game read as "dark purple" instead
+     of pure black. Hue-shifting these changes the whole game mood.      */
+
+  /* Deepest surface (nav, deepest panels) — rgb(5, 2, 14) */
+  --ui-bg-deep-rgb:      5,   2,  14;
+
+  /* Panel / modal / card background — rgb(10, 8, 28) */
+  --ui-bg-panel-rgb:    10,   8,  28;
+
+  /* Border / divider tint between panels — rgb(30, 18, 48) */
+  --ui-border-rgb:      30,  18,  48;
+
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.5;
