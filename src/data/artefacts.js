@@ -25,7 +25,7 @@ export function getSlotBonuses(slot, rarity) {
     case 'waist':  return [{ stat: 'health',            type: MOD.FLAT, value: B * 5 * m }];
     case 'feet':   return [{ stat: 'defense',           type: MOD.FLAT, value: B * m }];
     case 'neck':   return [{ stat: 'elemental_defense', type: MOD.FLAT, value: B * m }];
-    case 'ring':   return [{ stat: 'essence',           type: MOD.FLAT, value: B * m }];
+    case 'ring':   return [{ stat: 'qi_speed',          type: MOD.FLAT, value: 0.05 * m }];
     default:       return [];
   }
 }
@@ -67,7 +67,7 @@ const ARTEFACTS_RAW = [
   { id: 'iron_bracers',          slot: 'hands', rarity: 'Iron',         name: 'Iron Bracers',          description: 'Basic iron bracers that reinforce the forearms and improve blocking stability.' },
   { id: 'tiger_claw_gauntlets',  slot: 'hands', rarity: 'Bronze',       name: 'Tiger Claw Gauntlets',  description: 'Gauntlets styled after tiger claws; slightly increases the damage of unarmed and polearm strikes.' },
   { id: 'mithril_bracers',       slot: 'hands', rarity: 'Silver',       name: 'Mithril Bracers',       description: 'Lightweight mithril bracers that conduct elemental energy through each strike.' },
-  { id: 'dragon_vein_gauntlets', slot: 'hands', rarity: 'Gold',         name: 'Dragon Vein Gauntlets', description: 'Gauntlets threaded with dragon-vein ore; amplify Essence-based attacks channelled through the hands.' },
+  { id: 'dragon_vein_gauntlets', slot: 'hands', rarity: 'Gold',         name: 'Dragon Vein Gauntlets', description: 'Gauntlets threaded with dragon-vein ore; channel qi through the arms at a noticeably faster cadence.' },
   { id: 'heaven_palm_guards',    slot: 'hands', rarity: 'Transcendent', name: 'Heaven Palm Guards',    description: 'Ancient guards worn by a palm-technique grandmaster; dramatically amplify open-palm secret techniques.' },
 
   // ── Waist ─────────────────────────────────────────────────────────────────
@@ -95,8 +95,8 @@ const ARTEFACTS_RAW = [
   { id: 'copper_spirit_ring', slot: 'ring', rarity: 'Iron',         name: 'Copper Spirit Ring', description: 'A plain copper ring that channels a faint qi current through the meridians.' },
   { id: 'jade_focus_ring',    slot: 'ring', rarity: 'Bronze',       name: 'Jade Focus Ring',    description: 'A carved jade ring that sharpens elemental technique control, reducing wasted energy.' },
   { id: 'void_stone_ring',    slot: 'ring', rarity: 'Silver',       name: 'Void Stone Ring',    description: 'Set with a void stone fragment; has a small storage space and boosts spatial-technique damage.' },
-  { id: 'dragon_blood_ring',  slot: 'ring', rarity: 'Gold',         name: 'Dragon Blood Ring',  description: 'A ring forged with dragon blood alloy; significantly boosts Essence and Body stats.' },
-  { id: 'immortal_soul_ring', slot: 'ring', rarity: 'Transcendent', name: 'Immortal Soul Ring', description: "A ring said to contain a sliver of an immortal's soul; dramatically boosts all three primary stats." },
+  { id: 'dragon_blood_ring',  slot: 'ring', rarity: 'Gold',         name: 'Dragon Blood Ring',  description: 'A ring forged with dragon blood alloy; significantly accelerates the wearer\'s qi circulation.' },
+  { id: 'immortal_soul_ring', slot: 'ring', rarity: 'Transcendent', name: 'Immortal Soul Ring', description: "A ring said to contain a sliver of an immortal's soul; dramatically amplifies qi speed on the wearer." },
 ];
 
 export const ARTEFACTS = mergeRecordArray(ARTEFACTS_RAW, 'artefacts', 'id');

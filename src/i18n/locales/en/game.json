@@ -591,7 +591,7 @@
     },
     "dragon_vein_gauntlets": {
       "name": "Dragon Vein Gauntlets",
-      "desc": "Gauntlets threaded with dragon-vein ore; amplify Essence-based attacks channelled through the hands."
+      "desc": "Gauntlets threaded with dragon-vein ore; channel qi through the arms at a noticeably faster cadence."
     },
     "heaven_palm_guards": {
       "name": "Heaven Palm Guards",
@@ -671,11 +671,11 @@
     },
     "dragon_blood_ring": {
       "name": "Dragon Blood Ring",
-      "desc": "A ring forged with dragon blood alloy; significantly boosts Essence and Body stats."
+      "desc": "A ring forged with dragon blood alloy; significantly accelerates the wearer's qi circulation."
     },
     "immortal_soul_ring": {
       "name": "Immortal Soul Ring",
-      "desc": "A ring said to contain a sliver of an immortal's soul; dramatically boosts all three primary stats."
+      "desc": "A ring said to contain a sliver of an immortal's soul; dramatically amplifies qi speed on the wearer."
     }
   },
   "techniques": {},

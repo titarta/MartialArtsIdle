@@ -399,7 +399,7 @@
     "iron_bracers":          { "name": "Braçadeiras de Ferro",       "desc": "Braçadeiras básicas de ferro que reforçam os antebraços e melhoram a estabilidade de bloqueio." },
     "tiger_claw_gauntlets":  { "name": "Manoplas Garras de Tigre",   "desc": "Manoplas inspiradas em garras de tigre; aumenta ligeiramente o dano de golpes desarmados e com armas de haste." },
     "mithril_bracers":       { "name": "Braçadeiras de Mithril",     "desc": "Braçadeiras leves de mithril que conduzem energia elemental através de cada golpe." },
-    "dragon_vein_gauntlets": { "name": "Manoplas das Veias do Dragão","desc": "Manoplas entrelaçadas com minério das veias do dragão; amplificam ataques baseados em Essência canalizados pelas mãos." },
+    "dragon_vein_gauntlets": { "name": "Manoplas das Veias do Dragão","desc": "Manoplas entrelaçadas com minério das veias do dragão; canalizam qi pelos braços com cadência notavelmente mais rápida." },
     "heaven_palm_guards":    { "name": "Guardas de Palma Celestiais", "desc": "Guardas ancestrais usadas por um grão-mestre de técnicas de palma; amplificam drasticamente técnicas secretas de palma aberta." },
     "leather_cultivation_belt": { "name": "Cinto de Cultivo de Couro",  "desc": "Um cinto robusto que estabiliza o dantian e reduz a dispersão de qi durante o combate." },
     "spirit_jade_sash":         { "name": "Faixa de Jade Espiritual",   "desc": "Uma faixa de seda incrustada com contas de jade espiritual; melhora a circulação de qi entre a parte superior e inferior do corpo." },
@@ -419,8 +419,8 @@
     "copper_spirit_ring": { "name": "Anel de Espírito de Cobre", "desc": "Um simples anel de cobre que canaliza uma fraca corrente de qi pelos meridianos." },
     "jade_focus_ring":    { "name": "Anel de Foco de Jade",      "desc": "Um anel de jade esculpido que aguça o controle de técnicas elementais, reduzindo o desperdício de energia." },
     "void_stone_ring":    { "name": "Anel de Pedra do Vazio",    "desc": "Incrustado com um fragmento de pedra do vazio; tem um pequeno espaço de armazenamento e aumenta o dano de técnicas espaciais." },
-    "dragon_blood_ring":  { "name": "Anel de Sangue de Dragão",  "desc": "Um anel forjado com liga de sangue de dragão; aumenta significativamente os atributos Essência e Corpo." },
-    "immortal_soul_ring": { "name": "Anel da Alma Imortal",      "desc": "Um anel que dizem conter um estilhaço da alma de um imortal; aumenta drasticamente os três atributos primários." }
+    "dragon_blood_ring":  { "name": "Anel de Sangue de Dragão",  "desc": "Um anel forjado com liga de sangue de dragão; acelera significativamente a circulação de qi do usuário." },
+    "immortal_soul_ring": { "name": "Anel da Alma Imortal",      "desc": "Um anel que dizem conter um estilhaço da alma de um imortal; amplifica drasticamente a velocidade de qi do usuário." }
   },
 
   "techniques": {},
