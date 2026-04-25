@@ -2699,11 +2699,14 @@ html, body, * {
 /* Settled phase accepts taps anywhere on the overlay. */
 .ces-phase-settled { pointer-events: auto; cursor: pointer; }
 
-/* Tap hint — pulses gently during the settled hold. */
+/* Tap hint — pulses gently above the evolved crystal during the settled
+   hold. Stage is 220px tall and centred at 50vh, so the crystal's top edge
+   sits at 50vh - 110px; place the hint ~40px above that and clamp with a
+   max() floor so very short viewports don't push it under the top bar. */
 .ces-tap-hint {
   position: fixed;
   left: 50%;
-  bottom: 10vh;
+  top: max(60px, calc(50vh - 150px));
   transform: translateX(-50%);
   color: #ffffff;
   font-size: 0.85rem;
@@ -2721,10 +2724,10 @@ html, body, * {
 }
 
 @keyframes cesTapHint {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-6px); }
   20%  { opacity: 1; transform: translateX(-50%) translateY(0); }
   60%  { opacity: 0.6; }
-  100% { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px); }
 }
 
 /* Evolution card — pinned below the centred crystal so it never overlaps
