@@ -678,6 +678,10 @@ export default function useCombat() {
   const stopFight = useCallback(() => {
     stateRef.current.phase = 'idle';
     setPhase('idle');
+    // Clear the log when leaving combat (CombatScreen calls this in its
+    // unmount cleanup) so re-entering — same region or a new one — starts
+    // fresh instead of showing entries from the previous battle.
+    setLog([]);
   }, []);
 
   return {
