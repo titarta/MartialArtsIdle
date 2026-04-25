@@ -39,17 +39,14 @@ html, body, * {
      Used to keep background art and content from bleeding behind the nav. */
   --nav-h: 48px;
   --top-bar-h: 48px;
-  /* Visible buffer between modals and each fixed bar. Different per side
-     because the top-bar (z-700) is above the modal-overlay (z-200) and clips
-     the modal's upward shadow on its own — so 8px there reads as a clean
-     8px gap. The bottom nav (z-100) is below the overlay, so the modal's
-     ~32-40px box-shadow bleeds over it; the larger bottom buffer absorbs
-     the shadow so the perceived gap matches the top. */
-  --modal-edge-pad-top:    8px;
-  --modal-edge-pad-bottom: 24px;
+  /* Visible buffer above and below modals so the bars have clear breathing
+     room and the modal's box-shadow doesn't bleed over the bottom nav (which
+     sits below the overlay in the z-stack — top-bar is above and clips its
+     own shadow side). Used by both --modal-max-h and .modal-overlay padding. */
+  --modal-edge-pad: 24px;
   /* Maximum height available to popups/modals — viewport minus both fixed bars,
-     their safe-area insets, and the per-side buffers above. */
-  --modal-max-h: calc(100svh - var(--top-bar-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--modal-edge-pad-top) - var(--modal-edge-pad-bottom));
+     their safe-area insets, and the buffer applied on each side. */
+  --modal-max-h: calc(100svh - var(--top-bar-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - (var(--modal-edge-pad) * 2));
 }
 
 .app {
@@ -4939,7 +4936,7 @@ html, body, * {
   align-items: center;
   justify-content: center;
   z-index: 200;
-  padding: calc(var(--top-bar-h) + env(safe-area-inset-top) + var(--modal-edge-pad-top)) 20px calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--modal-edge-pad-bottom));
+  padding: calc(var(--top-bar-h) + env(safe-area-inset-top) + var(--modal-edge-pad)) 20px calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--modal-edge-pad));
   animation: fade-in 0.2s ease-out;
 }
 
@@ -5937,161 +5934,8 @@ html, body, * {
   opacity: 0.5;
 }
 
-/* Transmutation panel */
-.tx-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.tx-item-grid {
-  margin-top: 4px;
-}
-
-.tx-slot {
-  cursor: pointer;
-  transition: box-shadow 0.15s;
-}
-
-.tx-slot-selected {
-  box-shadow: 0 0 0 2px var(--accent), 0 0 8px rgba(233,69,96,0.4);
-}
-
-.tx-hint {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  padding: 12px 0;
-}
-
-/* Upgrade panel */
-.tx-upgrade-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tx-upgrade-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.tx-item-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: block;
-}
-
-.tx-item-sub {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  text-transform: capitalize;
-  display: block;
-  margin-top: 2px;
-}
-
-.tx-quality-badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  border: 1px solid;
-  border-radius: 4px;
-  padding: 2px 8px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.tx-upgrade-arrow {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.tx-cost-list {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 7px;
-  padding: 10px 12px;
-}
-
-.tx-cost-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.8rem;
-}
-
-.tx-cost-name {
-  color: var(--text-secondary);
-}
-
-.tx-cost-qty {
-  font-weight: 600;
-  font-size: 0.78rem;
-}
-
-.tx-cost-sep {
-  opacity: 0.4;
-  margin: 0 2px;
-}
-
-.tx-cost-ok    { color: #4ade80; }
-.tx-cost-short { color: #f87171; }
-
-.tx-upgrade-btn {
-  width: 100%;
-  padding: 11px;
-  background: rgba(233,69,96,0.15);
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  color: var(--accent);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.04em;
-}
-
-.tx-upgrade-btn:active { transform: scale(0.97); }
-
-.tx-upgrade-btn-disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.tx-max-quality {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-/* Transmutation detail panel */
-.tx-detail-panel {
-  background: rgba(var(--ui-bg-panel-rgb), 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
-}
-
-.tx-detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.tx-section-title {
+/* Section title — used by RecipeBrowser inside AlchemyPanel. */
+.alchemy-section-title {
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -6099,168 +5943,6 @@ html, body, * {
   color: rgba(var(--ui-label-rgb), 0.4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding-bottom: 4px;
-}
-
-.tx-bracket {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.tx-bracket-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 0;
-}
-
-.tx-mod-list {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.tx-mod-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 7px;
-  padding: 8px 10px;
-}
-
-.tx-mod-row-empty {
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  background: transparent;
-}
-
-/* Unique-affix row — distinct glow so it stands out from rarity colours. */
-.tx-mod-row-unique {
-  background: linear-gradient(90deg,
-    rgba(255, 122, 230, 0.12) 0%,
-    rgba(255, 122, 230, 0.04) 100%);
-  box-shadow: 0 0 0 1px rgba(255, 122, 230, 0.35) inset;
-}
-
-.tx-mod-unique-tag {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-right: 6px;
-}
-
-.tx-mod-left {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 1;
-}
-
-.tx-mod-name {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.tx-mod-value {
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
-.tx-mod-desc {
-  font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.3;
-}
-
-.tx-mod-empty {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.tx-mod-actions {
-  display: flex;
-  gap: 5px;
-  flex-shrink: 0;
-}
-
-.tx-craft-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 4px 8px;
-  border: 1px solid rgba(233, 69, 96, 0.35);
-  border-radius: 6px;
-  background: rgba(233, 69, 96, 0.08);
-  color: var(--accent);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  min-width: 42px;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-@media (hover: hover) {
-  .tx-craft-btn:hover:not(.tx-craft-btn-disabled) {
-    border-color: rgba(233, 69, 96, 0.7);
-    background: rgba(233, 69, 96, 0.14);
-  }
-}
-
-.tx-craft-btn:active { transform: scale(0.95); }
-
-.tx-craft-btn-disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.tx-craft-btn-add {
-  font-size: 1rem;
-}
-
-.tx-craft-cost {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.tx-craft-cost-item {
-  font-size: 0.55rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* Stat rows (technique stats) */
-.tx-stat-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tx-stat-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  padding: 2px 4px;
-}
-
-.tx-stat-row span:last-child {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-/* Upgrade section within detail panel */
-.tx-upgrade-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 /* Action button */
