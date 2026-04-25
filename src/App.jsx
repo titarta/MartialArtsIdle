@@ -44,9 +44,10 @@ import useAchievements from './hooks/useAchievements';
 import ToastStack from './components/ToastStack';
 import SelectionModal from './components/SelectionModal';
 import { AudioManager } from './audio';
+import { EventQueueProvider, useEventQueue, useBlockingPresence } from './contexts/EventQueueContext';
 import './App.css';
 
-function App() {
+function AppInner() {
   const [currentScreen, setCurrentScreen] = useState('home');
   const [screenParam,   setScreenParam]   = useState(null);
   const [selectionModalOpen, setSelectionModalOpen] = useState(false);
@@ -67,10 +68,19 @@ function App() {
 
   const dailyBonus = useDailyBonus();
 
-  // Auto-open daily bonus popup on login if uncollected
+  // Event queue — coordinates spontaneous popups so they don't stack.
+  const { enqueue, currentEvent, dismiss } = useEventQueue();
+
+  // Player-driven modals pause the queue while open (Settings, Achievements,
+  // Journey, Shop, Pills, Daily Bonus tap-opened, mid-session reward cards
+  // tap-opened). Spontaneous events queued behind them wait until they close.
+  useBlockingPresence(!!activeModal || selectionModalOpen);
+
+  // Auto-enqueue daily bonus on login if uncollected — the queue presents it
+  // when nothing else (offline gains, breakthrough, etc.) is in front.
   useEffect(() => {
-    if (dailyBonus.isAvailable) setActiveModal('daily');
-  }, []);
+    if (dailyBonus.isAvailable) enqueue('daily-bonus', null, { dedupe: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
@@ -160,22 +170,47 @@ function App() {
   const majorBreakthroughRef = useRef(null);
   majorBreakthroughRef.current = cultivation.majorBreakthrough;
 
-  // Auto-open selection modal only when pendingCount increases mid-session
+  // Auto-enqueue selection cards when pendingCount increases mid-session
   // (i.e. a real level-up just happened). Skip on load so players aren't
   // greeted by the modal immediately — the notification badge is enough.
-  // Major breakthroughs: BreakthroughBanner.onDone opens the modal after the
-  // animation; suppress here by checking the ref (guaranteed fresh at effect time).
+  // Major breakthroughs: BreakthroughBanner.onDone enqueues the cards after
+  // the animation; suppress here so they don't double-fire.
   const prevPendingRef = useRef(null);
   useEffect(() => {
     const prev = prevPendingRef.current;
     prevPendingRef.current = selections.pendingCount;
-    if (prev === null) return; // first render — treat as load, don't open
+    if (prev === null) return; // first render — treat as load, don't enqueue
     if (selections.pendingCount > prev && currentScreen === 'home') {
       if (!majorBreakthroughRef.current) {
-        setSelectionModalOpen(true);
+        enqueue('selection-cards', null, { dedupe: true });
       }
     }
   }, [selections.pendingCount]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-enqueue offline earnings when they appear. High priority so they
+  // jump ahead of less-impactful events like the daily bonus.
+  useEffect(() => {
+    if (cultivation.offlineEarnings > 0) {
+      enqueue('offline-earnings', null, { priority: 'high', dedupe: true });
+    }
+  }, [cultivation.offlineEarnings]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mirror the queue's selection-cards event onto the legacy modal flag so
+  // the existing render path stays simple. Player-tap on the rewards chip
+  // also flips this flag directly, bypassing the queue.
+  useEffect(() => {
+    if (currentEvent?.kind === 'selection-cards') setSelectionModalOpen(true);
+  }, [currentEvent]);
+
+  // Once all pending selections are resolved, retire the queue event and
+  // collapse the modal flag — covers the "player picked the last reward"
+  // path where SelectionModal unmounts on its own without firing onClose.
+  useEffect(() => {
+    if (selections.pendingCount === 0) {
+      if (selectionModalOpen) setSelectionModalOpen(false);
+      if (currentEvent?.kind === 'selection-cards') dismiss(currentEvent.id);
+    }
+  }, [selections.pendingCount, selectionModalOpen, currentEvent, dismiss]);
 
   // Keep selection qi speed mult in sync with cultivation game loop
   useEffect(() => {
@@ -678,7 +713,10 @@ function App() {
             const r = cultivation.dismantleLaw(lawId);
             if (r) inventory.addItem(mineralForRarity(r), 1);
           }}
-          onClose={() => setSelectionModalOpen(false)}
+          onClose={() => {
+            setSelectionModalOpen(false);
+            if (currentEvent?.kind === 'selection-cards') dismiss(currentEvent.id);
+          }}
         />
       )}
       {activeModal === 'settings'     && <SettingsScreen onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
@@ -686,16 +724,28 @@ function App() {
       {activeModal === 'journey'      && <JourneyModal   realmIndex={cultivation.realmIndex} onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
       {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
       {activeModal === 'pills'        && pills        && <PillDrawer open pills={pills} onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }} />}
-      {activeModal === 'daily' && (
+      {(activeModal === 'daily' || currentEvent?.kind === 'daily-bonus') && (
         <DailyBonusModal
           streak={dailyBonus.streak}
           todayReward={dailyBonus.todayReward}
           isAvailable={dailyBonus.isAvailable}
           onCollect={() => { AudioManager.playSfx('ui_confirm'); dailyBonus.collect(); }}
-          onClose={() => { AudioManager.playSfx('ui_close'); setActiveModal(null); }}
+          onClose={() => {
+            AudioManager.playSfx('ui_close');
+            setActiveModal(null);
+            if (currentEvent?.kind === 'daily-bonus') dismiss(currentEvent.id);
+          }}
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <EventQueueProvider>
+      <AppInner />
+    </EventQueueProvider>
   );
 }
 

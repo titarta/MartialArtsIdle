@@ -9,6 +9,7 @@ import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import CrystalFeedModal from '../components/CrystalFeedModal';
 import DailyBonusWidget from '../components/DailyBonusWidget';
 import { FEATURE_GATES } from '../data/featureGates';
+import { useEventQueue, useBlockingPresence } from '../contexts/EventQueueContext';
 import WORLDS from '../data/worlds';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
@@ -543,15 +544,21 @@ function HomeScreen({
     try { return !localStorage.getItem(HOLD_HINT_SEEN_KEY); } catch { return true; }
   });
 
+  // ── Event queue wiring ───────────────────────────────────────────────────
+  // Spontaneous popups (offline earnings, breakthrough banner, level-up cards,
+  // crystal evolution) all flow through one FIFO queue so they don't stack.
+  const { enqueue, currentEvent, dismiss } = useEventQueue();
+
   // ── Crystal feed modal ───────────────────────────────────────────────────
   const [crystalModalOpen, setCrystalModalOpen] = useState(false);
   useEffect(() => { if (openCrystal && isCrystalUnlocked) setCrystalModalOpen(true); }, [openCrystal]); // eslint-disable-line react-hooks/exhaustive-deps
+  // While the player is feeding the crystal, queued events (breakthrough
+  // banner, level-up cards) wait until the modal closes.
+  useBlockingPresence(crystalModalOpen);
 
   // ── Crystal evolution overlay ────────────────────────────────────────────
-  // `event` is null when idle; set to {id, previousTier, newTier, newLevel, origin}
-  // when the modal reports a tier crossing. Incrementing id ensures remount.
-  const [crystalEvolution, setCrystalEvolution] = useState(null);
-  const evolutionIdRef = useRef(0);
+  // Enqueued at high priority so the moment of evolution feels immediate
+  // when the player closes the feed modal.
   const handleCrystalEvolve = useCallback((info) => {
     // Measure the home crystal's on-screen rect so the overlay starts at its
     // position (lift-and-return illusion). Query lazily — the DOM always has
@@ -564,9 +571,8 @@ function HomeScreen({
         origin = { x: r.left, y: r.top, w: r.width, h: r.height };
       }
     }
-    evolutionIdRef.current += 1;
-    setCrystalEvolution({ id: evolutionIdRef.current, ...info, origin });
-  }, []);
+    enqueue('crystal-evolution', { ...info, origin }, { priority: 'high' });
+  }, [enqueue]);
 
   // Debug bridge — gd.crystalEvolve(newTier, previousTier?) fires this event.
   useEffect(() => {
@@ -574,6 +580,18 @@ function HomeScreen({
     window.addEventListener('mai:crystal-evolve', handler);
     return () => window.removeEventListener('mai:crystal-evolve', handler);
   }, [handleCrystalEvolve]);
+
+  // ── Breakthrough banner — enqueue when majorBreakthrough state appears ──
+  const enqueuedBreakthroughIdRef = useRef(null);
+  useEffect(() => {
+    if (majorBreakthrough && enqueuedBreakthroughIdRef.current !== majorBreakthrough.id) {
+      enqueuedBreakthroughIdRef.current = majorBreakthrough.id;
+      enqueue('breakthrough', majorBreakthrough);
+    }
+  }, [majorBreakthrough, enqueue]);
+
+  // ── Offline earnings — render via queue. App.jsx is already enqueueing. ─
+  // (Render condition below combines queue head with cultivation state.)
 
   const idleTimerRef = useRef(null);
   const resetIdleTimer = useCallback(() => {
@@ -615,14 +633,19 @@ function HomeScreen({
           sit at the same visual depth regardless of screen aspect ratio */}
       <div className="home-bg" style={{ backgroundImage: `url(${BASE}backgrounds/home.png)` }} />
 
-      {/* Offline earnings modal */}
-      {offlineEarnings > 0 && (
+      {/* Offline earnings modal — gated by the event queue so it doesn't
+          stack on top of the daily bonus or breakthrough banner. */}
+      {currentEvent?.kind === 'offline-earnings' && offlineEarnings > 0 && (
         <OfflineEarningsModal
           amount={offlineEarnings}
-          onCollect={() => collectOfflineEarnings(1)}
+          onCollect={() => {
+            collectOfflineEarnings(1);
+            dismiss(currentEvent.id);
+          }}
           onDoubleCollect={cultivationAd.isReady ? () => {
             collectOfflineEarnings(2);
             cultivationAd.show();
+            dismiss(currentEvent.id);
           } : null}
         />
       )}
@@ -651,15 +674,20 @@ function HomeScreen({
         {/* ── Cultivation zone: absolutely-positioned scene elements ─── */}
         <div className="home-cultivation-zone">
 
-          {/* Major-realm breakthrough celebration — keyed so every event remounts. */}
-          <BreakthroughBanner
-            key={majorBreakthrough?.id ?? 'none'}
-            event={majorBreakthrough}
-            onDone={() => {
-              clearMajorBreakthrough();
-              if (selections?.pendingCount > 0) onOpenSelections?.();
-            }}
-          />
+          {/* Major-realm breakthrough celebration — gated by the event queue. */}
+          {currentEvent?.kind === 'breakthrough' && (
+            <BreakthroughBanner
+              key={currentEvent.id}
+              event={currentEvent.payload}
+              onDone={() => {
+                dismiss(currentEvent.id);
+                clearMajorBreakthrough();
+                if (selections?.pendingCount > 0) {
+                  enqueue('selection-cards', null, { dedupe: true });
+                }
+              }}
+            />
+          )}
 
           {/* ── Top-left chip stack — priority order: rewards → no law → idle ── */}
           <div className="home-chips-tl">
@@ -722,7 +750,7 @@ function HomeScreen({
             isUnlocked={isCrystalUnlocked}
             onOpen={() => setCrystalModalOpen(true)}
             particleColors={isCrystalUnlocked && crystal ? CRYSTAL_COLORS[getCrystalTier(crystal.level)] : CRYSTAL_COLORS[1]}
-            hidden={!!crystalEvolution}
+            hidden={currentEvent?.kind === 'crystal-evolution'}
           />
 
           {/* Character + hold-hint group — grounded at scene bottom */}
@@ -783,7 +811,7 @@ function HomeScreen({
               boosting={boosting}
               maxed={maxed}
               realmIndex={cultivation.realmIndex}
-              breakthrough={!!majorBreakthrough}
+              breakthrough={currentEvent?.kind === 'breakthrough'}
               peakStage={cultivation.isInPeakStage}
             />
           </div>
@@ -808,11 +836,13 @@ function HomeScreen({
       )}
 
       {/* Crystal evolution celebration — fires on visual-tier change. */}
-      <CrystalEvolutionOverlay
-        key={crystalEvolution?.id ?? 'none'}
-        event={crystalEvolution}
-        onDone={() => setCrystalEvolution(null)}
-      />
+      {currentEvent?.kind === 'crystal-evolution' && (
+        <CrystalEvolutionOverlay
+          key={currentEvent.id}
+          event={currentEvent.payload}
+          onDone={() => dismiss(currentEvent.id)}
+        />
+      )}
 
     </div>
   );
