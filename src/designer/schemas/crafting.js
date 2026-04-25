@@ -20,14 +20,6 @@ const bracketRow = [
   { key: 'mineralMod',  type: 'enum',   label: 'Modifier mineral (replace)', options: itemIdOptions },
 ];
 
-const rarityCostMap = [
-  { key: 'Iron',         type: 'array', label: 'Iron',         itemSchema: costRow },
-  { key: 'Bronze',       type: 'array', label: 'Bronze',       itemSchema: costRow },
-  { key: 'Silver',       type: 'array', label: 'Silver',       itemSchema: costRow },
-  { key: 'Gold',         type: 'array', label: 'Gold',         itemSchema: costRow },
-  { key: 'Transcendent', type: 'array', label: 'Transcendent', itemSchema: costRow },
-];
-
 /*
  * Meta-schema describing each singleton. The CraftingEditor picks the right
  * form per singleton name.
@@ -61,17 +53,6 @@ export const CRAFTING_SINGLETONS = [
       { key: 'Bronze', type: 'array', label: 'Bronze', itemSchema: costRow },
       { key: 'Silver', type: 'array', label: 'Silver', itemSchema: costRow },
       { key: 'Gold',   type: 'array', label: 'Gold',   itemSchema: costRow },
-    ],
-  },
-  {
-    key: 'REFINE_COSTS',
-    label: 'Refine costs',
-    description: 'Cost to forge a random artefact / technique / law at each rarity.',
-    type: 'object',
-    fields: [
-      { key: 'artefact',  type: 'object', label: 'Artefact',  fields: rarityCostMap },
-      { key: 'technique', type: 'object', label: 'Technique', fields: rarityCostMap },
-      { key: 'law',       type: 'object', label: 'Law',       fields: rarityCostMap },
     ],
   },
 ];

@@ -490,7 +490,7 @@ function App() {
       const SCREEN = {
         worlds: 'worlds', gathering: 'worlds', mining: 'worlds',
         production: 'production', transmutation: 'production',
-        refining: 'production', alchemy: 'production',
+        alchemy: 'production',
         character: 'character', collection: 'collection',
         qi_crystal: 'home',
       };

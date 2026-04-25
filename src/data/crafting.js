@@ -1,25 +1,23 @@
 /**
- * crafting.js — single source of truth for all crafting, transmutation, and upgrade costs.
+ * crafting.js — single source of truth for transmutation + upgrade costs.
  *
  * ── Design contract ───────────────────────────────────────────────────────────
- *  artefact  refine  → minerals only          (physical forging)
- *  technique refine  → mineral + cultivation_2 (combat essence inscribed into scroll)
- *  law       refine  → mineral + cultivation_1 (qi condensate compiled into law)
  *  upgrade   (all)   → current + next mineral  (gateway material from next world tier)
  *  hone/add          → mineralStat ×TRANSMUTE_QTY.hone / .add
  *  replace           → mineralMod  ×TRANSMUTE_QTY.replace
  *
+ *  Artefacts and techniques drop from combat fully rolled; laws drop from
+ *  major-realm ascension selections. There is no refining flow anymore.
+ *
  * ── Dev panel note ────────────────────────────────────────────────────────────
- *  Every exported object here is directly editable config.
- *  A future dev panel should expose SLOT_BRACKETS, TRANSMUTE_QTY, UPGRADE_COSTS,
- *  and REFINE_COSTS as editable fields. No numeric constants are buried in
- *  component code — everything flows from this file.
+ *  Every exported object here is directly editable config. A future dev
+ *  panel should expose SLOT_BRACKETS, TRANSMUTE_QTY, and UPGRADE_COSTS as
+ *  editable fields.
  *
  * ── Adding a new tier ─────────────────────────────────────────────────────────
  *  1. Add a bracket entry to SLOT_BRACKETS.
  *  2. Add a row to UPGRADE_COSTS (current rarity → next).
- *  3. Add a row to each REFINE_COSTS[type] object.
- *  That's it — UI components derive everything else from these tables.
+ *  UI components derive everything else from these tables.
  */
 
 import { RARITY_TIER } from './affixPools';
@@ -136,38 +134,3 @@ export function getUpgradeCosts(kind, rarity) {
   return UPGRADE_COSTS[rarity] ?? [];
 }
 
-// ── Refine costs ──────────────────────────────────────────────────────────────
-// Cost to forge a random item of a given rarity.
-//
-// artefact  → minerals only        (forged from raw ore)
-// technique → mineral + cult_2     (combat essence pressed into scroll)
-// law       → mineral + cult_1     (qi condensate compiled into law structure)
-//
-// cultivation_1 materials: Beast Qi Core / Ancient Qi Marrow / Saint Qi Relic / Primal Qi Core
-//   → dropped by beasts, frontier creatures, saint-realm undead, primordial entities
-//   → consumed to compile Cultivation Laws (qi structural work)
-//
-// cultivation_2 materials: Corrupted Qi Shard / Immortal Soul Remnant / Void Qi Pearl / Heaven Qi Crystal
-//   → dropped by corrupted cultivators, immortal-grade entities, void-touched creatures, heaven entities
-//   → consumed to inscribe Secret Techniques (volatile combat essences)
-//
-// Dev panel: edit qty values or swap itemId references to retarget material sinks.
-
-const REFINE_COSTS_RAW = {
-  artefact: {
-    Iron:         [ { itemId: 'iron_mineral_1',         qty: 5 } ],
-    Bronze:       [ { itemId: 'bronze_mineral_1',       qty: 5 }, { itemId: 'bronze_mineral_2',        qty: 3 } ],
-    Silver:       [ { itemId: 'silver_mineral_1',       qty: 5 }, { itemId: 'silver_mineral_2',        qty: 3 } ],
-    Gold:         [ { itemId: 'gold_mineral_1',         qty: 5 }, { itemId: 'gold_mineral_2',          qty: 3 } ],
-    Transcendent: [ { itemId: 'transcendent_mineral_1', qty: 5 }, { itemId: 'transcendent_mineral_2',  qty: 3 } ],
-  },
-  technique: {
-    Iron:         [ { itemId: 'iron_mineral_1',         qty: 3 }, { itemId: 'iron_cultivation_2',         qty: 5 } ],
-    Bronze:       [ { itemId: 'bronze_mineral_1',       qty: 3 }, { itemId: 'bronze_cultivation_2',       qty: 5 } ],
-    Silver:       [ { itemId: 'silver_mineral_1',       qty: 3 }, { itemId: 'silver_cultivation_2',       qty: 5 } ],
-    Gold:         [ { itemId: 'gold_mineral_1',         qty: 3 }, { itemId: 'gold_cultivation_2',         qty: 3 } ],
-    Transcendent: [ { itemId: 'transcendent_mineral_1', qty: 3 }, { itemId: 'transcendent_cultivation_2', qty: 3 } ],
-  },
-  // Laws are no longer refinable — they drop from major-realm breakthroughs.
-};
-export const REFINE_COSTS = mergeSingleton(REFINE_COSTS_RAW, 'crafting', 'REFINE_COSTS');

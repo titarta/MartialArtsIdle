@@ -57,7 +57,7 @@ const BASELINE = {
   },
   mining: {
     gate: { type: 'realm', minRealmIndex: 7 },
-    desc: 'Dispatch an idle worker to extract ores from cleared regions. Materials fuel refining and forging.',
+    desc: 'Dispatch an idle worker to extract ores from cleared regions. Materials fuel transmutation and upgrades.',
     hint: 'Reach Tempered Body Layer 8',
     unlockMsg: 'Mining unlocked.',
   },
@@ -93,13 +93,6 @@ const BASELINE = {
     desc: 'Upgrade, replace, and transmute your artefacts, technique slots, and law bindings using gathered materials.',
     hint: 'Gather herbs, mine minerals, or collect a blood core to unlock',
     unlockMsg: 'Transmutation unlocked.',
-  },
-  // refining: paired with mining (ore-driven artefact/technique/law forging).
-  refining: {
-    gate: { type: 'realm', minRealmIndex: 7 },
-    desc: 'Feed raw minerals into the Refining Furnace to forge powerful artefacts and high-grade equipment.',
-    hint: 'Reach Tempered Body Layer 8',
-    unlockMsg: 'Refining Furnace lit.',
   },
   // alchemy: paired with gathering (herb-driven pill crafting). Unlocks
   // the first time the player collects any herb (Sect Grounds Grass /

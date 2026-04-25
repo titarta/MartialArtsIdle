@@ -107,7 +107,7 @@ export default function useReincarnationTree({ karma, spendKarma, lives = 0 } = 
       // ── Fate's Path ───────────────────────────────────────────────
       craftRarityUpChance:purchased.has('fp_1') ? 0.10 : 0,   // fp_1 +10% tier-up on craft
       gatherMineRarityUpChance: purchased.has('fp_2') ? 0.10 : 0,
-      refineCostMult:     purchased.has('fp_3') ? 0.70 : 1,   // fp_3 -30% refine cost
+      // fp_3 is currently a placeholder — no modifier wired.
       selectionOptionCount: purchased.has('fp_4') ? 4 : 3,
       dualAutoFarm:       purchased.has('fp_k'),              // fp_k twofold path
 

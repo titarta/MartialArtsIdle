@@ -2,7 +2,7 @@
  * Crafting editor — singleton-table UI.
  *
  * Unlike other categories, crafting overrides store full REPLACEMENT objects
- * per singleton name (SLOT_BRACKETS, TRANSMUTE_QTY, UPGRADE_COSTS, REFINE_COSTS).
+ * per singleton name (SLOT_BRACKETS, TRANSMUTE_QTY, UPGRADE_COSTS).
  * Left rail lists the singletons; right side is a SchemaForm.
  *
  * Editing loads the baseline value from the game source and the form writes
@@ -14,7 +14,7 @@
 import { useState } from 'react';
 import SchemaForm from '../SchemaForm.jsx';
 import {
-  SLOT_BRACKETS, TRANSMUTE_QTY, UPGRADE_COSTS, REFINE_COSTS,
+  SLOT_BRACKETS, TRANSMUTE_QTY, UPGRADE_COSTS,
 } from '../../data/crafting.js';
 import { CRAFTING_SINGLETONS } from '../schemas/crafting.js';
 
@@ -22,7 +22,6 @@ const BASELINES = {
   SLOT_BRACKETS,
   TRANSMUTE_QTY,
   UPGRADE_COSTS,
-  REFINE_COSTS,
 };
 
 export default function CraftingEditor({ edited, onChangeRecords }) {

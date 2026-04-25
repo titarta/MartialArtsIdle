@@ -134,8 +134,8 @@ export const NODES = [
   },
   {
     id: 'fp_3', branch: 'fate', step: 2,
-    label: 'Connoisseur', icon: '💎',
-    desc: 'All Refine operations cost −30% minerals.',
+    label: 'Reserved', icon: '💎',
+    desc: 'No effect yet — reserved for a future perk.',
     cost: 5, prereqs: ['fp_2'], prereqMode: 'and',
   },
   {

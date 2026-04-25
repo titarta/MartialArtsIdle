@@ -15,12 +15,7 @@ import { findPill, PILLS, PILLS_BY_ID, RECIPES_BY_PILL } from '../data/pills';
 
 const ITEMS_BY_ID = { ...ALL_MATERIALS, ...PILLS_BY_ID };
 import { formatUniqueDescription } from '../data/lawUniques';
-import { generateTechnique } from '../data/techniqueDrops';
-// generateLaw moved out of the refining flow — laws now drop from major
-// breakthroughs via useSelections. ARTEFACTS / ARTEFACT_NEXT_RARITY /
-// MAX_ARTEFACTS no longer needed here — artefact crafting moved to the
-// Collection tab (stage 13 of the overhaul).
-import { TECH_NEXT_QUALITY, MAX_TECHNIQUES } from '../hooks/useTechniques';
+import { TECH_NEXT_QUALITY } from '../hooks/useTechniques';
 import { LAW_NEXT_RARITY } from '../hooks/useCultivation';
 import {
   SLOT_BRACKETS,
@@ -28,7 +23,6 @@ import {
   getActiveArtefactBrackets,
   getBracketCost as bracketCost,
   UPGRADE_COSTS,
-  REFINE_COSTS,
   getUpgradeCosts,
 } from '../data/crafting';
 
@@ -55,8 +49,8 @@ function buildBracketSlots(items, rarity, bracketsProvider = getActiveBrackets) 
   });
 }
 
-// bracketCost, SLOT_BRACKETS, getActiveBrackets, UPGRADE_COSTS, REFINE_COSTS
-// are all imported from src/data/crafting.js — edit costs there, not here.
+// bracketCost, SLOT_BRACKETS, getActiveBrackets, UPGRADE_COSTS are all
+// imported from src/data/crafting.js — edit costs there, not here.
 
 // ─── Quality label helpers ───────────────────────────────────────────────────
 
@@ -560,161 +554,8 @@ function formatEffect(eff) {
 
 // HerbSelector replaced by inline herb picker in AlchemyPanel.
 
-// ─── RefiningPanel ───────────────────────────────────────────────────────────
-
-const REFINE_RARITIES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
-
-// Per-rarity recipes — each tier uses materials of matching rarity.
-// `costMult` (0..1) shrinks every entry's qty (rounded up, min 1) — used by
-// the fp_3 Connoisseur reincarnation node which sets the mult to 0.7.
-function getRefineCost(type, rarity, costMult = 1) {
-  const base = REFINE_COSTS[type]?.[rarity] ?? [];
-  if (costMult >= 1) return base;
-  return base.map(c => ({ ...c, qty: Math.max(1, Math.ceil(c.qty * costMult)) }));
-}
-
-const REFINE_ICONS = { artefact: '⚔', technique: '✦', law: '☯' };
-
-// Map rarity to worldId for technique generation (1-5 tier scaling)
-const RARITY_TO_WORLD = { Iron: 1, Bronze: 2, Silver: 3, Gold: 4, Transcendent: 5 };
-
-// Rarity colors (mirror QUALITY/LAW_RARITY)
-const RARITY_COLOR = {
-  Iron: '#9ca3af', Bronze: '#cd7f32', Silver: '#c0c0c0', Gold: '#f5c842', Transcendent: '#c084fc',
-};
-
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function RefineCard({ type, inventory, onRefine, inventoryFull = false, refineCostMult = 1 }) {
-  const { t } = useTranslation('ui');
-  const [rarity, setRarity] = useState('Iron');
-
-  const REFINE_INFO = {
-    artefact:  { title: t('production.refineArtefactTitle'), description: t('production.refineArtefactDesc'), icon: REFINE_ICONS.artefact },
-    technique: { title: t('production.refineTechTitle'),    description: t('production.refineTechDesc'),    icon: REFINE_ICONS.technique },
-  };
-  const info  = REFINE_INFO[type];
-  const costs = getRefineCost(type, rarity, refineCostMult);
-  const afford = costs.every(c => inventory.getQuantity(c.itemId) >= c.qty);
-  const canRefine = afford && !inventoryFull;
-  const rColor = RARITY_COLOR[rarity];
-
-  return (
-    <div className="refine-card">
-      <div className="refine-card-header">
-        <span className="refine-card-icon">{info.icon}</span>
-        <div className="refine-card-title-block">
-          <span className="refine-card-title">{info.title}</span>
-          <span className="refine-card-desc">{info.description}</span>
-        </div>
-      </div>
-
-      {/* Rarity selector */}
-      <div className="refine-rarity-tabs">
-        {REFINE_RARITIES.map(r => {
-          const c = RARITY_COLOR[r];
-          const active = r === rarity;
-          return (
-            <button
-              key={r}
-              className={`refine-rarity-tab ${active ? 'refine-rarity-tab-active' : ''}`}
-              style={active ? { color: c, borderColor: c } : undefined}
-              onClick={() => setRarity(r)}
-            >
-              {r}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="refine-cost-list">
-        {costs.map(c => {
-          const mat  = ITEMS_BY_ID[c.itemId];
-          const have = inventory.getQuantity(c.itemId);
-          const ok   = have >= c.qty;
-          return (
-            <div key={c.itemId} className="tx-cost-row">
-              <span className="tx-cost-name">{mat?.name ?? c.itemId}</span>
-              <span className={`tx-cost-qty ${ok ? 'tx-cost-ok' : 'tx-cost-short'}`}>
-                {c.qty} <span className="tx-cost-sep">/</span> {have}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <button
-        className={`refine-btn ${canRefine ? '' : 'refine-btn-disabled'}`}
-        style={canRefine ? { color: rColor, borderColor: rColor, background: `${rColor}22` } : undefined}
-        onClick={() => canRefine && onRefine(type, rarity)}
-        disabled={!canRefine}
-        title={inventoryFull ? t('production.inventoryFull', { defaultValue: 'Inventory full — dismantle something first.' }) : undefined}
-      >
-        {t('production.refineBtn', { rarity: t(`quality.${rarity}`, { defaultValue: rarity }) })}
-      </button>
-    </div>
-  );
-}
-
-function RefiningPanel({ inventory, artefacts, techniques, cultivation, tree }) {
-  const { t } = useTranslation('ui');
-  const [flashMsg, setFlashMsg] = useState(null);
-
-  // fp_3 Connoisseur — multiplier on every refine cost (×0.7 when owned).
-  const refineCostMult = tree?.modifiers?.refineCostMult ?? 1;
-  // fp_1 Lucky Star — 10% chance the refined output bumps one rarity.
-  const craftRarityUpChance = tree?.modifiers?.craftRarityUpChance ?? 0;
-  // md_4 Veteran's Eye — all crafted techniques arrive +1 quality tier.
-  const techQualityBump = tree?.modifiers?.craftedTechQualityBump ?? 0;
-
-  const RARITY_LADDER = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
-  const bumpRarity = (r) => {
-    const i = RARITY_LADDER.indexOf(r);
-    return i >= 0 && i < RARITY_LADDER.length - 1 ? RARITY_LADDER[i + 1] : r;
-  };
-
-  const refine = (type, rarity) => {
-    const costs = getRefineCost(type, rarity, refineCostMult);
-    if (!costs.every(c => inventory.getQuantity(c.itemId) >= c.qty)) return;
-    for (const c of costs) inventory.removeItem(c.itemId, c.qty);
-
-    // fp_1 Lucky Star — 10% chance to upgrade output rarity by one tier.
-    let outRarity = rarity;
-    if (craftRarityUpChance > 0 && Math.random() < craftRarityUpChance) {
-      outRarity = bumpRarity(rarity);
-    }
-
-    let resultName = '';
-    // Artefact refining removed in stage 13 of the Damage & Element Overhaul
-    // — artefacts now drop fully-rolled from combat (see Artefacts.md).
-    if (type === 'technique') {
-      // md_4 stacks on top of fp_1 — bump rarity once more if owned.
-      const finalRarity = techQualityBump > 0 ? bumpRarity(outRarity) : outRarity;
-      const worldId = RARITY_TO_WORLD[finalRarity] ?? RARITY_TO_WORLD[rarity] ?? 1;
-      const tech = generateTechnique(worldId);
-      techniques.addOwnedTechnique(tech);
-      resultName = tech.name;
-    }
-    // Laws no longer refine — they come from major-realm breakthrough
-    // selections (see useSelections).
-
-    setFlashMsg(t('production.refinedFlash', { rarity: t(`quality.${rarity}`, { defaultValue: rarity }), name: resultName }));
-    setTimeout(() => setFlashMsg(null), 2000);
-  };
-
-  // Cap checks — refining is refused at the cap (button grey-out +
-  // tooltip). The player must dismantle something from the Collection
-  // screen before rolling another item.
-  const techniquesFull = Object.keys(techniques?.ownedTechniques ?? {}).length >= MAX_TECHNIQUES;
-
-  return (
-    <div className="refining-panel">
-      <RefineCard type="technique" inventory={inventory} onRefine={refine} inventoryFull={techniquesFull} refineCostMult={refineCostMult} />
-      {flashMsg && <div className="refine-flash">{flashMsg}</div>}
-    </div>
-  );
-}
+// Refining was removed — artefacts and techniques now drop from combat,
+// and laws come from major-realm ascension selections (see useSelections).
 
 /** Check if the player can afford a recipe key ("herb|herb|herb"). */
 function canAffordRecipe(key, inventory) {
@@ -970,7 +811,6 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
   const { t } = useTranslation('ui');
 
   const PROD_TABS = [
-    { key: 'refining',      tKey: 'production.tabRefining',      feature: 'refining'      },
     { key: 'alchemy',       tKey: 'production.tabAlchemy',       feature: 'alchemy'       },
     { key: 'transmutation', tKey: 'production.tabTransmutation', feature: 'transmutation' },
   ];
@@ -1006,16 +846,6 @@ function ProductionScreen({ inventory, artefacts, techniques, cultivation, pills
           );
         })}
       </div>
-
-      {activeUnlocked && activeTab === 'refining' && (
-        <RefiningPanel
-          inventory={inventory}
-          artefacts={artefacts}
-          techniques={techniques}
-          cultivation={cultivation}
-          tree={tree}
-        />
-      )}
 
       {activeUnlocked && activeTab === 'alchemy' && (
         <AlchemyPanel inventory={inventory} pills={pills} tree={tree} />
