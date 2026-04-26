@@ -8,7 +8,7 @@ import { formatAffixValue, AFFIX_UNIQUE_COLOR } from '../data/affixDisplay';
 import { effectiveAffixValue, bonusCount } from '../data/artefactUpgrades';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
-import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown, getK } from '../data/techniques';
+import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown } from '../data/techniques';
 import { MAX_ARTEFACTS } from '../hooks/useArtefacts';
 import { MAX_UPGRADE_BY_RARITY } from '../data/artefactUpgrades';
 import { ARTEFACT_SETS } from '../data/artefactSets';
@@ -465,10 +465,12 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                   <span className="item-stat-label">{t('inventory.labelCooldown')}</span>
                   <span className="item-stat-value">{cd.toFixed(1)}s</span>
                 </div>
-                {tech.type === 'Attack' && (
+                {tech.type === 'Attack' && (tech.physMult || tech.elemMult) && (
                   <div className="item-stat-row">
-                    <span className="item-stat-label">{t('inventory.labelDmgMult')}</span>
-                    <span className="item-stat-value">{getK(tech.rank, tech.quality)}</span>
+                    <span className="item-stat-label">Scaling</span>
+                    <span className="item-stat-value">
+                      {((tech.physMult ?? 0) * 100).toFixed(0)}% phys / {((tech.elemMult ?? 0) * 100).toFixed(0)}% elem
+                    </span>
                   </div>
                 )}
                 {tech.type === 'Heal' && (

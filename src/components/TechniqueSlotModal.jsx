@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   TECHNIQUE_QUALITY, TECHNIQUE_RANK,
-  TYPE_COLOR, getCooldown, getK, canEquip,
+  TYPE_COLOR, getCooldown, canEquip,
   getTechniqueBaseId,
 } from '../data/techniques';
 
@@ -17,7 +17,6 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
   const quality = TECHNIQUE_QUALITY[tech.quality];
   const rank    = TECHNIQUE_RANK[tech.rank];
   const cd      = getCooldown(tech.type, tech.quality);
-  const K       = getK(tech.rank, tech.quality);
 
   // i18n keys live on the catalogue base id; drop-instance ids carry a
   // `__suffix` for uniqueness — strip it before looking up translations.
@@ -47,16 +46,11 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
 
       <div className="tech-item-stats">
         <span>{t('techniqueSlotModal.cooldown', { cd: cd.toFixed(1) })}</span>
-        {tech.type === 'Attack' && (
-          <>
-            <span>{t('techniqueSlotModal.kMult', { k: K })}</span>
-            {(tech.physMult || tech.elemMult) && (
-              <span>{t('techniqueSlotModal.scaling', {
-                phys: ((tech.physMult ?? 0) * 100).toFixed(0),
-                elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
-              })}</span>
-            )}
-          </>
+        {tech.type === 'Attack' && (tech.physMult || tech.elemMult) && (
+          <span>{t('techniqueSlotModal.scaling', {
+            phys: ((tech.physMult ?? 0) * 100).toFixed(0),
+            elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
+          })}</span>
         )}
         {tech.type === 'Heal' && (
           <>

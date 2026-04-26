@@ -88,20 +88,20 @@ Base cooldown by type, reduced by quality:
 
 ```
 Damage = bonus
-       + K × (physMult × physical_damage + elemMult × elemental_damage)
+       + physMult × physical_damage
+       + elemMult × elemental_damage
        + damage_all
        × (1 + secret_technique_damage)
 ```
 
 | Variable | Meaning |
 |---|---|
-| `bonus` | Flat additive damage per technique (small, scales 0/5/10/15/20 by quality default) |
-| `K` | Rank × quality multiplier on the phys+elem contribution (see table below) |
+| `bonus` | Flat additive damage per technique (scales 0/5/10/15/20 by quality default; designer can override) |
 | `physMult` | Technique's coefficient on the `physical_damage` stat (any non-negative decimal) |
 | `elemMult` | Technique's coefficient on the `elemental_damage` stat (any non-negative decimal) |
 | `damage_all` | Universal flat from artefacts + sets + laws |
 
-> **Cleanup pass 2026-04-27**: the dead `K × (essence + soul + body + artefactFlat) × arteMult` term was removed (every multiplicand was 0 since the primary-stat layer was retired stage 15). All damage now flows from physical_damage + elemental_damage via the per-technique `physMult` / `elemMult` coefficients. `K` survives as a multiplier on that contribution so rank × quality still drives a meaningful curve (Mortal-Iron K=0.5 → Heaven-Trans K=13.0).
+> **K removed 2026-04-27**: the rank × quality K multiplier (`K_TABLE`) is gone. Damage scales purely through the player's gear-driven phys / elem stat growth. Rank still gates *equip* (Mortal techs equip from Tempered Body, Heaven techs require Open Heaven); quality still drives *cooldown* (Iron 1.0× → Transcendent 0.55×). But neither rank nor quality multiplies damage directly anymore — both their gameplay effects come from non-damage axes plus the player's own stats hitting harder over time.
 
 > **Damage-type model overhauled 2026-04-27 (earlier same day)**: the categorical `damageType` field (`'physical'` / `'elemental'`) was replaced by two coefficients, `physMult` and `elemMult`. A technique can scale with both stats independently — designer authors how heavily it leans. A "balanced" technique with `physMult: 1.0, elemMult: 1.0` adds 100% of both stats. A pure-physical technique uses `physMult: 1.0, elemMult: 0`.
 
@@ -114,17 +114,6 @@ effectiveArmour = (physMult × eDef + elemMult × eElemDef) / (physMult + elemMu
 A pure-physical tech faces only `eDef`; a balanced tech (1.0/1.0) faces 50/50; a heavy elemental tech faces mostly `eElemDef`. After def_pen reduces effective armour, the standard PoE armour curve runs.
 
 **Basic attack** (fires when no secret technique is ready) is hard-pinned to physical damage and adds 100% of `physical_damage` directly. See [[Damage Types]].
-
-### K Scaling (Rank × Quality)
-
-| Rank | Requires | Iron | Bronze | Silver | Gold | Transcendent |
-|---|---|---|---|---|---|---|
-| Mortal | Tempered Body | 0.5 | 0.7 | 1.0 | 1.3 | 1.8 |
-| Earth | Qi Transformation | 1.0 | 1.4 | 2.0 | 2.7 | 3.5 |
-| Sky | Separation & Reunion | 1.5 | 2.0 | 2.8 | 3.8 | 5.0 |
-| Saint | Saint | 2.0 | 2.8 | 3.8 | 5.2 | 6.8 |
-| Emperor | Void King | 2.5 | 3.5 | 4.8 | 6.5 | 8.5 |
-| Heaven | Open Heaven | 4.0 | 5.5 | 7.5 | 10.0 | 13.0 |
 
 ---
 
@@ -152,7 +141,7 @@ Total: 60 unique entries. The user / designer fills in names, flavour, and per-e
 
 > **Quality is identity.** "Iron Sword Slash" and "Bronze Sword Slash" are different catalogue entries with different ids. There is **no upgrade path** between them — players acquire higher-rarity techniques only via drops.
 
-> **Rank is per-drop, not identity.** Rank is set when the technique drops, from the world tier (W1=Mortal … W6=Heaven). A single Iron-quality entry can manifest at any of the 6 ranks; the K_TABLE indexes by `(rank, quality)`.
+> **Rank is per-drop, not identity.** Rank is set when the technique drops, from the world tier (W1=Mortal … W6=Heaven). A single Iron-quality entry can manifest at any of the 6 ranks; rank only gates equip (the K_TABLE that previously multiplied damage by rank × quality was removed 2026-04-27).
 
 ---
 

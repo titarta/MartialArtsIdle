@@ -5,7 +5,8 @@
  * is decided, a uniform-random pick from the matching subset of TECHNIQUES is
  * cloned and tagged with: a fresh drop id (`${baseId}__suffix`) so duplicates
  * stack distinctly in `ownedTechniques`, and a `rank` derived from the world
- * tier (W1=Mortal … W6=Heaven) — the K_TABLE indexes by rank × quality.
+ * tier (W1=Mortal … W6=Heaven). Rank only gates equip; damage scaling no
+ * longer keys off rank/quality (K_TABLE was removed 2026-04-27).
  */
 
 import { TECHNIQUES } from './techniques';

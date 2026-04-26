@@ -19,15 +19,12 @@ export const TECHNIQUE_RANK = {
   Heaven:   { label: 'Heaven',   minRealmIndex: 45 },  // Open Heaven
 };
 
-// ─── K multiplier table: rank × quality ──────────────────────────────────────
-export const K_TABLE = {
-  Mortal:   { Iron: 0.5, Bronze: 0.7, Silver: 1.0, Gold: 1.3, Transcendent: 1.8  },
-  Earth:    { Iron: 1.0, Bronze: 1.4, Silver: 2.0, Gold: 2.7, Transcendent: 3.5  },
-  Sky:      { Iron: 1.5, Bronze: 2.0, Silver: 2.8, Gold: 3.8, Transcendent: 5.0  },
-  Saint:    { Iron: 2.0, Bronze: 2.8, Silver: 3.8, Gold: 5.2, Transcendent: 6.8  },
-  Emperor:  { Iron: 2.5, Bronze: 3.5, Silver: 4.8, Gold: 6.5, Transcendent: 8.5  },
-  Heaven:   { Iron: 4.0, Bronze: 5.5, Silver: 7.5, Gold: 10.0, Transcendent: 13.0 },
-};
+// K_TABLE + getK removed 2026-04-27 — K multiplier was vestigial after the
+// damage formula was rebuilt around physMult / elemMult coefficients applied
+// directly to player phys / elem stats. Rank/quality progression now comes
+// from the player's gear-driven stat growth, not a built-in technique
+// multiplier. Rank still gates equip via TECHNIQUE_RANK; quality still
+// drives cooldown via TECHNIQUE_QUALITY.cdMult.
 
 // ─── Base cooldowns (seconds) by type ────────────────────────────────────────
 export const BASE_COOLDOWN = {
@@ -193,41 +190,36 @@ export function getCooldown(type, quality) {
   return BASE_COOLDOWN[type] * (TECHNIQUE_QUALITY[quality]?.cdMult ?? 1);
 }
 
-/** K damage multiplier from rank × quality table. */
-export function getK(rank, quality) {
-  return K_TABLE[rank]?.[quality] ?? 1.0;
-}
-
 /**
- * Attack damage formula (2026-04-27, post-cleanup):
+ * Attack damage formula (2026-04-27, post-K-removal):
  *
  *   damage = bonus
- *          + K × (physMult × physical_damage + elemMult × elemental_damage)
+ *          + physMult × physical_damage
+ *          + elemMult × elemental_damage
  *          + damage_all
  *          × (1 + secret_technique_damage)
  *
- * `K` (rank × quality table) multiplies the phys+elem stat contribution so
- * Heaven-Transcendent techs scale dramatically harder than Mortal-Iron ones.
- * `bonus` is a small flat per-technique add. `damage_all` and the
- * `secret_technique_damage` source multiplier behave as before.
+ * Damage is purely the player's phys + elem stat contribution scaled by
+ * the per-technique coefficients, plus the per-technique flat bonus and
+ * universal damage_all. Rank/quality progression now lives in the player's
+ * gear-driven stat growth (artefacts, sets, laws, pills) rather than a
+ * built-in K multiplier on top.
  *
- * Removed in this cleanup pass:
- *   - essence / soul / body params (primary-stat layer was retired stage 15)
- *   - `_law` param (element-matching elemBonus was removed 2026-04-26)
- *   - artefactFlat param (no caller fills it; was always 0)
+ * Removed in earlier cleanups (kept for reference):
+ *   - essence / soul / body params (primary-stat layer retired stage 15)
+ *   - `_law` param (element-matching elemBonus removed 2026-04-26)
+ *   - artefactFlat param (was always 0)
  *   - `arteMult` per-technique field (was multiplying a zero term)
- *
- * The previous categorical `damageType` (physical|elemental) was replaced
- * 2026-04-27 by independent `physMult` + `elemMult` coefficients.
+ *   - K (rank × quality) multiplier — removed 2026-04-27 so all damage
+ *     scaling flows through phys / elem stats directly. K_TABLE deleted.
  *
  * @param {object} tech
  * @param {{physical:number, elemental:number, damage_all?:number, secret_technique_damage?:number}|null} damageStats
  */
 export function calcDamage(tech, damageStats = null) {
-  const K = getK(tech.rank, tech.quality);
   const physBonus = (tech.physMult ?? 0) * (damageStats?.physical  ?? 0);
   const elemBonus = (tech.elemMult ?? 0) * (damageStats?.elemental ?? 0);
-  let dmg = (tech.bonus ?? 0) + K * (physBonus + elemBonus);
+  let dmg = (tech.bonus ?? 0) + physBonus + elemBonus;
 
   // Universal damage_all flat bonus (whole-attack, no share).
   if (damageStats?.damage_all) dmg += damageStats.damage_all;
