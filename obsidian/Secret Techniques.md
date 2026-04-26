@@ -31,7 +31,7 @@ Advanced combat skills that fire automatically during fights. Available from the
 | Type | Triggers | Effect |
 |---|---|---|
 | **Attack** | Cooldown expires | Deal damage using the attack formula |
-| **Heal** | Cooldown expires **and** HP ≤ 50% | Restore a flat or % HP amount |
+| **Heal** | Cooldown expires **and** HP ≤ 50% | Restore `(healPercent × maxHP) + (physMult × physical_damage) + (elemMult × elemental_damage)`, scaled by `healing_received` |
 | **Defend** | Cooldown expires | Apply a DEF buff for N enemy hits |
 | **Dodge** | Cooldown expires | Apply a dodge chance buff for N enemy hits |
 | **Expose** | Cooldown expires | Apply an offensive / mitigation buff with per-effect clocks (see below) |
@@ -87,22 +87,36 @@ Base cooldown by type, reduced by quality:
 ## Attack Formula
 
 ```
-Damage = K * realmIndex * arte_mult + bonus + damageBucketFlat
+Damage = K * realmIndex * arte_mult + bonus
+       + physMult × physical_damage
+       + elemMult × elemental_damage
+       + damage_all
+       × (1 + secret_technique_damage)
 ```
 
 | Variable | Meaning |
 |---|---|
 | `K` | Technique multiplier — scales with rank and quality (see table below) |
 | `realmIndex` | Player's realm progression index (placeholder anchor since primary stats were removed — see [[Primary Stats]]) |
-| `arte_mult` | Artefact-specific multiplier |
+| `arte_mult` | Technique's `arteMult` — multiplier on the K-formula main term |
 | `bonus` | Flat additive damage |
-| `damageBucketFlat` | `physical_damage` if `damageType === 'physical'`, `elemental_damage` if `'elemental'` |
+| `physMult` | Technique's coefficient on the `physical_damage` stat (any non-negative decimal) |
+| `elemMult` | Technique's coefficient on the `elemental_damage` stat (any non-negative decimal) |
+| `damage_all` | Universal flat from artefacts + sets + laws |
+
+> **Damage-type model overhauled 2026-04-27**: the categorical `damageType` field (`'physical'` / `'elemental'`) was replaced by two coefficients, `physMult` and `elemMult`. A technique can scale with both stats independently — designer authors how heavily it leans. A "balanced" technique with `physMult: 1.0, elemMult: 1.0` adds 100% of both stats. A pure-physical technique uses `physMult: 1.0, elemMult: 0`.
 
 > The element-matching `elem_bonus` was removed in 2026-04-26 — techniques no longer carry an `element` field. Laws still carry an element for other systems.
 
-After the formula resolves, the player damage is mitigated by **enemy DEF / ELEM_DEF** via the PoE-style armour curve — see [[Combat]] for the mitigation pipeline.
+After the formula resolves, the player damage is mitigated by **enemy DEF / ELEM_DEF** via the PoE-style armour curve — see [[Combat]] for the mitigation pipeline. The mitigating armour is the **weighted average** of phys + elem armour, weighted by `physMult` and `elemMult`:
 
-**Basic attack** (fires when no secret technique is ready) is hard-pinned to physical damage. Secret techniques pick their own damage bucket via the `damageType` field. See [[Damage Types]].
+```
+effectiveArmour = (physMult × eDef + elemMult × eElemDef) / (physMult + elemMult)
+```
+
+A pure-physical tech faces only `eDef`; a balanced tech (1.0/1.0) faces 50/50; a heavy elemental tech faces mostly `eElemDef`. After def_pen reduces effective armour, the standard PoE armour curve runs.
+
+**Basic attack** (fires when no secret technique is ready) is hard-pinned to physical damage and adds 100% of `physical_damage` directly. See [[Damage Types]].
 
 ### K Scaling (Rank × Quality)
 

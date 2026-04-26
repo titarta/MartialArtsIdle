@@ -48,10 +48,26 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
       <div className="tech-item-stats">
         <span>{t('techniqueSlotModal.cooldown', { cd: cd.toFixed(1) })}</span>
         {tech.type === 'Attack' && (
-          <span>{t('techniqueSlotModal.kMult', { k: K })}</span>
+          <>
+            <span>{t('techniqueSlotModal.kMult', { k: K })}</span>
+            {(tech.physMult || tech.elemMult) && (
+              <span>{t('techniqueSlotModal.scaling', {
+                phys: ((tech.physMult ?? 0) * 100).toFixed(0),
+                elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
+              })}</span>
+            )}
+          </>
         )}
         {tech.type === 'Heal' && (
-          <span>{t('techniqueSlotModal.healPercent', { pct: Math.round((tech.healPercent ?? 0.25) * 100) })}</span>
+          <>
+            <span>{t('techniqueSlotModal.healPercent', { pct: Math.round((tech.healPercent ?? 0.25) * 100) })}</span>
+            {(tech.physMult || tech.elemMult) && (
+              <span>{t('techniqueSlotModal.scaling', {
+                phys: ((tech.physMult ?? 0) * 100).toFixed(0),
+                elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
+              })}</span>
+            )}
+          </>
         )}
         {tech.type === 'Defend' && (
           <span>{t('techniqueSlotModal.defBuff', { mult: tech.defMult, hits: tech.buffAttacks })}</span>

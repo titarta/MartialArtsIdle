@@ -246,6 +246,7 @@
     "slot3":        "Técnica III",
     "cooldown":     "Recarga {{cd}}s",
     "kMult":        "K ×{{k}}",
+    "scaling":      "Escala: {{phys}}% fís / {{elem}}% elem",
     "healPercent":  "Cura {{pct}}% de Vida",
     "defBuff":      "DEF ×{{mult}} / {{hits}} golpes",
     "dodgeBuff":    "{{pct}}% esquiva / {{hits}} golpes",

@@ -821,7 +821,16 @@ function executeTechnique(s, tech, slotIdx, logs, { stride = false } = {}) {
       const bypass = (s.stats?.setFlags?.attackBypassDefenseChance ?? 0) > 0
         && Math.random() * 100 < s.stats.setFlags.attackBypassDefenseChance;
       if (!bypass) {
-        const armour    = tech.damageType === 'elemental' ? (s.eElemDef ?? 0) : (s.eDef ?? 0);
+        // 2026-04-27: damageType replaced by physMult + elemMult coefficients.
+        // Enemy armour is the weighted average of phys + elem armour stats,
+        // weighted by the technique's mults. Pure-physical tech (1.0/0)
+        // faces only eDef; mixed (1.0/1.0) faces 50/50 of both.
+        const pm = tech.physMult ?? 0;
+        const em = tech.elemMult ?? 0;
+        const totalMults = pm + em;
+        const armour = totalMults > 0
+          ? ((pm * (s.eDef ?? 0)) + (em * (s.eElemDef ?? 0))) / totalMults
+          : (s.eDef ?? 0);
         const totalPen  = resolveDefPen(s, { exploited });
         const effArmour = Math.max(0, armour * (1 - totalPen));
         dmg = applyArmourMitigation(dmg, effArmour);
@@ -845,9 +854,16 @@ function executeTechnique(s, tech, slotIdx, logs, { stride = false } = {}) {
       dispatchTrigger(s, 'on_exploit_fired', { amount: dmg });
     }
   } else if (tech.type === 'Heal') {
-    const baseHeal = s.pMaxHp * (tech.healPercent ?? 0.25);
-    const healMult = 1 + (s.stats?.healingReceivedPct ?? 0);
-    const heal = Math.floor(baseHeal * healMult);
+    // 2026-04-27: Heal also scales with phys + elem damage stats via the
+    // same physMult / elemMult coefficients used by Attack. Adds a flat
+    // bonus on top of the maxHP-percent base, then healing_received scales
+    // the whole thing.
+    const baseHealPct = s.pMaxHp * (tech.healPercent ?? 0.25);
+    const dStats = s.stats?.damageStats ?? {};
+    const physBonus = (tech.physMult ?? 0) * (dStats.physical  ?? 0);
+    const elemBonus = (tech.elemMult ?? 0) * (dStats.elemental ?? 0);
+    const healMult  = 1 + (s.stats?.healingReceivedPct ?? 0);
+    const heal      = Math.floor((baseHealPct + physBonus + elemBonus) * healMult);
     s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
     logs.push({ msg: `${tech.name} → +${heal.toLocaleString()} HP`, kind: 'heal' });
     dispatchTrigger(s, 'on_heal', { amount: heal, sourceIdx: slotIdx });

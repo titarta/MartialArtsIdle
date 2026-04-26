@@ -68,7 +68,16 @@ function buildCatalogue() {
 
   QUALITIES.forEach((quality, qIdx) => {
     // ── Attack ×4 ──
+    // Per-slot lean defaults: slot 1 leans physical, slot 2 leans elemental,
+    // slot 3 is balanced, slot 4 leans physical harder. Designer overrides.
+    const ATTACK_MULTS = [
+      { physMult: 1.0, elemMult: 0.4 }, // slot 1 — phys-leaning
+      { physMult: 0.4, elemMult: 1.0 }, // slot 2 — elem-leaning
+      { physMult: 0.7, elemMult: 0.7 }, // slot 3 — balanced
+      { physMult: 1.0, elemMult: 0.5 }, // slot 4 — phys-leaning + secondary elem
+    ];
     for (let i = 1; i <= 4; i++) {
+      const mults = ATTACK_MULTS[i - 1];
       out.push({
         id:         `${quality.toLowerCase()}_attack_${i}`,
         name:       `Placeholder ${quality} Attack ${i}`,
@@ -77,12 +86,21 @@ function buildCatalogue() {
         flavour:    'TBD — designer to fill in.',
         arteMult:   parseFloat((1.0 + qIdx * 0.1).toFixed(2)),
         bonus:      qIdx * 5,
-        damageType: i % 2 === 0 ? 'elemental' : 'physical',
+        physMult:   mults.physMult,
+        elemMult:   mults.elemMult,
       });
     }
 
     // ── Heal ×2 ──
+    // Heal slots also scale with phys + elem stats (added 2026-04-27 — heal
+    // is now a multiplier-based effect, not just a maxHP fraction). Lower
+    // coefficients than Attack so heal doesn't dominate balance.
+    const HEAL_MULTS = [
+      { physMult: 0.4, elemMult: 0.2 }, // slot 1 — phys-leaning
+      { physMult: 0.2, elemMult: 0.4 }, // slot 2 — elem-leaning
+    ];
     for (let i = 1; i <= 2; i++) {
+      const mults = HEAL_MULTS[i - 1];
       out.push({
         id:          `${quality.toLowerCase()}_heal_${i}`,
         name:        `Placeholder ${quality} Heal ${i}`,
@@ -90,6 +108,8 @@ function buildCatalogue() {
         quality,
         flavour:     'TBD — designer to fill in.',
         healPercent: parseFloat((0.15 + qIdx * 0.05).toFixed(3)),
+        physMult:    mults.physMult,
+        elemMult:    mults.elemMult,
       });
     }
 
@@ -182,20 +202,23 @@ export function getK(rank, quality) {
 /**
  * Attack damage formula:
  *   K * (Essence + Soul + Body + artefactFlat) * arteMult + bonus
- *   + damage-bucket flat bonus (single bucket per technique)
+ *   + physMult × physical_damage + elemMult × elemental_damage
+ *   + damage_all
+ *   × (1 + secret_technique_damage)
  *
- * Element-matching elemBonus retired in 2026-04-26 secret-tech overhaul —
- * techniques no longer carry an `element` field.
+ * Element-matching elemBonus retired in 2026-04-26 — techniques no longer
+ * carry an `element` field.
  *
- * Damage-bucket flat bonus: each technique carries a single `damageType`
- * field — 'physical' or 'elemental'. The technique adds the matching flat
- * stat (physical_damage or elemental_damage) once.
+ * Damage-type model overhauled 2026-04-27: the categorical `damageType`
+ * (physical|elemental) is gone. Every technique now carries a `physMult`
+ * and `elemMult` coefficient that scales the matching stat. A technique
+ * can scale with both buckets — designer authors how heavily it leans.
  *
  * @param {object} tech
  * @param {number} essence
  * @param {number} soul
  * @param {number} body
- * @param {object|string|null} _law  — kept for backcompat, unused (element gone)
+ * @param {object|string|null} _law  — kept for backcompat, unused
  * @param {number} artefactFlat
  * @param {{physical:number, elemental:number}|null} damageStats
  */
@@ -206,10 +229,12 @@ export function calcDamage(tech, essence, soul, body, _law = null, artefactFlat 
           * (tech.arteMult ?? 1.0)
           + (tech.bonus ?? 0);
 
-  // Damage-bucket flat bonus. Untagged techniques default to physical.
+  // Phys + elem stat scaling. Each technique declares its own coefficients;
+  // both stats add independently so a balanced (physMult=1.0, elemMult=1.0)
+  // tech gets 100% of both. Designer balances per-tech identity.
   if (damageStats) {
-    const bucket = tech.damageType === 'elemental' ? 'elemental' : 'physical';
-    dmg += damageStats[bucket] ?? 0;
+    dmg += (tech.physMult ?? 0) * (damageStats.physical  ?? 0);
+    dmg += (tech.elemMult ?? 0) * (damageStats.elemental ?? 0);
   }
 
   // Universal damage_all flat bonus (whole-attack, no share).
