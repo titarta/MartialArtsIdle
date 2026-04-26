@@ -129,10 +129,19 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
           law,
         };
 
+    // Per-region drop suppression: training-zone-style regions can flag
+    // `noScrollOrArtefactDrops` to zero out scroll + artefact rolls without
+    // touching per-enemy chance values (those enemies appear in real loot
+    // zones too). Mutate a shallow clone of enemyDef so the source stays
+    // pristine.
+    const effectiveEnemyDef = region?.noScrollOrArtefactDrops
+      ? { ...enemyDef, techniqueDrop: { ...(enemyDef?.techniqueDrop ?? {}), chance: 0 } }
+      : enemyDef;
+
     startFight(
       playerStats,
       equippedTechniques,
-      enemyDef,
+      effectiveEnemyDef,
       inventory   ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
       techniques  ? (tech)  => techniques.addOwnedTechnique(tech) : null,
       region?.worldId ?? 1,

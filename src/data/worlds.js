@@ -35,6 +35,11 @@ const WORLDS = [
         minRealm: 'Tempered Body L1',
         minRealmIndex: 0,
         enemies: 'Outer sect disciples, training golems',
+        // First zone: training grounds yield no scrolls or artefacts. Combat
+        // rolls (techDropChance / artefactDropChance) get zeroed in CombatScreen
+        // when this flag is set, so the player has to clear it to start the
+        // real loot loop in zone 2 onward.
+        noScrollOrArtefactDrops: true,
         gatherDrops: [
           { itemId: 'iron_herb_1',        chance: 0.60, qty: [1, 3] },
           { itemId: 'iron_herb_2',        chance: 0.40, qty: [1, 2] },

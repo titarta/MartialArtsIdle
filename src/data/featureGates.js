@@ -38,9 +38,9 @@ const BASELINE = {
     unlockMsg: null,
   },
   worlds: {
-    gate: { type: 'realm', minRealmIndex: 3 },
+    gate: { type: 'realm', minRealmIndex: 2 },
     desc: 'Explore regions across multiple worlds, fight enemies in combat, and dispatch idle workers to gather herbs or mine ores.',
-    hint: 'Reach Tempered Body Layer 4',
+    hint: 'Reach Tempered Body Layer 3',
     unlockMsg: 'Worlds unlocked.',
   },
   character: {

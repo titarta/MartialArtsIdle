@@ -6,9 +6,10 @@
       "regions": [
         {
           "name": "Outer Sect Training Grounds",
-          "minRealm": "Tempered Body L4",
-          "minRealmIndex": 3,
+          "minRealm": "Tempered Body L3",
+          "minRealmIndex": 2,
           "enemies": "Outer sect disciples, training golems",
+          "noScrollOrArtefactDrops": true,
           "gatherDrops": [
             {
               "itemId": "iron_herb_1",
