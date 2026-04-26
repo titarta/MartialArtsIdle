@@ -58,26 +58,42 @@ export function wipeSave() {
 
 /**
  * Wipe for reincarnation. Preserves karma + tree (those keys are outside
- * the wipeSave list) and the **entire** owned-laws library — but clears
- * the active law so the reborn character must re-choose which manual to
- * cultivate. The library is the permanent identity across lives; the
- * active choice is the fresh start.
+ * the wipeSave list), the **entire** owned-laws library, and the alchemy
+ * meta-progression (discovered pill recipes + pinned recipes) — but
+ * clears the active law so the reborn character must re-choose which
+ * manual to cultivate. The library + recipe codex are permanent identity
+ * across lives; the active choice is the fresh start.
  */
 export function wipeReincarnation() {
-  // Snapshot the full library BEFORE the wipe so we can re-seed it.
+  // Snapshot persistent meta-progression BEFORE the wipe so we can re-seed it.
   let ownedLaws = [];
+  let discoveredPills = null;
+  let pinnedRecipes = null;
   try {
     const ownedRaw = localStorage.getItem('mai_owned_laws');
     ownedLaws = ownedRaw ? JSON.parse(ownedRaw) : [];
   } catch {}
+  try {
+    discoveredPills = localStorage.getItem('mai_discovered_pills');
+  } catch {}
+  try {
+    pinnedRecipes = localStorage.getItem('mai_pinned_recipes');
+  } catch {}
 
   wipeSave();
 
-  // Re-seed the library (no active selection — player picks anew).
+  // Re-seed the law library (no active selection — player picks anew).
   if (ownedLaws.length > 0) {
     try {
       localStorage.setItem('mai_owned_laws', JSON.stringify(ownedLaws));
     } catch {}
+  }
+  // Re-seed the alchemy codex.
+  if (discoveredPills) {
+    try { localStorage.setItem('mai_discovered_pills', discoveredPills); } catch {}
+  }
+  if (pinnedRecipes) {
+    try { localStorage.setItem('mai_pinned_recipes', pinnedRecipes); } catch {}
   }
   // mai_active_law was removed by wipeSave; leave it absent so activeLaw
   // derives to null on next load.
