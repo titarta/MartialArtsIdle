@@ -3,7 +3,10 @@ import { ARTEFACTS_BY_ID } from '../data/artefacts';
 import { generateAffixes, AFFIX_POOL_BY_SLOT } from '../data/affixPools';
 import { AFFIX_PCT_POINT_STATS } from '../data/affixDisplay';
 import { generateArtefactName, formatArtefactName } from '../data/artefactNames';
-import { evaluateArtefactUniques } from '../systems/artefactEngine';
+// Artefact unique modifiers were removed in 2026-04-27 — every artefact's
+// identity now lives in its element + set membership + standard affixes.
+// The artefactEngine + artefactUniqueEffects files were deleted with that
+// pass; only set-bonus aggregation remains in this hook.
 import { rollElementAndSet, getSetBonusModifiers } from '../data/artefactSets';
 import {
   MAX_UPGRADE_BY_RARITY, effectiveAffixValue, upgradeCost, rollUpgradeBonus, isBonusLevel,
@@ -315,22 +318,19 @@ export default function useArtefacts() {
 
   // Build the modifiers object expected by computeAllStats.
   //
-  // Three contribution layers are merged:
-  //   1. Slot bonuses (type-based catalogue defaults)
-  //   2. Normal (non-unique) affixes from transmutation
-  //   3. Unique affixes resolved through artefactEngine → declarative effects
+  // Two contribution layers are merged:
+  //   1. Normal affixes rolled by transmutation (1–5 per rarity)
+  //   2. Active set-bonus payloads (2-piece / 4-piece) — see artefactSets.js
   //
-  // Layer 3 means equipped unique affixes now actually influence stats — the
-  // old filter (`if (affix.unique) continue;`) is gone for entries that have
-  // a corresponding entry in ARTEFACT_UNIQUE_EFFECTS.
+  // Artefact unique modifiers were removed in 2026-04-27. The previous Layer 3
+  // (unique-affix declarative effects via artefactEngine) is gone; affixes
+  // marked `unique: true` are now skipped silently.
   const getStatModifiers = useCallback(() => {
     const mods = {};
     const equippedInstances = collectEquippedInstances();
     for (const instance of equippedInstances) {
       const art = resolveInstance(instance);
       if (!art) continue;
-      // Slot base bonuses removed — artefact stats are now exactly the
-      // rolled affixes (1–5 per rarity). See obsidian/Artefacts.md.
       const level    = instance.upgradeLevel ?? 0;
       const bonuses  = instance.affixBonuses ?? {};
       const affixArr = instance.affixes ?? [];
@@ -350,29 +350,37 @@ export default function useArtefacts() {
         (mods[affix.stat] ??= []).push({ type: affix.type, value });
       }
     }
-    // Layer 3: unique affix effects.
-    const { statMods } = evaluateArtefactUniques(equippedInstances);
-    for (const [stat, list] of Object.entries(statMods)) {
-      (mods[stat] ??= []).push(...list);
-    }
-    // Layer 4: active set bonuses (2-piece / 4-piece). Placeholder payloads
-    // per-element for now — see artefactSets.TWO_PIECE_STAT / FOUR_PIECE_STAT.
-    const setMods = getSetBonusModifiers(state.equipped, state.owned);
-    for (const [stat, list] of Object.entries(setMods)) {
+    // Layer 2: active set bonuses (2-piece / 4-piece). The set engine emits
+    // its own statMods bundle; flags + triggers are routed separately via
+    // getSetBundle() below so combat can fold them into setFlags / setTriggers.
+    const { statMods: setStatMods } = getSetBonusModifiers(state.equipped, state.owned);
+    for (const [stat, list] of Object.entries(setStatMods)) {
       (mods[stat] ??= []).push(...list);
     }
     return mods;
   }, [collectEquippedInstances, state.equipped, state.owned]);
 
   /**
-   * Flag bag produced by unique affixes. Combat / cultivation / autofarm
-   * screens read this to drive conditional effects (executeBonus, phoenix
-   * revive, first-attack crit, loot bonus, etc.).
+   * Set-bonus flag + trigger bundle. Combat reads `setFlags` for boolean /
+   * numeric flags (e.g. doubleSecretTechs) and `setTriggers` for event-driven
+   * effects (e.g. heal-on-dodge from a wood set).
    */
-  const getUniqueFlags = useCallback(() => {
-    const equippedInstances = collectEquippedInstances();
-    const { artefactFlags } = evaluateArtefactUniques(equippedInstances);
-    return artefactFlags;
+  const getSetBundle = useCallback(() => {
+    const { flags, triggers } = getSetBonusModifiers(state.equipped, state.owned);
+    return { setFlags: flags ?? {}, setTriggers: triggers ?? [] };
+  }, [state.equipped, state.owned]);
+
+  /**
+   * Per-element artefact counts (drives law uniques like "+X% damage per
+   * fire artefact equipped"). Returned as { fire, water, earth, wood, metal }.
+   */
+  const getEquippedArtefactsByElement = useCallback(() => {
+    const out = { fire: 0, water: 0, earth: 0, wood: 0, metal: 0 };
+    for (const inst of collectEquippedInstances()) {
+      const el = inst?.element;
+      if (el && out[el] !== undefined) out[el] += 1;
+    }
+    return out;
   }, [collectEquippedInstances]);
 
   return {
@@ -388,6 +396,7 @@ export default function useArtefacts() {
     equippedInSlot,
     dismantleArtefact,
     getStatModifiers,
-    getUniqueFlags,
+    getSetBundle,
+    getEquippedArtefactsByElement,
   };
 }

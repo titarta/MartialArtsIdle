@@ -1,14 +1,24 @@
 # Modifier Implementation Audit
 
-> Snapshot: 2026-04-22. Cross-check of every modifier/effect across
-> **artefact uniques**, **law modifiers**, and **secret technique
-> modifiers**. For each entry: what the data declares vs. what the
-> runtime actually consumes. Use this page as the single source of truth
-> when deciding which stubs to wire up or prune.
+> Snapshot: 2026-04-27. Cross-check of every modifier/effect across
+> **law modifiers** + **artefact set bonuses** + **secret technique
+> stats**. (Artefact unique modifiers were removed entirely on 2026-04-27
+> — see Section 1 below.) For each entry: what the data declares vs.
+> what the runtime actually consumes. Use this page as the single source
+> of truth when deciding which stubs to wire up or prune.
 
 ---
 
-## 1 · Artefact Unique Modifiers
+## 1 · Artefact Unique Modifiers — **REMOVED 2026-04-27**
+
+The artefact-unique system was deleted entirely on 2026-04-27. The 103-entry `artefactUniqueEffects.js` data file, the `artefactEngine.js` evaluator, the `getUniqueFlags` hook export, and all ~25 `artefactFlags` read sites in `useCombat.js` are gone. The flag bag (`firstAttackGuaranteedExploit`, `voidstepCdReset`, `executeBonusPct`, `damagePerRealmPct`, etc.) is no longer populated and no longer read.
+
+Element-specific identity that the unique system used to provide now lives in [[Artefact Sets]] (15 sets × 2-piece + 4-piece bonuses). Set bonuses can emit stat-mods, flags, triggers, and per-tech-type CD multipliers — the same vocabulary as law uniques.
+
+The deprecated unique pool is archived in [[Deprecated_Unique_Modifiers]] for reference; nothing in code consumes it.
+
+<details>
+<summary>Pre-removal documentation (kept for context)</summary>
 
 Defined in `src/data/uniqueModifiers.js`. Rolled onto
 Transcendent-tier artefact slots via `pickArtefactAffix`
@@ -163,6 +173,8 @@ the UI.
 | a_harvest_ring | Harvest Ring | +{value}% harvest speed.          |
 | a_mining_ring  | Mining Ring  | +{value}% mining speed.           |
 | a_alchemy_ring | Alchemy Ring | Pill effects +{value}%.           |
+
+</details>
 
 ---
 

@@ -14,7 +14,7 @@
  */
 
 import { MOD } from './stats';
-import { pickRandomUnique } from './lawUniques';
+import { pickRandomUnique, rollUniqueValue } from './lawUniques';
 import { rollArtefactUnique, ARTEFACT_UNIQUES } from './uniqueModifiers';
 import { mergeSingleton } from './config/loader';
 import { ELEMENTS } from './elements';
@@ -457,7 +457,8 @@ export function generateLaw(forcedRarity, realmIndex = Infinity) {
     // Pass `{ types }` so the picker filters to the law's pools ∪ general.
     const u = pickRandomUnique({ types }, usedIds);
     if (u) {
-      uniques[tier] = u;
+      // lawEngine reads each tier as { id, value } — store both.
+      uniques[tier] = { id: u.id, value: rollUniqueValue(u.id) };
       usedIds.push(u.id);
     }
   }

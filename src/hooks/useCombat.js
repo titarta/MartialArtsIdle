@@ -16,6 +16,18 @@ const ARMOUR_DAMAGE_FACTOR = 10;
 //   EnemyDef = max(10, region_index × ENEMY_DEF_PER_REGION × def_mult)
 const ENEMY_DEF_PER_REGION = 8;
 
+// Artefacts drop using the same per-enemy `techniqueDrop.chance`, scaled up
+// so they feel distinctly more common than Secret Technique scrolls.
+const ARTEFACT_DROP_MULT = 2.0;
+
+function fmtHp(n) {
+  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
+  if (n >= 1e9)  return (n / 1e9).toFixed(1)  + 'B';
+  if (n >= 1e6)  return (n / 1e6).toFixed(1)  + 'M';
+  if (n >= 1e3)  return (n / 1e3).toFixed(1)  + 'K';
+  return String(Math.ceil(n));
+}
+
 /**
  * Apply the PoE armour mitigation curve and return the final damage.
  *   mitigation = armour / (armour + 10 × damage), capped at 0.9.
@@ -45,11 +57,17 @@ function resolveExploitParams(s) {
 }
 
 /** Resolve total def_pen including any active expose buff (player clock). */
-function resolveDefPen(s) {
+function resolveDefPen(s, { exploited = false } = {}) {
   const base = s.stats?.defPen ?? 0;
   const ex   = s.exposeBuff;
-  if (!ex || ex.playerAttacksLeft <= 0) return base;
-  return Math.min(1, base + (ex.defPen ?? 0));
+  let total = base;
+  if (ex && ex.playerAttacksLeft > 0) total += (ex.defPen ?? 0);
+  // Metal law / set: "Exploit hits ignore X% of enemy defenses".
+  if (exploited) {
+    total += s.stats?.lawFlags?.exploitDefPenPct ?? 0;
+    total += s.stats?.setFlags?.exploitDefPenPct ?? 0;
+  }
+  return Math.min(1, total);
 }
 
 /** Resolve total incoming-damage reduction including the expose buff (enemy clock). */
@@ -73,99 +91,151 @@ function tickExposeBuff(s, clock) {
   if (ex.playerAttacksLeft <= 0 && ex.enemyAttacksLeft <= 0) s.exposeBuff = null;
 }
 
-// Artefacts drop using the same per-enemy `techniqueDrop.chance`, scaled up
-// so they feel distinctly more common than Secret Technique scrolls — per the
-// post-overhaul drop design (tech ~5% / artefact ~10% average).
-const ARTEFACT_DROP_MULT = 2.0;
-
-function fmtHp(n) {
-  if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
-  if (n >= 1e9)  return (n / 1e9).toFixed(1)  + 'B';
-  if (n >= 1e6)  return (n / 1e6).toFixed(1)  + 'M';
-  if (n >= 1e3)  return (n / 1e3).toFixed(1)  + 'K';
-  return String(Math.ceil(n));
-}
-
 /**
- * Resolve the number of enemy attacks a buff will cover.
+ * Resolve a single exploit roll. Folds the killing-stride guarantee into the
+ * standard exploit-chance roll. The `cannotExploit` law/set flag forces a
+ * non-exploit result regardless of chance / stride.
  *
- * Base value comes from the technique's `buffAttacks`. If the stats bundle
- * carries a `buffDurationMult` (fed by the buff_duration stat — e.g. the
- * Time Master law unique grants +20–50% more charges), scale up and ceil.
- * Always floors at 1 so a cast is never wasted.
- */
-function resolveBuffAttacks(base, stats) {
-  const mult = stats?.buffDurationMult ?? 1;
-  return Math.max(1, Math.ceil(base * mult));
-}
-
-/**
- * Compute the aggregate **conditional** damage bonus contributed by the
- * equipped artefact unique flags for the current in-combat state. Returns a
- * multiplier in the form (1 + sum of applicable bonuses). Each flag value is
- * a raw percent number (0–100) stored on `stats.artefactFlags`.
- */
-function computeArtefactDamageBonus(s) {
-  const flags = s.stats?.artefactFlags;
-  if (!flags) return 1;
-  const nowSec   = performance.now() / 1000;
-  const elapsed  = nowSec - (s.combatStartSec ?? nowSec);
-  const enemyPct = s.eMaxHp ? s.eHp / s.eMaxHp : 1;
-  const realmIdx = s.stats.realmIndex ?? 0;
-  const majorR   = Math.floor(realmIdx / 3);
-  const eqArt    = s.stats.equippedArtefactCount ?? 0;
-  const techCount= (s.equipped ?? []).filter(Boolean).length;
-
-  let bonus = 0;
-  if (flags.damageFirst5sPct  && elapsed <= 5)  bonus += flags.damageFirst5sPct  / 100;
-  if (flags.damageFirst10sPct && elapsed <= 10) bonus += flags.damageFirst10sPct / 100;
-  if (flags.executeBonusPct   && enemyPct < 0.25) bonus += flags.executeBonusPct / 100;
-  if (flags.damagePerRealmPct)            bonus += (flags.damagePerRealmPct / 100) * realmIdx;
-  if (flags.damagePerMajorRealmPct)       bonus += (flags.damagePerMajorRealmPct / 100) * majorR;
-  if (flags.damagePerArtefactPct)         bonus += (flags.damagePerArtefactPct / 100) * eqArt;
-  // damageIfSoulGtBodyPct retired in stage 16 — primary-stat layer is gone.
-  if (flags.damageIf3TechsPct && techCount >= 3) bonus += flags.damageIf3TechsPct / 100;
-  if (flags.damagePostDodgePct && nowSec - (s.lastDodgeAtSec ?? -Infinity) <= 3)
-    bonus += flags.damagePostDodgePct / 100;
-  if (flags.comboDamagePerHitPct) {
-    const capped = Math.min(10, s.comboCount ?? 0);
-    bonus += (flags.comboDamagePerHitPct / 100) * capped;
-  }
-  if (flags.damagePerKill5sPct) {
-    // Drop stale kills (>5s old) so the bonus is time-bounded.
-    const recent = (s.killsIn5s ?? []).filter(t => nowSec - t <= 5);
-    s.killsIn5s = recent;
-    bonus += (flags.damagePerKill5sPct / 100) * recent.length;
-  }
-  // Enemies have no defense stat in the current combat model, so
-  // ignore-defense rolls bleed into a flat damage boost (half value to
-  // approximate their expected contribution). `ignoreDefensePct` is always
-  // active; `ignoreDefenseChance` rolls once per attack.
-  const ignorePct = s.stats?.ignoreDefensePct ?? 0;
-  if (ignorePct > 0) bonus += (ignorePct / 100) * 0.5;
-  const ignoreChance = s.stats?.ignoreDefenseChancePct ?? 0;
-  if (ignoreChance > 0 && Math.random() * 100 < ignoreChance) bonus += 0.5;
-  return 1 + bonus;
-}
-
-/**
- * Resolve a single exploit roll. Folds together base exploit chance + the
- * Expose buff bonus (via resolveExploitParams), the killing-stride
- * guarantee, and the silent-crown / silent-steps "first attack guaranteed"
- * artefact flag. Returns the multiplier-bumped damage + whether it triggered.
- *
- * Crit was consolidated into exploit on 2026-04-26 — they were two parallel
- * damage-multiplier roll systems doing the same job. Sources that previously
- * used `crit_chance` / `crit_damage` / `crit_twice_chance` now feed
- * `exploit_chance` / `exploit_attack_mult`.
+ * Crit was consolidated into exploit on 2026-04-26.
+ * Artefact unique flags removed on 2026-04-27 (silent-crown's
+ * firstAttackGuaranteedExploit was the only consumer; gone with it).
  */
 function rollExploit(s, dmg, { stride = false } = {}) {
+  if (s.stats?.lawFlags?.cannotExploit || s.stats?.setFlags?.cannotExploit) {
+    s.nextHitExploit = false;
+    return { dmg, exploited: false };
+  }
+  // Wood Set 2 4-piece: "Dodging makes the next attack or secret technique an
+  // exploit hit". Consumed by the next attack regardless of dmg.
+  const guaranteedFromDodge = s.nextHitExploit === true;
+  if (guaranteedFromDodge) s.nextHitExploit = false;
   const { chance, mult } = resolveExploitParams(s);
-  const flags = s.stats?.artefactFlags ?? {};
-  const guaranteedFirst = flags.firstAttackGuaranteedExploit && !s.firstAttackFired;
-  const exploited = stride || guaranteedFirst || (chance > 0 && Math.random() * 100 < chance);
+  const exploited = stride || guaranteedFromDodge || (chance > 0 && Math.random() * 100 < chance);
   if (!exploited) return { dmg, exploited: false };
   return { dmg: Math.floor(dmg * (mult / 100)), exploited: true };
+}
+
+// ─── Trigger dispatch (law + set on-event effects) ────────────────────────────
+
+/**
+ * Walk the active law-trigger + set-trigger lists, invoking each handler whose
+ * event matches and whose condition (if any) passes. Triggers are declarative
+ * data emitted by lawEngine / set engine — see `applyTriggerAction` for the
+ * supported action shapes.
+ *
+ * @param {object} s        combat state ref
+ * @param {string} event    one of 'on_heal' | 'on_default_attack_fired' |
+ *                          'on_secret_tech_fired' | 'on_dodge_success' |
+ *                          'on_hit_taken' | 'on_enemy_killed' | 'on_exploit_fired'
+ * @param {object} payload  event-specific data (e.g. { amount } for on_heal)
+ */
+function dispatchTrigger(s, event, payload = {}) {
+  const lawTriggers = s.stats?.lawTriggers ?? [];
+  const setTriggers = s.stats?.setTriggers ?? [];
+  for (const t of [...lawTriggers, ...setTriggers]) {
+    if (t.event !== event) continue;
+    applyTriggerAction(s, t.action, payload);
+  }
+}
+
+function applyTriggerAction(s, action, payload) {
+  if (!action || typeof action !== 'object') return;
+  switch (action.type) {
+    case 'heal_pct': {
+      const heal = Math.floor(s.pMaxHp * (action.value ?? 0));
+      if (heal > 0) {
+        s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
+        s._triggerLog?.push({ msg: `Trigger → +${heal} HP`, kind: 'heal' });
+      }
+      break;
+    }
+    case 'damage_enemy_pct_of_payload': {
+      const amount = payload?.amount ?? 0;
+      const dmg = Math.max(0, Math.floor(amount * (action.value ?? 0)));
+      if (dmg > 0) {
+        s.eHp = Math.max(0, s.eHp - dmg);
+        s._triggerLog?.push({ msg: `Trigger → ${dmg} reflected dmg`, kind: 'damage' });
+      }
+      break;
+    }
+    case 'null_next_enemy_hit': {
+      s.nextEnemyHitNulls = true;
+      break;
+    }
+    case 'reduce_other_tech_cd_pct': {
+      const pct = action.value ?? 0;
+      const sourceIdx = payload?.sourceIdx;
+      for (let i = 0; i < s.cds.length; i++) {
+        if (i === sourceIdx) continue;
+        if (isFinite(s.cds[i]) && s.cds[i] > 0) {
+          s.cds[i] = Math.max(0, s.cds[i] * (1 - pct));
+        }
+      }
+      break;
+    }
+    case 'dodge_stack_increment': {
+      s.dodgeStacks = (s.dodgeStacks ?? 0) + (action.value ?? 1);
+      break;
+    }
+    case 'dodge_stack_reset': {
+      s.dodgeStacks = 0;
+      break;
+    }
+    case 'default_attack_buff_set': {
+      s.defaultAttackBuff = { stacks: action.value ?? 1 };
+      break;
+    }
+    case 'default_attack_buff_clear': {
+      s.defaultAttackBuff = null;
+      break;
+    }
+    case 'add_dodge_chance': {
+      // Non-stacking-by-default flat dodge bonus, consumed at the next dodge roll.
+      s.transientDodgeBonus = (s.transientDodgeBonus ?? 0) + (action.value ?? 0);
+      break;
+    }
+    default:
+      // Unknown action type — silently ignore so designer-facing law data
+      // never crashes combat if a typo or unimplemented action sneaks through.
+      break;
+  }
+}
+
+// ─── Per-element artefact damage bonus (new, replaces artefact-flag stack) ───
+
+/**
+ * Aggregate the law-flag conditional damage bonuses that scale with current
+ * combat state. Returns a multiplier (1 + sum). Replaces the deleted
+ * computeArtefactDamageBonus that previously aggregated ~11 artefact-unique
+ * flag bonuses.
+ *
+ * Active scalers (sourced from law uniques + set bonuses):
+ *   - damagePerArtefactOfElement   : 1 + (pct/100) × count of matching-element artefacts
+ *   - damagePerMissingHpPct        : 1 + (pct/100) × pct missing HP (0–100)
+ *   - damageScalesWithDodgeChance  : 1 + currentDodgeChance/100  (multiplicative)
+ *   - secretTechMoreDmgPerMetalArt : Attack-tech only; +pct% per metal artefact
+ */
+function computeLawDamageBonus(s, { tech } = {}) {
+  const flags = s.stats?.lawFlags ?? {};
+  const setFlags = s.stats?.setFlags ?? {};
+  let bonus = 0;
+
+  // Wood law "Damage is increased by current dodge chance".
+  if (flags.damageScalesWithDodgeChance) {
+    const dodgePct = s.stats?.dodgeChancePct ?? 0;
+    bonus += dodgePct / 100;
+  }
+  // Fire set 1 4-piece: "10% more damage for each artefact that matches the law".
+  // setFlags.damagePerLawMatchingArtefactPct stores the raw %.
+  if (setFlags.damagePerLawMatchingArtefactPct) {
+    const law = s.stats?.law;
+    const lawEl = law?.element ?? null;
+    if (lawEl) {
+      const matching = s.stats?.equippedArtefactsByElement?.[lawEl] ?? 0;
+      bonus += (setFlags.damagePerLawMatchingArtefactPct / 100) * matching;
+    }
+  }
+  return 1 + bonus;
 }
 
 function rollDrops(drops) {
@@ -188,65 +258,60 @@ function rollDrops(drops) {
  * Damage is dealt at the START of each turn.
  * The next turn only begins once the current attack animation signals completion
  * via playerAnimDoneRef / enemyAnimDoneRef — preventing animation overlap.
- *
- * Attack speed stat (TODO): will scale the inter-turn delay once connected.
  */
 
 const MAX_LOG = 100;
+
+/**
+ * Resolve the number of enemy attacks a buff will cover.
+ *
+ * Base value comes from the technique's `buffAttacks`. If the stats bundle
+ * carries a `buffDurationMult` (fed by the buff_duration stat — e.g. the
+ * Time Master law unique grants +20–50% more charges), scale up and ceil.
+ * Always floors at 1 so a cast is never wasted.
+ */
+function resolveBuffAttacks(base, stats) {
+  const mult = stats?.buffDurationMult ?? 1;
+  return Math.max(1, Math.ceil(base * mult));
+}
 
 export default function useCombat() {
   // ─── All mutable fight state in one ref ──────────────────────────────────
   const stateRef = useRef({
     phase:     'idle',
-    turnPhase: 'player_turn', // 'player_turn'|'waiting_player'|'enemy_turn'|'waiting_enemy'
+    turnPhase: 'player_turn',
     pHp: 0, pMaxHp: 0,
     eHp: 0, eMaxHp: 0, eAtk: 0,
     cds:    [Infinity, Infinity, Infinity],
     maxCds: [Infinity, Infinity, Infinity],
-    // Both buffs now consume 1 charge per enemy attack instead of ticking
-    // on a wall-clock timer. A cast sets `attacksLeft`; the enemy turn
-    // decrements it after applying the effect (if any charges remain).
     defBuff:   { mult: 1, attacksLeft: 0 },
     dodgeBuff: { chance: 0, attacksLeft: 0 },
+    exposeBuff: null,
     stats:    null,
     equipped: [null, null, null],
   });
 
   const lastTRef = useRef(performance.now());
-  // md_k Killing Stride — flag persists across fights so the bonus applies
-  // to the *next* cast even if the kill ended the current fight.
   const strideRef = useRef(false);
-  // cb_ts Veteran's Hunt — every 10 kills grants one pending +1-rarity
-  // bump that the next gather/mine cycle consumes. Read by App.jsx and
-  // forwarded into autoFarm via getFullStats.
   const killsForHuntRef = useRef(0);
   const huntBumpsPendingRef = useRef(0);
 
-  // ─── React state — phase transitions and log only ────────────────────────
   const [phase, setPhase] = useState('idle');
   const [enemy, setEnemy] = useState({ name: '', maxHp: 0 });
   const [log,   setLog]   = useState([]);
 
-  // ─── DOM refs — HP bars, patched at 60fps ─────────────────────────────────
   const pHpBarRef  = useRef(null);
   const eHpBarRef  = useRef(null);
   const pHpTextRef = useRef(null);
   const eHpTextRef = useRef(null);
   const cdBarRefs  = useRef([null, null, null]);
 
-  // ─── Debug flags — mutated directly by gameDebug.js ─────────────────────
   const debugRef = useRef({ godMode: false, oneShot: false, nextEnemy: null, watchMode: false });
 
-  // ─── Drop callbacks — refreshed on each startFight call ─────────────────
   const onDropsRef          = useRef(null);
   const onTechniqueDropRef  = useRef(null);
   const onArtefactDropRef   = useRef(null);
 
-  // ─── Sprite animation callbacks ────────────────────────────────────────────
-  // playerAttackRef / enemyAttackRef: called by useCombat → CombatStage plays animation
-  // playerAnimDoneRef / enemyAnimDoneRef: called by CombatStage → useCombat advances turn
-  // spawnDamageNumberRef: registered by CombatStage; called here on each damage event
-  // spawnDropsRef: registered by CombatStage; called here with material drops on kill
   const playerAttackRef       = useRef(null);
   const enemyAttackRef        = useRef(null);
   const playerAnimDoneRef     = useRef(null);
@@ -254,7 +319,6 @@ export default function useCombat() {
   const spawnDamageNumberRef  = useRef(null);
   const spawnDropsRef         = useRef(null);
 
-  // ─── Helpers ──────────────────────────────────────────────────────────────
   const patchBars = (s) => {
     if (pHpBarRef.current)
       pHpBarRef.current.style.width = `${(s.pHp / s.pMaxHp) * 100}%`;
@@ -279,57 +343,31 @@ export default function useCombat() {
     }
   };
 
-  // ─── startFight ───────────────────────────────────────────────────────────
-  /**
-   * @param {object}   stats             — { essence, soul, body, lawElement }
-   * @param {array}    equippedTechs     — technique slots
-   * @param {object}   enemyDef          — entry from data/enemies.js
-   * @param {function} onDrops           — callback([{itemId, qty}]) fired on material victory drops
-   * @param {function} onTechniqueDrop   — callback(techniqueObj) fired when a technique drops
-   * @param {number}   worldId           — world tier 1–6, used for technique generation
-   * @param {number}   regionIndex       — minRealmIndex of the region; anchors enemy HP to
-   *                                       zone difficulty on a smooth 1.12×-per-index curve
-   * @param {function} onArtefactDrop    — callback(catalogueId) fired when an artefact drops
-   */
   const startFight = useCallback((stats, equippedTechs, enemyDef = null, onDrops = null, onTechniqueDrop = null, worldId = 1, regionIndex = 0, onArtefactDrop = null) => {
     if (stateRef.current.phase === 'fighting') return;
-    // Primary-stat layer retired in stage 15 — pMaxHp flows through the
-    // `health` stat bundle now (stats.js placeholder formula).
 
     const hpMult     = enemyDef?.statMult?.hp     ?? 1;
     const atkMult    = enemyDef?.statMult?.atk    ?? 1;
     const defMultE   = enemyDef?.statMult?.def    ?? 1;
     const elemDefMul = enemyDef?.statMult?.elemDef ?? 1;
     const eName     = enemyDef?.name ?? 'Training Dummy';
-    // Each enemy deals a fixed damage type; the combat tick picks the
-    // matching defence stat below. Default to 'physical' for anything the
-    // DAMAGE_TYPE_BY_ID map missed (e.g. designer-added enemies).
     const eDmgType = enemyDef?.damageType ?? 'physical';
 
     const pMaxHp = stats?.health ?? 100;
-    // Enemy HP anchored to region index, not player stats. Base 150 × 1.12^index
-    // gives W1 R1 ≈ 150, W2 R1 ≈ 980, W3 R1 ≈ 1830, W6 R4 ≈ 46k — a ~300× spread
-    // across the 52 region indices before the per-enemy hpMult is applied.
     const hpBase = 150 * Math.pow(1.12, Math.max(0, regionIndex ?? 0));
     const eMaxHp = Math.max(100, Math.floor(hpBase * hpMult));
-    // Enemy attack is anchored to region index (not to player stats) so the
-    // hit is a FIXED value per-region. Base 18 × 1.12^index puts W1 R1 ≈ 18,
-    // W2 R1 ≈ 117, W3 R1 ≈ 219, W6 R4 ≈ 5520 before the per-enemy atkMult.
-    // Mitigated in the enemy-turn tick via the player's matching defence stat.
     const atkBase = 18 * Math.pow(1.12, Math.max(0, regionIndex ?? 0));
     const eAtk    = Math.max(10, Math.floor(atkBase * atkMult));
-    // Enemy DEF / ELEM_DEF — scale-independent like ATK, anchored to region.
-    // Starting values; tune after balance pass (see plan).
     const defBase  = ENEMY_DEF_PER_REGION * Math.max(0, regionIndex ?? 0);
     const eDef     = Math.max(10, Math.floor(defBase * defMultE));
     const eElemDef = Math.max(10, Math.floor(defBase * elemDefMul));
 
-    // md_1 Steady Hands (+ artefact cooldown reductions) — both shrink every
-    // cooldown. `cooldownReductionPct` is an artefact-derived 0–1 fraction.
+    // Per-tech-type CD multiplier (e.g. fire law "Healing techs have double CD").
     const cdMult   = (stats?.cooldownMult ?? 1) * Math.max(0.1, 1 - (stats?.cooldownReductionPct ?? 0));
+    const cdTypeMults = stats?.lawCdTypeMults ?? {};
     const cds    = equippedTechs.map(t => t ? 0        : Infinity);
     const maxCds = equippedTechs.map(t => t
-      ? getCooldown(t.type, t.quality) * cdMult
+      ? getCooldown(t.type, t.quality) * cdMult * (cdTypeMults[t.type] ?? 1)
       : Infinity);
 
     onDropsRef.current         = onDrops;
@@ -345,9 +383,6 @@ export default function useCombat() {
       maxCds: [...maxCds],
       defBuff:   { mult: 1, attacksLeft: 0 },
       dodgeBuff: { chance: 0, attacksLeft: 0 },
-      // Expose buff (added 2026-04-26). Null when inactive. Per-clock charges
-      // — playerAttacksLeft burns on player attacks, enemyAttacksLeft on
-      // enemy attacks. Re-cast overwrites (no stacking).
       exposeBuff: null,
       stats:    { ...stats },
       equipped: [...equippedTechs],
@@ -356,16 +391,15 @@ export default function useCombat() {
       artefactDropChance: (enemyDef?.techniqueDrop?.chance ?? 0) * ARTEFACT_DROP_MULT,
       worldId,
       // Reincarnation tree state
-      undyingUsed: false,                 // hw_3 once-per-fight
-      castCount:   0,                     // yy_4 every-Nth free
-      stridePending: false,               // md_k post-kill exploit flag
-      // ── Artefact-unique runtime state ──────────────────────────────────
-      combatStartSec:   performance.now() / 1000,
-      firstAttackFired: false,
-      phoenixUsed:      false,
-      comboCount:       0,                // resets when enemy hits player
-      lastDodgeAtSec:   -Infinity,
-      killsIn5s:  [],                     // timestamps for battle_sash stacks
+      undyingUsed: false,
+      castCount:   0,
+      stridePending: false,
+      // ── Law / set runtime state ────────────────────────────────────────
+      defaultAttackBuff: null,         // { stacks: N } — fire double-strike
+      dodgeStacks:       0,            // wood dodge laws
+      transientDodgeBonus: 0,          // wood "+5% dodge per hit taken"
+      nextEnemyHitNulls: false,        // water "healing nulls next hit"
+      lastDodgeAtSec:    -Infinity,    // lawEngine context input
     };
 
     lastTRef.current = performance.now();
@@ -376,7 +410,6 @@ export default function useCombat() {
       ...(prev.length ? [{ msg: '───────────────', kind: 'divider' }] : []),
       ...prev,
     ].slice(0, MAX_LOG));
-    // Give both fighters a brief idle window before the first exchange
     setTimeout(() => {
       if (stateRef.current.phase === 'fighting')
         stateRef.current.turnPhase = 'player_turn';
@@ -394,68 +427,62 @@ export default function useCombat() {
 
       const dt    = Math.min((now - lastTRef.current) / 1000, 0.1);
       lastTRef.current = now;
-      const nowSec = now / 1000;
 
-      // ── Tick technique cooldowns (time-based, independent of turns) ───────
+      // ── Tick technique cooldowns (time-based) ────────────────────────────
       for (let i = 0; i < s.cds.length; i++) {
         if (isFinite(s.cds[i])) s.cds[i] = Math.max(0, s.cds[i] - dt);
       }
 
-      // ── yy_3 Yang Resolve — regen 5%/s of max HP while above 50% HP ──────
+      // ── Reincarnation-tree HP regen (above 50% only) ─────────────────────
       const regen = s.stats?.hpRegenPerSec ?? 0;
       if (regen > 0 && s.pHp > s.pMaxHp * 0.5 && s.pHp < s.pMaxHp) {
         s.pHp = Math.min(s.pMaxHp, s.pHp + s.pMaxHp * regen * dt);
       }
-      // Artefact-derived in-combat regen (hp_regen_in_combat stored as
-      // fraction of maxHP / sec). Plus regen_at_full_hp applies only when
-      // at max HP (no-op otherwise but included for parity with the flag).
-      const artRegen = s.stats?.hpRegenInCombatPct ?? 0;
-      if (artRegen > 0 && s.pHp < s.pMaxHp) {
-        s.pHp = Math.min(s.pMaxHp, s.pHp + s.pMaxHp * artRegen * dt);
+      // Generic in-combat regen (water laws "5% HP/s natural regen"; pills).
+      const inCombatRegen = s.stats?.hpRegenInCombatPct ?? 0;
+      if (inCombatRegen > 0 && s.pHp < s.pMaxHp) {
+        s.pHp = Math.min(s.pMaxHp, s.pHp + s.pMaxHp * inCombatRegen * dt);
       }
 
-      // ── Player's turn: deal damage, fire animation, then wait ─────────────
+      // ── Player's turn ────────────────────────────────────────────────────
       if (s.turnPhase === 'player_turn') {
         s.turnPhase = 'waiting_player';
         const logs = [];
+        s._triggerLog = logs; // exposed to applyTriggerAction for log lines
 
-        // Basic attack always fires — techniques layer on top when ready.
-        // Placeholder formula (Stage 4 of the Damage & Element Overhaul):
-        // scales purely off realmIndex while the replacement stat axis is
-        // designed. See obsidian/Primary Stats.md#Placeholder formulas.
+        // ── Basic attack (always fires) ────────────────────────────────────
         {
           const K_BASIC = 10;
-          const realmIdx = s.stats.realmIndex ?? 0;
+          const realmIdx = s.stats?.realmIndex ?? 0;
           let dmg = K_BASIC * (realmIdx + 1);
-          // Universal damage_all flat (artefacts / law uniques).
-          dmg += s.stats.damageStats?.damage_all ?? 0;
-          // Source multiplier: default_attack_damage applies only to basic
-          // attacks (techniques get their own secret_technique_damage in
-          // calcDamage).
-          const baseMult = 1 + (s.stats.damageStats?.default_attack_damage ?? 0);
+          dmg += s.stats?.damageStats?.damage_all ?? 0;
+          // Earth law: "Default attacks deal 5% of max HP as physical damage".
+          if (s.stats?.lawFlags?.basicAttackHpPctDmg) {
+            dmg += Math.floor(s.pMaxHp * s.stats.lawFlags.basicAttackHpPctDmg);
+          }
+          const baseMult = 1 + (s.stats?.damageStats?.default_attack_damage ?? 0);
           dmg = Math.max(5, Math.floor(dmg * baseMult));
-          // Single exploit roll (crit was consolidated into exploit on
-          // 2026-04-26). Pulls expose-buff bonuses + silent-crown guarantee
-          // through rollExploit.
+          // Fire double-strike: doubled damage; consumed by this attack.
+          if (s.defaultAttackBuff?.stacks > 0) {
+            dmg = dmg * 2;
+            s.defaultAttackBuff = null;
+          }
           const exRes = rollExploit(s, dmg);
           dmg = exRes.dmg;
           const exploited = exRes.exploited;
-          // Artefact-unique conditional damage stack (time / combo / realm…).
-          dmg = Math.floor(dmg * computeArtefactDamageBonus(s));
-          dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
-          // Enemy mitigation (PoE armour curve). Basic attack is hard-pinned
-          // to physical damage; def_pen + expose-buff defPen reduce armour.
-          {
+          dmg = Math.floor(dmg * computeLawDamageBonus(s));
+          dmg = Math.floor(dmg * (s.stats?.damageMult ?? 1));
+          // Metal Set 3 4-piece: 30% chance attacks bypass all defenses.
+          const bypass = (s.stats?.setFlags?.attackBypassDefenseChance ?? 0) > 0
+            && Math.random() * 100 < s.stats.setFlags.attackBypassDefenseChance;
+          if (!bypass) {
             const armour    = s.eDef ?? 0;
-            const totalPen  = resolveDefPen(s);
+            const totalPen  = resolveDefPen(s, { exploited });
             const effArmour = Math.max(0, armour * (1 - totalPen));
             dmg = applyArmourMitigation(dmg, effArmour);
           }
-          // Player-clock expose buff burns one charge per player attack
-          // regardless of whether the boost contributed.
           tickExposeBuff(s, 'player');
           s.eHp = Math.max(0, s.eHp - dmg);
-          // Lifesteal from artefact affixes (blood_drinker / blood_palms / …).
           const lifestealPct = s.stats?.lifestealPct ?? 0;
           if (lifestealPct > 0 && dmg > 0) {
             const heal = Math.max(1, Math.floor(dmg * lifestealPct / 100));
@@ -468,20 +495,25 @@ export default function useCombat() {
             kind: 'damage',
           });
           spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
-          if (exploited) s.lastExploitAt = performance.now() / 1000;
-          s.firstAttackFired = true;
-          s.comboCount = (s.comboCount ?? 0) + 1;
+          if (exploited) {
+            s.lastExploitAt = performance.now() / 1000;
+            dispatchTrigger(s, 'on_exploit_fired', { amount: dmg });
+          }
+          dispatchTrigger(s, 'on_default_attack_fired', { amount: dmg });
         }
 
-        // First ready technique fires in parallel to the basic attack.
+        // ── First ready technique fires alongside the basic attack ──────────
         for (let i = 0; i < s.cds.length; i++) {
           if (!isFinite(s.cds[i]) || s.cds[i] > 0) continue;
           const tech = s.equipped[i];
           if (!tech) continue;
-          if (tech.type === 'Heal' && s.pHp > s.pMaxHp * 0.5) continue;
+          // Heal threshold: 50% by default; sets can override to 70%.
+          const healThreshold = s.stats?.setFlags?.healAt70Pct ? 0.7 : 0.5;
+          if (tech.type === 'Heal' && s.pHp > s.pMaxHp * healThreshold) continue;
+          // Forbid flags from earth ("cannot heal") / metal-set ("cannot use attack secrets") / fire ("cannot exploit" — handled in rollExploit).
+          if (tech.type === 'Heal'   && (s.stats?.lawFlags?.cannotHeal || s.stats?.setFlags?.cannotHeal)) continue;
+          if (tech.type === 'Attack' && (s.stats?.lawFlags?.cannotUseAttackSecrets || s.stats?.setFlags?.cannotUseAttackSecrets)) continue;
 
-          // yy_4 Equilibrium — every Nth cast is free (no CD applied).
-          // a_inner_eye — random free-cast chance from an artefact unique.
           s.castCount += 1;
           const freeEvery   = s.stats?.freeCastEvery ?? 0;
           const freeChance  = s.stats?.freeCastChancePct ?? 0;
@@ -490,123 +522,43 @@ export default function useCombat() {
           const isFree = isFreeTree || isFreeChance;
           s.cds[i]   = isFree ? 0 : s.maxCds[i];
 
-          if (tech.type === 'Attack') {
-            // calcDamage keeps its essence/soul/body signature for
-            // backward-compat — all zero after stage 15.
-            let dmg = calcDamage(
-              tech,
-              0, 0, 0,
-              s.stats.law ?? s.stats.lawElement,
-              0,
-              s.stats.damageStats ?? null,
-            );
-            // Single exploit roll. md_k Killing Stride — next cast after a
-            // kill is a guaranteed exploit and gets an extra +50% damage on
-            // top. One-shot flag, consumed here.
-            const stride = strideRef.current;
-            strideRef.current = false;
-            const exRes = rollExploit(s, dmg, { stride });
-            dmg = exRes.dmg;
-            const exploited = exRes.exploited;
-            if (stride) dmg = Math.floor(dmg * 1.5);
-            // Artefact-unique conditional stack.
-            dmg = Math.floor(dmg * computeArtefactDamageBonus(s));
-            // Reincarnation-tree "Triple All Damage" node.
-            dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
-            // Enemy mitigation: pick DEF / ELEM_DEF by tech damage type, then
-            // apply def_pen + expose-buff defPen, then PoE armour curve.
-            {
-              const armour    = tech.damageType === 'elemental' ? (s.eElemDef ?? 0) : (s.eDef ?? 0);
-              const totalPen  = resolveDefPen(s);
-              const effArmour = Math.max(0, armour * (1 - totalPen));
-              dmg = applyArmourMitigation(dmg, effArmour);
-            }
-            // Player-clock expose buff burns a charge per player attack.
-            tickExposeBuff(s, 'player');
-            s.eHp = Math.max(0, s.eHp - dmg);
-            // Lifesteal — counts every damage source.
-            const lifestealPct = s.stats?.lifestealPct ?? 0;
-            if (lifestealPct > 0 && dmg > 0) {
-              const heal = Math.max(1, Math.floor(dmg * lifestealPct / 100));
-              s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
-            }
-            logs.push({
-              msg: exploited
-                ? `${tech.name} → EXPLOIT! ${dmg.toLocaleString()} dmg`
-                : `${tech.name} → ${dmg.toLocaleString()} dmg`,
-              kind: 'damage',
-            });
-            spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
-            if (exploited) s.lastExploitAt = performance.now() / 1000;
-            s.firstAttackFired = true;
-            s.comboCount = (s.comboCount ?? 0) + 1;
-          } else if (tech.type === 'Heal') {
-            const heal = Math.floor(s.pMaxHp * (tech.healPercent ?? 0.25)
-                        * (1 + (s.stats?.healingReceivedPct ?? 0)));
-            s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
-            logs.push({ msg: `${tech.name} → +${heal.toLocaleString()} HP`, kind: 'heal' });
-          } else if (tech.type === 'Defend') {
-            const atks    = resolveBuffAttacks(tech.buffAttacks ?? 3, s.stats);
-            const effMult = 1 + (s.stats.buffEffectMult ?? 0);
-            const defMult = (tech.defMult ?? 1.5) * effMult;
-            s.defBuff = { mult: defMult, attacksLeft: atks };
-            logs.push({ msg: `${tech.name} → DEF ×${defMult.toFixed(2)} (${atks} hits)`, kind: 'buff' });
-          } else if (tech.type === 'Dodge') {
-            const atks    = resolveBuffAttacks(tech.buffAttacks ?? 3, s.stats);
-            const effMult = 1 + (s.stats.buffEffectMult ?? 0);
-            const chance  = Math.min(1, (tech.dodgeChance ?? 0.4) * effMult);
-            s.dodgeBuff = { chance, attacksLeft: atks };
-            logs.push({ msg: `${tech.name} → ${Math.round(chance * 100)}% dodge (${atks} hits)`, kind: 'buff' });
-          } else if (tech.type === 'Expose') {
-            // Per-effect clocks: any of {exploitChance, exploitMult, defPen}
-            // burns on player attacks; dmgReduction burns on enemy attacks.
-            const playerAtks = resolveBuffAttacks(tech.buffPlayerAttacks ?? 0, s.stats);
-            const enemyAtks  = resolveBuffAttacks(tech.buffEnemyAttacks  ?? 0, s.stats);
-            s.exposeBuff = {
-              exploitChance:     tech.exploitChance ?? 0,
-              exploitMult:       tech.exploitMult, // undefined → fall back to stats.exploitMult in resolveExploitParams
-              defPen:            tech.defPen ?? 0,
-              dmgReduction:      tech.dmgReduction ?? 0,
-              playerAttacksLeft: tech.buffPlayerAttacks ? playerAtks : 0,
-              enemyAttacksLeft:  tech.buffEnemyAttacks  ? enemyAtks  : 0,
-            };
-            const parts = [];
-            if (tech.exploitChance) parts.push(`+${tech.exploitChance}% exploit`);
-            if (tech.defPen)        parts.push(`${Math.round(tech.defPen * 100)}% def pen`);
-            if (tech.exploitMult)   parts.push(`exploit ×${(tech.exploitMult/100).toFixed(2)}`);
-            if (tech.dmgReduction)  parts.push(`${Math.round(tech.dmgReduction * 100)}% dmg red`);
-            const charges = [
-              tech.buffPlayerAttacks ? `${playerAtks} player` : null,
-              tech.buffEnemyAttacks  ? `${enemyAtks} enemy`   : null,
-            ].filter(Boolean).join(' / ');
-            logs.push({ msg: `${tech.name} → ${parts.join(', ')} (${charges} hits)`, kind: 'buff' });
+          // Set 4-piece "Secret techniques trigger twice" — fires the same tech
+          // execution path a second time. Skipped for Heal/Defend/Dodge/Expose
+          // for now (would feel weird; user can scope this later).
+          const doubleAttack = !!s.stats?.setFlags?.doubleSecretTechs && tech.type === 'Attack';
+          const fires = doubleAttack ? 2 : 1;
+
+          // Killing-stride: consumed by the first cast only.
+          const stride = strideRef.current;
+          strideRef.current = false;
+
+          for (let cast = 0; cast < fires; cast++) {
+            executeTechnique(s, tech, i, logs, { stride: cast === 0 ? stride : false });
           }
+
+          // Any technique cast clears the fire double-strike buff.
+          if (s.defaultAttackBuff) s.defaultAttackBuff = null;
+
+          dispatchTrigger(s, 'on_secret_tech_fired', { sourceIdx: i, techType: tech.type });
           break; // one technique per turn
         }
 
-        // Debug: force enemy death on every hit
+        s._triggerLog = null;
+
         if (debugRef.current.oneShot && s.eHp > 0) s.eHp = 0;
-        // Debug: keep enemy alive so full animation loop plays forever
         if (debugRef.current.watchMode && s.eHp <= 0) s.eHp = 1;
 
         if (logs.length) setLog(prev => [...logs, ...prev].slice(0, MAX_LOG));
 
-        // Fire attack animation — turn advances in playerAnimDoneRef callback
         playerAttackRef.current?.();
         patchBars(s);
 
-        // Register what happens when player animation finishes
         playerAnimDoneRef.current = () => {
           const s2 = stateRef.current;
           if (s2.phase !== 'fighting') return;
           if (s2.eHp <= 0) {
             s2.phase = 'won';
-            // Track kill timestamps for artefact damage_per_kill_5s stacks.
-            s2.killsIn5s = [...(s2.killsIn5s ?? []), performance.now() / 1000];
-            // md_k Killing Stride — arm the next cast for guaranteed exploit + 50%.
             if (s2.stats?.killingStride) strideRef.current = true;
-            // cb_ts Veteran's Hunt — every 10 kills banks 1 rarity-bump
-            // for the next gather/mine cycle.
             if (s2.stats?.regionKillBonus) {
               killsForHuntRef.current += 1;
               if (killsForHuntRef.current >= 10) {
@@ -614,16 +566,15 @@ export default function useCombat() {
                 huntBumpsPendingRef.current += 1;
               }
             }
+            dispatchTrigger(s2, 'on_enemy_killed', {});
 
             const newLogs = [{ msg: 'Enemy defeated! Victory!', kind: 'system' }];
 
-            // Roll material drops, scaled by artefact `all_loot_bonus`.
             const lootMult = 1 + (s2.stats?.allLootBonusPct ?? 0);
             const dropped = rollDrops(s2.enemyDrops).map(d =>
               lootMult !== 1 ? { ...d, qty: Math.max(1, Math.floor(d.qty * lootMult)) } : d);
             if (dropped.length > 0) {
               onDropsRef.current?.(dropped);
-              // Spawn drop orbs in the stage — visual-only, fires before Victory overlay
               spawnDropsRef.current?.(dropped);
               const dropMsg = dropped
                 .map(d => `${d.qty}× ${ALL_MATERIALS[d.itemId]?.name ?? d.itemId}`)
@@ -631,7 +582,6 @@ export default function useCombat() {
               newLogs.unshift({ msg: `Drops: ${dropMsg}`, kind: 'system' });
             }
 
-            // Roll technique drop
             if (s2.techDropChance > 0 && Math.random() < s2.techDropChance) {
               const tech = pickTechnique(s2.worldId);
               if (tech) {
@@ -640,8 +590,6 @@ export default function useCombat() {
               }
             }
 
-            // Roll artefact drop — independent from the technique roll so an
-            // enemy can drop both. Uses the techniqueDrop.chance scaled up.
             if (s2.artefactDropChance > 0 && Math.random() < s2.artefactDropChance) {
               const artId = pickRandomArtefact(s2.worldId);
               if (artId) {
@@ -666,118 +614,118 @@ export default function useCombat() {
         };
       }
 
-      // ── Enemy's turn: deal damage, fire animation, then wait ──────────────
+      // ── Enemy's turn ─────────────────────────────────────────────────────
       if (s.turnPhase === 'enemy_turn') {
         s.turnPhase = 'waiting_enemy';
         const logs = [];
+        s._triggerLog = logs;
 
-        // Buffs are charge-based: each enemy attack consumes one charge
-        // from whichever buff is active, regardless of whether it triggered.
         const dodgeActive = s.dodgeBuff.attacksLeft > 0;
-        const defActive   = s.defBuff.attacksLeft > 0;
+        const defActive   = s.defBuff.attacksLeft   > 0;
 
-        const artDodgePct = s.stats?.dodgeChancePct ?? 0;
-        const artDodgeRoll = artDodgePct > 0 && Math.random() * 100 < artDodgePct;
-        if (dodgeActive && Math.random() < s.dodgeBuff.chance) {
-          logs.push({ msg: 'Enemy attack — dodged!', kind: 'dodge' });
+        // Dodge chance: passive dodge_chance stat + transient bonus (wood
+        // "+5% per hit taken") − dodge-stack reduction (wood "Each dodge
+        // increases defenses by 30%, decreases dodge chance by 5%").
+        const reductionPerStack = s.stats?.lawFlags?.dodgeReductionPerDodgeStack ?? 0;
+        const passiveDodgePct = Math.max(0,
+          (s.stats?.dodgeChancePct ?? 0)
+          + (s.transientDodgeBonus ?? 0)
+          - (s.dodgeStacks ?? 0) * reductionPerStack
+        );
+        const passiveDodgeRoll = passiveDodgePct > 0 && Math.random() * 100 < passiveDodgePct;
+
+        // ── Pre-hit consumed flags ─────────────────────────────────────────
+        const nullsThisHit = s.nextEnemyHitNulls === true;
+        if (nullsThisHit) s.nextEnemyHitNulls = false;
+
+        const finishDodge = () => {
           s.lastDodgeAtSec = performance.now() / 1000;
-        } else if (artDodgeRoll) {
+          s.transientDodgeBonus = 0;
+          // Wood Set 2 4-piece: dodging arms the next attack as a guaranteed exploit.
+          if (s.stats?.setFlags?.nextHitExploitOnDodge) s.nextHitExploit = true;
+          // Wood Set 3 4-piece: take % of hit damage even on dodge.
+          const partialPct = s.stats?.setFlags?.dodgeTakesPctDamage ?? 0;
+          if (partialPct > 0) {
+            const partial = Math.max(1, Math.floor(s.eAtk * partialPct));
+            s.pHp = Math.max(0, s.pHp - partial);
+            logs.push({ msg: `Partial hit on dodge → −${partial} HP`, kind: 'damage-taken' });
+          }
+          dispatchTrigger(s, 'on_dodge_success', {});
+        };
+
+        if (nullsThisHit) {
+          logs.push({ msg: 'Enemy attack — nullified by healing!', kind: 'dodge' });
+          finishDodge();
+        } else if (dodgeActive && Math.random() < s.dodgeBuff.chance) {
           logs.push({ msg: 'Enemy attack — dodged!', kind: 'dodge' });
-          s.lastDodgeAtSec = performance.now() / 1000;
-          // a_voidstep — each dodge resets one cooldown.
-          if (s.stats?.artefactFlags?.voidstepCdReset) {
-            for (let i = 0; i < s.cds.length; i++) {
-              if (isFinite(s.cds[i]) && s.cds[i] > 0) { s.cds[i] = 0; break; }
-            }
-          }
-          // a_clarity_storm — after dodging, slice a % off every active CD.
-          const postDodgeCdRed = s.stats?.artefactFlags?.postDodgeCdReductionPct ?? 0;
-          if (postDodgeCdRed > 0) {
-            const mult = 1 - postDodgeCdRed / 100;
-            for (let i = 0; i < s.cds.length; i++) {
-              if (isFinite(s.cds[i]) && s.cds[i] > 0) s.cds[i] *= mult;
-            }
-          }
-          // a_serpent_skin / serpent_skin — heal % of max HP on dodge.
-          const healPct = s.stats?.artefactFlags?.healOnDodgePct ?? 0;
-          if (healPct > 0) {
-            s.pHp = Math.min(s.pMaxHp, s.pHp + Math.floor(s.pMaxHp * healPct / 100));
-          }
+          finishDodge();
+        } else if (passiveDodgeRoll) {
+          logs.push({ msg: 'Enemy attack — dodged!', kind: 'dodge' });
+          finishDodge();
         } else if (debugRef.current.godMode) {
           logs.push({ msg: 'Enemy attack — negated (god mode)', kind: 'dodge' });
         } else {
+          // ── Enemy hit lands ─────────────────────────────────────────────
           const defMult = defActive ? s.defBuff.mult : 1;
-          // Pick the defence stat that matches this enemy's damage type.
           let rawDef;
           if (s.eDmgType === 'elemental') {
-            rawDef = s.stats.elementalDefense ?? 0;
+            rawDef = s.stats?.elementalDefense ?? 0;
           } else {
-            rawDef = s.stats.defense ?? 0;
+            rawDef = s.stats?.defense ?? 0;
           }
-          // Defend buff multiplies effective armour (and therefore mitigation
-          // in the PoE curve). 2026-04-26 overhaul: incoming-damage reduction
-          // (player stat + enemy-clock expose buff) is applied BEFORE armour
-          // mitigation, then armour curve runs.
-          const armour = Math.max(1, rawDef * defMult);
+          // Wood law: defense is added per dodge stack (each stack = +30% defense).
+          const stackDefMult = 1 + (s.dodgeStacks ?? 0) * (s.stats?.lawFlags?.defensePerDodgeStack ?? 0);
+          // Wood Set 3 2-piece: defense scales with dodge chance (defense × (1 + dodgePct)).
+          const dodgeScale = s.stats?.setFlags?.defenseScalesWithDodgeChance
+            ? 1 + ((s.stats?.dodgeChancePct ?? 0) / 100)
+            : 1;
+          const armour = Math.max(1, rawDef * defMult * stackDefMult * dodgeScale);
           const reduction = resolveIncomingDmgReduction(s);
-          let rawDmg = Math.max(1, Math.floor(s.eAtk * (1 - reduction)));
-          rawDmg = applyArmourMitigation(rawDmg, armour);
-          // hw_3 Undying Resolve — once per fight, a lethal hit leaves you
-          // at 1 HP instead of dying. Charge consumed regardless of whether
-          // the hit would actually have killed (only triggers on kill).
-          let dmg = rawDmg;
-          if (s.stats?.undyingResolve && !s.undyingUsed && rawDmg >= s.pHp) {
+          const preDef = Math.max(1, Math.floor(s.eAtk * (1 - reduction)));
+          const postArmour = applyArmourMitigation(preDef, armour);
+          const mitigated = Math.max(0, preDef - postArmour);
+
+          let dmg = postArmour;
+          if (s.stats?.undyingResolve && !s.undyingUsed && postArmour >= s.pHp) {
             dmg = Math.max(0, s.pHp - 1);
             s.undyingUsed = true;
             logs.push({ msg: 'UNDYING RESOLVE — survived at 1 HP!', kind: 'system' });
           }
-          // a_oracles_insight / a_oracle_amulet — lethal-blow dodge roll.
-          const fatalDodgeChance = s.stats?.dodgeFatalChancePct ?? 0;
-          if (fatalDodgeChance > 0 && dmg >= s.pHp && Math.random() * 100 < fatalDodgeChance) {
-            dmg = Math.max(0, s.pHp - 1);
-            logs.push({ msg: 'Fatal blow dodged!', kind: 'dodge' });
-          }
-          // a_unyielding_garb — HP floor. Clamps incoming damage so we never
-          // drop below the floor. Percentage stored as raw 0–100.
-          const hpFloor = s.stats?.artefactFlags?.hpFloorPct ?? 0;
-          if (hpFloor > 0) {
-            const floorHp = Math.floor(s.pMaxHp * hpFloor / 100);
-            if (s.pHp - dmg < floorHp) dmg = Math.max(0, s.pHp - floorHp);
-          }
           s.pHp = Math.max(0, s.pHp - dmg);
-          // a_phoenix_robe / a_phoenix_ring — once-per-fight lethal save.
-          const phoenixPct = s.stats?.artefactFlags?.phoenixRevivePct ?? 0;
-          if (phoenixPct > 0 && !s.phoenixUsed && s.pHp <= 0) {
-            s.pHp = Math.max(1, Math.floor(s.pMaxHp * phoenixPct / 100));
-            s.phoenixUsed = true;
-            logs.push({ msg: `PHOENIX — revived with ${s.pHp} HP!`, kind: 'system' });
+
+          // Earth law: "50% of mitigated damage is retaliated"
+          const retaliatePct = s.stats?.lawFlags?.retaliateMitigatedPct ?? 0;
+          if (retaliatePct > 0 && mitigated > 0) {
+            const reflected = Math.max(1, Math.floor(mitigated * retaliatePct));
+            s.eHp = Math.max(0, s.eHp - reflected);
+            logs.push({ msg: `Retaliated ${reflected} dmg`, kind: 'damage' });
           }
-          // a_reflective_skin — reflect a share of damage taken back to enemy.
+          // Reflect (carried over from existing lifesteal/reflect plumbing).
           const reflectPct = s.stats?.reflectPct ?? 0;
           if (reflectPct > 0 && dmg > 0) {
             const reflected = Math.max(1, Math.floor(dmg * reflectPct / 100));
             s.eHp = Math.max(0, s.eHp - reflected);
             logs.push({ msg: `Reflected ${reflected} dmg`, kind: 'damage' });
           }
-          // Reset consecutive-hit combo on any incoming damage.
-          s.comboCount = 0;
           logs.push({ msg: `Enemy hits → −${dmg.toLocaleString()} HP`, kind: 'damage-taken' });
           spawnDamageNumberRef.current?.(dmg, 'player', s.pMaxHp);
+
+          // Wood law: dodge stack reset on hit; transient bonus may also reset.
+          if (s.stats?.lawFlags?.dodgeStackResetOnHit) s.dodgeStacks = 0;
+
+          dispatchTrigger(s, 'on_hit_taken', { amount: dmg });
         }
 
-        // Consume a charge from any active buff after this attack resolves.
         if (dodgeActive) s.dodgeBuff.attacksLeft -= 1;
         if (defActive)   s.defBuff.attacksLeft   -= 1;
-        // Expose buff enemy clock — burns whether the hit landed, was dodged,
-        // or was god-moded; the buff covered the moment regardless.
         tickExposeBuff(s, 'enemy');
 
+        s._triggerLog = null;
         if (logs.length) setLog(prev => [...logs, ...prev].slice(0, MAX_LOG));
 
         enemyAttackRef.current?.();
         patchBars(s);
 
-        // Register what happens when enemy animation finishes
         enemyAnimDoneRef.current = () => {
           const s2 = stateRef.current;
           if (s2.phase !== 'fighting') return;
@@ -806,9 +754,6 @@ export default function useCombat() {
   const stopFight = useCallback(() => {
     stateRef.current.phase = 'idle';
     setPhase('idle');
-    // Clear the log when leaving combat (CombatScreen calls this in its
-    // unmount cleanup) so re-entering — same region or a new one — starts
-    // fresh instead of showing entries from the previous battle.
     setLog([]);
   }, []);
 
@@ -831,8 +776,97 @@ export default function useCombat() {
     enemyAnimDoneRef,
     spawnDamageNumberRef,
     spawnDropsRef,
-    // cb_ts Veteran's Hunt — read by App.jsx getFullStats so the next
-    // gather/mine tick consumes a pending bump.
     huntBumpsPendingRef,
   };
+}
+
+// ─── Helpers extracted from the player-turn block ─────────────────────────────
+
+/** Execute a single technique. Mutates state, pushes a log entry. */
+function executeTechnique(s, tech, slotIdx, logs, { stride = false } = {}) {
+  if (tech.type === 'Attack') {
+    let dmg = calcDamage(
+      tech,
+      0, 0, 0,
+      s.stats?.law ?? s.stats?.lawElement,
+      0,
+      s.stats?.damageStats ?? null,
+    );
+    const exRes = rollExploit(s, dmg, { stride });
+    dmg = exRes.dmg;
+    const exploited = exRes.exploited;
+    if (stride) dmg = Math.floor(dmg * 1.5);
+    dmg = Math.floor(dmg * computeLawDamageBonus(s, { tech }));
+    dmg = Math.floor(dmg * (s.stats?.damageMult ?? 1));
+    {
+      const bypass = (s.stats?.setFlags?.attackBypassDefenseChance ?? 0) > 0
+        && Math.random() * 100 < s.stats.setFlags.attackBypassDefenseChance;
+      if (!bypass) {
+        const armour    = tech.damageType === 'elemental' ? (s.eElemDef ?? 0) : (s.eDef ?? 0);
+        const totalPen  = resolveDefPen(s, { exploited });
+        const effArmour = Math.max(0, armour * (1 - totalPen));
+        dmg = applyArmourMitigation(dmg, effArmour);
+      }
+    }
+    tickExposeBuff(s, 'player');
+    s.eHp = Math.max(0, s.eHp - dmg);
+    const lifestealPct = s.stats?.lifestealPct ?? 0;
+    if (lifestealPct > 0 && dmg > 0) {
+      const heal = Math.max(1, Math.floor(dmg * lifestealPct / 100));
+      s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
+    }
+    logs.push({
+      msg: exploited
+        ? `${tech.name} → EXPLOIT! ${dmg.toLocaleString()} dmg`
+        : `${tech.name} → ${dmg.toLocaleString()} dmg`,
+      kind: 'damage',
+    });
+    if (exploited) {
+      s.lastExploitAt = performance.now() / 1000;
+      dispatchTrigger(s, 'on_exploit_fired', { amount: dmg });
+    }
+  } else if (tech.type === 'Heal') {
+    const baseHeal = s.pMaxHp * (tech.healPercent ?? 0.25);
+    const healMult = 1 + (s.stats?.healingReceivedPct ?? 0);
+    const heal = Math.floor(baseHeal * healMult);
+    s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
+    logs.push({ msg: `${tech.name} → +${heal.toLocaleString()} HP`, kind: 'heal' });
+    dispatchTrigger(s, 'on_heal', { amount: heal, sourceIdx: slotIdx });
+  } else if (tech.type === 'Defend') {
+    const extra   = s.stats?.lawFlags?.defendBuffExtraHits ?? 0;
+    const atks    = resolveBuffAttacks((tech.buffAttacks ?? 3) + extra, s.stats);
+    const effMult = 1 + (s.stats?.buffEffectMult ?? 0);
+    const defMult = (tech.defMult ?? 1.5) * effMult;
+    s.defBuff = { mult: defMult, attacksLeft: atks };
+    logs.push({ msg: `${tech.name} → DEF ×${defMult.toFixed(2)} (${atks} hits)`, kind: 'buff' });
+  } else if (tech.type === 'Dodge') {
+    const extra   = s.stats?.lawFlags?.dodgeBuffExtraHits ?? 0;
+    const atks    = resolveBuffAttacks((tech.buffAttacks ?? 3) + extra, s.stats);
+    const effMult = 1 + (s.stats?.buffEffectMult ?? 0);
+    const chance  = Math.min(1, (tech.dodgeChance ?? 0.4) * effMult);
+    s.dodgeBuff = { chance, attacksLeft: atks };
+    logs.push({ msg: `${tech.name} → ${Math.round(chance * 100)}% dodge (${atks} hits)`, kind: 'buff' });
+  } else if (tech.type === 'Expose') {
+    const extra      = s.stats?.lawFlags?.exposeBuffExtraHits ?? 0;
+    const playerAtks = resolveBuffAttacks((tech.buffPlayerAttacks ?? 0) + extra, s.stats);
+    const enemyAtks  = resolveBuffAttacks((tech.buffEnemyAttacks  ?? 0) + extra, s.stats);
+    s.exposeBuff = {
+      exploitChance:     tech.exploitChance ?? 0,
+      exploitMult:       tech.exploitMult,
+      defPen:            tech.defPen ?? 0,
+      dmgReduction:      tech.dmgReduction ?? 0,
+      playerAttacksLeft: tech.buffPlayerAttacks ? playerAtks : 0,
+      enemyAttacksLeft:  tech.buffEnemyAttacks  ? enemyAtks  : 0,
+    };
+    const parts = [];
+    if (tech.exploitChance) parts.push(`+${tech.exploitChance}% exploit`);
+    if (tech.defPen)        parts.push(`${Math.round(tech.defPen * 100)}% def pen`);
+    if (tech.exploitMult)   parts.push(`exploit ×${(tech.exploitMult/100).toFixed(2)}`);
+    if (tech.dmgReduction)  parts.push(`${Math.round(tech.dmgReduction * 100)}% dmg red`);
+    const charges = [
+      tech.buffPlayerAttacks ? `${playerAtks} player` : null,
+      tech.buffEnemyAttacks  ? `${enemyAtks} enemy`   : null,
+    ].filter(Boolean).join(' / ');
+    logs.push({ msg: `${tech.name} → ${parts.join(', ')} (${charges} hits)`, kind: 'buff' });
+  }
 }

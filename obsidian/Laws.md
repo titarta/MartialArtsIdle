@@ -38,12 +38,90 @@ Each law has a `types: [...]` array — one or more of the five elements plus op
 LAW_UNIQUE_POOLS = ['fire', 'water', 'earth', 'wood', 'metal', 'general']
 ```
 
-All six pools start **empty** after the overhaul. The designer fills them by porting / rewriting entries from [[Deprecated_Unique_Modifiers]] (effects must be rewritten — no `essence`/`soul`/`body`, no `psychic_damage`, no `soul_toughness`).
+**Repopulated 2026-04-27** with 50 element-themed entries (10 per element). The first 3 of each pool are "<Set N> counts as +1 artefact" — one per of that element's 3 sets (see [[Artefact Sets]]).
 
 - Authoritative pool list: `LAW_UNIQUE_POOLS` in `src/data/lawUniques.js`.
 - Generated-law element-to-types mapping: see `src/data/affixPools.js` (typically `<element> → [<element>]`).
+- The `general` pool is currently empty; designer can populate later.
 
-The designer panel still exposes a read-only **Law Uniques** viewer (Progression section) that lists every unique grouped by its pool — currently empty until the pools are refilled.
+### Law Uniques Catalogue (50 entries)
+
+#### Fire — damage / aggression
+
+| ID | Effect |
+|---|---|
+| `l_fire_set1_extra` | Ember Legacy artefact count counts as having one more artefact |
+| `l_fire_set2_extra` | Phoenix Coterie artefact count counts as having one more artefact |
+| `l_fire_set3_extra` | Sunforge Compact artefact count counts as having one more artefact |
+| `l_fire_aggressor` | 50% more damage with techniques. 20% less damage with default attack. 10% reduced technique cooldown |
+| `l_fire_double_strike` | Default attacks double the damage of the next default attack. Using a technique removes this buff |
+| `l_fire_burning_will` | Healing techniques have double the cooldown. 30% more damage |
+| `l_fire_legion` | 6% more damage for each fire artefact equipped |
+| `l_fire_desperate` | 1% more damage for each 1% of life missing |
+| `l_fire_violent_dao` | Qi/s is increased by 10% of damage increase multiplier |
+| `l_fire_overwhelming` | 200% increased damage. Cannot execute exploit attacks |
+
+#### Water — healing / sustain
+
+| ID | Effect |
+|---|---|
+| `l_water_set1_extra` | Tidebound Rite artefact count counts as having one more artefact |
+| `l_water_set2_extra` | Frost Mirror artefact count counts as having one more artefact |
+| `l_water_set3_extra` | Abyssal Pact artefact count counts as having one more artefact |
+| `l_water_swift_mend` | Healing techniques have 40% reduced cooldown. 10% less damage |
+| `l_water_purity` | Any source of healing is 30% more effective |
+| `l_water_purifying_tide` | Damage enemies by 30% of healing received |
+| `l_water_natural_flow` | 5% HP per second natural regeneration |
+| `l_water_resonant_healing` | Triggering healing secret techniques reduce other secret techniques cooldown by 40% |
+| `l_water_living_rivers` | Qi/s is increased by healing increase multiplier |
+| `l_water_sanctuary` | Healing makes the next enemy hit deal no damage |
+
+#### Earth — defence / mitigation
+
+| ID | Effect |
+|---|---|
+| `l_earth_set1_extra` | Stoneblood Oath artefact count counts as having one more artefact |
+| `l_earth_set2_extra` | Mountain Chapel artefact count counts as having one more artefact |
+| `l_earth_set3_extra` | Dune Wanderers artefact count counts as having one more artefact |
+| `l_earth_warrior_monk` | 80% increased defense and elemental defense. You cannot heal |
+| `l_earth_iron_resolve` | 50% more defense and elemental defense if below 50% health |
+| `l_earth_thornward` | 50% of mitigated damage is retaliated |
+| `l_earth_steady_ward` | Defense techniques apply to 1 more hit |
+| `l_earth_iron_fist` | Default attacks deal 5% of maximum health as physical damage |
+| `l_earth_meditative` | 5% of out-of-combat defense is added to Qi/s |
+| `l_earth_dual_aspect` | Elemental defense is equal to defense. 35% less defense |
+
+#### Metal — exploit / debuff
+
+| ID | Effect |
+|---|---|
+| `l_metal_set1_extra` | Iron Bastion artefact count counts as having one more artefact |
+| `l_metal_set2_extra` | Razor Hierarchy artefact count counts as having one more artefact |
+| `l_metal_set3_extra` | Sovereign Plate artefact count counts as having one more artefact |
+| `l_metal_concentrated` | 50% reduced exploit chance. 100% increased exploit damage |
+| `l_metal_piercing` | Exploit hits ignore 20% of enemy defenses |
+| `l_metal_extended_pressure` | Expose secret techniques apply to 2 more hits |
+| `l_metal_torment` | Any debuff on an enemy is 30% more effective |
+| `l_metal_armoury` | 20% reduced secret technique cooldowns for each Expose technique equipped |
+| `l_metal_predator` | Qi/s is increased by exploit chance |
+| `l_metal_resonant` | 4% more secret technique effectiveness per metal artefact equipped |
+
+#### Wood — dodge / evasion
+
+| ID | Effect |
+|---|---|
+| `l_wood_set1_extra` | Verdant Accord artefact count counts as having one more artefact |
+| `l_wood_set2_extra` | Root Conclave artefact count counts as having one more artefact |
+| `l_wood_set3_extra` | Bloomward artefact count counts as having one more artefact |
+| `l_wood_swift_step` | Dodge secret techniques have 20% reduced cooldown and last 1 more hit |
+| `l_wood_anticipation` | Dodge chance is increased by 5% for each hit taken. Resets on successful dodge |
+| `l_wood_renewing_breeze` | Heal 5% HP on successful dodge |
+| `l_wood_lithe` | Damage is increased by current dodge chance |
+| `l_wood_unbroken_dance` | Each successful dodge increases defenses by 30%. Decreases dodge chance by 5% for each successful dodge |
+| `l_wood_living_dao` | 30% increased Qi/s |
+| `l_wood_grove` | 3% dodge chance for each wood artefact equipped |
+
+The designer panel **Law Uniques** viewer (Progression section) renders these grouped by pool.
 
 ### Types and Damage
 

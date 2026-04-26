@@ -55,7 +55,7 @@ No affix id may repeat anywhere on the same item. Iron Sharpness on the only slo
 
 ### Unique modifiers
 
-The previous artefact-unique pool (the magenta-highlighted ★ rolls) is **archived** in [[Deprecated_Unique_Modifiers]]. Stage 7 of the overhaul removed the auto-roll path; whether to reintroduce a unique slot is a designer call after pools are refilled.
+**Removed entirely 2026-04-27.** The previous artefact-unique system (magenta ★ rolls + the 103-entry `artefactUniqueEffects.js` flag bag + ~25 read sites in `useCombat.js`) is gone. Every artefact's identity now lives in its **element + set membership + standard affixes** ([[Artefact Sets]] carries the per-element identity that the unique system used to provide). The deprecated pool stays in [[Deprecated_Unique_Modifiers]] as an idea archive, but nothing in code consumes it.
 
 ---
 

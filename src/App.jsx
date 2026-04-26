@@ -33,6 +33,7 @@ import { PHASE_TECHNIQUE_LAW, PHASE_TECHNIQUE_ID } from './data/laws';
 import { mineralForRarity } from './data/materials';
 import { computeAllStats, computeStat, mergeModifiers } from './data/stats';
 import { evaluateLawUniques, buildContext } from './systems/lawEngine';
+import { getSetBonusModifiers } from './data/artefactSets';
 import { initDebug } from './debug/gameDebug';
 import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
 import { loadGraphics, applyGraphics } from './systems/graphics';
@@ -231,16 +232,42 @@ function AppInner() {
   // speed + luck), combat (exploit chance/mult), and cultivation (focus mult).
   // Called per-tick from autoFarm and per-fight from CombatScreen — kept
   // pure / read-only so it never triggers React renders.
+  // Multiplicatively combine per-tech-type CD scalers from law + set sources.
+  // e.g. law gives Heal ×2 and a set gives Heal ×0.8 → final Heal ×1.6.
+  const mergeCdTypeMults = (a, b) => {
+    const out = { ...(a ?? {}) };
+    for (const [t, m] of Object.entries(b ?? {})) {
+      out[t] = (out[t] ?? 1) * m;
+    }
+    return out;
+  };
+
   const getFullStats = useCallback(() => {
     const qi         = cultivation.qiRef.current;
     const law        = cultivation.activeLaw;
     const realmIndex = cultivation.indexRef.current;
 
+    // Pre-compute light context fields the new element-themed law uniques
+    // need (per-element artefact counts + per-type tech counts). Stat-driven
+    // fields (current dodge chance, damage multiplier, etc.) aren't known
+    // until *after* stats compute below; lawEngine handles their absence
+    // gracefully (resolvers default to 0 → effect contributes nothing).
+    const equippedArtefactsByElement = artefacts?.getEquippedArtefactsByElement?.()
+      ?? { fire: 0, water: 0, earth: 0, wood: 0, metal: 0 };
+    const equippedTechsByType = (() => {
+      const out = { Attack: 0, Heal: 0, Defend: 0, Dodge: 0, Expose: 0 };
+      for (const t of (techniques?.equippedTechniques ?? [])) {
+        if (t?.type && out[t.type] !== undefined) out[t.type] += 1;
+      }
+      return out;
+    })();
     const lawCtx    = buildContext({
       inCombat: false,
       realmIndex,
       lawElement: law?.element,
       isAtPeak: realmIndex >= 46,
+      equippedArtefactsByElement,
+      equippedTechsByType,
     });
     const lawBundle = evaluateLawUniques(law, lawCtx);
 
@@ -283,25 +310,22 @@ function AppInner() {
     };
     const scaledArtefactMods = scaleArtefactBundle(artefactMods);
 
-    // ── Realm / body-conversion late-bound unique stat mods ───────────────
-    // A handful of artefact uniques express their stat contribution as a
-    // function of the player's realm or another primary stat. They live as
-    // flags on the engine output but we need the realmIndex (only known
-    // here) to expand them into concrete modifiers. We push the resulting
-    // entries directly into the scaledArtefactMods bundle so they flow
-    // through the usual merge path below.
-    const artefactFlagsNow = artefacts?.getUniqueFlags?.() ?? {};
-    const majorRealm = Math.floor(realmIndex / 3);
-    const pushScaledMod = (stat, value) => {
-      if (!value) return;
-      (scaledArtefactMods[stat] ??= []).push({ type: 'increased', value });
-    };
-    // allStatsPerRealmPct / allStatsPerMajorRealmPct / bodyToEssencePct
-    // artefact flags pointed at the retired primary-stat layer — they're
-    // no-ops after stage 15. The flag keys remain so pre-stage-15 save
-    // data deserializes without errors; a later cleanup pass will remove
-    // the unique-effect definitions that emit them.
-    void majorRealm;
+    // ── Set-bonus aggregation (depends on lawBundle's setCountBonus) ──────
+    // Set bonuses can be inflated by law uniques like "<Ember Legacy> counts
+    // as +1". Compute once with the law-side count bonus piped in; the
+    // statMods stack with artefact + law mods below, while flags + triggers
+    // + cdTypeMults attach directly to the combat stats bundle further down.
+    const setBundle = getSetBonusModifiers(
+      artefacts?.equipped ?? {},
+      artefacts?.owned ?? [],
+      { hpPct: 1 }, // out-of-combat placeholder ctx; conditional set effects evaluate inactive
+      lawBundle?.setCountBonus ?? null,
+    );
+    // Push set-bonus statMods into the scaledArtefactMods bundle so they
+    // flow through the usual merge path below.
+    for (const [stat, list] of Object.entries(setBundle.statMods)) {
+      (scaledArtefactMods[stat] ??= []).push(...list);
+    }
     // Collapse artefact-only qi_speed mods into a single multiplier fed to
     // the cultivation tick. Law-unique qi_speed is handled inside cultivation
     // directly, so it is NOT included here (double-count guard).
@@ -410,9 +434,18 @@ function AppInner() {
       craftingCostReduction:  Math.min(0.75, collapsePct('crafting_cost_reduction')),
       allLootBonusPct:        collapsePct('all_loot_bonus'),          // 0–1
       lootLuckPct:            collapseFlat('loot_luck'),              // 0–100
-      // Raw flag bag from artefactEngine (merged with other sources below
-      // so combat only needs to look at one place).
-      artefactFlags:          artefacts?.getUniqueFlags?.() ?? {},
+      // Set-bonus flags + triggers (the artefact-uniques flag bag was deleted
+      // in 2026-04-27 alongside the unique system). setBundle is the
+      // law-aware aggregate computed earlier in this same callback.
+      setFlags:               setBundle?.flags ?? {},
+      setTriggers:            setBundle?.triggers ?? [],
+      // Law-unique flags + triggers (sourced from the active law's uniques).
+      // Per-tech-type CD multipliers stack across law + set sources.
+      lawFlags:               lawBundle?.flags ?? {},
+      lawTriggers:            lawBundle?.triggers ?? [],
+      lawCdTypeMults:         mergeCdTypeMults(lawBundle?.cdTypeMults, setBundle?.cdTypeMults),
+      // Per-element artefact counts (drives per-element scaling laws).
+      equippedArtefactsByElement: artefacts?.getEquippedArtefactsByElement?.() ?? { fire: 0, water: 0, earth: 0, wood: 0, metal: 0 },
       // Heavenly QI multiplier (artefact rings) — only applies during ad boost.
       heavenlyQiMult:   collapsePct('heavenly_qi_mult'),
       // Artefact-derived qi_speed aggregate — mirrored to useCultivation so
