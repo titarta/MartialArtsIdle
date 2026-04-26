@@ -74,11 +74,17 @@ function PillDrawer({ open, onClose, defaultTab = 'combat', pills }) {
   const [tab, setTab] = useState(defaultTab);
 
   const byCategory = useMemo(() => {
-    const map = { combat: [], harvest: [], mining: [] };
+    // Build the bucket map from the canonical category list so any
+    // category added to PILL_CATEGORIES (e.g. 'cultivation') gets an
+    // empty array — prevents the iterator at line ~108 from doing
+    // undefined.reduce when no pills of that category are owned yet.
+    const map = Object.fromEntries(PILL_CATEGORIES.map(c => [c, []]));
     for (const p of PILLS) {
       const owned = pills?.getOwnedCount?.(p.id) ?? 0;
       if (owned <= 0) continue;
-      for (const cat of p.categories) map[cat].push({ pill: p, owned });
+      for (const cat of p.categories) {
+        if (map[cat]) map[cat].push({ pill: p, owned });
+      }
     }
     return map;
   }, [pills]);
