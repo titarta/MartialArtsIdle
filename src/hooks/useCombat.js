@@ -463,6 +463,10 @@ export default function useCombat() {
           const K_BASIC = 10;
           const realmIdx = s.stats?.realmIndex ?? 0;
           let dmg = K_BASIC * (realmIdx + 1);
+          // Basic attack is hard-pinned to physical damage, so it adds 100%
+          // of the physical_damage stat (same as a physical secret tech does
+          // via calcDamage's damage_bucket addition).
+          dmg += s.stats?.damageStats?.physical ?? 0;
           dmg += s.stats?.damageStats?.damage_all ?? 0;
           // Earth law: "Default attacks deal 5% of max HP as physical damage".
           if (s.stats?.lawFlags?.basicAttackHpPctDmg) {
