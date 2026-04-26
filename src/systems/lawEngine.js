@@ -57,7 +57,7 @@ export function evaluateLawUniques(law, ctx) {
  */
 export function buildContext({
   hpPct, hpFull, enemyHpPct, inCombat, combatTimeSec, lastDamageAt, lastTechAt,
-  lastKillAt, lastDodgeAt, lastCritAt, firstAttackFired,
+  lastKillAt, lastDodgeAt, lastExploitAt, firstAttackFired,
   essence, soul, body, lawElement, techElements,
   realmIndex, isAtPeak, activePillCount, equippedArtefactCount,
   equippedRingCount, focusing, currentQi,
@@ -72,7 +72,7 @@ export function buildContext({
     lastTechAt,
     lastKillAt,
     lastDodgeAt,
-    lastCritAt,
+    lastExploitAt,
     firstAttackFired,
     essence, soul, body,
     lawElement,
@@ -188,7 +188,7 @@ export function evaluateCondition(cond, ctx) {
     case 'no_technique_for_sec': return ctx.lastTechAt !== undefined && ctx.nowSec - ctx.lastTechAt > cond.sec;
     case 'recent_kill_sec':    return ctx.lastKillAt !== undefined && ctx.nowSec - ctx.lastKillAt < cond.sec;
     case 'recent_dodge_sec':   return ctx.lastDodgeAt !== undefined && ctx.nowSec - ctx.lastDodgeAt < cond.sec;
-    case 'recent_crit_sec':    return ctx.lastCritAt !== undefined && ctx.nowSec - ctx.lastCritAt < cond.sec;
+    case 'recent_exploit_sec':    return ctx.lastExploitAt !== undefined && ctx.nowSec - ctx.lastExploitAt < cond.sec;
     case 'first_attack':       return !ctx.firstAttackFired;
     case 'body_gt_soul':       return (ctx.body ?? 0) > (ctx.soul ?? 0);
     case 'soul_gt_body':       return (ctx.soul ?? 0) > (ctx.body ?? 0);

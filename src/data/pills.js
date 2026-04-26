@@ -117,7 +117,7 @@ const STAT_TO_CATEGORY = {
   defense:              'combat',
   elemental_defense:    'combat',
   health:               'combat',
-  // Exploit / crit-style
+  // Exploit (per-hit damage-multiplier roll)
   exploit_chance:       'combat',
   exploit_attack_mult:  'combat',
   // Gathering utility

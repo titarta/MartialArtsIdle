@@ -148,19 +148,24 @@ function computeArtefactDamageBonus(s) {
   return 1 + bonus;
 }
 
-/** Roll crit chance/damage from artefact stats. Returns {dmg, crit}. */
-function rollCritMultiplier(s, dmg) {
-  const crit   = s.stats?.critChance ?? 0;
-  const bonus  = s.stats?.critDamagePct ?? 0;
-  const twice  = s.stats?.critTwiceChancePct ?? 0;
-  const flags  = s.stats?.artefactFlags ?? {};
-  const silentCrown = flags.firstAttackGuaranteedCrit && !s.firstAttackFired;
-  const didCrit = silentCrown || (crit > 0 && Math.random() * 100 < crit);
-  if (!didCrit) return { dmg, crit: false };
-  // Base crit × 1.5; +critDamagePct% additional; +50% again on crit-twice roll.
-  let mult = 1.5 + (bonus / 100);
-  if (twice > 0 && Math.random() * 100 < twice) mult += 0.5;
-  return { dmg: Math.floor(dmg * mult), crit: true };
+/**
+ * Resolve a single exploit roll. Folds together base exploit chance + the
+ * Expose buff bonus (via resolveExploitParams), the killing-stride
+ * guarantee, and the silent-crown / silent-steps "first attack guaranteed"
+ * artefact flag. Returns the multiplier-bumped damage + whether it triggered.
+ *
+ * Crit was consolidated into exploit on 2026-04-26 — they were two parallel
+ * damage-multiplier roll systems doing the same job. Sources that previously
+ * used `crit_chance` / `crit_damage` / `crit_twice_chance` now feed
+ * `exploit_chance` / `exploit_attack_mult`.
+ */
+function rollExploit(s, dmg, { stride = false } = {}) {
+  const { chance, mult } = resolveExploitParams(s);
+  const flags = s.stats?.artefactFlags ?? {};
+  const guaranteedFirst = flags.firstAttackGuaranteedExploit && !s.firstAttackFired;
+  const exploited = stride || guaranteedFirst || (chance > 0 && Math.random() * 100 < chance);
+  if (!exploited) return { dmg, exploited: false };
+  return { dmg: Math.floor(dmg * (mult / 100)), exploited: true };
 }
 
 function rollDrops(drops) {
@@ -429,16 +434,14 @@ export default function useCombat() {
           // calcDamage).
           const baseMult = 1 + (s.stats.damageStats?.default_attack_damage ?? 0);
           dmg = Math.max(5, Math.floor(dmg * baseMult));
-          // Exploit also applies to basic attacks. Pulls expose-buff bonuses
-          // through resolveExploitParams.
-          const { chance: exChance, mult: exMult } = resolveExploitParams(s);
-          const exploited = exChance > 0 && Math.random() * 100 < exChance;
-          if (exploited) dmg = Math.floor(dmg * (exMult / 100));
+          // Single exploit roll (crit was consolidated into exploit on
+          // 2026-04-26). Pulls expose-buff bonuses + silent-crown guarantee
+          // through rollExploit.
+          const exRes = rollExploit(s, dmg);
+          dmg = exRes.dmg;
+          const exploited = exRes.exploited;
           // Artefact-unique conditional damage stack (time / combo / realm…).
           dmg = Math.floor(dmg * computeArtefactDamageBonus(s));
-          // Crit roll from artefact crit_chance / crit_damage.
-          const critRes = rollCritMultiplier(s, dmg);
-          dmg = critRes.dmg;
           dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
           // Enemy mitigation (PoE armour curve). Basic attack is hard-pinned
           // to physical damage; def_pen + expose-buff defPen reduce armour.
@@ -459,14 +462,13 @@ export default function useCombat() {
             s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
           }
           logs.push({
-            msg: critRes.crit
-              ? `Basic attack → CRIT! ${dmg.toLocaleString()} dmg`
-              : exploited
-                ? `Basic attack → EXPLOIT! ${dmg.toLocaleString()} dmg`
-                : `Basic attack → ${dmg.toLocaleString()} dmg`,
+            msg: exploited
+              ? `Basic attack → EXPLOIT! ${dmg.toLocaleString()} dmg`
+              : `Basic attack → ${dmg.toLocaleString()} dmg`,
             kind: 'damage',
           });
-          spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited || critRes.crit });
+          spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
+          if (exploited) s.lastExploitAt = performance.now() / 1000;
           s.firstAttackFired = true;
           s.comboCount = (s.comboCount ?? 0) + 1;
         }
@@ -498,21 +500,17 @@ export default function useCombat() {
               0,
               s.stats.damageStats ?? null,
             );
-            // Exploit: roll exploitChance % per attack; on success multiply
-            // damage by exploitMult % (default 150%). Expose buff folds in.
-            const { chance: exChance, mult: exMult } = resolveExploitParams(s);
-            // md_k Killing Stride — next cast after a kill is a guaranteed
-            // exploit and gets +50% damage. One-shot flag, consumed here.
+            // Single exploit roll. md_k Killing Stride — next cast after a
+            // kill is a guaranteed exploit and gets an extra +50% damage on
+            // top. One-shot flag, consumed here.
             const stride = strideRef.current;
             strideRef.current = false;
-            const exploited = stride || (exChance > 0 && Math.random() * 100 < exChance);
-            if (exploited) dmg = Math.floor(dmg * (exMult / 100));
+            const exRes = rollExploit(s, dmg, { stride });
+            dmg = exRes.dmg;
+            const exploited = exRes.exploited;
             if (stride) dmg = Math.floor(dmg * 1.5);
             // Artefact-unique conditional stack.
             dmg = Math.floor(dmg * computeArtefactDamageBonus(s));
-            // Crit roll (independent from exploit).
-            const critRes = rollCritMultiplier(s, dmg);
-            dmg = critRes.dmg;
             // Reincarnation-tree "Triple All Damage" node.
             dmg = Math.floor(dmg * (s.stats.damageMult ?? 1));
             // Enemy mitigation: pick DEF / ELEM_DEF by tech damage type, then
@@ -533,14 +531,13 @@ export default function useCombat() {
               s.pHp = Math.min(s.pMaxHp, s.pHp + heal);
             }
             logs.push({
-              msg: critRes.crit
-                ? `${tech.name} → CRIT! ${dmg.toLocaleString()} dmg`
-                : exploited
-                  ? `${tech.name} → EXPLOIT! ${dmg.toLocaleString()} dmg`
-                  : `${tech.name} → ${dmg.toLocaleString()} dmg`,
+              msg: exploited
+                ? `${tech.name} → EXPLOIT! ${dmg.toLocaleString()} dmg`
+                : `${tech.name} → ${dmg.toLocaleString()} dmg`,
               kind: 'damage',
             });
-            spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited || critRes.crit });
+            spawnDamageNumberRef.current?.(dmg, 'enemy', s.eMaxHp, { exploit: exploited });
+            if (exploited) s.lastExploitAt = performance.now() / 1000;
             s.firstAttackFired = true;
             s.comboCount = (s.comboCount ?? 0) + 1;
           } else if (tech.type === 'Heal') {

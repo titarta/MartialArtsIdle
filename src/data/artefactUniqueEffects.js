@@ -49,16 +49,19 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
   a_focused_will:      [{ kind: 'stat', stat: 'exploit_chance',         mod: F, value: 'rolled_pct' }],
   a_serene_face:       [{ kind: 'stat', stat: 'healing_received',       mod: F, value: 'rolled' }],
   // a_warmind: retuned in stage 16 — legacy effect keyed off soul > body.
-  // New payload: flat crit_chance bonus (similar power curve).
-  a_warmind:           [{ kind: 'stat', stat: 'crit_chance',           mod: F, value: 'rolled_pct' }],
+  // Now grants flat exploit_chance bonus.
+  a_warmind:           [{ kind: 'stat', stat: 'exploit_chance',       mod: F, value: 'rolled_pct' }],
   a_seeker_eye:        [{ kind: 'stat', stat: 'exploit_attack_mult',    mod: F, value: 'rolled_pct' }],
   a_oracles_insight:   [{ kind: 'stat', stat: 'dodge_fatal_chance',     mod: F, value: 'rolled_pct' }],
   a_clarity_storm:     [{ kind: 'flag', flag: 'postDodgeCdReductionPct', value: 'rolled_pct' }],
-  a_crown_focus:       [{ kind: 'stat', stat: 'crit_twice_chance',      mod: F, value: 'rolled_pct' }],
+  // a_crown_focus: previously rolled crit_twice_chance (chance for double-crit).
+  // Crit was consolidated into exploit on 2026-04-26; this redirects to a flat
+  // exploit_chance bump in the same spirit ("more chance for the big hits").
+  a_crown_focus:       [{ kind: 'stat', stat: 'exploit_chance',       mod: F, value: 'rolled_pct' }],
   a_inner_eye:         [{ kind: 'stat', stat: 'tech_free_cast_chance',  mod: F, value: 'rolled_pct' }],
   a_visionary_mind:    [{ kind: 'stat', stat: 'offline_qi_mult',        mod: I, value: 'rolled' }],
   a_warmask:           [{ kind: 'flag', flag: 'damageIf3TechsPct',      value: 'rolled_pct' }],
-  a_silent_crown:      [{ kind: 'flag', flag: 'firstAttackGuaranteedCrit', value: true }],
+  a_silent_crown:      [{ kind: 'flag', flag: 'firstAttackGuaranteedExploit', value: true }],
   a_dao_helm:          [{ kind: 'stat', stat: 'qi_speed',               mod: M, value: 'rolled_as_more' }],
 
   // ─── Body ──────────────────────────────────────────────────────────────────
@@ -93,7 +96,7 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
   a_blossoming_robe:   [{ kind: 'flag', flag: 'regenAtFullHpPct',       value: 'rolled_pct' }],
 
   // ─── Hands ─────────────────────────────────────────────────────────────────
-  a_dragon_claws:      [{ kind: 'stat', stat: 'crit_damage',           mod: F, value: 'rolled_pct' }],
+  a_dragon_claws:      [{ kind: 'stat', stat: 'exploit_attack_mult',  mod: F, value: 'rolled_pct' }],
   a_qi_channeler:      [{ kind: 'stat', stat: 'elemental_damage',      mod: I, value: 'rolled' }],
   a_void_grip:         [{ kind: 'stat', stat: 'ignore_defense_pct',    mod: F, value: 'rolled_pct' }],
   a_blood_palms:       [{ kind: 'stat', stat: 'lifesteal',             mod: F, value: 'rolled_pct' }],
@@ -130,7 +133,7 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
   // with the emperor amulet/ring so there's a single realm-scaling hook.
   a_emperor_belt:      [{ kind: 'flag', flag: 'damagePerRealmPct',     value: 'rolled_pct' }],
   a_thirsty_belt:      [{ kind: 'stat', stat: 'lifesteal',             mod: F, value: 'rolled_pct' }],
-  a_assassin_belt:     [{ kind: 'stat', stat: 'crit_chance',           mod: F, value: 'rolled_pct' }],
+  a_assassin_belt:     [{ kind: 'stat', stat: 'exploit_chance',       mod: F, value: 'rolled_pct' }],
 
   // ─── Feet ──────────────────────────────────────────────────────────────────
   a_swift_boots:       [{ kind: 'stat', stat: 'dodge_chance',          mod: F, value: 'rolled_pct' }],
@@ -139,7 +142,7 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
   a_dancers_boots:     [{ kind: 'flag', flag: 'damagePostDodgePct',    value: 'rolled_pct' }],
   a_voidstep:          [{ kind: 'flag', flag: 'voidstepCdReset',       value: true }],
   a_dragon_treaders:   [{ kind: 'stat', stat: 'physical_damage',      mod: I, value: 'rolled' }],
-  a_silent_steps:      [{ kind: 'flag', flag: 'firstAttackGuaranteedCrit', value: true }],
+  a_silent_steps:      [{ kind: 'flag', flag: 'firstAttackGuaranteedExploit', value: true }],
   a_iron_treads:       [
     { kind: 'stat', stat: 'defense', mod: I, value: 'rolled' },
     { kind: 'stat', stat: 'health',  mod: I, value: 'rolled' },
@@ -159,7 +162,7 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
     { kind: 'stat', stat: 'defense',    mod: I, value: 'rolled' },
   ],
   a_oracle_amulet:     [{ kind: 'stat', stat: 'dodge_fatal_chance',    mod: F, value: 'rolled_pct' }],
-  a_assassin_pendant:  [{ kind: 'stat', stat: 'crit_chance',           mod: F, value: 'rolled_pct' }],
+  a_assassin_pendant:  [{ kind: 'stat', stat: 'exploit_chance',       mod: F, value: 'rolled_pct' }],
   a_emperor_amulet:    [{ kind: 'flag', flag: 'damagePerRealmPct',     value: 'rolled_pct' }],
   a_eternal_amulet:    [{ kind: 'stat', stat: 'healing_received',      mod: F, value: 'rolled' }],
   a_speed_amulet:      [{ kind: 'stat', stat: 'cooldown_reduction_all', mod: F, value: 'rolled' }],
@@ -169,7 +172,7 @@ export const ARTEFACT_UNIQUE_EFFECTS = {
   a_essence_ring:      [{ kind: 'stat', stat: 'elemental_damage',      mod: I, value: 'rolled' }],
   a_soul_ring:         [{ kind: 'stat', stat: 'elemental_defense',     mod: I, value: 'rolled' }],
   a_body_ring:         [{ kind: 'stat', stat: 'physical_damage',       mod: I, value: 'rolled' }],
-  a_crit_ring:         [{ kind: 'stat', stat: 'crit_chance',           mod: F, value: 'rolled_pct' }],
+  a_crit_ring:         [{ kind: 'stat', stat: 'exploit_chance',       mod: F, value: 'rolled_pct' }],
   a_speed_ring:        [{ kind: 'stat', stat: 'cooldown_reduction_all', mod: F, value: 'rolled' }],
   a_blood_ring:        [{ kind: 'stat', stat: 'lifesteal',             mod: F, value: 'rolled_pct' }],
   a_void_ring:         [{ kind: 'stat', stat: 'ignore_defense_pct',    mod: F, value: 'rolled_pct' }],

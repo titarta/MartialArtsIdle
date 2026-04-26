@@ -107,7 +107,8 @@ export const STAT_IDS = [
   // Combat defense
   'defense',
   'elemental_defense',
-  // Combat exploit (crit)
+  // Combat exploit (per-hit damage-multiplier roll — formerly known as crit
+  // in some artefact entries; consolidated to exploit on 2026-04-26).
   'exploit_chance',
   'exploit_attack_mult',
   // Cultivation

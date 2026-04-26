@@ -390,8 +390,8 @@ function AppInner() {
       // Scales magnitude (defMult / dodgeChance) at cast time.
       buffEffectMult:   collapsePct('buff_effect'),
       // ── Artefact-derived extras ───────────────────────────────────────
-      critChance:             collapseFlat('crit_chance'),            // 0–100
-      critDamagePct:          collapseFlat('crit_damage'),            // % over 100
+      // crit_chance / crit_damage / crit_twice_chance were consolidated
+      // into exploit_chance / exploit_attack_mult on 2026-04-26.
       lifestealPct:           collapseFlat('lifesteal'),              // 0–100
       dodgeChancePct:         collapseFlat('dodge_chance'),           // 0–100
       dodgeFatalChancePct:    collapseFlat('dodge_fatal_chance'),     // 0–100
@@ -403,7 +403,6 @@ function AppInner() {
                                          + collapsePct('technique_cd_reduction')
                                          + collapsePct('attack_cd_reduction')),
       freeCastChancePct:      collapseFlat('tech_free_cast_chance'),  // 0–100
-      critTwiceChancePct:     collapseFlat('crit_twice_chance'),      // 0–100
       hpRegenInCombatPct:     collapsePct('hp_regen_in_combat'),      // fraction of maxHP / sec
       hpRegenOutCombatPct:    collapsePct('hp_regen_out_combat'),     // fraction of maxHP / sec
       offlineQiMult:          1 + collapsePct('offline_qi_mult'),     // 1 + 0.30 = 1.30
