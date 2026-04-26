@@ -80,15 +80,28 @@ export const RARITY_TIER = {
 //   - FLAT_PCT rolls store decimals (0.05 = +5pp on percentage stats).
 //   - FLAT_QI rolls store decimals (0.30 = +0.30 qi/sec).
 //
-// 2026-04-27 rebalance: pre-overhaul ranges produced absurd late-game numbers
-// once the new element-themed laws + 30 set bonuses started stacking on top
-// of the artefact-only baseline. Cuts (vs prior values):
-//   MORE_TIER  ~50% (the worst offender — multiplicative across every layer)
+// 2026-04-27 rebalance pass 1: pre-overhaul ranges produced absurd late-game
+// numbers once the new element-themed laws + 30 set bonuses started stacking
+// on top of the artefact-only baseline. Cuts (vs prior values):
+//   MORE_TIER  ~50% (multiplicative — worst offender)
 //   INCR_LARGE ~40% (damage stats stack with set/law INCR damage)
 //   FLAT_PCT   ~50% (exploit chance trivially hit 100%)
 //   INCR_BASIC ~35%
 //   FLAT_DMG   ~37%
 //   FLAT_HP    ~35%
+//
+// 2026-04-27 rebalance pass 2: pass 1 wasn't enough. With same-stat
+// hyper-focus on a single artefact (FLAT + BASE_FLAT + INCREASED + MORE all
+// rolling exploit_chance), a player could still cap exploit at 100% from
+// 2 Trans artefacts. Two changes:
+//   1. MORE removed entirely from the artefact affix pool (see ALL_MOD_TYPES
+//      below). Multiplicative bonuses now live only on set 4-pieces, law
+//      uniques, and the reincarnation tree.
+//   2. FLAT_PCT cut another 50% (Trans now 2.5-5pp, was 5-10pp).
+// Existing artefacts retain their baked-in MORE affixes — only fresh drops
+// are affected. MORE_TIER table left in place as defensive code; unreachable
+// from the artefact pool but available if any other system rolls MORE.
+//
 //   FLAT_PRIMARY / FLAT_QI: unchanged (less compounding pressure)
 // Spread Iron→Transcendent stays ~10× so rarity progression still feels
 // meaningful. Existing instances keep their old (high) baked-in values; only
@@ -106,7 +119,7 @@ const RANGES = {
   FLAT_DMG:     { Iron:[4,9],       Bronze:[9,20],      Silver:[20,44],     Gold:[44,95],     Transcendent:[95,190]    },
   FLAT_HP:      { Iron:[14,32],     Bronze:[32,78],     Silver:[78,180],    Gold:[180,390],   Transcendent:[390,780]   },
   FLAT_PRIMARY: { Iron:[3,8],       Bronze:[8,18],      Silver:[18,35],     Gold:[35,60],     Transcendent:[60,100]    },
-  FLAT_PCT:     { Iron:[0.005,0.015], Bronze:[0.01,0.025], Silver:[0.02,0.04], Gold:[0.03,0.06], Transcendent:[0.05,0.10] },
+  FLAT_PCT:     { Iron:[0.0025,0.0075], Bronze:[0.005,0.0125], Silver:[0.01,0.02], Gold:[0.015,0.03], Transcendent:[0.025,0.05] },
   FLAT_QI:      { Iron:[0.05,0.15], Bronze:[0.15,0.30], Silver:[0.30,0.55], Gold:[0.55,0.90], Transcendent:[0.90,1.50] },
 };
 
@@ -175,7 +188,13 @@ const SLOT_PREFIX = {
   waist: 'wa', feet: 'fe', neck: 'ne', ring: 'ri',
 };
 
-const ALL_MOD_TYPES = [MOD.FLAT, MOD.BASE_FLAT, MOD.INCREASED, MOD.MORE];
+// 2026-04-27: MORE removed from the artefact affix pool. Multiplicative rolls
+// on every artefact slot stacked exponentially with the new sets + laws,
+// making encounters un-balance-able. Multiplicative bonuses now live only on
+// set 4-pieces, law uniques, and the reincarnation tree (PoE pattern: MORE
+// is a rare/curated multiplier, not an affix-pool roll). Existing artefact
+// instances keep their baked-in MORE affixes — only fresh drops are MORE-free.
+const ALL_MOD_TYPES = [MOD.FLAT, MOD.BASE_FLAT, MOD.INCREASED];
 
 const MOD_SUFFIX = {
   [MOD.FLAT]:      'flat',
