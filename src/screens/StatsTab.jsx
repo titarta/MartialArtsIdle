@@ -170,9 +170,12 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
     return { base: baseLabel ? { label: baseLabel, value: baseVal } : null, sources, total, unit };
   }
 
-  const healthBase = Math.max(100, realmIndex * 200);
-  const defenseBase = realmIndex * 5;
-  const elemDefBase = realmIndex * 5;
+  // Realm-based scaling removed 2026-04-27 — bases are flat now (health 100,
+  // defense / elem_def 0). All growth comes from pills, artefacts, sets,
+  // laws, and the reincarnation tree.
+  const healthBase = 100;
+  const defenseBase = 0;
+  const elemDefBase = 0;
 
   const qiSpeedBreakdown = {
     base: { label: 'Base', value: 1 },
@@ -191,19 +194,19 @@ function StatsContent({ cultivation, artefacts, pills, selections, tree }) {
       <div className="secondary-stats-grid">
         <StatGroup title={t('stats.groupCombat')}>
           <StatRow
-            label={t('statNames.health')}            hint="max(100, realm × 200)"
+            label={t('statNames.health')}            hint="base 100 + bonuses"
             value={combat.health}
             breakdown={mkBd('health', healthBase, `Base (${fmt(healthBase)})`, combat.health)}
           />
           <StatRow
-            label={t('statNames.defense')}           hint="realm × 5"
+            label={t('statNames.defense')}           hint="bonus"
             value={combat.defense}
-            breakdown={mkBd('defense', defenseBase, `Base (${defenseBase})`, combat.defense)}
+            breakdown={mkBd('defense', defenseBase, null, combat.defense)}
           />
           <StatRow
-            label={t('statNames.elemental_defense')} hint="realm × 5"
+            label={t('statNames.elemental_defense')} hint="bonus"
             value={combat.elemDef}
-            breakdown={mkBd('elemental_defense', elemDefBase, `Base (${elemDefBase})`, combat.elemDef)}
+            breakdown={mkBd('elemental_defense', elemDefBase, null, combat.elemDef)}
           />
           <StatRow
             label={t('statNames.physical_damage')}  hint="bonus"

@@ -75,15 +75,18 @@ export function computeAllStats(qi, law, realmIndex, modifiers = {}) {
   const r = Math.max(0, realmIndex ?? 0);
 
   // ── Combat ─────────────────────────────────────────────────────────────────
-  // Placeholder formulas — see obsidian/Primary Stats.md.
-  const health        = Math.max(100, Math.floor(computeStat(Math.max(100, r * 200), mods('health'))));
+  // Realm-based scaling removed 2026-04-27: health / defense / elemental_defense
+  // no longer auto-scale with realmIndex. All growth comes from pills, artefacts,
+  // sets, laws, and the reincarnation tree. health keeps a 100 floor so an
+  // unequipped player still has HP; defense + elem_def start at 0.
+  const health        = Math.max(100, Math.floor(computeStat(100, mods('health'))));
   // Base damage floors (added 2026-04-27): give the player a non-zero baseline
   // before any artefact / law / set contribution so unequipped builds still
   // deal something. Modifier sources still stack normally on top.
   const physDmg       = Math.floor(computeStat(20, mods('physical_damage')));
   const elemDmg       = Math.floor(computeStat(20, mods('elemental_damage')));
-  const defense       = Math.floor(computeStat(r * 5,  mods('defense')));
-  const elemDef       = Math.floor(computeStat(r * 5,  mods('elemental_defense')));
+  const defense       = Math.floor(computeStat(0, mods('defense')));
+  const elemDef       = Math.floor(computeStat(0, mods('elemental_defense')));
   const exploitChance = Math.round(computeStat(5,   mods('exploit_chance')));
   const exploitMult   = Math.round(computeStat(150, mods('exploit_attack_mult')));
   // Expose-pipeline stats (added 2026-04-26 secret-tech overhaul).
