@@ -136,25 +136,28 @@ function RegionRow({ region, tab, locked, lockHint, combatLocked, onNavigate, wo
     : null;
 
   function handleClick() {
-    if (!isWorld) return;
-    const sprites = [...new Set(
-      (region.enemyPool ?? []).map(e => ENEMIES[e.enemyId]?.sprite).filter(Boolean)
-    )];
-    sprites.forEach(sprite => preloadEnemySprites(sprite));
-    onNavigate('combat-arena', { region, worldId, fromTab: tab });
+    if (locked) return;
+    if (isWorld) {
+      const sprites = [...new Set(
+        (region.enemyPool ?? []).map(e => ENEMIES[e.enemyId]?.sprite).filter(Boolean)
+      )];
+      sprites.forEach(sprite => preloadEnemySprites(sprite));
+      onNavigate('combat-arena', { region, worldId, fromTab: tab });
+      return;
+    }
+    if (canIdle) {
+      if (isIdling) { AudioManager.playSfx('ui_click'); onClearIdle(); }
+      else          { AudioManager.playSfx('ui_confirm'); onSetIdle(); }
+    }
   }
 
-  function handleIdleClick(e) {
-    e.stopPropagation();
-    if (isIdling) { AudioManager.playSfx('ui_click'); onClearIdle(); }
-    else          { AudioManager.playSfx('ui_confirm'); onSetIdle(); }
-  }
+  const rowIsInteractive = !locked && (isWorld || canIdle);
 
   return (
     <div
-      className={`region-row${locked ? ' region-locked' : ''}${isWorld && !locked ? ' region-row-world' : ''}${isIdling ? ' region-row-idling' : ''}`}
-      onClick={isWorld && !locked ? handleClick : undefined}
-      role={isWorld && !locked ? 'button' : undefined}
+      className={`region-row${locked ? ' region-locked' : ''}${isWorld && !locked ? ' region-row-world' : ''}${!isWorld && canIdle && !locked ? ' region-row-idle-target' : ''}${isIdling ? ' region-row-idling' : ''}`}
+      onClick={rowIsInteractive ? handleClick : undefined}
+      role={rowIsInteractive ? 'button' : undefined}
       title={locked && lockHint ? lockHint : undefined}
     >
       <div className="region-row-left">
@@ -186,13 +189,12 @@ function RegionRow({ region, tab, locked, lockHint, combatLocked, onNavigate, wo
       )}
 
       {!locked && !isWorld && (canIdle || isIdling) && (
-        <button
-          className={`region-idle-btn${isIdling ? ' region-idle-btn-active' : ''}`}
-          onClick={handleIdleClick}
-          title={isIdling ? 'Stop idling here' : 'Idle here automatically'}
+        <span
+          className={`region-idle-stamp${isIdling ? ' region-idle-stamp-active' : ''}`}
+          aria-hidden="true"
         >
           {isIdling ? '◉ Idling' : '◎ Idle'}
-        </button>
+        </span>
       )}
 
       {!locked && !isWorld && isLastIdle && hasPendingGains && onCollect && (
