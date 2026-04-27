@@ -79,9 +79,24 @@ export const QI_SPARKS = [
     duration:    60_000,
     effect:      { type: 'focus_mult_bonus', value: 0.3 },
   },
-  // TODO Phase 1B — `painless_ascension` and `lingering_focus` need deeper
-  // integration with useCultivation tick (qi-drain interception; focus-release
-  // transition tracking). Held back from the launch pool until then.
+  {
+    id:          'painless_ascension',
+    rarity:      'common',
+    name:        'Painless Ascension',
+    description: 'Your next breakthrough costs no qi — the full amount carries into the next realm.',
+    kind:        'next_breakthrough_flag',
+    flag:        'painless_breakthrough',
+  },
+  {
+    id:          'lingering_focus',
+    rarity:      'common',
+    name:        'Lingering Focus',
+    description: 'For 60 seconds, your qi/s continues at 50% for 5 seconds after you release Focus.',
+    kind:        'lingering_focus_flag',
+    duration:    60_000,
+    residualMult:        0.5,
+    residualDurationMs:  5_000,
+  },
   {
     id:          'echo_of_insight',
     rarity:      'common',

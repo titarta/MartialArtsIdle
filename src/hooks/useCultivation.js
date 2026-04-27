@@ -193,8 +193,20 @@ export default function useCultivation() {
   // Qi Sparks — temporary buffs from the per-breakthrough card-pick system.
   // sparkQiMultRef multiplies cultivation rate (e.g. 1.5 = +50%);
   // sparkFocusMultBonusRef multiplies the focus boost mult (e.g. 0.3 = +30% on top).
-  const sparkQiMultRef         = useRef(1);
-  const sparkFocusMultBonusRef = useRef(0);
+  const sparkQiMultRef               = useRef(1);
+  const sparkFocusMultBonusRef       = useRef(0);
+  // Painless Ascension — when true, the next breakthrough doesn't drain qi.
+  // Consumed (set false) by the tick when a breakthrough fires; the hook
+  // listens for the 'mai:painless-consumed' event to remove the spark.
+  const sparkPainlessRef             = useRef(false);
+  // Lingering Focus — sustains a fraction of the focus boost for `residualMs`
+  // after the player releases focus. focusReleaseTimeRef tracks the moment
+  // boost transitioned true→false.
+  const sparkLingeringActiveRef      = useRef(false);
+  const sparkLingeringResidualMsRef  = useRef(0);
+  const sparkLingeringResidualMultRef = useRef(0);
+  const focusReleaseTimeRef          = useRef(0);
+  const prevBoostStateRef            = useRef(false);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
   // Default 300% = the legacy 3× behavior; App.jsx writes the player's actual
   // focus mult into this ref each second.
@@ -255,7 +267,27 @@ export default function useCultivation() {
       // Qi Spark "Focus Surge" cards layer additively on top via sparkFocusMultBonusRef.
       const baseFocusMult = (focusMultRef.current ?? 300) / 100;
       const focusMultWithSpark = baseFocusMult * (1 + sparkFocusMultBonusRef.current);
-      const boostMult = boostRef.current ? Math.max(1, focusMultWithSpark) : 1;
+
+      // Detect focus release transition for Lingering Focus tracking.
+      if (prevBoostStateRef.current && !boostRef.current && sparkLingeringActiveRef.current) {
+        focusReleaseTimeRef.current = now;
+      }
+      prevBoostStateRef.current = boostRef.current;
+
+      let boostMult;
+      if (boostRef.current) {
+        boostMult = Math.max(1, focusMultWithSpark);
+      } else if (
+        sparkLingeringActiveRef.current
+        && focusReleaseTimeRef.current > 0
+        && (now - focusReleaseTimeRef.current) < sparkLingeringResidualMsRef.current
+      ) {
+        // Lingering Focus residual — apply a fraction of the focus mult while
+        // the player is no longer holding, for `residualMs` after release.
+        boostMult = Math.max(1, focusMultWithSpark * sparkLingeringResidualMultRef.current);
+      } else {
+        boostMult = 1;
+      }
       // Heavenly QI extras — only apply while the ad boost is live. Two
       // independent multiplicative sources: the reincarnation tree node
       // and the artefact heavenly_qi_mult stat.
@@ -296,7 +328,14 @@ export default function useCultivation() {
             qiRef.current = costRef.current;
             gateRef.current = { required: requiredRate, current: rate };
           } else {
-            qiRef.current -= costRef.current;
+            // Painless Ascension spark — when active, skip the qi drain and
+            // notify useQiSparks to consume the spark.
+            if (sparkPainlessRef.current) {
+              sparkPainlessRef.current = false;
+              try { window.dispatchEvent(new CustomEvent('mai:painless-consumed')); } catch {}
+            } else {
+              qiRef.current -= costRef.current;
+            }
             const fromIndex = indexRef.current;
             const nextIndex = fromIndex + 1;
             const isMajor = isMajorTransition(fromIndex);
@@ -413,6 +452,10 @@ export default function useCultivation() {
     // Qi Sparks refs — updated by App.jsx from useQiSparks
     sparkQiMultRef,
     sparkFocusMultBonusRef,
+    sparkPainlessRef,
+    sparkLingeringActiveRef,
+    sparkLingeringResidualMsRef,
+    sparkLingeringResidualMultRef,
     // QI Crystal flat bonus ref — updated by App.jsx from useQiCrystal
     crystalQiBonusRef,
     // Artefact qi_speed aggregate ref — updated by App.jsx each second

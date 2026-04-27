@@ -52,8 +52,16 @@ export default function useQiSparks({ cultivation }) {
   });
 
   // Refs read by useCultivation rate calc each tick
-  const qiMultRef         = useRef(1);
-  const focusMultBonusRef = useRef(0);
+  const qiMultRef                = useRef(1);
+  const focusMultBonusRef        = useRef(0);
+  // True iff a 'next_breakthrough_flag' (painless ascension) is currently
+  // active. useCultivation reads this when about to drain qi at breakthrough.
+  const painlessActiveRef        = useRef(false);
+  // Lingering Focus state — when active, useCultivation sustains a fraction
+  // of the focus boost for `residualDurationMs` after release.
+  const lingeringActiveRef       = useRef(false);
+  const lingeringResidualMsRef   = useRef(0);
+  const lingeringResidualMultRef = useRef(0);
 
   const prevRealmIndexRef = useRef(cultivation.realmIndex);
 
@@ -76,18 +84,36 @@ export default function useQiSparks({ cultivation }) {
   const recomputeRefs = useCallback((sparks) => {
     let qiMult = 1;
     let focusBonus = 0;
+    let painless = false;
+    let lingering = false;
+    let lingeringMs = 0;
+    let lingeringMult = 0;
     const now = Date.now();
     for (const s of sparks) {
       if (s.expiresAt && s.expiresAt <= now) continue;
       const card = QI_SPARK_BY_ID[s.sparkId];
       if (!card) continue;
+      if (card.kind === 'next_breakthrough_flag') {
+        painless = true;
+        continue;
+      }
+      if (card.kind === 'lingering_focus_flag') {
+        lingering = true;
+        lingeringMs = card.residualDurationMs ?? 0;
+        lingeringMult = card.residualMult ?? 0;
+        continue;
+      }
       const eff = card.effect;
       if (!eff) continue;
       if (eff.type === 'qi_mult')         qiMult     *= (1 + eff.value);
       if (eff.type === 'focus_mult_bonus') focusBonus += eff.value;
     }
-    qiMultRef.current         = qiMult;
-    focusMultBonusRef.current = focusBonus;
+    qiMultRef.current                = qiMult;
+    focusMultBonusRef.current        = focusBonus;
+    painlessActiveRef.current        = painless;
+    lingeringActiveRef.current       = lingering;
+    lingeringResidualMsRef.current   = lingeringMs;
+    lingeringResidualMultRef.current = lingeringMult;
   }, []);
 
   useEffect(() => { recomputeRefs(activeSparks); }, [activeSparks, recomputeRefs]);
@@ -285,12 +311,30 @@ export default function useQiSparks({ cultivation }) {
     setPityCounter(0);
   }, []);
 
+  // Listen for painless-consumed event from useCultivation. Removes the
+  // active painless spark so a fresh card is needed for the next free
+  // breakthrough.
+  useEffect(() => {
+    const handler = () => {
+      setActiveSparks(prev => prev.filter(s => {
+        const card = QI_SPARK_BY_ID[s.sparkId];
+        return !card || card.kind !== 'next_breakthrough_flag';
+      }));
+    };
+    window.addEventListener('mai:painless-consumed', handler);
+    return () => window.removeEventListener('mai:painless-consumed', handler);
+  }, []);
+
   return {
     activeSparks,
     pendingOffer,
     bloodLotusBalance,
     qiMultRef,
     focusMultBonusRef,
+    painlessActiveRef,
+    lingeringActiveRef,
+    lingeringResidualMsRef,
+    lingeringResidualMultRef,
     choose,
     reroll,
     nextRerollCost,

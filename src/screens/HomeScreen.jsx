@@ -8,6 +8,7 @@ import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import CrystalFeedModal from '../components/CrystalFeedModal';
 import DailyBonusWidget from '../components/DailyBonusWidget';
+import ActiveSparksBar from '../components/ActiveSparksBar';
 import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue, useBlockingPresence } from '../contexts/EventQueueContext';
 import WORLDS from '../data/worlds';
@@ -487,6 +488,7 @@ function HomeScreen({
   openCrystal,
   onOpenPills,
   totalOwnedPills,
+  activeSparks,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -729,6 +731,7 @@ function HomeScreen({
 
           {/* ── Top-left chip stack — priority order: rewards → no law → idle ── */}
           <div className="home-chips-tl">
+            <ActiveSparksBar activeSparks={activeSparks} />
             {selections?.pendingCount > 0 && !majorBreakthrough && (
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>

@@ -222,9 +222,9 @@ function AppInner() {
     cultivation.crystalQiBonusRef.current = crystal.crystalQiBonus;
   }, [crystal.crystalQiBonus, cultivation.crystalQiBonusRef]);
 
-  // Mirror Qi Sparks multipliers into cultivation refs each render. Cheap;
-  // runs only when activeSparks identity changes (the hook returns the same
-  // array reference when no expiry happened).
+  // Mirror Qi Sparks multipliers + flags into cultivation refs each render.
+  // Cheap; runs only when activeSparks identity changes (the hook returns
+  // the same array reference when no expiry happened).
   useEffect(() => {
     if (cultivation.sparkQiMultRef) {
       cultivation.sparkQiMultRef.current = qiSparks.qiMultRef.current;
@@ -232,7 +232,19 @@ function AppInner() {
     if (cultivation.sparkFocusMultBonusRef) {
       cultivation.sparkFocusMultBonusRef.current = qiSparks.focusMultBonusRef.current;
     }
-  }, [qiSparks.activeSparks, cultivation.sparkQiMultRef, cultivation.sparkFocusMultBonusRef, qiSparks.qiMultRef, qiSparks.focusMultBonusRef]);
+    if (cultivation.sparkPainlessRef) {
+      cultivation.sparkPainlessRef.current = qiSparks.painlessActiveRef.current;
+    }
+    if (cultivation.sparkLingeringActiveRef) {
+      cultivation.sparkLingeringActiveRef.current = qiSparks.lingeringActiveRef.current;
+    }
+    if (cultivation.sparkLingeringResidualMsRef) {
+      cultivation.sparkLingeringResidualMsRef.current = qiSparks.lingeringResidualMsRef.current;
+    }
+    if (cultivation.sparkLingeringResidualMultRef) {
+      cultivation.sparkLingeringResidualMultRef.current = qiSparks.lingeringResidualMultRef.current;
+    }
+  }, [qiSparks.activeSparks]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   // ── Centralised stat getter ─────────────────────────────────────────────
@@ -662,7 +674,7 @@ function AppInner() {
   const reincarnationUnlocked = karma.unlocked;
 
   const screens = {
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={selections} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} />,
     worlds: <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} lastIdleAssignment={autoFarm.lastIdleAssignment} onSetIdle={(act, w, r) => autoFarm.setIdleActivity(act, w, r, !!tree.modifiers.dualAutoFarm)} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} getFullStats={getFullStats} />,
     // Sub-screens launched from the Worlds hub
     'combat-arena': <CombatScreen
