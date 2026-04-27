@@ -550,6 +550,9 @@ function HomeScreen({
       if (gateRef?.current)    { lastFloaterQiRef.current = qiRef.current; return; }
       const now   = qiRef.current;
       const delta = now - lastFloaterQiRef.current;
+      // Breakthrough drained qi to a leftover — reseed the tracker and
+      // skip this tick so floaters resume cleanly on the next one.
+      if (delta < 0) { lastFloaterQiRef.current = now; return; }
       const whole = Math.floor(delta);
       if (whole < 1) return;
       lastFloaterQiRef.current += whole;

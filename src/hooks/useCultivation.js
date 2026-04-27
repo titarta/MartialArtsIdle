@@ -391,7 +391,11 @@ export default function useCultivation() {
     majorBreakthrough,
     clearMajorBreakthrough: () => setMajorBreakthrough(null),
     ascended,
-    isInPeakStage: !!(REALMS[realmIndex]?.stage?.includes('Peak')) || !REALMS[realmIndex + 1],
+    // True only at the very final realm (Open Heaven Layer 6) so peak-stage
+    // bar treatment is reserved for the actual endgame pinnacle. Per-realm
+    // Peak X sub-stages are still announced by the breakthrough banner when
+    // entered — they don't need persistent bar styling on top of that.
+    isInPeakStage: !REALMS[realmIndex + 1],
     setRealmIndex,
     activeLaw,
     setActiveLaw,

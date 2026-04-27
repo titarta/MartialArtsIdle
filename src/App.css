@@ -1971,8 +1971,8 @@ html, body, * {
   background: radial-gradient(
     ellipse at center,
     transparent 42%,
-    rgba(255, 200, 80, 0.10) 78%,
-    rgba(255, 150, 30, 0.22) 100%
+    rgba(92, 216, 255, 0.12)  78%,
+    rgba(20, 150, 220, 0.26)  100%
   );
   opacity: 0;
   transition: opacity 280ms ease-out;
@@ -4018,45 +4018,87 @@ html, body, * {
   top: 0;
   bottom: 0;
   left: 0;
-  background: linear-gradient(to right, #b8860b, #ffd700, #b8860b);
+  overflow: hidden;
+}
+
+/* Inner gradient layer — JS keeps its width = 100% of the channel
+   regardless of the outer fill's width, so the bright core stays anchored
+   to a fixed absolute position inside the bar. The bar visibly "charges
+   up" as the leading edge sweeps across the gradient. */
+.realm-fill-inner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to right, #205a85, #6ab8de, #205a85);
 }
 
 .realm-fill-boosted {
-  background: linear-gradient(to right, #ff6a00, #ffd700, #ff6a00);
-  box-shadow: 0 0 10px rgba(255, 200, 0, 0.6);
+  box-shadow:
+    0 0 14px rgba(92, 216, 255, 0.95),
+    0 0 28px rgba(40, 170, 230, 0.55);
+  animation: realmBoostedPulse 1.1s ease-in-out infinite alternate;
 }
 
-/* Peak Stage — persistent crimson-gold while sitting at the pinnacle */
+.realm-fill-boosted .realm-fill-inner {
+  background: linear-gradient(to right, #3ddcff, #ffffff, #3ddcff);
+}
+
+@keyframes realmBoostedPulse {
+  0%   {
+    box-shadow:
+      0 0 12px rgba(92, 216, 255, 0.80),
+      0 0 22px rgba(40, 170, 230, 0.45);
+    filter: brightness(1.0);
+  }
+  100% {
+    box-shadow:
+      0 0 18px rgba(150, 235, 255, 1.0),
+      0 0 36px rgba(60, 200, 255, 0.70);
+    filter: brightness(1.15);
+  }
+}
+
+/* Peak Stage — endgame pinnacle. Reserved for the very final realm so
+   it reads as "you're at the absolute apex". Deep blue stays in the
+   cultivation family; violet core signals transcendence. */
 .realm-fill-peak-stage {
-  background: linear-gradient(to right, #991b1b, #ffd700, #991b1b);
   box-shadow:
-    0 0 10px rgba(255, 50,  50,  0.55),
-    0 0 22px rgba(255, 180, 0,   0.35);
+    0 0 10px rgba(150, 100, 255, 0.55),
+    0 0 22px rgba(100,  60, 200, 0.35);
   animation: realmPeakStagePulse 1.8s ease-in-out infinite alternate;
+}
+
+.realm-fill-peak-stage .realm-fill-inner {
+  background: linear-gradient(to right, #0d2d52, #9968ff, #0d2d52);
 }
 
 @keyframes realmPeakStagePulse {
   from {
     box-shadow:
-      0 0 8px  rgba(255, 50,  50,  0.45),
-      0 0 16px rgba(255, 180, 0,   0.28);
+      0 0 8px  rgba(150, 100, 255, 0.45),
+      0 0 16px rgba(100,  60, 200, 0.28);
     filter: brightness(1.0);
   }
   to {
     box-shadow:
-      0 0 18px rgba(255, 50,  50,  0.80),
-      0 0 36px rgba(255, 180, 0,   0.55);
+      0 0 20px rgba(180, 130, 255, 0.85),
+      0 0 38px rgba(120,  80, 230, 0.60);
     filter: brightness(1.22);
   }
 }
 
 /* Major breakthrough — white-violet transcendence pulse */
 .realm-fill-breakthrough {
-  background: linear-gradient(to right, var(--ui-purple-deep), #ffffff, var(--ui-purple-soft));
   box-shadow:
     0 0 14px rgba(255, 255, 255, 0.85),
     0 0 32px rgba(var(--ui-purple-soft-rgb), 0.70);
   animation: realmBreakthroughPulse 0.85s ease-in-out infinite alternate;
+}
+
+.realm-fill-breakthrough .realm-fill-inner {
+  background: linear-gradient(to right, var(--ui-purple-deep), #ffffff, var(--ui-purple-soft));
 }
 
 @keyframes realmBreakthroughPulse {
@@ -4094,8 +4136,41 @@ html, body, * {
 }
 
 .realm-track-gated .realm-fill {
-  filter: hue-rotate(-30deg) saturate(1.1);
+  box-shadow: 0 0 10px rgba(255, 90, 60, 0.55);
   animation: realmGateFillPulse 1.4s ease-in-out infinite;
+}
+
+.realm-track-gated .realm-fill-inner {
+  background: linear-gradient(to right, #7a1a1a, #ff7a3a, #7a1a1a);
+}
+
+/* Gated + holding — "fighting through the gate". Same warm/red family
+   as the gated baseline, pushed hotter: red → yellow molten core, faster
+   pulse, heavier glow. Reads as the gate "burning" under player pressure. */
+.realm-track-gated .realm-fill.realm-fill-boosted {
+  box-shadow:
+    0 0 14px rgba(255, 130, 50, 0.95),
+    0 0 28px rgba(255,  80, 30, 0.65);
+  animation: realmGateBoostedPulse 0.7s ease-in-out infinite alternate;
+}
+
+.realm-track-gated .realm-fill-boosted .realm-fill-inner {
+  background: linear-gradient(to right, #c33010, #ffe066, #c33010);
+}
+
+@keyframes realmGateBoostedPulse {
+  0%   {
+    box-shadow:
+      0 0 12px rgba(255, 130, 50, 0.85),
+      0 0 22px rgba(255,  80, 30, 0.55);
+    filter: brightness(1.0);
+  }
+  100% {
+    box-shadow:
+      0 0 22px rgba(255, 200, 80, 1.0),
+      0 0 44px rgba(255, 130, 30, 0.85);
+    filter: brightness(1.30);
+  }
 }
 
 @keyframes realmGatePulse {
@@ -4143,7 +4218,7 @@ html, body, * {
 }
 
 .stage-boosted .sprite-animator {
-  filter: brightness(1.1) saturate(1.18) drop-shadow(0 0 5px rgba(255, 210, 90, 0.45));
+  filter: brightness(1.1) saturate(1.18) drop-shadow(0 0 5px rgba(120, 220, 255, 0.65));
 }
 
 /* ── Hold-state aura ─────────────────────────────────────────────────────
@@ -4156,8 +4231,8 @@ html, body, * {
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 220, 120, 0.40) 0%,
-    rgba(255, 180, 60, 0.18)  35%,
+    rgba(120, 220, 255, 0.50) 0%,
+    rgba(60, 180, 230, 0.26)  35%,
     transparent               72%
   );
   opacity: 0;
@@ -4272,12 +4347,12 @@ html, body, * {
   font-weight: 900;
   font-size: 1.85rem;
   letter-spacing: 0.02em;
-  color: #ffe27a;
+  color: #b3eeff;
   white-space: nowrap;
   pointer-events: none;
   text-shadow:
-    0 0 8px rgba(255, 210, 90, 0.95),
-    0 0 18px rgba(255, 180, 60, 0.55),
+    0 0 8px rgba(92, 216, 255, 0.95),
+    0 0 18px rgba(30, 170, 230, 0.55),
     0 2px 0 rgba(0, 0, 0, 0.85),
     1px 0 0 rgba(0, 0, 0, 0.75),
     -1px 0 0 rgba(0, 0, 0, 0.75),

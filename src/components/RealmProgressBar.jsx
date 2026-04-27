@@ -13,8 +13,9 @@ import { useEffect, useRef } from 'react';
 const BASE = import.meta.env.BASE_URL;
 
 function RealmProgressBar({ qiRef, costRef, gateRef, boosting, maxed, realmIndex, breakthrough, peakStage }) {
-  const fillRef  = useRef(null);
-  const trackRef = useRef(null);
+  const fillRef      = useRef(null);
+  const fillInnerRef = useRef(null);
+  const trackRef     = useRef(null);
 
   // Mirror React props into refs so the RAF closure always reads current values
   // without needing to be re-created on every prop change.
@@ -35,8 +36,20 @@ function RealmProgressBar({ qiRef, costRef, gateRef, boosting, maxed, realmIndex
 
     const update = () => {
       // ── Bar width ───────────────────────────────────────────────────────
-      const pct = maxed ? 100 : Math.min((qiRef.current / costRef.current) * 100, 100);
+      // During the major-breakthrough banner the qi has already drained into
+      // the next realm and `cost` has advanced, which would snap the bar to
+      // a tiny sliver mid-celebration. Hold it at 100% until the banner
+      // dismisses so the bar visibly *completes* the realm.
+      const pct = (maxed || breakthroughRef.current)
+        ? 100
+        : Math.min((qiRef.current / costRef.current) * 100, 100);
       if (fillRef.current) fillRef.current.style.width = `${pct}%`;
+      // Inner gradient is inverse-scaled so it always spans the full channel,
+      // regardless of fill width — anchors the bright core to a fixed
+      // absolute position inside the bar instead of riding the fill.
+      if (fillInnerRef.current) {
+        fillInnerRef.current.style.width = pct > 0.05 ? `${10000 / pct}%` : '100%';
+      }
 
       // ── Gate indicator (track shake / glow class) ────────────────────
       const isGated = !!gateRef?.current;
@@ -45,13 +58,15 @@ function RealmProgressBar({ qiRef, costRef, gateRef, boosting, maxed, realmIndex
         if (trackRef.current) trackRef.current.classList.toggle('realm-track-gated', isGated);
       }
 
-      // ── Fill colour — priority: breakthrough > gated/peak > boosted ──
-      // "gated" covers both major-realm gates and peak-stage gates; in both
-      // cases the player is actively fighting to raise their qi/s so the bar
-      // should signal urgency the whole time the gate is open.
-      const bt  = !!breakthroughRef.current;
-      const pk  = !bt && (isGated || !!peakStageRef.current);
-      const bst = !bt && !pk && !!boostingRef.current;
+      // ── Fill colour — priority: breakthrough > gated/peak, with boost
+      //    layered on top during gates so the player sees their hold is
+      //    doing work while fighting through the qi/s threshold. Pure peak
+      //    stage (no gate) still suppresses boost — peak is a resting
+      //    state, not an active push. ────────────────────────────────────
+      const bt     = !!breakthroughRef.current;
+      const inPeak = !!peakStageRef.current;
+      const pk     = !bt && (isGated || inPeak);
+      const bst    = !bt && !!boostingRef.current && !(inPeak && !isGated);
 
       if (bt !== btPrev || pk !== pkPrev || bst !== bstPrev) {
         btPrev = bt; pkPrev = pk; bstPrev = bst;
@@ -79,9 +94,10 @@ function RealmProgressBar({ qiRef, costRef, gateRef, boosting, maxed, realmIndex
             ref={fillRef}
             className="realm-fill"
             style={{ width: maxed ? '100%' : `${Math.min((qiRef.current / costRef.current) * 100, 100)}%` }}
-          />
+          >
+            <div ref={fillInnerRef} className="realm-fill-inner" />
+          </div>
         </div>
-        <div className="realm-center-badge">{realmIndex + 1}</div>
       </div>
     </div>
   );
