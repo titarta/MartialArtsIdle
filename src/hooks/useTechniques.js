@@ -82,11 +82,23 @@ export default function useTechniques({ extraSlots = 0 } = {}) {
     return { added: true, duplicate: false, baseId, quality: tech.quality ?? 'Iron' };
   }, []);
 
-  /** Look up a technique by id — the owned (drop-instance) entry first, then
-   *  the static catalogue (so legacy ids without the drop suffix still resolve). */
+  /**
+   * Look up a technique by id. Drop instances are stored as a frozen snapshot
+   * of the catalogue entry at drop time — meaning any retune to the catalogue
+   * (e.g. bonus 20 → 10000 on a Transcendent Attack 1) DOESN'T propagate to
+   * existing saves, leaving equipped techs running stale numbers. Fix: merge
+   * the live catalogue entry over the stored drop, so combat always reads
+   * current stats while the drop's identity (id, drop-instance suffix) is
+   * preserved. Falls back gracefully if either side is missing — a legacy
+   * id without a base entry returns the stored snapshot, and a base-only id
+   * (no owned drop) returns the catalogue entry.
+   */
   const getTechById = useCallback((id) => {
     if (!id) return null;
-    return ownedTechniques[id] ?? getTechnique(id) ?? null;
+    const owned = ownedTechniques[id];
+    const base  = getTechnique(id);   // strips `__suffix` internally
+    if (owned && base) return { ...owned, ...base, id: owned.id };
+    return owned ?? base ?? null;
   }, [ownedTechniques]);
 
   const equip = useCallback((slotIndex, techniqueId) => {
