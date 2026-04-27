@@ -66,6 +66,14 @@ if (DESIGNER_ENABLED && params.has('designer')) {
   import('./localizer/mount.jsx').then(({ mountLocalizer }) => {
     mountLocalizer(rootEl)
   })
+} else if (import.meta.env.DEV && params.has('particleEdit')) {
+  // Dev-only: Qi particle path editor — access via /?particleEdit in dev server.
+  // Tree-shaken out of every ship build because the condition is a build-time constant.
+  import('./components/QiParticleEditor.jsx').then(({ default: QiParticleEditor }) => {
+    createRoot(rootEl).render(
+      <StrictMode><QiParticleEditor /></StrictMode>
+    )
+  })
 } else {
   mountApp()
 }

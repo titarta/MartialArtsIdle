@@ -362,7 +362,7 @@ const CRYSTAL_COLORS = {
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, decorative).
  *  The feed modal is opened from the top-bar 🪨 button, not by tapping the
  *  crystal itself, so this component is purely visual. */
-function KeyCrystal({ crystal, isUnlocked, particleColors, hidden }) {
+function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung }) {
   const unlockHint = FEATURE_GATES.qi_crystal?.hint ?? 'Reach a higher realm';
 
   if (!isUnlocked) {
@@ -401,7 +401,7 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden }) {
           draggable="false"
         />
       </div>
-      <QiParticles colors={particleColors} />
+      <QiParticles colors={particleColors} rung={cfRung} />
       <div className="crystal-tooltip">
         <div className="ctt-title">Qi Crystal · Lv {level}</div>
         <div className="ctt-desc">A crystallised vessel of refined Qi. Feed it QI stones to level it up and increase your cultivation speed.</div>
@@ -473,13 +473,66 @@ function HomePCLeftPanel({ realmName, realmStage, qiRef, costRef, rateRef, gateR
   );
 }
 
-/** Falling qi-particle stream between crystal and character (5 particles). */
-function QiParticles({ colors }) {
-  const p = colors?.particles ?? ['#a78bfa','#8b5cf6','#a78bfa','#ddd6fe','#7c3aed'];
+/** Flowing qi-particle stream — energy pours from the full width of the
+ *  crystal area and converges onto the cultivator below.
+ *  Base: 6 paths × 6 particles = 36 dots at rung 0.
+ *  As the player holds and climbs CF rungs, particle count and path count
+ *  escalate: higher rungs add more particles per path and activate wider
+ *  outer arc paths (G/H at rung 2, I/J at rung 4) so the absorption
+ *  effect visually intensifies alongside the hold bonus.
+ *  Each particle interpolates colour along its path from the crystal's
+ *  tier colour to the cultivator's active aura colour (CF rung when held,
+ *  baseline cyan otherwise). */
+function QiParticles({ colors, rung = 0 }) {
+  const start = colors?.glowA ?? colors?.particles?.[0] ?? 'rgba(167, 139, 250, 0.95)';
+
+  // Rung → particles-per-path. Starts at 6 (baseline 36 total), climbing
+  // to 18 at rung 5 so the stream visibly thickens as the hold deepens.
+  const PER_PATH_BY_RUNG = [6, 7, 9, 11, 14, 18];
+  const perPath = PER_PATH_BY_RUNG[Math.min(rung, 5)];
+
+  // Base paths always active. Wide outer arcs unlock at rung 2;
+  // extreme wing arcs unlock at rung 4 for full sweep coverage.
+  const BASE_PATHS    = ['A', 'B', 'C', 'D', 'E', 'F'];
+  const WIDE_PATHS    = ['G', 'H'];   // rung 2+
+  const EXTREME_PATHS = ['I', 'J'];   // rung 4+
+  const PATHS = [
+    ...BASE_PATHS,
+    ...(rung >= 2 ? WIDE_PATHS    : []),
+    ...(rung >= 4 ? EXTREME_PATHS : []),
+  ];
+
+  // Delay spread uses a fixed 2.4 s period so particle spacing stays
+  // consistent regardless of the animation-duration override in CSS.
+  const PERIOD = 2.4;
+  const slots = [];
+  for (let p = 0; p < PATHS.length; p++) {
+    for (let n = 0; n < perPath; n++) {
+      // Particle size grows one step at rung 3+ for extra visual weight.
+      const sizeBase = rung >= 3 ? 1 : 0;
+      slots.push({
+        path:  PATHS[p],
+        delay: (p * 0.07 + n * (PERIOD / perPath)).toFixed(2),
+        size:  3 + sizeBase + ((p + n) % 3),
+      });
+    }
+  }
   return (
-    <div className="home-qi-particles" aria-hidden="true">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={`home-qi-particle home-qi-p${i + 1}`} style={{ background: p[i] }} />
+    <div
+      className="home-qi-particles"
+      aria-hidden="true"
+      style={{ '--qi-particle-start': start }}
+    >
+      {slots.map((s, i) => (
+        <span
+          key={i}
+          className={`home-qi-particle home-qi-particle-path${s.path}`}
+          style={{
+            animationDelay: `${s.delay}s`,
+            width:  `${s.size}px`,
+            height: `${s.size}px`,
+          }}
+        />
       ))}
     </div>
   );
@@ -588,6 +641,15 @@ function HomeScreen({
   }, [activateAdBoost]);
 
   const cultivationAd = useRewardedAd(onCultivationReward, 30 * 60 * 1000, 'mai_ad_cd_cultivation');
+
+  // ── Consecutive Focus rung — mirrors the body class set in App.jsx so
+  // QiParticles can scale particle density without touching the DOM directly.
+  const [cfRung, setCfRung] = useState(0);
+  useEffect(() => {
+    const onRung = (e) => setCfRung(e.detail?.rung ?? 0);
+    window.addEventListener('mai:cf-rung', onRung);
+    return () => window.removeEventListener('mai:cf-rung', onRung);
+  }, []);
 
   // ── Hold-hint ────────────────────────────────────────────────────────────
   const [showHoldHint, setShowHoldHint] = useState(() => {
@@ -803,6 +865,7 @@ function HomeScreen({
             isUnlocked={isCrystalUnlocked}
             particleColors={isCrystalUnlocked && crystal ? CRYSTAL_COLORS[getCrystalTier(crystal.level)] : CRYSTAL_COLORS[1]}
             hidden={currentEvent?.kind === 'crystal-evolution'}
+            cfRung={cfRung}
           />
 
           {/* Character + hold-hint group — grounded at scene bottom */}
