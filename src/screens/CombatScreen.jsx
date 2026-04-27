@@ -2,6 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TYPE_COLOR } from '../data/techniques';
+import { mineralForRarity } from '../data/materials';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -143,7 +144,19 @@ function CombatScreen({ cultivation, techniques, combat, inventory, artefacts = 
       equippedTechniques,
       effectiveEnemyDef,
       inventory   ? (drops) => drops.forEach(d => inventory.addItem(d.itemId, d.qty)) : null,
-      techniques  ? (tech)  => techniques.addOwnedTechnique(tech) : null,
+      // Drop callback: hand the tech to the techniques hook, which dedupes
+      // by base id. If duplicate, refund the matching dismantle mineral and
+      // return `{ kind: 'duplicate', refundedItemId }` so useCombat can log
+      // the auto-dismantle path. Otherwise return `{ kind: 'new' }`.
+      techniques ? (tech) => {
+        const result = techniques.addOwnedTechnique(tech);
+        if (result.duplicate) {
+          const refundedItemId = mineralForRarity(result.quality);
+          inventory?.addItem?.(refundedItemId, 1);
+          return { kind: 'duplicate', refundedItemId };
+        }
+        return { kind: 'new' };
+      } : null,
       region?.worldId ?? 1,
       regionIndex,
       artefacts   ? (id)    => artefacts.addArtefact(id) : null,

@@ -199,22 +199,26 @@ function TechSlotCard({ index, tech, onClick }) {
   }
 
   const quality  = TECHNIQUE_QUALITY[tech.quality];
+  const typeCol  = TYPE_COLOR[tech.type] ?? '#fff';
   const cd       = getCooldown(tech);
   const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
+  const tooltip  = `${t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })} · ${t(`quality.${tech.quality}`, { defaultValue: quality.label })}`;
 
   return (
-    <button className="card build-slot build-tech-slot build-tech-filled" onClick={onClick}>
+    <button
+      className="card build-slot build-tech-slot build-tech-filled"
+      style={{ '--tech-quality': quality.color }}
+      onClick={onClick}
+    >
       <span className="build-slot-label">{t(`build.technique${index + 1}`)}</span>
+      <span
+        className="tech-icon tech-icon-large"
+        style={{ background: typeCol + '22', borderColor: typeCol }}
+        title={tooltip}
+      >
+        <span className="tech-icon-glyph">{tech.icon ?? '?'}</span>
+      </span>
       <span className="build-tech-name">{techName}</span>
-      <div className="build-tech-badges">
-        <span className="build-tech-badge" style={{ color: TYPE_COLOR[tech.type], borderColor: TYPE_COLOR[tech.type] }}>
-          {t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}
-        </span>
-        <span className="build-tech-badge" style={{ color: quality.color, borderColor: quality.color }}>
-          {t(`quality.${tech.quality}`, { defaultValue: quality.label })}
-        </span>
-        <span className="build-tech-badge build-tech-rank">{t(`techniqueRanks.${tech.rank}`, { defaultValue: tech.rank })}</span>
-      </div>
       <span className="build-tech-cd">{t('build.cdLabel', { n: cd.toFixed(1) })}</span>
     </button>
   );
@@ -493,7 +497,6 @@ function BuildContent({ cultivation, techniques, artefacts }) {
         <TechniqueSlotModal
           slotIndex={selectedTechSlot}
           currentId={techniques.slots[selectedTechSlot]}
-          realmIndex={realmIndex}
           ownedTechniques={techniques.ownedTechniques}
           onEquip={handleEquip}
           onClose={() => setSelectedTechSlot(null)}

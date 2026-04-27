@@ -3,10 +3,11 @@
  *
  * Quality is rolled per world (same rarity table as materials). Once quality
  * is decided, a uniform-random pick from the matching subset of TECHNIQUES is
- * cloned and tagged with: a fresh drop id (`${baseId}__suffix`) so duplicates
- * stack distinctly in `ownedTechniques`, and a `rank` derived from the world
- * tier (W1=Mortal … W6=Heaven). Rank only gates equip; damage scaling no
- * longer keys off rank/quality (K_TABLE was removed 2026-04-27).
+ * cloned and tagged with a fresh drop id (`${baseId}__suffix`) so duplicates
+ * stack distinctly in `ownedTechniques` (the dedupe path in
+ * `useTechniques.addOwnedTechnique` then auto-dismantles same-base-id drops).
+ *
+ * Rank was removed 2026-04-28 — quality is now the only stratification.
  */
 
 import { TECHNIQUES } from './techniques';
@@ -21,11 +22,6 @@ export const WORLD_QUALITY_WEIGHTS = [
   { Iron: 0,  Bronze: 8,  Silver: 28, Gold: 47, Transcendent: 17 }, // World 4
   { Iron: 0,  Bronze: 2,  Silver: 10, Gold: 43, Transcendent: 45 }, // World 5
   { Iron: 0,  Bronze: 0,  Silver: 3,  Gold: 20, Transcendent: 77 }, // World 6
-];
-
-/** Rank of dropped techniques per world. */
-export const WORLD_RANK = [
-  'Mortal', 'Earth', 'Sky', 'Saint', 'Emperor', 'Heaven',
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -51,13 +47,12 @@ export function weightedPick(weights) {
  *
  * @param {number} worldId  1–6
  * @returns Technique drop instance (catalogue entry clone with a fresh drop
- *          id + world-derived rank). All stats are baked into the catalogue
- *          entry itself — no random rolls beyond which entry was picked.
+ *          id). All stats are baked into the catalogue entry itself — no
+ *          random rolls beyond which entry was picked.
  */
 export function pickTechnique(worldId) {
   const wIdx    = Math.max(0, Math.min(5, worldId - 1));
   const quality = weightedPick(WORLD_QUALITY_WEIGHTS[wIdx]);
-  const rank    = WORLD_RANK[wIdx];
 
   const pool = TECHNIQUES.filter(t => t.quality === quality);
   if (pool.length === 0) return null;
@@ -65,7 +60,6 @@ export function pickTechnique(worldId) {
 
   return {
     ...base,
-    rank,
     id: `${base.id}__${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
   };
 }

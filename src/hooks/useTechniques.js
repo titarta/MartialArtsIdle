@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { saveTechniques, loadTechniques, saveOwnedTechniques, loadOwnedTechniques } from '../systems/save';
-import { getTechnique } from '../data/techniques';
+import { getTechnique, getTechniqueBaseId } from '../data/techniques';
 
 // One-shot save migration flag. The 2026-04-26 secret-tech overhaul switched
 // the technique system from procedural generation + passive pool to a fixed
@@ -45,13 +45,32 @@ export default function useTechniques({ extraSlots = 0 } = {}) {
     saveOwnedTechniques(ownedTechniques);
   }, [ownedTechniques]);
 
-  /** Add a dropped technique to the owned collection. Silently ignored when full. */
+  /**
+   * Add a dropped technique to the owned collection.
+   *
+   * Returns `{ added, duplicate, baseId, quality }`:
+   *   - `duplicate: true`  — the catalogue entry is already owned (any drop
+   *     instance with a matching base id). Caller is expected to refund the
+   *     equivalent dismantle mineral and surface the auto-dismantle in the
+   *     combat log. State is not mutated.
+   *   - `added: true`      — successfully added (was not a duplicate).
+   *   - `added: false, duplicate: false` — capped at MAX_TECHNIQUES, dropped on the floor.
+   */
   const addOwnedTechnique = useCallback((tech) => {
+    const baseId = getTechniqueBaseId(tech.id);
+    const isDuplicate = Object.values(ownedTechniques)
+      .some(t => getTechniqueBaseId(t.id) === baseId);
+    if (isDuplicate) {
+      return { added: false, duplicate: true, baseId, quality: tech.quality ?? 'Iron' };
+    }
+    let added = false;
     setOwned(prev => {
       if (Object.keys(prev).length >= MAX_TECHNIQUES) return prev;
+      added = true;
       return { ...prev, [tech.id]: tech };
     });
-  }, []);
+    return { added, duplicate: false, baseId, quality: tech.quality ?? 'Iron' };
+  }, [ownedTechniques]);
 
   /** Look up a technique by id — the owned (drop-instance) entry first, then
    *  the static catalogue (so legacy ids without the drop suffix still resolve). */

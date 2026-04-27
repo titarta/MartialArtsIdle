@@ -5193,8 +5193,9 @@ html, body, * {
   transition: border-color 0.2s;
 }
 
-.build-tech-filled {
-  border-color: var(--accent);
+.build-tech-slot.build-tech-filled {
+  border: 2px solid var(--tech-quality, var(--accent));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--tech-quality, var(--accent)) 25%, transparent);
 }
 
 .build-tech-name {
@@ -5205,30 +5206,56 @@ html, body, * {
   margin-bottom: 4px;
 }
 
-.build-tech-badges {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  margin-bottom: 6px;
-}
-
-.build-tech-badge {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid;
-}
-
-.build-tech-rank {
-  color: var(--text-muted);
-  border-color: var(--border);
-}
-
 .build-tech-cd {
   font-size: 0.7rem;
   color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────
+   Tech icon chip — used in Collection grid,
+   equip modal cards, build slots, modal headings
+   ───────────────────────────────────────────── */
+
+.tech-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.tech-icon-glyph {
+  font-size: 1rem;
+  line-height: 1;
+  /* avoid emoji baseline drift */
+  display: block;
+}
+
+.tech-icon-large {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+}
+
+.tech-icon-large .tech-icon-glyph {
+  font-size: 1.55rem;
+}
+
+.tech-modal-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tech-item-stats-modal {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 8px 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -5289,101 +5316,65 @@ html, body, * {
 .tech-list-item {
   width: 100%;
   background: rgba(var(--ui-bg-panel-rgb), 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 2px solid var(--tech-quality, rgba(255, 255, 255, 0.07));
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   text-align: left;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  transition: border-color 0.15s, background 0.15s;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--tech-quality, transparent) 18%, transparent),
+              0 2px 8px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
-.tech-list-item:hover { border-color: rgba(233, 69, 96, 0.4); background: rgba(255, 255, 255, 0.02); }
+.tech-list-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--tech-quality, var(--accent)) 35%, transparent),
+              0 2px 8px rgba(0, 0, 0, 0.35);
+}
 
 .tech-list-equipped {
   background: rgba(233, 69, 96, 0.07);
-  border-color: rgba(233, 69, 96, 0.45);
-  box-shadow: 0 0 12px rgba(233, 69, 96, 0.09), 0 2px 8px rgba(0, 0, 0, 0.35);
-}
-
-.tech-list-locked {
-  opacity: 0.45;
-  cursor: not-allowed;
+  box-shadow: 0 0 14px color-mix(in srgb, var(--tech-quality, var(--accent)) 45%, transparent),
+              0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .tech-item-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 5px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .tech-item-name {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.tech-item-badges {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-}
-
-.tech-badge {
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 5px;
-  border-radius: 4px;
-  border: 1px solid;
-}
-
-.tech-badge-rank {
-  color: rgba(var(--ui-muted-rgb), 0.55);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
 .tech-item-stats {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-  margin-bottom: 5px;
-}
-
-.tech-element {
-  color: #fb923c;
-  font-weight: 600;
-}
-
-.tech-item-passives {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 5px;
+  gap: 3px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin: 0 0 6px 0;
+  padding: 0;
 }
 
-.tech-item-passives li {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  padding-left: 8px;
+.tech-item-stats li {
+  padding-left: 10px;
   position: relative;
+  line-height: 1.35;
 }
 
-.tech-item-passives li::before {
-  content: '◆';
+.tech-item-stats li::before {
+  content: '·';
   position: absolute;
-  left: 0;
-  font-size: 0.45rem;
-  top: 2px;
-  color: var(--gold);
+  left: 2px;
+  color: var(--text-muted);
 }
 
 .tech-item-flavour {
@@ -5403,13 +5394,6 @@ html, body, * {
   color: rgba(233, 69, 96, 0.9);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-}
-
-.tech-locked-badge {
-  display: block;
-  font-size: 0.65rem;
-  color: var(--accent);
-  margin-top: 4px;
 }
 
 .tech-unequip-btn {

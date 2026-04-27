@@ -2,21 +2,21 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  TECHNIQUE_QUALITY, TECHNIQUE_RANK,
-  TYPE_COLOR, getCooldown, canEquip,
+  TECHNIQUE_QUALITY,
+  TYPE_COLOR,
+  describeTechnique,
   getTechniqueBaseId,
 } from '../data/techniques';
 
 const FILTER_KEYS = ['All', 'Attack', 'Heal', 'Defend', 'Dodge', 'Expose'];
 const SLOT_T_KEYS = ['techniqueSlotModal.slot1', 'techniqueSlotModal.slot2', 'techniqueSlotModal.slot3'];
 
-function TechniqueCard({ tech, equipped, locked, onClick }) {
+function TechniqueCard({ tech, equipped, onClick }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
 
-  const quality = TECHNIQUE_QUALITY[tech.quality];
-  const rank    = TECHNIQUE_RANK[tech.rank];
-  const cd      = getCooldown(tech);
+  const quality  = TECHNIQUE_QUALITY[tech.quality];
+  const typeCol  = TYPE_COLOR[tech.type] ?? '#fff';
 
   // i18n keys live on the catalogue base id; drop-instance ids carry a
   // `__suffix` for uniqueness — strip it before looking up translations.
@@ -24,83 +24,38 @@ function TechniqueCard({ tech, equipped, locked, onClick }) {
   const techName    = tGame(`techniques.${baseId}.name`,    { defaultValue: tech.name });
   const techFlavour = tGame(`techniques.${baseId}.flavour`, { defaultValue: tech.flavour });
 
+  const lines = describeTechnique(tech);
+  const tooltip = `${t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })} · ${t(`quality.${tech.quality}`, { defaultValue: quality.label })}`;
+
   return (
     <button
-      className={`tech-list-item${equipped ? ' tech-list-equipped' : ''}${locked ? ' tech-list-locked' : ''}`}
-      onClick={locked ? undefined : onClick}
+      className={`tech-list-item${equipped ? ' tech-list-equipped' : ''}`}
+      style={{ '--tech-quality': quality.color }}
+      onClick={onClick}
     >
       <div className="tech-item-header">
+        <span
+          className="tech-icon"
+          style={{ background: typeCol + '22', borderColor: typeCol }}
+          title={tooltip}
+        >
+          <span className="tech-icon-glyph">{tech.icon ?? '?'}</span>
+        </span>
         <span className="tech-item-name">{techName}</span>
-        <div className="tech-item-badges">
-          <span className="tech-badge" style={{ color: TYPE_COLOR[tech.type], borderColor: TYPE_COLOR[tech.type] }}>
-            {t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}
-          </span>
-          <span className="tech-badge" style={{ color: quality.color, borderColor: quality.color }}>
-            {t(`quality.${tech.quality}`, { defaultValue: quality.label })}
-          </span>
-          <span className="tech-badge tech-badge-rank">
-            {t(`techniqueRanks.${tech.rank}`, { defaultValue: rank.label })}
-          </span>
-        </div>
       </div>
 
-      <div className="tech-item-stats">
-        <span>{t('techniqueSlotModal.cooldown', { cd: cd.toFixed(1) })}</span>
-        {tech.type === 'Attack' && (tech.physMult || tech.elemMult) && (
-          <span>{t('techniqueSlotModal.scaling', {
-            phys: ((tech.physMult ?? 0) * 100).toFixed(0),
-            elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
-          })}</span>
-        )}
-        {tech.type === 'Heal' && (
-          <>
-            <span>{t('techniqueSlotModal.healPercent', { pct: Math.round((tech.healPercent ?? 0.25) * 100) })}</span>
-            {(tech.physMult || tech.elemMult) && (
-              <span>{t('techniqueSlotModal.scaling', {
-                phys: ((tech.physMult ?? 0) * 100).toFixed(0),
-                elem: ((tech.elemMult ?? 0) * 100).toFixed(0),
-              })}</span>
-            )}
-          </>
-        )}
-        {tech.type === 'Defend' && (
-          <span>{t('techniqueSlotModal.defBuff', { mult: tech.defMult, hits: tech.buffAttacks })}</span>
-        )}
-        {tech.type === 'Dodge' && (
-          <span>{t('techniqueSlotModal.dodgeBuff', { pct: Math.round((tech.dodgeChance ?? 0) * 100), hits: tech.buffAttacks })}</span>
-        )}
-      </div>
-
-      {tech.type === 'Expose' && (
-        <ul className="tech-item-passives">
-          {tech.exploitChance ? (
-            <li>{t('techniqueSlotModal.exposeExploitChance', { pct: tech.exploitChance, hits: tech.buffPlayerAttacks })}</li>
-          ) : null}
-          {tech.exploitMult ? (
-            <li>{t('techniqueSlotModal.exposeExploitMult', { mult: (tech.exploitMult / 100).toFixed(2), hits: tech.buffPlayerAttacks })}</li>
-          ) : null}
-          {tech.defPen ? (
-            <li>{t('techniqueSlotModal.exposeDefPen', { pct: Math.round(tech.defPen * 100), hits: tech.buffPlayerAttacks })}</li>
-          ) : null}
-          {tech.dmgReduction ? (
-            <li>{t('techniqueSlotModal.exposeDmgReduction', { pct: Math.round(tech.dmgReduction * 100), hits: tech.buffEnemyAttacks })}</li>
-          ) : null}
-        </ul>
-      )}
+      <ul className="tech-item-stats">
+        {lines.map((line, i) => <li key={i}>{line}</li>)}
+      </ul>
 
       {techFlavour && <p className="tech-item-flavour">"{techFlavour}"</p>}
 
       {equipped && <span className="tech-equipped-badge">{t('common.equipped')}</span>}
-      {locked   && (
-        <span className="tech-locked-badge">
-          {t('techniqueSlotModal.requiresRealm', { rank: t(`techniqueRanks.${tech.rank}`, { defaultValue: rank.label }) })}
-        </span>
-      )}
     </button>
   );
 }
 
-function TechniqueSlotModal({ slotIndex, currentId, realmIndex, ownedTechniques = {}, onEquip, onClose }) {
+function TechniqueSlotModal({ slotIndex, currentId, ownedTechniques = {}, onEquip, onClose }) {
   const { t } = useTranslation('ui');
   const [filter, setFilter] = useState('All');
 
@@ -140,7 +95,6 @@ function TechniqueSlotModal({ slotIndex, currentId, realmIndex, ownedTechniques 
               key={tech.id}
               tech={tech}
               equipped={tech.id === currentId}
-              locked={!canEquip(tech, realmIndex)}
               onClick={() => onEquip(slotIndex, tech.id)}
             />
           ))}

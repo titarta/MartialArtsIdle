@@ -632,8 +632,19 @@ export default function useCombat() {
             if (s2.techDropChance > 0 && Math.random() < s2.techDropChance) {
               const tech = pickTechnique(s2.worldId);
               if (tech) {
-                onTechniqueDropRef.current?.(tech);
-                newLogs.unshift({ msg: `Scroll found: ${tech.name} (${tech.quality} ${tech.type})`, kind: 'technique' });
+                const result = onTechniqueDropRef.current?.(tech) ?? { kind: 'new' };
+                if (result.kind === 'duplicate') {
+                  const matName = ALL_MATERIALS[result.refundedItemId]?.name ?? result.refundedItemId;
+                  newLogs.unshift({
+                    msg: `Duplicate scroll dismantled — refunded 1× ${matName}`,
+                    kind: 'technique',
+                  });
+                } else {
+                  newLogs.unshift({
+                    msg: `Scroll found: ${tech.name} (${tech.quality} ${tech.type})`,
+                    kind: 'technique',
+                  });
+                }
               }
             }
 

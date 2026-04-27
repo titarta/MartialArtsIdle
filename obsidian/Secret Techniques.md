@@ -1,10 +1,12 @@
 # Secret Techniques
 
-Advanced combat skills that fire automatically during fights. Available from the start — higher ranks unlock as the cultivator progresses through realms.
+Advanced combat skills that fire automatically during fights. Available from the start — quality drives identity (Iron → Transcendent), and any technique can be equipped at any realm.
 
 > **Overhaul note (2026-04-26):** procedural generation + the per-technique "passive" pool were both **removed**. The catalogue is now hand-authored: 60 unique techniques (12 per quality × 5 qualities). Each technique's effects are baked into the definition — no random rolls, no transmutation, no refining. The previous passive-pool archive is in [[Deprecated_Unique_Modifiers]].
 
-> **Implementation:** Catalogue lives in `src/data/techniques.js → TECHNIQUES`. Drops resolve via `src/data/techniqueDrops.js → pickTechnique(worldId)`: roll quality from the world's quality table, then uniform-pick a matching-quality entry from the catalogue, clone it, assign `rank` from the world tier (W1=Mortal … W6=Heaven), and stamp a fresh drop id (`${baseId}__${suffix}`) so duplicates stack distinctly.
+> **Implementation:** Catalogue lives in `src/data/techniques.js → TECHNIQUES`. Each entry carries an explicit `icon` (emoji used by all UI surfaces). Drops resolve via `src/data/techniqueDrops.js → pickTechnique(worldId)`: roll quality from the world's quality table, then uniform-pick a matching-quality entry from the catalogue, clone it, and stamp a fresh drop id (`${baseId}__${suffix}`). Duplicate drops (same base id already owned) are auto-dismantled by `useTechniques.addOwnedTechnique` — see Discovery & Acquisition below.
+
+> **Rank removed (2026-04-28):** the `rank` field + per-major-realm equip gate are gone. Quality is the only stratification axis; with K_TABLE retired, rank no longer drives anything. Saved tech instances may still carry a stale `rank`; it's ignored on load.
 
 ---
 
@@ -179,9 +181,7 @@ A second pass on the catalogue (2026-04-28) gave most entries a unique mechanic 
 
 ## Requirements to Equip
 
-- Minimum **major realm** matching the technique's rank
-- Matching **artefact type** (sword, polearm, etc.)
-- Minimum **Essence / Soul / Body** threshold (varies per technique)
+- None. Any owned technique can be equipped at any realm. Quality is the only stratification axis.
 
 ---
 
@@ -201,18 +201,19 @@ Total: 60 unique entries. The user / designer fills in names, flavour, and per-e
 
 > **Quality is identity.** "Iron Sword Slash" and "Bronze Sword Slash" are different catalogue entries with different ids. There is **no upgrade path** between them — players acquire higher-rarity techniques only via drops.
 
-> **Rank is per-drop, not identity.** Rank is set when the technique drops, from the world tier (W1=Mortal … W6=Heaven). A single Iron-quality entry can manifest at any of the 6 ranks; rank only gates equip (the K_TABLE that previously multiplied damage by rank × quality was removed 2026-04-27).
-
 ---
 
 ## Discovery & Acquisition
 
 - **Dropped by mobs** — each enemy has a per-kill technique drop chance (see [[Enemies]] drop tables). Chance is rare; stronger zones have higher rates.
 - **Quality is world-gated** — the dropped technique's quality tier is rolled using the same rarity weights as material drops: World 1 yields mostly Iron/Bronze, World 6 yields mostly Transcendent.
-- **Rank is world-gated** — World 1 drops Mortal-rank, … World 6 drops Heaven-rank.
 - **Once quality is rolled**, a uniform-random entry from the matching-quality subset of the 60-entry catalogue is picked.
 - Dropped techniques are stored in the player's **owned collection** and appear in the equip screen.
 - Rewards from zone clears or boss fights (TBD)
+
+### Duplicates auto-dismantle
+
+Each catalogue entry can be owned **at most once**. When a drop's base id matches an entry already in `ownedTechniques`, `useTechniques.addOwnedTechnique` returns `{ duplicate: true }` and the CombatScreen drop callback refunds the same dismantle mineral (1× iron-dust / bronze-dust / silver-dust / gold-dust / transcendent-dust depending on quality) that a manual dismantle would yield. The combat log surfaces the auto-dismantle as `Duplicate scroll dismantled — refunded 1× <Mineral>`. State for the existing copy is untouched (so equipped slots are safe).
 
 ### World 1 Technique Drop Rates
 

@@ -254,7 +254,6 @@
     "exposeExploitMult":   "Exploração ×{{mult}} / {{hits}} golpes",
     "exposeDefPen":        "{{pct}}% pen. de defesa / {{hits}} golpes",
     "exposeDmgReduction":  "{{pct}}% redução de dano / {{hits}} golpes inimigos",
-    "requiresRealm":"Requer reino {{rank}}",
     "unequip":      "Desequipar"
   },
 
@@ -342,15 +341,6 @@
     "Defend": "Defesa",
     "Dodge":  "Esquiva",
     "Expose": "Expor"
-  },
-
-  "techniqueRanks": {
-    "Mortal":  "Mortal",
-    "Earth":   "Terra",
-    "Sky":     "Céu",
-    "Saint":   "Santo",
-    "Emperor": "Imperador",
-    "Heaven":  "Celestial"
   },
 
   "rarity": {

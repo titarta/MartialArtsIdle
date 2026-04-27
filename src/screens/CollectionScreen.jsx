@@ -8,7 +8,7 @@ import { formatAffixValue, AFFIX_UNIQUE_COLOR } from '../data/affixDisplay';
 import { effectiveAffixValue, bonusCount } from '../data/artefactUpgrades';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
-import { TECHNIQUE_QUALITY, TYPE_COLOR, getCooldown } from '../data/techniques';
+import { TECHNIQUE_QUALITY, TYPE_COLOR, describeTechnique } from '../data/techniques';
 import { MAX_ARTEFACTS } from '../hooks/useArtefacts';
 import { MAX_UPGRADE_BY_RARITY } from '../data/artefactUpgrades';
 import { ARTEFACT_SETS } from '../data/artefactSets';
@@ -214,6 +214,7 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
             <div className="inv-grid">
               {Object.values(techniques.ownedTechniques).map((tech) => {
                 const color    = LAW_RARITY[tech.quality]?.color ?? '#9ca3af';
+                const typeCol  = TYPE_COLOR[tech.type] ?? '#fff';
                 const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
                 return (
                   <button
@@ -222,7 +223,12 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                     style={{ borderColor: color }}
                     onClick={() => setSelectedTechnique(tech)}
                   >
-                    <span className="inv-quality-gem" style={{ color }}>◆</span>
+                    <span
+                      className="tech-icon"
+                      style={{ background: typeCol + '22', borderColor: typeCol }}
+                    >
+                      <span className="tech-icon-glyph">{tech.icon ?? '?'}</span>
+                    </span>
                     <span className="inv-name" style={{ color }}>{techName}</span>
                     <span className="inv-slot-label">{t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}</span>
                   </button>
@@ -445,79 +451,30 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
         const tech     = selectedTechnique;
         const quality  = TECHNIQUE_QUALITY[tech.quality] ?? { label: tech.quality, color: '#9ca3af' };
         const typeCol  = TYPE_COLOR[tech.type] ?? '#fff';
-        const cd       = getCooldown(tech);
         const techName    = tGame(`techniques.${tech.id}.name`,    { defaultValue: tech.name });
         const techFlavour = tGame(`techniques.${tech.id}.flavour`, { defaultValue: tech.flavour });
+        const lines = describeTechnique(tech);
         return (
           <div className="modal-overlay" onClick={() => setSelectedTechnique(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <button className="modal-close" onClick={() => setSelectedTechnique(null)}>x</button>
-              <h2 className="modal-title">{techName}</h2>
-              <span className="modal-rarity" style={{ color: quality.color }}>
-                {t(`quality.${tech.quality}`, { defaultValue: quality.label })} · {t(`techniqueRanks.${tech.rank}`, { defaultValue: tech.rank })}
-              </span>
-              <div className="item-stat-block">
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelType')}</span>
-                  <span className="item-stat-value" style={{ color: typeCol }}>{t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}</span>
+              <div className="tech-modal-heading">
+                <span
+                  className="tech-icon tech-icon-large"
+                  style={{ background: typeCol + '22', borderColor: typeCol }}
+                >
+                  <span className="tech-icon-glyph">{tech.icon ?? '?'}</span>
+                </span>
+                <div>
+                  <h2 className="modal-title">{techName}</h2>
+                  <span className="modal-rarity" style={{ color: quality.color }}>
+                    {t(`quality.${tech.quality}`, { defaultValue: quality.label })} · {t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}
+                  </span>
                 </div>
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelCooldown')}</span>
-                  <span className="item-stat-value">{cd.toFixed(1)}s</span>
-                </div>
-                {tech.type === 'Attack' && (tech.physMult || tech.elemMult) && (
-                  <div className="item-stat-row">
-                    <span className="item-stat-label">Scaling</span>
-                    <span className="item-stat-value">
-                      {((tech.physMult ?? 0) * 100).toFixed(0)}% phys / {((tech.elemMult ?? 0) * 100).toFixed(0)}% elem
-                    </span>
-                  </div>
-                )}
-                {tech.type === 'Heal' && (
-                  <div className="item-stat-row">
-                    <span className="item-stat-label">{t('inventory.labelHeal')}</span>
-                    <span className="item-stat-value">{Math.round((tech.healPercent ?? 0.25) * 100)}% HP</span>
-                  </div>
-                )}
-                {tech.type === 'Defend' && (
-                  <>
-                    <div className="item-stat-row">
-                      <span className="item-stat-label">{t('inventory.labelDefMult')}</span>
-                      <span className="item-stat-value">×{tech.defMult}</span>
-                    </div>
-                    <div className="item-stat-row">
-                      <span className="item-stat-label">{t('inventory.labelBuffHits', { defaultValue: 'Covers' })}</span>
-                      <span className="item-stat-value">{tech.buffAttacks} hits</span>
-                    </div>
-                  </>
-                )}
-                {tech.type === 'Dodge' && (
-                  <>
-                    <div className="item-stat-row">
-                      <span className="item-stat-label">{t('inventory.labelDodgeChance')}</span>
-                      <span className="item-stat-value">{Math.round((tech.dodgeChance ?? 0) * 100)}%</span>
-                    </div>
-                    <div className="item-stat-row">
-                      <span className="item-stat-label">{t('inventory.labelBuffHits', { defaultValue: 'Covers' })}</span>
-                      <span className="item-stat-value">{tech.buffAttacks} hits</span>
-                    </div>
-                  </>
-                )}
-                {tech.element && tech.element !== 'Normal' && (
-                  <div className="item-stat-row">
-                    <span className="item-stat-label">{t('inventory.labelElement')}</span>
-                    <span className="item-stat-value">{t(`elements.${tech.element}`, { defaultValue: tech.element })}</span>
-                  </div>
-                )}
               </div>
-              {tech.passives?.length > 0 && (
-                <div className="item-stat-block">
-                  {tech.passives.map((p, i) => {
-                    const passiveDesc = tGame(`techniques.${tech.id}.passives.${p.name}`, { defaultValue: p.description });
-                    return <p key={i} className="modal-desc"><strong>{p.name}:</strong> {passiveDesc}</p>;
-                  })}
-                </div>
-              )}
+              <ul className="tech-item-stats tech-item-stats-modal">
+                {lines.map((line, i) => <li key={i}>{line}</li>)}
+              </ul>
               {techFlavour && <p className="modal-desc tech-item-flavour">"{techFlavour}"</p>}
               {(() => {
                 const isEquipped = techniques.slots.includes(tech.id);

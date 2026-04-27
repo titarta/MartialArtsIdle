@@ -255,7 +255,6 @@
     "exposeExploitMult": "Exploit ×{{mult}} / {{hits}} player hits",
     "exposeDefPen": "{{pct}}% def pen / {{hits}} player hits",
     "exposeDmgReduction": "{{pct}}% incoming dmg reduction / {{hits}} enemy hits",
-    "requiresRealm": "Requires {{rank}} realm",
     "unequip": "Unequip"
   },
   "pillDrawer": {
@@ -340,14 +339,6 @@
     "Defend": "Defend",
     "Dodge": "Dodge",
     "Expose": "Expose"
-  },
-  "techniqueRanks": {
-    "Mortal": "Mortal",
-    "Earth": "Earth",
-    "Sky": "Sky",
-    "Saint": "Saint",
-    "Emperor": "Emperor",
-    "Heaven": "Heaven"
   },
   "rarity": {
     "Common": "Common",
