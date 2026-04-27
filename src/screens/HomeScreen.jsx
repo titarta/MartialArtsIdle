@@ -491,11 +491,11 @@ function QiParticles({ colors, rung = 0 }) {
   const PER_PATH_BY_RUNG = [6, 7, 9, 11, 14, 18];
   const perPath = PER_PATH_BY_RUNG[Math.min(rung, 5)];
 
-  // Base paths always active. Wide outer arcs unlock at rung 2;
-  // extreme wing arcs unlock at rung 4 for full sweep coverage.
+  // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
   const BASE_PATHS    = ['A', 'B', 'C', 'D', 'E', 'F'];
-  const WIDE_PATHS    = ['G', 'H'];   // rung 2+
-  const EXTREME_PATHS = ['I', 'J'];   // rung 4+
+  const WIDE_PATHS    = ['G', 'H'];
+  const EXTREME_PATHS = ['I', 'J'];
+  // qi-particle-paths-end
   const PATHS = [
     ...BASE_PATHS,
     ...(rung >= 2 ? WIDE_PATHS    : []),

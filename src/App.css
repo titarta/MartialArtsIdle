@@ -4390,31 +4390,18 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   animation: home-qi-flow 2.4s linear infinite;
 }
 
-/* 6 Bezier path variants — all converge on (100, 70). Coordinates assume
-   a 200×~70 container; particles span from x=10..190 (full crystal width)
-   and curve inward as they drop. Each path has visible curvature so the
-   stream reads as flowing energy, not straight lines. */
-.home-qi-particle-pathA { offset-path: path('M   45  -21 C   30   30,  133   34,  128   70'); }  /* far-left big sweep right */
-.home-qi-particle-pathB { offset-path: path('M   57   -3 C   40   30,  110   50,  100   70'); }  /* left, gentle arc */
-.home-qi-particle-pathC { offset-path: path('M   80    0 C  110   20,   70   50,  100   70'); }  /* centre-left S-curve */
-.home-qi-particle-pathD { offset-path: path('M  120    0 C   90   20,  130   50,  100   70'); }  /* centre-right S-curve (mirror) */
-.home-qi-particle-pathE { offset-path: path('M  143   -2 C  160   30,   90   50,   99   70'); }  /* right, gentle arc */
-.home-qi-particle-pathF { offset-path: path('M  152  -19 C  170   30,   60   30,   72   72'); }  /* far-right big sweep left */
-
-/* Wide outer arcs — unlocked at CF rung 2.
-   Depart from the LEFT/RIGHT SIDES of the crystal (not the bottom),
-   sweep far outward, and arrive at the LEFT/RIGHT EDGE of the cultivator's
-   aura circle — so the particles look like they are wrapping around the
-   player and feeding into the pulsing aura from the sides. */
-.home-qi-particle-pathG { offset-path: path('M   46  -42 C    5  -22, -100   62,   48   82'); }  /* crystal left side → player aura left */
-.home-qi-particle-pathH { offset-path: path('M  154  -43 C  195  -22,  300   62,  152   82'); }  /* crystal right side → player aura right (mirror) */
-
-/* Extreme wing arcs — unlocked at CF rung 4.
-   Depart from even further out on the crystal sides, swing much wider,
-   and arrive lower on the aura circle so at peak rung the cultivator is
-   fully enveloped — qi streaming in from every angle. */
-.home-qi-particle-pathI { offset-path: path('M   53  -63 C -181    3,  -69   84,   26  124'); }  /* crystal far-left → aura far-left */
-.home-qi-particle-pathJ { offset-path: path('M  147  -63 C  383    8,  257   94,  174  129'); }  /* crystal far-right → aura far-right (mirror) */
+/* qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)  */
+.home-qi-particle-pathA { offset-path: path('M   45  -21 C   30   30,  133   34,  128   70'); }
+.home-qi-particle-pathB { offset-path: path('M   57   -3 C   40   30,  110   50,  100   70'); }
+.home-qi-particle-pathC { offset-path: path('M   80    0 C  110   20,   70   50,  100   70'); }
+.home-qi-particle-pathD { offset-path: path('M  120    0 C   90   20,  130   50,  100   70'); }
+.home-qi-particle-pathE { offset-path: path('M  143   -2 C  160   30,   90   50,   99   70'); }
+.home-qi-particle-pathF { offset-path: path('M  152  -19 C  170   30,   60   30,   72   72'); }
+.home-qi-particle-pathG { offset-path: path('M   46  -42 C    5  -22, -100   62,   48   82'); }
+.home-qi-particle-pathH { offset-path: path('M  154  -43 C  195  -22,  300   62,  152   82'); }
+.home-qi-particle-pathI { offset-path: path('M   53  -63 C -181    3,  -69   84,   26  124'); }
+.home-qi-particle-pathJ { offset-path: path('M  147  -63 C  383    8,  257   94,  174  129'); }
+/* qi-particle-paths-end */
 
 @keyframes home-qi-flow {
   0%   { opacity: 0;    offset-distance: 0%;   --qi-mix: 0%; }

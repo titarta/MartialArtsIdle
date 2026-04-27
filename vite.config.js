@@ -12,10 +12,11 @@ function treeEditorPlugin() {
     name: 'tree-editor-save',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.method !== 'POST') return next();
+        // Only handle our own endpoints — pass everything else through.
+        if (!req.url.startsWith('/__')) return next();
 
         // ── Tree editor ──────────────────────────────────────────────────
-        if (req.url === '/__tree-save') {
+        if (req.method === 'POST' && req.url === '/__tree-save') {
           let body = '';
           req.on('data', c => { body += c; });
           req.on('end', () => {
@@ -36,29 +37,98 @@ function treeEditorPlugin() {
           return;
         }
 
-        // ── Particle path editor ─────────────────────────────────────────
-        // Receives { paths: { A:[x0,y0,cx1,cy1,cx2,cy2,x1,y1], … } } and
-        // regex-replaces every .home-qi-particle-pathX rule in App.css so
-        // Vite hot-reloads the animation immediately.
-        if (req.url === '/__particle-save') {
+        // ── Particle path editor — load current state ────────────────────
+        // Reads App.css and HomeScreen.jsx and returns the current paths +
+        // tier metadata so the editor initialises from the live file state.
+        if (req.method === 'GET' && req.url === '/__particle-load') {
+          try {
+            const cssPath = path.resolve('src/App.css');
+            const jsxPath = path.resolve('src/screens/HomeScreen.jsx');
+            const css = fs.readFileSync(cssPath, 'utf-8');
+            const jsx = fs.readFileSync(jsxPath, 'utf-8');
+
+            // Parse all .home-qi-particle-pathX rules
+            const pathRx = /\.home-qi-particle-path([A-Z]+)\s*\{\s*offset-path:\s*path\('M\s*([-\d.]+)\s+([-\d.]+)\s+C\s*([-\d.]+)\s+([-\d.]+),\s*([-\d.]+)\s+([-\d.]+),\s*([-\d.]+)\s+([-\d.]+)'\)/g;
+            const paths = {};
+            let m;
+            while ((m = pathRx.exec(css)) !== null) {
+              paths[m[1]] = [m[2],m[3],m[4],m[5],m[6],m[7],m[8],m[9]].map(Number);
+            }
+
+            // Parse tier arrays from HomeScreen.jsx
+            const arrRx = name => {
+              const r = new RegExp(`const ${name}\\s*=\\s*\\[([^\\]]+)\\]`);
+              const hit = jsx.match(r);
+              if (!hit) return [];
+              return hit[1].match(/'([A-Z]+)'/g)?.map(s => s.replace(/'/g,'')) ?? [];
+            };
+            const base    = arrRx('BASE_PATHS');
+            const wide    = arrRx('WIDE_PATHS');
+            const extreme = arrRx('EXTREME_PATHS');
+
+            const meta = {};
+            for (const id of Object.keys(paths)) {
+              meta[id] = { rung: extreme.includes(id) ? 4 : wide.includes(id) ? 2 : 0 };
+            }
+
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ ok: true, paths, meta, base, wide, extreme }));
+          } catch (err) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ ok: false, error: String(err) }));
+          }
+          return;
+        }
+
+        // ── Particle path editor — save ───────────────────────────────────
+        // Receives { paths, meta } and replaces the sentinel blocks in both
+        // App.css and HomeScreen.jsx so Vite hot-reloads both immediately.
+        if (req.method === 'POST' && req.url === '/__particle-save') {
           let body = '';
           req.on('data', c => { body += c; });
           req.on('end', () => {
             try {
-              const { paths } = JSON.parse(body);
+              const { paths, meta } = JSON.parse(body);
+              const pad = (n, w = 4) => String(Math.round(n)).padStart(w);
+
+              // ── App.css: rebuild the sentinel block ─────────────────────
+              const cssLines = Object.entries(paths).map(([name, p]) => {
+                const [x0,y0,cx1,cy1,cx2,cy2,x1,y1] = p;
+                return `.home-qi-particle-path${name} { offset-path: path('M ${pad(x0)} ${pad(y0)} C ${pad(cx1)} ${pad(cy1)}, ${pad(cx2)} ${pad(cy2)}, ${pad(x1)} ${pad(y1)}'); }`;
+              });
+              const cssBlock =
+                `/* qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)  */\n` +
+                cssLines.join('\n') + '\n' +
+                `/* qi-particle-paths-end */`;
+
               const cssPath = path.resolve('src/App.css');
-              let src = fs.readFileSync(cssPath, 'utf-8');
-              const pad = (n, w = 4) => String(n).padStart(w);
-              for (const [name, p] of Object.entries(paths)) {
-                const [x0, y0, cx1, cy1, cx2, cy2, x1, y1] = p;
-                const replacement =
-                  `.home-qi-particle-path${name} { offset-path: path('M ${pad(x0)} ${pad(y0)} C ${pad(cx1)} ${pad(cy1)}, ${pad(cx2)} ${pad(cy2)}, ${pad(x1)} ${pad(y1)}'); }`;
-                src = src.replace(
-                  new RegExp(`\\.home-qi-particle-path${name}\\s*\\{[^}]+\\}`),
-                  replacement
-                );
-              }
-              fs.writeFileSync(cssPath, src, 'utf-8');
+              let cssSrc = fs.readFileSync(cssPath, 'utf-8');
+              cssSrc = cssSrc.replace(
+                /\/\* qi-particle-paths-start[\s\S]*?qi-particle-paths-end \*\//,
+                cssBlock
+              );
+              fs.writeFileSync(cssPath, cssSrc, 'utf-8');
+
+              // ── HomeScreen.jsx: rebuild the sentinel block ──────────────
+              const base    = Object.keys(paths).filter(id => (meta[id]?.rung ?? 0) === 0);
+              const wide    = Object.keys(paths).filter(id => (meta[id]?.rung ?? 0) === 2);
+              const extreme = Object.keys(paths).filter(id => (meta[id]?.rung ?? 0) === 4);
+              const fmt     = arr => arr.map(s => `'${s}'`).join(', ');
+              const jsxBlock =
+                `  // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)\n` +
+                `  const BASE_PATHS    = [${fmt(base)}];\n` +
+                `  const WIDE_PATHS    = [${fmt(wide)}];\n` +
+                `  const EXTREME_PATHS = [${fmt(extreme)}];\n` +
+                `  // qi-particle-paths-end`;
+
+              const jsxPath = path.resolve('src/screens/HomeScreen.jsx');
+              let jsxSrc = fs.readFileSync(jsxPath, 'utf-8');
+              jsxSrc = jsxSrc.replace(
+                /\/\/ qi-particle-paths-start[\s\S]*?\/\/ qi-particle-paths-end/,
+                jsxBlock
+              );
+              fs.writeFileSync(jsxPath, jsxSrc, 'utf-8');
+
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ ok: true }));
             } catch (err) {
