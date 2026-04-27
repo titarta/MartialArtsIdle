@@ -268,8 +268,10 @@ export default function useCultivation() {
       const baseFocusMult = (focusMultRef.current ?? 300) / 100;
       const focusMultWithSpark = baseFocusMult * (1 + sparkFocusMultBonusRef.current);
 
-      // Detect focus release transition for Lingering Focus tracking.
-      if (prevBoostStateRef.current && !boostRef.current && sparkLingeringActiveRef.current) {
+      // Record every focus release time. Cheap, and lets Lingering Focus
+      // pick up a release that happened just before the spark was activated
+      // (e.g. when a layer-breakthrough modal interrupted the player's hold).
+      if (prevBoostStateRef.current && !boostRef.current) {
         focusReleaseTimeRef.current = now;
       }
       prevBoostStateRef.current = boostRef.current;
