@@ -4371,6 +4371,26 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   --qi-particle-end:   var(--cf-aura-core, rgba(120, 220, 255, 0.85));
 }
 
+/* Per-path wrapper — one per bezier branch. Sits on top of the qi-particles
+   container and covers the full 200px×h area. Its CSS opacity transition is
+   the sole mechanism for graceful drain: setting opacity to 0 lets already-
+   running particle animations finish their cycle invisibly rather than being
+   hard-removed (which would restart the animation and cause a positional jump). */
+.home-qi-path-group {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: opacity 2.4s linear;
+}
+/* Applied to path groups whose rung is being released — fade out over one
+   full animation period so every particle completes its arc before vanishing. */
+.home-qi-path-draining {
+  opacity: 0;
+}
+
 .home-qi-particle {
   position: absolute;
   top: 0;
@@ -11843,13 +11863,19 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
 
 .artefact-upgrade-cost-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px 10px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   font-size: 0.82rem;
+}
+
+.artefact-upgrade-cost-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .artefact-upgrade-cost-gem { flex-shrink: 0; }
@@ -11869,12 +11895,32 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   flex-shrink: 0;
 }
 .artefact-upgrade-cost-have.is-met   { color: #a3e635; }
-.artefact-upgrade-cost-have.is-short { color: #f87171; }
+.artefact-upgrade-cost-have.is-short { color: rgba(220, 230, 240, 0.7); }
 
-/* "+N" chunk shown when queued sacrifices contribute to this cost. */
-.artefact-upgrade-cost-queued {
-  color: #fbbf24;
-  font-weight: 700;
+/* Progress bar — `have` segment (green) + `queued` segment (gold) stacked
+   horizontally inside a dark track. Each segment's width is set inline as
+   a percentage of `need`, capped at 100% so overflow never extends past it. */
+.artefact-upgrade-cost-bar {
+  position: relative;
+  display: flex;
+  height: 6px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.artefact-upgrade-cost-bar-have {
+  background: linear-gradient(90deg, #65a30d, #a3e635);
+  box-shadow: 0 0 6px rgba(163, 230, 53, 0.4);
+  transition: width 0.18s ease;
+}
+
+.artefact-upgrade-cost-bar-queued {
+  background: linear-gradient(90deg, #d97706, #fbbf24);
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.45);
+  transition: width 0.18s ease;
 }
 
 /* ── Sacrifice feed ────────────────────────────────────────────────────── */

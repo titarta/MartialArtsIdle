@@ -477,14 +477,21 @@ function HomePCLeftPanel({ realmName, realmStage, qiRef, costRef, rateRef, gateR
  *  converges onto the cultivator below.
  *  Always 6 particles per path. Rung controls which PATH GROUPS are
  *  active (WIDE at rung 2, EXTREME at rung 4) — never particle count.
- *  Each particle colour-interpolates from the crystal tier to the aura. */
+ *
+ *  Lifecycle rules:
+ *  • NEW paths: positive delays (0, 0.4 … 2.0 s) so particles appear
+ *    one-by-one from the crystal and build to steady state over 2.4 s.
+ *  • DRAINING paths: the path-GROUP container fades to opacity 0 via CSS
+ *    transition. Individual particle animations are NEVER touched so there
+ *    is no animation restart and no positional jump on tap/untap/tap.
+ *  • RE-ACTIVATION during drain: removing the draining class reverses the
+ *    opacity transition smoothly; particles were cycling uninterrupted. */
 function QiParticles({ colors, rung = 0 }) {
   const start = colors?.glowA ?? colors?.particles?.[0] ?? 'rgba(167, 139, 250, 0.95)';
 
-  // Fixed 6 particles per path — rung never changes this.
   const PER_PATH = 6;
   const PERIOD   = 2.4;
-  const INTERVAL = PERIOD / PER_PATH; // 0.4 s spacing between slots
+  const INTERVAL = PERIOD / PER_PATH; // 0.4 s between each slot
 
   // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
   const BASE_PATHS    = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -492,10 +499,9 @@ function QiParticles({ colors, rung = 0 }) {
   const EXTREME_PATHS = ['I', 'J', 'K', 'L', 'Q', 'R'];
   // qi-particle-paths-end
 
-  // displayRung controls which PATH GROUPS are rendered.
-  // Goes UP immediately (new branches appear right away).
-  // Goes DOWN after one full cycle so draining particles finish their
-  // current loop naturally before the spans are unmounted.
+  // displayRung: goes UP immediately, holds on the way DOWN until the
+  // CSS fade-out completes, then snaps to the real rung so path groups
+  // unmount invisibly.
   const [displayRung, setDisplayRung] = useState(rung);
   const [isDraining,  setIsDraining]  = useState(false);
   const prevRungRef   = useRef(rung);
@@ -515,6 +521,7 @@ function QiParticles({ colors, rung = 0 }) {
     } else {
       setIsDraining(true);
       if (drainTimerRef.current) clearTimeout(drainTimerRef.current);
+      // Timer fires just after the CSS opacity transition finishes (PERIOD s).
       drainTimerRef.current = setTimeout(() => {
         setDisplayRung(latestRungRef.current);
         setIsDraining(false);
@@ -539,54 +546,48 @@ function QiParticles({ colors, rung = 0 }) {
     ...(displayRung >= 4 ? EXTREME_PATHS : []),
   ];
 
-  const slots = [];
-  for (let p = 0; p < PATHS.length; p++) {
-    const pathDraining = isDraining && !livePathSet.has(PATHS[p]);
-    for (let n = 0; n < PER_PATH; n++) {
-      // Negative delay = pre-seed each particle into its natural phase.
-      // When a new path group activates, its particles appear already
-      // distributed along the path — no burst-spawn wave from zero.
-      const phase = (p * 0.4 + n * INTERVAL) % PERIOD;
-      // Deterministic jitter — stable per (path, n) so re-renders and
-      // rung changes never reshuffle existing particles.
-      const jx = ((p * 17 + n * 11 + 5) % 19) - 9;   // ±9 px horizontal
-      const jy = ((p * 13 + n *  7 + 3) % 11) - 5;   // ±5 px vertical
-      // Colour head-start: most start at crystal colour, a few pre-warmed.
-      const MIX_STARTS = [0, 0, 0, 0, 40, 0, 65, 0, 0, 90];
-      const mixStart = MIX_STARTS[(p * 7 + n * 3) % MIX_STARTS.length];
-      slots.push({
-        path:  PATHS[p],
-        n,
-        delay:    phase.toFixed(2),   // negative applied below as `-${delay}s`
-        size:     3 + ((p + n) % 3), // 3–5 px, stable, not rung-dependent
-        jx, jy,
-        mixStart,
-        draining: pathDraining,
-      });
-    }
-  }
-
   return (
     <div
       className="home-qi-particles"
       aria-hidden="true"
       style={{ '--qi-particle-start': start }}
     >
-      {slots.map((s) => (
-        <span
-          key={`${s.path}-${s.n}`}
-          className={`home-qi-particle home-qi-particle-path${s.path}`}
-          style={{
-            animationDelay: `-${s.delay}s`,  // negative = pre-seeded into cycle
-            width:  `${s.size}px`,
-            height: `${s.size}px`,
-            transform: `translate(${s.jx}px, ${s.jy}px)`,
-            '--qi-mix-start': `${s.mixStart}%`,
-            // Draining: finish current cycle naturally (opacity→0), then stop.
-            ...(s.draining ? { animationIterationCount: '1' } : {}),
-          }}
-        />
-      ))}
+      {PATHS.map((pathName, p) => {
+        const draining = isDraining && !livePathSet.has(pathName);
+        return (
+          // Per-path container: opacity transition handles drain/reactivation
+          // without touching individual particle animations.
+          <div
+            key={pathName}
+            className={`home-qi-path-group${draining ? ' home-qi-path-draining' : ''}`}
+          >
+            {Array.from({ length: PER_PATH }, (_, n) => {
+              // Positive delay → particles appear one-by-one from the crystal
+              // on first activation, building to steady state over one PERIOD.
+              const delay = (n * INTERVAL).toFixed(2);
+              // Deterministic jitter — stable per (path, n) so re-renders and
+              // rung changes never reshuffle particles already in flight.
+              const jx = ((p * 17 + n * 11 + 5) % 19) - 9;
+              const jy = ((p * 13 + n *  7 + 3) % 11) - 5;
+              const MIX_STARTS = [0, 0, 0, 0, 40, 0, 65, 0, 0, 90];
+              const mixStart = MIX_STARTS[(p * 7 + n * 3) % MIX_STARTS.length];
+              return (
+                <span
+                  key={n}
+                  className={`home-qi-particle home-qi-particle-path${pathName}`}
+                  style={{
+                    animationDelay:    `${delay}s`,
+                    width:  `${3 + ((p + n) % 3)}px`,
+                    height: `${3 + ((p + n) % 3)}px`,
+                    transform:         `translate(${jx}px, ${jy}px)`,
+                    '--qi-mix-start':  `${mixStart}%`,
+                  }}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }
