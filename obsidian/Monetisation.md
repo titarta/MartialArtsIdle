@@ -24,12 +24,12 @@ No interstitial ads at launch. Earn player trust first, evaluate interstitials l
 
 ### Placement 2 — Ancient Scroll of Time (Home Screen, on return)
 
-| Property | Value |
-|---|---|
-| Trigger | Automatic popup when player returns after 5+ minutes away |
-| Reward | Collect offline Qi earnings ×2 instead of ×1 |
-| Cooldown | Once per session (dismissed after first collection) |
-| Visibility | Only shown if offline earnings exist; ad button hidden if no ad loaded |
+| Property         | Value                                                                   |
+| ---------------- | ----------------------------------------------------------------------- |
+| Trigger          | Automatic popup when player returns after 5+ minutes away               |
+| Reward           | Collect offline Qi earnings ×2 instead of ×1                            |
+| Cooldown         | Once per session (dismissed after first collection)                     |
+| Visibility       | Only shown if offline earnings exist; ad button hidden if no ad loaded  |
 | Thematic framing | "While you were away, the heavens continued to nourish your foundation" |
 
 ## Ad Network

@@ -18,13 +18,13 @@ The current system has three separate vocabularies (10 elements, 3 core stats, 3
 
 Each element is tied to one gameplay identity:
 
-| Element | Identity | Set Bonus Direction |
-|---|---|---|
-| Fire 火 | Offensive | Physical dmg, exploit, attack power |
-| Earth 土 | Defensive | HP, physical def, magical def |
-| Metal 金 | Technique | Magical dmg, cooldown, technique power |
-| Wood 木 | Cultivation | Cultivation speed, qi gain, realm bonuses |
-| Water 水 | Utility | Harvest speed, mining speed, activity buffs |
+| Element | Identity    | Set Bonus Direction                         |
+| ------- | ----------- | ------------------------------------------- |
+| Fire 火  | Offensive   | Physical dmg, exploit, attack power         |
+| Earth 土 | Defensive   | HP, physical def, magical def               |
+| Metal 金 | Technique   | Magical dmg, cooldown, technique power      |
+| Wood 木  | Cultivation | Cultivation speed, qi gain, realm bonuses   |
+| Water 水 | Utility     | Harvest speed, mining speed, activity buffs |
 
 Wuxing is thematically authentic to xianxia and mechanically simple. A player reads "Fire = Offensive" without documentation.
 
