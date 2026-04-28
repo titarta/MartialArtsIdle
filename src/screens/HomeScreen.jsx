@@ -486,36 +486,76 @@ function HomePCLeftPanel({ realmName, realmStage, qiRef, costRef, rateRef, gateR
 function QiParticles({ colors, rung = 0 }) {
   const start = colors?.glowA ?? colors?.particles?.[0] ?? 'rgba(167, 139, 250, 0.95)';
 
-  // Rung → particles-per-path. Starts at 6 (baseline 36 total), climbing
-  // to 18 at rung 5 so the stream visibly thickens as the hold deepens.
   const PER_PATH_BY_RUNG = [6, 7, 9, 11, 14, 18];
-  const perPath = PER_PATH_BY_RUNG[Math.min(rung, 5)];
+  const PERIOD   = 2.4;
+  const INTERVAL = PERIOD / 6; // 0.4 s — constant, regardless of perPath
 
-                          // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
+  // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
   const BASE_PATHS    = ['A', 'B', 'C', 'D', 'E', 'F'];
   const WIDE_PATHS    = ['G', 'H', 'M', 'N', 'O', 'P'];
   const EXTREME_PATHS = ['I', 'J', 'K', 'L', 'Q', 'R'];
   // qi-particle-paths-end
-  const PATHS = [
+
+  // displayRung drives which paths + how many particles are rendered.
+  // On rung-up it updates immediately (new paths appear at once).
+  // On rung-down it holds at the old value for one full animation period
+  // so in-flight particles on the extra branches can finish their current
+  // cycle before being unmounted, rather than blinking out mid-flow.
+  const [displayRung, setDisplayRung] = useState(rung);
+  const [isDraining,  setIsDraining]  = useState(false);
+  const prevRungRef    = useRef(rung);
+  const latestRungRef  = useRef(rung);
+  const drainTimerRef  = useRef(null);
+
+  useEffect(() => {
+    latestRungRef.current = rung;
+    const prev = prevRungRef.current;
+    prevRungRef.current = rung;
+    if (rung === prev) return;
+
+    if (rung > prev) {
+      // Rung went up — show new paths immediately, cancel any drain.
+      if (drainTimerRef.current) { clearTimeout(drainTimerRef.current); drainTimerRef.current = null; }
+      setDisplayRung(rung);
+      setIsDraining(false);
+    } else {
+      // Rung went down — keep extra paths visible but mark them as draining
+      // (animationIterationCount:1) so current particles finish then stop.
+      setIsDraining(true);
+      if (drainTimerRef.current) clearTimeout(drainTimerRef.current);
+      drainTimerRef.current = setTimeout(() => {
+        // Use the rung at fire-time in case it changed again while waiting.
+        setDisplayRung(latestRungRef.current);
+        setIsDraining(false);
+        drainTimerRef.current = null;
+      }, Math.round(PERIOD * 1000) + 300); // one full cycle + safety margin
+    }
+  }, [rung]);
+
+  useEffect(() => () => {
+    if (drainTimerRef.current) clearTimeout(drainTimerRef.current);
+  }, []);
+
+  // Paths that belong to the CURRENT rung (not draining).
+  const livePathSet = new Set([
     ...BASE_PATHS,
     ...(rung >= 2 ? WIDE_PATHS    : []),
     ...(rung >= 4 ? EXTREME_PATHS : []),
-  ];
+  ]);
 
-  // The delay interval is fixed to PERIOD / 6 (the base particle count) and
-  // never changes regardless of perPath. This means existing particle <span>s
-  // keep identical animationDelay values when the rung goes up — only the
-  // newly added particles (higher n indices) mount fresh. Combined with
-  // path+n as the React key, this prevents running animations from restarting
-  // when a new CF rung unlocks additional particles.
-  const PERIOD   = 2.4;
-  const INTERVAL = PERIOD / 6; // 0.4 s — constant, regardless of perPath
+  const perPath = PER_PATH_BY_RUNG[Math.min(displayRung, 5)];
+  const PATHS = [
+    ...BASE_PATHS,
+    ...(displayRung >= 2 ? WIDE_PATHS    : []),
+    ...(displayRung >= 4 ? EXTREME_PATHS : []),
+  ];
 
   const slots = [];
   for (let p = 0; p < PATHS.length; p++) {
+    // A path is draining if we're in drain mode AND it's not in the live set.
+    const pathDraining = isDraining && !livePathSet.has(PATHS[p]);
     for (let n = 0; n < perPath; n++) {
-      // Particle size grows one step at rung 3+ for extra visual weight.
-      const sizeBase = rung >= 3 ? 1 : 0;
+      const sizeBase = displayRung >= 3 ? 1 : 0;
       // Deterministic positional jitter — stable per (path, n) pair so
       // re-renders and rung changes never reshuffle existing particles.
       const jx = ((p * 17 + n * 11 + 5) % 19) - 9;   // ±9 px horizontal
@@ -528,14 +568,15 @@ function QiParticles({ colors, rung = 0 }) {
       slots.push({
         path:  PATHS[p],
         n,
-        delay: (p * 0.07 + n * INTERVAL).toFixed(2),  // stable per (path, n)
-        size:  3 + sizeBase + ((p + n) % 3),
-        jx,
-        jy,
+        delay:    (p * 0.07 + n * INTERVAL).toFixed(2),
+        size:     3 + sizeBase + ((p + n) % 3),
+        jx, jy,
         mixStart,
+        draining: pathDraining,
       });
     }
   }
+
   return (
     <div
       className="home-qi-particles"
@@ -552,6 +593,8 @@ function QiParticles({ colors, rung = 0 }) {
             height: `${s.size}px`,
             transform: `translate(${s.jx}px, ${s.jy}px)`,
             '--qi-mix-start': `${s.mixStart}%`,
+            // Draining: play once to end (opacity 0) then stop — no new spawns.
+            ...(s.draining ? { animationIterationCount: '1' } : {}),
           }}
         />
       ))}
