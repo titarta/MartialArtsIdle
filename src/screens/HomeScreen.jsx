@@ -491,10 +491,10 @@ function QiParticles({ colors, rung = 0 }) {
   const PER_PATH_BY_RUNG = [6, 7, 9, 11, 14, 18];
   const perPath = PER_PATH_BY_RUNG[Math.min(rung, 5)];
 
-            // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
+                          // qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)
   const BASE_PATHS    = ['A', 'B', 'C', 'D', 'E', 'F'];
-  const WIDE_PATHS    = ['G', 'H', 'M', 'N'];
-  const EXTREME_PATHS = ['I', 'J', 'K', 'L'];
+  const WIDE_PATHS    = ['G', 'H', 'M', 'N', 'O', 'P'];
+  const EXTREME_PATHS = ['I', 'J', 'K', 'L', 'Q', 'R'];
   // qi-particle-paths-end
   const PATHS = [
     ...BASE_PATHS,
@@ -520,6 +520,11 @@ function QiParticles({ colors, rung = 0 }) {
       // re-renders and rung changes never reshuffle existing particles.
       const jx = ((p * 17 + n * 11 + 5) % 19) - 9;   // ±9 px horizontal
       const jy = ((p * 13 + n *  7 + 3) % 11) - 5;   // ±5 px vertical
+      // Per-particle colour head-start: most begin at the crystal colour
+      // (0%), a handful spawn pre-warmed toward the aura end so some dots
+      // always look like they've "arrived" and blend into the glow.
+      const MIX_STARTS = [0, 0, 0, 0, 40, 0, 65, 0, 0, 90];
+      const mixStart = MIX_STARTS[(p * 7 + n * 3) % MIX_STARTS.length];
       slots.push({
         path:  PATHS[p],
         n,
@@ -527,6 +532,7 @@ function QiParticles({ colors, rung = 0 }) {
         size:  3 + sizeBase + ((p + n) % 3),
         jx,
         jy,
+        mixStart,
       });
     }
   }
@@ -545,6 +551,7 @@ function QiParticles({ colors, rung = 0 }) {
             width:  `${s.size}px`,
             height: `${s.size}px`,
             transform: `translate(${s.jx}px, ${s.jy}px)`,
+            '--qi-mix-start': `${s.mixStart}%`,
           }}
         />
       ))}
