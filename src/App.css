@@ -4375,20 +4375,27 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   position: absolute;
   top: 0;
   left: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 0;          /* square pixel blocks — no smooth circles */
+  image-rendering: pixelated;
   /* Gradient along path — start at crystal colour, transition to
      cultivator aura colour via @property --qi-mix interpolation. */
   background: color-mix(in oklab,
     var(--qi-particle-start),
     var(--qi-particle-end) var(--qi-mix));
-  box-shadow: 0 0 6px color-mix(in oklab,
+  /* Hard 1px spread, zero blur — crisp pixel art border glow.
+     Gives each square a one-pixel halo without any softness. */
+  box-shadow: 0 0 0 1px color-mix(in oklab,
     var(--qi-particle-start),
     var(--qi-particle-end) var(--qi-mix));
   opacity: 0;
   offset-rotate: 0deg;
-  animation: home-qi-flow 2.4s linear infinite;
+  /* Split animation: position hops discretely (pixel art choppiness ~7 fps),
+     while fade + colour stay smooth so the energy-flow feel is preserved. */
+  animation:
+    home-qi-flow-pos  2.4s steps(18, jump-none) infinite,
+    home-qi-flow-fade 2.4s linear               infinite;
 }
 
 /* qi-particle-paths-start — managed by QiParticleEditor (?particleEdit)  */
@@ -4412,11 +4419,20 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
 .home-qi-particle-pathR { offset-path: path('M  140  -77 C  300    1,  139   31,  149   80'); }
 /* qi-particle-paths-end */
 
-@keyframes home-qi-flow {
-  0%   { opacity: 0;    offset-distance: 0%;   --qi-mix: var(--qi-mix-start, 0%); }
+/* Position hops at discrete steps — gives each particle pixel-art
+   choppiness (~7 fps) while travelling along the bezier path. */
+@keyframes home-qi-flow-pos {
+  from { offset-distance: 0%;   }
+  to   { offset-distance: 100%; }
+}
+
+/* Opacity + colour fade on a smooth linear curve so the energy
+   feel (gentle appearance / disappearance) isn't lost. */
+@keyframes home-qi-flow-fade {
+  0%   { opacity: 0;    --qi-mix: var(--qi-mix-start, 0%); }
   10%  { opacity: 0.95; }
   88%  { opacity: 0.65; }
-  100% { opacity: 0;    offset-distance: 100%; --qi-mix: 100%; }
+  100% { opacity: 0;    --qi-mix: 100%; }
 }
 
 /* ── Character group — grounded at scene bottom ─────────────────────────── */
