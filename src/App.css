@@ -5632,7 +5632,9 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(200, 185, 220, 0.65);
+  /* Aligned with .coll-modal-section-title and .artefact-upgrade-section-title
+     so headers across the Collection screen + its modals read as one family. */
+  color: rgba(200, 210, 220, 0.6);
 }
 
 .col-section-badge {
@@ -12035,3 +12037,321 @@ body[class*="cf-rung-"] .realm-fill-boosted .realm-fill-inner {
   font-size: 0.92rem;
   letter-spacing: 0.04em;
 }
+
+/* ── Collection detail modals — shared aesthetic family ──────────────────
+   Mirrors .artefact-upgrade-panel so the artefact / technique / law / item
+   detail modals look like the same family as the upgrade modal. The .inv-grid
+   sizing for inventory tiles (78/96/116px per breakpoint) is intentionally
+   left untouched — those rules live in the .inventory-screen scope and are
+   tuned for the three supported resolutions. */
+
+.coll-modal-panel {
+  background: linear-gradient(180deg, rgba(20, 28, 40, 0.96), rgba(10, 14, 22, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  width: min(440px, 96vw);
+  max-height: var(--modal-max-h);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.55), 0 8px 32px rgba(0, 0, 0, 0.7);
+  animation: modal-pop 0.2s ease-out;
+}
+
+.coll-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.coll-modal-gem {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.coll-modal-titles { flex: 1; min-width: 0; }
+
+.coll-modal-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coll-modal-curlevel {
+  margin-left: 6px;
+  opacity: 0.85;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.coll-modal-subtitle {
+  font-size: 0.72rem;
+  color: rgba(200, 210, 220, 0.65);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.coll-modal-close {
+  position: static;
+  font-size: 1.05rem;
+  padding: 2px 8px;
+  line-height: 1;
+}
+
+.coll-modal-body {
+  padding: 12px 14px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.coll-modal-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(200, 210, 220, 0.55);
+  margin-bottom: 6px;
+}
+
+.coll-modal-desc {
+  font-size: 0.85rem;
+  color: rgba(200, 210, 220, 0.78);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.coll-modal-flavour {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: rgba(200, 210, 220, 0.55);
+  line-height: 1.5;
+  margin: 0;
+  padding: 6px 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.coll-modal-footer {
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Stat list — affixes / law modifiers / technique effects ─────────── */
+.coll-stat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.coll-stat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 10px;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
+.coll-stat-row:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.coll-stat-label {
+  flex: 1;
+  color: rgba(220, 230, 240, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coll-stat-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: rgba(220, 230, 240, 0.95);
+  flex-shrink: 0;
+}
+
+.coll-stat-bonus {
+  font-size: 0.66rem;
+  color: #fbbf24;
+  font-weight: 700;
+  margin-left: 4px;
+  letter-spacing: 0.04em;
+}
+
+.coll-stat-row.is-unique {
+  background: rgba(245, 200, 66, 0.06);
+  border: 1px solid rgba(245, 200, 66, 0.2);
+}
+
+/* ── Sprite slot — used by ItemModal for material icons ───────────────── */
+.coll-modal-sprite {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+.coll-modal-sprite-img {
+  width: 88px;
+  height: 88px;
+  image-rendering: auto;
+}
+
+/* Centered owned-quantity readout for ItemModal */
+.coll-modal-qty {
+  font-size: 0.85rem;
+  text-align: center;
+  color: rgba(200, 210, 220, 0.75);
+  font-variant-numeric: tabular-nums;
+}
+.coll-modal-qty strong {
+  color: var(--gold, #f5c842);
+  font-weight: 700;
+}
+
+/* ── Upgrade summary block — shown inside artefact detail modal ──────── */
+.coll-upgrade-block {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coll-upgrade-block-top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.coll-upgrade-block-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(200, 210, 220, 0.6);
+}
+
+.coll-upgrade-block-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.coll-upgrade-block-btn {
+  width: 100%;
+}
+
+.coll-upgrade-block-maxed {
+  font-size: 0.78rem;
+  color: rgba(200, 210, 220, 0.55);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Single-segment progress bar (no queue dimension here — that lives in
+   .artefact-upgrade-cost-bar). Same green palette so they read as one
+   family of progress indicators. */
+.coll-progress-bar {
+  position: relative;
+  display: flex;
+  height: 6px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.coll-progress-bar-fill {
+  background: linear-gradient(90deg, #65a30d, #a3e635);
+  box-shadow: 0 0 6px rgba(163, 230, 53, 0.4);
+  transition: width 0.18s ease;
+}
+
+/* ── Set membership card — shown inside artefact detail modal ───────── */
+.coll-set-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.coll-set-card + .coll-set-card { margin-top: 6px; }
+
+.coll-set-card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.coll-set-card-gem { font-size: 0.95rem; flex-shrink: 0; }
+
+.coll-set-card-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.coll-set-card-element {
+  font-size: 0.7rem;
+  color: rgba(200, 210, 220, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.coll-set-card-piece {
+  font-size: 0.74rem;
+  color: rgba(200, 210, 220, 0.7);
+  line-height: 1.4;
+  padding-left: 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.06);
+}
+
+.coll-set-card-piece-tag {
+  font-weight: 700;
+  color: rgba(220, 230, 240, 0.9);
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Technique modal: large icon slot in header ──────────────────────── */
+.coll-modal-tech-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--type-color, rgba(255, 255, 255, 0.15));
+  background: var(--type-bg, rgba(255, 255, 255, 0.04));
+}
+.coll-modal-tech-icon-glyph {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+

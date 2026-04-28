@@ -16,6 +16,7 @@ import { MAX_TECHNIQUES } from '../hooks/useTechniques';
 import { MAX_LAWS } from '../hooks/useCultivation';
 import ItemModal from '../components/ItemModal';
 import ArtefactTooltip, { useTooltipPos } from '../components/ArtefactTooltip';
+import ArtefactUpgradeModal from '../components/ArtefactUpgradeModal';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -96,6 +97,7 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
   const [activeTab,         setActiveTab]         = useState('materials');
   const [selectedItem,      setSelectedItem]       = useState(null);
   const [selectedArtefact,  setSelectedArtefact]   = useState(null);
+  const [upgradeArtefactUid, setUpgradeArtefactUid] = useState(null);
   const artTooltip = useTooltipPos();
   const [hoveredArtUid,     setHoveredArtUid]      = useState(null);
   const [selectedTechnique, setSelectedTechnique]  = useState(null);
@@ -308,142 +310,170 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
         const artDesc = tGame(`artefacts.${art.id}.desc`, { defaultValue: art.description });
         const level  = live.upgradeLevel ?? 0;
         const cap    = MAX_UPGRADE_BY_RARITY[rarity] ?? 0;
-        const cost   = level < cap ? (artefacts.getUpgradeCost?.(live.uid) ?? null) : null;
-        const canAfford = !!cost && cost.every(c => getQuantity(c.itemId) >= c.qty);
+        const upgradePct = cap > 0 ? Math.min(100, (level / cap) * 100) : 0;
+        const isEquipped = !!artefacts.equippedInSlot(live.uid);
+        const subtitle = [
+          t(`quality.${rarity}`, { defaultValue: q.label }),
+          t(`build.slots.${art.slot}`, { defaultValue: art.slot }),
+          live.element ? t(`elements.${live.element}`, { defaultValue: live.element }) : null,
+        ].filter(Boolean).join(' · ');
         return (
-          <div className="modal-overlay" onClick={() => setSelectedArtefact(null)}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setSelectedArtefact(null)}>x</button>
-              <h2 className="modal-title">
-                {artName}{level > 0 && <span style={{ color: q.color, marginLeft: 8 }}>+{level}</span>}
-              </h2>
-              <span className="modal-rarity" style={{ color: q.color }}>
-                {t(`quality.${rarity}`, { defaultValue: q.label })} · {t(`build.slots.${art.slot}`, { defaultValue: art.slot })}
-                {live.element && <> · {t(`elements.${live.element}`, { defaultValue: live.element })}</>}
-              </span>
-              <p className="modal-desc">{artDesc}</p>
-
-              {/* ── Rolled affixes (level-scaled) ───────────────────────── */}
-              {affixes.length > 0 && (
-                <div className="item-stat-block">
-                  {affixes.map((a, i) => {
-                    const entry    = affixBonuses[i];
-                    const count    = bonusCount(entry);
-                    const effValue = effectiveAffixValue(a, level, entry);
-                    const display  = { ...a, value: effValue };
-                    const line     = formatAffixValue(display);
-                    return (
-                      <div
-                        key={i}
-                        className="item-stat-row"
-                        style={a.unique ? { color: AFFIX_UNIQUE_COLOR } : undefined}
-                      >
-                        <span className="item-stat-label">
-                          {a.unique && '★ '}{line}
-                        </span>
-                        {count > 0 && (
-                          <span className="item-stat-value" style={{ opacity: 0.6, fontSize: 11 }}>
-                            +{count}
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* ── Set membership ──────────────────────────────────────── */}
-              {Array.isArray(live.setIds) && live.setIds.length > 0 && (
-                <div className="item-stat-block" style={{ marginTop: 8 }}>
-                  <div className="item-stat-row" style={{ opacity: 0.85 }}>
-                    <span className="item-stat-label">{t('collection.setLabel', { defaultValue: 'Set' })}</span>
+          <div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={artName}
+            onClick={() => setSelectedArtefact(null)}
+          >
+            <div className="coll-modal-panel" onClick={e => e.stopPropagation()}>
+              <header className="coll-modal-header">
+                <span className="coll-modal-gem" style={{ color: q.color }}>◆</span>
+                <div className="coll-modal-titles">
+                  <div className="coll-modal-title" style={{ color: q.color }}>
+                    {artName}
+                    {level > 0 && <span className="coll-modal-curlevel"> +{level}</span>}
                   </div>
-                  {live.setIds.map(sid => {
-                    const s = ARTEFACT_SETS[sid];
-                    if (!s) return null;
-                    return (
-                      <div key={sid} style={{ paddingLeft: 12, marginBottom: 4 }}>
-                        <div className="item-stat-row">
-                          <span className="item-stat-label">◆ {s.name}</span>
-                          <span className="item-stat-value" style={{ opacity: 0.7 }}>
-                            {t(`elements.${s.element}`, { defaultValue: s.element })}
-                          </span>
-                        </div>
-                        <div className="item-stat-row" style={{ paddingLeft: 12, opacity: 0.65, fontSize: 12 }}>
-                          <span className="item-stat-label">2p: {s.twoPiece?.description}</span>
-                        </div>
-                        <div className="item-stat-row" style={{ paddingLeft: 12, opacity: 0.65, fontSize: 12 }}>
-                          <span className="item-stat-label">4p: {s.fourPiece?.description}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  <div className="coll-modal-subtitle">{subtitle}</div>
                 </div>
-              )}
+                <button
+                  type="button"
+                  className="modal-close coll-modal-close"
+                  aria-label="Close"
+                  onClick={() => setSelectedArtefact(null)}
+                >
+                  ✕
+                </button>
+              </header>
 
-              {/* ── Upgrade panel ───────────────────────────────────────── */}
-              <div className="item-stat-block" style={{ marginTop: 12, padding: 10, border: `1px solid ${q.color}55`, borderRadius: 6 }}>
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('collection.upgradeLevel', { defaultValue: 'Upgrade' })}</span>
-                  <span className="item-stat-value" style={{ color: q.color }}>+{level} / +{cap}</span>
-                </div>
-                {level < cap && cost && (
-                  <>
-                    <div className="item-stat-row" style={{ marginTop: 6, opacity: 0.85 }}>
-                      <span className="item-stat-label">{t('collection.upgradeCost', { defaultValue: 'Next level cost' })}</span>
+              <div className="coll-modal-body">
+                {artDesc && <p className="coll-modal-desc">{artDesc}</p>}
+
+                {/* ── Rolled affixes (level-scaled) ─────────────────── */}
+                {affixes.length > 0 && (
+                  <section>
+                    <div className="coll-modal-section-title">Affixes</div>
+                    <ul className="coll-stat-list">
+                      {affixes.map((a, i) => {
+                        const entry    = affixBonuses[i];
+                        const count    = bonusCount(entry);
+                        const effValue = effectiveAffixValue(a, level, entry);
+                        const line     = formatAffixValue({ ...a, value: effValue });
+                        return (
+                          <li
+                            key={i}
+                            className={`coll-stat-row${a.unique ? ' is-unique' : ''}`}
+                            style={a.unique ? { color: AFFIX_UNIQUE_COLOR } : undefined}
+                          >
+                            <span className="coll-stat-label">
+                              {a.unique && '★ '}{line}
+                            </span>
+                            {count > 0 && (
+                              <span className="coll-stat-bonus">+{count}</span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+                )}
+
+                {/* ── Set membership ───────────────────────────────── */}
+                {Array.isArray(live.setIds) && live.setIds.length > 0 && (
+                  <section>
+                    <div className="coll-modal-section-title">
+                      {t('collection.setLabel', { defaultValue: 'Sets' })}
                     </div>
-                    {cost.map((c, i) => {
-                      const have = getQuantity(c.itemId);
-                      const short = have < c.qty;
-                      const matName = ALL_MATERIALS[c.itemId]?.name ?? c.itemId;
+                    {live.setIds.map(sid => {
+                      const s = ARTEFACT_SETS[sid];
+                      if (!s) return null;
+                      const setEl = t(`elements.${s.element}`, { defaultValue: s.element });
                       return (
-                        <div key={i} className="item-stat-row" style={{ paddingLeft: 12 }}>
-                          <span className="item-stat-label">{tGame(`materials.${c.itemId}.name`, { defaultValue: matName })}</span>
-                          <span className="item-stat-value" style={{ color: short ? '#f87171' : '#a3e635' }}>
-                            {have} / {c.qty}
-                          </span>
+                        <div key={sid} className="coll-set-card">
+                          <div className="coll-set-card-head">
+                            <span className="coll-set-card-gem" style={{ color: q.color }}>◆</span>
+                            <span className="coll-set-card-name">{s.name}</span>
+                            <span className="coll-set-card-element">{setEl}</span>
+                          </div>
+                          {s.twoPiece?.description && (
+                            <div className="coll-set-card-piece">
+                              <span className="coll-set-card-piece-tag">2p</span>
+                              {s.twoPiece.description}
+                            </div>
+                          )}
+                          {s.fourPiece?.description && (
+                            <div className="coll-set-card-piece">
+                              <span className="coll-set-card-piece-tag">4p</span>
+                              {s.fourPiece.description}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
-                    <button
-                      className="save-btn"
-                      style={{ marginTop: 8, width: '100%' }}
-                      disabled={!canAfford}
-                      title={canAfford ? '' : 'Not enough materials.'}
-                      onClick={() => {
-                        if (!canAfford) return;
-                        for (const c of cost) inventory.removeItem(c.itemId, c.qty);
-                        artefacts.levelUpArtefact(live.uid);
-                      }}
-                    >
-                      {t('collection.upgradeBtn', { defaultValue: 'Upgrade +1' })}
-                    </button>
-                  </>
+                  </section>
                 )}
-                {level >= cap && (
-                  <div className="item-stat-row" style={{ marginTop: 6, opacity: 0.7 }}>
-                    <span className="item-stat-label">{t('collection.upgradeMaxed', { defaultValue: 'Fully upgraded' })}</span>
+
+                {/* ── Upgrade summary — progress bar + open-modal trigger ── */}
+                <section>
+                  <div className="coll-modal-section-title">
+                    {t('collection.upgradeLevel', { defaultValue: 'Upgrade' })}
                   </div>
-                )}
+                  <div className="coll-upgrade-block">
+                    <div className="coll-upgrade-block-top">
+                      <span className="coll-upgrade-block-label">Level</span>
+                      <span className="coll-upgrade-block-value" style={{ color: q.color }}>
+                        +{level} / +{cap}
+                      </span>
+                    </div>
+                    <div className="coll-progress-bar" aria-hidden="true">
+                      <span
+                        className="coll-progress-bar-fill"
+                        style={{ width: `${upgradePct}%` }}
+                      />
+                    </div>
+                    {level < cap ? (
+                      <button
+                        type="button"
+                        className="save-btn coll-upgrade-block-btn"
+                        onClick={() => setUpgradeArtefactUid(live.uid)}
+                      >
+                        {t('collection.upgradeOpen', { defaultValue: 'Upgrade…' })}
+                      </button>
+                    ) : (
+                      <div className="coll-upgrade-block-maxed">
+                        {t('collection.upgradeMaxed', { defaultValue: 'Fully upgraded' })}
+                      </div>
+                    )}
+                  </div>
+                </section>
               </div>
 
-              {(() => {
-                const isEquipped = !!artefacts.equippedInSlot(live.uid);
-                return (
-                  <DismantleButton
-                    rarity={rarity}
-                    invested={(live.craftCount ?? 0) > 0 || level > 0}
-                    disabled={isEquipped}
-                    disabledReason={isEquipped ? 'Unequip this artefact first.' : undefined}
-                    onDismantle={() => {
-                      const r = artefacts.dismantleArtefact(live.uid);
-                      if (r) { dismantleTo(inventory, r); setSelectedArtefact(null); }
-                    }}
-                  />
-                );
-              })()}
+              <footer className="coll-modal-footer">
+                <DismantleButton
+                  rarity={rarity}
+                  invested={(live.craftCount ?? 0) > 0 || level > 0}
+                  disabled={isEquipped}
+                  disabledReason={isEquipped ? 'Unequip this artefact first.' : undefined}
+                  onDismantle={() => {
+                    const r = artefacts.dismantleArtefact(live.uid);
+                    if (r) { dismantleTo(inventory, r); setSelectedArtefact(null); }
+                  }}
+                />
+              </footer>
             </div>
           </div>
+        );
+      })()}
+
+      {upgradeArtefactUid && (() => {
+        const target = artefacts.owned.find(o => o.uid === upgradeArtefactUid);
+        if (!target) return null;
+        return (
+          <ArtefactUpgradeModal
+            artefact={target}
+            artefacts={artefacts}
+            inventory={inventory}
+            onClose={() => setUpgradeArtefactUid(null)}
+          />
         );
       })()}
 
@@ -454,43 +484,69 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
         const techName    = tGame(`techniques.${tech.id}.name`,    { defaultValue: tech.name });
         const techFlavour = tGame(`techniques.${tech.id}.flavour`, { defaultValue: tech.flavour });
         const lines = describeTechnique(tech);
+        const isEquipped = techniques.slots.includes(tech.id);
+        const subtitle = `${t(`quality.${tech.quality}`, { defaultValue: quality.label })} · ${t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}`;
         return (
-          <div className="modal-overlay" onClick={() => setSelectedTechnique(null)}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setSelectedTechnique(null)}>x</button>
-              <div className="tech-modal-heading">
+          <div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={techName}
+            onClick={() => setSelectedTechnique(null)}
+          >
+            <div className="coll-modal-panel" onClick={e => e.stopPropagation()}>
+              <header className="coll-modal-header">
                 <span
-                  className="tech-icon tech-icon-large"
-                  style={{ background: typeCol + '22', borderColor: typeCol }}
+                  className="coll-modal-tech-icon"
+                  style={{ '--type-color': typeCol, '--type-bg': `${typeCol}22` }}
                 >
-                  <span className="tech-icon-glyph">{tech.icon ?? '?'}</span>
+                  <span className="coll-modal-tech-icon-glyph">{tech.icon ?? '?'}</span>
                 </span>
-                <div>
-                  <h2 className="modal-title">{techName}</h2>
-                  <span className="modal-rarity" style={{ color: quality.color }}>
-                    {t(`quality.${tech.quality}`, { defaultValue: quality.label })} · {t(`techniqueTypes.${tech.type}`, { defaultValue: tech.type })}
-                  </span>
+                <div className="coll-modal-titles">
+                  <div className="coll-modal-title" style={{ color: quality.color }}>{techName}</div>
+                  <div className="coll-modal-subtitle">{subtitle}</div>
                 </div>
+                <button
+                  type="button"
+                  className="modal-close coll-modal-close"
+                  aria-label="Close"
+                  onClick={() => setSelectedTechnique(null)}
+                >
+                  ✕
+                </button>
+              </header>
+
+              <div className="coll-modal-body">
+                {lines.length > 0 && (
+                  <section>
+                    <div className="coll-modal-section-title">Effects</div>
+                    <ul className="coll-stat-list">
+                      {lines.map((line, i) => (
+                        <li key={i} className="coll-stat-row">
+                          <span className="coll-stat-label">{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {techFlavour && (
+                  <p className="coll-modal-flavour">&ldquo;{techFlavour}&rdquo;</p>
+                )}
               </div>
-              <ul className="tech-item-stats tech-item-stats-modal">
-                {lines.map((line, i) => <li key={i}>{line}</li>)}
-              </ul>
-              {techFlavour && <p className="modal-desc tech-item-flavour">"{techFlavour}"</p>}
-              {(() => {
-                const isEquipped = techniques.slots.includes(tech.id);
-                return (
-                  <DismantleButton
-                    rarity={tech.quality}
-                    invested={(tech.passives ?? []).some(p => p.tier && p.tier !== 'Iron')}
-                    disabled={isEquipped}
-                    disabledReason={isEquipped ? 'Unequip this technique first.' : undefined}
-                    onDismantle={() => {
-                      const r = techniques.dismantleTechnique(tech.id);
-                      if (r) { dismantleTo(inventory, r); setSelectedTechnique(null); }
-                    }}
-                  />
-                );
-              })()}
+
+              <footer className="coll-modal-footer">
+                <DismantleButton
+                  rarity={tech.quality}
+                  invested={(tech.passives ?? []).some(p => p.tier && p.tier !== 'Iron')}
+                  disabled={isEquipped}
+                  disabledReason={isEquipped ? 'Unequip this technique first.' : undefined}
+                  onDismantle={() => {
+                    const r = techniques.dismantleTechnique(tech.id);
+                    if (r) { dismantleTo(inventory, r); setSelectedTechnique(null); }
+                  }}
+                />
+              </footer>
             </div>
           </div>
         );
@@ -501,49 +557,86 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
         const rarity  = LAW_RARITY[law.rarity];
         const lawName    = tGame(`laws.${law.id}.name`,    { defaultValue: law.name });
         const lawFlavour = tGame(`laws.${law.id}.flavour`, { defaultValue: law.flavour });
+        const isActive = cultivation?.activeLaw?.id === law.id;
+        const subtitle = `${t(`quality.${law.rarity}`, { defaultValue: rarity.label })} · ${t(`elements.${law.element}`, { defaultValue: law.element })}`;
+        const uniqueEntries = law.uniques
+          ? Object.entries(law.uniques).filter(([, u]) => !!u)
+          : [];
         return (
-          <div className="modal-overlay" onClick={() => setSelectedLaw(null)}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <button className="modal-close" onClick={() => setSelectedLaw(null)}>x</button>
-              <h2 className="modal-title">{lawName}</h2>
-              <span className="modal-rarity" style={{ color: rarity.color }}>
-                {t(`quality.${law.rarity}`, { defaultValue: rarity.label })} · {t(`elements.${law.element}`, { defaultValue: law.element })}
-              </span>
-              <div className="item-stat-block">
-                <div className="item-stat-row">
-                  <span className="item-stat-label">{t('inventory.labelCultSpeed')}</span>
-                  <span className="item-stat-value">×{law.cultivationSpeedMult.toFixed(1)}</span>
+          <div
+            className="modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            aria-label={lawName}
+            onClick={() => setSelectedLaw(null)}
+          >
+            <div className="coll-modal-panel" onClick={e => e.stopPropagation()}>
+              <header className="coll-modal-header">
+                <span className="coll-modal-gem" style={{ color: rarity.color }}>◆</span>
+                <div className="coll-modal-titles">
+                  <div className="coll-modal-title" style={{ color: rarity.color }}>{lawName}</div>
+                  <div className="coll-modal-subtitle">{subtitle}</div>
                 </div>
+                <button
+                  type="button"
+                  className="modal-close coll-modal-close"
+                  aria-label="Close"
+                  onClick={() => setSelectedLaw(null)}
+                >
+                  ✕
+                </button>
+              </header>
+
+              <div className="coll-modal-body">
+                <section>
+                  <div className="coll-modal-section-title">Cultivation</div>
+                  <ul className="coll-stat-list">
+                    <li className="coll-stat-row">
+                      <span className="coll-stat-label">
+                        {t('inventory.labelCultSpeed', { defaultValue: 'Cultivation speed' })}
+                      </span>
+                      <span className="coll-stat-value" style={{ color: rarity.color }}>
+                        ×{law.cultivationSpeedMult.toFixed(1)}
+                      </span>
+                    </li>
+                  </ul>
+                </section>
+
+                {uniqueEntries.length > 0 && (
+                  <section>
+                    <div className="coll-modal-section-title">
+                      {t('inventory.labelUniqueModifiers', { defaultValue: 'Unique modifiers' })}
+                    </div>
+                    <ul className="coll-stat-list">
+                      {uniqueEntries.map(([tier, u]) => (
+                        <li key={tier} className="coll-stat-row">
+                          <span className="coll-stat-label">
+                            <strong style={{ color: LAW_RARITY[tier]?.color }}>{tier}:</strong>{' '}
+                            {formatUniqueDescription(u.id, u.value)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+
+                {lawFlavour && (
+                  <p className="coll-modal-flavour">&ldquo;{lawFlavour}&rdquo;</p>
+                )}
               </div>
-              {law.uniques && Object.keys(law.uniques).length > 0 && (
-                <div className="item-stat-block">
-                  <span className="item-stat-section">{t('inventory.labelUniqueModifiers')}</span>
-                  {Object.entries(law.uniques).map(([tier, u]) => (
-                    u && (
-                      <p key={tier} className="modal-desc">
-                        <strong style={{ color: LAW_RARITY[tier]?.color }}>{tier}:</strong>{' '}
-                        {formatUniqueDescription(u.id, u.value)}
-                      </p>
-                    )
-                  ))}
-                </div>
-              )}
-              <p className="modal-desc tech-item-flavour">"{lawFlavour}"</p>
-              {(() => {
-                const isActive = cultivation?.activeLaw?.id === law.id;
-                return (
-                  <DismantleButton
-                    rarity={law.rarity}
-                    invested={Object.keys(law.uniques ?? {}).length > 0}
-                    disabled={isActive}
-                    disabledReason={isActive ? 'This is your active law — pick another first.' : undefined}
-                    onDismantle={() => {
-                      const r = cultivation.dismantleLaw(law.id);
-                      if (r) { dismantleTo(inventory, r); setSelectedLaw(null); }
-                    }}
-                  />
-                );
-              })()}
+
+              <footer className="coll-modal-footer">
+                <DismantleButton
+                  rarity={law.rarity}
+                  invested={Object.keys(law.uniques ?? {}).length > 0}
+                  disabled={isActive}
+                  disabledReason={isActive ? 'This is your active law — pick another first.' : undefined}
+                  onDismantle={() => {
+                    const r = cultivation.dismantleLaw(law.id);
+                    if (r) { dismantleTo(inventory, r); setSelectedLaw(null); }
+                  }}
+                />
+              </footer>
             </div>
           </div>
         );
