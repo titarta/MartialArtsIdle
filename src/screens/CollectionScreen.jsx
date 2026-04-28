@@ -1,5 +1,5 @@
 // @refresh reset
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS, RARITY, mineralForRarity, ALL_MATERIALS } from '../data/materials';
 import { QUALITY, ARTEFACTS_BY_ID } from '../data/artefacts';
@@ -17,6 +17,20 @@ import { MAX_LAWS } from '../hooks/useCultivation';
 import ItemModal from '../components/ItemModal';
 import ArtefactTooltip, { useTooltipPos } from '../components/ArtefactTooltip';
 import ArtefactUpgradeModal from '../components/ArtefactUpgradeModal';
+
+const ARTEFACT_SLOT_ORDER = ['weapon', 'head', 'body', 'hands', 'waist', 'feet', 'neck', 'ring'];
+const RARITY_ORDER         = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
+const TECH_TYPE_ORDER      = ['Attack', 'Heal', 'Defend', 'Dodge', 'Expose'];
+const ELEMENT_ORDER        = ['fire', 'water', 'earth', 'wood', 'metal'];
+// Wuxing-aligned filter chip tints. Used only when a chip is active so the
+// strip stays neutral at rest. Subset chosen for readability against dark bg.
+const ELEMENT_FILTER_COLOR = {
+  fire:  '#f87171',
+  water: '#60a5fa',
+  earth: '#fbbf24',
+  wood:  '#a3e635',
+  metal: '#cbd5e1',
+};
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -104,6 +118,172 @@ function CollectionSection({ title, badge, count, max, isEmpty, emptyMessage, al
   );
 }
 
+/** FilterChips — single-select strip of filter pills.
+    Pass options as `[{ value, label, color? }, ...]`. The "All" chip clears
+    the selection (value passed is null). When a chip carries a `color`, the
+    chip's active state is tinted with that colour via --chip-accent. */
+function FilterChips({ label, options, value, onChange }) {
+  return (
+    <div className="coll-filter-row">
+      {label && <span className="coll-filter-label">{label}</span>}
+      <div className="coll-filter-chips">
+        <button
+          type="button"
+          className={`coll-filter-chip${value == null ? ' is-active' : ''}`}
+          onClick={() => onChange(null)}
+        >
+          All
+        </button>
+        {options.map(opt => (
+          <button
+            key={opt.value}
+            type="button"
+            className={`coll-filter-chip${value === opt.value ? ' is-active' : ''}`}
+            style={opt.color ? { '--chip-accent': opt.color } : undefined}
+            onClick={() => onChange(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** LoadoutSummary — pinned card at the top of the Gear tab showing the
+    8 artefact slots, 4 technique slots, and the active law. Tapping a
+    filled slot opens the corresponding detail modal; empty slots are
+    informational placeholders. */
+function LoadoutSummary({ artefacts, techniques, cultivation, onSelectArtefact, onSelectTechnique, onSelectLaw, t }) {
+  const filledArtefactCount = ARTEFACT_SLOT_ORDER
+    .filter(slot => artefacts.equipped[slot]).length;
+  const filledTechCount = (techniques.slots ?? [])
+    .filter(id => !!id).length;
+  const techMax = (techniques.slots ?? []).length || MAX_TECHNIQUES;
+  const activeLaw = cultivation?.activeLaw ?? null;
+  const activeLawRarity = activeLaw ? LAW_RARITY[activeLaw.rarity] : null;
+
+  return (
+    <div className="coll-loadout">
+      {/* ── Artefact slots ── */}
+      <div className="coll-loadout-section">
+        <div className="coll-loadout-section-head">
+          <span className="coll-loadout-section-title">
+            {t('collection.loadoutArtefacts', { defaultValue: 'Equipped artefacts' })}
+          </span>
+          <span className="coll-loadout-section-count">
+            {filledArtefactCount} / {ARTEFACT_SLOT_ORDER.length}
+          </span>
+        </div>
+        <div className="coll-loadout-grid">
+          {ARTEFACT_SLOT_ORDER.map(slot => {
+            const uid = artefacts.equipped[slot];
+            const inst = uid ? artefacts.owned.find(o => o.uid === uid) : null;
+            const cat  = inst ? ARTEFACTS_BY_ID[inst.catalogueId] : null;
+            const rarity = inst ? (inst.rarity ?? cat?.rarity ?? 'Iron') : null;
+            const q = rarity ? QUALITY[rarity] : null;
+            const level = inst?.upgradeLevel ?? 0;
+            return (
+              <button
+                key={slot}
+                type="button"
+                className={`coll-loadout-slot${inst ? '' : ' is-empty'}`}
+                style={inst && q ? { borderColor: `${q.color}77` } : undefined}
+                onClick={() => inst && onSelectArtefact(inst)}
+                title={inst
+                  ? `${formatArtefactName(inst) ?? cat?.name ?? slot}${level > 0 ? ` +${level}` : ''}`
+                  : t(`build.slots.${slot}`, { defaultValue: slot })}
+              >
+                {inst && q ? (
+                  <>
+                    <span className="coll-loadout-slot-gem" style={{ color: q.color }}>◆</span>
+                    {level > 0 && (
+                      <span className="coll-loadout-slot-level" style={{ color: q.color }}>+{level}</span>
+                    )}
+                    <span className="coll-loadout-slot-label">
+                      {t(`build.slots.${slot}`, { defaultValue: slot })}
+                    </span>
+                  </>
+                ) : (
+                  <span className="coll-loadout-slot-label">
+                    {t(`build.slots.${slot}`, { defaultValue: slot })}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Technique slots ── */}
+      <div className="coll-loadout-section">
+        <div className="coll-loadout-section-head">
+          <span className="coll-loadout-section-title">
+            {t('collection.loadoutTechniques', { defaultValue: 'Equipped techniques' })}
+          </span>
+          <span className="coll-loadout-section-count">
+            {filledTechCount} / {techMax}
+          </span>
+        </div>
+        <div className="coll-loadout-tech-row">
+          {(techniques.slots ?? []).map((techId, i) => {
+            const tech = techId ? techniques.ownedTechniques?.[techId] : null;
+            const typeCol = tech ? (TYPE_COLOR[tech.type] ?? '#fff') : null;
+            return (
+              <button
+                key={i}
+                type="button"
+                className={`coll-loadout-tech-slot${tech ? '' : ' is-empty'}`}
+                style={tech && typeCol ? { borderColor: `${typeCol}77` } : undefined}
+                onClick={() => tech && onSelectTechnique(tech)}
+                title={tech ? tech.name : 'Empty slot'}
+              >
+                {tech ? (
+                  <span className="coll-loadout-tech-glyph" style={{ color: typeCol }}>
+                    {tech.icon ?? '?'}
+                  </span>
+                ) : (
+                  <span className="coll-loadout-tech-glyph" style={{ opacity: 0.4 }}>·</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Active law ── */}
+      <div className="coll-loadout-section">
+        <div className="coll-loadout-section-head">
+          <span className="coll-loadout-section-title">
+            {t('collection.loadoutLaw', { defaultValue: 'Active law' })}
+          </span>
+        </div>
+        {activeLaw && activeLawRarity ? (
+          <button
+            type="button"
+            className="coll-loadout-law"
+            style={{ borderColor: `${activeLawRarity.color}77` }}
+            onClick={() => onSelectLaw(activeLaw)}
+            title={activeLaw.name}
+          >
+            <span className="coll-loadout-law-gem" style={{ color: activeLawRarity.color }}>◆</span>
+            <span className="coll-loadout-law-name" style={{ color: activeLawRarity.color }}>
+              {activeLaw.name}
+            </span>
+            <span className="coll-loadout-law-element">
+              {t(`elements.${activeLaw.element}`, { defaultValue: activeLaw.element })}
+            </span>
+          </button>
+        ) : (
+          <div className="coll-loadout-law is-empty">
+            <span>{t('collection.loadoutNoLaw', { defaultValue: 'No active law — pick one in Character.' })}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
   const { t }        = useTranslation('ui');
   const { t: tGame } = useTranslation('game');
@@ -118,9 +298,54 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
   const [selectedTechnique, setSelectedTechnique]  = useState(null);
   const [selectedLaw,       setSelectedLaw]        = useState(null);
 
+  // Filter state — null means "All". One state per dimension per grid.
+  const [artefactSlotFilter,   setArtefactSlotFilter]   = useState(null);
+  const [artefactRarityFilter, setArtefactRarityFilter] = useState(null);
+  const [techniqueTypeFilter,  setTechniqueTypeFilter]  = useState(null);
+  const [lawElementFilter,     setLawElementFilter]     = useState(null);
+
   const artCount  = artefacts?.owned.length ?? 0;
   const techCount = Object.keys(techniques?.ownedTechniques ?? {}).length;
   const lawCount  = cultivation?.ownedLaws.length ?? 0;
+
+  // Filtered + sorted derivations. Filters narrow the grid; the existing
+  // equipped/active-first sort is preserved on top.
+  const filteredArtefacts = useMemo(() => {
+    return [...artefacts.owned]
+      .filter(o => {
+        const cat = ARTEFACTS_BY_ID[o.catalogueId];
+        if (!cat) return false;
+        if (artefactSlotFilter && cat.slot !== artefactSlotFilter) return false;
+        const r = o.rarity ?? cat.rarity ?? 'Iron';
+        if (artefactRarityFilter && r !== artefactRarityFilter) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        const aEq = !!artefacts.equippedInSlot(a.uid);
+        const bEq = !!artefacts.equippedInSlot(b.uid);
+        return aEq === bEq ? 0 : aEq ? -1 : 1;
+      });
+  }, [artefacts, artefactSlotFilter, artefactRarityFilter]);
+
+  const filteredTechniques = useMemo(() => {
+    return Object.values(techniques.ownedTechniques)
+      .filter(tech => !techniqueTypeFilter || tech.type === techniqueTypeFilter)
+      .sort((a, b) => {
+        const aEq = techniques.slots.includes(a.id);
+        const bEq = techniques.slots.includes(b.id);
+        return aEq === bEq ? 0 : aEq ? -1 : 1;
+      });
+  }, [techniques, techniqueTypeFilter]);
+
+  const filteredLaws = useMemo(() => {
+    return [...cultivation.ownedLaws]
+      .filter(law => !lawElementFilter || law.element === lawElementFilter)
+      .sort((a, b) => {
+        const aActive = cultivation?.activeLaw?.id === a.id;
+        const bActive = cultivation?.activeLaw?.id === b.id;
+        return aActive === bActive ? 0 : aActive ? -1 : 1;
+      });
+  }, [cultivation, lawElementFilter]);
 
   return (
     <div className="screen inventory-screen">
@@ -182,6 +407,19 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
       {activeTab === 'gear' && (
         <div className="col-sections">
 
+          {/* Loadout summary — only meaningful once the player has gear */}
+          {(artCount > 0 || techCount > 0 || lawCount > 0) && (
+            <LoadoutSummary
+              artefacts={artefacts}
+              techniques={techniques}
+              cultivation={cultivation}
+              onSelectArtefact={setSelectedArtefact}
+              onSelectTechnique={setSelectedTechnique}
+              onSelectLaw={setSelectedLaw}
+              t={t}
+            />
+          )}
+
           {/* Artefacts */}
           <CollectionSection
             title={t('inventory.tabArtefacts')}
@@ -191,14 +429,31 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
             emptyMessage={t('collection.emptyArtefacts', { defaultValue: 'Defeat enemies in Worlds to find artefacts.' })}
             alwaysShow
           >
+            {artCount > 0 && (
+              <>
+                <FilterChips
+                  label="Slot"
+                  value={artefactSlotFilter}
+                  onChange={setArtefactSlotFilter}
+                  options={ARTEFACT_SLOT_ORDER.map(slot => ({
+                    value: slot,
+                    label: t(`build.slots.${slot}`, { defaultValue: slot }),
+                  }))}
+                />
+                <FilterChips
+                  label="Rarity"
+                  value={artefactRarityFilter}
+                  onChange={setArtefactRarityFilter}
+                  options={RARITY_ORDER.map(r => ({
+                    value: r,
+                    label: t(`quality.${r}`, { defaultValue: r }),
+                    color: QUALITY[r]?.color,
+                  }))}
+                />
+              </>
+            )}
             <div className="inv-grid">
-              {[...artefacts.owned]
-                .sort((a, b) => {
-                  const aEq = !!artefacts.equippedInSlot(a.uid);
-                  const bEq = !!artefacts.equippedInSlot(b.uid);
-                  return aEq === bEq ? 0 : aEq ? -1 : 1;
-                })
-                .map((instance) => {
+              {filteredArtefacts.map((instance) => {
                   const art = ARTEFACTS_BY_ID[instance.catalogueId];
                   if (!art) return null;
                   const rarity     = instance.rarity ?? art.rarity;
@@ -239,14 +494,20 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
             emptyMessage={t('collection.emptyTechniques', { defaultValue: 'Defeat enemies to drop techniques.' })}
             alwaysShow
           >
+            {techCount > 0 && (
+              <FilterChips
+                label="Type"
+                value={techniqueTypeFilter}
+                onChange={setTechniqueTypeFilter}
+                options={TECH_TYPE_ORDER.map(type => ({
+                  value: type,
+                  label: t(`techniqueTypes.${type}`, { defaultValue: type }),
+                  color: TYPE_COLOR[type],
+                }))}
+              />
+            )}
             <div className="inv-grid">
-              {Object.values(techniques.ownedTechniques)
-                .sort((a, b) => {
-                  const aEq = techniques.slots.includes(a.id);
-                  const bEq = techniques.slots.includes(b.id);
-                  return aEq === bEq ? 0 : aEq ? -1 : 1;
-                })
-                .map((tech) => {
+              {filteredTechniques.map((tech) => {
                   const color    = LAW_RARITY[tech.quality]?.color ?? '#9ca3af';
                   const typeCol  = TYPE_COLOR[tech.type] ?? '#fff';
                   const techName = tGame(`techniques.${tech.id}.name`, { defaultValue: tech.name });
@@ -282,14 +543,20 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
             emptyMessage={t('collection.emptyLaws', { defaultValue: 'Reach new realms or defeat elites to drop laws.' })}
             alwaysShow
           >
+            {lawCount > 0 && (
+              <FilterChips
+                label="Element"
+                value={lawElementFilter}
+                onChange={setLawElementFilter}
+                options={ELEMENT_ORDER.map(el => ({
+                  value: el,
+                  label: t(`elements.${el}`, { defaultValue: el }),
+                  color: ELEMENT_FILTER_COLOR[el],
+                }))}
+              />
+            )}
             <div className="inv-grid">
-              {[...cultivation.ownedLaws]
-                .sort((a, b) => {
-                  const aActive = cultivation?.activeLaw?.id === a.id;
-                  const bActive = cultivation?.activeLaw?.id === b.id;
-                  return aActive === bActive ? 0 : aActive ? -1 : 1;
-                })
-                .map((law) => {
+              {filteredLaws.map((law) => {
                   const rarity  = LAW_RARITY[law.rarity];
                   const lawName = tGame(`laws.${law.id}.name`, { defaultValue: law.name });
                   const isActive = cultivation?.activeLaw?.id === law.id;
