@@ -15,11 +15,11 @@
 - [[Items]] — Pills and Artefacts
 - [[Artefacts]] — Affix pools, weights, and generation rules
 - [[Materials]] — Herbs, Minerals, Cultivation resources
-- [[Worlds/World]] — Combat zones, region unlocks
-- [[Worlds/Gathering]] — Herb collection (idle, occasional enemies)
-- [[Worlds/Mining]] — Ore extraction for artefact crafting (idle, occasional enemies)
-- [[Combat]] — Map, zones, enemies
-- [[Enemies]] — Enemy types, stat profiles, technique pools, region assignments
+- [[backup/Worlds/World]] — Combat zones, region unlocks *(backup — next implementation)*
+- [[backup/Worlds/Gathering]] — Herb collection *(backup — next implementation)*
+- [[backup/Worlds/Mining]] — Ore extraction *(backup — next implementation)*
+- [[backup/Combat]] — Combat map, zones, enemies *(backup — next implementation)*
+- [[backup/Enemies]] — Enemy types, stat profiles, technique pools *(backup — next implementation)*
 - [[Reincarnation]] — Prestige system
 - [[Implementation Notes]] — Tech stack, file structure, what's built vs stubbed
 - [[Ideation]] — Brainstorms, open questions, scratchpad
