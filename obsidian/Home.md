@@ -43,21 +43,30 @@
 
 ## Implementation Status
 
-| Screen | Status |
-|---|---|
-| Home (Cultivation) | Implemented |
-| Inventory (Materials) | Implemented |
-| Inventory (Items) | Stub |
-| Stats | Partial (hardcoded placeholders) |
-| Training | Stub |
-| Combat | Stub |
-| Shop | Stub |
+_Updated 2026-05-20. See [[Implementation Notes]] for full technical details._
+
+| Layer | Feature | Status |
+|---|---|---|
+| **Layer 1** | Qi cultivation loop, realm progression, focused mode, offline Qi | ✅ Done |
+| **Layer 1** | QI Crystal, Qi Sparks, Selection events, Ad boost | ✅ Done |
+| **Layer 2** | Laws (element, rarity, cult speed, typeMults, uniques) | ✅ Done |
+| **Layer 2** | Secret Techniques, Technique slots + drops | ✅ Done |
+| **Layer 2** | Combat loop, Enemies, Cleared regions | ✅ Done |
+| **Layer 2** | Artefacts (drop, equip, roll, sets, upgrades), Unique modifiers | ✅ Done |
+| **Layer 2** | Primary stats (Essence/Soul/Body) | ⚠️ Defined; some not fully wired |
+| **Layer 3** | Gathering (idle herb collection) | ✅ Done |
+| **Layer 3** | Pills, Alchemy / Production screen, Crafting | ✅ Done |
+| **Layer 4** | Mining ore data + world region mapping | ⚠️ Data only |
+| **Layer 4** | Mining hook + UI screen | ❌ Not started |
+| **Layer 4** | Artefact refinement (ore → material) | ❌ Not started |
+| **Prestige** | Reincarnation (karma, eternal tree, wipe rules) | ✅ Done |
+| **Infra** | Daily bonus, IAP / Blood Lotus, Achievements, Audio, EN/PT i18n | ✅ Done |
+
+**Not started:** World bosses, domain drops, active play content (see [[Proposals/Early Game Hook — Engagement Pass]]), return-visit signal.
 
 **Tech stack:** React 19 + Vite + Capacitor 8 (mobile)  
-**Save system:** localStorage (`mai_save`, `mai_inventory`), auto-save every 2s  
+**Save system:** localStorage, auto-save every 2s, export/import via base64  
 **Game loop:** `requestAnimationFrame` with delta-time
-
-See [[Implementation Notes]] for full technical details.
 
 ---
 
