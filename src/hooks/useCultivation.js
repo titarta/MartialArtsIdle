@@ -858,9 +858,7 @@ export default function useCultivation() {
 
   const collectCrystalReservoir = useCallback(() => {
     if (sparkCrystalClickRateRef.current <= 0) return 0;
-    // 2026-05-22: tap cooldown removed (was 150ms / 6.67 taps/sec). Players
-    // can now spam-tap freely. The empty-tap floor doubles as a no-op floor
-    // when reservoir < floor (see below), so spam-taps still grant value.
+    // 2026-05-22: tap cooldown removed. Players can now spam-tap freely.
 
     const reservoir = crystalReservoirRef.current;
     // Floor at 1 qi so the floater never displays "+0" (fmt() floors values
@@ -869,10 +867,20 @@ export default function useCultivation() {
     // I-V upgrades multiply the floor (×2 per upgrade, ×32 at full set).
     const tapMult = upgradeCrystalTapMultRef.current || 1;
     const floor   = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
-    // Use max(reservoir, floor) — tapping a tiny reservoir (e.g. 0.1 qi)
-    // used to grant that tiny amount instead of the floor, punishing the
-    // player for mistiming the tap. Now the floor is a true minimum.
-    const granted = Math.max(reservoir, floor);
+
+    // Diminishing returns on partial reservoirs — quadratic falloff. At
+    // fill %, the player gets cap × fillPct² instead of the raw reservoir
+    // (which is cap × fillPct). Discourages mid-taps: 50% full → only 25%
+    // of cap; 75% full → 56% of cap; ≥90% full barely loses anything.
+    // Floor still applies via max(), so empty/near-empty taps grant the
+    // floor instead of the tiny diminished amount.
+    const rate = rateRef.current ?? 0;
+    const cap = sparkCrystalClickCapMinRef.current * 60 * rate;
+    const fillPct = cap > 0 ? Math.min(1, reservoir / cap) : 0;
+    const effectiveReservoir = cap * fillPct * fillPct;
+    const granted = Math.max(effectiveReservoir, floor);
+    // Always zero the reservoir on tap — the diminished portion is the
+    // cost of mistiming; refunding it would defeat the purpose.
     crystalReservoirRef.current = 0;
     try { localStorage.setItem('mai_crystal_reservoir', '0'); } catch {}
     qiRef.current += granted;
