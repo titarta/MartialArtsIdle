@@ -260,16 +260,28 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
         </>
       )}
 
-      {detailProducer && (
-        <ProducerDetailModal
-          producer={detailProducer}
-          owned={producers.getOwned(detailProducer.id)}
-          unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
-          upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
-          totalGameRate={rate}
-          onClose={() => setDetailProducer(null)}
-        />
-      )}
+      {detailProducer && (() => {
+        // Base production rate = sum of every producer's raw output (incl.
+        // per-producer Refined Tap-style upgrade doubles) + the BASE_RATE
+        // baseline (1 qi/s). Percent multipliers (crystal, sparks, focus,
+        // pills, etc.) apply equally to every producer, so the most
+        // meaningful "contribution" reading is share of base — not share
+        // of live total qi/s. That way the percentages across all
+        // producers actually add up to ~100%.
+        const perProducerMult = (pid) => upgrades?.getProducerMult?.(pid) ?? 1;
+        const producerSum     = producers.getRate(perProducerMult);
+        const baseProductionRate = 1 /* BASE_RATE */ + producerSum;
+        return (
+          <ProducerDetailModal
+            producer={detailProducer}
+            owned={producers.getOwned(detailProducer.id)}
+            unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
+            upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
+            baseGameRate={baseProductionRate}
+            onClose={() => setDetailProducer(null)}
+          />
+        );
+      })()}
 
       {tab === 'upgrades' && (
         visibleUpgrades.length === 0 ? (
