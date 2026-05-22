@@ -4,9 +4,8 @@ import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
 import BloodLotusShopModal from './components/BloodLotusShopModal';
 import { addBloodLotus as addBloodLotusBalance } from './systems/bloodLotus';
-import AchievementsModal from './components/AchievementsModal';
 import PillDrawer from './components/PillDrawer';
-import JourneyModal from './components/JourneyModal';
+import ProgressHubModal from './components/ProgressHubModal';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
@@ -110,7 +109,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['settings', 'shop', 'journey', 'achievements', 'pills', 'daily']);
+    const ours = new Set(['settings', 'shop', 'progress', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -148,6 +147,21 @@ function AppInner() {
     const id = setInterval(() => { recordStat('timePlayed', 1); }, 1000);
     return () => clearInterval(id);
   }, []);
+
+  // Progress hub migration card — fires once per existing player who
+  // remembers the old separate Journey + Achievements TopBar buttons.
+  // Gated on having seen WELCOME so brand-new players don't get an
+  // explanation for buttons they never had. Marks itself seen on fire so
+  // it never repeats. Runs once on mount; if the EventQueueContext is
+  // backed up, fireTutorialOnce enqueues normally and waits its turn.
+  useEffect(() => {
+    if (
+      hasSeenTutorial(TUTORIAL_IDS.WELCOME) &&
+      !hasSeenTutorial(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION)
+    ) {
+      fireTutorialOnce(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION, enqueue);
+    }
+  }, [enqueue]);
 
   // Save schema version stamp. Set on first launch (and after any future
   // migrations). On v1 (Cookie-Clicker pivot) no data migration is needed —
@@ -1380,8 +1394,7 @@ function AppInner() {
       <TopBar
         bloodLotusBalance={selections.bloodLotusBalance}
         onOpenShop={() => openModal('shop')}
-        onOpenJourney={() => openModal('journey')}
-        onOpenAchievements={() => openModal('achievements', () => setHasNewAch(false))}
+        onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
         onOpenSettings={() => openModal('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
@@ -1478,8 +1491,14 @@ function AppInner() {
       )}
       {activeModal === 'settings'     && <SettingsScreen onClose={() => setActiveModal(null)} />}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
-      {activeModal === 'journey'      && <JourneyModal   realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'progress'     && (
+        <ProgressHubModal
+          realmIndex={cultivation.realmIndex}
+          achievements={achievements}
+          stats={stats}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
       {activeModal === 'pills'        && pills        && <PillDrawer open pills={pills} onClose={() => setActiveModal(null)} />}
       {(activeModal === 'daily' || currentEvent?.kind === 'daily-bonus') && (
         <DailyBonusModal

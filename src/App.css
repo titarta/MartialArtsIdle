@@ -12457,9 +12457,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* ─── Achievements HUD button ───────────────────────────────────────────────── */
-
-.home-hud-trophy {
+/* ─── Progress hub HUD button ───────────────────────────────────────────
+   Replaces the old separate .home-hud-trophy / .home-hud-journey buttons
+   with a single Progress hub entry point. Old class is kept in the
+   selector list as a no-cost compatibility hook in case any debug
+   wiring still references it. */
+.home-hud-trophy,
+.home-hud-progress {
   width: 34px;
   height: 34px;
   background: rgba(var(--ui-purple-strong-rgb), 0.08);
@@ -12473,7 +12477,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   transition: background 0.15s;
   position: relative;
 }
-.home-hud-trophy:hover {
+.home-hud-trophy:hover,
+.home-hud-progress:hover {
   background: rgba(var(--ui-purple-strong-rgb), 0.18);
 }
 .home-hud-trophy-badge {
@@ -12547,6 +12552,99 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   height: 100%;
   background: linear-gradient(90deg, var(--ui-purple-light), var(--ui-purple-light));
   transition: width 0.4s ease;
+}
+
+/* ─── Progress Hub Modal ────────────────────────────────────────────────
+   Replaces the previous Journey + Achievements + (new) Stats trio of
+   TopBar buttons with a single 📊 hub that holds three tabs at the top.
+   Mirrors .achievements-modal chrome so the panel looks like part of the
+   same family. position:relative comes from the safety-net rule
+   (.modal-overlay > *) added earlier — modal-close anchors correctly. */
+.progress-hub-modal {
+  background: rgb(var(--ui-bg-panel-rgb));
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.25);
+  border-radius: 16px;
+  width: min(96vw, 460px);
+  max-height: var(--modal-max-h);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-pop 0.2s ease-out;
+}
+
+/* Top-level tab row. Sits flush with the modal top (no border-bottom of
+   its own — the active-chip background + the body content provide the
+   visual separation). Reserved right-padding clears the absolute close
+   button so the rightmost tab never tucks under it. */
+.progress-hub-tabs {
+  padding: 14px 52px 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Scrollable container for the active tab body. Each Body component
+   renders its own header/list/etc. inside this. */
+.progress-hub-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Stats tab — Run / Lifetime toggle. Reuses .stg-segment shape from
+   SettingsScreen so the control reads as a familiar segmented chooser. */
+.stats-mode-segment {
+  margin: 14px 16px 12px;
+  align-self: stretch;
+}
+
+.stats-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px 18px;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Mirrors .stg-section-label — small, uppercase, letterspaced, muted. */
+.stats-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+}
+
+.stats-footer {
+  margin-top: 4px;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.5);
+  font-style: italic;
+}
+
+/* Compact meta row that sits above the progress bar in the Journey /
+   Achievements bodies. The hub tab chip already carries the panel name,
+   so the body skips a full title row and surfaces just the count. */
+.journey-progress-meta,
+.ach-progress-meta {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 16px 6px;
+  flex-shrink: 0;
+}
+
+/* Inner sub-category chips inside the Achievements tab body — visually
+   quieter than the parent .progress-hub-tabs so the two rows don't
+   compete. Smaller padding, no border-bottom of its own. */
+.ach-subtabs {
+  padding: 8px 14px 8px;
+  border-bottom: none;
 }
 
 .ach-tabs {
@@ -12659,12 +12757,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* ─── Journey HUD button ─────────────────────────────────────────────────────── */
 
-.home-hud-journey,
+/* Crystal HUD button — sibling of the Progress hub button. The old
+   .home-hud-journey class is gone (consolidated into .home-hud-progress
+   via the Progress hub refactor) so this rule now stands alone. */
 .home-hud-crystal {
   width: 34px;
   height: 34px;
-  background: rgba(100, 180, 255, 0.07);
-  border: 1px solid rgba(100, 180, 255, 0.2);
+  background: rgba(150, 100, 255, 0.07);
+  border: 1px solid rgba(150, 100, 255, 0.22);
   border-radius: 9px;
   display: flex;
   align-items: center;
@@ -12673,15 +12773,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   cursor: pointer;
   transition: background 0.15s;
 }
-.home-hud-crystal {
-  background: rgba(150, 100, 255, 0.07);
-  border-color: rgba(150, 100, 255, 0.22);
-}
 .home-hud-crystal:hover {
   background: rgba(150, 100, 255, 0.18);
-}
-.home-hud-journey:hover {
-  background: rgba(100, 180, 255, 0.15);
 }
 .top-bar-btn--active {
   background: rgba(255, 255, 255, 0.18) !important;

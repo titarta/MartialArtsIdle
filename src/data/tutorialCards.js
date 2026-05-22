@@ -41,6 +41,13 @@ export const TUTORIAL_IDS = Object.freeze({
   FIRST_MAJOR_GATE:   'first_major_gate',
   FIRST_SPARK_OFFER:  'first_spark_offer',
   FIRST_SAINT:        'first_saint',
+  // One-shot card for players upgrading from the build that had separate
+  // Journey + Achievements TopBar icons. Fires once per existing save
+  // shortly after the upgrade so they know where their two old buttons
+  // moved (now both live behind the 📊 Progress hub icon alongside the
+  // new Stats panel). New players never see it (they don't have prior
+  // muscle memory to undo).
+  PROGRESS_HUB_MIGRATION: 'progress_hub_migration',
 });
 
 /**
@@ -101,6 +108,12 @@ const CARDS = {
     kicker:  'Reincarnation',
     title:   'A Second Life',
     body:    'You can reincarnate from here on. The progress of this life turns into karma, and karma buys permanent boosts on the Eternal Tree. Every life makes the next one start a little stronger. Keep grinding this run if it\'s still moving, or rebirth whenever the climb starts to drag.',
+    ctaText: 'Got it',
+  },
+  [TUTORIAL_IDS.PROGRESS_HUB_MIGRATION]: {
+    kicker:  'Layout update',
+    title:   'Journey, Achievements & Stats',
+    body:    'Your Cultivation Journey and Achievements panels now live behind the 📊 Progress button at the top of the screen, alongside the new Statistics panel. One button, three tabs. Tap it whenever you want to see how far you\'ve climbed.',
     ctaText: 'Got it',
   },
 };

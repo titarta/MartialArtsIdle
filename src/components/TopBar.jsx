@@ -25,8 +25,7 @@ function QiLiveText({ qiRef }) {
 export default function TopBar({
   bloodLotusBalance,
   onOpenShop,
-  onOpenJourney,
-  onOpenAchievements,
+  onOpenProgress,
   onOpenSettings,
   hasNewAchievement,
   activeModal,
@@ -93,19 +92,17 @@ export default function TopBar({
           🪨
         </button>
       )}
+      {/* Progress hub — replaces the previous Journey + Achievements
+          buttons with a single 📊 entry point that opens a 3-tab modal
+          (Journey / Achievements / Stats). Achievement badge dot now
+          surfaces on this button so the unread signal survives the
+          consolidation. */}
       <button
-        className={`home-hud-journey${activeModal === 'journey' ? ' top-bar-btn--active' : ''}`}
-        onClick={onOpenJourney}
-        aria-label="Cultivation Journey"
+        className={`home-hud-progress${activeModal === 'progress' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenProgress}
+        aria-label="Progress"
       >
-        🗺️
-      </button>
-      <button
-        className={`home-hud-trophy${activeModal === 'achievements' ? ' top-bar-btn--active' : ''}`}
-        onClick={onOpenAchievements}
-        aria-label="Achievements"
-      >
-        🏆
+        📊
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
       <button

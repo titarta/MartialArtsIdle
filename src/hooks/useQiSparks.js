@@ -495,7 +495,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     // the Dial-8 global counter that wasn't persisted across reloads and
     // couldn't be surfaced on the roadmap. Same rough rate (~half of
     // sub-stage BTs + every major) but now stable: the same stage always
-    // does or doesn't give a spark, so JourneyModal can mark them.
+    // does or doesn't give a spark, so JourneyBody can mark them.
     const shouldDrawSpark = stageHasSpark(curr);
     if (!shouldDrawSpark) return;  // skip the draw entirely this BT
 
