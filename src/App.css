@@ -13298,6 +13298,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .js-past .js-label { color: rgba(255, 255, 255, 0.35); }
 
+/* Global stage number — tiny dim secondary label after the stage name.
+   Tabular-nums keeps the # column visually aligned across rows. */
+.js-stage-num {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.30);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.js-current .js-stage-num { color: rgba(180, 160, 240, 0.65); }
+.js-past    .js-stage-num { color: rgba(255, 255, 255, 0.20); }
+
 .js-cost {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.25);

@@ -115,7 +115,13 @@ function JourneyModal({ realmIndex, onClose }) {
                             {isCurrent && <span className="js-dot-pulse" />}
                           </div>
                           <div className="js-body">
-                            <span className="js-label">{entry.stage}</span>
+                            <span className="js-label">
+                              {entry.stage}
+                              {/* Global stage number across the whole journey
+                                  (#1 through #N). Dim secondary label so it
+                                  doesn't compete with the stage name. */}
+                              <span className="js-stage-num">#{entry.index + 1}</span>
+                            </span>
                             {/* Cost group: a fixed-width spark slot sits to
                                 the LEFT of the qi value so every row's qi
                                 number lines up in the same column whether
