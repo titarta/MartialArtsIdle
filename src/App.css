@@ -2074,9 +2074,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .asb-popover-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(230, 240, 238, 0.9);
   flex: 1;
@@ -2084,10 +2084,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .asb-popover-count {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(230, 240, 238, 0.65);
+  font-variant-numeric: tabular-nums;
+  color: rgba(230, 240, 238, 0.7);
   background: rgba(167, 139, 250, 0.12);
   border: 1px solid rgba(167, 139, 250, 0.3);
-  padding: 2px 9px;
+  padding: 2px 10px;
   border-radius: 999px;
 }
 .asb-popover-header .modal-close {
@@ -2186,27 +2187,35 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .asb-popover-link {
   margin-top: 4px;
-  padding: 9px 12px;
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  background: rgba(167, 139, 250, 0.12);
-  color: rgba(220, 215, 255, 0.95);
+  padding: 10px 14px;
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  background: linear-gradient(140deg, rgba(14, 12, 28, 0.95), rgba(8, 6, 18, 0.95));
+  color: rgba(230, 220, 255, 1);
   font-family: inherit;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 800;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  border-radius: 8px;
+  border-radius: 999px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background 0.15s, border-color 0.15s;
+  box-shadow:
+    0 4px 16px rgba(80, 50, 150, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
 }
-.asb-popover-link:hover {
-  background: rgba(167, 139, 250, 0.22);
-  border-color: rgba(167, 139, 250, 0.6);
+.asb-popover-link:hover,
+.asb-popover-link:focus-visible {
+  filter: brightness(1.14);
+  box-shadow:
+    0 6px 22px rgba(167, 139, 250, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  outline: none;
 }
+.asb-popover-link:active { transform: translateY(1px) scale(0.98); }
 .asb-popover-link .asb-arrow {
   transition: transform 0.15s;
 }
@@ -2683,9 +2692,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 5px;
 }
 .st-detail-section-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(167, 139, 250, 0.85);
 }
@@ -2875,9 +2884,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 5px;
 }
 .qs-detail-section-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(167, 139, 250, 0.85);
 }
@@ -3578,16 +3587,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .art-pick-section-label {
-  font-size: 0.65rem;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: rgba(var(--ui-muted-rgb), 0.55);
-  margin: 4px 0 2px;
+  margin: 6px 0 4px;
 }
 
 .art-pick-empty {
-  font-size: 0.8rem;
-  color: rgba(var(--ui-muted-rgb), 0.60);
+  font-size: 13px;
+  color: rgba(var(--ui-muted-rgb), 0.7);
   font-style: italic;
   padding: 8px 0;
 }
@@ -3601,7 +3611,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .art-pick-card {
   background: rgba(var(--ui-bg-panel-rgb), 0.85);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
   display: flex;
@@ -3627,24 +3637,27 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .art-pick-name {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .art-pick-quality {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   flex-shrink: 0;
 }
 
 .art-pick-bonus {
-  font-size: 0.72rem;
-  color: rgba(var(--ui-muted-rgb), 0.60);
+  font-size: 12px;
+  color: rgba(var(--ui-muted-rgb), 0.65);
+  font-variant-numeric: tabular-nums;
 }
 
 .art-pick-tag {
-  font-size: 0.65rem;
-  color: rgba(var(--ui-muted-rgb), 0.60);
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.6);
   font-style: italic;
 }
 
@@ -4510,18 +4523,32 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .daily-modal {
   position: relative;
-  background: linear-gradient(160deg, rgba(12, 6, 30, 0.99), rgba(25, 8, 48, 0.99));
+  background: linear-gradient(160deg, rgba(28, 10, 22, 0.98), rgba(14, 6, 14, 0.98));
   border: 1px solid rgba(220, 60, 80, 0.4);
   border-radius: 16px;
-  padding: 20px 18px 18px;
+  padding: 20px 20px 18px;
   width: 100%; max-width: 340px;
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 30px rgba(180, 40, 60, 0.15);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7), 0 0 28px rgba(180, 40, 60, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 .daily-modal-header { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.daily-modal-icon { width: 36px; height: 36px; object-fit: contain; }
-.daily-modal-title { font-size: 1.15rem; font-weight: 700; color: rgba(255, 210, 220, 1); }
-.daily-modal-sub   { font-size: 0.72rem; color: rgba(var(--ui-label-rgb), 0.6); text-align: center; }
+.daily-modal-icon {
+  width: 48px; height: 48px; object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+.daily-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 210, 220, 1);
+  text-align: center;
+}
+.daily-modal-sub {
+  font-size: 12px;
+  color: rgba(var(--ui-label-rgb), 0.65);
+  text-align: center;
+  line-height: 1.5;
+}
 
 /* 7-day grid */
 .daily-modal-grid {
@@ -4547,26 +4574,43 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   opacity: 0.55;
 }
 .daily-day-future { opacity: 0.4; }
-.daily-day-label  { font-size: 0.6rem; font-weight: 600; color: rgba(var(--ui-label-rgb), 0.7); text-transform: uppercase; letter-spacing: 0.04em; }
+.daily-day-label  { font-size: 10px; font-weight: 700; color: rgba(var(--ui-label-rgb), 0.7); text-transform: uppercase; letter-spacing: 0.06em; }
 .daily-day-icon   { width: 20px; height: 20px; object-fit: contain; }
-.daily-day-reward { font-size: 0.72rem; font-weight: 700; color: rgba(255, 200, 210, 0.9); }
+.daily-day-reward { font-size: 12px; font-weight: 700; color: rgba(255, 200, 210, 0.9); font-variant-numeric: tabular-nums; }
 .daily-day-check  {
   position: absolute; top: 3px; right: 5px;
-  font-size: 0.6rem; color: rgba(100, 220, 140, 0.9); font-weight: 700;
+  font-size: 10px; color: rgba(100, 220, 140, 0.9); font-weight: 700;
 }
 
-/* Collect button */
+/* Collect button — pill CTA in the tutorial-cta family, tinted red/lotus */
 .daily-modal-collect {
-  display: flex; align-items: center; gap: 8px;
-  background: linear-gradient(135deg, rgba(200, 40, 60, 0.9), rgba(140, 10, 35, 0.95));
-  border: 1px solid rgba(255, 80, 100, 0.5);
-  border-radius: 10px;
-  color: rgba(255, 210, 220, 1); font-size: 0.9rem; font-weight: 700;
-  padding: 10px 24px; cursor: pointer; width: 100%;
+  display: flex; align-items: center; gap: 10px;
+  background: linear-gradient(140deg, rgba(60, 14, 24, 0.95), rgba(34, 8, 14, 0.95));
+  border: 1px solid rgba(255, 80, 100, 0.55);
+  border-radius: 999px;
+  color: #ffe8ec;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  cursor: pointer;
+  width: 100%;
   justify-content: center;
-  transition: opacity 0.15s, transform 0.1s;
+  box-shadow:
+    0 4px 18px rgba(200, 40, 60, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
 }
-.daily-modal-collect:hover { opacity: 0.88; transform: scale(1.02); }
+.daily-modal-collect:hover,
+.daily-modal-collect:focus-visible {
+  filter: brightness(1.12);
+  box-shadow:
+    0 6px 24px rgba(255, 100, 120, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+.daily-modal-collect:active { transform: translateY(1px) scale(0.98); }
 .daily-modal-btn-icon { width: 18px; height: 18px; object-fit: contain; }
 
 /* Success state */
@@ -6129,16 +6173,18 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .cfm-title {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--ui-purple-wash);
   letter-spacing: 0.03em;
 }
 
 .cfm-subtitle {
   font-size: 11px;
-  color: rgba(var(--ui-purple-soft-rgb), 0.7);
-  font-weight: 600;
-  margin-top: 1px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-purple-soft-rgb), 0.55);
+  margin-top: 3px;
 }
 
 .cfm-bonus-block {
@@ -6240,10 +6286,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .cfm-section-label {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(var(--ui-purple-soft-rgb), 0.5);
-  letter-spacing: 0.08em;
+  color: rgba(var(--ui-purple-soft-rgb), 0.55);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 0 16px 6px;
+  padding: 0 16px 8px;
   flex-shrink: 0;
 }
 
@@ -8362,9 +8408,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .modal-content {
   background: rgba(var(--ui-bg-panel-rgb), 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  padding: 28px 28px;
+  padding: 22px 22px;
   max-width: 400px;
   width: 100%;
   text-align: center;
@@ -8423,21 +8469,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .modal-title {
-  font-size: 1.2rem;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin: 0 32px 4px 0;  /* reserve room for absolute .modal-close */
 }
 
 .modal-rarity {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   display: block;
   margin-bottom: 12px;
 }
 
 .modal-desc {
-  font-size: 0.85rem;
-  color: rgba(var(--ui-label-rgb), 0.65);
+  font-size: 13px;
+  color: rgba(var(--ui-label-rgb), 0.7);
   line-height: 1.5;
   margin-bottom: 16px;
 }
@@ -8546,12 +8596,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   max-height: 85vh;
   display: flex;
   flex-direction: column;
+  padding: 16px 18px 18px;
 }
 
 .tech-modal-title {
-  font-size: 1.1rem;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  margin: 0 32px 4px 0;  /* reserve room for absolute .modal-close */
 }
 
 .tech-type-filters {
@@ -9146,7 +9199,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* Empty state — "no laws yet" message */
 .law-picker-empty {
   padding: 24px 16px;
-  font-size: 0.85rem;
+  font-size: 13px;
   color: var(--ui-text-caption);
   text-align: center;
 }
@@ -9156,13 +9209,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   max-height: var(--modal-max-h);
   overflow-y: auto;
   text-align: left;
+  padding: 16px 18px 18px;
 }
 
 .law-picker-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .law-picker-card {
@@ -9204,7 +9258,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .law-picker-card-name {
-  font-size: 0.85rem;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -9213,16 +9267,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 0.7rem;
-  color: rgba(var(--ui-label-rgb), 0.55);
+  font-size: 12px;
+  color: rgba(var(--ui-label-rgb), 0.6);
+  font-variant-numeric: tabular-nums;
 }
 
 .law-picker-card-active-tag {
-  font-size: 0.6rem;
+  font-size: 11px;
   color: rgba(var(--accent-rgb), 0.9);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
 /* ─────────────────────────────────────────────
@@ -11943,7 +11998,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--ui-purple-light);
   letter-spacing: 0.03em;
@@ -11951,12 +12006,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .pill-modal-count-badge {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(var(--ui-purple-strong-rgb), 0.7);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--ui-purple-strong-rgb), 0.75);
   background: rgba(var(--ui-purple-strong-rgb), 0.09);
   border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.2);
-  border-radius: 20px;
+  border-radius: 999px;
   padding: 2px 10px;
   flex-shrink: 0;
 }
@@ -12075,13 +12131,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: baseline;
 }
 .pill-drawer-card-name {
-  font-size: 0.82rem;
+  font-size: 13px;
   font-weight: 700;
 }
 .pill-drawer-card-qty {
-  font-size: 0.72rem;
-  color: rgba(var(--ui-purple-strong-rgb), 0.65);
+  font-size: 12px;
+  color: rgba(var(--ui-purple-strong-rgb), 0.7);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .pill-drawer-card-effects {
   display: flex;
@@ -12089,9 +12146,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 2px;
 }
 .pill-drawer-card-effect {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.3;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
 }
 .pill-drawer-card-use {
   margin-top: 4px;
@@ -12266,37 +12323,40 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: center;
   gap: 10px;
   /* right padding reserved for the absolute .modal-close button */
-  padding-right: 44px;
+  padding: 0 44px 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 2px;
 }
 
 .blood-lotus-shop-icon {
   width: 32px;
   height: 32px;
-  filter: brightness(1.3);
+  filter: brightness(1.3) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
 }
 
 .blood-lotus-shop-title {
   flex: 1;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
+  letter-spacing: 0.03em;
   color: var(--ui-purple-light);
 }
 
 .blood-lotus-shop-success {
-  background: rgba(80, 200, 120, 0.15);
+  background: rgba(80, 200, 120, 0.12);
   border: 1px solid rgba(80, 200, 120, 0.4);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 10px 12px;
   font-size: 13px;
   color: #6ee7a0;
   text-align: center;
 }
 
 .blood-lotus-shop-error {
-  background: rgba(220, 80, 80, 0.15);
+  background: rgba(220, 80, 80, 0.12);
   border: 1px solid rgba(220, 80, 80, 0.4);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 10px 12px;
   font-size: 13px;
   color: #f08080;
   text-align: center;
@@ -12351,12 +12411,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .blood-lotus-shop-item-amount {
   font-size: 20px;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
   color: var(--ui-purple-light);
 }
 
 .blood-lotus-shop-item-label {
   font-size: 11px;
-  color: rgba(var(--ui-label-rgb), 0.65);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
   text-align: center;
 }
 
@@ -12364,20 +12428,28 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   margin-top: 4px;
   font-size: 14px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: #fff;
 }
 
 .blood-lotus-shop-restore {
   background: none;
   border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
-  color: #888;
-  font-size: 12px;
-  padding: 8px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 9px 16px;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.blood-lotus-shop-restore:hover { color: #ccc; }
+.blood-lotus-shop-restore:hover {
+  color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+}
 
 /* ─── Achievements HUD button ───────────────────────────────────────────────── */
 
@@ -12438,7 +12510,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--ui-purple-light);
   letter-spacing: 0.03em;
@@ -12448,12 +12520,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .ach-modal-trophy { font-size: 18px; }
 
 .ach-modal-progress {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(var(--ui-purple-strong-rgb), 0.7);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(var(--ui-purple-strong-rgb), 0.75);
   background: rgba(var(--ui-purple-strong-rgb), 0.09);
   border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.2);
-  border-radius: 20px;
+  border-radius: 999px;
   padding: 2px 10px;
   flex-shrink: 0;
 }
@@ -12552,15 +12625,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-size: 13px;
   font-weight: 700;
   color: #eee;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .ach-card-unlocked .ach-card-title { color: var(--ui-purple-light); }
 
 .ach-card-desc {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.45;
 }
 
 .ach-card-check {
@@ -12648,7 +12721,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-size: 15px;
   font-weight: 700;
   color: var(--ui-purple-light);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   flex: 1;
 }
 
@@ -12668,7 +12741,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .stg-section-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -13116,11 +13189,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .journey-progress-label {
   font-size: 11px;
-  font-weight: 600;
-  color: rgba(180, 220, 255, 0.6);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(180, 220, 255, 0.65);
   background: rgba(100, 180, 255, 0.09);
-  border: 1px solid rgba(100, 180, 255, 0.18);
-  border-radius: 20px;
+  border: 1px solid rgba(100, 180, 255, 0.2);
+  border-radius: 999px;
   padding: 2px 10px;
   flex-shrink: 0;
 }
@@ -13390,15 +13464,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .reinc-header-text { flex: 1; min-width: 0; }
 .reinc-title {
-  font-size: 1.05rem;
+  font-size: 15px;
   font-weight: 700;
+  letter-spacing: 0.03em;
   color: rgba(210, 180, 255, 1);
   line-height: 1.2;
 }
 .reinc-subtitle {
-  font-size: 0.78rem;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: rgba(var(--ui-label-rgb), 0.55);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 .reinc-karma-badge {
   display: flex;
@@ -13465,10 +13543,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   border: 1px solid rgba(60, 200, 100, 0.22);
 }
 .reinc-info-card-title {
-  font-size: 0.78rem;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   margin-bottom: 8px;
   color: rgba(var(--ui-hover-rgb), 0.65);
 }
@@ -13483,10 +13561,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 4px;
 }
 .reinc-info-list li {
-  font-size: 0.8rem;
-  color: rgba(210, 195, 240, 0.75);
+  font-size: 13px;
+  color: rgba(210, 195, 240, 0.8);
   padding-left: 12px;
   position: relative;
+  line-height: 1.5;
 }
 .reinc-info-list li::before {
   content: '•';
@@ -13513,14 +13592,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 2px;
 }
 .reinc-stat-label {
-  font-size: 0.73rem;
-  color: rgba(200, 180, 240, 0.5);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(200, 180, 240, 0.55);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 .reinc-stat-value {
-  font-size: 0.92rem;
+  font-size: 14px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: rgba(220, 195, 255, 0.95);
 }
 .reinc-actions {
@@ -13546,18 +13627,31 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .reinc-btn-secondary:hover { background: rgba(var(--ui-purple-strong-rgb), 0.2); border-color: rgba(var(--ui-purple-strong-rgb), 0.55); }
 .reinc-btn-danger {
   flex: 1;
-  background: linear-gradient(135deg, rgba(180, 30, 60, 0.85), rgba(120, 10, 40, 0.9));
-  border: 1px solid rgba(220, 60, 80, 0.4);
-  border-radius: 8px;
-  color: rgba(255, 200, 210, 0.95);
+  background: linear-gradient(140deg, rgba(60, 14, 30, 0.95), rgba(34, 8, 18, 0.95));
+  border: 1px solid rgba(220, 60, 80, 0.55);
+  border-radius: 999px;
+  color: #ffe8ec;
   cursor: pointer;
-  font-size: 0.88rem;
-  font-weight: 700;
-  padding: 10px 14px;
-  transition: opacity 0.15s, transform 0.12s;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 11px 18px;
+  box-shadow:
+    0 4px 18px rgba(120, 20, 40, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.reinc-btn-danger:hover { opacity: 0.88; transform: scale(1.02); }
+.reinc-btn-danger:hover,
+.reinc-btn-danger:focus-visible {
+  filter: brightness(1.12);
+  box-shadow:
+    0 6px 24px rgba(220, 60, 80, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+.reinc-btn-danger:active { transform: translateY(1px) scale(0.98); }
 .reinc-locked-hint {
   font-size: 0.8rem;
   color: rgba(180, 160, 200, 0.5);
@@ -14629,8 +14723,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: center;
   gap: 10px;
   /* right padding reserved for the absolute .modal-close button */
-  padding: 12px 52px 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 14px 52px 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
 
@@ -14643,9 +14737,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .artefact-upgrade-titles { flex: 1; min-width: 0; }
 
 .artefact-upgrade-title {
-  font-size: 0.98rem;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -14659,15 +14753,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .artefact-upgrade-subtitle {
-  font-size: 0.72rem;
-  color: rgba(var(--ui-label-rgb), 0.60);
-  letter-spacing: 0.04em;
-  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  margin-top: 3px;
 }
 
 /* Body — scrolls when content overflows the panel max-height */
 .artefact-upgrade-body {
-  padding: 12px 14px;
+  padding: 14px 16px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
@@ -14785,11 +14881,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* ── Section title shared by Cost + Feed ───────────────────────────────── */
 .artefact-upgrade-section-title {
-  font-size: 0.7rem;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: rgba(var(--ui-muted-rgb), 0.55);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .artefact-upgrade-section-hint {
@@ -14973,15 +15070,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */
 .artefact-upgrade-footer {
-  padding: 10px 14px 12px;
+  padding: 12px 16px 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
 .artefact-upgrade-confirm-btn {
   width: 100%;
-  font-size: 0.92rem;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  border-radius: 999px;
 }
 
 /* ── Collection detail modals — shared aesthetic family ──────────────────
@@ -15009,8 +15110,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: center;
   gap: 10px;
   /* right padding reserved for the absolute .modal-close button */
-  padding: 12px 52px 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 14px 52px 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
 
@@ -15023,9 +15124,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .coll-modal-titles { flex: 1; min-width: 0; }
 
 .coll-modal-title {
-  font-size: 0.98rem;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -15039,14 +15140,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .coll-modal-subtitle {
-  font-size: 0.72rem;
-  color: rgba(var(--ui-label-rgb), 0.60);
-  letter-spacing: 0.04em;
-  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  margin-top: 3px;
 }
 
 .coll-modal-body {
-  padding: 12px 14px;
+  padding: 14px 16px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   display: flex;
@@ -15055,32 +15158,33 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .coll-modal-section-title {
-  font-size: 0.7rem;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: rgba(var(--ui-muted-rgb), 0.55);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .coll-modal-desc {
-  font-size: 0.85rem;
-  color: rgba(var(--ui-hover-rgb), 0.75);
+  font-size: 13px;
+  color: rgba(var(--ui-hover-rgb), 0.85);
   line-height: 1.5;
   margin: 0;
 }
 
 .coll-modal-flavour {
-  font-size: 0.78rem;
+  font-size: 13px;
   font-style: italic;
-  color: rgba(var(--ui-muted-rgb), 0.55);
-  line-height: 1.5;
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  line-height: 1.55;
   margin: 0;
   padding: 6px 10px;
   border-left: 2px solid rgba(255, 255, 255, 0.08);
 }
 
 .coll-modal-footer {
-  padding: 10px 14px 12px;
+  padding: 12px 16px 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   display: flex;
@@ -15088,32 +15192,34 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 8px;
 }
 
-/* ── Stat list — affixes / law modifiers / technique effects ─────────── */
+/* ── Stat list — affixes / law modifiers / technique effects ───────────
+   Mirrors the .pdm-stats group: rounded container with 1px-gap dark rows
+   that read as dividers, label muted, value bright + tabular-nums. */
 .coll-stat-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .coll-stat-row {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  padding: 5px 10px;
-  font-size: 0.82rem;
-  border-radius: 6px;
-}
-
-.coll-stat-row:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.04);
+  padding: 8px 12px;
+  background: rgba(20, 16, 12, 0.5);
+  font-size: 13px;
 }
 
 .coll-stat-label {
   flex: 1;
-  color: rgba(var(--ui-hover-rgb), 0.80);
+  color: rgba(var(--ui-hover-rgb), 0.65);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -15122,7 +15228,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .coll-stat-value {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  color: rgba(var(--ui-hover-rgb), 0.90);
+  color: rgba(var(--ui-hover-rgb), 0.95);
   flex-shrink: 0;
 }
 
@@ -15135,26 +15241,31 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .coll-stat-row.is-unique {
-  background: rgba(var(--ui-purple-strong-rgb), 0.06);
-  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.2);
+  background: rgba(var(--ui-purple-strong-rgb), 0.12);
+}
+.coll-stat-row.is-unique .coll-stat-value {
+  color: var(--ui-purple-light);
 }
 
-/* ── Sprite slot — used by ItemModal for material icons ───────────────── */
+/* ── Sprite slot — used by ItemModal for material icons. Mirrors the
+   .pdm-hero pattern: centered 96px sprite with drop-shadow for depth. */
 .coll-modal-sprite {
   display: flex;
   justify-content: center;
-  padding: 4px 0 8px;
+  padding: 6px 0 4px;
 }
 .coll-modal-sprite-img {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
 }
 
 /* Centered owned-quantity readout for ItemModal */
 .coll-modal-qty {
-  font-size: 0.85rem;
+  font-size: 13px;
   text-align: center;
-  color: rgba(var(--ui-label-rgb), 0.65);
+  color: rgba(var(--ui-label-rgb), 0.7);
   font-variant-numeric: tabular-nums;
 }
 .coll-modal-qty strong {
