@@ -6205,16 +6205,22 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   white-space: nowrap;
 }
 
+/* Stateful "next tap will level up" chip. Shape matches the canonical
+   header-pill family (.journey-progress-label, .pill-modal-count-badge,
+   .ach-modal-progress) — 999px radius, 11px tabular-nums — but keeps a
+   heavier accent background + soft glow so it reads as a callout, not
+   just an info badge. */
 .cfm-bonus-next {
   display: flex;
   align-items: center;
   gap: 5px;
   background: rgba(var(--ui-purple-rgb), 0.18);
   border: 1px solid rgba(var(--ui-purple-rgb), 0.4);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 12px;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--ui-purple-light);
   white-space: nowrap;
   box-shadow: 0 0 8px rgba(var(--ui-purple-rgb), 0.25);
@@ -15247,18 +15253,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: var(--ui-purple-light);
 }
 
-/* ── Sprite slot — used by ItemModal for material icons. Mirrors the
-   .pdm-hero pattern: centered 96px sprite with drop-shadow for depth. */
+/* ── Sprite slot — used by ItemModal for material icons. The sprite-img
+   visual (96px + drop-shadow) is now shared with .modal-hero-sprite via
+   a grouped selector lower in this file — see the "Modal hero zone"
+   block. This rule only owns the centered row container. */
 .coll-modal-sprite {
   display: flex;
   justify-content: center;
   padding: 6px 0 4px;
-}
-.coll-modal-sprite-img {
-  width: 96px;
-  height: 96px;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
 }
 
 /* Centered owned-quantity readout for ItemModal */
@@ -16278,6 +16280,13 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   position: relative;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.4);
 }
+/* ── Modal hero zone — reusable utility for detail-style modals ──────
+   The canonical "centered icon (+ optional small badge) at top of modal"
+   pattern, factored out of .pdm-hero so future detail modals can adopt
+   it with a single class. Existing modals (.pdm-hero, .coll-modal-sprite-img)
+   share these rules via grouped selectors below — no JSX changes needed
+   for backward compatibility. */
+.modal-hero,
 .pdm-hero {
   display: flex;
   flex-direction: column;
@@ -16285,7 +16294,9 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   gap: 8px;
   padding: 8px 0 4px;
 }
-.pdm-hero-sprite {
+.modal-hero-sprite,
+.pdm-hero-sprite,
+.coll-modal-sprite-img {
   width: 96px;
   height: 96px;
   object-fit: contain;
