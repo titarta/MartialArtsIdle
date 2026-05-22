@@ -12594,21 +12594,26 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* Stats tab — Run / Lifetime toggle. Reuses .stg-segment shape from
    SettingsScreen so the control reads as a familiar segmented chooser. */
 .stats-mode-segment {
-  margin: 14px 16px 12px;
+  margin: 10px 14px 10px;
   align-self: stretch;
+}
+.stats-mode-segment .stg-segment-btn {
+  padding: 5px 12px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
 }
 
 .stats-sections {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 0 16px 18px;
+  gap: 12px;
+  padding: 0 14px 14px;
 }
 
 .stats-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* Mirrors .stg-section-label — small, uppercase, letterspaced, muted. */
@@ -12618,6 +12623,46 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(var(--ui-muted-rgb), 0.55);
+}
+
+/* ── Compact density modifiers for the Stats tab ──────────────────────
+   The .pdm-stats family was designed for the producer/crystal detail
+   modal where each row is a paragraph-sized statement. In the Stats tab
+   we have many short label→value pairs and the page scrolls a lot. The
+   `.pdm-stats-grid` modifier flips the container to a 2-column grid so
+   rows pack twice as densely. Emphasised rows span both columns. We
+   also tighten padding + font inside .stats-section to match. */
+.pdm-stats.pdm-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  /* Avoid the column-1 cells from rendering wider than column-2 when
+     the value text is long. minmax(0, 1fr) forces equal columns even
+     when content would push them apart. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.pdm-stats.pdm-stats-grid .pdm-stat-row-emph,
+.pdm-stats.pdm-stats-grid .pdm-stat-row-full {
+  grid-column: 1 / -1;
+}
+.stats-section .pdm-stat-row {
+  padding: 6px 10px;
+  font-size: 12px;
+  /* Prevent value text from pushing the label out of the cell on narrow
+     phones. Label can ellipsis-truncate, value stays right-anchored. */
+  min-width: 0;
+}
+.stats-section .pdm-stat-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 6px;
+}
+.stats-section .pdm-stat-value {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .stats-footer {
@@ -12754,6 +12799,182 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-weight: 700;
   color: var(--ui-purple-light);
 }
+
+/* ── Achievement badge grid (Cookie-Clicker pattern) ─────────────────────
+   Replaces the previous one-row-per-achievement layout with a square
+   icon grid so dozens of entries fit on one screen without scrolling.
+   Tapping a badge selects it and reveals the title + description in
+   the sticky .ach-detail drawer below (position: sticky; bottom: 0).
+   Tapping the same badge again — or the drawer's ✕ — clears the
+   selection. */
+/* No `flex:1`/`overflow-y:auto` on the grid itself — the parent
+   .progress-hub-body owns scroll. Sharing that scroll context lets the
+   .ach-detail drawer below sticky-pin to the visible bottom regardless
+   of how far the player has scrolled into the grid. */
+.ach-grid {
+  padding: 4px 14px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 6px;
+  align-content: start;
+}
+
+.ach-badge {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  font-family: inherit;
+}
+.ach-badge:hover  { transform: scale(1.06); }
+.ach-badge:active { transform: scale(0.96); }
+
+.ach-badge-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* Locked — Cookie-Clicker pattern: a red "?" on a dim slot. We use the
+   warm-red accent (#e94560) the rest of the UI already uses for "you
+   haven't unlocked this yet" cues so it reads as a single visual
+   language. */
+.ach-badge-locked .ach-badge-icon {
+  color: #e94560;
+  font-weight: 800;
+  opacity: 0.85;
+}
+.ach-badge-locked {
+  background: rgba(255, 80, 90, 0.04);
+  border-color: rgba(255, 80, 90, 0.15);
+}
+
+/* Unlocked — purple accent matches the modal frame. */
+.ach-badge-unlocked {
+  background: rgba(var(--ui-purple-strong-rgb), 0.08);
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.25);
+}
+.ach-badge-unlocked:hover {
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.55);
+  background: rgba(var(--ui-purple-strong-rgb), 0.14);
+}
+
+/* Tiny ✓ tucked in the bottom-right corner — small enough to not
+   compete with the icon, distinctive enough to read at a glance. */
+.ach-badge-check {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  color: rgba(120, 230, 160, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+/* Selected state — gold ring so it pops against both locked and
+   unlocked palettes. */
+.ach-badge-selected {
+  outline: 2px solid rgba(255, 215, 130, 0.85);
+  outline-offset: -2px;
+}
+
+/* ── Achievement detail drawer ──────────────────────────────────────────
+   Pinned to the bottom of the scrollable area via position: sticky so
+   it stays visible no matter where the player scrolled the grid. Same
+   visual family as .pdm-stat-row-emph: subtle accent tint + 1px border. */
+.ach-detail {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 14px 14px;
+  padding: 10px 36px 12px 12px; /* right padding reserved for the ✕ */
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 16, 28, 0.96);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.55);
+  animation: ach-detail-pop 0.16s ease-out;
+}
+@keyframes ach-detail-pop {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+
+.ach-detail-unlocked {
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.35);
+  background: linear-gradient(160deg,
+    rgba(var(--ui-purple-strong-rgb), 0.14),
+    rgba(20, 16, 28, 0.96) 60%);
+}
+.ach-detail-locked {
+  border-color: rgba(255, 80, 90, 0.25);
+}
+
+.ach-detail-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+}
+.ach-detail-locked .ach-detail-icon {
+  color: #e94560;
+  font-weight: 800;
+}
+
+.ach-detail-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ach-detail-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.02em;
+}
+.ach-detail-locked .ach-detail-title {
+  color: rgba(255, 200, 200, 0.85);
+}
+.ach-detail-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ach-detail-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.ach-detail-close:hover { color: rgba(255, 255, 255, 0.95); background: rgba(255, 255, 255, 0.06); }
 
 /* ─── Journey HUD button ─────────────────────────────────────────────────────── */
 

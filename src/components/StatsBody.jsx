@@ -140,7 +140,11 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
               {/* Reuse the canonical .pdm-stats grouped-row container so
                   the Stats tab matches the producer/crystal detail modal
                   visual family. */}
-              <div className="pdm-stats">
+              {/* `pdm-stats-grid` modifier turns the canonical .pdm-stats
+                  container into a 2-column grid for density. Emphasised
+                  rows (Achievements completion) get the standard
+                  `.pdm-stat-row-emph` class which spans both columns. */}
+              <div className="pdm-stats pdm-stats-grid">
                 {/* Snapshot rows pinned to the top of the Cultivation
                     section. These read live numbers (Qi balance, Qi/s,
                     run-started-at) instead of accumulating in mai_stats.
@@ -175,7 +179,9 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
                 })}
                 {/* Achievement completion summary pinned at the bottom
                     of the Meta section. Same treatment as CC — surfaces
-                    the "you're 2% in" reality check on the stats panel. */}
+                    the "you're 2% in" reality check on the stats panel.
+                    The pdm-stat-row-emph rule both tints the row and
+                    spans both grid columns. */}
                 {cat.id === 'meta' && achTotal > 0 && (
                   <div className="pdm-stat-row pdm-stat-row-emph">
                     <span className="pdm-stat-label">Achievements unlocked</span>
