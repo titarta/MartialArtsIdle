@@ -34,7 +34,7 @@ const MIN_OFFLINE_SEC = 5 * 60; // only show offline popup after 5 min away
 //   EMPTY_FLOOR — when the reservoir is dry, a tap still grants this many
 //     seconds of current qi/s. Stops the "tap = nothing" silent zero while
 //     keeping waiting strictly more profitable than spam-tapping.
-const CRYSTAL_TAP_COOLDOWN_MS   = 150;
+// CRYSTAL_TAP_COOLDOWN_MS removed 2026-05-22 — taps are unthrottled now.
 const CRYSTAL_EMPTY_TAP_FLOOR_S = 0.25;
 
 const label = (r) => (r.stage ? `${r.name} - ${r.stage}` : r.name);
@@ -353,9 +353,7 @@ export default function useCultivation() {
       return Number.isFinite(v) && v > 0 ? v : 0;
     } catch { return 0; }
   })());
-  // Tracks the last successful crystal tap time so the cooldown can throttle
-  // autoclickers without affecting passive accrual.
-  const lastCrystalTapAtRef = useRef(0);
+  // Crystal-tap throttle ref retired 2026-05-22 — taps are unthrottled.
   const prevBoostStateRef            = useRef(false);
   // Consecutive Focus mechanic — every unlocked tier adds a rung to a
   // cumulative ladder of (holdMs, bonus). Each tick sums every met rung
@@ -836,11 +834,12 @@ export default function useCultivation() {
   }, [offlineEarnings]);
 
   /**
-   * Tap the crystal. When the reservoir has accrued qi, drains it. When the
-   * reservoir is empty, grants a small floor (rate × CRYSTAL_EMPTY_TAP_FLOOR_S)
-   * so the tap never feels like a no-op. Throttled by CRYSTAL_TAP_COOLDOWN_MS.
+   * Tap the crystal. Always grants max(reservoir, floor) — the floor is
+   * `rate × CRYSTAL_EMPTY_TAP_FLOOR_S × tapMult` so a tap is never a
+   * pittance even if the reservoir is empty or tiny. No cooldown — taps
+   * are unthrottled.
    *
-   * @returns {number} qi granted by this tap (0 if throttled).
+   * @returns {number} qi granted by this tap (0 only if mechanic is locked).
    */
   /**
    * Spend qi atomically. Used by the Cultivation shop (producers + upgrades)
@@ -858,25 +857,24 @@ export default function useCultivation() {
   }, []);
 
   const collectCrystalReservoir = useCallback(() => {
-    const now = performance.now();
-    if (now - lastCrystalTapAtRef.current < CRYSTAL_TAP_COOLDOWN_MS) return 0;
     if (sparkCrystalClickRateRef.current <= 0) return 0;
-    lastCrystalTapAtRef.current = now;
+    // 2026-05-22: tap cooldown removed (was 150ms / 6.67 taps/sec). Players
+    // can now spam-tap freely. The empty-tap floor doubles as a no-op floor
+    // when reservoir < floor (see below), so spam-taps still grant value.
 
     const reservoir = crystalReservoirRef.current;
-    let granted;
-    if (reservoir > 0) {
-      granted = reservoir;
-      crystalReservoirRef.current = 0;
-      try { localStorage.setItem('mai_crystal_reservoir', '0'); } catch {}
-    } else {
-      // Floor at 1 qi so the floater never displays "+0" (fmt() floors values
-      // <1000 to integers). At low realms the 1-qi minimum dominates the
-      // rate × 0.25 calc; once rate ≥ 4, the calc takes over.
-      // upgradeCrystalTapMultRef multiplies the floor (Refined Tap I–V upgrades).
-      const tapMult = upgradeCrystalTapMultRef.current || 1;
-      granted = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
-    }
+    // Floor at 1 qi so the floater never displays "+0" (fmt() floors values
+    // <1000 to integers). At low realms the 1-qi minimum dominates the
+    // rate × 0.25 calc; once rate ≥ 4, the calc takes over. Refined Tap
+    // I-V upgrades multiply the floor (×2 per upgrade, ×32 at full set).
+    const tapMult = upgradeCrystalTapMultRef.current || 1;
+    const floor   = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
+    // Use max(reservoir, floor) — tapping a tiny reservoir (e.g. 0.1 qi)
+    // used to grant that tiny amount instead of the floor, punishing the
+    // player for mistiming the tap. Now the floor is a true minimum.
+    const granted = Math.max(reservoir, floor);
+    crystalReservoirRef.current = 0;
+    try { localStorage.setItem('mai_crystal_reservoir', '0'); } catch {}
     qiRef.current += granted;
     // Cookie-Clicker pivot — tap qi counts toward realm progress too.
     qiEarnedThisRealmRef.current += granted;
