@@ -35,7 +35,16 @@ const MIN_OFFLINE_SEC = 5 * 60; // only show offline popup after 5 min away
 //     seconds of current qi/s. Stops the "tap = nothing" silent zero while
 //     keeping waiting strictly more profitable than spam-tapping.
 // CRYSTAL_TAP_COOLDOWN_MS removed 2026-05-22 — taps are unthrottled now.
-const CRYSTAL_EMPTY_TAP_FLOOR_S = 0.25;
+// CRYSTAL_FLOOR_RECHARGE_S — full empty-tap floor is only available 1 sec
+// after the last tap. Spam-tapping gets the floor scaled by
+// secSinceLastTap so the throughput-per-second of pure spam ≈ one
+// full-floor tap per second (instead of one full floor per spam tap).
+const CRYSTAL_FLOOR_RECHARGE_S  = 1;
+// Was 0.25 (= 0.25s of qi/s per tap base, up to 8× rate at max Refined Tap).
+// Lowered to 0.03 (= 0.03s base, ~1× rate at max Refined Tap) so the
+// spam-tap floor matches the intended reservoir throughput (1× rate/sec
+// at full T5) instead of overshooting it by 8×.
+const CRYSTAL_EMPTY_TAP_FLOOR_S = 0.03;
 
 const label = (r) => (r.stage ? `${r.name} - ${r.stage}` : r.name);
 
@@ -353,7 +362,10 @@ export default function useCultivation() {
       return Number.isFinite(v) && v > 0 ? v : 0;
     } catch { return 0; }
   })());
-  // Crystal-tap throttle ref retired 2026-05-22 — taps are unthrottled.
+  // Tracks the last crystal-tap timestamp so the empty-tap floor can
+  // decay-scale with the gap since the previous tap (no cooldown, but
+  // spam-taps don't get full floor every time).
+  const lastCrystalTapAtRef = useRef(0);
   const prevBoostStateRef            = useRef(false);
   // Consecutive Focus mechanic — every unlocked tier adds a rung to a
   // cumulative ladder of (holdMs, bonus). Each tick sums every met rung
@@ -858,15 +870,26 @@ export default function useCultivation() {
 
   const collectCrystalReservoir = useCallback(() => {
     if (sparkCrystalClickRateRef.current <= 0) return 0;
-    // 2026-05-22: tap cooldown removed. Players can now spam-tap freely.
+    // 2026-05-22: tap cooldown removed. Players can spam-tap freely, but
+    // the empty-tap floor decay-scales with secSinceLastTap so spamming
+    // doesn't run away with throughput.
+
+    const now = performance.now();
+    const lastTap = lastCrystalTapAtRef.current;
+    const secSinceLastTap = lastTap > 0
+      ? Math.max(0, (now - lastTap) / 1000)
+      : CRYSTAL_FLOOR_RECHARGE_S; // first ever tap gets full floor
+    lastCrystalTapAtRef.current = now;
 
     const reservoir = crystalReservoirRef.current;
-    // Floor at 1 qi so the floater never displays "+0" (fmt() floors values
-    // <1000 to integers). At low realms the 1-qi minimum dominates the
-    // rate × 0.25 calc; once rate ≥ 4, the calc takes over. Refined Tap
-    // I-V upgrades multiply the floor (×2 per upgrade, ×32 at full set).
+    // Empty-tap floor — base 0.03s of qi/s × Refined Tap mult (×32 at full
+    // set). DECAY: floor scales by secSinceLastTap / 1 (capped at 1) so
+    // spam-tapping 100ms after the last tap gets 10% floor; waiting 1+ sec
+    // gets full floor. Throughput-per-second of spam ≈ one full floor / sec.
     const tapMult = upgradeCrystalTapMultRef.current || 1;
-    const floor   = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
+    const floorMult = Math.min(1, secSinceLastTap / CRYSTAL_FLOOR_RECHARGE_S);
+    const baseFloor = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
+    const floor = baseFloor * floorMult;
 
     // Diminishing returns on partial reservoirs — quadratic falloff. At
     // fill %, the player gets cap × fillPct² instead of the raw reservoir
