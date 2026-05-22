@@ -7,6 +7,7 @@ import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
 import { computeStat, MOD } from '../data/stats';
 import { MAX_OFFLINE_HOURS } from '../systems/autoFarm';
 import { trackRealmAdvance, trackQiSink, trackAscension, trackActiveLawSwitch, trackFirstTime, trackOfflineQiCollected } from '../analytics';
+import { recordStat, eventStat } from '../systems/statsRecorder';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -426,6 +427,10 @@ export default function useCultivation() {
   // breakthrough leftover) don't matter — the floater tracks against its
   // own snapshot of this counter, not the absolute value.
   const passiveQiAccruedRef = useRef(0);
+  // Stats — per-tick qi accumulator. Flushed to recordStat('qiEarned')
+  // once per second by an interval below so we don't hit the singleton at
+  // 60 Hz from inside the tick loop.
+  const statsQiAccumRef = useRef(0);
   // When the player is qi-capped waiting for enough qi/s to ascend between
   // MAJOR realms, this holds { required, current }. Null otherwise. Read by
   // the UI via rAF to render the gate indicator without React re-renders.
@@ -578,6 +583,10 @@ export default function useCultivation() {
       // Realm meter (Cookie-Clicker pivot) — fills with cumulative income
       // for this realm; never decreases via spending.
       qiEarnedThisRealmRef.current += dQi;
+      // Stats — accumulate passive qi here; flushed to the stats recorder
+      // once per second by the interval below so we don't hammer the
+      // singleton at 60 Hz.
+      statsQiAccumRef.current += dQi;
 
       // Crystal Click reservoir accrual — fill at (rate × clickRate) per second
       // up to (capMinutes × 60 × rate). Paused when mechanic is not unlocked.
@@ -601,6 +610,7 @@ export default function useCultivation() {
           // Sound is played by BreakthroughBanner on mount so it stays in sync
           // with the reveal animation (avoids firing during the qi update tick).
           try {
+            eventStat('breakthroughs');
             trackRealmAdvance(indexRef.current, REALMS[indexRef.current].name, false, true);
             trackAscension(indexRef.current);
             trackFirstTime('Ascension', indexRef.current);
@@ -675,6 +685,7 @@ export default function useCultivation() {
               qiEarnedThisRealmRef.current += bonus;
             }
             setRealmIndex(nextIndex);
+            try { eventStat('breakthroughs'); } catch {}
             try { trackQiSink(REALMS[fromIndex].cost, 'Breakthrough', `r${nextIndex}`); } catch {}
             try { trackFirstTime('RealmAdvance', nextIndex); } catch {}
             if (isMajor || isPeak) {
@@ -735,6 +746,20 @@ export default function useCultivation() {
       window.removeEventListener('mai:pattern-click-buff', onBuff);
       clearTimeout(resetTimer);
     };
+  }, []);
+
+  // Stats — flush the per-tick qi accumulator into the recorder once per
+  // second. Sub-1qi increments are still flushed (the recorder's own state
+  // accepts floats; the Stats tab formatter handles display rounding).
+  useEffect(() => {
+    const id = setInterval(() => {
+      const v = statsQiAccumRef.current;
+      if (v > 0) {
+        statsQiAccumRef.current = 0;
+        recordStat('qiEarned', v);
+      }
+    }, 1000);
+    return () => clearInterval(id);
   }, []);
 
   // Auto-save every 2 seconds
@@ -804,6 +829,7 @@ export default function useCultivation() {
     }
     setRealmIndex(nextIndex);
 
+    try { eventStat('breakthroughs'); } catch {}
     try { trackQiSink(REALMS[fromIndex].cost, 'Breakthrough', `r${nextIndex}`); } catch {}
     try { trackFirstTime('RealmAdvance', nextIndex); } catch {}
     try {
@@ -873,6 +899,7 @@ export default function useCultivation() {
     // 2026-05-22: tap cooldown removed. Players can spam-tap freely, but
     // the empty-tap floor decay-scales with secSinceLastTap so spamming
     // doesn't run away with throughput.
+    try { eventStat('crystalTaps'); } catch {}
 
     const now = performance.now();
     const lastTap = lastCrystalTapAtRef.current;

@@ -39,6 +39,8 @@ import useQiCrystal  from './hooks/useQiCrystal';
 import useProducers  from './hooks/useProducers';
 import useUpgrades   from './hooks/useUpgrades';
 import useAutoFarm    from './hooks/useAutoFarm';
+import useStats       from './hooks/useStats';
+import { recordStat } from './systems/statsRecorder';
 import WORLDS         from './data/worlds';
 import { PHASE_TECHNIQUE_LAW, PHASE_TECHNIQUE_ID } from './data/laws';
 import { mineralForRarity } from './data/materials';
@@ -137,6 +139,16 @@ function AppInner() {
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
   useEffect(() => { applyGraphics(loadGraphics()); }, []);
 
+  // Stats — wall-clock time-played counter. Ticks 1 second per second of
+  // foreground time. setInterval pauses naturally when the tab is
+  // backgrounded (mobile browsers throttle background timers heavily),
+  // which is the desired behaviour — "time the player actually spent in
+  // the game", not real-world elapsed time.
+  useEffect(() => {
+    const id = setInterval(() => { recordStat('timePlayed', 1); }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
   // Save schema version stamp. Set on first launch (and after any future
   // migrations). On v1 (Cookie-Clicker pivot) no data migration is needed —
   // combat-tied keys are preserved on disk and hidden by FEATURES flags.
@@ -154,6 +166,10 @@ function AppInner() {
   // body class letterboxes the inner game viewport). See desktopResolution.js.
   useEffect(() => { restoreResolution(); }, []);
 
+  // useStats MUST mount before any hook that records stats so the
+  // singleton recorder is bound when those hooks fire their first events.
+  // See src/systems/statsRecorder.js for the binding mechanism.
+  const stats           = useStats();
   const cultivation     = useCultivation();
   const inventory       = useInventory();
   const karma           = useReincarnationKarma();
@@ -1227,6 +1243,12 @@ function AppInner() {
     // Give React a tick to flush the karma state to localStorage before we
     // wipe the rest of the save + hard-reload.
     setTimeout(() => {
+      // Stats — wipe the in-memory run bucket BEFORE wipeReincarnation
+      // so the beforeunload flush (triggered by reload below) doesn't
+      // restore the old run counters. resetRun also persists, so when
+      // wipeReincarnation reads mai_stats it sees the correct lifetime
+      // (including the +1 livesLived just fired by karma.reincarnate()).
+      try { stats.resetRun(); } catch {}
       wipeReincarnation();
 
       // Restore al_2 Echo of Mastery snapshot.
@@ -1263,7 +1285,7 @@ function AppInner() {
 
       window.location.reload();
     }, 50);
-  }, [karma, cultivation.realmIndex, tree.modifiers]);
+  }, [karma, cultivation.realmIndex, tree.modifiers, stats]);
 
   const goBack = () => {
     navigate('worlds', {

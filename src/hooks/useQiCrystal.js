@@ -25,6 +25,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { getRefinedQi } from '../data/materials';
 import { trackCrystalFed } from '../analytics';
+import { recordStat, peakStat } from '../systems/statsRecorder';
 
 const SAVE_KEY = 'mai_qi_crystal';
 
@@ -247,6 +248,7 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
     // Compute the transition eagerly from current state so the return value is
     // populated before this function returns (setState updaters are not
     // guaranteed to run synchronously).
+    const startLevel = state.level;
     let level       = state.level;
     let refinedQi   = state.refinedQi + totalRqi;
     // Treat locked (tier 0) as tier 1 for evolution purposes — the locked sprite
@@ -265,6 +267,14 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
       : empty;
     applyState({ level, refinedQi });
     try { trackCrystalFed(level, result.tierChanged, endTier); } catch {}
+    // Stats — peak level reached + each tier evolution crossed. The
+    // total-level-ups stat is omitted in v1 (level-ups across a run are
+    // equal to the peak; lifetime would just be sum of run peaks).
+    try {
+      peakStat('crystalLevelPeak', level);
+      const evos = endTier - startTier;
+      if (evos > 0) recordStat('crystalEvolutions', evos);
+    } catch {}
     return result;
   }, [state.level, state.refinedQi, getQuantity, removeItem, applyState]);
 
@@ -306,6 +316,12 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
       : { tierChanged: false, previousTier: startTier, newTier: endTier, newLevel: level };
     applyState({ level, refinedQi });
     try { trackCrystalFed(level, result.tierChanged, endTier); } catch {}
+    // Stats — peak level + each tier evolution crossed (see feedMultiple).
+    try {
+      peakStat('crystalLevelPeak', level);
+      const evos = endTier - startTier;
+      if (evos > 0) recordStat('crystalEvolutions', evos);
+    } catch {}
     return result;
   }, [state.level, state.refinedQi, applyState]);
 

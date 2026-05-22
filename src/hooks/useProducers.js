@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
+import { recordStat } from '../systems/statsRecorder';
 
 const SAVE_KEY = 'mai_producers';
 
@@ -120,6 +121,8 @@ export default function useProducers() {
     if (n <= 0) return false;
     if (!PRODUCERS_BY_ID[id]) return false;
     setOwned(prev => ({ ...prev, [id]: (prev[id] ?? 0) + n }));
+    // Stats — aggregate counter (per-producer breakdown deferred to v2).
+    try { recordStat('producersBought', n); } catch {}
     return true;
   }, []);
 

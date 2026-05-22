@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import UPGRADES, { UPGRADES_BY_ID } from '../data/upgrades';
+import { eventStat } from '../systems/statsRecorder';
 
 const SAVE_KEY = 'mai_upgrades';
 
@@ -178,6 +179,8 @@ export default function useUpgrades() {
       next.add(id);
       return next;
     });
+    // Stats — aggregate upgrade-purchase counter.
+    try { eventStat('upgradesBought'); } catch {}
     return true;
   }, []);
 

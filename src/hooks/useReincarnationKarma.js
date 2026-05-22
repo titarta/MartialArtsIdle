@@ -13,6 +13,7 @@ import {
   PEAK_INDEX,
 } from '../data/reincarnationTree';
 import { trackKarmaSource, trackKarmaSink } from '../analytics';
+import { recordStat, eventStat } from '../systems/statsRecorder';
 
 const SAVE_KEY = 'mai_reincarnation';
 
@@ -59,6 +60,7 @@ export default function useReincarnationKarma() {
       }
       if (awarded > 0) {
         try { trackKarmaSource(awarded, `r${index}`); } catch {}
+        try { recordStat('karmaEarned', awarded); } catch {}
         // Surface to consumers (App.jsx fires a toast on this).
         lastAwardedRef.current = {
           amount: awarded,
@@ -79,6 +81,10 @@ export default function useReincarnationKarma() {
   /** Bumps the life counter. Actual save wipe happens in App.jsx. */
   const reincarnate = useCallback(() => {
     setState(prev => ({ ...prev, lives: prev.lives + 1 }));
+    // Stats — lifetime-only counter (declared lifetimeOnly in statsKeys.js).
+    // wipeReincarnation rewrites mai_stats to preserve lifetime + reset
+    // run; this event lands on lifetime before the page reload.
+    try { eventStat('livesLived'); } catch {}
   }, []);
 
   /** Spend karma on a tree node. Returns true on success. */
@@ -89,7 +95,10 @@ export default function useReincarnationKarma() {
       ok = true;
       return { ...prev, karma: prev.karma - cost };
     });
-    if (ok) { try { trackKarmaSink(cost, nodeId); } catch {} }
+    if (ok) {
+      try { trackKarmaSink(cost, nodeId); } catch {}
+      try { recordStat('karmaSpent', cost); } catch {}
+    }
     return ok;
   }, []);
 

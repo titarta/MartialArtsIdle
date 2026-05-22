@@ -85,6 +85,9 @@ export function wipeSave() {
   localStorage.removeItem('mai_producers_rate_snapshot');
   localStorage.removeItem('mai_upgrades');
   localStorage.removeItem('mai_achievements');
+  // Cookie-Clicker stats tracker (useStats). Factory wipe = both run +
+  // lifetime go to zero. wipeReincarnation below preserves lifetime.
+  localStorage.removeItem('mai_stats');
   localStorage.removeItem('mai_permanent_pill_stats');
   // Per-pill consumption counter that drives diminishing returns. Lives
   // alongside permanentStats — both are per-incarnation, both wipe together.
@@ -142,6 +145,10 @@ export function wipeReincarnation() {
   const pinnedRecipes         = snapshot('mai_pinned_recipes');
   const bankedRerolls         = snapshot('mai_banked_rerolls');
   const rebirthCultBuffUntil  = snapshot('mai_rebirth_cult_buff_until');
+  // Cookie-Clicker stats — lifetime + sinceTs survive reincarnation; the
+  // run bucket is wiped to zero and the player starts the new life with
+  // fresh per-run counters.
+  const statsRaw              = snapshot('mai_stats');
 
   wipeSave();
 
@@ -150,6 +157,20 @@ export function wipeReincarnation() {
   restore('mai_reincarnation_tree',     tree);
   restore('mai_banked_rerolls',         bankedRerolls);
   restore('mai_rebirth_cult_buff_until', rebirthCultBuffUntil);
+
+  // Re-seed stats — preserve lifetime + sinceTs, reset run.
+  if (statsRaw) {
+    try {
+      const parsed = JSON.parse(statsRaw);
+      const reseeded = {
+        version:  parsed.version  ?? 1,
+        run:      {},               // wiped
+        lifetime: parsed.lifetime || {},
+        sinceTs:  parsed.sinceTs ?? Date.now(),
+      };
+      localStorage.setItem('mai_stats', JSON.stringify(reseeded));
+    } catch {}
+  }
 
   // Re-seed the law library (no active selection — player picks anew).
   if (ownedLawsRaw) {
