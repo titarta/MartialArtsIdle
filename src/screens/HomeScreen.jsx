@@ -3,6 +3,7 @@ import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
+import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
@@ -813,7 +814,7 @@ const CRYSTAL_COLORS = {
 
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tapable when
  *  Crystal Click mechanic is active). Reservoir fill tracked via rAF. */
-function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine }) {
+function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
   const unlockHint = FEATURE_GATES.qi_crystal?.hint ?? 'Reach a higher realm';
   // true only when the Crystal Click spark is active AND the crystal is unlocked
   const mechanicOn = !!(crystalClickCapMinRef && onCollect && isUnlocked);
@@ -935,11 +936,22 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
       onClick={handleCrystalTap}
     >
       <div className="home-crystal-float" style={{ '--cg-a': glowA, '--cg-b': glowB }}>
-        <span className="home-crystal-tag">
+        {/* Level chip is a button that opens the crystal detail modal.
+            stopPropagation so the click doesn't bubble to the anchor's
+            crystal-tap collect handler. */}
+        <button
+          type="button"
+          className="home-crystal-tag home-crystal-tag-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenDetail?.();
+          }}
+          aria-label="Crystal details"
+        >
           Qi Crystal
           <span className="home-crystal-tag-divider">·</span>
           <span className="home-crystal-tag-level">Lv {level}</span>
-        </span>
+        </button>
         <div
           className="home-crystal-img-wrap"
           style={{ '--spark-hue': `${vfxHue}deg`, '--spark-sat': vfxSat }}
@@ -982,17 +994,10 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
           existing path infrastructure once the new art lands. The gap variable
           --qi-particles-h still holds the layout open so the refine button has
           its breathing room. */}
-      <div className="crystal-tooltip">
-        <div className="ctt-title">Qi Crystal · Lv {level}</div>
-        <div className="ctt-desc">A crystallised vessel of refined Qi. Feed it QI stones to level it up and increase your cultivation speed.</div>
-        <div className="ctt-bonus">
-          <span className="ctt-gem">◆</span> Current bonus: <strong>+{crystalQiBonus} Qi/s</strong>
-        </div>
-        {mechanicOn
-          ? <div className="ctt-hint">Tap to collect stored Qi</div>
-          : <div className="ctt-hint">Tap the chip below to refine</div>
-        }
-      </div>
+      {/* Hover tooltip retired 2026-05-22 — replaced by the
+          CrystalDetailModal opened from the level chip above. Hovers don't
+          work well on mobile, and the modal gives us more room for the
+          "next evolution preview" the player actually wants to see. */}
     </div>
   );
 }
@@ -1890,6 +1895,9 @@ function HomeScreen({
     return (HOME_BG_H * s * 0.21) / 128;
   };
   const [spriteScale, setSpriteScale] = useState(computeSpriteScale);
+  // Crystal detail modal — opens when the player taps the level chip.
+  // Replaces the legacy hover tooltip (poor mobile UX).
+  const [crystalDetailOpen, setCrystalDetailOpen] = useState(false);
   useEffect(() => {
     const update = () => setSpriteScale(computeSpriteScale());
     update();
@@ -2492,6 +2500,7 @@ function HomeScreen({
             onCollect={handleCrystalCollect}
             qiRef={cultivation.qiRef}
             onRefine={handleCrystalRefine}
+            onOpenDetail={() => setCrystalDetailOpen(true)}
           />
 
           {/* Character + Consecutive-Focus meter group — grounded at scene bottom */}
@@ -2665,6 +2674,15 @@ function HomeScreen({
           fire on whichever screen the player is currently looking at —
           e.g. first_producer fires while you're still on the Cultivation
           tab, not after you navigate back to Home. */}
+
+      {/* Crystal detail modal — opens when the player taps the crystal
+          level chip. Replaces the legacy hover tooltip (poor mobile UX). */}
+      {crystalDetailOpen && isCrystalUnlocked && crystal && (
+        <CrystalDetailModal
+          level={crystal.level}
+          onClose={() => setCrystalDetailOpen(false)}
+        />
+      )}
 
     </div>
   );

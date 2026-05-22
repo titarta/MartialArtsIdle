@@ -1,0 +1,158 @@
+import { fmt } from '../utils/format';
+import {
+  getCrystalQiMult,
+  CRYSTAL_MULT_PER_LEVEL,
+  MAX_CRYSTAL_LEVEL,
+} from '../hooks/useQiCrystal';
+
+const BASE = import.meta.env.BASE_URL;
+
+// Visual tier thresholds — mirrors useQiCrystal / HomeScreen / CultivationScreen
+// /CrystalFeedModal so the modal can compute "next evolution level". Keep in
+// sync if those move (10 entries: T1=L1 ... T9=L80 ... T10=L100).
+const CRYSTAL_TIER_THRESHOLDS = [100, 80, 70, 60, 50, 40, 30, 20, 10, 1];
+const CRYSTAL_TIER_VALUES     = [ 10,  9,  8,  7,  6,  5,  4,  3,  2, 1];
+
+function getCrystalTier(level) {
+  if (level <= 0) return 0;
+  for (let i = 0; i < CRYSTAL_TIER_THRESHOLDS.length; i++) {
+    if (level >= CRYSTAL_TIER_THRESHOLDS[i]) return CRYSTAL_TIER_VALUES[i];
+  }
+  return 1;
+}
+
+// Evocative names per tier (mirrors HomeScreen's local CRYSTAL_TIER_NAMES).
+// Kept inline so the modal stays self-contained.
+const CRYSTAL_TIER_NAMES = {
+  1:  'Raw Shard',
+  2:  'Veined Shard',
+  3:  'Azure Heart',
+  4:  'Cobalt Prism',
+  5:  'Sapphire Bloom',
+  6:  'Amethyst Sigil',
+  7:  'Violet Lotus',
+  8:  'Lilac Radiance',
+  9:  'Dawnfire Crystal',
+  10: 'Sunflare Relic',
+};
+
+/** Find the next tier threshold above `currentLevel`. Returns null if maxed. */
+function getNextTierInfo(currentLevel) {
+  // Walk THRESHOLDS in ascending tier order — find the first tier whose
+  // threshold is strictly above the current level.
+  const pairs = CRYSTAL_TIER_THRESHOLDS
+    .map((thresh, i) => ({ thresh, tier: CRYSTAL_TIER_VALUES[i] }))
+    .sort((a, b) => a.tier - b.tier); // T1, T2, T3 ...
+  for (const { thresh, tier } of pairs) {
+    if (thresh > currentLevel) {
+      return { tier, level: thresh };
+    }
+  }
+  return null;
+}
+
+/**
+ * Crystal detail modal — opens when the player taps the Qi Crystal level
+ * chip on HomeScreen. Mirrors ProducerDetailModal's layout so the two
+ * detail screens feel consistent.
+ *
+ * Shows:
+ *   - Current visual tier + evocative name + sprite
+ *   - Level / max level
+ *   - Current cultivation multiplier
+ *   - Next evolution preview: tier, name, sprite, level threshold,
+ *     levels remaining, and the multiplier the player will have once they
+ *     reach it.
+ *   - "Crystal fully evolved" state when at max.
+ */
+export default function CrystalDetailModal({ level, onClose }) {
+  const tier        = getCrystalTier(level);
+  const tierName    = CRYSTAL_TIER_NAMES[tier] ?? 'Qi Crystal';
+  const sprite      = `${BASE}crystals/crystal_${Math.max(1, tier)}.png`;
+  const crystalMult = getCrystalQiMult(level);
+  const isMaxed     = level >= MAX_CRYSTAL_LEVEL;
+
+  const nextInfo   = getNextTierInfo(level);
+  const nextSprite = nextInfo ? `${BASE}crystals/crystal_${nextInfo.tier}.png` : null;
+  const nextName   = nextInfo ? CRYSTAL_TIER_NAMES[nextInfo.tier] : null;
+  const nextMult   = nextInfo ? getCrystalQiMult(nextInfo.level) : null;
+  const levelsAway = nextInfo ? Math.max(0, nextInfo.level - level) : 0;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="pdm-modal" onClick={e => e.stopPropagation()}>
+        <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+
+        <div className="pdm-hero">
+          <img
+            src={sprite}
+            alt=""
+            className="pdm-hero-sprite"
+            draggable={false}
+          />
+          <span className={`pdm-tier-badge pdm-badge-tier-${tier}`}>
+            T{tier} · {tierName}
+          </span>
+        </div>
+
+        <div className="pdm-name">Qi Crystal</div>
+
+        <div className="pdm-stats">
+          <div className="pdm-stat-row">
+            <span className="pdm-stat-label">Level</span>
+            <span className="pdm-stat-value">
+              {level} / {MAX_CRYSTAL_LEVEL}
+              {isMaxed && <span className="pdm-stat-mult"> (max)</span>}
+            </span>
+          </div>
+          <div className="pdm-stat-row pdm-stat-row-emph">
+            <span className="pdm-stat-label">Cultivation bonus</span>
+            <span className="pdm-stat-value">×{crystalMult.toFixed(3)}</span>
+          </div>
+          <div className="pdm-stat-row">
+            <span className="pdm-stat-label">Per crystal level</span>
+            <span className="pdm-stat-value">+{(CRYSTAL_MULT_PER_LEVEL * 100).toFixed(1)}%</span>
+          </div>
+        </div>
+
+        {/* Next evolution preview — full reveal, no silhouette. The player
+            has earned a look at where they're heading. */}
+        {nextInfo ? (
+          <div className="cdm-next">
+            <div className="cdm-next-header">Next Evolution</div>
+            <div className="cdm-next-row">
+              <img
+                src={nextSprite}
+                alt=""
+                className="cdm-next-sprite"
+                draggable={false}
+              />
+              <div className="cdm-next-body">
+                <div className="cdm-next-name">
+                  T{nextInfo.tier} · {nextName}
+                </div>
+                <div className="cdm-next-meta">
+                  Reaches at level {nextInfo.level}
+                  {levelsAway > 0 && (
+                    <> · <strong>{levelsAway}</strong> {levelsAway === 1 ? 'level' : 'levels'} away</>
+                  )}
+                </div>
+                <div className="cdm-next-meta">
+                  Bonus at T{nextInfo.tier}: <strong>×{nextMult.toFixed(3)}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="cdm-next cdm-next-maxed">
+            <div className="cdm-next-header">Fully Evolved</div>
+            <div className="cdm-next-meta">
+              The crystal has reached its peak form. Every facet of your
+              cultivation drinks from it now.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

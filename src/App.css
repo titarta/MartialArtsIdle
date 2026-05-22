@@ -5550,6 +5550,79 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: #fff8e6;
   font-variant-numeric: tabular-nums;
 }
+
+/* The chip is now a <button> that opens the crystal detail modal.
+   Reset the default button chrome and add a hover/active feedback so it
+   reads as tappable. */
+.home-crystal-tag-btn {
+  /* Reset native button styling */
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform 120ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.home-crystal-tag-btn:hover {
+  transform: scale(1.04);
+  border-color: var(--cg-a, rgba(245, 236, 214, 0.85));
+}
+.home-crystal-tag-btn:active {
+  transform: scale(0.96);
+}
+
+/* Crystal Detail Modal — next-evolution preview section. Sits below the
+   stat rows in .pdm-modal (reuses the producer modal frame). */
+.cdm-next {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(110, 200, 180, 0.18);
+}
+.cdm-next-header {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(220, 235, 240, 0.75);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.cdm-next-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cdm-next-sprite {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+.cdm-next-body {
+  flex: 1;
+  min-width: 0;
+}
+.cdm-next-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f4e9d5;
+  margin-bottom: 4px;
+}
+.cdm-next-meta {
+  font-size: 12px;
+  color: rgba(220, 230, 240, 0.7);
+  line-height: 1.4;
+}
+.cdm-next-meta strong {
+  color: #d1fae5;
+  font-weight: 700;
+}
+.cdm-next-maxed .cdm-next-meta {
+  text-align: center;
+  font-style: italic;
+}
 .home-crystal-tag-locked {
   color: rgba(220, 220, 230, 0.55);
   border-color: rgba(255, 255, 255, 0.18);
