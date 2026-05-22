@@ -8421,17 +8421,35 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   to { transform: scale(1); opacity: 1; }
 }
 
+/* ── Unified modal close button (2026-05-22 normalization pass) ─────────
+   ONE class for every modal close button across the game. Absolute
+   top-right, generous tap target for mobile, hover/active feedback.
+   Modal containers must be `position: relative` for the absolute
+   positioning to land inside the modal box. */
 .modal-close {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
   background: none;
   border: none;
-  color: rgba(var(--ui-muted-rgb), 0.60);
-  font-size: 1.2rem;
+  color: rgba(var(--ui-muted-rgb), 0.65);
+  font-size: 1.15rem;
+  line-height: 1;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 6px 9px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
   -webkit-tap-highlight-color: transparent;
+}
+.modal-close:hover {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.06);
+}
+.modal-close:active {
+  background: rgba(255, 255, 255, 0.10);
 }
 
 .modal-sprite {
