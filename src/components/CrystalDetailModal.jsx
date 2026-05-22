@@ -81,7 +81,7 @@ export default function CrystalDetailModal({ level, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="pdm-modal" onClick={e => e.stopPropagation()}>
-        <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="pdm-hero">
           <img

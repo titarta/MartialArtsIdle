@@ -248,7 +248,7 @@ function SparkDetailPanel({ spark, ctx, isTrinityActive, onClose }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className={`st-detail-panel st-detail-r-${card.rarity}`} style={{ '--rarity-color': rarity.color }}>
-        <button type="button" className="st-detail-close" onClick={onClose} aria-label="Close">✕</button>
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <div className="st-detail-hero">
           <Icon icon={icon} className="st-detail-hero-img" />
           <div className={`st-detail-rarity-banner st-rt-${card.rarity}`}>{rarity.label}</div>

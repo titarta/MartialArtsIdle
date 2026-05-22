@@ -29,14 +29,7 @@ function ItemModal({ item, quantity, onClose }) {
             <div className="coll-modal-title" style={{ color: rarity.color }}>{itemName}</div>
             <div className="coll-modal-subtitle">{rarityLabel}</div>
           </div>
-          <button
-            type="button"
-            className="modal-close coll-modal-close"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            ✕
-          </button>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </header>
 
         <div className="coll-modal-body">

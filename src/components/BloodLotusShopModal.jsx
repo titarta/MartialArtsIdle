@@ -52,7 +52,7 @@ export default function BloodLotusShopCard({ onClose, onBalanceChange }) {
       <div className="blood-lotus-shop-header">
         <img src={`${BASE}sprites/items/blood_lotus.png`} className="blood-lotus-shop-icon" alt="" draggable="false" />
         <span className="blood-lotus-shop-title">Blood Lotus Shop</span>
-        <button className="blood-lotus-shop-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
       </div>
 
       {success && <div className="blood-lotus-shop-success">{success}</div>}

@@ -52,7 +52,7 @@ function GearSlotModal({ slot, artefacts, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content art-pick-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>x</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         <h2 className="modal-title">{t(`build.slots.${slot.type}`, { defaultValue: slot.label })}</h2>
         <p className="modal-desc">{desc}</p>

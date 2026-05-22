@@ -515,14 +515,7 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                 >
                   {live.locked ? '🔒' : '🔓'}
                 </button>
-                <button
-                  type="button"
-                  className="modal-close coll-modal-close"
-                  aria-label="Close"
-                  onClick={() => setSelectedArtefact(null)}
-                >
-                  ✕
-                </button>
+                <button type="button" className="modal-close" onClick={() => setSelectedArtefact(null)} aria-label="Close">✕</button>
               </header>
 
               <div className="coll-modal-body">
@@ -690,14 +683,7 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                   <div className="coll-modal-title" style={{ color: quality.color }}>{techName}</div>
                   <div className="coll-modal-subtitle">{subtitle}</div>
                 </div>
-                <button
-                  type="button"
-                  className="modal-close coll-modal-close"
-                  aria-label="Close"
-                  onClick={() => setSelectedTechnique(null)}
-                >
-                  ✕
-                </button>
+                <button type="button" className="modal-close" onClick={() => setSelectedTechnique(null)} aria-label="Close">✕</button>
               </header>
 
               <div className="coll-modal-body">
@@ -761,14 +747,7 @@ function CollectionScreen({ inventory, artefacts, techniques, cultivation }) {
                   <div className="coll-modal-title" style={{ color: rarity.color }}>{lawName}</div>
                   <div className="coll-modal-subtitle">{subtitle}</div>
                 </div>
-                <button
-                  type="button"
-                  className="modal-close coll-modal-close"
-                  aria-label="Close"
-                  onClick={() => setSelectedLaw(null)}
-                >
-                  ✕
-                </button>
+                <button type="button" className="modal-close" onClick={() => setSelectedLaw(null)} aria-label="Close">✕</button>
               </header>
 
               <div className="coll-modal-body">

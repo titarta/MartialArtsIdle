@@ -232,7 +232,7 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
               </span>
             </div>
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="cfm-modal-body">
@@ -458,7 +458,7 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
               </span>
             </div>
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="cfm-modal-body">

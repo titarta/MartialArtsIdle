@@ -55,12 +55,12 @@ function JourneyModal({ realmIndex, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="journey-modal" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <div className="journey-header">
           <span className="journey-title">🗺️ Cultivation Journey</span>
           <div className="journey-progress-label">
             {realmIndex + 1} / {REALMS.length} stages
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="journey-progress-bar">

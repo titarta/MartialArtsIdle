@@ -36,6 +36,7 @@ function AchievementsModal({ achievements, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="achievements-modal" onClick={e => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <div className="ach-modal-header">
           <div className="ach-modal-title">
             <span className="ach-modal-trophy">🏆</span>
@@ -44,7 +45,6 @@ function AchievementsModal({ achievements, onClose }) {
           <div className="ach-modal-progress">
             {achievements.unlockedCount} / {achievements.totalCount}
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="ach-progress-bar">

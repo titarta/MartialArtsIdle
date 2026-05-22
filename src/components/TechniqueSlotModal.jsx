@@ -68,7 +68,7 @@ function TechniqueSlotModal({ slotIndex, currentId, ownedTechniques = {}, onEqui
         className="modal-content tech-modal-content"
         onClick={e => e.stopPropagation()}
       >
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <h2 className="tech-modal-title">{t(SLOT_T_KEYS[slotIndex])}</h2>
 
         <div className="tech-type-filters">

@@ -108,7 +108,7 @@ function PillDrawer({ open, onClose, defaultTab = 'combat', pills }) {
         <div className="pill-modal-header">
           <span className="pill-modal-title">◈ {t('pillDrawer.title')}</span>
           <span className="pill-modal-count-badge">{totalOwned} owned</span>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className="pill-modal-tab-row">
           <div className="pill-drawer-tabs">

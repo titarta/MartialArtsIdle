@@ -121,7 +121,7 @@ function DetailPanel({ sparkId, onClose, onPick }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className={`qs-detail-panel qs-detail-r-${card.rarity}`} style={{ '--rarity-color': rarity.color }}>
-        <button type="button" className="qs-detail-close" onClick={onClose} aria-label="Close">✕</button>
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <div className="qs-detail-hero">
           <CardIcon icon={icon} />
           <div className={`qs-detail-rarity-banner qs-rt-${card.rarity}`}>{rarity.label}</div>
