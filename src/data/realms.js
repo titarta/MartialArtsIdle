@@ -115,16 +115,55 @@ const REALMS_RAW = [
   { name: 'Open Heaven',        stage: 'Layer 6',     cost: 672_750_000_000_000 },  // High-Rank
 ];
 
-const REALMS = mergeArrayByIndex(REALMS_RAW, 'realms');
+/**
+ * Global steepness factor (2026-05-22 Dial-3.1).
+ *
+ * Compounds across stage index: stage `i` is scaled by COST_STEEPNESS^i.
+ * A small per-step factor barely moves the needle early (×1.01^10 ≈ +10%
+ * by end of Tempered Body) but compounds into a meaningful late-game
+ * wall (×1.01^50 ≈ +64% at Origin Returning Late, ×1.01^56 ≈ +74% at
+ * Open Heaven Layer 6). Tunes the curve in one knob without re-touching
+ * every per-stage cost.
+ *
+ * Lower to 1.005 for a gentler curve, raise to 1.015 for harder. The
+ * scaling is applied BEFORE designer overrides (mergeArrayByIndex)
+ * so any per-stage override in realms.override.json still wins as the
+ * final authority.
+ */
+export const COST_STEEPNESS = 1.01;
+
+const REALMS_SCALED = REALMS_RAW.map((r, i) => ({
+  ...r,
+  cost: Math.round(r.cost * Math.pow(COST_STEEPNESS, i)),
+}));
+
+const REALMS = mergeArrayByIndex(REALMS_SCALED, 'realms');
 
 // ── Major breakthrough qi/s gate ─────────────────────────────────────────────
 // Ascending between major realms (i.e. `realm.name` changes) requires a
 // minimum sustained qi/s. The threshold is expressed as a percentage of the
-// NEXT realm's qi cost and decays with each successive major transition — the
-// early gates squeeze hardest, late realms soften because the cost is already
-// enormous.
-export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.0025; // 0.25% at the first gate
-export const MAJOR_BREAKTHROUGH_DECAY    = 0.5;    // multiplicative per major gate
+// NEXT realm's qi cost and decays with each successive major transition.
+//
+// 2026-05-22 Dial-3.1 — DECAY relaxed from 0.5 → 0.9. The previous halving
+// made every gate past the first one functionally invisible (gate at major
+// 5 was 0.0078% of cost — fraction of a second of production). 0.9 keeps
+// the first gate identical at 0.25% but holds subsequent gates near
+// 0.1-0.2% of next-realm cost, so players actually need to push
+// (focus-hold, divine qi orbs, ad boost, future paid multiplier boosts)
+// to clear them instead of breaking through the moment the bar fills.
+//
+//   ord   gate %      example next   gate qi/s     (at relaxed 0.9 decay)
+//   0     0.25%       200 K          500
+//   1     0.225%      1.65 M         3.7 K
+//   3     0.182%      95 M           173 K
+//   5     0.148%      6.4 B          9.4 M
+//   7     0.12%       320 B          384 M
+//   9     0.097%      5.25 T         5.1 B
+//
+// Compare to the old 0.5 decay where ord-5 was 500 K qi/s — invisible
+// late game.
+export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.0025; // 0.25% at the first gate (unchanged)
+export const MAJOR_BREAKTHROUGH_DECAY    = 0.9;    // multiplicative per major gate
 
 /** Is the transition `fromIndex → fromIndex+1` a major-realm change? */
 export function isMajorTransition(fromIndex) {
