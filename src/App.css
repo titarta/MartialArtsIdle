@@ -2069,7 +2069,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 2px 4px 6px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 2px 44px 6px 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .asb-popover-title {
@@ -6110,7 +6111,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px 12px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 14px 52px 12px 16px;
   background: rgba(var(--ui-purple-rgb), 0.07);
   border-bottom: 1px solid rgba(var(--ui-purple-rgb), 0.18);
   flex-shrink: 0;
@@ -8379,8 +8381,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* ── Unified modal close button (2026-05-22 normalization pass) ─────────
    ONE class for every modal close button across the game. Absolute
    top-right, generous tap target for mobile, hover/active feedback.
-   Modal containers must be `position: relative` for the absolute
-   positioning to land inside the modal box. */
+   The safety-net rule below guarantees every panel under .modal-overlay
+   is a positioning context, so .modal-close always anchors to the panel
+   instead of escaping to the viewport. */
+.modal-overlay > * {
+  position: relative;
+}
 .modal-close {
   position: absolute;
   top: 8px;
@@ -11927,7 +11933,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px 12px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 16px 52px 12px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
@@ -12258,6 +12265,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding-right: 44px;
 }
 
 .blood-lotus-shop-icon {
@@ -12419,7 +12428,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px 12px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 16px 52px 12px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
@@ -12625,7 +12635,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px 14px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 16px 52px 14px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
@@ -13089,7 +13100,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 20px 12px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 16px 52px 12px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   flex-shrink: 0;
 }
@@ -13366,7 +13378,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px 10px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 14px 52px 10px 16px;
   border-bottom: 1px solid rgba(var(--ui-purple-strong-rgb), 0.18);
 }
 .reinc-header-icon {
@@ -14615,7 +14628,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px 10px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 12px 52px 10px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
@@ -14994,7 +15008,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px 10px;
+  /* right padding reserved for the absolute .modal-close button */
+  padding: 12px 52px 10px 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
