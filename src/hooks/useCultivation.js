@@ -7,7 +7,7 @@ import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
 import { computeStat, MOD } from '../data/stats';
 import { MAX_OFFLINE_HOURS } from '../systems/autoFarm';
 import { trackRealmAdvance, trackQiSink, trackAscension, trackActiveLawSwitch, trackFirstTime, trackOfflineQiCollected } from '../analytics';
-import { recordStat, eventStat } from '../systems/statsRecorder';
+import { recordStat, eventStat, peakStat } from '../systems/statsRecorder';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -751,6 +751,9 @@ export default function useCultivation() {
   // Stats — flush the per-tick qi accumulator into the recorder once per
   // second. Sub-1qi increments are still flushed (the recorder's own state
   // accepts floats; the Stats tab formatter handles display rounding).
+  // Same tick also samples the current rate into the qiPerSecPeak peak
+  // counter (one-call-per-second instead of per-frame keeps the hot path
+  // clean while still capturing the highest sustained rate).
   useEffect(() => {
     const id = setInterval(() => {
       const v = statsQiAccumRef.current;
@@ -758,6 +761,8 @@ export default function useCultivation() {
         statsQiAccumRef.current = 0;
         recordStat('qiEarned', v);
       }
+      const rate = rateRef.current ?? 0;
+      if (rate > 0) peakStat('qiPerSecPeak', rate);
     }, 1000);
     return () => clearInterval(id);
   }, []);

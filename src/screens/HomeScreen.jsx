@@ -21,6 +21,7 @@ import { hasSeenTutorial } from '../systems/tutorialSeen';
 import { TUTORIAL_IDS } from '../data/tutorialCards';
 import WORLDS from '../data/worlds';
 import AudioManager from '../audio/AudioManager';
+import { eventStat } from '../systems/statsRecorder';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -1466,6 +1467,9 @@ function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
     phaseRef.current = 'collected';
     setPhase('collected');
     try { AudioManager.playSfx('divine_qi_collect'); } catch {}
+    // Stats — divine qi orbs are our golden-cookie equivalent. Only the
+    // successful click registers (auto-expire doesn't count).
+    try { eventStat('divineQiClicks'); } catch {}
     // Spawn the "+N qi" floater as a SIBLING of the orb (not via the
     // fighter-stage vfx-layer) so it shares the orb's stacking context.
     // `.home-fighter-stage` is a stacking context at z-index 2 — anything

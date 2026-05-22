@@ -27,7 +27,7 @@ const TABS = [
   { id: 'stats',        label: 'Stats'        },
 ];
 
-function ProgressHubModal({ realmIndex, achievements, stats, onClose }) {
+function ProgressHubModal({ realmIndex, achievements, stats, qiRef, rateRef, onClose }) {
   const [tab, setTab] = useState('journey');
 
   return (
@@ -50,7 +50,14 @@ function ProgressHubModal({ realmIndex, achievements, stats, onClose }) {
         <div className="progress-hub-body">
           {tab === 'journey'      && <JourneyBody realmIndex={realmIndex} />}
           {tab === 'achievements' && achievements && <AchievementsBody achievements={achievements} />}
-          {tab === 'stats'        && <StatsBody stats={stats} />}
+          {tab === 'stats'        && (
+            <StatsBody
+              stats={stats}
+              qiRef={qiRef}
+              rateRef={rateRef}
+              achievements={achievements}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -35,19 +35,26 @@ function loadState() {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) {
       const data = JSON.parse(raw);
+      const now = Date.now();
       return {
-        version:  data.version  ?? STATS_VERSION,
-        run:      { ...emptyBucket(), ...(data.run      || {}) },
-        lifetime: { ...emptyBucket(), ...(data.lifetime || {}) },
-        sinceTs:  data.sinceTs ?? Date.now(),
+        version:      data.version      ?? STATS_VERSION,
+        run:          { ...emptyBucket(), ...(data.run      || {}) },
+        lifetime:     { ...emptyBucket(), ...(data.lifetime || {}) },
+        sinceTs:      data.sinceTs      ?? now,
+        // When the CURRENT run started. Reset on reincarnation
+        // (resetRun). Missing on older saves → backfill to sinceTs so
+        // "run started X ago" still reads as a meaningful timestamp.
+        runStartedTs: data.runStartedTs ?? data.sinceTs ?? now,
       };
     }
   } catch {}
+  const now = Date.now();
   return {
-    version:  STATS_VERSION,
-    run:      emptyBucket(),
-    lifetime: emptyBucket(),
-    sinceTs:  Date.now(),
+    version:      STATS_VERSION,
+    run:          emptyBucket(),
+    lifetime:     emptyBucket(),
+    sinceTs:      now,
+    runStartedTs: now,
   };
 }
 
@@ -106,10 +113,11 @@ export default function useStats() {
       // a reference change and re-renders. Mutating the existing object
       // wouldn't trigger a re-render and the Stats tab would look stale.
       const next = {
-        version:  liveRef.current.version,
-        run:      { ...liveRef.current.run },
-        lifetime: { ...liveRef.current.lifetime },
-        sinceTs:  liveRef.current.sinceTs,
+        version:      liveRef.current.version,
+        run:          { ...liveRef.current.run },
+        lifetime:     { ...liveRef.current.lifetime },
+        sinceTs:      liveRef.current.sinceTs,
+        runStartedTs: liveRef.current.runStartedTs,
       };
       liveRef.current = next;
       setSnapshot(next);
@@ -138,10 +146,13 @@ export default function useStats() {
   // same treatment so flushes between then and the reload behave.
   const resetRun = useCallback(() => {
     const next = {
-      version:  liveRef.current.version,
-      run:      emptyBucket(),
-      lifetime: { ...liveRef.current.lifetime },
-      sinceTs:  liveRef.current.sinceTs,
+      version:      liveRef.current.version,
+      run:          emptyBucket(),
+      lifetime:     { ...liveRef.current.lifetime },
+      sinceTs:      liveRef.current.sinceTs,
+      // Stamp a fresh "run started now" so the "X ago" readout in the
+      // Stats tab resets alongside the run bucket.
+      runStartedTs: Date.now(),
     };
     liveRef.current = next;
     dirtyRef.current = false; // suppress the next flush
@@ -150,9 +161,10 @@ export default function useStats() {
   }, []);
 
   return {
-    run:      snapshot.run,
-    lifetime: snapshot.lifetime,
-    sinceTs:  snapshot.sinceTs,
+    run:          snapshot.run,
+    lifetime:     snapshot.lifetime,
+    sinceTs:      snapshot.sinceTs,
+    runStartedTs: snapshot.runStartedTs,
     resetRun,
     // Direct API in case a consumer wants to record without going through
     // the singleton (rare — singleton is the canonical path).

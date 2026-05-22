@@ -158,15 +158,19 @@ export function wipeReincarnation() {
   restore('mai_banked_rerolls',         bankedRerolls);
   restore('mai_rebirth_cult_buff_until', rebirthCultBuffUntil);
 
-  // Re-seed stats — preserve lifetime + sinceTs, reset run.
+  // Re-seed stats — preserve lifetime + sinceTs, reset run + stamp a
+  // fresh runStartedTs so the "run started X ago" readout starts from
+  // the moment of rebirth.
   if (statsRaw) {
     try {
       const parsed = JSON.parse(statsRaw);
+      const now = Date.now();
       const reseeded = {
-        version:  parsed.version  ?? 1,
-        run:      {},               // wiped
-        lifetime: parsed.lifetime || {},
-        sinceTs:  parsed.sinceTs ?? Date.now(),
+        version:      parsed.version  ?? 1,
+        run:          {},               // wiped
+        lifetime:     parsed.lifetime || {},
+        sinceTs:      parsed.sinceTs ?? now,
+        runStartedTs: now,
       };
       localStorage.setItem('mai_stats', JSON.stringify(reseeded));
     } catch {}

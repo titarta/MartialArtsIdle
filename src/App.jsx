@@ -1496,6 +1496,8 @@ function AppInner() {
           realmIndex={cultivation.realmIndex}
           achievements={achievements}
           stats={stats}
+          qiRef={cultivation.qiRef}
+          rateRef={cultivation.rateRef}
           onClose={() => setActiveModal(null)}
         />
       )}
