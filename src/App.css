@@ -16819,6 +16819,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 8px;
   padding: 8px 12px 80px;
   overflow-y: auto;
+  /* iOS-Safari hardening for the producer list scroll. The global `*`
+     selector sets touch-action: manipulation which CAN keep children's
+     disabled buttons from passing touches through to the scroll
+     container. Pinning pan-y here guarantees a vertical swipe is
+     always recognised as scroll, even if it started on a disabled
+     child. Paired with `pl-buy:disabled { pointer-events: none }`
+     so the actual disabled buy button doesn't claim the touchstart. */
+  touch-action: pan-y;
+}
+
+/* iOS-Safari scroll-lock fix: disabled buy buttons must pass touches
+   through to the .cs-list scroll container behind them. Without this,
+   touching a now-unaffordable buy button consumes the touchstart and
+   any subsequent swipe is ignored as a scroll gesture — the player has
+   to lift and tap elsewhere to "unlock" scrolling. The button remains
+   visually disabled via .pl-buy-disabled; this only changes touch
+   hit-testing on the :disabled state. */
+.pl-buy:disabled {
+  pointer-events: none;
 }
 
 .cs-row {
