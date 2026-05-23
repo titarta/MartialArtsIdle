@@ -12971,10 +12971,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* Procession — pseudo on each stage wrapper, z above the two img
    layers (color z:1, silhouette z:2) so the shine renders on top.
    `mask-image: var(--sprite-src)` clips the shine to the sprite's
-   actual alpha — the sweep only paints over the visible silhouette
-   pixels, never over the surrounding transparent box. Mask sizing
-   matches the sprite's object-fit/object-position so it aligns
-   pixel-perfect with the colour/silhouette image layers. */
+   actual alpha. Mask sizing matches the sprite's object-fit /
+   object-position so it aligns pixel-perfect with the layers below.
+
+   The crystal sprites have hard-edge alpha (no halo) but they fill
+   ~60% of the bounding box, so a WIDE bright band would read as a
+   wash across the whole crystal. The gradient below uses a NARROW
+   bright peak (47-53%, just 6% of gradient width) at higher
+   brightness — reads as a tight diagonal "slash" of polish across
+   the sprite rather than a wash. */
 .bls-procession[data-slot="crystal"] .bls-proc-stage::before {
   content: '';
   position: absolute;
@@ -12982,10 +12987,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   pointer-events: none;
   z-index: 3;
   background: linear-gradient(
-    115deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.55) 50%,
-    transparent 65%
+    110deg,
+    transparent 46%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 54%
   );
   /* Mask the sweep to the sprite's alpha channel — uses --sprite-src
      supplied per-stage via inline style on the stage wrapper. */
@@ -13003,7 +13008,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 /* Regular tint card — pseudo on .bls-card-preview, but we already
    use ::after for the glow halo. Use ::before here for the shine.
-   Mask sized to match .bls-card-preview-sprite (88%, centred). */
+   Mask sized to match .bls-card-preview-sprite (88%, centred).
+   Same narrow-band gradient as the procession version. */
 .bls-card[data-slot="crystal"] .bls-card-preview::before {
   content: '';
   position: absolute;
@@ -13011,14 +13017,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   pointer-events: none;
   z-index: 1; /* above sprite (no z), below the glow ::after */
   background: linear-gradient(
-    115deg,
-    transparent 35%,
-    rgba(255, 255, 255, 0.55) 50%,
-    transparent 65%
+    110deg,
+    transparent 46%,
+    rgba(255, 255, 255, 0.85) 50%,
+    transparent 54%
   );
   -webkit-mask-image: var(--sprite-src);
           mask-image: var(--sprite-src);
-  /* Sprite renders at max 88% of preview box, centred — mask matches. */
   -webkit-mask-size: 88% 88%;
           mask-size: 88% 88%;
   -webkit-mask-repeat: no-repeat;
