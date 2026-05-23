@@ -3,7 +3,9 @@ import NavBar from './components/NavBar';
 import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
 import BloodLotusShopModal from './components/BloodLotusShopModal';
-import { addBloodLotus as addBloodLotusBalance } from './systems/bloodLotus';
+import BloodLotusSpendShopModal from './components/BloodLotusSpendShopModal';
+import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './systems/bloodLotus';
+import useShopInventory from './hooks/useShopInventory';
 import PillDrawer from './components/PillDrawer';
 import ProgressHubModal from './components/ProgressHubModal';
 import DailyBonusModal from './components/DailyBonusModal';
@@ -109,7 +111,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['settings', 'shop', 'progress', 'pills', 'daily']);
+    const ours = new Set(['settings', 'shop', 'lotus-shop', 'progress', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -148,6 +150,18 @@ function AppInner() {
     return () => clearInterval(id);
   }, []);
 
+  // Blood Lotus Shop — "Decisive Heart" QoL. When the player owns this
+  // and a major breakthrough is pending, auto-fire confirm so the
+  // celebratory pause is skipped. The cultivation hook is already idem-
+  // potent on confirmMajorBreakthrough (no-op if nothing pending), and
+  // the post-confirm banner / spark-offer flow still runs — we're just
+  // saving a tap.
+  useEffect(() => {
+    if (!cultivation.pendingMajorBreakthrough) return;
+    if (!shopInventory.hasQol('qol_skip_bt_confirm')) return;
+    cultivation.confirmMajorBreakthrough?.();
+  }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
+
   // Progress hub migration card — fires once per existing player who
   // remembers the old separate Journey + Achievements TopBar buttons.
   // Gated on having seen WELCOME so brand-new players don't get an
@@ -184,6 +198,7 @@ function AppInner() {
   // singleton recorder is bound when those hooks fire their first events.
   // See src/systems/statsRecorder.js for the binding mechanism.
   const stats           = useStats();
+  const shopInventory   = useShopInventory();
   const cultivation     = useCultivation();
   const inventory       = useInventory();
   const karma           = useReincarnationKarma();
@@ -1393,7 +1408,11 @@ function AppInner() {
       )}
       <TopBar
         bloodLotusBalance={selections.bloodLotusBalance}
-        onOpenShop={() => openModal('shop')}
+        /* Lotus chip in TopBar now opens the SPEND shop (where players
+           use their Blood Lotus to buy buffs / QoL / etc.). The IAP
+           "Top Up Blood Lotus" modal is reached from a CTA inside the
+           spend shop. */
+        onOpenShop={() => openModal('lotus-shop')}
         onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
         onOpenSettings={() => openModal('settings')}
         hasNewAchievement={hasNewAch}
@@ -1491,6 +1510,14 @@ function AppInner() {
       )}
       {activeModal === 'settings'     && <SettingsScreen onClose={() => setActiveModal(null)} />}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
+      {activeModal === 'lotus-shop'   && (
+        <BloodLotusSpendShopModal
+          inventory={shopInventory}
+          balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
+          onClose={() => setActiveModal(null)}
+          onOpenTopUp={() => openModal('shop')}
+        />
+      )}
       {activeModal === 'progress'     && (
         <ProgressHubModal
           realmIndex={cultivation.realmIndex}

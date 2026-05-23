@@ -159,9 +159,22 @@ export default function useCultivation() {
                            + (hasUp('u_offline_cap_2') ? 4 : 0)
                            + (hasUp('u_offline_cap_3') ? 4 : 0)
                            + (hasUp('u_offline_cap_4') ? 4 : 0);
+    // Blood Lotus Shop — "Patient Mind +2h" stackable purchase. Read
+    // directly from localStorage since this branch runs pre-React-mount
+    // (offline calc) and there's no useShopInventory available yet.
+    let shopOfflineCapBonusH = 0;
+    try {
+      const rawInv = localStorage.getItem('mai_shop_inventory');
+      if (rawInv) {
+        const inv = JSON.parse(rawInv);
+        const stacks = inv?.stacks ?? {};
+        const n = Math.max(0, parseInt(stacks.qol_offline_cap_2h ?? 0, 10) || 0);
+        shopOfflineCapBonusH = n * 2;
+      }
+    } catch {}
     // Cap at MAX_OFFLINE_HOURS so a week-long absence doesn't trivialise
     // progression. Same constant as gather/mine offline cap.
-    const awaySeconds = Math.min(rawAwaySeconds, (MAX_OFFLINE_HOURS + offlineCapBonusH) * 3600);
+    const awaySeconds = Math.min(rawAwaySeconds, (MAX_OFFLINE_HOURS + offlineCapBonusH + shopOfflineCapBonusH) * 3600);
     const realm = REALMS[saved.realmIndex];
     if (!realm || !REALMS[saved.realmIndex + 1]) return 0; // maxed
 

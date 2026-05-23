@@ -39,7 +39,7 @@ export default function TopBar({
   return (
     <div className="top-bar">
       <button
-        className={`home-hud-blood-lotus${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-blood-lotus${(activeModal === 'lotus-shop' || activeModal === 'shop') ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenShop}
         aria-label="Blood Lotus Shop"
       >

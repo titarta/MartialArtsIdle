@@ -12297,6 +12297,259 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-variant-numeric: tabular-nums;
 }
 
+/* ─── Blood Lotus Spend Shop Modal (.bls-*) ──────────────────────────────
+   Where players SPEND their Blood Lotus. Distinct from the IAP "Top Up"
+   modal (.blood-lotus-shop-card) which is the purchase-currency flow.
+   Mirrors .progress-hub-modal chrome — same family, same close button,
+   same .ach-tabs chip row for category navigation. */
+.bls-modal {
+  background: rgb(var(--ui-bg-panel-rgb));
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.3);
+  border-radius: 16px;
+  width: min(96vw, 480px);
+  max-height: var(--modal-max-h);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modal-pop 0.2s ease-out;
+}
+
+.bls-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Right padding reserved for the absolute .modal-close button. */
+  padding: 14px 52px 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+}
+.bls-header-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+}
+.bls-header-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ui-purple-light);
+}
+.bls-header-balance {
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 200, 200, 0.95);
+  background: rgba(200, 60, 80, 0.12);
+  border: 1px solid rgba(200, 60, 80, 0.28);
+  border-radius: 999px;
+  padding: 3px 12px;
+  flex-shrink: 0;
+}
+.bls-header-balance-suffix {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 200, 200, 0.6);
+  margin-left: 2px;
+}
+
+.bls-tabs {
+  /* Override .ach-tabs default padding so the tab row hugs the
+     header tighter inside the shop modal. */
+  padding: 8px 14px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.bls-flash {
+  margin: 8px 14px 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  animation: bls-flash-in 0.18s ease-out;
+}
+.bls-flash-ok {
+  background: rgba(80, 200, 120, 0.12);
+  border: 1px solid rgba(80, 200, 120, 0.4);
+  color: #6ee7a0;
+}
+.bls-flash-err {
+  background: rgba(220, 80, 80, 0.12);
+  border: 1px solid rgba(220, 80, 80, 0.4);
+  color: #f08080;
+}
+@keyframes bls-flash-in {
+  from { transform: translateY(-4px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.bls-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bls-empty {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  font-style: italic;
+}
+
+/* One row per shop item — icon · body · buy button. */
+.bls-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: background 0.15s, border-color 0.15s;
+}
+.bls-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.bls-item-owned {
+  background: rgba(var(--ui-purple-strong-rgb), 0.07);
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.25);
+}
+.bls-item-active {
+  background: rgba(255, 80, 90, 0.08);
+  border-color: rgba(255, 80, 90, 0.3);
+}
+.bls-item-maxed {
+  opacity: 0.7;
+}
+
+.bls-item-icon {
+  font-size: 26px;
+  width: 38px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bls-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.bls-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #eee;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bls-item-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ui-purple-light);
+  background: rgba(var(--ui-purple-strong-rgb), 0.18);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+}
+.bls-buff-countdown {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 200, 200, 0.85);
+  background: rgba(200, 60, 80, 0.18);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-variant-numeric: tabular-nums;
+}
+.bls-item-desc {
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Buy / Owned / Maxed button. Reuses the .tutorial-cta family vocabulary
+   (pill, dark base, accent glow) at a smaller scale. */
+.bls-item-buy {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.45);
+  background: linear-gradient(140deg, rgba(20, 14, 30, 0.95), rgba(12, 8, 20, 0.95));
+  color: #ffe;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    0 3px 12px rgba(80, 50, 150, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-item-buy:hover:not(:disabled),
+.bls-item-buy:focus-visible {
+  filter: brightness(1.15);
+  outline: none;
+  box-shadow:
+    0 4px 18px rgba(var(--ui-purple-strong-rgb), 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.bls-item-buy:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+.bls-item-buy:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Bottom "Top Up" CTA — opens the IAP modal. Quieter than the buy
+   buttons (dim border, no glow) so it doesn't compete visually with
+   the in-shop CTAs. */
+.bls-topup {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 16px;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-topup:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.9);
+}
+.bls-topup-cta {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 200, 210, 0.95);
+  margin-left: 6px;
+}
+
 /* ── Jade Shop Card ──────────────────────────────────────────────────────── */
 
 /* Floating card — anchored below the HUD, no overlay */
