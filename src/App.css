@@ -12801,40 +12801,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   --proc-h: 58px;
 }
 
-.bls-proc-sprite {
+/* Per-stage wrapper — owns positioning + scale + z-index. Holds two
+   image layers (colour underneath, silhouette on top) so the
+   transition from "fully revealed" to "fully shadowed" is a smooth
+   per-stage opacity blend rather than a hard cutoff. */
+.bls-proc-stage {
   position: absolute;
   bottom: 6px;
-  /* Distribute sprites' LEFT edges evenly across the available width
-     so the first sprite starts at left=PAD and the last sprite's RIGHT
-     edge sits at right=PAD. Math:
-        step = (containerW - 2·PAD - spriteW) / (count - 1)
-        leftᵢ = PAD + i · step
-     With 13 stages, ~340px content, --proc-w 42, --proc-pad 12:
-        step ≈ (340 - 24 - 42) / 12 ≈ 23 px
-        overlap ≈ spriteW - step ≈ 19 px (~45% of front sprite)
-     Silhouettes show ~23 px of width each — legible without crowding. */
+  /* Distribute stage wrappers' LEFT edges evenly across the available
+     width so the first starts at left=PAD and the last's RIGHT edge
+     sits at right=PAD. */
   left: calc(
     var(--proc-pad) +
     var(--stage-index, 0) *
     ((100% - 2 * var(--proc-pad) - var(--proc-w)) / max(1, calc(var(--stage-count, 1) - 1)))
   );
   width: var(--proc-w);
-  /* Fixed height + object-fit prevents variable-aspect sprites (like
-     the crystal set, whose source PNGs range from 89x110 to 97x99)
-     from appearing to "shrink" at later tiers — each sprite now fills
-     a consistent box, centered. Cultivator sprites are uniform
-     256x256 so this also works for them without distortion. */
   height: var(--proc-h, 52px);
-  object-fit: contain;
-  object-position: bottom center;
-  /* Subtle growth with depth — later (deeper-Z) silhouettes are a
-     hair BIGGER than the front sprites so they read as "looming
-     behind" rather than "shrinking into the distance". Ramps from
-     1.00 (front) → 1.06 (deepest back). Just enough to push the
-     back silhouettes' heads above the front sprites' outlines so the
-     viewer reads a sense of "scale of progression" without it
-     feeling cartoonish. transform-origin: bottom center keeps every
-     sprite anchored to the same baseline. */
+  /* Subtle growth with depth — later (deeper-Z) silhouettes are a hair
+     BIGGER than the front sprites so they read as "looming behind". */
   transform-origin: bottom center;
   transform: scale(calc(
     1 + (var(--stage-index, 0) * (0.06 / max(1, calc(var(--stage-count, 1) - 1))))
@@ -12842,13 +12827,40 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
 }
 
-.bls-proc-sprite-hidden {
-  /* True-black silhouette via the global SVG filter. Full opacity —
-     every silhouette is fully visible, no depth-fade. The recession
-     read comes entirely from the subtle scale ramp + z-stacking. */
+/* Both image layers stack on top of each other inside the wrapper —
+   absolute fills the wrapper, same fit + anchor so they line up
+   pixel-perfect. */
+.bls-proc-sprite-color,
+.bls-proc-sprite-silhouette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  pointer-events: none;
+}
+.bls-proc-sprite-color {
+  /* Bottom layer — always full opacity. The silhouette layer's
+     opacity is what hides/shows it. */
+  z-index: 1;
+}
+.bls-proc-sprite-silhouette {
+  z-index: 2;
   filter:
     url(#mai-silhouette)
-    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+  /* Opacity ramp — stages 1 + 2 + 3 transition smoothly from full
+     colour to full silhouette; stage 4 onwards is pitch-black.
+     Linear ramp: i / 3, clamped at 1.
+       i=0 (stage 1): 0   → silhouette invisible, see only colour
+       i=1 (stage 2): 0.33 → partial silhouette, mostly colour
+       i=2 (stage 3): 0.67 → mostly silhouette, hint of colour
+       i=3 (stage 4): 1.0  → fully silhouetted (no colour bleeds)
+       i=4+         : 1.0  → fully silhouetted (clamped)
+     Using max() instead of min() to clamp upward keeps both
+     directions sane if --stage-index is somehow negative. */
+  opacity: min(1, calc(var(--stage-index, 0) / 3));
 }
 
 .bls-strip-footer {

@@ -185,20 +185,36 @@ function CosmeticCardProcession({ item, ownership, balance, onBuy, onEquip, onUn
         style={{ '--stage-count': totalStages }}
       >
         {sprites.map((src, i) => {
-          const isHidden = i >= revealedCount;
+          // Each stage is a wrapper with TWO image layers: the colour
+          // sprite on the bottom + the silhouetted sprite on top with
+          // a CSS-driven opacity. The opacity ramps stage-by-stage so
+          // stages 2 + 3 are PARTIALLY silhouetted (gradual fade) and
+          // stage 4+ becomes fully shadowed. See CSS for the ramp math.
           return (
-            <img
+            <div
               key={i}
-              src={src}
-              alt=""
-              draggable="false"
-              className={`bls-proc-sprite${isHidden ? ' bls-proc-sprite-hidden' : ''}`}
+              className="bls-proc-stage"
               style={{
                 '--stage-index': i,
                 zIndex: totalStages - i, // earlier stages on top
               }}
-              aria-label={isHidden ? `Stage ${i + 1} — locked` : `Stage ${i + 1}`}
-            />
+              aria-label={i === 0
+                ? `Stage ${i + 1}`
+                : `Stage ${i + 1} — partially revealed`}
+            >
+              <img
+                src={src}
+                alt=""
+                draggable="false"
+                className="bls-proc-sprite-color"
+              />
+              <img
+                src={src}
+                alt=""
+                draggable="false"
+                className="bls-proc-sprite-silhouette"
+              />
+            </div>
           );
         })}
       </div>
