@@ -4700,7 +4700,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-family: var(--font-display);
   font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.35em;
+  /* Letter-spacing was 0.35em when this was system-sans — heavy tracking
+     was needed to give sans-serif uppercase visual rhythm. Cinzel's wide
+     letterforms already carry that rhythm, so 0.35em reads as drunk /
+     exploded with the serif. Dropped to 0.14em which feels ceremonial
+     without spreading the word past its container at mobile widths.   */
+  letter-spacing: 0.14em;
   color: #ffe4a0;
   text-transform: uppercase;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
