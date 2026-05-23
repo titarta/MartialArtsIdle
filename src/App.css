@@ -18764,11 +18764,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    top stop to be even brighter (e.g. rgba(95, 165, 125)) for a more
    confident jade panel face. */
 
-/* ── AGED SCROLL theme (2026-05-23) — light parchment modals with
-   deep ink text + dark wood frame. Cultivation-game-as-ancient-
-   manuscript aesthetic, per frontend designer recommendation.
+/* ── LACQUER theme (2026-05-23) — dark lacquer panels with bright
+   cream/gold trim. The game's text rules were designed for DARK
+   backgrounds (most use white/cream text); flipping to light panels
+   broke readability everywhere. This theme keeps panels dark (so
+   text stays readable) but uses bright cream borders + warm-gold
+   accents so the WARMTH the user wanted reads through the trim,
+   not the backdrop. Like Chinese lacquerware — black/brown lacquer
+   surface with cream-and-gold inlay.
+
    Modals INTENTIONALLY excluded (kept on their own theme chrome):
-     .daily-modal           — blood-red lotus gradient (gift-day) */
+     .daily-modal           — blood-red lotus gradient (gift-day)  */
 .achievements-modal,
 .progress-hub-modal,
 .journey-modal,
@@ -18782,69 +18788,36 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .artefact-upgrade-panel,
 .modal-content,
 .blood-lotus-shop-card {
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(255, 250, 235, 0.6), transparent 70%),
-    linear-gradient(160deg, #f5e9d3 0%, #e8d4ad 100%) !important;
-  border: 1px solid #8b6f47 !important;
+  /* Dark warm-charcoal panel — subtly warm-tinged so it doesn't read
+     as cold black/grey. Slight gradient mimics polished lacquer. */
+  background: linear-gradient(
+    160deg,
+    #2a2218 0%,
+    #1a1510 100%
+  ) !important;
+  /* Cream-gold border — this is where the "warm cream" lives. Bright
+     and visible so the panel edge reads as cream/sandalwood trim. */
+  border: 1px solid rgba(212, 184, 136, 0.55) !important;
   box-shadow:
-    0 14px 40px rgba(45, 30, 15, 0.45),
-    0 0 0 1px rgba(255, 252, 245, 0.4) inset,
-    0 1px 0 rgba(255, 252, 245, 0.7) inset,
-    0 0 80px rgba(180, 145, 95, 0.15) inset !important;
-  color: #2b1d10 !important;
-
-  /* SCOPED VARIABLE OVERRIDES — inside cream parchment modals,
-     remap the --ui-purple-* family so all existing var() consumers
-     (stat labels, badges, borders, hover text) auto-flip from "pale
-     cream on dark" → "deep ink on cream" without per-rule edits. */
-  --ui-purple-rgb:         184,  38,  26;  /* vermillion seal */
-  --ui-purple-deep-rgb:    139,  28,  20;
-  --ui-purple-strong-rgb:  184,  38,  26;
-  --ui-purple-soft-rgb:    139, 111,  71;  /* sandalwood */
-  --ui-purple-light-rgb:    43,  29,  16;  /* deep ink */
-
-  --ui-purple-darker:  #2b1d10;
-  --ui-purple-deep:    #5d4630;
-  --ui-purple-strong:  #b8261a;  /* vermillion */
-  --ui-purple-soft:    #8b6f47;
-  --ui-purple-light:   #2b1d10;  /* dark ink (was pale cream) */
-  --ui-purple-wash:    #5d4630;
-  --ui-purple-pale:    #f5e9d3;
-
-  --ui-hover-rgb:       43,  29,  16;  /* deep ink hover */
-  --ui-label-rgb:       93,  70,  48;  /* tea-stained label */
-  --ui-muted-rgb:      138, 114,  89;  /* faded brush stroke */
-  --ui-shadow-rgb:      45,  30,  15;
-
-  /* Nested-panel background var — inside cream modals, "panel" means
-     a creamier inset block, not the dark sandalwood from index.css. */
-  --ui-bg-panel-rgb:   255, 248, 230;
-  --ui-bg-deep-rgb:    232, 212, 173;
-  --ui-border-rgb:     139, 111,  71;
+    0 12px 36px rgba(0, 0, 0, 0.75),
+    0 0 24px rgba(212, 184, 136, 0.10),
+    inset 0 1px 0 rgba(232, 213, 168, 0.15) !important;
 }
 
-/* Inner stat-row containers — creamier inset on the parchment panel,
-   ink-divided rows like ledger lines. */
+/* Inner stat-row containers — slightly lighter than the panel bg so
+   nested content still reads with depth. Bordered in cream/gold to
+   match the modal trim vocabulary. */
 .pdm-stats,
 .coll-stat-list {
-  background: rgba(255, 248, 230, 0.55) !important;
-  border: 1px solid rgba(139, 111, 71, 0.22) !important;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(212, 184, 136, 0.18) !important;
 }
 .pdm-stat-row {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(139, 111, 71, 0.14);
-  color: #2b1d10 !important;
-}
-.pdm-stat-row:last-child {
-  border-bottom: none;
+  background: rgba(0, 0, 0, 0.15) !important;
 }
 .pdm-stat-row-emph {
-  background: rgba(184, 38, 26, 0.08) !important;  /* vermillion seal wash */
-  color: #2b1d10 !important;
+  background: rgba(220, 175, 110, 0.10) !important;  /* warm-gold wash */
 }
-.pdm-stat-label { color: #5d4630 !important; }
-.pdm-stat-value { color: #2b1d10 !important; }
 
 /* ─────────────────────────────────────────────────────────────────────
    ── CHROME OVERRIDE (header / footer / nav) — 2026-05-23 ──────────

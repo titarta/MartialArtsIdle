@@ -37,58 +37,57 @@
        -wash    pale uppercase labels, subtle backgrounds
        -pale    palest ultra-soft backgrounds, very diffuse tints                                            */
 
-  /* WARM PARCHMENT / SANDALWOOD — 2026-05-23 theme pivot from jade.
-     User wanted a more neutral oriental palette: aged scroll paper,
-     tea-stained silk, sandalwood — restrained, classical, readable.
-     RGB triplets are vivid enough at low alpha to still read as
-     warmth (not a colourless grey), but desaturated enough to stay
-     out of the way of game content. */
-  --ui-purple-rgb:         175, 145, 100;  /* base — warm parchment (#af9164) */
-  --ui-purple-deep-rgb:    130, 100,  65;  /* sandalwood deep (#826441) */
-  --ui-purple-strong-rgb:  200, 170, 120;  /* loud cream/tan accent (#c8aa78) */
-  --ui-purple-soft-rgb:    220, 195, 155;  /* soft cream (#dcc39b) */
-  --ui-purple-light-rgb:   240, 220, 190;  /* pale cream (#f0dcbe) */
+  /* WARM CREAM ACCENT family — 2026-05-23 lacquer theme.
+     The PANEL backgrounds stay dark (the game's text rules expect
+     it). These vars provide WARM CREAM/TAN/GOLD accent colours
+     used for borders, highlights, glows, and emphasis text. Bright
+     enough to read as warmth on the dark panels. */
+  --ui-purple-rgb:         200, 170, 120;  /* base — warm tan (#c8aa78) */
+  --ui-purple-deep-rgb:    155, 125,  80;  /* sandalwood (#9b7d50) */
+  --ui-purple-strong-rgb:  220, 175, 110;  /* lantern amber (#dcaf6e) */
+  --ui-purple-soft-rgb:    232, 213, 168;  /* soft cream (#e8d5a8) */
+  --ui-purple-light-rgb:   245, 230, 200;  /* pale cream highlight (#f5e6c8) */
 
   /* Discrete shades (dark → light) used as solid colors */
-  --ui-purple-darker:  #3d2e1f;   /* deepest umber — gradient starts */
-  --ui-purple-deep:    #6b5232;   /* pressed sandalwood, emphasised outlines */
-  --ui-purple-strong:  #c8a878;   /* loud callouts, strong accents */
-  --ui-purple-soft:    #dcc39b;   /* secondary accents, softer glow */
-  --ui-purple-light:   #f0dcbe;   /* highlights, emphasis text (pale cream) */
-  --ui-purple-wash:    #f5e6c9;   /* pale label / uppercase text */
-  --ui-purple-pale:    #faefd9;   /* ultra-soft backgrounds */
+  --ui-purple-darker:  #4a3520;   /* deepest sandalwood */
+  --ui-purple-deep:    #9b7d50;   /* pressed accent */
+  --ui-purple-strong:  #dcaf6e;   /* loud callouts (lantern amber) */
+  --ui-purple-soft:    #e8d5a8;   /* secondary cream accent */
+  --ui-purple-light:   #f5e6c8;   /* highlights, emphasis text */
+  --ui-purple-wash:    #f8edd4;   /* pale label / uppercase text */
+  --ui-purple-pale:    #fcf5e2;   /* ultra-soft tints */
 
   /* ── UI chrome tints ──────────────────────────────────────────────────
-     2026-05-23: re-tinted for the warm-parchment theme. Atmosphere
-     colours are warm cream / tan / sandalwood so the UI reads as
-     classical-oriental-scroll (vs cool jade). Store as rgb triples
-     so alpha varies per usage via rgba(). */
+     2026-05-23: re-tinted for the lacquer theme. Text/label colours
+     remain LIGHT cream/tan family so they read on the dark lacquer
+     panels. Atmosphere stays warm-toned for the oriental feel. */
 
-  /* Hover / pale interactive text (240, 220, 190 — pale cream) */
-  --ui-hover-rgb:      240, 220, 190;
+  /* Hover / pale interactive text (245, 230, 200 — pale cream) */
+  --ui-hover-rgb:      245, 230, 200;
 
-  /* Secondary text / labels / captions (200, 175, 140 — warm tan) */
-  --ui-label-rgb:      200, 175, 140;
+  /* Secondary text / labels / captions (210, 195, 170 — warm cream-grey) */
+  --ui-label-rgb:      210, 195, 170;
 
-  /* Muted / disabled text (175, 155, 130 — desaturated tan) */
-  --ui-muted-rgb:      175, 155, 130;
+  /* Muted / disabled text (175, 160, 140 — desaturated warm grey) */
+  --ui-muted-rgb:      175, 160, 140;
 
-  /* Deep brown shadow for tooltip/modal drop-shadows (75, 55, 30) */
-  --ui-shadow-rgb:      75,  55,  30;
+  /* Deep brown shadow for tooltip/modal drop-shadows (40, 30, 18) */
+  --ui-shadow-rgb:      40,  30,  18;
 
-  /* ── UI surface backgrounds — warm dark earth ────────────────────────
-     Warm dark backbone for the whole game. Subtle brown cast at high
-     opacity reads as "aged wood / weathered scroll" rather than a
-     neutral black. Deep stays near-black for the outermost backdrop. */
+  /* ── UI surface backgrounds — dark lacquer ──────────────────────────
+     Dark backbone for the whole game. Subtle warm tinge keeps the
+     lacquer-and-cream-trim aesthetic; cream borders/accents from
+     the --ui-purple-* family above are what carry the "cultivation
+     scroll" warmth on top of these dark surfaces. */
 
   /* Deepest surface (nav, deepest panels) — near-black with warm cast. */
-  --ui-bg-deep-rgb:     20,  14,   8;
+  --ui-bg-deep-rgb:     14,  12,   8;
 
-  /* Panel / modal / card background — dark sandalwood / aged-wood tone. */
-  --ui-bg-panel-rgb:    50,  38,  25;
+  /* Panel / modal / card background — dark warm-charcoal. */
+  --ui-bg-panel-rgb:    32,  26,  18;
 
-  /* Border / divider tint between panels — medium warm tan. */
-  --ui-border-rgb:      90,  70,  45;
+  /* Border / divider tint between panels — warm medium. */
+  --ui-border-rgb:      75,  60,  40;
 
   /* ── Old purple palette (revert by uncommenting + commenting jade above) ─
   --ui-purple-rgb:         139,  92, 246;
