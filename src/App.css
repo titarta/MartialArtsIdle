@@ -18965,3 +18965,225 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     inset 0 0 0 1px rgba(232, 195, 130, 0.5),
     0 0 12px rgba(184, 38, 26, 0.3) !important;
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   BLOOD LOTUS SHOP — interior palette refinement (2026-05-23)
+   Frontend-designer pass: four-accent system enforced inside the
+   shop modal + IAP top-up card. Kills the legacy purple leakage
+   that survived the red-chrome migration; commits to vermillion +
+   ember-gold + jade-of-immortality + ivory-mist with sharp
+   semantic meaning per accent.
+
+   Vermillion = primary identity / spend action (the wax seal)
+   Ember gold = premium / equipped / value headline
+   Jade      = active right now (richer than CSS bright green)
+   Ivory     = neutral / locked / coming soon (replaces blue-grey)
+
+   All rules scope to .bls-modal / .blood-lotus-shop-card so the
+   override can't leak into other parts of the game.
+   ────────────────────────────────────────────────────────────────── */
+
+.bls-modal,
+.blood-lotus-shop-card {
+  /* Scoped palette tokens so child rules don't need to repeat hex */
+  --shop-vermillion:       #7a1018;
+  --shop-vermillion-rgb:   122, 16, 24;
+  --shop-vermillion-light: #c2374a;
+  --shop-vermillion-deep:  #4a0810;
+  --shop-ember:            #d4a866;
+  --shop-ember-rgb:        212, 168, 102;
+  --shop-ember-deep:       #8a6a35;
+  --shop-jade:             #4a9778;
+  --shop-jade-rgb:         74, 151, 120;
+  --shop-jade-light:       #7ed4a8;
+  --shop-ivory:            #e8d5a8;
+  --shop-ivory-rgb:        232, 213, 168;
+}
+
+/* === Header balance chip — stronger seal vocabulary === */
+.bls-modal .bls-header-balance,
+.blood-lotus-shop-card .bls-header-balance {
+  background: linear-gradient(
+    135deg,
+    rgba(122, 16, 24, 0.30) 0%,
+    rgba(74, 8, 16, 0.30) 100%
+  );
+  border: 1px solid rgba(212, 168, 102, 0.45);
+  color: #ffe8d4;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.18),
+    0 0 12px rgba(122, 16, 24, 0.25);
+}
+
+/* === Card base — kill the purple leak === */
+.bls-modal .bls-card,
+.bls-modal .bls-buff-card,
+.blood-lotus-shop-card .bls-card,
+.blood-lotus-shop-card .bls-buff-card {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(220, 80, 100, 0.06), transparent 60%),
+    linear-gradient(180deg, rgba(28, 10, 14, 0.96) 0%, rgba(14, 6, 10, 0.96) 100%);
+  border-color: rgba(220, 80, 100, 0.10);
+}
+.bls-modal .bls-card:hover,
+.blood-lotus-shop-card .bls-card:hover {
+  box-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(212, 168, 102, 0.18);
+  border-color: rgba(212, 168, 102, 0.35);
+}
+
+/* === Card body fade — deep crimson, no purple === */
+.bls-modal .bls-card-body,
+.blood-lotus-shop-card .bls-card-body {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(14, 4, 8, 0.85) 100%
+  );
+}
+
+/* === Card preview area — subtle crimson tint instead of pure black === */
+.bls-modal .bls-card-preview,
+.blood-lotus-shop-card .bls-card-preview {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 220, 200, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(28, 8, 14, 0.45), rgba(14, 4, 8, 0.6));
+}
+
+/* === BUY button — vermillion seal lacquer (MAJOR repaint) ===
+   This is the spend moment. Make it feel like pressing a wax seal. */
+.bls-modal .bls-card-cta-buyable,
+.blood-lotus-shop-card .bls-card-cta-buyable {
+  background: linear-gradient(180deg, #9a1a24 0%, #5a0c14 100%);
+  border: 1px solid rgba(212, 168, 102, 0.50);
+  color: #fff2dc;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.20),
+    inset 0 -1px 6px rgba(60, 4, 10, 0.6),
+    0 3px 12px rgba(122, 16, 24, 0.45),
+    0 0 0 1px rgba(212, 168, 102, 0.15);
+}
+.bls-modal .bls-card-cta-buyable:hover:not(:disabled),
+.blood-lotus-shop-card .bls-card-cta-buyable:hover:not(:disabled) {
+  filter: brightness(1.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.28),
+    inset 0 -1px 6px rgba(60, 4, 10, 0.6),
+    0 4px 18px rgba(212, 168, 102, 0.40),   /* ember halo on hover */
+    0 0 0 1px rgba(212, 168, 102, 0.30);
+}
+
+/* === COMING SOON — ivory mist instead of blue-grey === */
+.bls-modal .bls-card-cta-coming-soon,
+.blood-lotus-shop-card .bls-card-cta-coming-soon {
+  border: 1px dashed rgba(232, 213, 168, 0.30);
+  background: rgba(232, 213, 168, 0.03);
+  color: rgba(232, 213, 168, 0.65);
+}
+.bls-modal .bls-card-ribbon-soon,
+.blood-lotus-shop-card .bls-card-ribbon-soon {
+  background: rgba(232, 213, 168, 0.10);
+  color: rgba(232, 213, 168, 0.85);
+  border-color: rgba(232, 213, 168, 0.40);
+}
+
+/* === ACTIVE buff — richer jade instead of CSS bright green === */
+.bls-modal .bls-card-ribbon-active,
+.blood-lotus-shop-card .bls-card-ribbon-active {
+  background: rgba(74, 151, 120, 0.22);
+  color: rgba(180, 230, 200, 1);
+  border-color: rgba(126, 212, 168, 0.60);
+}
+.bls-modal .bls-buff-card-active,
+.blood-lotus-shop-card .bls-buff-card-active {
+  border-color: rgba(126, 212, 168, 0.50);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.45),
+    0 0 16px rgba(74, 151, 120, 0.26);
+}
+
+/* === BUFF CARD content — kill the purple-cream name === */
+.bls-modal .bls-buff-card-name,
+.blood-lotus-shop-card .bls-buff-card-name {
+  color: rgba(255, 220, 200, 0.88);
+}
+
+/* === ITEM ROWS (Consumables + QoL) — tie into the red family === */
+.bls-modal .bls-item,
+.blood-lotus-shop-card .bls-item {
+  background: linear-gradient(
+    180deg,
+    rgba(28, 10, 14, 0.55) 0%,
+    rgba(14, 6, 10, 0.55) 100%
+  );
+  border-color: rgba(220, 80, 100, 0.14);
+}
+.bls-modal .bls-item:hover,
+.blood-lotus-shop-card .bls-item:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(40, 14, 20, 0.65) 0%,
+    rgba(22, 8, 14, 0.65) 100%
+  );
+  border-color: rgba(212, 168, 102, 0.28);
+}
+
+/* === FLASH BANNERS — keep semantic but RICHER === */
+.bls-modal .bls-flash-ok,
+.blood-lotus-shop-card .bls-flash-ok {
+  background: rgba(74, 151, 120, 0.15);
+  border: 1px solid rgba(126, 212, 168, 0.45);
+  color: #a8e6c8;
+}
+.bls-modal .bls-flash-err,
+.blood-lotus-shop-card .bls-flash-err {
+  background: rgba(122, 16, 24, 0.20);
+  border: 1px solid rgba(194, 55, 74, 0.55);
+  color: #ff9eae;
+}
+
+/* === TOP UP footer — elevate from quiet link to premium gateway ===
+   This is the IAP funnel. Ember sheen on hover sells "you are being
+   offered a ceremonial path" without permanent marketing throb. */
+.bls-modal .bls-topup,
+.blood-lotus-shop-card .bls-topup {
+  background: linear-gradient(180deg, rgba(28, 10, 14, 0.85) 0%, rgba(40, 12, 18, 0.85) 100%);
+  border-top: 1px solid rgba(212, 168, 102, 0.30);
+  color: rgba(232, 213, 168, 0.85);
+  position: relative;
+  overflow: hidden;
+}
+.bls-modal .bls-topup::before,
+.blood-lotus-shop-card .bls-topup::before {
+  /* Subtle ember sweep on hover. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    rgba(212, 168, 102, 0.10) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+.bls-modal .bls-topup:hover::before,
+.blood-lotus-shop-card .bls-topup:hover::before {
+  transform: translateX(100%);
+}
+.bls-modal .bls-topup:hover,
+.blood-lotus-shop-card .bls-topup:hover {
+  background: linear-gradient(180deg, rgba(40, 12, 18, 0.95) 0%, rgba(60, 16, 24, 0.95) 100%);
+  color: #fff2dc;
+}
+.bls-modal .bls-topup-cta,
+.blood-lotus-shop-card .bls-topup-cta {
+  color: #d4a866;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
