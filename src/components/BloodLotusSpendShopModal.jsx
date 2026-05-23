@@ -196,11 +196,6 @@ function CosmeticCardProcession({ item, ownership, balance, onBuy, onEquip, onUn
               className="bls-proc-stage"
               style={{
                 '--stage-index': i,
-                /* --sprite-src is the sprite URL used as a CSS mask
-                   for the shine sweep pseudo so the shine clips to
-                   the sprite's actual alpha (the visible silhouette)
-                   instead of painting the full rectangular box. */
-                '--sprite-src': `url(${src})`,
                 zIndex: totalStages - i, // earlier stages on top
               }}
               aria-label={i === 0
@@ -276,13 +271,7 @@ function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, bus
       {stateClass === 'equipped' && <span className="bls-card-ribbon">EQUIPPED</span>}
       {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
 
-      <div
-        className="bls-card-preview"
-        /* --sprite-src exposed as a CSS var for the crystal shine
-           pseudo to use as mask-image, so the shine clips to the
-           actual sprite alpha rather than the rectangular preview box. */
-        style={preview.kind === 'sprite' ? { '--sprite-src': `url(${preview.src})` } : undefined}
-      >
+      <div className="bls-card-preview">
         {preview.kind === 'sprite' && (
           <img
             src={preview.src}
