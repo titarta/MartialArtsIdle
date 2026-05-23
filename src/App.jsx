@@ -1547,9 +1547,18 @@ function AppInner() {
         getDesc={featureFlags.getDesc}
       />
       <main className={`screen-container${(currentScreen === 'home' || currentScreen === 'reincarnation') ? ' sc-fullbleed' : ''}`}>
-        {/* Safety net: if currentScreen happens to land on a flag-null entry
-            (e.g. mid-render after a flag flip) render the home fallback. */}
-        {screens[currentScreen] ?? screens.home}
+        {/* HomeScreen is ALWAYS mounted — the divine-qi orb and pattern-click
+            minigame both live as local state inside HomeScreen (see
+            usePatternClick / divine-qi spawn controllers). Unmounting on tab
+            switch would destroy any active spawn, so a player who pops into
+            another tab the moment an orb appears loses it on return. Hiding
+            via display:none keeps the spawn timers + state alive while still
+            removing the visuals from layout. `display: contents` when active
+            so HomeScreen renders as if it were the direct child of <main>. */}
+        <div style={{ display: currentScreen === 'home' ? 'contents' : 'none' }}>
+          {screens.home}
+        </div>
+        {currentScreen !== 'home' && (screens[currentScreen] ?? null)}
       </main>
       <ToastStack
         toasts={notifications.toastQueue}

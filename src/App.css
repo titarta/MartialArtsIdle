@@ -19169,6 +19169,27 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    First-arrival drop-in plays once per mount.
    ═════════════════════════════════════════════════════════════════════════ */
 
+/* Ma Shan Zheng — Chinese brush-calligraphy font, licensed under the SIL
+   Open Font License (OFL). Used only for the 天 glyph on the Petition
+   Tablet (and reserved for any future plaque variants with 仙 / 道 / 命
+   etc. — the bundled chunk covers ~200 common Simplified Chinese chars).
+   Sourced from Google Fonts and bundled locally because the game ships as
+   an offline-first Capacitor build; a runtime Google Fonts dependency
+   would silently fall back to system serif on first offline launch.
+   Relative path so Vite hashes the asset and rewrites the URL with the
+   correct base prefix for every build mode (dev / Capacitor / Steam /
+   GH Pages). */
+@font-face {
+  font-family: 'Ma Shan Zheng';
+  font-style:  normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/ma-shan-zheng-common.woff2') format('woff2');
+  /* No unicode-range — the file is already bundled (no lazy download to
+     optimise) and we want future plaques with 仙 / 道 / 命 / 神 etc. to
+     render automatically without re-editing this rule. */
+}
+
 .home-hq-tablet {
   position: relative;
   width: 86px;

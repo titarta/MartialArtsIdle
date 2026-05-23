@@ -185,7 +185,10 @@ export default defineConfig(({ command, mode }) => {
         workbox: {
           navigateFallback: 'index.html',
           // Precache SFX (small) but not BGM (4-5 MB each — too large for precache).
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}', 'audio/sfx/*.{ogg,mp3,wav}'],
+          // woff/woff2 covers bundled fonts (Ma Shan Zheng for the 天 glyph on
+          // the Petition Tablet) so the calligraphy renders correctly on first
+          // offline launch instead of falling back to system serif.
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,woff,woff2}', 'audio/sfx/*.{ogg,mp3,wav}'],
           // Play Store assets (screenshots, feature graphic, dev tooling .exe) live
           // in public/store/ so they get mirrored into the Android Capacitor build,
           // but they have no business in the PWA precache — some exceed the 3 MiB
