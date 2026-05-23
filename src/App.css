@@ -12817,28 +12817,31 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   width: var(--proc-w);
   height: auto;
   object-fit: contain;
-  /* Recession via uniform scale around the bottom-center so the
-     baseline stays flat — sprites look like they're standing on the
-     same ground, fading into distance. Ramps from 1.0 (front) → 0.55
-     (deepest back). */
+  /* Subtle growth with depth — later (deeper-Z) silhouettes are a
+     hair BIGGER than the front sprites so they read as "looming
+     behind" rather than "shrinking into the distance". Ramps from
+     1.00 (front) → 1.06 (deepest back). Just enough to push the
+     back silhouettes' heads above the front sprites' outlines so the
+     viewer reads a sense of "scale of progression" without it
+     feeling cartoonish. transform-origin: bottom center keeps every
+     sprite anchored to the same baseline. */
   transform-origin: bottom center;
   transform: scale(calc(
-    1 - (var(--stage-index, 0) * (0.45 / max(1, calc(var(--stage-count, 1) - 1))))
+    1 + (var(--stage-index, 0) * (0.06 / max(1, calc(var(--stage-count, 1) - 1))))
   ));
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
 }
 
 .bls-proc-sprite-hidden {
-  /* True-black silhouette via the global SVG filter. Still legible
-     because we kept --proc-w large enough that ~23px of each sprite
-     pokes out from behind the one in front. */
+  /* True-black silhouette via the global SVG filter. */
   filter:
     url(#mai-silhouette)
     drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
-  /* Mild opacity fade with depth so deeper stages blend gently into
-     the dark gradient — sells the "receding into mist" feel. */
+  /* Gentler opacity fade than before — silhouettes stay clearly
+     visible to the back of the procession (0.85 → 0.7). The user
+     wants the late silhouettes READABLE; heavy fade would lose them. */
   opacity: calc(
-    0.95 - (var(--stage-index, 0) * (0.40 / max(1, calc(var(--stage-count, 1) - 1))))
+    0.85 - (var(--stage-index, 0) * (0.15 / max(1, calc(var(--stage-count, 1) - 1))))
   );
 }
 
