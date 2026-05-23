@@ -19193,3 +19193,344 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   letter-spacing: 0.10em;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   Heavenly Qi — Petition Tablet
+   ─────────────────────────────────────────────────────────────────────────
+   Vertical hanging plaque in the top-right of the cultivation scene. The
+   offer is *inscribed on the plaque* so first-time players can read what
+   they get without tapping. Three states share one frame:
+     .hq-ready  — sway + ember pulse + glowing 天 (button)
+     .hq-active — ignited wood, amber blaze, mm:ss countdown (div)
+     .hq-cd     — desaturated, moon glyph above cord, returns-at (div)
+   Cord is anchored to the top of the wrap; the whole wrap rotates about
+   its top center so it sways like a real hanging tablet. Tokens are
+   lacquer-themed and pulled from --ui-purple-* (warm cream/tan family).
+   First-arrival drop-in plays once per mount.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.home-hq-tablet {
+  position: relative;
+  width: 86px;
+  height: 178px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  cursor: default;
+  font-family: inherit;
+  /* The whole wrap rotates so the cord stays anchored to the top center. */
+  transform-origin: 50% 0;
+  /* First-arrival drop-in followed by the continuous sway loop. */
+  animation:
+    hq-arrive 1.4s cubic-bezier(.34, 1.56, .64, 1) both,
+    hq-sway   5.4s ease-in-out 1.4s infinite;
+}
+.home-hq-tablet.hq-ready { cursor: pointer; }
+.home-hq-tablet.hq-cd    { animation: hq-arrive 1.4s cubic-bezier(.34, 1.56, .64, 1) both; }
+
+/* ── Cord — the rope the plaque hangs from ─────────────────────────────── */
+.hq-cord {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 22px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Cap — the worn bead at the top of the plaque ──────────────────────── */
+.hq-cap {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 18px;
+  height: 6px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #3a2a18 0%, #1a120a 100%);
+  border-radius: 3px 3px 1px 1px;
+  border: 1px solid rgba(220, 175, 110, 0.42);
+  box-shadow:
+    0 1px 0 rgba(255, 225, 170, 0.18) inset,
+    0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Plaque — the carved wood body ─────────────────────────────────────── */
+.hq-plaque {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 78px;
+  height: 152px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 6px;
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.10) 0%,
+      rgba(220, 175, 110, 0)    18%,
+      rgba(220, 175, 110, 0)    82%,
+      rgba(220, 175, 110, 0.10) 100%),
+    linear-gradient(180deg,
+      #2a1d10 0%,
+      #3a2916 30%,
+      #2e2012 70%,
+      #1f160c 100%);
+  border: 1px solid rgba(220, 175, 110, 0.55);
+  border-radius: 4px 4px 6px 6px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 225, 170, 0.18) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.4)      inset,
+    0 10px 18px -10px rgba(0, 0, 0, 0.95);
+}
+/* Tiny carved corner notches */
+.hq-plaque::before,
+.hq-plaque::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 4px;
+  height: 4px;
+  border: 1px solid rgba(220, 175, 110, 0.45);
+  border-radius: 1px;
+}
+.hq-plaque::before { left: 3px;  border-right:  none; border-bottom: none; }
+.hq-plaque::after  { right: 3px; border-left:   none; border-bottom: none; }
+
+/* ── Inscribed text rows ───────────────────────────────────────────────── */
+.hq-kicker {
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  color: #dcaf6e; /* ember */
+  text-transform: uppercase;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+.hq-glyph {
+  /* System Chinese serif — the offline-first build can't depend on
+     Google Fonts. Songti / STSong on iOS, Noto Serif CJK SC on Android,
+     final fallback to generic serif. */
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 44px;
+  line-height: 1;
+  color: #f5e6c8;
+  text-shadow:
+    0 0 14px rgba(220, 175, 110, 0.55),
+    0 0 4px  rgba(255, 207, 131, 0.30),
+    0 1px 0  rgba(0, 0, 0, 0.6);
+  margin-top: -2px;
+}
+.hq-offer {
+  font-size: 7.5px;
+  letter-spacing: 0.10em;
+  color: rgba(245, 230, 200, 0.92);
+  text-align: center;
+  border-top:    1px solid rgba(220, 175, 110, 0.28);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.28);
+  padding: 3px 2px;
+  width: 100%;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hq-cta {
+  font-size: 7px;
+  letter-spacing: 0.18em;
+  color: rgba(245, 230, 200, 0.55);
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Ember motes — rise from the plaque base ───────────────────────────── */
+.hq-embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hq-embers > span {
+  position: absolute;
+  bottom: 10px;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #ffcf83;
+  box-shadow: 0 0 5px #ffcf83;
+  opacity: 0;
+  animation: hq-rise 4.2s linear infinite;
+}
+.hq-embers > span:nth-child(1) { left: 28%; animation-delay: 0s;   }
+.hq-embers > span:nth-child(2) { left: 50%; animation-delay: 1.4s; }
+.hq-embers > span:nth-child(3) { left: 68%; animation-delay: 2.8s; }
+.hq-embers > span:nth-child(4) { left: 40%; animation-delay: 3.6s; }
+
+/* ═══════════════════ READY state ═══════════════════ */
+.home-hq-tablet.hq-ready .hq-plaque {
+  animation: hq-ember-pulse 2.6s ease-in-out infinite;
+}
+.home-hq-tablet.hq-ready .hq-glyph {
+  animation: hq-glyph-glow 2.6s ease-in-out infinite;
+}
+.home-hq-tablet.hq-ready .hq-cta {
+  color: #ffcf83;
+  animation: hq-cta-blink 1.6s ease-in-out infinite;
+}
+.home-hq-tablet.hq-ready:hover .hq-plaque {
+  filter: brightness(1.08);
+}
+.home-hq-tablet.hq-ready:active {
+  transform-origin: 50% 0;
+  transform: scale(0.97);
+}
+
+/* ═══════════════════ ACTIVE state ═══════════════════ */
+.home-hq-tablet.hq-active .hq-plaque {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 207, 131, 0.18) 0%,
+      rgba(255, 207, 131, 0)    35%,
+      rgba(255, 207, 131, 0)    65%,
+      rgba(255, 207, 131, 0.18) 100%),
+    linear-gradient(180deg,
+      #4a2f15 0%,
+      #6b3f1a 30%,
+      #5a3318 70%,
+      #2e1a0a 100%);
+  border-color: #ffcf83;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 225, 170, 0.30) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.5)      inset,
+    0 0 22px -2px rgba(255, 207, 131, 0.55),
+    0 10px 18px -10px rgba(0, 0, 0, 0.95);
+  animation: hq-ignite-pulse 1.8s ease-in-out infinite;
+}
+.home-hq-tablet.hq-active .hq-glyph {
+  color: #ffcf83;
+  text-shadow:
+    0 0 22px rgba(255, 207, 131, 0.75),
+    0 0 8px  rgba(255, 207, 131, 0.55),
+    0 1px 0  rgba(0, 0, 0, 0.6);
+}
+.home-hq-tablet.hq-active .hq-kicker { color: #ffcf83; }
+.home-hq-tablet.hq-active .hq-offer  {
+  border-color: rgba(255, 207, 131, 0.55);
+  color: #fff;
+}
+.home-hq-tablet.hq-active .hq-cta {
+  color: #ffcf83;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+/* ═══════════════════ COOLDOWN state ═══════════════════ */
+.home-hq-tablet.hq-cd .hq-plaque {
+  background:
+    linear-gradient(180deg, rgba(150, 140, 120, 0.06) 0%, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.2) 100%),
+    linear-gradient(180deg, #1a160f 0%, #211b13 50%, #16110c 100%);
+  border-color: rgba(150, 140, 120, 0.30);
+  filter: saturate(0.55);
+}
+.home-hq-tablet.hq-cd .hq-glyph {
+  color: #d9d3c0;
+  opacity: 0.32;
+  text-shadow: none;
+}
+.home-hq-tablet.hq-cd .hq-kicker { color: rgba(217, 211, 192, 0.45); }
+.home-hq-tablet.hq-cd .hq-offer  {
+  border-color: rgba(150, 140, 120, 0.18);
+  color: rgba(217, 211, 192, 0.45);
+}
+.home-hq-tablet.hq-cd .hq-cta { color: rgba(217, 211, 192, 0.55); }
+/* Tiny moon glyph drifts above the cord while asleep. */
+.home-hq-tablet.hq-cd .hq-cord::before {
+  content: '☾';
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: rgba(217, 211, 192, 0.5);
+  text-shadow: 0 0 10px rgba(217, 211, 192, 0.18);
+}
+
+/* ── Keyframes ─────────────────────────────────────────────────────────── */
+@keyframes hq-arrive {
+  0%   { transform: translateY(-220px) rotate(-6deg); opacity: 0; }
+  60%  { transform: translateY(6px)    rotate(2deg);  opacity: 1; }
+  100% { transform: translateY(0)      rotate(0);     opacity: 1; }
+}
+@keyframes hq-sway {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate( 1.2deg); }
+}
+@keyframes hq-ember-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.5),
+      0 1px 0 rgba(255, 225, 170, 0.20) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.4)      inset,
+      0 0 14px -4px rgba(220, 175, 110, 0.40),
+      0 10px 18px -10px rgba(0, 0, 0, 0.95);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.5),
+      0 1px 0 rgba(255, 225, 170, 0.30) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.4)      inset,
+      0 0 26px -2px rgba(255, 207, 131, 0.60),
+      0 10px 18px -10px rgba(0, 0, 0, 0.95);
+  }
+}
+@keyframes hq-glyph-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 12px rgba(220, 175, 110, 0.40),
+      0 0 3px  rgba(255, 207, 131, 0.20),
+      0 1px 0  rgba(0, 0, 0, 0.6);
+  }
+  50% {
+    text-shadow:
+      0 0 22px rgba(255, 207, 131, 0.80),
+      0 0 8px  rgba(255, 207, 131, 0.55),
+      0 1px 0  rgba(0, 0, 0, 0.6);
+  }
+}
+@keyframes hq-ignite-pulse {
+  0%, 100% { filter: brightness(1.00); }
+  50%      { filter: brightness(1.12); }
+}
+@keyframes hq-cta-blink {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1.00; }
+}
+@keyframes hq-rise {
+  0%   { transform: translateY(0)     translateX(0); opacity: 0; }
+  10%  { opacity: 0.9; }
+  100% { transform: translateY(-150px) translateX(6px); opacity: 0; }
+}
+
+/* Respect users who prefer reduced motion — kill sway, ember rise, and
+   glyph pulse; keep the still tablet readable. */
+@media (prefers-reduced-motion: reduce) {
+  .home-hq-tablet,
+  .home-hq-tablet.hq-ready .hq-plaque,
+  .home-hq-tablet.hq-ready .hq-glyph,
+  .home-hq-tablet.hq-ready .hq-cta,
+  .home-hq-tablet.hq-active .hq-plaque,
+  .hq-embers > span {
+    animation: none !important;
+  }
+}

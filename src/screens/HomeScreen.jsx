@@ -228,41 +228,104 @@ function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, 
   );
 }
 
-// ── Heavenly Qi chip — redesigned as a pill floating in the scene (top-right) ──
-/** Purple pill chip — replaces the old circular button.  Shows a pulsing dot,
- *  a label, and an optional countdown when an ad boost is running or on CD. */
+// ── Heavenly Qi — Petition Tablet ───────────────────────────────────────────
+/**
+ *  Vertical hanging plaque that lives in the top-right of the cultivation
+ *  scene like a temple petition tablet. The offer (×2 qi/s · 30 min) is
+ *  *inscribed on the plaque* so first-time players don't have to tap to
+ *  discover what it does. Three states share one frame:
+ *
+ *    READY    — sways gently, glyph (天) pulses gold, ember motes rise.
+ *               The whole plaque is a button; tap triggers ad.show.
+ *    ACTIVE   — wood reads warmer, glyph blazes amber, mm:ss countdown
+ *               replaces the CTA line. Not interactive.
+ *    COOLDOWN — desaturated, glyph dims to moonlight, ☾ floats above
+ *               the cord, hh:mm:ss "returns at" timer in place of CTA.
+ *
+ *  Props signature is unchanged from the old chip so the parent call site
+ *  needs no edits. Replaces the old purple-pill <HeavenlyQiButton>.
+ */
 function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
   const { t } = useTranslation('ui');
   if (maxed) return null;
 
+  // ACTIVE — boost is currently running.
   if (adBoostActive) {
     return (
-      <div className="home-hq-chip home-hq-chip-active" title={t('home.heavenlyQiActive')}>
-        <span className="home-hq-dot" />
-        <span className="home-hq-text">×2</span>
-        <span className="home-hq-timer">{adBoostRemaining}</span>
-      </div>
+      <HQTablet
+        state="active"
+        kicker={t('home.channeling', { defaultValue: 'Channeling' })}
+        offer="×2 QI/S"
+        cta={adBoostRemaining}
+        title={t('home.heavenlyQiActive', { defaultValue: 'Heavenly Qi active' })}
+      />
     );
   }
 
-  const isCd      = ad.isCooldown;
+  // COOLDOWN — petition spent, waiting.
+  if (ad.isCooldown) {
+    return (
+      <HQTablet
+        state="cd"
+        kicker={t('home.returnsAt', { defaultValue: 'Returns in' })}
+        offer="— REST —"
+        cta={formatCooldown(ad.cooldownRemaining)}
+        title={formatCooldown(ad.cooldownRemaining)}
+      />
+    );
+  }
+
+  // LOADING — the offer chip is being fetched. Sit on the READY frame
+  // but disable interaction so the player can't double-tap.
   const isLoading = ad.isLoading;
-  const label = isCd
-    ? formatCooldown(ad.cooldownRemaining)
-    : isLoading
-    ? t('home.channeling')
-    : t('home.heavenlyQi');
+  const isReady   = ad.isReady && !isLoading;
 
   return (
-    <button
-      className={`home-hq-chip${ad.isReady ? ' home-hq-chip-ready' : ''}${isCd ? ' home-hq-chip-cd' : ''}`}
-      onClick={ad.show}
-      disabled={!ad.isReady}
-      title={ad.isReady ? t('home.channelTitle') : label}
+    <HQTablet
+      state="ready"
+      kicker={t('home.heavenlyQi', { defaultValue: 'Heavenly Qi' })}
+      offer="×2 QI/S · 30 MIN"
+      cta={isLoading
+        ? t('home.channeling', { defaultValue: 'Channeling…' })
+        : t('home.tapToPetition', { defaultValue: 'Tap to petition' })}
+      onClick={isReady ? ad.show : undefined}
+      disabled={!isReady}
+      title={isReady ? t('home.channelTitle', { defaultValue: 'Channel Heavenly Qi' }) : ''}
+    />
+  );
+}
+
+/**
+ *  Inner presentational tablet. Renders cord + cap + plaque body with
+ *  kicker / glyph / offer / cta. Becomes a <button> when onClick is
+ *  passed (READY), otherwise a <div> (ACTIVE / COOLDOWN). Ember motes
+ *  only render on READY + ACTIVE — the cooldown plaque is asleep.
+ */
+function HQTablet({ state, kicker, offer, cta, onClick, disabled, title }) {
+  const Tag    = onClick ? 'button' : 'div';
+  const showEm = state === 'ready' || state === 'active';
+  return (
+    <Tag
+      className={`home-hq-tablet hq-${state}`}
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      type={onClick ? 'button' : undefined}
     >
-      <span className="home-hq-dot" />
-      <span className="home-hq-text">{label}</span>
-    </button>
+      <span className="hq-cord" />
+      <span className="hq-cap" />
+      <span className="hq-plaque">
+        <span className="hq-kicker">{kicker}</span>
+        <span className="hq-glyph" aria-hidden="true">天</span>
+        <span className="hq-offer">{offer}</span>
+        <span className="hq-cta">{cta}</span>
+      </span>
+      {showEm && (
+        <span className="hq-embers" aria-hidden="true">
+          <span /><span /><span /><span />
+        </span>
+      )}
+    </Tag>
   );
 }
 

@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Heavenly Qi — Petition Tablet (3 states)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Petition Tablet — Heavenly Qi redesign
+   A vertical hanging plaque hung from a worn cord, lacquered
+   wood with cream/gold calligraphy. Three states:
+     READY    — ember pulse + slow sway, "天" glowing
+     ACTIVE   — ignited, "active" stripe, mm:ss countdown
+     COOLDOWN — dim, moon glyph, returns at hh:mm
+   Tokens lifted from the live game's lacquer theme so the
+   tablet sits inside HomeScreen without re-tinting anything.
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        rgb(14, 12, 8);
+  --bg-panel:       rgb(32, 26, 18);
+  --bg-panel-2:     rgb(26, 21, 16);
+
+  --cream:          #f5e6c8;
+  --cream-soft:     #e8d5a8;
+  --tan:            #c8aa78;
+  --tan-deep:       #9b7d50;
+  --tan-darker:     #4a3520;
+
+  --ember:          #dcaf6e;       /* lantern amber  */
+  --ember-hot:      #ffcf83;       /* hot ember pop  */
+  --ember-deep:     #6b3f1a;       /* charred wood   */
+
+  --moon:           #d9d3c0;       /* cooldown grey  */
+  --moon-deep:      #6a6353;
+
+  --ink:            #1a120a;       /* deep lacquer   */
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 600px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(220,175,110,.04) 0%, transparent 60%),
+    linear-gradient(180deg, #0c0a07 0%, #15110b 60%, #0c0a07 100%);
+  color: var(--cream);
+  font-family: 'Cinzel', 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: .02em;
+}
+header{
+  text-align:center;
+  padding: 40px 20px 14px;
+}
+header h1{
+  font-size: 22px;
+  letter-spacing: .18em;
+  color: var(--ember);
+  font-weight: 600;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+}
+header p{
+  margin-top: 8px;
+  color: rgba(245,230,200,.55);
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.stage{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 28px auto 60px;
+  padding: 0 24px;
+}
+.cell{
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.04) 0%, rgba(220,175,110,0) 70%),
+    linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
+  border: 1px solid rgba(212,184,136,.35);
+  border-radius: 14px;
+  padding: 28px 18px 22px;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,225,170,.06) inset,
+    0 18px 36px -22px rgba(0,0,0,.9);
+}
+.cell .label{
+  font-size: 10px;
+  letter-spacing: .28em;
+  color: rgba(245,230,200,.55);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.cell .desc{
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: rgba(245,230,200,.45);
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.55;
+}
+
+/* ── The Tablet ────────────────────────────────────────────── */
+.tablet-wrap{
+  position: relative;
+  width: 168px;
+  height: 320px;
+  display: flex;
+  justify-content: center;
+  transform-origin: top center;
+}
+/* The hanging cord */
+.cord{
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 2px;
+  height: 38px;
+  background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
+  transform: translateX(-50%);
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4);
+}
+/* The capping bead at the top of the cord */
+.cap{
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 8px;
+  background: linear-gradient(180deg, #3a2a18 0%, #1a120a 100%);
+  border-radius: 4px 4px 2px 2px;
+  border: 1px solid rgba(220,175,110,.4);
+  box-shadow:
+    0 1px 0 rgba(255,225,170,.18) inset,
+    0 2px 4px rgba(0,0,0,.7);
+}
+/* The plaque body */
+.tablet{
+  position: absolute;
+  top: 38px;
+  width: 140px;
+  height: 250px;
+  background:
+    /* subtle wood grain via 2 stacked gradients */
+    linear-gradient(180deg, rgba(220,175,110,.10) 0%, rgba(220,175,110,0) 18%, rgba(220,175,110,0) 82%, rgba(220,175,110,.10) 100%),
+    linear-gradient(180deg, #2a1d10 0%, #3a2916 30%, #2e2012 70%, #1f160c 100%);
+  border: 1px solid rgba(220,175,110,.55);
+  border-radius: 6px 6px 10px 10px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 1px 0 rgba(255,225,170,.18) inset,
+    0 -2px 0 rgba(0,0,0,.4) inset,
+    0 18px 28px -16px rgba(0,0,0,.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 10px 16px;
+  transform-origin: 50% -10%;
+}
+/* Tiny corner notches give it a carved/finished feel */
+.tablet::before,
+.tablet::after{
+  content:'';
+  position: absolute;
+  top: 4px;
+  width: 6px;
+  height: 6px;
+  border: 1px solid rgba(220,175,110,.45);
+  border-radius: 1px;
+}
+.tablet::before{ left: 6px;  border-right:none; border-bottom:none; }
+.tablet::after { right: 6px; border-left: none; border-bottom:none; }
+
+/* The big calligraphy character */
+.glyph{
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
+  font-size: 84px;
+  line-height: 1;
+  color: var(--cream);
+  margin-top: 6px;
+  text-shadow:
+    0 0 22px rgba(220,175,110,.55),
+    0 0 6px rgba(255,207,131,.35),
+    0 1px 0 rgba(0,0,0,.6);
+}
+.kicker{
+  font-size: 9.5px;
+  letter-spacing: .32em;
+  color: var(--ember);
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+}
+.offer{
+  font-size: 10.5px;
+  letter-spacing: .18em;
+  color: rgba(245,230,200,.85);
+  text-align: center;
+  border-top: 1px solid rgba(220,175,110,.25);
+  border-bottom: 1px solid rgba(220,175,110,.25);
+  padding: 6px 4px;
+  width: 100%;
+}
+.cta{
+  font-size: 9.5px;
+  letter-spacing: .26em;
+  color: rgba(245,230,200,.55);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── READY state ───────────────────────────────────────────── */
+.cell.ready .tablet-wrap{
+  animation: sway 5.4s ease-in-out infinite;
+}
+.cell.ready .tablet{
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 1px 0 rgba(255,225,170,.20) inset,
+    0 -2px 0 rgba(0,0,0,.4) inset,
+    0 0 28px -2px rgba(220,175,110,.45),
+    0 18px 28px -16px rgba(0,0,0,.95);
+  animation: ember-pulse 2.6s ease-in-out infinite;
+}
+.cell.ready .glyph{
+  animation: glyph-glow 2.6s ease-in-out infinite;
+}
+.cell.ready .cta{
+  color: var(--ember-hot);
+  animation: cta-blink 1.6s ease-in-out infinite;
+}
+
+/* Faint ember motes drifting up from the tablet base */
+.embers{
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.embers span{
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ember-hot);
+  box-shadow: 0 0 6px var(--ember-hot);
+  opacity: 0;
+  animation: rise 4.2s linear infinite;
+}
+.embers span:nth-child(1){ left: 22%; animation-delay: 0s;   }
+.embers span:nth-child(2){ left: 48%; animation-delay: 1.4s; }
+.embers span:nth-child(3){ left: 71%; animation-delay: 2.8s; }
+.embers span:nth-child(4){ left: 36%; animation-delay: 3.6s; }
+.cell:not(.ready):not(.active) .embers{ display:none; }
+
+/* ── ACTIVE state ──────────────────────────────────────────── */
+.cell.active .tablet{
+  background:
+    linear-gradient(180deg, rgba(255,207,131,.18) 0%, rgba(255,207,131,0) 35%, rgba(255,207,131,0) 65%, rgba(255,207,131,.18) 100%),
+    linear-gradient(180deg, #4a2f15 0%, #6b3f1a 30%, #5a3318 70%, #2e1a0a 100%);
+  border-color: var(--ember-hot);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 1px 0 rgba(255,225,170,.30) inset,
+    0 -2px 0 rgba(0,0,0,.5) inset,
+    0 0 38px -2px rgba(255,207,131,.55),
+    0 18px 28px -16px rgba(0,0,0,.95);
+  animation: ignite-pulse 1.8s ease-in-out infinite;
+}
+.cell.active .glyph{
+  color: var(--ember-hot);
+  text-shadow:
+    0 0 32px rgba(255,207,131,.75),
+    0 0 10px rgba(255,207,131,.55),
+    0 1px 0 rgba(0,0,0,.6);
+}
+.cell.active .kicker{ color: var(--ember-hot); }
+.cell.active .offer{
+  border-color: rgba(255,207,131,.55);
+  color: #fff;
+}
+.cell.active .cta{
+  color: var(--ember-hot);
+  font-size: 14px;
+  letter-spacing: .12em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── COOLDOWN state ────────────────────────────────────────── */
+.cell.cd .tablet{
+  background:
+    linear-gradient(180deg, rgba(150,140,120,.06) 0%, rgba(0,0,0,0) 50%, rgba(0,0,0,.2) 100%),
+    linear-gradient(180deg, #1a160f 0%, #211b13 50%, #16110c 100%);
+  border-color: rgba(150,140,120,.30);
+  filter: saturate(.6);
+}
+.cell.cd .glyph{
+  color: var(--moon);
+  opacity: .35;
+  text-shadow: none;
+}
+.cell.cd .kicker{ color: rgba(217,211,192,.45); }
+.cell.cd .offer{
+  border-color: rgba(150,140,120,.18);
+  color: rgba(217,211,192,.45);
+}
+.cell.cd .cta{
+  color: rgba(217,211,192,.55);
+  font-variant-numeric: tabular-nums;
+}
+/* Tiny moon glyph drifts above the cord */
+.cell.cd .cord::before{
+  content:'☾';
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  color: rgba(217,211,192,.45);
+  text-shadow: 0 0 12px rgba(217,211,192,.18);
+}
+
+/* ── First-arrival drop-in (READY tablet) ──────────────────── */
+.cell.ready .tablet-wrap{
+  animation:
+    arrive 1.4s cubic-bezier(.34,1.56,.64,1) both,
+    sway 5.4s ease-in-out 1.4s infinite;
+}
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes arrive{
+  0%   { transform: translateY(-380px) rotate(-6deg); opacity: 0; }
+  60%  { transform: translateY(8px)    rotate(2deg);  opacity: 1; }
+  100% { transform: translateY(0)      rotate(0);     opacity: 1; }
+}
+@keyframes sway{
+  0%, 100% { transform: rotate(-1.2deg); }
+  50%      { transform: rotate( 1.2deg); }
+}
+@keyframes ember-pulse{
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.5),
+      0 1px 0 rgba(255,225,170,.20) inset,
+      0 -2px 0 rgba(0,0,0,.4) inset,
+      0 0 24px -4px rgba(220,175,110,.40),
+      0 18px 28px -16px rgba(0,0,0,.95);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(0,0,0,.5),
+      0 1px 0 rgba(255,225,170,.30) inset,
+      0 -2px 0 rgba(0,0,0,.4) inset,
+      0 0 42px -2px rgba(255,207,131,.65),
+      0 18px 28px -16px rgba(0,0,0,.95);
+  }
+}
+@keyframes glyph-glow{
+  0%, 100% {
+    text-shadow: 0 0 18px rgba(220,175,110,.40), 0 0 4px rgba(255,207,131,.20), 0 1px 0 rgba(0,0,0,.6);
+  }
+  50% {
+    text-shadow: 0 0 32px rgba(255,207,131,.80), 0 0 12px rgba(255,207,131,.55), 0 1px 0 rgba(0,0,0,.6);
+  }
+}
+@keyframes ignite-pulse{
+  0%, 100% { filter: brightness(1.00); }
+  50%      { filter: brightness(1.12); }
+}
+@keyframes cta-blink{
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1.0; }
+}
+@keyframes rise{
+  0%   { transform: translateY(0) translateX(0);  opacity: 0; }
+  10%  { opacity: .9; }
+  100% { transform: translateY(-260px) translateX(8px); opacity: 0; }
+}
+
+/* ── Footer compare strip ─────────────────────────────────── */
+.compare{
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  padding: 22px 24px;
+  border: 1px dashed rgba(212,184,136,.25);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.compare h3{
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: var(--ember);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.compare p{
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: rgba(245,230,200,.7);
+}
+.old-chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-family: 'Cinzel', sans-serif;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--cream);
+  background: rgba(60,40,90,.4);
+  border: 1px solid rgba(167,139,250,.45);
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+.old-chip::before{
+  content:'';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #c4b5fd;
+  box-shadow: 0 0 6px #c4b5fd;
+}
+@media (max-width: 800px){
+  .stage{ grid-template-columns: 1fr; }
+  .compare{ grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Heavenly Qi — Petition Tablet</h1>
+  <p>Three states, side-by-side, for evaluation</p>
+</header>
+
+<div class="stage">
+
+  <!-- ── READY ─────────────────────────────────────────────── -->
+  <div class="cell ready">
+    <div class="label">Ready</div>
+    <div class="tablet-wrap">
+      <div class="cord"></div>
+      <div class="cap"></div>
+      <div class="tablet">
+        <div class="kicker">Heavenly Qi</div>
+        <div class="glyph">天</div>
+        <div class="offer">×1.5 QI/S · 30 MIN</div>
+        <div class="cta">Tap to Petition</div>
+      </div>
+      <div class="embers">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="desc">
+      Sways gently. Glyph pulses gold. Ember motes rise.
+      A first-time player can read the offer without tapping.
+    </div>
+  </div>
+
+  <!-- ── ACTIVE ────────────────────────────────────────────── -->
+  <div class="cell active">
+    <div class="label">Active</div>
+    <div class="tablet-wrap">
+      <div class="cord"></div>
+      <div class="cap"></div>
+      <div class="tablet">
+        <div class="kicker">Channeling</div>
+        <div class="glyph">天</div>
+        <div class="offer">×1.5 QI/S</div>
+        <div class="cta">29:42</div>
+      </div>
+      <div class="embers">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+    <div class="desc">
+      Wood reads warmer. Glyph blazes amber. Countdown ticks down where
+      the CTA used to be. No new chrome — the same tablet, ignited.
+    </div>
+  </div>
+
+  <!-- ── COOLDOWN ──────────────────────────────────────────── -->
+  <div class="cell cd">
+    <div class="label">Cooldown</div>
+    <div class="tablet-wrap">
+      <div class="cord"></div>
+      <div class="cap"></div>
+      <div class="tablet">
+        <div class="kicker">Returns at</div>
+        <div class="glyph">天</div>
+        <div class="offer">— REST —</div>
+        <div class="cta">02:14:38</div>
+      </div>
+    </div>
+    <div class="desc">
+      Desaturated. Glyph dims to moonlight. A tiny ☾ floats above the cord.
+      Tap is disabled — the tablet is sleeping until the clock returns to zero.
+    </div>
+  </div>
+
+</div>
+
+<div class="compare">
+  <div>
+    <h3>Before — purple pill chip</h3>
+    <div class="old-chip"><span>Heavenly Qi</span></div>
+    <p style="margin-top:12px;">
+      Tiny. Reads as &ldquo;another UI button.&rdquo; The offer (×1.5 qi/s for 30 min)
+      is invisible until you tap. Players miss it for hours.
+    </p>
+  </div>
+  <div>
+    <h3>After — Petition Tablet</h3>
+    <p>
+      A vertical hanging object that lives in the scene like a temple plaque.
+      The offer is <em>inscribed on the tablet</em> — there&rsquo;s nothing to discover
+      by tapping. The first arrival animation (drops down from above with a
+      soft overshoot) introduces it once; after that it sways and pulses,
+      letting peripheral vision do the calling.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
