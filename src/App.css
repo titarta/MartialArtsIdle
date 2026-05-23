@@ -8455,58 +8455,6 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   to { transform: scale(1); opacity: 1; }
 }
 
-/* ── Unified modal chrome (2026-05-23 jade theme refresh) ───────────────
-   Every modal container inherits the SAME solid-jade chrome as the
-   TutorialModal — a layered jade gradient background, a bright-mint
-   border, a multi-layer shadow with colored glow and an inset top
-   highlight. Single override rule replaces the flat
-   `rgb(var(--ui-bg-panel-rgb))` backgrounds that made the modals
-   read as "near-black with a hint of tint" no matter how vibrant the
-   palette tokens were. Each modal still owns its size, padding,
-   border-radius, etc. via its specific class — we only swap the
-   chrome here. */
-.achievements-modal,
-.progress-hub-modal,
-.journey-modal,
-.pdm-modal,
-.bls-modal,
-.settings-modal,
-.pill-modal,
-.reinc-modal,
-.cfm-modal,
-.coll-modal-panel,
-.artefact-upgrade-panel,
-.daily-modal,
-.modal-content,
-.blood-lotus-shop-card {
-  background: linear-gradient(
-    160deg,
-    rgba(78, 145, 110, 0.97) 0%,
-    rgba(36,  80,  60, 0.97) 100%
-  );
-  border: 1px solid rgba(140, 230, 180, 0.55);
-  box-shadow:
-    0 10px 48px rgba(0, 0, 0, 0.78),
-    0 0   28px rgba(36, 110,  76, 0.50),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-
-/* Inner cards / stat-row containers inside modals — keep them slightly
-   darker than the modal bg so nested content still has visible depth
-   against the new solid-jade chrome (the previous near-black inner
-   rows now read as "too dark" against the bright jade backdrop). */
-.pdm-stats,
-.coll-stat-list {
-  background: rgba(20, 50, 35, 0.65);
-  border-color: rgba(140, 230, 180, 0.22);
-}
-.pdm-stat-row {
-  background: rgba(14, 36, 25, 0.55);
-}
-.pdm-stat-row-emph {
-  background: rgba(255, 215, 130, 0.10);
-}
-
 /* ── Unified modal close button (2026-05-22 normalization pass) ─────────
    ONE class for every modal close button across the game. Absolute
    top-right, generous tap target for mobile, hover/active feedback.
@@ -18797,4 +18745,61 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     -1px  1px 0 rgba(0, 0, 0, 1),
      1px  1px 0 rgba(0, 0, 0, 1),
      0 2px 6px rgba(0, 0, 0, 0.95);
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   ── JADE THEME OVERRIDE — 2026-05-23 ────────────────────────────────
+   Lives at the END of App.css so it wins every same-specificity tie
+   against the per-modal `background: rgb(var(--ui-bg-panel-rgb))`
+   rules scattered around line 12000+. Mimics the TutorialModal chrome
+   exactly: solid jade gradient (~0.97 alpha — NOT a translucent wash),
+   bright-mint border, multi-layer shadow with colored glow + inset top
+   highlight. Each modal still owns its size/padding/border-radius via
+   its specific class — we only swap the CHROME here.
+
+   Goal: the whole game's chrome should feel like the TutorialModal,
+   which is the visual quality bar.
+
+   If this still doesn't land, the next lever is to bump the gradient's
+   top stop to be even brighter (e.g. rgba(95, 165, 125)) for a more
+   confident jade panel face. */
+
+.achievements-modal,
+.progress-hub-modal,
+.journey-modal,
+.pdm-modal,
+.bls-modal,
+.settings-modal,
+.pill-modal,
+.reinc-modal,
+.cfm-modal,
+.coll-modal-panel,
+.artefact-upgrade-panel,
+.daily-modal,
+.modal-content,
+.blood-lotus-shop-card {
+  background: linear-gradient(
+    160deg,
+    rgba(78, 145, 110, 0.97) 0%,
+    rgba(36,  80,  60, 0.97) 100%
+  ) !important;
+  border: 1px solid rgba(140, 230, 180, 0.55) !important;
+  box-shadow:
+    0 10px 48px rgba(0, 0, 0, 0.78),
+    0 0   28px rgba(36, 110,  76, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Inner stat-row containers — re-tint slightly darker than the new
+   solid-jade modal bg so nested content still has visible depth. */
+.pdm-stats,
+.coll-stat-list {
+  background: rgba(20, 50, 35, 0.65) !important;
+  border-color: rgba(140, 230, 180, 0.22) !important;
+}
+.pdm-stat-row {
+  background: rgba(14, 36, 25, 0.55) !important;
+}
+.pdm-stat-row-emph {
+  background: rgba(255, 215, 130, 0.10) !important;
 }
