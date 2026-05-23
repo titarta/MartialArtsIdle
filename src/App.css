@@ -12770,8 +12770,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .bls-procession {
   position: relative;
   width: 100%;
-  /* Height fits the front sprite (tallest at scale 1.0) + baseline. */
-  height: 96px;
+  /* Height fits the largest sprite (last stage, scale 1.06) + baseline
+     anchor padding. */
+  height: 100px;
   padding: 8px 0 6px;
   /* UNIFORM background — slightly desaturated purple-grey. The
      previous off-centre radial gradient + bottom fade darkened the
@@ -12782,12 +12783,22 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   background: linear-gradient(180deg, rgba(34, 26, 44, 0.65), rgba(22, 16, 32, 0.65));
   border-radius: 8px;
   overflow: hidden;
-  /* Width of each sprite (fixed). 42 keeps silhouettes legible AND
-     leaves enough room for 13 stages to fit a ~340px content area
-     without horizontal scroll. */
+  /* Width + height of each sprite (fixed). 42x52 fits 13 stages in
+     a ~340px content area without horizontal scroll, with comfortable
+     overlap for legible silhouettes. */
   --proc-w: 42px;
+  --proc-h: 52px;
   /* Horizontal padding inside the procession (each side). */
   --proc-pad: 12px;
+}
+/* Crystal slot — crystals are visually more compact than cultivator
+   silhouettes (no humanoid shape spelling them out), so we bump them
+   up to a slightly larger slot so they read clearly at the same
+   procession scale. The fixed height also normalises the variable-
+   aspect source PNGs (89-110px tall depending on tier). */
+.bls-procession[data-slot="crystal"] {
+  --proc-w: 50px;
+  --proc-h: 58px;
 }
 
 .bls-proc-sprite {
@@ -12808,8 +12819,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     ((100% - 2 * var(--proc-pad) - var(--proc-w)) / max(1, calc(var(--stage-count, 1) - 1)))
   );
   width: var(--proc-w);
-  height: auto;
+  /* Fixed height + object-fit prevents variable-aspect sprites (like
+     the crystal set, whose source PNGs range from 89x110 to 97x99)
+     from appearing to "shrink" at later tiers — each sprite now fills
+     a consistent box, centered. Cultivator sprites are uniform
+     256x256 so this also works for them without distortion. */
+  height: var(--proc-h, 52px);
   object-fit: contain;
+  object-position: bottom center;
   /* Subtle growth with depth — later (deeper-Z) silhouettes are a
      hair BIGGER than the front sprites so they read as "looming
      behind" rather than "shrinking into the distance". Ramps from

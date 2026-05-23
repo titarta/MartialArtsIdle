@@ -174,9 +174,14 @@ function CosmeticCardProcession({ item, ownership, balance, onBuy, onEquip, onUn
           horizontal step so the whole row fits the card width without
           scrolling. Each sprite is absolutely positioned with a CSS
           var index. Earlier stages sit on TOP (higher z-index) so the
-          silhouettes recede behind. */}
+          silhouettes recede behind.
+          `data-slot` lets CSS apply slot-specific tuning — crystal
+          sprites are variable-aspect (not uniform like cultivators)
+          so they need a fixed slot box to avoid late-tier visual
+          shrink. */}
       <div
         className="bls-procession"
+        data-slot={item.cosmeticSlot}
         style={{ '--stage-count': totalStages }}
       >
         {sprites.map((src, i) => {
