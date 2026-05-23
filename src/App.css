@@ -18765,43 +18765,114 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    confident jade panel face. */
 
 /* ── LACQUER theme (2026-05-23) — dark lacquer panels with bright
-   cream/gold trim. The game's text rules were designed for DARK
-   backgrounds (most use white/cream text); flipping to light panels
-   broke readability everywhere. This theme keeps panels dark (so
-   text stays readable) but uses bright cream borders + warm-gold
-   accents so the WARMTH the user wanted reads through the trim,
-   not the backdrop. Like Chinese lacquerware — black/brown lacquer
-   surface with cream-and-gold inlay.
+   cream/gold trim. Core chrome for informational/utility modals
+   that don't have their own identity. Dark panels keep the
+   existing light-on-dark text rules readable; warmth lives in
+   the cream/gold border + accents. Chinese lacquerware aesthetic.
 
-   Modals INTENTIONALLY excluded (kept on their own theme chrome):
-     .daily-modal           — blood-red lotus gradient (gift-day)  */
+   Modals INTENTIONALLY excluded (each has its own identity):
+     .daily-modal              — blood-red lotus (gift day)
+     .bls-modal                — blood-red lotus (spend shop, matches currency)
+     .blood-lotus-shop-card    — blood-red lotus (IAP top-up)
+     .reinc-modal              — deep violet (karma + rebirth mystical)
+     .pill-modal               — warm amber gold (alchemy + elixir)
+   See the four themed-modal blocks below this one. */
 .achievements-modal,
 .progress-hub-modal,
 .journey-modal,
 .pdm-modal,
-.bls-modal,
 .settings-modal,
-.pill-modal,
-.reinc-modal,
 .cfm-modal,
 .coll-modal-panel,
 .artefact-upgrade-panel,
-.modal-content,
-.blood-lotus-shop-card {
-  /* Dark warm-charcoal panel — subtly warm-tinged so it doesn't read
-     as cold black/grey. Slight gradient mimics polished lacquer. */
+.modal-content {
   background: linear-gradient(
     160deg,
     #2a2218 0%,
     #1a1510 100%
   ) !important;
-  /* Cream-gold border — this is where the "warm cream" lives. Bright
-     and visible so the panel edge reads as cream/sandalwood trim. */
   border: 1px solid rgba(212, 184, 136, 0.55) !important;
   box-shadow:
     0 12px 36px rgba(0, 0, 0, 0.75),
     0 0 24px rgba(212, 184, 136, 0.10),
     inset 0 1px 0 rgba(232, 213, 168, 0.15) !important;
+}
+
+/* ── BLOOD LOTUS theme — spend shop + IAP top-up. Matches the
+   .daily-modal's red-lotus chrome so "anything blood lotus" reads
+   as red regardless of which surface. Deep crimson lacquer panel
+   with bright red-coral trim. */
+.bls-modal,
+.blood-lotus-shop-card {
+  background: linear-gradient(
+    160deg,
+    #2a0a14 0%,
+    #14060a 100%
+  ) !important;
+  border: 1px solid rgba(220, 80, 100, 0.55) !important;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.78),
+    0 0 28px rgba(220, 60, 80, 0.18),
+    inset 0 1px 0 rgba(255, 200, 210, 0.12) !important;
+
+  /* Scoped accent overrides — inside blood-lotus modals, the cream
+     trim variables become coral red so existing var() consumers
+     match the theme. */
+  --ui-purple-rgb:         220,  80, 100;
+  --ui-purple-strong-rgb:  240, 110, 130;
+  --ui-purple-soft-rgb:    250, 170, 180;
+  --ui-purple-light-rgb:   255, 210, 215;
+  --ui-purple-strong:      #f06e82;
+  --ui-purple-soft:        #faaaba;
+  --ui-purple-light:       #ffd2d7;
+}
+
+/* ── REINCARNATION theme — deep violet for karma + rebirth. The
+   traditional cultivation-mystical purple. Death/rebirth resonance. */
+.reinc-modal {
+  background: linear-gradient(
+    160deg,
+    #1f1530 0%,
+    #100a1c 100%
+  ) !important;
+  border: 1px solid rgba(180, 140, 255, 0.55) !important;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.78),
+    0 0 28px rgba(140, 90, 220, 0.22),
+    inset 0 1px 0 rgba(220, 200, 255, 0.14) !important;
+
+  /* Scoped violet accents for inner var() consumers. */
+  --ui-purple-rgb:         180, 140, 255;
+  --ui-purple-strong-rgb:  200, 160, 255;
+  --ui-purple-soft-rgb:    220, 190, 255;
+  --ui-purple-light-rgb:   235, 215, 255;
+  --ui-purple-strong:      #c8a0ff;
+  --ui-purple-soft:        #dcbeff;
+  --ui-purple-light:       #ebd7ff;
+}
+
+/* ── ALCHEMY theme — pill drawer. Warm amber/gold for the elixir
+   identity. Cultivation alchemy is always gold-warm in the genre. */
+.pill-modal {
+  background: linear-gradient(
+    160deg,
+    #2a1e0a 0%,
+    #181005 100%
+  ) !important;
+  border: 1px solid rgba(255, 195, 100, 0.55) !important;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.78),
+    0 0 28px rgba(220, 165, 80, 0.20),
+    inset 0 1px 0 rgba(255, 230, 180, 0.14) !important;
+
+  /* Scoped amber/gold accents for inner var() consumers. */
+  --ui-purple-rgb:         255, 195, 100;
+  --ui-purple-strong-rgb:  255, 210, 120;
+  --ui-purple-soft-rgb:    255, 225, 170;
+  --ui-purple-light-rgb:   255, 240, 210;
+  --ui-purple-strong:      #ffd278;
+  --ui-purple-soft:        #ffe1aa;
+  --ui-purple-light:       #fff0d2;
 }
 
 /* Inner stat-row containers — slightly lighter than the panel bg so
