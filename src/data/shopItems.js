@@ -24,10 +24,21 @@ export const SHOP_CATEGORIES = [
   { id: 'buff',       label: 'Buffs'        },
   { id: 'consumable', label: 'Consumables'  },
   { id: 'qol',        label: 'Quality of Life' },
-  // Cosmetics ship in a follow-up commit with sprite generation. Left
-  // declared here so the tab row already shows the eventual slot.
   { id: 'cosmetic',   label: 'Cosmetics'    },
 ];
+
+/**
+ * Cosmetic slots — one equipped item per slot. Selectors that apply the
+ * cosmetic (via body classes in App.css) all key off these slot names.
+ * Premium pixelart skins (full sprite swaps) drop into the SAME slots
+ * later — they just declare a different `effect.kind`.
+ */
+export const COSMETIC_SLOTS = {
+  CHARACTER:  'character',
+  CRYSTAL:    'crystal',
+  PARTICLES:  'particles',
+  BACKGROUND: 'background',
+};
 
 export const SHOP_ITEMS = [
   // ── Buffs ───────────────────────────────────────────────────────────────
@@ -138,6 +149,126 @@ export const SHOP_ITEMS = [
     ownership: 'stackable',
     maxStack: 3,
     effect: { type: 'qol_offline_cap', addHours: 2 },
+  },
+
+  // ── Cosmetics — Tier 1 (CSS-tint variants) ──────────────────────────────
+  //
+  // Each cosmetic is a permanent-owned slot item. Buying auto-equips;
+  // the player can then equip/unequip from the shop later to swap looks.
+  // Tier 1 cosmetics ship without new sprite art — they apply a CSS
+  // hue-rotate / tint to the existing assets. Premium pixelart skins
+  // (full sprite swaps) drop into the same slots with a different
+  // `effect.kind`.
+  //
+  //   effect.kind = 'tint' — body class adds a hue-rotate filter
+  //                          to the slot's target element(s).
+  //   effect.bodyClass    — the class App.jsx toggles when equipped.
+
+  // Character tints
+  {
+    id: 'cos_char_crimson',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
+    name: 'Crimson Path',
+    desc: 'Tints your cultivator with the deep red of the crimson sect. CSS recolour — premium pixelart skins arrive later.',
+    icon: '🔴',
+    cost: 300,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-char-crimson' },
+  },
+  {
+    id: 'cos_char_verdant',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
+    name: 'Verdant Path',
+    desc: 'Tints your cultivator in jade-green serenity. CSS recolour.',
+    icon: '🟢',
+    cost: 300,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-char-verdant' },
+  },
+  {
+    id: 'cos_char_amethyst',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
+    name: 'Amethyst Path',
+    desc: 'Tints your cultivator in royal violet. CSS recolour.',
+    icon: '🟣',
+    cost: 300,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-char-amethyst' },
+  },
+
+  // Crystal tints — affect the crystal sprite on the home screen.
+  {
+    id: 'cos_crystal_verdant',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,
+    name: 'Verdant Crystal',
+    desc: 'Recolours your qi crystal jade-green through all tiers. CSS recolour.',
+    icon: '◆',
+    cost: 200,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-crystal-verdant' },
+  },
+  {
+    id: 'cos_crystal_amber',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,
+    name: 'Amber Crystal',
+    desc: 'Recolours your qi crystal in warm amber-gold. CSS recolour.',
+    icon: '◆',
+    cost: 200,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-crystal-amber' },
+  },
+
+  // Particle tints — affect the qi-flow VFX orbs around the cultivator.
+  {
+    id: 'cos_particles_jade',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.PARTICLES,
+    name: 'Jade Particles',
+    desc: 'Qi orbs flow as jade motes instead of the default white-gold.',
+    icon: '✨',
+    cost: 150,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-particles-jade' },
+  },
+  {
+    id: 'cos_particles_violet',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.PARTICLES,
+    name: 'Violet Particles',
+    desc: 'Qi orbs flow in deep violet, befitting a high-aspect cultivator.',
+    icon: '✨',
+    cost: 150,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-particles-violet' },
+  },
+
+  // Background tints — overlay a tinted gradient on the home backdrop.
+  {
+    id: 'cos_bg_dawn',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.BACKGROUND,
+    name: 'Dawn Sky',
+    desc: 'Bathes the home backdrop in warm sunrise light.',
+    icon: '🌅',
+    cost: 250,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-bg-dawn' },
+  },
+  {
+    id: 'cos_bg_twilight',
+    category: 'cosmetic',
+    cosmeticSlot: COSMETIC_SLOTS.BACKGROUND,
+    name: 'Twilight Veil',
+    desc: 'Cools the home backdrop with twilight blues and indigo shadows.',
+    icon: '🌌',
+    cost: 250,
+    ownership: 'cosmetic',
+    effect: { kind: 'tint', bodyClass: 'cosmetic-bg-twilight' },
   },
 ];
 

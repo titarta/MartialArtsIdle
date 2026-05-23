@@ -26,13 +26,65 @@ function BuffCountdown({ expiresAtMs }) {
 
 /**
  * One row in the items list. Layout: icon · name+desc · cost+CTA.
+ *
  * The CTA reflects ownership state:
- *   permanent owned → "Owned"
- *   stackable maxed → "Maxed"
- *   timed active    → "Active · 3h 12m left"
- *   otherwise       → "Buy · 50"
+ *   permanent owned   → "Owned"
+ *   stackable maxed   → "Maxed"
+ *   timed active      → "Active · 3h 12m left" countdown chip
+ *   cosmetic owned    → "Equip" / "Equipped" toggle (replaces Buy)
+ *   otherwise         → "Buy · 50"
+ *
+ * Cosmetics get a SECONDARY action — the primary CTA flips between
+ * Buy and Equip/Equipped based on ownership; unequip is implicit
+ * (equip another cosmetic in the same slot to swap, or tap the
+ * currently-equipped cosmetic to clear the slot).
  */
-function ShopItemRow({ item, ownership, balance, onBuy, busy }) {
+function ShopItemRow({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
+  // ── Cosmetic flow (distinct from buyable items because the CTA is
+  //    not always "Buy") ────────────────────────────────────────────────
+  if (item.ownership === 'cosmetic') {
+    const owned    = ownership.isCosmeticOwned(item.id);
+    const equipped = ownership.isCosmeticEquipped(item.id);
+    let label, disabled, onClick, stateClass;
+    if (!owned) {
+      label      = `Buy · ${item.cost}`;
+      disabled   = balance < item.cost || busy;
+      onClick    = () => onBuy(item.id);
+      stateClass = 'buyable';
+    } else if (equipped) {
+      label      = 'Equipped';
+      disabled   = false;
+      onClick    = () => onUnequip(item.cosmeticSlot);
+      stateClass = 'equipped';
+    } else {
+      label      = 'Equip';
+      disabled   = false;
+      onClick    = () => onEquip(item.id);
+      stateClass = 'owned';
+    }
+    return (
+      <div className={`bls-item bls-item-${stateClass}`}>
+        <div className="bls-item-icon">{item.icon}</div>
+        <div className="bls-item-body">
+          <div className="bls-item-name">
+            {item.name}
+            {equipped && <span className="bls-item-tag bls-item-tag-equipped">EQUIPPED</span>}
+          </div>
+          <div className="bls-item-desc">{item.desc}</div>
+        </div>
+        <button
+          type="button"
+          className="bls-item-buy"
+          onClick={onClick}
+          disabled={disabled}
+        >
+          {label}
+        </button>
+      </div>
+    );
+  }
+
+  // ── Non-cosmetic flow (buffs / consumables / qol) ───────────────────
   const { state, label, disabled } = (() => {
     // Permanent
     if (item.ownership === 'permanent' && ownership.hasQol(item.id)) {
@@ -174,11 +226,7 @@ export default function BloodLotusSpendShopModal({
 
         <div className="bls-body">
           {items.length === 0 ? (
-            <div className="bls-empty">
-              {tab === 'cosmetic'
-                ? 'Cosmetic skins and particle sets arrive in a future update.'
-                : 'Nothing here yet.'}
-            </div>
+            <div className="bls-empty">Nothing here yet.</div>
           ) : (
             items.map(item => (
               <ShopItemRow
@@ -187,6 +235,8 @@ export default function BloodLotusSpendShopModal({
                 ownership={inventory}
                 balance={balance}
                 onBuy={handleBuy}
+                onEquip={(id) => inventory.equip(id)}
+                onUnequip={(slot) => inventory.unequip(slot)}
                 busy={busy}
               />
             ))

@@ -17369,6 +17369,95 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   50%      { transform: scale(1.015); }
 }
 
+/* ── Shop cosmetics — Tier 1 CSS-tint variants ─────────────────────────
+   Each body class is toggled by App.jsx whenever the matching cosmetic
+   item is equipped via the shop. Premium pixelart skins (Tier 2) will
+   drop into the same slots later with image swaps; the body-class
+   contract here stays as a clean fallback.
+
+   Slots and target elements:
+     character → .home-cultivator-sprite (filter hue-rotate)
+     crystal   → .home-crystal-img       (filter hue-rotate)
+     particles → .home-cultivator-qi-flow-layer img (filter hue-rotate
+                                          on the orb sprites)
+     background→ .home-bg-image / .home-stage (mix-blend tint overlay)
+
+   Implementation note: hue-rotate is a cheap GPU op on the existing
+   sprite; saturate+brightness tuning each variant so the recolour
+   reads as deliberate instead of muddy. */
+
+body.cosmetic-char-crimson .home-cultivator-sprite {
+  filter: hue-rotate(-95deg) saturate(1.35) brightness(0.95);
+}
+body.cosmetic-char-verdant .home-cultivator-sprite {
+  filter: hue-rotate(60deg) saturate(1.2) brightness(0.95);
+}
+body.cosmetic-char-amethyst .home-cultivator-sprite {
+  filter: hue-rotate(180deg) saturate(1.2) brightness(0.95);
+}
+
+body.cosmetic-crystal-verdant .home-crystal-img {
+  filter: hue-rotate(110deg) saturate(1.25) brightness(0.95);
+}
+body.cosmetic-crystal-amber .home-crystal-img {
+  filter: hue-rotate(-140deg) saturate(1.4) brightness(1.05);
+}
+
+/* Particles — target the qi-flow inflow orbs and the click-burst shower.
+   Both layers share the qi_orb_*.png sprite set; one hue-rotate filter
+   recolours every active orb on screen. */
+body.cosmetic-particles-jade .home-cultivator-qi-flow-layer img,
+body.cosmetic-particles-jade .home-click-burst-p {
+  filter: hue-rotate(110deg) saturate(1.3);
+}
+body.cosmetic-particles-violet .home-cultivator-qi-flow-layer img,
+body.cosmetic-particles-violet .home-click-burst-p {
+  filter: hue-rotate(180deg) saturate(1.3) brightness(1.1);
+}
+
+/* Background — overlay a tinted radial-gradient on the home backdrop.
+   mix-blend-mode keeps the original scenery visible through the tint
+   rather than replacing it. .home-bg is the div carrying the bg image. */
+body.cosmetic-bg-dawn .home-bg::after,
+body.cosmetic-bg-twilight .home-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+body.cosmetic-bg-dawn .home-bg::after {
+  background: radial-gradient(ellipse at 50% 20%,
+    rgba(255, 180, 80, 0.45) 0%,
+    rgba(255, 120, 60, 0.20) 35%,
+    rgba(0, 0, 0, 0)         70%);
+}
+body.cosmetic-bg-twilight .home-bg::after {
+  background: radial-gradient(ellipse at 50% 30%,
+    rgba(120, 140, 255, 0.40) 0%,
+    rgba(80, 50, 180, 0.25)   40%,
+    rgba(0, 0, 0, 0)          75%);
+}
+/* The .home-bg element needs `position: relative` so the ::after anchors
+   inside it. Safety net specifically for the cosmetic overlay. */
+body.cosmetic-bg-dawn .home-bg,
+body.cosmetic-bg-twilight .home-bg {
+  position: relative;
+}
+
+/* Equipped-tag pill inside .bls-item (shop modal). Distinguishes from
+   the regular ×N count tag so the player can spot the "this is on"
+   state at a glance. */
+.bls-item-tag-equipped {
+  background: rgba(120, 230, 160, 0.18) !important;
+  color: rgba(180, 250, 200, 1) !important;
+  letter-spacing: 0.08em !important;
+}
+.bls-item-equipped {
+  background: rgba(120, 230, 160, 0.08);
+  border-color: rgba(120, 230, 160, 0.32);
+}
+
 /* ── Crimson Aura VFX ─────────────────────────────────────────────────
    Activated by `body.body-crimson-aura-active` while any Crimson Aura
    shop buff is in the active-buffs list. Two layered effects:

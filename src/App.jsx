@@ -6,6 +6,7 @@ import BloodLotusShopModal from './components/BloodLotusShopModal';
 import BloodLotusSpendShopModal from './components/BloodLotusSpendShopModal';
 import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './systems/bloodLotus';
 import useShopInventory from './hooks/useShopInventory';
+import { SHOP_ITEMS_BY_ID } from './data/shopItems';
 import PillDrawer from './components/PillDrawer';
 import ProgressHubModal from './components/ProgressHubModal';
 import DailyBonusModal from './components/DailyBonusModal';
@@ -559,6 +560,32 @@ function AppInner() {
       cultivation.upgradeFocusMultAddRef.current = upgrades.getFocusMultAdd();
     }
   }, [upgrades.owned, tree.modifiers, cultivation.upgradeCrystalTapMultRef, cultivation.upgradeFocusMultAddRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Blood Lotus Shop — equipped cosmetics. Each cosmetic declares a
+  // `effect.bodyClass`; this effect syncs the currently-equipped class
+  // per slot to the document body so CSS selectors in App.css can
+  // tint the relevant element (cultivator sprite, crystal, particles,
+  // background) without touching JSX. Re-runs when inv changes
+  // (equip / unequip / purchase / reincarnation rehydrate).
+  useEffect(() => {
+    const equippedMap = shopInventory.inv?.equipped ?? {};
+    // Collect the bodyClass for every currently-equipped cosmetic.
+    const desired = new Set();
+    for (const [, itemId] of Object.entries(equippedMap)) {
+      const item = SHOP_ITEMS_BY_ID[itemId];
+      if (item?.effect?.bodyClass) desired.add(item.effect.bodyClass);
+    }
+    // Sync body.classList: remove any cosmetic-* classes not in the
+    // desired set; add desired ones not present. We only touch
+    // classes starting with `cosmetic-` so unrelated body classes
+    // (event-cinematic, vfx-disabled, …) are left alone.
+    const toRemove = [];
+    for (const cls of document.body.classList) {
+      if (cls.startsWith('cosmetic-') && !desired.has(cls)) toRemove.push(cls);
+    }
+    toRemove.forEach((cls) => document.body.classList.remove(cls));
+    desired.forEach((cls) => document.body.classList.add(cls));
+  }, [shopInventory.inv]);
 
   // Crimson Aura VFX — toggles `body.body-crimson-aura-active` while
   // any Crimson Aura buff is active. CSS (App.css) attaches the halo

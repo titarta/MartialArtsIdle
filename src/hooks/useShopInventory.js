@@ -39,6 +39,8 @@ function emptyInventory() {
     stacks:      {},   // { [itemId]: int }
     consumables: {},   // { [itemId]: int }
     buffs:       {},   // { [itemId]: { expiresAtMs } }
+    cosmetics:   {},   // { [itemId]: true } — owned (purchased)
+    equipped:    {},   // { [slotType]: itemId } — currently equipped per slot
   };
 }
 
@@ -143,12 +145,51 @@ export default function useShopInventory() {
           ...next.buffs,
           [itemId]: { expiresAtMs: baseEnd + item.effect.durationMs },
         };
+      } else if (item.ownership === 'cosmetic') {
+        // Cosmetics are permanent-owned and auto-equip on first purchase
+        // (the player just bought it — they want to see it). Subsequent
+        // equip/unequip flows live in the dedicated equip() method.
+        next.cosmetics = { ...next.cosmetics, [itemId]: true };
+        if (item.cosmeticSlot) {
+          next.equipped = { ...next.equipped, [item.cosmeticSlot]: itemId };
+        }
       }
       return next;
     });
 
     return { ok: true };
   }, [inv]);
+
+  // ── Cosmetic equip / unequip ──────────────────────────────────────────
+  // Equip sets the slot to itemId (replacing whatever was there).
+  // Unequip clears the slot (game falls back to the default asset).
+  const equip = useCallback((itemId) => {
+    const item = SHOP_ITEMS_BY_ID[itemId];
+    if (!item || item.ownership !== 'cosmetic') return false;
+    if (!inv.cosmetics[itemId]) return false; // can't equip what you don't own
+    setInv(prev => ({
+      ...prev,
+      equipped: { ...prev.equipped, [item.cosmeticSlot]: itemId },
+    }));
+    return true;
+  }, [inv]);
+
+  const unequip = useCallback((slotType) => {
+    setInv(prev => {
+      if (!prev.equipped[slotType]) return prev;
+      const next = { ...prev, equipped: { ...prev.equipped } };
+      delete next.equipped[slotType];
+      return next;
+    });
+  }, []);
+
+  const isCosmeticOwned    = useCallback((id) => !!inv.cosmetics[id], [inv]);
+  const isCosmeticEquipped = useCallback((id) => {
+    const item = SHOP_ITEMS_BY_ID[id];
+    if (!item?.cosmeticSlot) return false;
+    return inv.equipped[item.cosmeticSlot] === id;
+  }, [inv]);
+  const getEquippedInSlot  = useCallback((slot) => inv.equipped[slot] ?? null, [inv]);
 
   // ── Use a one-shot consumable ──────────────────────────────────────────
   // Decrements the count for `itemId`. Returns true iff one was available.
@@ -225,5 +266,11 @@ export default function useShopInventory() {
     getActiveBuffMult,
     getActiveBuffAdd,
     activeBuffs,
+    // Cosmetic equip/unequip API
+    equip,
+    unequip,
+    isCosmeticOwned,
+    isCosmeticEquipped,
+    getEquippedInSlot,
   };
 }
