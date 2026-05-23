@@ -18764,6 +18764,11 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    top stop to be even brighter (e.g. rgba(95, 165, 125)) for a more
    confident jade panel face. */
 
+/* Modals INTENTIONALLY excluded from the jade override (they have their
+   own thematic chrome that the user prefers to preserve):
+     .daily-modal           — blood-red lotus gradient (gift-day theme)
+   If more modals need to opt out, drop them from the selector list
+   below; the original per-modal rules will re-apply automatically. */
 .achievements-modal,
 .progress-hub-modal,
 .journey-modal,
@@ -18775,7 +18780,6 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .cfm-modal,
 .coll-modal-panel,
 .artefact-upgrade-panel,
-.daily-modal,
 .modal-content,
 .blood-lotus-shop-card {
   background: linear-gradient(
