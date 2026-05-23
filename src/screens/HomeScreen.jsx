@@ -8,7 +8,6 @@ import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
-import DailyBonusWidget from '../components/DailyBonusWidget';
 import ActiveSparksBar from '../components/ActiveSparksBar';
 import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue } from '../contexts/EventQueueContext';
@@ -1951,7 +1950,6 @@ function HomeScreen({
   selections, onOpenSelections,
   onNavigate,
   crystal, isCrystalUnlocked,
-  dailyBonus, onOpenDailyBonus,
   lastIdleAssignment,
   openCrystal,
   onOpenPills,
@@ -2553,7 +2551,10 @@ function HomeScreen({
             )}
           </div>
 
-          {/* ── Top-right chip stack — reserved for timed/seasonal events ── */}
+          {/* ── Top-right chip stack — Petition Tablet stands alone ──
+              The Daily Gift chip was removed (the modal auto-opens via the
+              event queue on first login each day, so the chip provided no
+              value and only diluted the ceremonial weight of the plaque). */}
           <div className="home-chips-tr">
             <HeavenlyQiButton
               ad={cultivationAd}
@@ -2561,14 +2562,6 @@ function HomeScreen({
               adBoostRemaining={adBoostRemaining}
               maxed={maxed}
             />
-            {dailyBonus && (
-              <DailyBonusWidget
-                streak={dailyBonus.streak}
-                todayReward={dailyBonus.todayReward}
-                isAvailable={dailyBonus.isAvailable}
-                onOpen={onOpenDailyBonus}
-              />
-            )}
           </div>
 
           {/* Divine Qi orbs — float over the scene at random positions */}
