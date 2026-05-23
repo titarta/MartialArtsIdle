@@ -18782,27 +18782,30 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .artefact-upgrade-panel,
 .modal-content,
 .blood-lotus-shop-card {
+  /* Warm parchment / sandalwood gradient — same vocabulary as the
+     jade pass (solid 0.97-alpha gradient + bright border + multi-
+     layer shadow + inset highlight) but in oriental-scroll tones. */
   background: linear-gradient(
     160deg,
-    rgba(78, 145, 110, 0.97) 0%,
-    rgba(36,  80,  60, 0.97) 100%
+    rgba(155, 125,  85, 0.97) 0%,
+    rgba( 75,  55,  35, 0.97) 100%
   ) !important;
-  border: 1px solid rgba(140, 230, 180, 0.55) !important;
+  border: 1px solid rgba(232, 213, 168, 0.55) !important;
   box-shadow:
     0 10px 48px rgba(0, 0, 0, 0.78),
-    0 0   28px rgba(36, 110,  76, 0.50),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+    0 0   28px rgba(110,  80,  50, 0.50),
+    inset 0 1px 0 rgba(255, 245, 220, 0.14) !important;
 }
 
 /* Inner stat-row containers — re-tint slightly darker than the new
-   solid-jade modal bg so nested content still has visible depth. */
+   warm parchment modal bg so nested content still has visible depth. */
 .pdm-stats,
 .coll-stat-list {
-  background: rgba(20, 50, 35, 0.65) !important;
-  border-color: rgba(140, 230, 180, 0.22) !important;
+  background: rgba(50, 35, 22, 0.65) !important;
+  border-color: rgba(232, 213, 168, 0.22) !important;
 }
 .pdm-stat-row {
-  background: rgba(14, 36, 25, 0.55) !important;
+  background: rgba(36, 25, 15, 0.55) !important;
 }
 .pdm-stat-row-emph {
   background: rgba(255, 215, 130, 0.10) !important;
@@ -18822,17 +18825,18 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    This block fixes all three. Lives at EOF so it wins specificity
    ties against the per-element rules higher in the file. */
 
-/* Solid deep-jade frame around the gameplay area. No alpha — the
+/* Solid warm-earth frame around the gameplay area. No alpha — the
    bars now read as a definite edge of the game window rather than
-   a translucent darkening over the backdrop. */
+   a translucent darkening over the backdrop. Warm dark wood/scroll
+   tones to match the parchment modal chrome. */
 .top-bar {
-  background: linear-gradient(180deg, rgba(18, 42, 30, 1) 0%, rgba(10, 26, 18, 1) 100%) !important;
-  border-bottom: 1px solid rgba(140, 230, 180, 0.30) !important;
+  background: linear-gradient(180deg, rgba(45, 33, 22, 1) 0%, rgba(28, 20, 12, 1) 100%) !important;
+  border-bottom: 1px solid rgba(220, 195, 155, 0.32) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55) !important;
 }
 .navbar {
-  background: linear-gradient(180deg, rgba(10, 26, 18, 1) 0%, rgba(18, 42, 30, 1) 100%) !important;
-  border-top: 1px solid rgba(140, 230, 180, 0.30) !important;
+  background: linear-gradient(180deg, rgba(28, 20, 12, 1) 0%, rgba(45, 33, 22, 1) 100%) !important;
+  border-top: 1px solid rgba(220, 195, 155, 0.32) !important;
   box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.55) !important;
 }
 
@@ -18845,34 +18849,33 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     linear-gradient(to top,    rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 16%) !important;
 }
 
-/* Nav button labels — bump readable opacity from 0.5 to 0.78 so the
-   tab labels are legible at a glance. Active state gets a jade glow
-   replacing the old warm-yellow text-shadow. */
+/* Nav button labels — readable cream/parchment colour. Active state
+   gets an amber/gold glow that fits the warm-earth chrome. */
 .nav-btn {
-  color: rgba(220, 240, 225, 0.78) !important;
+  color: rgba(245, 230, 200, 0.78) !important;
 }
 .nav-icon-img,
 .nav-icon-emoji {
   opacity: 0.78 !important;
 }
 .nav-btn.active {
-  color: rgba(195, 245, 215, 1) !important;
-  text-shadow: 0 0 8px rgba(110, 200, 150, 0.55) !important;
+  color: rgba(255, 240, 210, 1) !important;
+  text-shadow: 0 0 8px rgba(220, 175, 110, 0.55) !important;
 }
 .nav-btn.active .nav-icon-img,
 .nav-btn.active .nav-icon-emoji {
   opacity: 1 !important;
 }
 .nav-btn.active .nav-icon-img {
-  filter: drop-shadow(0 0 5px rgba(110, 200, 150, 0.65)) !important;
+  filter: drop-shadow(0 0 5px rgba(220, 175, 110, 0.65)) !important;
 }
 .nav-btn:hover {
-  color: rgba(220, 250, 230, 0.95) !important;
+  color: rgba(255, 245, 220, 0.95) !important;
 }
 
-/* TopBar buttons get the same active-state vocabulary (jade tint) —
-   replaces the generic white wash from .top-bar-btn--active. */
+/* TopBar buttons get the same active-state vocabulary (warm amber
+   tint) — replaces the generic white wash from .top-bar-btn--active. */
 .top-bar-btn--active {
-  background: rgba(110, 200, 150, 0.22) !important;
-  box-shadow: inset 0 0 0 1px rgba(140, 230, 180, 0.55) !important;
+  background: rgba(220, 175, 110, 0.22) !important;
+  box-shadow: inset 0 0 0 1px rgba(232, 213, 168, 0.55) !important;
 }

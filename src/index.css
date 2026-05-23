@@ -37,62 +37,58 @@
        -wash    pale uppercase labels, subtle backgrounds
        -pale    palest ultra-soft backgrounds, very diffuse tints                                            */
 
-  /* BRIGHT JADE — the main glow/accent hue. Used as solid hex OR as the
-     rgb channel inside rgba() for translucent fills, glows, shadows.
-     2026-05-23 boost pass: saturation cranked so low-alpha consumers
-     (rgba(..., 0.08-0.25), which is most of the codebase) still read
-     as confident jade rather than a faint wash. */
-  --ui-purple-rgb:         110, 215, 155;  /* base — vibrant jade (#6ed79b) */
-  --ui-purple-deep-rgb:     70, 160, 110;  /* deep emerald (#46a06e) */
-  --ui-purple-strong-rgb:  130, 235, 175;  /* loud jade highlight (#82ebaf) */
-  --ui-purple-soft-rgb:    160, 240, 195;  /* soft mint (#a0f0c3) */
-  --ui-purple-light-rgb:   195, 245, 215;  /* pale mint (#c3f5d7) */
+  /* WARM PARCHMENT / SANDALWOOD — 2026-05-23 theme pivot from jade.
+     User wanted a more neutral oriental palette: aged scroll paper,
+     tea-stained silk, sandalwood — restrained, classical, readable.
+     RGB triplets are vivid enough at low alpha to still read as
+     warmth (not a colourless grey), but desaturated enough to stay
+     out of the way of game content. */
+  --ui-purple-rgb:         175, 145, 100;  /* base — warm parchment (#af9164) */
+  --ui-purple-deep-rgb:    130, 100,  65;  /* sandalwood deep (#826441) */
+  --ui-purple-strong-rgb:  200, 170, 120;  /* loud cream/tan accent (#c8aa78) */
+  --ui-purple-soft-rgb:    220, 195, 155;  /* soft cream (#dcc39b) */
+  --ui-purple-light-rgb:   240, 220, 190;  /* pale cream (#f0dcbe) */
 
   /* Discrete shades (dark → light) used as solid colors */
-  --ui-purple-darker:  #2a6b48;   /* deepest forest — gradient starts */
-  --ui-purple-deep:    #46a06e;   /* pressed, emphasised outlines */
-  --ui-purple-strong:  #82ebaf;   /* loud callouts, strong accents */
-  --ui-purple-soft:    #a0f0c3;   /* secondary accents, softer glow */
-  --ui-purple-light:   #c3f5d7;   /* highlights, emphasis text */
-  --ui-purple-wash:    #ddf5e4;   /* pale label / uppercase text */
-  --ui-purple-pale:    #e8f8ec;   /* ultra-soft backgrounds */
+  --ui-purple-darker:  #3d2e1f;   /* deepest umber — gradient starts */
+  --ui-purple-deep:    #6b5232;   /* pressed sandalwood, emphasised outlines */
+  --ui-purple-strong:  #c8a878;   /* loud callouts, strong accents */
+  --ui-purple-soft:    #dcc39b;   /* secondary accents, softer glow */
+  --ui-purple-light:   #f0dcbe;   /* highlights, emphasis text (pale cream) */
+  --ui-purple-wash:    #f5e6c9;   /* pale label / uppercase text */
+  --ui-purple-pale:    #faefd9;   /* ultra-soft backgrounds */
 
   /* ── UI chrome tints ──────────────────────────────────────────────────
-     These are the "atmosphere" colours that make the UI read as jade
-     even when not using the bright --ui-purple-* (named purple but
-     valued as jade — see migration note above). Store as rgb triples
+     2026-05-23: re-tinted for the warm-parchment theme. Atmosphere
+     colours are warm cream / tan / sandalwood so the UI reads as
+     classical-oriental-scroll (vs cool jade). Store as rgb triples
      so alpha varies per usage via rgba(). */
 
-  /* Hover / pale interactive text (200, 235, 215 — pale mint) */
-  --ui-hover-rgb:      200, 235, 215;
+  /* Hover / pale interactive text (240, 220, 190 — pale cream) */
+  --ui-hover-rgb:      240, 220, 190;
 
-  /* Secondary text / labels / captions (160, 200, 180 — mint-grey) */
-  --ui-label-rgb:      160, 200, 180;
+  /* Secondary text / labels / captions (200, 175, 140 — warm tan) */
+  --ui-label-rgb:      200, 175, 140;
 
-  /* Muted / disabled text (150, 175, 160 — desaturated jade-grey) */
-  --ui-muted-rgb:      150, 175, 160;
+  /* Muted / disabled text (175, 155, 130 — desaturated tan) */
+  --ui-muted-rgb:      175, 155, 130;
 
-  /* Deep jade shadow for tooltip/modal drop-shadows (18, 60, 40) */
-  --ui-shadow-rgb:      18,  60,  40;
+  /* Deep brown shadow for tooltip/modal drop-shadows (75, 55, 30) */
+  --ui-shadow-rgb:      75,  55,  30;
 
-  /* ── UI surface backgrounds — confident dark jade ────────────────────
-     2026-05-23 brighten pass: panels were rendering as near-black
-     even at full opacity, which made the UI feel washed-out no
-     matter the hue. New values commit to a visible dark-jade so
-     panels READ as jade-toned surfaces (not "very dark with a
-     hint of green"). Deep stays near-black for the outermost
-     backdrop where contrast for panels-on-top matters. */
+  /* ── UI surface backgrounds — warm dark earth ────────────────────────
+     Warm dark backbone for the whole game. Subtle brown cast at high
+     opacity reads as "aged wood / weathered scroll" rather than a
+     neutral black. Deep stays near-black for the outermost backdrop. */
 
-  /* Deepest surface (nav, deepest panels) — near-black for max contrast
-     against panels-on-top. Slight green cast keeps the family unified. */
-  --ui-bg-deep-rgb:      6,  18,  12;
+  /* Deepest surface (nav, deepest panels) — near-black with warm cast. */
+  --ui-bg-deep-rgb:     20,  14,   8;
 
-  /* Panel / modal / card background — visible dark jade rather than
-     near-black. This is the single biggest "feels modern" lever. */
-  --ui-bg-panel-rgb:    24,  55,  38;
+  /* Panel / modal / card background — dark sandalwood / aged-wood tone. */
+  --ui-bg-panel-rgb:    50,  38,  25;
 
-  /* Border / divider tint between panels — slightly brighter jade. */
-  --ui-border-rgb:      40,  80,  55;
+  /* Border / divider tint between panels — medium warm tan. */
+  --ui-border-rgb:      90,  70,  45;
 
   /* ── Old purple palette (revert by uncommenting + commenting jade above) ─
   --ui-purple-rgb:         139,  92, 246;
