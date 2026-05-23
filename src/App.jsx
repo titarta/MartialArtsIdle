@@ -1518,11 +1518,14 @@ function AppInner() {
       )}
       <TopBar
         bloodLotusBalance={selections.bloodLotusBalance}
-        /* Lotus chip in TopBar now opens the SPEND shop (where players
-           use their Blood Lotus to buy buffs / QoL / etc.). The IAP
-           "Top Up Blood Lotus" modal is reached from a CTA inside the
-           spend shop. */
-        onOpenShop={() => openModal('lotus-shop')}
+        /* Top-left has TWO separate buttons now:
+             onOpenShop      → IAP modal (Top Up — buy more Blood Lotus)
+             onOpenLotusShop → spend shop (buffs / QoL / cosmetics)
+           The lotus chip shows the player's balance and acts as the
+           Top Up entry point; the shop button right next to it is the
+           dedicated spend surface. */
+        onOpenShop={() => openModal('shop')}
+        onOpenLotusShop={() => openModal('lotus-shop')}
         onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
         onOpenSettings={() => openModal('settings')}
         hasNewAchievement={hasNewAch}

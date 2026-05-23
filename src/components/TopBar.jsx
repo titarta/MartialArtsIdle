@@ -24,7 +24,8 @@ function QiLiveText({ qiRef }) {
 
 export default function TopBar({
   bloodLotusBalance,
-  onOpenShop,
+  onOpenShop,        // IAP "Top Up Blood Lotus" modal
+  onOpenLotusShop,   // SPEND shop (buffs / consumables / QoL / cosmetics)
   onOpenProgress,
   onOpenSettings,
   hasNewAchievement,
@@ -38,10 +39,13 @@ export default function TopBar({
 }) {
   return (
     <div className="top-bar">
+      {/* Top Up button — opens the IAP modal where Blood Lotus is bought
+          with real money. Shows the player's current balance so it
+          doubles as the balance readout. */}
       <button
-        className={`home-hud-blood-lotus${(activeModal === 'lotus-shop' || activeModal === 'shop') ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-blood-lotus${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenShop}
-        aria-label="Blood Lotus Shop"
+        aria-label="Top Up Blood Lotus"
       >
         <img
           src={`${BASE}sprites/items/blood_lotus.png`}
@@ -50,6 +54,17 @@ export default function TopBar({
           draggable="false"
         />
         <span className="home-hud-blood-lotus-amount">{bloodLotusBalance ?? 0}</span>
+      </button>
+      {/* Spend Shop button — sits right next to the Top Up button. Opens
+          the Blood Lotus Shop where the balance is SPENT on buffs /
+          consumables / QoL / cosmetics. Icon-only (the balance lives on
+          the Top Up button just to the left). */}
+      <button
+        className={`home-hud-lotus-shop${activeModal === 'lotus-shop' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenLotusShop}
+        aria-label="Blood Lotus Shop"
+      >
+        🛍️
       </button>
       <div className="topbar-currencies">
         <div className="topbar-currency-row" aria-label="Current Qi">

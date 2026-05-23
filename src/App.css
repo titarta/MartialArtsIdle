@@ -4003,6 +4003,31 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   pointer-events: none;
 }
 
+/* Lotus Spend Shop button — sits IMMEDIATELY right of the Top Up chip
+   so the player gets two distinct entry points in the top-left: tap
+   the balance chip to buy more Blood Lotus, tap the bag to spend it.
+   Sized to match the other TopBar icon buttons (.home-hud-progress,
+   .home-hud-crystal, .home-hud-settings) so the row reads as one
+   uniform control strip. */
+.home-hud-lotus-shop {
+  width: 34px;
+  height: 34px;
+  background: rgba(220, 60, 80, 0.10);
+  border: 1px solid rgba(220, 60, 80, 0.32);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  margin-left: 6px;
+}
+.home-hud-lotus-shop:hover {
+  background: rgba(220, 60, 80, 0.22);
+}
+
 /* Qi + Karma currency rows — sit right of the Blood Lotus button.
    Stacked vertically (2 rows) to fit the top bar's 48px height. */
 .topbar-currencies {
@@ -13812,7 +13837,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   position: relative;
 }
 
-.journey-group-icon { font-size: 16px; flex-shrink: 0; }
+.journey-group-icon { font-size: 16px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.journey-group-icon-img { width: 24px; height: 24px; display: block; object-fit: contain; }
 
 .journey-group-name {
   font-size: 13px;
