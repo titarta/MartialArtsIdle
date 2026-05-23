@@ -128,103 +128,20 @@ function getEvolutionSprites(item) {
   return [];
 }
 
-// ─── Version A — Stack / Overlap ──────────────────────────────────────
-// Shows ~6 evolutions overlapping in a single tile. First 3 in full
-// colour; the rest silhouetted. Each sprite shifts right + drops down
-// + scales up slightly as you read into the "future", giving a
-// "growing into" depth illusion. Compact (fits the regular grid) so
-// it scales to many skins at once. Tap to see the full evolution
-// sequence (future polish — modal expansion).
-function CosmeticCardStack({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
-  const sprites = getEvolutionSprites(item);
-  // Sample 6 stages out of the full list so the stack reads as a
-  // sequence without crowding (13 sprites overlapping would smear).
-  const sampleCount = 6;
-  const step = Math.max(1, Math.floor(sprites.length / sampleCount));
-  const sampled = [];
-  for (let i = 0; i < sampleCount; i++) {
-    const idx = Math.min(sprites.length - 1, i * step);
-    sampled.push({ src: sprites[idx], tier: idx + 1 });
-  }
-  const revealedCount = 3;
-  const totalStages = sprites.length;
-
-  // State machine for CTA (same as base CosmeticCard)
-  let stateClass, label, disabled, onClick;
-  if (item.comingSoon) {
-    stateClass = 'coming-soon'; label = 'Coming Soon'; disabled = true; onClick = null;
-  } else {
-    const owned    = ownership.isCosmeticOwned(item.id);
-    const equipped = ownership.isCosmeticEquipped(item.id);
-    if (!owned)         { stateClass = 'buyable';  label = `${item.cost} BL`; disabled = balance < item.cost || busy; onClick = () => onBuy(item.id); }
-    else if (equipped)  { stateClass = 'equipped'; label = 'Equipped';        disabled = false; onClick = () => onUnequip(item.cosmeticSlot); }
-    else                { stateClass = 'owned';    label = 'Equip';           disabled = false; onClick = () => onEquip(item.id); }
-  }
-
-  return (
-    <div className={`bls-card bls-card-stack-variant bls-card-${stateClass}`}>
-      {stateClass === 'equipped'    && <span className="bls-card-ribbon">EQUIPPED</span>}
-      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
-
-      <div className="bls-stack-preview">
-        {sampled.map((s, i) => {
-          const isHidden = i >= revealedCount;
-          return (
-            <img
-              key={i}
-              src={s.src}
-              alt=""
-              draggable="false"
-              className={`bls-stack-sprite${isHidden ? ' bls-stack-sprite-hidden' : ''}`}
-              style={{
-                /* Each successive sprite peeks from behind the previous,
-                   shifted right + slightly down. The z-index ramp keeps
-                   later sprites IN FRONT so the eye reads left-to-right
-                   as "this is what you grow into". */
-                '--stack-index': i,
-                zIndex: i + 1,
-              }}
-            />
-          );
-        })}
-      </div>
-
-      <div className="bls-card-body">
-        <div className="bls-card-name">{item.name}</div>
-        <div className="bls-card-evolution-badge">
-          <span className="bls-card-evolution-dots" aria-hidden="true">
-            <span /><span /><span /><span /><span />
-          </span>
-          <span className="bls-card-evolution-label">
-            {revealedCount} / {totalStages} revealed
-          </span>
-        </div>
-        <button
-          type="button"
-          className={`bls-card-cta bls-card-cta-${stateClass}`}
-          onClick={onClick ?? undefined}
-          disabled={disabled}
-        >
-          {label}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Version B — Full Strip / Lane ────────────────────────────────────
-// Full-width card with a horizontal strip showing EVERY tier of the
-// skin. First 3 cells in full colour; the rest silhouetted. Each cell
-// has a small tier number underneath so the player can read "I'm at
-// stage 5 right now, here's what 6 looks like, 7+ is a mystery".
-// Heavier than the stack variant but maximises the "scope of progression"
-// feeling.
-function CosmeticCardStrip({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
+// ─── Cosmetic Card — Evolution Procession ─────────────────────────────
+// Full-width card with ALL evolution stages laid out as an overlapping
+// procession that recedes into depth. The early stages (revealed, in
+// full colour) sit in FRONT — fully visible. Later stages (silhouetted)
+// recede backward — each one slightly smaller, lower opacity, partially
+// hidden behind the one in front. The whole procession fits inside the
+// card width with NO horizontal scroll — overlap is calculated to
+// guarantee fit while still leaving every silhouette legible.
+function CosmeticCardProcession({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
   const sprites = getEvolutionSprites(item);
   const revealedCount = 3;
   const totalStages = sprites.length;
 
-  // CTA state
+  // CTA state machine
   let stateClass, label, disabled, onClick;
   if (item.comingSoon) {
     stateClass = 'coming-soon'; label = 'Coming Soon'; disabled = true; onClick = null;
@@ -253,18 +170,30 @@ function CosmeticCardStrip({ item, ownership, balance, onBuy, onEquip, onUnequip
         </button>
       </div>
 
-      <div className="bls-strip-preview">
+      {/* Procession — `--stage-count` lets CSS compute the per-stage
+          horizontal step so the whole row fits the card width without
+          scrolling. Each sprite is absolutely positioned with a CSS
+          var index. Earlier stages sit on TOP (higher z-index) so the
+          silhouettes recede behind. */}
+      <div
+        className="bls-procession"
+        style={{ '--stage-count': totalStages }}
+      >
         {sprites.map((src, i) => {
           const isHidden = i >= revealedCount;
           return (
-            <div
+            <img
               key={i}
-              className={`bls-strip-cell${isHidden ? ' bls-strip-cell-hidden' : ''}`}
+              src={src}
+              alt=""
+              draggable="false"
+              className={`bls-proc-sprite${isHidden ? ' bls-proc-sprite-hidden' : ''}`}
+              style={{
+                '--stage-index': i,
+                zIndex: totalStages - i, // earlier stages on top
+              }}
               aria-label={isHidden ? `Stage ${i + 1} — locked` : `Stage ${i + 1}`}
-            >
-              <img src={src} alt="" draggable="false" className="bls-strip-cell-sprite" />
-              <span className="bls-strip-cell-tier">{i + 1}</span>
-            </div>
+            />
           );
         })}
       </div>
@@ -619,53 +548,27 @@ export default function BloodLotusSpendShopModal({
                       </section>
                     )}
 
-                    {/* Premium Tier-2 "Coming Soon" — render in BOTH
-                        layouts for character + crystal so the user can
-                        compare. Particles + backgrounds (single-form)
-                        keep the regular card layout. */}
+                    {/* Premium Tier-2 multi-tier skins (cultivator +
+                        crystal) — full-width procession cards that show
+                        every evolution stage receding into depth. */}
                     {group.premium.length > 0 && isMultiTier && (
-                      <>
-                        <section className="bls-cosmetic-section bls-cosmetic-section-mockup">
-                          <div className="bls-cosmetic-section-label bls-mockup-label">
-                            <span className="bls-mockup-tag">VERSION A</span>
-                            {group.label} — Stack Preview
-                          </div>
-                          <div className="bls-card-grid">
-                            {group.premium.map(item => (
-                              <CosmeticCardStack
-                                key={`stack-${item.id}`}
-                                item={item}
-                                ownership={inventory}
-                                balance={balance}
-                                onBuy={handleBuy}
-                                onEquip={(id)  => inventory.equip(id)}
-                                onUnequip={(s) => inventory.unequip(s)}
-                                busy={busy}
-                              />
-                            ))}
-                          </div>
-                        </section>
-                        <section className="bls-cosmetic-section bls-cosmetic-section-mockup">
-                          <div className="bls-cosmetic-section-label bls-mockup-label">
-                            <span className="bls-mockup-tag bls-mockup-tag-b">VERSION B</span>
-                            {group.label} — Full Strip
-                          </div>
-                          <div className="bls-strip-list">
-                            {group.premium.map(item => (
-                              <CosmeticCardStrip
-                                key={`strip-${item.id}`}
-                                item={item}
-                                ownership={inventory}
-                                balance={balance}
-                                onBuy={handleBuy}
-                                onEquip={(id)  => inventory.equip(id)}
-                                onUnequip={(s) => inventory.unequip(s)}
-                                busy={busy}
-                              />
-                            ))}
-                          </div>
-                        </section>
-                      </>
+                      <section className="bls-cosmetic-section">
+                        <div className="bls-cosmetic-section-label">{group.label} — Coming Soon</div>
+                        <div className="bls-strip-list">
+                          {group.premium.map(item => (
+                            <CosmeticCardProcession
+                              key={item.id}
+                              item={item}
+                              ownership={inventory}
+                              balance={balance}
+                              onBuy={handleBuy}
+                              onEquip={(id)  => inventory.equip(id)}
+                              onUnequip={(s) => inventory.unequip(s)}
+                              busy={busy}
+                            />
+                          ))}
+                        </div>
+                      </section>
                     )}
 
                     {/* Single-form premium cosmetics (particles + backdrops)

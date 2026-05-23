@@ -12718,65 +12718,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Cosmetic card — Version A (Stack / Overlap) ────────────────────
-   Same outer dimensions as the regular .bls-card, but the preview
-   area shows ~6 evolution sprites overlapping in a fanned sequence.
-   First 3 in colour, the rest silhouetted via the SVG #mai-silhouette
-   filter so the player gets "you grow into this" without seeing the
-   specific late-stage shapes. Each sprite shifts right/down/scales
-   slightly as `--stack-index` grows, creating depth. */
-.bls-stack-preview {
-  position: relative;
-  flex: 1;
-  min-height: 150px;
-  background:
-    radial-gradient(circle at 45% 55%, rgba(255, 255, 255, 0.05), transparent 60%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
-  overflow: hidden;
-}
-.bls-stack-sprite {
-  position: absolute;
-  /* Anchor each sprite to the same baseline (bottom-center) so they
-     read as a row of figures growing left-to-right. */
-  bottom: 12px;
-  left: 50%;
-  width: 56px;
-  height: 56px;
-  object-fit: contain;
-  /* Stack offset: each successive sprite shifts right + scales up
-     slightly. The eye reads a "this is what's next" sequence. */
-  transform:
-    translateX(calc(-50% + (var(--stack-index, 0) * 14px) - 36px))
-    scale(calc(1 + (var(--stack-index, 0) * 0.03)));
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-  transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.bls-stack-sprite-hidden {
-  /* Late-stage silhouette — true-black cutout via the SVG filter. */
-  filter:
-    url(#mai-silhouette)
-    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
-  opacity: 0.85;
-}
-/* Bottom fade so silhouettes blend into the dark base of the preview
-   area rather than ending in a hard line. */
-.bls-stack-preview::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 30%;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.65));
-  pointer-events: none;
-}
+/* ── Cosmetic card — Evolution Procession ────────────────────────────
+   Full-width card spanning the cosmetic section. Header (name + CTA),
+   then a procession of EVERY evolution stage laid out as overlapping
+   sprites that recede into depth (-Z). Revealed stages (first 3) sit
+   in FRONT, full colour, full size. Silhouetted stages (rest) recede
+   backward: each one slightly smaller, lower opacity, partially
+   behind the one in front. Whole procession fits the card width with
+   NO horizontal scroll — overlap calculated via the `--stage-count`
+   CSS var so it auto-fits 10 or 13 (or any count) sprites.
 
-/* ── Cosmetic card — Version B (Full Strip) ──────────────────────────
-   Full-width card spanning the whole cosmetic section. Header row
-   (name + CTA), then a horizontal strip showing EVERY tier with a
-   tiny tier-number caption underneath. First N cells in colour; the
-   rest silhouetted. Heavier than the stack variant but maximises the
-   "scope of progression" feeling. */
+   Math:
+     --proc-base-w     base sprite width (front-stage size)
+     --proc-min-w      smallest stage size (deepest in back)
+     --proc-shrink     per-stage scale reduction
+     --proc-step       per-stage horizontal advance (constant)
+                       computed so total width <= 100% of container
+
+   Earlier stage = higher z-index = on top. Later stage = lower z =
+   recedes behind. */
 .bls-strip-list {
   display: flex;
   flex-direction: column;
@@ -12791,7 +12751,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   /* Reserve room for the absolute Coming Soon / Equipped ribbon. */
   padding-right: 100px;
 }
@@ -12806,57 +12766,82 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   width: auto;
   min-width: 92px;
 }
-.bls-strip-preview {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  padding: 8px 8px 6px;
-  background:
-    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.04), transparent 70%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55));
-  border-radius: 8px;
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-.bls-strip-preview::-webkit-scrollbar { height: 4px; }
-.bls-strip-preview::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
-.bls-strip-cell {
+
+.bls-procession {
   position: relative;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 4px 2px 2px;
-  border-radius: 6px;
-  transition: background 0.15s, transform 0.12s;
+  width: 100%;
+  /* Height fits the front sprite (tallest at scale 1.0) + baseline. */
+  height: 96px;
+  padding: 8px 0 6px;
+  background:
+    radial-gradient(ellipse at 30% 60%, rgba(255, 255, 255, 0.05), transparent 65%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.58));
+  border-radius: 8px;
+  overflow: hidden;
+  /* Width of each sprite (fixed). 42 keeps silhouettes legible AND
+     leaves enough room for 13 stages to fit a ~340px content area
+     without horizontal scroll. */
+  --proc-w: 42px;
+  /* Horizontal padding inside the procession (each side). */
+  --proc-pad: 12px;
 }
-.bls-strip-cell:hover {
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-2px);
+/* Bottom fade so silhouettes blend into the dark base instead of
+   ending in a hard line. */
+.bls-procession::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
+  pointer-events: none;
+  z-index: 100; /* above all sprites so it tints the whole procession */
 }
-.bls-strip-cell-sprite {
-  width: 36px;
-  height: 36px;
+
+.bls-proc-sprite {
+  position: absolute;
+  bottom: 6px;
+  /* Distribute sprites' LEFT edges evenly across the available width
+     so the first sprite starts at left=PAD and the last sprite's RIGHT
+     edge sits at right=PAD. Math:
+        step = (containerW - 2·PAD - spriteW) / (count - 1)
+        leftᵢ = PAD + i · step
+     With 13 stages, ~340px content, --proc-w 42, --proc-pad 12:
+        step ≈ (340 - 24 - 42) / 12 ≈ 23 px
+        overlap ≈ spriteW - step ≈ 19 px (~45% of front sprite)
+     Silhouettes show ~23 px of width each — legible without crowding. */
+  left: calc(
+    var(--proc-pad) +
+    var(--stage-index, 0) *
+    ((100% - 2 * var(--proc-pad) - var(--proc-w)) / max(1, calc(var(--stage-count, 1) - 1)))
+  );
+  width: var(--proc-w);
+  height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  /* Recession via uniform scale around the bottom-center so the
+     baseline stays flat — sprites look like they're standing on the
+     same ground, fading into distance. Ramps from 1.0 (front) → 0.55
+     (deepest back). */
+  transform-origin: bottom center;
+  transform: scale(calc(
+    1 - (var(--stage-index, 0) * (0.45 / max(1, calc(var(--stage-count, 1) - 1))))
+  ));
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
 }
-.bls-strip-cell-hidden .bls-strip-cell-sprite {
+
+.bls-proc-sprite-hidden {
+  /* True-black silhouette via the global SVG filter. Still legible
+     because we kept --proc-w large enough that ~23px of each sprite
+     pokes out from behind the one in front. */
   filter:
     url(#mai-silhouette)
-    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
-  opacity: 0.78;
+    drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
+  /* Mild opacity fade with depth so deeper stages blend gently into
+     the dark gradient — sells the "receding into mist" feel. */
+  opacity: calc(
+    0.95 - (var(--stage-index, 0) * (0.40 / max(1, calc(var(--stage-count, 1) - 1))))
+  );
 }
-.bls-strip-cell-tier {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.5);
-  font-variant-numeric: tabular-nums;
-}
-.bls-strip-cell-hidden .bls-strip-cell-tier {
-  color: rgba(255, 255, 255, 0.3);
-}
+
 .bls-strip-footer {
   margin-top: 8px;
   text-align: center;
@@ -12869,31 +12854,6 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: rgba(255, 215, 130, 0.7);
 }
 
-/* ── Mockup section labels (DEV: comparing layouts) ───────────────────
-   Temporary chrome for the "pick a version" period. Once the player
-   chooses, these labels + the losing layout get pulled. */
-.bls-cosmetic-section-mockup .bls-cosmetic-section-label {
-  color: rgba(255, 215, 130, 0.85);
-}
-.bls-mockup-tag {
-  display: inline-block;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(255, 215, 130, 0.18);
-  border: 1px solid rgba(255, 215, 130, 0.45);
-  color: rgba(255, 235, 200, 1);
-  margin-right: 8px;
-  vertical-align: middle;
-}
-.bls-mockup-tag-b {
-  background: rgba(140, 200, 255, 0.16);
-  border-color: rgba(140, 200, 255, 0.45);
-  color: rgba(200, 230, 255, 1);
-}
 .bls-cosmetic-slot-group {
   display: flex;
   flex-direction: column;
