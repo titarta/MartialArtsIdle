@@ -281,21 +281,26 @@ export const SHOP_ITEMS = [
   // skin lands we drop `comingSoon`, add `effect.kind: 'skin'` and an
   // `assetPath`, and reuse the same slot.
   //
-  // Character — show different "preview tiers" so the row reads as
-  // variety (player sees "I could be any of these one day"). Each
-  // declares a `previewSprite` index (0-12) to pick which existing
-  // cultivator sprite to use for the silhouette teaser.
-  { id: 'cos_char_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Sword Saint', desc: 'A blade-bound cultivator clad in jade brocade. Premium pixelart skin — coming soon.',  icon: '🗡️', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
-  { id: 'cos_char_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Demon Path',  desc: 'A heretical path stained in shadow and ember. Premium pixelart skin — coming soon.',  icon: '👹', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
-  { id: 'cos_char_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller', desc: 'Robes woven from cloud-silk, eyes lit with lightning. Premium pixelart skin — coming soon.',  icon: '⚡', ownership: 'cosmetic', comingSoon: true, previewSprite: 9 },
-  { id: 'cos_char_premium_4', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',   desc: 'Serene petals bloom around an ascetic\'s frame. Premium pixelart skin — coming soon.',  icon: '🪷', ownership: 'cosmetic', comingSoon: true, previewSprite: 11 },
+  // Character — silhouette previews use a MID-LATE tier so the card
+  // sells "this gets epic" while hiding the specific late-game shape
+  // (full silhouette filter strips colour, only outline reads).
+  // Pokémon-Pokedex-style tease, not LoL-style full reveal. Real
+  // Tier-2 skins (when they ship) will show a mid-tier (t4-5) at
+  // FULL colour as the hero shot + the "Evolves through 13 stages"
+  // caption — same data shape, just `comingSoon: false` + a real
+  // `assetPath` for the sprite override.
+  { id: 'cos_char_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Sword Saint',  desc: 'A blade-bound cultivator. Evolves through all 13 realms with you.',                          icon: '🗡️', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
+  { id: 'cos_char_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Demon Path',   desc: 'A heretical path stained in shadow and ember. Evolves through all 13 realms.',               icon: '👹', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
+  { id: 'cos_char_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller', desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',                  icon: '⚡', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
+  { id: 'cos_char_premium_4', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',   desc: 'Petals bloom around an ascetic\'s frame. Evolves through all 13 realms.',                    icon: '🪷', ownership: 'cosmetic', comingSoon: true, previewSprite: 8 },
 
   // Crystal — Tier-2 premium skins (different gem cuts / fantasy
-  // materials). Show silhouettes of mid-tier crystals (3-7) so the
-  // late-tier shapes stay a surprise.
-  { id: 'cos_crystal_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Obsidian Heart', desc: 'A jet-black crystal carved by void cultivators. Premium skin — coming soon.', icon: '⬣', ownership: 'cosmetic', comingSoon: true, previewSprite: 4 },
-  { id: 'cos_crystal_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Phoenix Core',   desc: 'A molten ember bound in crystal lattice. Premium skin — coming soon.',         icon: '🔥', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
-  { id: 'cos_crystal_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Dragon Tear',    desc: 'Wept by a slumbering ancient. Premium skin — coming soon.',                   icon: '🐉', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
+  // materials). 10-tier evolution like the base crystal; silhouette
+  // a mid-tier (T4-T6) so the card teases shape without revealing
+  // the specific late-tier signature look.
+  { id: 'cos_crystal_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Obsidian Heart', desc: 'A jet-black crystal carved by void cultivators. Evolves through all 10 tiers.', icon: '⬣', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
+  { id: 'cos_crystal_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Phoenix Core',   desc: 'A molten ember bound in crystal lattice. Evolves through all 10 tiers.',         icon: '🔥', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
+  { id: 'cos_crystal_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Dragon Tear',    desc: 'Wept by a slumbering ancient. Evolves through all 10 tiers.',                   icon: '🐉', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
 
   // Particles — Tier-2 (alt particle pools)
   { id: 'cos_particles_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Cherry Blossom', desc: 'Petals drift inward instead of orbs. Premium skin — coming soon.',  icon: '🌸', ownership: 'cosmetic', comingSoon: true },

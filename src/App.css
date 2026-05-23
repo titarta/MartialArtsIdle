@@ -12677,6 +12677,47 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   letter-spacing: 0.14em;
 }
 
+/* Evolution badge — tiny inline ladder of dots + label, signals to the
+   player "this skin evolves across all realms". Only rendered on
+   character + crystal cosmetics (the slots whose sprites change with
+   progression). Particles + backgrounds skip it — they're single-form.
+   The dots intentionally aren't tier-accurate (5 dots, not 10 or 13)
+   — they're a visual abstraction, not a progress bar. */
+.bls-card-evolution-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 215, 130, 0.8);
+  background: rgba(255, 215, 130, 0.06);
+  border: 1px solid rgba(255, 215, 130, 0.20);
+  border-radius: 999px;
+  padding: 3px 8px;
+  justify-content: center;
+}
+.bls-card-evolution-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.bls-card-evolution-dots > span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 215, 130, 0.4);
+}
+.bls-card-evolution-dots > span:nth-child(1) { background: rgba(255, 215, 130, 0.3); width: 3px; height: 3px; }
+.bls-card-evolution-dots > span:nth-child(2) { background: rgba(255, 215, 130, 0.45); }
+.bls-card-evolution-dots > span:nth-child(3) { background: rgba(255, 215, 130, 0.6); width: 5px; height: 5px; }
+.bls-card-evolution-dots > span:nth-child(4) { background: rgba(255, 215, 130, 0.75); width: 6px; height: 6px; }
+.bls-card-evolution-dots > span:nth-child(5) { background: rgba(255, 215, 130, 0.95); width: 7px; height: 7px; box-shadow: 0 0 6px rgba(255, 215, 130, 0.6); }
+.bls-card-evolution-label {
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── Buff cards ─────────────────────────────────────────────────────────
    Bigger than CompactRow but not full-grid. Horizontal layout: icon
    stamp · headline + name + meta · price CTA. The headline (×2 QI/S

@@ -186,6 +186,26 @@ function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, bus
 
       <div className="bls-card-body">
         <div className="bls-card-name">{item.name}</div>
+        {/* Evolution badge — only on character/crystal cosmetics that
+            evolve through realm/tier (i.e. NOT background or particle
+            sets which are single-form). Signals "you grow into this"
+            without spoiling the specific evolved shapes. */}
+        {(item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) && (
+          <div className="bls-card-evolution-badge">
+            <span className="bls-card-evolution-dots" aria-hidden="true">
+              <span /><span /><span /><span /><span />
+            </span>
+            <span className="bls-card-evolution-label">Evolves · 13 stages</span>
+          </div>
+        )}
+        {(item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) && (
+          <div className="bls-card-evolution-badge">
+            <span className="bls-card-evolution-dots" aria-hidden="true">
+              <span /><span /><span /><span /><span />
+            </span>
+            <span className="bls-card-evolution-label">Evolves · 10 tiers</span>
+          </div>
+        )}
         <button
           type="button"
           className={`bls-card-cta bls-card-cta-${stateClass}`}
