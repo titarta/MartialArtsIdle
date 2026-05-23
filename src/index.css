@@ -162,6 +162,15 @@
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-primary);
+
+  /* ── Display font for LORE-NAMED text surfaces ─────────────────────────
+     Cinzel Roman serif (bundled at src/assets/fonts/cinzel-latin.woff2),
+     used for realm names, breakthrough banner, modal titles, achievement
+     / tutorial names. NEVER use this for buttons, body text, tooltips,
+     micro-labels, or anything <12 px — those keep the default system
+     sans for instant legibility. See the typography audit at
+     _design/typography-audit.md for the full rationale. */
+  --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 
 * {

@@ -4050,6 +4050,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-size: 12px;
   font-weight: 700;
   color: var(--ui-purple-light);
+  font-variant-numeric: tabular-nums;  /* live qi + karma readouts stay column-aligned */
   white-space: nowrap;
 }
 .topbar-currency-icon {
@@ -4287,6 +4288,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: rgba(255, 255, 255, 0.92);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
   letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;  /* stop digit-wobble while qi/s ticks */
   transition: color 0.15s, background 0.15s, box-shadow 0.2s;
 }
 .qi-rate-value::before { content: ''; }
@@ -4695,8 +4697,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .home-breakthrough-kicker {
+  font-family: var(--font-display);
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.35em;
   color: #ffe4a0;
   text-transform: uppercase;
@@ -4705,9 +4708,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .home-breakthrough-name {
+  font-family: var(--font-display);
   font-size: 2.3rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   color: #fff4c8;
   text-shadow:
     0 0 14px rgba(255, 210, 80, 0.85),
@@ -8466,9 +8470,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .modal-title {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--text-primary);
   margin: 0 32px 4px 0;  /* reserve room for absolute .modal-close */
 }
@@ -8597,9 +8602,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .tech-modal-title {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--text-primary);
   margin: 0 32px 4px 0;  /* reserve room for absolute .modal-close */
 }
@@ -13393,10 +13399,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ui-purple-light);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   flex: 1;
 }
 
@@ -13643,8 +13650,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .ach-card-title {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: #eee;
   margin-bottom: 3px;
 }
@@ -13818,10 +13827,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 3px;
 }
 .ach-detail-title {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ui-purple-light);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
 }
 .ach-detail-locked .ach-detail-title {
   color: rgba(255, 200, 200, 0.85);
@@ -14435,8 +14445,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .journey-group-icon-img { width: 32px; height: 32px; display: block; object-fit: contain; }
 
 .journey-group-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: rgba(255, 255, 255, 0.7);
   flex: 1;
 }
@@ -14557,6 +14569,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.25);
   flex-shrink: 0;
+  font-variant-numeric: tabular-nums;  /* align decimals across the journey list */
 }
 
 .js-current .js-cost { color: rgba(var(--ui-purple-strong-rgb), 0.5); }
@@ -18341,9 +18354,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 .tutorial-title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1.5rem;
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: #ffffff;
   text-shadow:
     0 0 14px rgba(0, 0, 0, 0.55),
@@ -19188,6 +19202,24 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   /* No unicode-range — the file is already bundled (no lazy download to
      optimise) and we want future plaques with 仙 / 道 / 命 / 神 etc. to
      render automatically without re-editing this rule. */
+}
+
+/* Cinzel — Roman all-caps display serif, classical and ceremonial, used
+   for the game's lore-named text surfaces (realm names, breakthrough
+   banner, modal titles, achievement / tutorial names). Pairs naturally
+   with Ma Shan Zheng. Variable font — ONE file covers weights 400-900,
+   so we get 600 + 700 from a single ~26 KB woff2. Latin subset only
+   (the game is English-first; realm and modal names are ASCII).
+   Reference via the `--font-display` token at :root so every consumer
+   uses the same stack; never hardcode 'Cinzel' in a rule body. */
+@font-face {
+  font-family: 'Cinzel';
+  font-style:  normal;
+  font-weight: 400 900;   /* variable axis — one file, all weights */
+  font-display: swap;
+  src: url('./assets/fonts/cinzel-latin.woff2') format('woff2-variations'),
+       url('./assets/fonts/cinzel-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FFFD;
 }
 
 .home-hq-tablet {
