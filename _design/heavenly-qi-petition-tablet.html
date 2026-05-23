@@ -207,14 +207,35 @@ header p{
   text-shadow: 0 1px 0 rgba(0,0,0,.6);
 }
 .offer{
-  font-size: 10.5px;
-  letter-spacing: .18em;
-  color: rgba(245,230,200,.85);
-  text-align: center;
-  border-top: 1px solid rgba(220,175,110,.25);
-  border-bottom: 1px solid rgba(220,175,110,.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
   padding: 6px 4px;
   width: 100%;
+  border-top: 1px solid rgba(220,175,110,.25);
+  border-bottom: 1px solid rgba(220,175,110,.25);
+}
+.offer-rate{
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  color: rgba(245,230,200,.95);
+  white-space: nowrap;
+}
+.offer-sep{
+  width: 28%;
+  height: 1px;
+  background: rgba(220,175,110,.30);
+}
+.offer-dur{
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  color: rgba(245,230,200,.72);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
 }
 .cta{
   font-size: 9.5px;
@@ -291,10 +312,10 @@ header p{
     0 1px 0 rgba(0,0,0,.6);
 }
 .cell.active .kicker{ color: var(--ember-hot); }
-.cell.active .offer{
-  border-color: rgba(255,207,131,.55);
-  color: #fff;
-}
+.cell.active .offer       { border-color: rgba(255,207,131,.55); }
+.cell.active .offer-rate  { color: #fff; }
+.cell.active .offer-dur   { color: rgba(255,240,215,.85); }
+.cell.active .offer-sep   { background: rgba(255,207,131,.45); }
 .cell.active .cta{
   color: var(--ember-hot);
   font-size: 14px;
@@ -316,10 +337,10 @@ header p{
   text-shadow: none;
 }
 .cell.cd .kicker{ color: rgba(217,211,192,.45); }
-.cell.cd .offer{
-  border-color: rgba(150,140,120,.18);
-  color: rgba(217,211,192,.45);
-}
+.cell.cd .offer       { border-color: rgba(150,140,120,.18); }
+.cell.cd .offer-rate  { color: rgba(217,211,192,.45); }
+.cell.cd .offer-dur   { color: rgba(217,211,192,.40); }
+.cell.cd .offer-sep   { background: rgba(150,140,120,.18); }
 .cell.cd .cta{
   color: rgba(217,211,192,.55);
   font-variant-numeric: tabular-nums;
@@ -462,7 +483,11 @@ header p{
       <div class="tablet">
         <div class="kicker">Heavenly Qi</div>
         <div class="glyph">天</div>
-        <div class="offer">×1.5 QI/S · 30 MIN</div>
+        <div class="offer">
+          <span class="offer-rate">×2 QI/S</span>
+          <span class="offer-sep"></span>
+          <span class="offer-dur">30 MIN</span>
+        </div>
         <div class="cta">Tap to Petition</div>
       </div>
       <div class="embers">
@@ -471,7 +496,8 @@ header p{
     </div>
     <div class="desc">
       Sways gently. Glyph pulses gold. Ember motes rise.
-      A first-time player can read the offer without tapping.
+      Offer stacks vertically — couplet-style — so a first-time player
+      reads both the rate AND the duration without tapping.
     </div>
   </div>
 
@@ -484,7 +510,9 @@ header p{
       <div class="tablet">
         <div class="kicker">Channeling</div>
         <div class="glyph">天</div>
-        <div class="offer">×1.5 QI/S</div>
+        <div class="offer">
+          <span class="offer-rate">×2 QI/S</span>
+        </div>
         <div class="cta">29:42</div>
       </div>
       <div class="embers">
@@ -492,8 +520,8 @@ header p{
       </div>
     </div>
     <div class="desc">
-      Wood reads warmer. Glyph blazes amber. Countdown ticks down where
-      the CTA used to be. No new chrome — the same tablet, ignited.
+      Wood reads warmer. Glyph blazes amber. The duration line drops away —
+      the countdown IS the duration playing out, so it takes the CTA slot.
     </div>
   </div>
 
@@ -506,7 +534,9 @@ header p{
       <div class="tablet">
         <div class="kicker">Returns at</div>
         <div class="glyph">天</div>
-        <div class="offer">— REST —</div>
+        <div class="offer">
+          <span class="offer-rate">— REST —</span>
+        </div>
         <div class="cta">02:14:38</div>
       </div>
     </div>

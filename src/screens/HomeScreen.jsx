@@ -249,7 +249,9 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
   const { t } = useTranslation('ui');
   if (maxed) return null;
 
-  // ACTIVE — boost is currently running.
+  // ACTIVE — boost is currently running. Bottom row is the countdown
+  // (the CTA slot), so the duration sub-line is dropped; the timer IS
+  // the duration playing out.
   if (adBoostActive) {
     return (
       <HQTablet
@@ -262,7 +264,8 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     );
   }
 
-  // COOLDOWN — petition spent, waiting.
+  // COOLDOWN — petition spent, waiting. Single-line "REST" placeholder
+  // (no duration sub-line needed).
   if (ad.isCooldown) {
     return (
       <HQTablet
@@ -275,8 +278,10 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     );
   }
 
-  // LOADING — the offer chip is being fetched. Sit on the READY frame
-  // but disable interaction so the player can't double-tap.
+  // READY (+ loading sub-case) — show the full pitch: rate on top of the
+  // offer block, duration below a thin internal divider. Vertical stack
+  // matches the temple-plaque "couplet" tradition and keeps both pieces
+  // of info legible on a narrow mobile plaque.
   const isLoading = ad.isLoading;
   const isReady   = ad.isReady && !isLoading;
 
@@ -284,7 +289,8 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     <HQTablet
       state="ready"
       kicker={t('home.heavenlyQi', { defaultValue: 'Heavenly Qi' })}
-      offer="×2 QI/S · 30 MIN"
+      offer="×2 QI/S"
+      offerDur="30 MIN"
       cta={isLoading
         ? t('home.channeling', { defaultValue: 'Channeling…' })
         : t('home.tapToPetition', { defaultValue: 'Tap to petition' })}
@@ -300,8 +306,12 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
  *  kicker / glyph / offer / cta. Becomes a <button> when onClick is
  *  passed (READY), otherwise a <div> (ACTIVE / COOLDOWN). Ember motes
  *  only render on READY + ACTIVE — the cooldown plaque is asleep.
+ *
+ *  The `offer` block stacks vertically when `offerDur` is provided:
+ *  rate sits on top, a hairline divider, then the duration. Without
+ *  `offerDur` (ACTIVE / COOLDOWN) only the single line renders.
  */
-function HQTablet({ state, kicker, offer, cta, onClick, disabled, title }) {
+function HQTablet({ state, kicker, offer, offerDur, cta, onClick, disabled, title }) {
   const Tag    = onClick ? 'button' : 'div';
   const showEm = state === 'ready' || state === 'active';
   return (
@@ -317,7 +327,15 @@ function HQTablet({ state, kicker, offer, cta, onClick, disabled, title }) {
       <span className="hq-plaque">
         <span className="hq-kicker">{kicker}</span>
         <span className="hq-glyph" aria-hidden="true">天</span>
-        <span className="hq-offer">{offer}</span>
+        <span className={`hq-offer${offerDur ? ' hq-offer-stack' : ''}`}>
+          <span className="hq-offer-rate">{offer}</span>
+          {offerDur && (
+            <>
+              <span className="hq-offer-sep" aria-hidden="true" />
+              <span className="hq-offer-dur">{offerDur}</span>
+            </>
+          )}
+        </span>
         <span className="hq-cta">{cta}</span>
       </span>
       {showEm && (

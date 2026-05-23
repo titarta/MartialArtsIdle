@@ -19331,17 +19331,44 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     0 1px 0  rgba(0, 0, 0, 0.6);
   margin-top: -2px;
 }
+/* Offer block. Single-line mode is the default (used by ACTIVE +
+   COOLDOWN states which only have one piece of text). When the inner
+   `.hq-offer-stack` modifier is on (READY state), the block becomes
+   a 2-row stack: rate on top, hairline divider, duration below — the
+   traditional vertical-plaque "couplet" reading order. */
 .hq-offer {
-  font-size: 7.5px;
-  letter-spacing: 0.10em;
-  color: rgba(245, 230, 200, 0.92);
-  text-align: center;
-  border-top:    1px solid rgba(220, 175, 110, 0.28);
-  border-bottom: 1px solid rgba(220, 175, 110, 0.28);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   padding: 3px 2px;
   width: 100%;
+  border-top:    1px solid rgba(220, 175, 110, 0.28);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.28);
+}
+.hq-offer-rate {
+  font-size: 8.5px;
   font-weight: 700;
+  letter-spacing: 0.10em;
+  color: rgba(245, 230, 200, 0.95);
+  text-align: center;
   white-space: nowrap;
+}
+.hq-offer-sep {
+  width: 28%;
+  height: 1px;
+  background: rgba(220, 175, 110, 0.28);
+}
+.hq-offer-dur {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  color: rgba(245, 230, 200, 0.72);
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .hq-cta {
   font-size: 7px;
@@ -19427,8 +19454,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .home-hq-tablet.hq-active .hq-kicker { color: #ffcf83; }
 .home-hq-tablet.hq-active .hq-offer  {
   border-color: rgba(255, 207, 131, 0.55);
-  color: #fff;
 }
+.home-hq-tablet.hq-active .hq-offer-rate { color: #fff; }
+.home-hq-tablet.hq-active .hq-offer-dur  { color: rgba(255, 240, 215, 0.85); }
+.home-hq-tablet.hq-active .hq-offer-sep  { background: rgba(255, 207, 131, 0.45); }
 .home-hq-tablet.hq-active .hq-cta {
   color: #ffcf83;
   font-size: 10px;
@@ -19451,8 +19480,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .home-hq-tablet.hq-cd .hq-kicker { color: rgba(217, 211, 192, 0.45); }
 .home-hq-tablet.hq-cd .hq-offer  {
   border-color: rgba(150, 140, 120, 0.18);
-  color: rgba(217, 211, 192, 0.45);
 }
+.home-hq-tablet.hq-cd .hq-offer-rate { color: rgba(217, 211, 192, 0.45); }
+.home-hq-tablet.hq-cd .hq-offer-dur  { color: rgba(217, 211, 192, 0.40); }
+.home-hq-tablet.hq-cd .hq-offer-sep  { background: rgba(150, 140, 120, 0.18); }
 .home-hq-tablet.hq-cd .hq-cta { color: rgba(217, 211, 192, 0.55); }
 /* Tiny moon glyph drifts above the cord while asleep. */
 .home-hq-tablet.hq-cd .hq-cord::before {
