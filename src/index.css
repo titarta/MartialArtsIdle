@@ -39,22 +39,23 @@
 
   /* BRIGHT JADE — the main glow/accent hue. Used as solid hex OR as the
      rgb channel inside rgba() for translucent fills, glows, shadows.
-     Matches the TutorialModal's jade vocabulary the rest of the UI
-     now needs to live up to. */
-  --ui-purple-rgb:          95, 175, 130;  /* base — working jade (#5faf82) */
-  --ui-purple-deep-rgb:     56, 120,  85;  /* deep emerald (#387855) */
-  --ui-purple-strong-rgb:  110, 200, 150;  /* loud jade highlight (#6ec896) */
-  --ui-purple-soft-rgb:    140, 220, 175;  /* soft mint (#8cdcaf) */
-  --ui-purple-light-rgb:   180, 235, 205;  /* pale mint (#b4ebcd) */
+     2026-05-23 boost pass: saturation cranked so low-alpha consumers
+     (rgba(..., 0.08-0.25), which is most of the codebase) still read
+     as confident jade rather than a faint wash. */
+  --ui-purple-rgb:         110, 215, 155;  /* base — vibrant jade (#6ed79b) */
+  --ui-purple-deep-rgb:     70, 160, 110;  /* deep emerald (#46a06e) */
+  --ui-purple-strong-rgb:  130, 235, 175;  /* loud jade highlight (#82ebaf) */
+  --ui-purple-soft-rgb:    160, 240, 195;  /* soft mint (#a0f0c3) */
+  --ui-purple-light-rgb:   195, 245, 215;  /* pale mint (#c3f5d7) */
 
   /* Discrete shades (dark → light) used as solid colors */
-  --ui-purple-darker:  #1d4a32;   /* deepest forest — gradient starts */
-  --ui-purple-deep:    #387855;   /* pressed, emphasised outlines */
-  --ui-purple-strong:  #6ec896;   /* loud callouts, strong accents */
-  --ui-purple-soft:    #8cdcaf;   /* secondary accents, softer glow */
-  --ui-purple-light:   #b4ebcd;   /* highlights, emphasis text */
-  --ui-purple-wash:    #d2f0dc;   /* pale label / uppercase text */
-  --ui-purple-pale:    #ddf3e2;   /* ultra-soft backgrounds */
+  --ui-purple-darker:  #2a6b48;   /* deepest forest — gradient starts */
+  --ui-purple-deep:    #46a06e;   /* pressed, emphasised outlines */
+  --ui-purple-strong:  #82ebaf;   /* loud callouts, strong accents */
+  --ui-purple-soft:    #a0f0c3;   /* secondary accents, softer glow */
+  --ui-purple-light:   #c3f5d7;   /* highlights, emphasis text */
+  --ui-purple-wash:    #ddf5e4;   /* pale label / uppercase text */
+  --ui-purple-pale:    #e8f8ec;   /* ultra-soft backgrounds */
 
   /* ── UI chrome tints ──────────────────────────────────────────────────
      These are the "atmosphere" colours that make the UI read as jade
@@ -74,19 +75,24 @@
   /* Deep jade shadow for tooltip/modal drop-shadows (18, 60, 40) */
   --ui-shadow-rgb:      18,  60,  40;
 
-  /* ── UI surface backgrounds (near-black with jade tint) ──────────────
-     Dark atmospheric backgrounds. The jade cast is subtle at opacity
-     0.85–1.0, but it's what shifts the game from "dark purple" to
-     "dark jade". Hue-shifting these changes the whole game mood.    */
+  /* ── UI surface backgrounds — confident dark jade ────────────────────
+     2026-05-23 brighten pass: panels were rendering as near-black
+     even at full opacity, which made the UI feel washed-out no
+     matter the hue. New values commit to a visible dark-jade so
+     panels READ as jade-toned surfaces (not "very dark with a
+     hint of green"). Deep stays near-black for the outermost
+     backdrop where contrast for panels-on-top matters. */
 
-  /* Deepest surface (nav, deepest panels) — rgb(3, 12, 8) */
-  --ui-bg-deep-rgb:      3,  12,   8;
+  /* Deepest surface (nav, deepest panels) — near-black for max contrast
+     against panels-on-top. Slight green cast keeps the family unified. */
+  --ui-bg-deep-rgb:      6,  18,  12;
 
-  /* Panel / modal / card background — rgb(8, 20, 14) */
-  --ui-bg-panel-rgb:     8,  20,  14;
+  /* Panel / modal / card background — visible dark jade rather than
+     near-black. This is the single biggest "feels modern" lever. */
+  --ui-bg-panel-rgb:    24,  55,  38;
 
-  /* Border / divider tint between panels — rgb(20, 45, 30) */
-  --ui-border-rgb:      20,  45,  30;
+  /* Border / divider tint between panels — slightly brighter jade. */
+  --ui-border-rgb:      40,  80,  55;
 
   /* ── Old purple palette (revert by uncommenting + commenting jade above) ─
   --ui-purple-rgb:         139,  92, 246;
@@ -108,6 +114,23 @@
   --ui-bg-deep-rgb:      5,   2,  14;
   --ui-bg-panel-rgb:    10,   8,  28;
   --ui-border-rgb:      30,  18,  48;
+  */
+
+  /* ── First jade pass (low-saturation, kept here for revert / reference) ─
+  --ui-purple-rgb:          95, 175, 130;
+  --ui-purple-deep-rgb:     56, 120,  85;
+  --ui-purple-strong-rgb:  110, 200, 150;
+  --ui-purple-soft-rgb:    140, 220, 175;
+  --ui-purple-light-rgb:   180, 235, 205;
+  --ui-purple-darker:  #1d4a32;
+  --ui-purple-deep:    #387855;
+  --ui-purple-strong:  #6ec896;
+  --ui-purple-soft:    #8cdcaf;
+  --ui-purple-light:   #b4ebcd;
+  --ui-purple-wash:    #d2f0dc;
+  --ui-purple-pale:    #ddf3e2;
+  --ui-bg-panel-rgb:     8,  20,  14;
+  --ui-border-rgb:      20,  45,  30;
   */
 
   /* ── Accent RGB decomposition ─────────────────────────────────────────────
