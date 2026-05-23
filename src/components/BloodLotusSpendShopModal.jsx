@@ -113,6 +113,171 @@ function BuffCountdown({ expiresAtMs }) {
   return <span className="bls-buff-countdown">{label} left</span>;
 }
 
+// ─── Evolution sprite resolver ────────────────────────────────────────
+// For multi-tier cosmetics (character + crystal), resolves the FULL
+// sprite list across all tiers using the existing in-game assets as
+// placeholders. When real Tier-2 skins ship, each skin will declare
+// its own `assetPaths` array and this function picks from there.
+function getEvolutionSprites(item) {
+  if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
+    return CULTIVATOR_SPRITES.map(s => `${BASE}${s.replace(/^\//, '')}`);
+  }
+  if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
+    return Array.from({ length: 10 }, (_, i) => `${BASE}crystals/crystal_${i + 1}.png`);
+  }
+  return [];
+}
+
+// ─── Version A — Stack / Overlap ──────────────────────────────────────
+// Shows ~6 evolutions overlapping in a single tile. First 3 in full
+// colour; the rest silhouetted. Each sprite shifts right + drops down
+// + scales up slightly as you read into the "future", giving a
+// "growing into" depth illusion. Compact (fits the regular grid) so
+// it scales to many skins at once. Tap to see the full evolution
+// sequence (future polish — modal expansion).
+function CosmeticCardStack({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
+  const sprites = getEvolutionSprites(item);
+  // Sample 6 stages out of the full list so the stack reads as a
+  // sequence without crowding (13 sprites overlapping would smear).
+  const sampleCount = 6;
+  const step = Math.max(1, Math.floor(sprites.length / sampleCount));
+  const sampled = [];
+  for (let i = 0; i < sampleCount; i++) {
+    const idx = Math.min(sprites.length - 1, i * step);
+    sampled.push({ src: sprites[idx], tier: idx + 1 });
+  }
+  const revealedCount = 3;
+  const totalStages = sprites.length;
+
+  // State machine for CTA (same as base CosmeticCard)
+  let stateClass, label, disabled, onClick;
+  if (item.comingSoon) {
+    stateClass = 'coming-soon'; label = 'Coming Soon'; disabled = true; onClick = null;
+  } else {
+    const owned    = ownership.isCosmeticOwned(item.id);
+    const equipped = ownership.isCosmeticEquipped(item.id);
+    if (!owned)         { stateClass = 'buyable';  label = `${item.cost} BL`; disabled = balance < item.cost || busy; onClick = () => onBuy(item.id); }
+    else if (equipped)  { stateClass = 'equipped'; label = 'Equipped';        disabled = false; onClick = () => onUnequip(item.cosmeticSlot); }
+    else                { stateClass = 'owned';    label = 'Equip';           disabled = false; onClick = () => onEquip(item.id); }
+  }
+
+  return (
+    <div className={`bls-card bls-card-stack-variant bls-card-${stateClass}`}>
+      {stateClass === 'equipped'    && <span className="bls-card-ribbon">EQUIPPED</span>}
+      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
+
+      <div className="bls-stack-preview">
+        {sampled.map((s, i) => {
+          const isHidden = i >= revealedCount;
+          return (
+            <img
+              key={i}
+              src={s.src}
+              alt=""
+              draggable="false"
+              className={`bls-stack-sprite${isHidden ? ' bls-stack-sprite-hidden' : ''}`}
+              style={{
+                /* Each successive sprite peeks from behind the previous,
+                   shifted right + slightly down. The z-index ramp keeps
+                   later sprites IN FRONT so the eye reads left-to-right
+                   as "this is what you grow into". */
+                '--stack-index': i,
+                zIndex: i + 1,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <div className="bls-card-body">
+        <div className="bls-card-name">{item.name}</div>
+        <div className="bls-card-evolution-badge">
+          <span className="bls-card-evolution-dots" aria-hidden="true">
+            <span /><span /><span /><span /><span />
+          </span>
+          <span className="bls-card-evolution-label">
+            {revealedCount} / {totalStages} revealed
+          </span>
+        </div>
+        <button
+          type="button"
+          className={`bls-card-cta bls-card-cta-${stateClass}`}
+          onClick={onClick ?? undefined}
+          disabled={disabled}
+        >
+          {label}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Version B — Full Strip / Lane ────────────────────────────────────
+// Full-width card with a horizontal strip showing EVERY tier of the
+// skin. First 3 cells in full colour; the rest silhouetted. Each cell
+// has a small tier number underneath so the player can read "I'm at
+// stage 5 right now, here's what 6 looks like, 7+ is a mystery".
+// Heavier than the stack variant but maximises the "scope of progression"
+// feeling.
+function CosmeticCardStrip({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
+  const sprites = getEvolutionSprites(item);
+  const revealedCount = 3;
+  const totalStages = sprites.length;
+
+  // CTA state
+  let stateClass, label, disabled, onClick;
+  if (item.comingSoon) {
+    stateClass = 'coming-soon'; label = 'Coming Soon'; disabled = true; onClick = null;
+  } else {
+    const owned    = ownership.isCosmeticOwned(item.id);
+    const equipped = ownership.isCosmeticEquipped(item.id);
+    if (!owned)         { stateClass = 'buyable';  label = `${item.cost} BL`; disabled = balance < item.cost || busy; onClick = () => onBuy(item.id); }
+    else if (equipped)  { stateClass = 'equipped'; label = 'Equipped';        disabled = false; onClick = () => onUnequip(item.cosmeticSlot); }
+    else                { stateClass = 'owned';    label = 'Equip';           disabled = false; onClick = () => onEquip(item.id); }
+  }
+
+  return (
+    <div className={`bls-card bls-card-strip-variant bls-card-${stateClass}`}>
+      {stateClass === 'equipped'    && <span className="bls-card-ribbon">EQUIPPED</span>}
+      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
+
+      <div className="bls-strip-header">
+        <div className="bls-strip-name">{item.name}</div>
+        <button
+          type="button"
+          className={`bls-card-cta bls-card-cta-${stateClass} bls-strip-cta`}
+          onClick={onClick ?? undefined}
+          disabled={disabled}
+        >
+          {label}
+        </button>
+      </div>
+
+      <div className="bls-strip-preview">
+        {sprites.map((src, i) => {
+          const isHidden = i >= revealedCount;
+          return (
+            <div
+              key={i}
+              className={`bls-strip-cell${isHidden ? ' bls-strip-cell-hidden' : ''}`}
+              aria-label={isHidden ? `Stage ${i + 1} — locked` : `Stage ${i + 1}`}
+            >
+              <img src={src} alt="" draggable="false" className="bls-strip-cell-sprite" />
+              <span className="bls-strip-cell-tier">{i + 1}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="bls-strip-footer">
+        <span className="bls-strip-footer-label">
+          {revealedCount} of {totalStages} stages revealed · evolves with you
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ─── Cosmetic Card ─────────────────────────────────────────────────────
 // Large grid cell with a sprite preview area on top + name/price/CTA
 // underneath. Used in the Cosmetics tab. Drives the showcase feel —
@@ -366,18 +531,21 @@ export default function BloodLotusSpendShopModal({
 
   const items = itemsByCategory.get(tab) ?? [];
 
-  // Group cosmetics by slot for the showcase layout.
+  // Group cosmetics by slot AND by tier (Tier-1 vs premium Coming Soon)
+  // so the cosmetic tab can render multiple presentation layouts side
+  // by side for evaluation.
   const cosmeticsBySlot = useMemo(() => {
     if (tab !== 'cosmetic') return null;
     const groups = {
-      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   items: [] },
-      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      items: [] },
-      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   items: [] },
-      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          items: [] },
+      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   tier1: [], premium: [] },
+      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      tier1: [], premium: [] },
+      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   tier1: [], premium: [] },
+      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          tier1: [], premium: [] },
     };
     for (const it of items) {
       if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
-      groups[it.cosmeticSlot].items.push(it);
+      if (it.comingSoon) groups[it.cosmeticSlot].premium.push(it);
+      else               groups[it.cosmeticSlot].tier1.push(it);
     }
     return groups;
   }, [tab, items]);
@@ -417,30 +585,113 @@ export default function BloodLotusSpendShopModal({
         )}
 
         <div className="bls-body">
-          {/* ── Cosmetics — showcase grid ──────────────────────────── */}
+          {/* ── Cosmetics — showcase grid ──────────────────────────────
+              Tier-1 (CSS-tint) cosmetics render in the regular grid.
+              Tier-2 premium "Coming Soon" cards render TWICE — once in
+              the Stack mockup and once in the Strip mockup — so the
+              two layout options can be compared side by side. Once
+              the user picks a layout, the loser is removed. */}
           {tab === 'cosmetic' && cosmeticsBySlot && (
             <div className="bls-cosmetic-sections">
-              {Object.entries(cosmeticsBySlot).map(([slot, group]) => (
-                group.items.length === 0 ? null : (
-                  <section key={slot} className="bls-cosmetic-section">
-                    <div className="bls-cosmetic-section-label">{group.label}</div>
-                    <div className="bls-card-grid">
-                      {group.items.map(item => (
-                        <CosmeticCard
-                          key={item.id}
-                          item={item}
-                          ownership={inventory}
-                          balance={balance}
-                          onBuy={handleBuy}
-                          onEquip={(id)   => inventory.equip(id)}
-                          onUnequip={(s)  => inventory.unequip(s)}
-                          busy={busy}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                )
-              ))}
+              {Object.entries(cosmeticsBySlot).map(([slot, group]) => {
+                if (group.tier1.length === 0 && group.premium.length === 0) return null;
+                const isMultiTier = slot === COSMETIC_SLOTS.CHARACTER || slot === COSMETIC_SLOTS.CRYSTAL;
+                return (
+                  <div key={slot} className="bls-cosmetic-slot-group">
+                    {/* Tier-1 tint variants — regular cards. */}
+                    {group.tier1.length > 0 && (
+                      <section className="bls-cosmetic-section">
+                        <div className="bls-cosmetic-section-label">{group.label}</div>
+                        <div className="bls-card-grid">
+                          {group.tier1.map(item => (
+                            <CosmeticCard
+                              key={item.id}
+                              item={item}
+                              ownership={inventory}
+                              balance={balance}
+                              onBuy={handleBuy}
+                              onEquip={(id)  => inventory.equip(id)}
+                              onUnequip={(s) => inventory.unequip(s)}
+                              busy={busy}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                    {/* Premium Tier-2 "Coming Soon" — render in BOTH
+                        layouts for character + crystal so the user can
+                        compare. Particles + backgrounds (single-form)
+                        keep the regular card layout. */}
+                    {group.premium.length > 0 && isMultiTier && (
+                      <>
+                        <section className="bls-cosmetic-section bls-cosmetic-section-mockup">
+                          <div className="bls-cosmetic-section-label bls-mockup-label">
+                            <span className="bls-mockup-tag">VERSION A</span>
+                            {group.label} — Stack Preview
+                          </div>
+                          <div className="bls-card-grid">
+                            {group.premium.map(item => (
+                              <CosmeticCardStack
+                                key={`stack-${item.id}`}
+                                item={item}
+                                ownership={inventory}
+                                balance={balance}
+                                onBuy={handleBuy}
+                                onEquip={(id)  => inventory.equip(id)}
+                                onUnequip={(s) => inventory.unequip(s)}
+                                busy={busy}
+                              />
+                            ))}
+                          </div>
+                        </section>
+                        <section className="bls-cosmetic-section bls-cosmetic-section-mockup">
+                          <div className="bls-cosmetic-section-label bls-mockup-label">
+                            <span className="bls-mockup-tag bls-mockup-tag-b">VERSION B</span>
+                            {group.label} — Full Strip
+                          </div>
+                          <div className="bls-strip-list">
+                            {group.premium.map(item => (
+                              <CosmeticCardStrip
+                                key={`strip-${item.id}`}
+                                item={item}
+                                ownership={inventory}
+                                balance={balance}
+                                onBuy={handleBuy}
+                                onEquip={(id)  => inventory.equip(id)}
+                                onUnequip={(s) => inventory.unequip(s)}
+                                busy={busy}
+                              />
+                            ))}
+                          </div>
+                        </section>
+                      </>
+                    )}
+
+                    {/* Single-form premium cosmetics (particles + backdrops)
+                        — keep the regular card layout for these. */}
+                    {group.premium.length > 0 && !isMultiTier && (
+                      <section className="bls-cosmetic-section">
+                        <div className="bls-cosmetic-section-label">{group.label} — Coming Soon</div>
+                        <div className="bls-card-grid">
+                          {group.premium.map(item => (
+                            <CosmeticCard
+                              key={item.id}
+                              item={item}
+                              ownership={inventory}
+                              balance={balance}
+                              onBuy={handleBuy}
+                              onEquip={(id)  => inventory.equip(id)}
+                              onUnequip={(s) => inventory.unequip(s)}
+                              busy={busy}
+                            />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
 

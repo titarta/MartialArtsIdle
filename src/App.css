@@ -12718,6 +12718,188 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Cosmetic card — Version A (Stack / Overlap) ────────────────────
+   Same outer dimensions as the regular .bls-card, but the preview
+   area shows ~6 evolution sprites overlapping in a fanned sequence.
+   First 3 in colour, the rest silhouetted via the SVG #mai-silhouette
+   filter so the player gets "you grow into this" without seeing the
+   specific late-stage shapes. Each sprite shifts right/down/scales
+   slightly as `--stack-index` grows, creating depth. */
+.bls-stack-preview {
+  position: relative;
+  flex: 1;
+  min-height: 150px;
+  background:
+    radial-gradient(circle at 45% 55%, rgba(255, 255, 255, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+  overflow: hidden;
+}
+.bls-stack-sprite {
+  position: absolute;
+  /* Anchor each sprite to the same baseline (bottom-center) so they
+     read as a row of figures growing left-to-right. */
+  bottom: 12px;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  /* Stack offset: each successive sprite shifts right + scales up
+     slightly. The eye reads a "this is what's next" sequence. */
+  transform:
+    translateX(calc(-50% + (var(--stack-index, 0) * 14px) - 36px))
+    scale(calc(1 + (var(--stack-index, 0) * 0.03)));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.bls-stack-sprite-hidden {
+  /* Late-stage silhouette — true-black cutout via the SVG filter. */
+  filter:
+    url(#mai-silhouette)
+    drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+  opacity: 0.85;
+}
+/* Bottom fade so silhouettes blend into the dark base of the preview
+   area rather than ending in a hard line. */
+.bls-stack-preview::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.65));
+  pointer-events: none;
+}
+
+/* ── Cosmetic card — Version B (Full Strip) ──────────────────────────
+   Full-width card spanning the whole cosmetic section. Header row
+   (name + CTA), then a horizontal strip showing EVERY tier with a
+   tiny tier-number caption underneath. First N cells in colour; the
+   rest silhouetted. Heavier than the stack variant but maximises the
+   "scope of progression" feeling. */
+.bls-strip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bls-card-strip-variant {
+  flex-direction: column;
+  min-height: 0;
+  padding: 12px 14px;
+}
+.bls-strip-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  /* Reserve room for the absolute Coming Soon / Equipped ribbon. */
+  padding-right: 100px;
+}
+.bls-strip-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgba(255, 235, 200, 1);
+}
+.bls-strip-cta {
+  width: auto;
+  min-width: 92px;
+}
+.bls-strip-preview {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 8px 8px 6px;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.04), transparent 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55));
+  border-radius: 8px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.bls-strip-preview::-webkit-scrollbar { height: 4px; }
+.bls-strip-preview::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+.bls-strip-cell {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 2px 2px;
+  border-radius: 6px;
+  transition: background 0.15s, transform 0.12s;
+}
+.bls-strip-cell:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+.bls-strip-cell-sprite {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+.bls-strip-cell-hidden .bls-strip-cell-sprite {
+  filter:
+    url(#mai-silhouette)
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+  opacity: 0.78;
+}
+.bls-strip-cell-tier {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+.bls-strip-cell-hidden .bls-strip-cell-tier {
+  color: rgba(255, 255, 255, 0.3);
+}
+.bls-strip-footer {
+  margin-top: 8px;
+  text-align: center;
+}
+.bls-strip-footer-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 215, 130, 0.7);
+}
+
+/* ── Mockup section labels (DEV: comparing layouts) ───────────────────
+   Temporary chrome for the "pick a version" period. Once the player
+   chooses, these labels + the losing layout get pulled. */
+.bls-cosmetic-section-mockup .bls-cosmetic-section-label {
+  color: rgba(255, 215, 130, 0.85);
+}
+.bls-mockup-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 215, 130, 0.18);
+  border: 1px solid rgba(255, 215, 130, 0.45);
+  color: rgba(255, 235, 200, 1);
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.bls-mockup-tag-b {
+  background: rgba(140, 200, 255, 0.16);
+  border-color: rgba(140, 200, 255, 0.45);
+  color: rgba(200, 230, 255, 1);
+}
+.bls-cosmetic-slot-group {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 /* ── Buff cards ─────────────────────────────────────────────────────────
    Bigger than CompactRow but not full-grid. Horizontal layout: icon
    stamp · headline + name + meta · price CTA. The headline (×2 QI/S
