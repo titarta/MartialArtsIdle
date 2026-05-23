@@ -557,36 +557,40 @@ ELEMENTS = {
     },
 
     # ── Shop nav button (Blood Lotus Shop on the top bar) ─────────────────────
-    # Match the simple bold-silhouette style of qi.png / karma.png. NO jade
-    # medallion frame, NO ring border, NO carved studs. Just one clean
-    # iconographic shape that reads instantly at small nav-button size.
+    # Designed to read at 16-24 pixel display size. Match the bold-silhouette
+    # punch of qi.png / karma.png. EVERYTHING is sacrificed for legibility at
+    # small size: chunky compact pouch, big dominant lotus emblem, no tassel,
+    # no qi mote, no drawstring detail. The 128×128 source is a MEDIUM for
+    # pixel-art clarity, NOT a canvas to fill with ornament.
     "shop_nav": {
         "size": (128, 128),
         "desc": (
-            "A pixel art icon for a top-bar SHOP button in a xianxia cultivation game — the "
-            "Blood Lotus Shop. Match the bold-silhouette style of qi.png and karma.png — ONE "
-            "CLEAR SUBJECT filling the icon, NO outer ring frame, NO jade-bronze badge border, "
-            "NO studs. Just the subject on a transparent background, readable at small "
-            "nav-button size. "
+            "A pixel art icon for a top-bar shop button in a xianxia cultivation game — the "
+            "Blood Lotus Shop. CRITICAL: this icon will be displayed at 16-24 pixels in the "
+            "live UI. Every design choice must prioritise LEGIBILITY at that tiny size over "
+            "detail. ONE chunky compact subject + ONE prominent emblem inside it, nothing else. "
             ""
-            "SUBJECT: a single ornate CHINESE RED SILK COIN POUCH viewed front-on, filling "
-            "the icon. Plump and rounded, cinched at the top with a thin gold cord tied in a "
-            "neat bow. Body is deep BLOOD RED with darker red shading on the lower half "
-            "(suggesting weight from coins inside). On the front centre, a small stylised "
-            "PINK BLOOD-LOTUS blossom is embroidered (4-5 petals around a pink-gold centre) "
-            "— the shop's emblem. From the cinched top, a single pale-cyan qi MOTE drifts "
-            "upward (one small spark). Below the pouch, a short red SILK TASSEL hangs (knot "
-            "with two short strands). "
+            "SUBJECT: a CHUNKY ROUND coin pouch viewed front-on, almost square-shaped "
+            "(slightly taller than wide), filling most of the icon. Simple rounded silhouette "
+            "like a drawstring bag — flat top with small gold knot, wide round body. Deep "
+            "BLOOD RED (#8a1a1a) fill with darker shadow on lower-right (#5a1010). Strong "
+            "thick CHARCOAL OUTLINE (#111, 2px) around the entire silhouette for contrast. "
             ""
-            "Treatment: thick charcoal outline around the pouch silhouette, flat colour fills, "
-            "no gradients, simple 1-pixel highlights along the upper-left edge for form. "
-            "Pixel-art style, 16-bit clean lines. Reads INSTANTLY as 'merchant pouch / shop'. "
+            "CENTRAL EMBLEM (the recognisable feature): a single LARGE bold lotus blossom "
+            "dominates the pouch centre — about 40-50% of the pouch width, front-on stylised "
+            "lotus with 5 broad clear petals in WARM PINK (#e07090) radiating from a small "
+            "bright YELLOW-GOLD centre dot. Petals are simple rounded shapes outlined in dark "
+            "red. This emblem must be the dominant element — visible even at 16 pixels. "
             ""
-            "Palette: deep BLOOD RED (#8a1a1a) pouch body, darker red (#5a1010) shadow side, "
-            "warm pink (#d05060) lotus embroidery, soft gold (#c89548) drawstring cord and "
-            "tassel knot, pale cyan (#7adcc4) qi mote, charcoal outline (#111). "
-            "NO ring border, NO jade frame, NO bronze studs, NO charcoal background fill — "
-            "background fully transparent. No human figure. "
+            "AT THE TOP: a small flat gold KNOT (4-5 pixels, simple trapezoid). "
+            "OMITTED: no tassel, no qi mote, no cord loops, no extra ornament. "
+            ""
+            "Treatment: thick charcoal outline, flat colour fills, no gradients, no texture. "
+            "Pixel-art 16-bit. Reads as 'red pouch with a lotus stamp' from across the room. "
+            ""
+            "Palette: BLOOD RED (#8a1a1a) body, darker red (#5a1010) shadow, warm pink "
+            "(#e07090) lotus petals, yellow-gold (#f0c850) lotus centre + knot, charcoal "
+            "(#111) outline, transparent background. "
             f"{S}"
         ),
     },

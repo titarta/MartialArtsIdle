@@ -507,7 +507,7 @@ export default function BloodLotusSpendShopModal({
 
         <div className="bls-header">
           <img
-            src={`${BASE}sprites/items/blood_lotus.png`}
+            src={`${BASE}ui/shop_nav.png`}
             className="bls-header-icon"
             alt=""
             draggable="false"
