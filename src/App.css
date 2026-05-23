@@ -12428,6 +12428,341 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-style: italic;
 }
 
+/* ── Cosmetic showcase grid ─────────────────────────────────────────────
+   Card-based layout (Fortnite / LoL feel). Each card is a tile with a
+   large preview area on top + name/CTA underneath. Auto-fit columns
+   pack 2 per row on narrow phones, 3 on wider mobile, 4 on tablet. */
+.bls-cosmetic-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 4px;
+}
+.bls-cosmetic-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bls-cosmetic-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-purple-strong-rgb), 0.7);
+  padding-left: 2px;
+}
+.bls-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+/* Base card — shared shape for cosmetics. Layered background so the
+   preview area has its own atmosphere distinct from the modal panel. */
+.bls-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg,
+    rgba(20, 16, 30, 0.96) 0%,
+    rgba(12, 10, 22, 0.96) 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  min-height: 200px;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.65), 0 0 18px rgba(var(--ui-purple-strong-rgb), 0.18);
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.32);
+}
+
+/* Variants — each state gets its own border + glow language so the
+   shop reads at a glance: buyable (neutral), owned (purple), equipped
+   (gold), coming-soon (dim). */
+.bls-card-buyable {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+.bls-card-owned {
+  border-color: rgba(var(--ui-purple-strong-rgb), 0.45);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(var(--ui-purple-strong-rgb), 0.18);
+}
+.bls-card-equipped {
+  border-color: rgba(255, 215, 130, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 130, 0.32);
+}
+.bls-card-coming-soon {
+  border-color: rgba(255, 255, 255, 0.06);
+  opacity: 0.85;
+}
+.bls-card-coming-soon:hover {
+  transform: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+
+/* Ribbon — small top-right banner for state callouts. */
+.bls-card-ribbon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgba(255, 215, 130, 0.18);
+  color: rgba(255, 230, 170, 1);
+  border: 1px solid rgba(255, 215, 130, 0.55);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+.bls-card-ribbon-soon {
+  background: rgba(120, 130, 160, 0.18);
+  color: rgba(200, 210, 230, 0.85);
+  border-color: rgba(150, 170, 200, 0.4);
+}
+.bls-card-ribbon-active {
+  background: rgba(120, 230, 160, 0.20);
+  color: rgba(180, 250, 200, 1);
+  border-color: rgba(120, 230, 160, 0.55);
+  animation: bls-ribbon-pulse 1.6s ease-in-out infinite;
+}
+@keyframes bls-ribbon-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1;    }
+}
+
+/* Preview area — 60% of card height, distinct dark background. */
+.bls-card-preview {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.05), transparent 60%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.5));
+  min-height: 120px;
+  padding: 8px;
+  overflow: hidden;
+}
+.bls-card-preview-sprite {
+  max-width: 88%;
+  max-height: 88%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
+  /* image-rendering follows the global Settings → Rendering toggle. */
+}
+/* Coming-soon silhouette — true-black cutout via the inline SVG filter
+   defined in App.jsx (#mai-silhouette). Hides shape detail so the
+   player gets a "what's coming" tease without spoiling premium-skin
+   silhouettes. */
+.bls-card-preview-silhouette {
+  filter:
+    url(#mai-silhouette)
+    drop-shadow(0 4px 12px rgba(0, 0, 0, 0.85));
+  opacity: 0.92;
+}
+
+/* Particle preview — three tiny orbs floating in the preview area to
+   suggest the visual feel of the particle set. */
+.bls-card-preview-particles {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bls-card-preview-orb {
+  position: absolute;
+  font-size: 28px;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+  animation: bls-card-orb-drift 3.6s ease-in-out infinite;
+}
+.bls-card-preview-orb-1 { left: 28%; top: 28%; animation-delay: 0s;    }
+.bls-card-preview-orb-2 { left: 58%; top: 48%; animation-delay: 0.8s; font-size: 22px; opacity: 0.85; }
+.bls-card-preview-orb-3 { left: 38%; top: 62%; animation-delay: 1.6s; font-size: 18px; opacity: 0.7;  }
+@keyframes bls-card-orb-drift {
+  0%, 100% { transform: translate(0, 0) scale(1);    opacity: var(--orb-op, 0.85); }
+  50%      { transform: translate(0, -8px) scale(1.1); opacity: 1; }
+}
+
+/* Background preview — full-bleed gradient inside the preview area. */
+.bls-card-preview-bg {
+  position: absolute;
+  inset: 0;
+}
+.bls-card-preview-bg-icon {
+  font-size: 48px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+}
+.bls-card-preview-icon {
+  font-size: 44px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+}
+
+/* Card body — name + CTA. Compact, all-bottom alignment. */
+.bls-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 10px 12px;
+  background: linear-gradient(180deg, rgba(20, 16, 32, 0), rgba(8, 6, 16, 0.85));
+}
+.bls-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+  line-height: 1.25;
+  min-height: 2.5em; /* reserve room for 2-line names so cards align */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card CTA — pill button, palette per state. */
+.bls-card-cta {
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-card-cta:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+}
+.bls-card-cta:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+.bls-card-cta-buyable {
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.5);
+  background: linear-gradient(140deg, rgba(28, 18, 40, 0.95), rgba(14, 10, 24, 0.95));
+  color: #ffe;
+  box-shadow: 0 3px 10px rgba(80, 50, 150, 0.35);
+}
+.bls-card-cta-buyable:hover:not(:disabled) { filter: brightness(1.18); }
+.bls-card-cta-owned {
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.55);
+  background: rgba(var(--ui-purple-strong-rgb), 0.15);
+  color: var(--ui-purple-light);
+}
+.bls-card-cta-owned:hover:not(:disabled) { background: rgba(var(--ui-purple-strong-rgb), 0.25); }
+.bls-card-cta-equipped {
+  border: 1px solid rgba(255, 215, 130, 0.55);
+  background: linear-gradient(140deg, rgba(60, 44, 18, 0.85), rgba(30, 22, 8, 0.9));
+  color: rgba(255, 235, 180, 1);
+  box-shadow: 0 3px 10px rgba(180, 130, 40, 0.3);
+}
+.bls-card-cta-equipped:hover:not(:disabled) { filter: brightness(1.1); }
+.bls-card-cta-coming-soon {
+  border: 1px dashed rgba(180, 190, 220, 0.3);
+  background: transparent;
+  color: rgba(200, 210, 230, 0.6);
+  letter-spacing: 0.14em;
+}
+
+/* ── Buff cards ─────────────────────────────────────────────────────────
+   Bigger than CompactRow but not full-grid. Horizontal layout: icon
+   stamp · headline + name + meta · price CTA. The headline (×2 QI/S
+   etc.) is the visual anchor — it's the reason the player buys. */
+.bls-buff-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bls-buff-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(140deg, rgba(28, 18, 32, 0.92), rgba(14, 10, 22, 0.92));
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.22);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s ease, box-shadow 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-buff-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), 0 0 14px rgba(var(--ui-purple-strong-rgb), 0.22);
+}
+.bls-buff-card-active {
+  border-color: rgba(120, 230, 160, 0.45);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), 0 0 16px rgba(120, 230, 160, 0.22);
+}
+.bls-buff-card-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.bls-buff-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bls-buff-card-headline {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: rgba(255, 230, 170, 1);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+  font-variant-numeric: tabular-nums;
+}
+.bls-buff-card-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(220, 215, 255, 0.85);
+  letter-spacing: 0.02em;
+}
+.bls-buff-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+.bls-buff-card-duration {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.bls-buff-card .bls-card-cta {
+  width: auto;
+  min-width: 88px;
+  flex-shrink: 0;
+}
+
 /* One row per shop item — icon · body · buy button. */
 .bls-item {
   display: flex;

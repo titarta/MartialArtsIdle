@@ -270,6 +270,40 @@ export const SHOP_ITEMS = [
     ownership: 'cosmetic',
     effect: { kind: 'tint', bodyClass: 'cosmetic-bg-twilight' },
   },
+
+  // ── Cosmetics — Tier 2 placeholder slots ("Coming Soon") ────────────────
+  //
+  // These cards exist purely for the showcase. The visual is a
+  // silhouetted late-realm cultivator / crystal sprite so the player
+  // gets a tease of "what's coming" without spoiling specific shapes.
+  // `comingSoon: true` flips the shop UI to a locked card variant —
+  // no Buy button, no price, just a teaser. When the real Tier-2
+  // skin lands we drop `comingSoon`, add `effect.kind: 'skin'` and an
+  // `assetPath`, and reuse the same slot.
+  //
+  // Character — show different "preview tiers" so the row reads as
+  // variety (player sees "I could be any of these one day"). Each
+  // declares a `previewSprite` index (0-12) to pick which existing
+  // cultivator sprite to use for the silhouette teaser.
+  { id: 'cos_char_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Sword Saint', desc: 'A blade-bound cultivator clad in jade brocade. Premium pixelart skin — coming soon.',  icon: '🗡️', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
+  { id: 'cos_char_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Demon Path',  desc: 'A heretical path stained in shadow and ember. Premium pixelart skin — coming soon.',  icon: '👹', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
+  { id: 'cos_char_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller', desc: 'Robes woven from cloud-silk, eyes lit with lightning. Premium pixelart skin — coming soon.',  icon: '⚡', ownership: 'cosmetic', comingSoon: true, previewSprite: 9 },
+  { id: 'cos_char_premium_4', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',   desc: 'Serene petals bloom around an ascetic\'s frame. Premium pixelart skin — coming soon.',  icon: '🪷', ownership: 'cosmetic', comingSoon: true, previewSprite: 11 },
+
+  // Crystal — Tier-2 premium skins (different gem cuts / fantasy
+  // materials). Show silhouettes of mid-tier crystals (3-7) so the
+  // late-tier shapes stay a surprise.
+  { id: 'cos_crystal_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Obsidian Heart', desc: 'A jet-black crystal carved by void cultivators. Premium skin — coming soon.', icon: '⬣', ownership: 'cosmetic', comingSoon: true, previewSprite: 4 },
+  { id: 'cos_crystal_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Phoenix Core',   desc: 'A molten ember bound in crystal lattice. Premium skin — coming soon.',         icon: '🔥', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
+  { id: 'cos_crystal_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Dragon Tear',    desc: 'Wept by a slumbering ancient. Premium skin — coming soon.',                   icon: '🐉', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
+
+  // Particles — Tier-2 (alt particle pools)
+  { id: 'cos_particles_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Cherry Blossom', desc: 'Petals drift inward instead of orbs. Premium skin — coming soon.',  icon: '🌸', ownership: 'cosmetic', comingSoon: true },
+  { id: 'cos_particles_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Sigil Runes',    desc: 'Glowing arcane glyphs spiral toward you. Premium skin — coming soon.',  icon: '🔮', ownership: 'cosmetic', comingSoon: true },
+
+  // Backgrounds — Tier-2 (full scene swaps)
+  { id: 'cos_bg_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.BACKGROUND, name: 'Frozen Peak',     desc: 'A snowbound summit at the edge of the heavens. Premium backdrop — coming soon.', icon: '🏔️', ownership: 'cosmetic', comingSoon: true },
+  { id: 'cos_bg_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.BACKGROUND, name: 'Lotus Pavilion',  desc: 'A jade pavilion floating on a still lotus pond. Premium backdrop — coming soon.', icon: '🏯', ownership: 'cosmetic', comingSoon: true },
 ];
 
 export const SHOP_ITEMS_BY_ID = Object.fromEntries(SHOP_ITEMS.map(i => [i.id, i]));

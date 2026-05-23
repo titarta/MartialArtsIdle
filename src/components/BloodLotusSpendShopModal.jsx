@@ -1,7 +1,96 @@
 import { useState, useEffect, useMemo } from 'react';
-import { SHOP_ITEMS, SHOP_CATEGORIES, SHOP_ITEMS_BY_ID } from '../data/shopItems';
+import { SHOP_ITEMS, SHOP_CATEGORIES, SHOP_ITEMS_BY_ID, COSMETIC_SLOTS } from '../data/shopItems';
 
 const BASE = import.meta.env.BASE_URL;
+
+// ── Cosmetic preview asset resolution ───────────────────────────────────
+// Map cosmetic id → preview info. Drives the visual "this is what
+// you're buying" tile at the top of each card. For Tier-1 (CSS-tint)
+// cosmetics, the filter string is duplicated from App.css so the card
+// preview tints LIVE — player sees exactly what their cultivator /
+// crystal will look like with the cosmetic equipped. For Tier-2
+// placeholders (`comingSoon: true`), the silhouette filter hides
+// detail so the player gets a teaser without spoiling shape.
+
+const CULTIVATOR_SPRITES = [
+  '/sprites/cultivator/t0_novice_normal.png',
+  '/sprites/cultivator/t1_qi_transformation_normal.png',
+  '/sprites/cultivator/t2_true_element_normal.png',
+  '/sprites/cultivator/t3_separation_normal.png',
+  '/sprites/cultivator/t4_immortal_ascension_normal.png',
+  '/sprites/cultivator/t5_saint_normal.png',
+  '/sprites/cultivator/t6_saint_king_normal.png',
+  '/sprites/cultivator/t7_origin_returning_normal.png',
+  '/sprites/cultivator/t8_origin_king_normal.png',
+  '/sprites/cultivator/t9_void_king_normal.png',
+  '/sprites/cultivator/t10_dao_source_normal.png',
+  '/sprites/cultivator/t11_emperor_realm_normal.png',
+  '/sprites/cultivator/t12_open_heaven_normal.png',
+];
+
+// Tier-1 cosmetic preview filters — mirror the body-class rules in
+// App.css. Kept in sync manually; if you change one, change both.
+const TINT_PREVIEW_FILTERS = {
+  cos_char_crimson:    'hue-rotate(-95deg) saturate(1.35) brightness(0.95)',
+  cos_char_verdant:    'hue-rotate(60deg) saturate(1.2) brightness(0.95)',
+  cos_char_amethyst:   'hue-rotate(180deg) saturate(1.2) brightness(0.95)',
+  cos_crystal_verdant: 'hue-rotate(110deg) saturate(1.25) brightness(0.95)',
+  cos_crystal_amber:   'hue-rotate(-140deg) saturate(1.4) brightness(1.05)',
+  cos_particles_jade:  'hue-rotate(110deg) saturate(1.3)',
+  cos_particles_violet:'hue-rotate(180deg) saturate(1.3) brightness(1.1)',
+};
+
+/** Resolve preview info for a cosmetic item. Returns:
+ *    { kind: 'sprite' | 'gradient', src?, filter?, gradient? }
+ *  Used by CosmeticCard to render the top half. */
+function getPreview(item) {
+  // Coming-soon items: silhouette a sprite to hint without spoiling.
+  if (item.comingSoon) {
+    if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
+      const idx = Math.min(CULTIVATOR_SPRITES.length - 1, Math.max(0, item.previewSprite ?? 5));
+      return { kind: 'sprite', src: `${BASE}${CULTIVATOR_SPRITES[idx].replace(/^\//, '')}`, silhouette: true };
+    }
+    if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
+      const tier = Math.min(10, Math.max(1, item.previewSprite ?? 5));
+      return { kind: 'sprite', src: `${BASE}crystals/crystal_${tier}.png`, silhouette: true };
+    }
+    if (item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES) {
+      return { kind: 'particle-icon', icon: item.icon };
+    }
+    if (item.cosmeticSlot === COSMETIC_SLOTS.BACKGROUND) {
+      return { kind: 'bg-icon', icon: item.icon };
+    }
+  }
+  // Tier-1 — live tint preview on a default cultivator / crystal sprite.
+  if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
+    return {
+      kind: 'sprite',
+      src: `${BASE}${CULTIVATOR_SPRITES[1].replace(/^\//, '')}`, // t1 — first "real" cultivator look
+      filter: TINT_PREVIEW_FILTERS[item.id],
+    };
+  }
+  if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
+    return {
+      kind: 'sprite',
+      src: `${BASE}crystals/crystal_5.png`,
+      filter: TINT_PREVIEW_FILTERS[item.id],
+    };
+  }
+  if (item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES) {
+    return { kind: 'particle-icon', icon: item.icon, filter: TINT_PREVIEW_FILTERS[item.id] };
+  }
+  if (item.cosmeticSlot === COSMETIC_SLOTS.BACKGROUND) {
+    // Pick a representative inline gradient based on bodyClass — keeps
+    // the bg preview self-contained without needing the actual bg image.
+    if (item.effect?.bodyClass === 'cosmetic-bg-dawn') {
+      return { kind: 'gradient', gradient: 'radial-gradient(ellipse at 50% 30%, rgba(255,180,80,.6), rgba(120,60,30,.85))' };
+    }
+    if (item.effect?.bodyClass === 'cosmetic-bg-twilight') {
+      return { kind: 'gradient', gradient: 'radial-gradient(ellipse at 50% 30%, rgba(120,140,255,.6), rgba(40,20,80,.9))' };
+    }
+  }
+  return { kind: 'icon', icon: item.icon };
+}
 
 /** Live "X:YY left" countdown for a timed buff. Runs its own 1 Hz tick so
  *  re-rendering this small label doesn't drag the whole inventory hook
@@ -24,99 +113,165 @@ function BuffCountdown({ expiresAtMs }) {
   return <span className="bls-buff-countdown">{label} left</span>;
 }
 
-/**
- * One row in the items list. Layout: icon · name+desc · cost+CTA.
- *
- * The CTA reflects ownership state:
- *   permanent owned   → "Owned"
- *   stackable maxed   → "Maxed"
- *   timed active      → "Active · 3h 12m left" countdown chip
- *   cosmetic owned    → "Equip" / "Equipped" toggle (replaces Buy)
- *   otherwise         → "Buy · 50"
- *
- * Cosmetics get a SECONDARY action — the primary CTA flips between
- * Buy and Equip/Equipped based on ownership; unequip is implicit
- * (equip another cosmetic in the same slot to swap, or tap the
- * currently-equipped cosmetic to clear the slot).
- */
-function ShopItemRow({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
-  // ── Cosmetic flow (distinct from buyable items because the CTA is
-  //    not always "Buy") ────────────────────────────────────────────────
-  if (item.ownership === 'cosmetic') {
+// ─── Cosmetic Card ─────────────────────────────────────────────────────
+// Large grid cell with a sprite preview area on top + name/price/CTA
+// underneath. Used in the Cosmetics tab. Drives the showcase feel —
+// the preview shows the player exactly what they're buying (or, for
+// Coming Soon cards, a silhouetted teaser).
+function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
+  const preview = getPreview(item);
+
+  // State machine for the CTA + card variant
+  let stateClass, label, disabled, onClick;
+  if (item.comingSoon) {
+    stateClass = 'coming-soon';
+    label      = 'Coming Soon';
+    disabled   = true;
+    onClick    = null;
+  } else {
     const owned    = ownership.isCosmeticOwned(item.id);
     const equipped = ownership.isCosmeticEquipped(item.id);
-    let label, disabled, onClick, stateClass;
     if (!owned) {
-      label      = `Buy · ${item.cost}`;
+      stateClass = 'buyable';
+      label      = `${item.cost} BL`;
       disabled   = balance < item.cost || busy;
       onClick    = () => onBuy(item.id);
-      stateClass = 'buyable';
     } else if (equipped) {
+      stateClass = 'equipped';
       label      = 'Equipped';
       disabled   = false;
       onClick    = () => onUnequip(item.cosmeticSlot);
-      stateClass = 'equipped';
     } else {
+      stateClass = 'owned';
       label      = 'Equip';
       disabled   = false;
       onClick    = () => onEquip(item.id);
-      stateClass = 'owned';
     }
-    return (
-      <div className={`bls-item bls-item-${stateClass}`}>
-        <div className="bls-item-icon">{item.icon}</div>
-        <div className="bls-item-body">
-          <div className="bls-item-name">
-            {item.name}
-            {equipped && <span className="bls-item-tag bls-item-tag-equipped">EQUIPPED</span>}
+  }
+
+  return (
+    <div className={`bls-card bls-card-${stateClass}`}>
+      {/* Equipped ribbon — a small badge in the top-right corner so the
+          player can spot equipped items at a glance from the grid. */}
+      {stateClass === 'equipped' && <span className="bls-card-ribbon">EQUIPPED</span>}
+      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
+
+      <div className="bls-card-preview">
+        {preview.kind === 'sprite' && (
+          <img
+            src={preview.src}
+            alt=""
+            draggable="false"
+            className={`bls-card-preview-sprite${preview.silhouette ? ' bls-card-preview-silhouette' : ''}`}
+            style={preview.filter ? { filter: preview.filter } : undefined}
+          />
+        )}
+        {preview.kind === 'particle-icon' && (
+          <div className="bls-card-preview-particles" style={preview.filter ? { filter: preview.filter } : undefined}>
+            <span className="bls-card-preview-orb bls-card-preview-orb-1">{preview.icon}</span>
+            <span className="bls-card-preview-orb bls-card-preview-orb-2">{preview.icon}</span>
+            <span className="bls-card-preview-orb bls-card-preview-orb-3">{preview.icon}</span>
           </div>
-          <div className="bls-item-desc">{item.desc}</div>
-        </div>
+        )}
+        {preview.kind === 'gradient' && (
+          <div className="bls-card-preview-bg" style={{ background: preview.gradient }} />
+        )}
+        {preview.kind === 'bg-icon' && (
+          <div className="bls-card-preview-bg-icon">{preview.icon}</div>
+        )}
+        {preview.kind === 'icon' && (
+          <div className="bls-card-preview-icon">{preview.icon}</div>
+        )}
+      </div>
+
+      <div className="bls-card-body">
+        <div className="bls-card-name">{item.name}</div>
         <button
           type="button"
-          className="bls-item-buy"
-          onClick={onClick}
+          className={`bls-card-cta bls-card-cta-${stateClass}`}
+          onClick={onClick ?? undefined}
           disabled={disabled}
         >
           {label}
         </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  // ── Non-cosmetic flow (buffs / consumables / qol) ───────────────────
+// ─── Buff Card ─────────────────────────────────────────────────────────
+// Slightly larger than the QoL/consumable row — buffs deserve visual
+// emphasis since they're the moment-to-moment "I'm powered up" purchases.
+// Layout: large icon stamp + headline effect + duration + price/CTA.
+function BuffCard({ item, ownership, balance, onBuy, busy }) {
+  const activeBuff = ownership.activeBuffs.find(b => b.id === item.id);
+  const headline   = (() => {
+    const e = item.effect;
+    if (!e) return '';
+    if (e.type === 'qi_mult')          return `×${e.mult} QI/S`;
+    if (e.type === 'crystal_tap_mult') return `×${e.mult} TAP`;
+    if (e.type === 'producer_mult')    return `×${e.mult} RATE`;
+    return '';
+  })();
+  const durationLabel = (() => {
+    const ms = item.effect?.durationMs ?? 0;
+    if (ms >= 3600_000) {
+      const h = Math.round(ms / 3600_000);
+      return `${h}h`;
+    }
+    const m = Math.round(ms / 60_000);
+    return `${m}m`;
+  })();
+  const disabled = balance < item.cost || busy;
+
+  return (
+    <div className={`bls-buff-card${activeBuff ? ' bls-buff-card-active' : ''}`}>
+      {activeBuff && <span className="bls-card-ribbon bls-card-ribbon-active">ACTIVE</span>}
+      <div className="bls-buff-card-icon">{item.icon}</div>
+      <div className="bls-buff-card-body">
+        <div className="bls-buff-card-headline">{headline}</div>
+        <div className="bls-buff-card-name">{item.name}</div>
+        <div className="bls-buff-card-meta">
+          <span className="bls-buff-card-duration">{durationLabel}</span>
+          {activeBuff && <BuffCountdown expiresAtMs={activeBuff.expiresAtMs} />}
+        </div>
+      </div>
+      <button
+        type="button"
+        className="bls-card-cta bls-card-cta-buyable"
+        onClick={() => onBuy(item.id)}
+        disabled={disabled}
+      >
+        {item.cost} BL
+      </button>
+    </div>
+  );
+}
+
+// ─── Compact Row (Consumables + QoL) ──────────────────────────────────
+// Utility items stay row-style — they don't need showcase treatment, the
+// PRICE and the EFFECT are what the player cares about.
+function CompactRow({ item, ownership, balance, onBuy, busy }) {
   const { state, label, disabled } = (() => {
-    // Permanent
     if (item.ownership === 'permanent' && ownership.hasQol(item.id)) {
       return { state: 'owned', label: 'Owned', disabled: true };
     }
-    // Stackable
     if (item.ownership === 'stackable') {
       const cur = ownership.getStack(item.id);
       const cap = item.maxStack ?? Infinity;
       if (cur >= cap) return { state: 'maxed', label: `Maxed (${cur}/${cap})`, disabled: true };
     }
-    // Timed — show countdown if active, still allow more purchases to extend
-    if (item.ownership === 'timed') {
-      const active = ownership.activeBuffs.find(b => b.id === item.id);
-      if (active) {
-        return { state: 'active', label: `Buy · ${item.cost}`, disabled: balance < item.cost || busy };
-      }
-    }
-    // Oneshot — show owned count, allow another purchase
     if (item.ownership === 'oneshot') {
       const cur = ownership.getConsumable(item.id);
       if (cur > 0) {
-        return { state: 'owned-some', label: `Buy · ${item.cost}`, disabled: balance < item.cost || busy };
+        return { state: 'owned-some', label: `${item.cost} BL`, disabled: balance < item.cost || busy };
       }
     }
-    // Default — can buy if affordable
-    return { state: 'buyable', label: `Buy · ${item.cost}`, disabled: balance < item.cost || busy };
+    return { state: 'buyable', label: `${item.cost} BL`, disabled: balance < item.cost || busy };
   })();
 
-  const stackCount = item.ownership === 'stackable' ? ownership.getStack(item.id) : 0;
-  const oneshotCount = item.ownership === 'oneshot' ? ownership.getConsumable(item.id) : 0;
-  const activeBuff   = item.ownership === 'timed' ? ownership.activeBuffs.find(b => b.id === item.id) : null;
+  const stackCount   = item.ownership === 'stackable' ? ownership.getStack(item.id) : 0;
+  const oneshotCount = item.ownership === 'oneshot'   ? ownership.getConsumable(item.id) : 0;
 
   return (
     <div className={`bls-item bls-item-${state}`}>
@@ -126,7 +281,6 @@ function ShopItemRow({ item, ownership, balance, onBuy, onEquip, onUnequip, busy
           {item.name}
           {stackCount > 0 && <span className="bls-item-tag">×{stackCount}</span>}
           {oneshotCount > 0 && <span className="bls-item-tag">×{oneshotCount}</span>}
-          {activeBuff && <BuffCountdown expiresAtMs={activeBuff.expiresAtMs} />}
         </div>
         <div className="bls-item-desc">{item.desc}</div>
       </div>
@@ -144,12 +298,15 @@ function ShopItemRow({ item, ownership, balance, onBuy, onEquip, onUnequip, busy
 
 /**
  * Blood Lotus Spend Shop — modal where players SPEND their Blood Lotus
- * on buffs, consumables, and QoL. The IAP "buy more Blood Lotus" flow
- * is a separate modal reached via the "Need more? Top up" button at
- * the bottom of this one.
+ * on buffs, consumables, QoL, and cosmetics. IAP "buy more Blood Lotus"
+ * flow is a separate top-bar button (and a footer CTA here as a backup
+ * for "ran out mid-purchase" moments).
  *
- * Tab row mirrors the Progress Hub chip pattern (.ach-tabs/.ach-tab)
- * for visual consistency.
+ * Tab visuals:
+ *   buff       — big effect cards (×2 QI/S etc.)
+ *   consumable — compact rows (utility)
+ *   qol        — compact rows (utility)
+ *   cosmetic   — showcase grid with sprite previews + silhouetted teasers
  */
 export default function BloodLotusSpendShopModal({
   inventory,
@@ -159,7 +316,7 @@ export default function BloodLotusSpendShopModal({
 }) {
   const [tab, setTab] = useState('buff');
   const [busy, setBusy] = useState(false);
-  const [flash, setFlash] = useState(null); // { msg, kind: 'ok' | 'err' }
+  const [flash, setFlash] = useState(null);
 
   const itemsByCategory = useMemo(() => {
     const out = new Map();
@@ -168,7 +325,6 @@ export default function BloodLotusSpendShopModal({
     return out;
   }, []);
 
-  // Auto-clear the flash banner after 2.5s so it doesn't pile up.
   useEffect(() => {
     if (!flash) return;
     const id = setTimeout(() => setFlash(null), 2500);
@@ -189,6 +345,22 @@ export default function BloodLotusSpendShopModal({
   };
 
   const items = itemsByCategory.get(tab) ?? [];
+
+  // Group cosmetics by slot for the showcase layout.
+  const cosmeticsBySlot = useMemo(() => {
+    if (tab !== 'cosmetic') return null;
+    const groups = {
+      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   items: [] },
+      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      items: [] },
+      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   items: [] },
+      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          items: [] },
+    };
+    for (const it of items) {
+      if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
+      groups[it.cosmeticSlot].items.push(it);
+    }
+    return groups;
+  }, [tab, items]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -225,29 +397,69 @@ export default function BloodLotusSpendShopModal({
         )}
 
         <div className="bls-body">
-          {items.length === 0 ? (
-            <div className="bls-empty">Nothing here yet.</div>
-          ) : (
-            items.map(item => (
-              <ShopItemRow
-                key={item.id}
-                item={item}
-                ownership={inventory}
-                balance={balance}
-                onBuy={handleBuy}
-                onEquip={(id) => inventory.equip(id)}
-                onUnequip={(slot) => inventory.unequip(slot)}
-                busy={busy}
-              />
-            ))
+          {/* ── Cosmetics — showcase grid ──────────────────────────── */}
+          {tab === 'cosmetic' && cosmeticsBySlot && (
+            <div className="bls-cosmetic-sections">
+              {Object.entries(cosmeticsBySlot).map(([slot, group]) => (
+                group.items.length === 0 ? null : (
+                  <section key={slot} className="bls-cosmetic-section">
+                    <div className="bls-cosmetic-section-label">{group.label}</div>
+                    <div className="bls-card-grid">
+                      {group.items.map(item => (
+                        <CosmeticCard
+                          key={item.id}
+                          item={item}
+                          ownership={inventory}
+                          balance={balance}
+                          onBuy={handleBuy}
+                          onEquip={(id)   => inventory.equip(id)}
+                          onUnequip={(s)  => inventory.unequip(s)}
+                          busy={busy}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                )
+              ))}
+            </div>
+          )}
+
+          {/* ── Buffs — big effect cards ──────────────────────────── */}
+          {tab === 'buff' && (
+            <div className="bls-buff-grid">
+              {items.map(item => (
+                <BuffCard
+                  key={item.id}
+                  item={item}
+                  ownership={inventory}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* ── Consumables + QoL — compact rows ──────────────────── */}
+          {(tab === 'consumable' || tab === 'qol') && (
+            items.length === 0 ? (
+              <div className="bls-empty">Nothing here yet.</div>
+            ) : (
+              items.map(item => (
+                <CompactRow
+                  key={item.id}
+                  item={item}
+                  ownership={inventory}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))
+            )
           )}
         </div>
 
-        <button
-          type="button"
-          className="bls-topup"
-          onClick={onOpenTopUp}
-        >
+        <button type="button" className="bls-topup" onClick={onOpenTopUp}>
           Need more Blood Lotus? <span className="bls-topup-cta">Top Up</span>
         </button>
       </div>
