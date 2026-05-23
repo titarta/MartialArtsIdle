@@ -12,9 +12,16 @@
   --gold:          #f5c842;   /* semantic rarity color — do NOT use for UI chrome */
   --border:        var(--ui-border-light);
 
-  /* ── UI Purple family ─────────────────────────────────────────────────
-     The hero colour of the game's UI chrome: borders, glows, active
-     states, hover emphasis. Everything that "reads as the game's colour".
+  /* ── UI Jade family (formerly Purple) ────────────────────────────────
+     2026-05-23: Theme refresh — the entire UI chrome palette migrated
+     from translucent violet to jade. The variable NAMES kept their
+     `--ui-purple-*` ids so every consumer across App.css / JSX
+     continued to work without a global rename; only the VALUES below
+     changed. The hue is now bright jade (cultivation-theme appropriate)
+     while the dark/light ramp + role semantics are preserved.
+
+     Old purple values are preserved at the bottom of this block for
+     fast revert; uncomment them and comment the jade block to swap back.
 
      These are SEPARATE from palette/rarity purples in `data/*.js`
      (Transcendent = #c084fc, Epic rarity, psychic damage, Yin-Yang node,
@@ -30,53 +37,78 @@
        -wash    pale uppercase labels, subtle backgrounds
        -pale    palest ultra-soft backgrounds, very diffuse tints                                            */
 
-  /* BRIGHT PURPLE — the main glow/accent hue. Used as solid hex OR as the
-     rgb channel inside rgba() for translucent fills, glows, shadows.       */
-  --ui-purple-rgb:         139,  92, 246;  /* base — equivalent of #8b5cf6 */
-  --ui-purple-deep-rgb:    124,  58, 237;  /* rgb form of #7c3aed  */
-  --ui-purple-strong-rgb:  168,  85, 247;  /* rgb form of #a855f7  */
-  --ui-purple-soft-rgb:    167, 139, 250;  /* rgb form of #a78bfa  */
-  --ui-purple-light-rgb:   196, 181, 253;  /* rgb form of #c4b5fd  */
+  /* BRIGHT JADE — the main glow/accent hue. Used as solid hex OR as the
+     rgb channel inside rgba() for translucent fills, glows, shadows.
+     Matches the TutorialModal's jade vocabulary the rest of the UI
+     now needs to live up to. */
+  --ui-purple-rgb:          95, 175, 130;  /* base — working jade (#5faf82) */
+  --ui-purple-deep-rgb:     56, 120,  85;  /* deep emerald (#387855) */
+  --ui-purple-strong-rgb:  110, 200, 150;  /* loud jade highlight (#6ec896) */
+  --ui-purple-soft-rgb:    140, 220, 175;  /* soft mint (#8cdcaf) */
+  --ui-purple-light-rgb:   180, 235, 205;  /* pale mint (#b4ebcd) */
 
   /* Discrete shades (dark → light) used as solid colors */
-  --ui-purple-darker:  #5b21b6;   /* darkest — gradient starts */
-  --ui-purple-deep:    #7c3aed;   /* pressed, emphasised outlines */
-  --ui-purple-strong:  #a855f7;   /* loud callouts, strong accents */
-  --ui-purple-soft:    #a78bfa;   /* secondary accents, softer glow */
-  --ui-purple-light:   #c4b5fd;   /* highlights, emphasis text */
-  --ui-purple-wash:    #e0d8ff;   /* pale label / uppercase text */
-  --ui-purple-pale:    #e9d5ff;   /* ultra-soft backgrounds */
+  --ui-purple-darker:  #1d4a32;   /* deepest forest — gradient starts */
+  --ui-purple-deep:    #387855;   /* pressed, emphasised outlines */
+  --ui-purple-strong:  #6ec896;   /* loud callouts, strong accents */
+  --ui-purple-soft:    #8cdcaf;   /* secondary accents, softer glow */
+  --ui-purple-light:   #b4ebcd;   /* highlights, emphasis text */
+  --ui-purple-wash:    #d2f0dc;   /* pale label / uppercase text */
+  --ui-purple-pale:    #ddf3e2;   /* ultra-soft backgrounds */
 
   /* ── UI chrome tints ──────────────────────────────────────────────────
-     These are the "atmosphere" colours that make the UI read as purple
-     even when not using the bright --ui-purple-*. Store as rgb triples
+     These are the "atmosphere" colours that make the UI read as jade
+     even when not using the bright --ui-purple-* (named purple but
+     valued as jade — see migration note above). Store as rgb triples
      so alpha varies per usage via rgba(). */
 
-  /* Hover / pale interactive text (220, 200, 255 — pale lavender) */
+  /* Hover / pale interactive text (200, 235, 215 — pale mint) */
+  --ui-hover-rgb:      200, 235, 215;
+
+  /* Secondary text / labels / captions (160, 200, 180 — mint-grey) */
+  --ui-label-rgb:      160, 200, 180;
+
+  /* Muted / disabled text (150, 175, 160 — desaturated jade-grey) */
+  --ui-muted-rgb:      150, 175, 160;
+
+  /* Deep jade shadow for tooltip/modal drop-shadows (18, 60, 40) */
+  --ui-shadow-rgb:      18,  60,  40;
+
+  /* ── UI surface backgrounds (near-black with jade tint) ──────────────
+     Dark atmospheric backgrounds. The jade cast is subtle at opacity
+     0.85–1.0, but it's what shifts the game from "dark purple" to
+     "dark jade". Hue-shifting these changes the whole game mood.    */
+
+  /* Deepest surface (nav, deepest panels) — rgb(3, 12, 8) */
+  --ui-bg-deep-rgb:      3,  12,   8;
+
+  /* Panel / modal / card background — rgb(8, 20, 14) */
+  --ui-bg-panel-rgb:     8,  20,  14;
+
+  /* Border / divider tint between panels — rgb(20, 45, 30) */
+  --ui-border-rgb:      20,  45,  30;
+
+  /* ── Old purple palette (revert by uncommenting + commenting jade above) ─
+  --ui-purple-rgb:         139,  92, 246;
+  --ui-purple-deep-rgb:    124,  58, 237;
+  --ui-purple-strong-rgb:  168,  85, 247;
+  --ui-purple-soft-rgb:    167, 139, 250;
+  --ui-purple-light-rgb:   196, 181, 253;
+  --ui-purple-darker:  #5b21b6;
+  --ui-purple-deep:    #7c3aed;
+  --ui-purple-strong:  #a855f7;
+  --ui-purple-soft:    #a78bfa;
+  --ui-purple-light:   #c4b5fd;
+  --ui-purple-wash:    #e0d8ff;
+  --ui-purple-pale:    #e9d5ff;
   --ui-hover-rgb:      220, 200, 255;
-
-  /* Secondary text / labels / captions (180, 160, 220 — lavender-grey) */
   --ui-label-rgb:      180, 160, 220;
-
-  /* Muted / disabled text (160, 155, 190 — desaturated purple-grey) */
   --ui-muted-rgb:      160, 155, 190;
-
-  /* Deep purple shadow for tooltip/modal drop-shadows (60, 20, 160) */
   --ui-shadow-rgb:      60,  20, 160;
-
-  /* ── UI surface backgrounds (near-black with purple tint) ─────────────
-     Dark atmospheric backgrounds. The purple cast is subtle at opacity
-     0.85–1.0, but it's what makes the game read as "dark purple" instead
-     of pure black. Hue-shifting these changes the whole game mood.      */
-
-  /* Deepest surface (nav, deepest panels) — rgb(5, 2, 14) */
   --ui-bg-deep-rgb:      5,   2,  14;
-
-  /* Panel / modal / card background — rgb(10, 8, 28) */
   --ui-bg-panel-rgb:    10,   8,  28;
-
-  /* Border / divider tint between panels — rgb(30, 18, 48) */
   --ui-border-rgb:      30,  18,  48;
+  */
 
   /* ── Accent RGB decomposition ─────────────────────────────────────────────
      --accent (#e94560) as an rgb triple so rgba() can vary the opacity.
