@@ -18764,11 +18764,11 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    top stop to be even brighter (e.g. rgba(95, 165, 125)) for a more
    confident jade panel face. */
 
-/* Modals INTENTIONALLY excluded from the jade override (they have their
-   own thematic chrome that the user prefers to preserve):
-     .daily-modal           — blood-red lotus gradient (gift-day theme)
-   If more modals need to opt out, drop them from the selector list
-   below; the original per-modal rules will re-apply automatically. */
+/* ── AGED SCROLL theme (2026-05-23) — light parchment modals with
+   deep ink text + dark wood frame. Cultivation-game-as-ancient-
+   manuscript aesthetic, per frontend designer recommendation.
+   Modals INTENTIONALLY excluded (kept on their own theme chrome):
+     .daily-modal           — blood-red lotus gradient (gift-day) */
 .achievements-modal,
 .progress-hub-modal,
 .journey-modal,
@@ -18782,34 +18782,69 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .artefact-upgrade-panel,
 .modal-content,
 .blood-lotus-shop-card {
-  /* Warm parchment / sandalwood gradient — same vocabulary as the
-     jade pass (solid 0.97-alpha gradient + bright border + multi-
-     layer shadow + inset highlight) but in oriental-scroll tones. */
-  background: linear-gradient(
-    160deg,
-    rgba(155, 125,  85, 0.97) 0%,
-    rgba( 75,  55,  35, 0.97) 100%
-  ) !important;
-  border: 1px solid rgba(232, 213, 168, 0.55) !important;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255, 250, 235, 0.6), transparent 70%),
+    linear-gradient(160deg, #f5e9d3 0%, #e8d4ad 100%) !important;
+  border: 1px solid #8b6f47 !important;
   box-shadow:
-    0 10px 48px rgba(0, 0, 0, 0.78),
-    0 0   28px rgba(110,  80,  50, 0.50),
-    inset 0 1px 0 rgba(255, 245, 220, 0.14) !important;
+    0 14px 40px rgba(45, 30, 15, 0.45),
+    0 0 0 1px rgba(255, 252, 245, 0.4) inset,
+    0 1px 0 rgba(255, 252, 245, 0.7) inset,
+    0 0 80px rgba(180, 145, 95, 0.15) inset !important;
+  color: #2b1d10 !important;
+
+  /* SCOPED VARIABLE OVERRIDES — inside cream parchment modals,
+     remap the --ui-purple-* family so all existing var() consumers
+     (stat labels, badges, borders, hover text) auto-flip from "pale
+     cream on dark" → "deep ink on cream" without per-rule edits. */
+  --ui-purple-rgb:         184,  38,  26;  /* vermillion seal */
+  --ui-purple-deep-rgb:    139,  28,  20;
+  --ui-purple-strong-rgb:  184,  38,  26;
+  --ui-purple-soft-rgb:    139, 111,  71;  /* sandalwood */
+  --ui-purple-light-rgb:    43,  29,  16;  /* deep ink */
+
+  --ui-purple-darker:  #2b1d10;
+  --ui-purple-deep:    #5d4630;
+  --ui-purple-strong:  #b8261a;  /* vermillion */
+  --ui-purple-soft:    #8b6f47;
+  --ui-purple-light:   #2b1d10;  /* dark ink (was pale cream) */
+  --ui-purple-wash:    #5d4630;
+  --ui-purple-pale:    #f5e9d3;
+
+  --ui-hover-rgb:       43,  29,  16;  /* deep ink hover */
+  --ui-label-rgb:       93,  70,  48;  /* tea-stained label */
+  --ui-muted-rgb:      138, 114,  89;  /* faded brush stroke */
+  --ui-shadow-rgb:      45,  30,  15;
+
+  /* Nested-panel background var — inside cream modals, "panel" means
+     a creamier inset block, not the dark sandalwood from index.css. */
+  --ui-bg-panel-rgb:   255, 248, 230;
+  --ui-bg-deep-rgb:    232, 212, 173;
+  --ui-border-rgb:     139, 111,  71;
 }
 
-/* Inner stat-row containers — re-tint slightly darker than the new
-   warm parchment modal bg so nested content still has visible depth. */
+/* Inner stat-row containers — creamier inset on the parchment panel,
+   ink-divided rows like ledger lines. */
 .pdm-stats,
 .coll-stat-list {
-  background: rgba(50, 35, 22, 0.65) !important;
-  border-color: rgba(232, 213, 168, 0.22) !important;
+  background: rgba(255, 248, 230, 0.55) !important;
+  border: 1px solid rgba(139, 111, 71, 0.22) !important;
+  border-radius: 6px;
 }
 .pdm-stat-row {
-  background: rgba(36, 25, 15, 0.55) !important;
+  background: transparent !important;
+  border-bottom: 1px solid rgba(139, 111, 71, 0.14);
+  color: #2b1d10 !important;
+}
+.pdm-stat-row:last-child {
+  border-bottom: none;
 }
 .pdm-stat-row-emph {
-  background: rgba(255, 215, 130, 0.10) !important;
+  background: rgba(184, 38, 26, 0.08) !important;  /* vermillion seal wash */
+  color: #2b1d10 !important;
 }
+.pdm-stat-label { color: #5d4630 !important; }
+.pdm-stat-value { color: #2b1d10 !important; }
 
 /* ─────────────────────────────────────────────────────────────────────
    ── CHROME OVERRIDE (header / footer / nav) — 2026-05-23 ──────────
@@ -18825,19 +18860,22 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    This block fixes all three. Lives at EOF so it wins specificity
    ties against the per-element rules higher in the file. */
 
-/* Solid warm-earth frame around the gameplay area. No alpha — the
-   bars now read as a definite edge of the game window rather than
-   a translucent darkening over the backdrop. Warm dark wood/scroll
-   tones to match the parchment modal chrome. */
+/* Mahogany frame — dark wood spindles holding the parchment scrolls.
+   The hanging-scroll metaphor: cream-paper modals + dark-wood rollers.
+   Stays dark on purpose to contrast with the cream panel interiors. */
 .top-bar {
-  background: linear-gradient(180deg, rgba(45, 33, 22, 1) 0%, rgba(28, 20, 12, 1) 100%) !important;
-  border-bottom: 1px solid rgba(220, 195, 155, 0.32) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55) !important;
+  background: linear-gradient(180deg, #2d1f10 0%, #1c1208 100%) !important;
+  border-bottom: 1px solid #6b5232 !important;
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(232, 195, 130, 0.12) inset !important;
 }
 .navbar {
-  background: linear-gradient(180deg, rgba(28, 20, 12, 1) 0%, rgba(45, 33, 22, 1) 100%) !important;
-  border-top: 1px solid rgba(220, 195, 155, 0.32) !important;
-  box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.55) !important;
+  background: linear-gradient(180deg, #1c1208 0%, #2d1f10 100%) !important;
+  border-top: 1px solid #6b5232 !important;
+  box-shadow:
+    0 -4px 18px rgba(0, 0, 0, 0.55),
+    0 -1px 0 rgba(232, 195, 130, 0.12) inset !important;
 }
 
 /* Soften the app-vignette near the bars — it was darkening the top
@@ -18849,33 +18887,37 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     linear-gradient(to top,    rgba(0, 0, 0, 0.32) 0%, rgba(0, 0, 0, 0) 16%) !important;
 }
 
-/* Nav button labels — readable cream/parchment colour. Active state
-   gets an amber/gold glow that fits the warm-earth chrome. */
+/* Nav buttons — cream text on dark wood frame. Active state gets a
+   lantern-amber glow + faint vermillion bloom (the stamp colour). */
 .nav-btn {
-  color: rgba(245, 230, 200, 0.78) !important;
+  color: rgba(245, 233, 211, 0.55) !important;
 }
 .nav-icon-img,
 .nav-icon-emoji {
-  opacity: 0.78 !important;
+  opacity: 0.6 !important;
 }
 .nav-btn.active {
-  color: rgba(255, 240, 210, 1) !important;
-  text-shadow: 0 0 8px rgba(220, 175, 110, 0.55) !important;
+  color: #f5e9d3 !important;
+  text-shadow: 0 0 10px rgba(232, 195, 130, 0.6) !important;
 }
 .nav-btn.active .nav-icon-img,
 .nav-btn.active .nav-icon-emoji {
   opacity: 1 !important;
 }
 .nav-btn.active .nav-icon-img {
-  filter: drop-shadow(0 0 5px rgba(220, 175, 110, 0.65)) !important;
+  filter:
+    drop-shadow(0 0 6px rgba(232, 195, 130, 0.7))
+    drop-shadow(0 0 12px rgba(184, 38, 26, 0.25)) !important;
 }
 .nav-btn:hover {
-  color: rgba(255, 245, 220, 0.95) !important;
+  color: rgba(245, 233, 211, 0.92) !important;
 }
 
-/* TopBar buttons get the same active-state vocabulary (warm amber
-   tint) — replaces the generic white wash from .top-bar-btn--active. */
+/* TopBar buttons — when their modal is open, glow lantern-amber
+   with a vermillion-stamp bloom matching the cultivation seal motif. */
 .top-bar-btn--active {
-  background: rgba(220, 175, 110, 0.22) !important;
-  box-shadow: inset 0 0 0 1px rgba(232, 213, 168, 0.55) !important;
+  background: rgba(232, 195, 130, 0.18) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 195, 130, 0.5),
+    0 0 12px rgba(184, 38, 26, 0.3) !important;
 }
