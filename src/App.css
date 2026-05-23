@@ -12773,9 +12773,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   /* Height fits the front sprite (tallest at scale 1.0) + baseline. */
   height: 96px;
   padding: 8px 0 6px;
-  background:
-    radial-gradient(ellipse at 30% 60%, rgba(255, 255, 255, 0.05), transparent 65%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.58));
+  /* UNIFORM background — slightly desaturated purple-grey. The
+     previous off-centre radial gradient + bottom fade darkened the
+     right side and the lower body of every sprite, so the LATE
+     silhouettes (right side, larger body) had the least contrast
+     against the background. Now the bg is even left-to-right and
+     top-to-bottom so every silhouette has the same readability. */
+  background: linear-gradient(180deg, rgba(34, 26, 44, 0.65), rgba(22, 16, 32, 0.65));
   border-radius: 8px;
   overflow: hidden;
   /* Width of each sprite (fixed). 42 keeps silhouettes legible AND
@@ -12784,17 +12788,6 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   --proc-w: 42px;
   /* Horizontal padding inside the procession (each side). */
   --proc-pad: 12px;
-}
-/* Bottom fade so silhouettes blend into the dark base instead of
-   ending in a hard line. */
-.bls-procession::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 30%;
-  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.7));
-  pointer-events: none;
-  z-index: 100; /* above all sprites so it tints the whole procession */
 }
 
 .bls-proc-sprite {
