@@ -12881,6 +12881,89 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 18px;
 }
 
+/* ── "Alive" polish: subtle floating for characters, pulsing glow for
+   crystals ─────────────────────────────────────────────────────────
+   Very small amplitudes — the shop reads more alive without becoming
+   busy. Animations honour the global reduced-motion preference. */
+
+/* Character bob — vertical translate, no scale change. Applied to the
+   stage wrapper in the procession (so the silhouette layer + colour
+   layer move together) AND to the single sprite in the regular grid
+   card preview. */
+@keyframes bls-char-bob {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -2px; }
+}
+.bls-procession[data-slot="character"] .bls-proc-stage {
+  /* `translate` (not transform: translateY) so it composes cleanly
+     with the existing transform: scale(...) on the wrapper without
+     stomping it. */
+  animation: bls-char-bob 3.6s ease-in-out infinite;
+  /* Staggered start per stage so the row doesn't bob in unison. */
+  animation-delay: calc(var(--stage-index, 0) * -0.3s);
+}
+.bls-card[data-slot="character"] .bls-card-preview-sprite {
+  animation: bls-char-bob 3.4s ease-in-out infinite;
+}
+
+/* Crystal glow — pulsing drop-shadow halo. Two glow layers in the
+   filter chain so the colour stays untouched (no hue-rotate
+   stomping); the existing wrapper drop-shadow stays as the depth
+   shadow, an additional purple glow drop-shadow pulses on top. */
+@keyframes bls-crystal-glow-stage {
+  0%, 100% {
+    filter:
+      drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7))
+      drop-shadow(0 0 3px  rgba(180, 130, 255, 0.30));
+  }
+  50% {
+    filter:
+      drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7))
+      drop-shadow(0 0 10px rgba(180, 130, 255, 0.65));
+  }
+}
+.bls-procession[data-slot="crystal"] .bls-proc-stage {
+  animation: bls-crystal-glow-stage 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--stage-index, 0) * -0.2s);
+}
+
+/* Regular grid card preview glow for the crystal slot. The IMG inside
+   has the hue-rotate tint applied inline, so we can't animate its
+   filter without stomping the tint. Use a pseudo-element on the
+   preview box for the glow instead — radial gradient that pulses
+   in scale + opacity, mix-blend screen so the colour pops. */
+.bls-card[data-slot="crystal"] .bls-card-preview {
+  position: relative;
+}
+.bls-card[data-slot="crystal"] .bls-card-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 55%,
+    rgba(180, 130, 255, 0.55) 0%,
+    rgba(180, 130, 255, 0.25) 35%,
+    rgba(0, 0, 0, 0) 60%);
+  mix-blend-mode: screen;
+  animation: bls-crystal-glow-card 2.6s ease-in-out infinite;
+  z-index: 0;
+}
+@keyframes bls-crystal-glow-card {
+  0%, 100% { opacity: 0.4; transform: scale(1);    }
+  50%      { opacity: 0.85; transform: scale(1.08); }
+}
+
+/* Respect reduced-motion users: kill the alive animations entirely so
+   the shop is fully static for anyone who's opted out of motion. */
+@media (prefers-reduced-motion: reduce) {
+  .bls-procession[data-slot="character"] .bls-proc-stage,
+  .bls-card[data-slot="character"] .bls-card-preview-sprite,
+  .bls-procession[data-slot="crystal"] .bls-proc-stage,
+  .bls-card[data-slot="crystal"] .bls-card-preview::after {
+    animation: none !important;
+  }
+}
+
 /* ── Buff cards ─────────────────────────────────────────────────────────
    Bigger than CompactRow but not full-grid. Horizontal layout: icon
    stamp · headline + name + meta · price CTA. The headline (×2 QI/S

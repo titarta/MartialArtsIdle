@@ -265,7 +265,7 @@ function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, bus
   }
 
   return (
-    <div className={`bls-card bls-card-${stateClass}`}>
+    <div className={`bls-card bls-card-${stateClass}`} data-slot={item.cosmeticSlot}>
       {/* Equipped ribbon — a small badge in the top-right corner so the
           player can spot equipped items at a glance from the grid. */}
       {stateClass === 'equipped' && <span className="bls-card-ribbon">EQUIPPED</span>}
