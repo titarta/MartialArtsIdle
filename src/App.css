@@ -17369,6 +17369,45 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   50%      { transform: scale(1.015); }
 }
 
+/* ── Crimson Aura VFX ─────────────────────────────────────────────────
+   Activated by `body.body-crimson-aura-active` while any Crimson Aura
+   shop buff is in the active-buffs list. Two layered effects:
+     1. A red-gold drop-shadow on the cultivator sprite (cheap, GPU)
+     2. A radial halo painted via .home-fighter-stage::before, pulsing
+        on a 2.4 s breathing rhythm matched to the cultivator's
+        existing breathe keyframe so the aura "lives" with the
+        character. Uses ::before instead of overriding the existing
+        .home-cultivator-aura element (which is the heavenly ad-boost
+        aura sprite and has its own backing image).
+   Both effects fade smoothly when the buff expires. */
+body.body-crimson-aura-active .home-cultivator-sprite {
+  filter:
+    drop-shadow(0 0 14px rgba(255, 80, 80, 0.85))
+    drop-shadow(0 0 28px rgba(255, 160, 60, 0.55));
+  transition: filter 0.4s ease;
+}
+body.body-crimson-aura-active .home-fighter-stage {
+  position: relative; /* in case any cousin rule unsets it */
+}
+body.body-crimson-aura-active .home-fighter-stage::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 60%,
+    rgba(255, 80, 80, 0.55) 0%,
+    rgba(255, 120, 40, 0.30) 35%,
+    rgba(255, 60, 30, 0)    70%);
+  mix-blend-mode: screen;
+  z-index: 0; /* behind the cultivator sprite (z:2) but above the stage */
+  pointer-events: none;
+  animation: home-crimson-aura-pulse 2.4s ease-in-out infinite;
+}
+@keyframes home-crimson-aura-pulse {
+  0%, 100% { opacity: 0.50; transform: scale(1);    }
+  50%      { opacity: 0.90; transform: scale(1.08); }
+}
+
 /* ── Qi flow VFX — orbs drift from a ring around the cultivator inward ───
    Layer overlays the fighter-stage. Sized inset:0 (matches the 128×scale
    stage) but particles spawn at radii > stage half-width — overflow:visible

@@ -504,8 +504,15 @@ function AppInner() {
     // legendary spark per-producer mult (pair synergies, count-based bonuses,
     // single-producer ×N, Phoenix Reborn). Both contribute multiplicatively.
     const ownedMap = producers.owned;
+    // Blood Lotus Shop — "Producer Surge" buff. Multiplies every
+    // producer's contribution uniformly. Folded into the perProducer
+    // callback so it stacks naturally with upgrade-driven and spark-
+    // driven per-producer multipliers (multiplicative chain).
+    const shopProducerMult = shopInventory.getActiveBuffMult('producer_mult');
     const perProducer = (pid) =>
-      upgrades.getProducerMult(pid) * qiSparks.getProducerSparkMult(pid, ownedMap);
+      upgrades.getProducerMult(pid)
+        * qiSparks.getProducerSparkMult(pid, ownedMap)
+        * shopProducerMult;
     // 2026-05-21 Dial-9 — Sect Discipline (common timed spark) adds +N to
     // every producer's per-unit qi/s while active. Read from the spark ref
     // (default 0). The bonus flows through per-producer mults and all
@@ -521,7 +528,7 @@ function AppInner() {
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phoenix Reborn (legendary E2) — useQiSparks dispatches this event when
   // a major realm transition fires while the spark is active. Reset the
@@ -552,6 +559,39 @@ function AppInner() {
       cultivation.upgradeFocusMultAddRef.current = upgrades.getFocusMultAdd();
     }
   }, [upgrades.owned, tree.modifiers, cultivation.upgradeCrystalTapMultRef, cultivation.upgradeFocusMultAddRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Crimson Aura VFX — toggles `body.body-crimson-aura-active` while
+  // any Crimson Aura buff is active. CSS (App.css) attaches the halo
+  // pseudo-element + drop-shadow to .home-cultivator-sprite via this
+  // class. Polls the active buffs list (already refreshed by
+  // useShopInventory's 1 Hz tick) so the VFX appears the moment a buff
+  // is purchased and clears the moment it expires.
+  useEffect(() => {
+    const active = (shopInventory.activeBuffs ?? []).some(
+      (b) => b.item?.effect?.vfx === 'crimson-aura'
+    );
+    if (active) {
+      document.body.classList.add('body-crimson-aura-active');
+      return () => document.body.classList.remove('body-crimson-aura-active');
+    }
+    return undefined;
+  }, [shopInventory.activeBuffs]);
+
+  // Mirror Blood Lotus Shop timed-buff multipliers into cultivation refs.
+  // Re-runs whenever the shopInventory state changes (purchase, expiry).
+  //   qi_mult         → cultivation.shopBuffQiMultRef
+  //   crystal_tap_mult→ cultivation.shopBuffCrystalTapMultRef
+  // Producer surge is folded into the producer-rate effect above via
+  // shopInventory.getActiveBuffMult('producer_mult') in the perProducer
+  // callback — keeps producer composition in one place.
+  useEffect(() => {
+    if (cultivation.shopBuffQiMultRef) {
+      cultivation.shopBuffQiMultRef.current = shopInventory.getActiveBuffMult('qi_mult');
+    }
+    if (cultivation.shopBuffCrystalTapMultRef) {
+      cultivation.shopBuffCrystalTapMultRef.current = shopInventory.getActiveBuffMult('crystal_tap_mult');
+    }
+  }, [shopInventory.inv, cultivation.shopBuffQiMultRef, cultivation.shopBuffCrystalTapMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mirror Qi Sparks multipliers + flags into cultivation refs each render.
   // Cheap; runs only when activeSparks identity changes (the hook returns

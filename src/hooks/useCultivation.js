@@ -310,6 +310,14 @@ export default function useCultivation() {
   // useUpgrades.getCrystalTapMult(). Each owned crystal_tap upgrade ×2.
   // Applied inside collectCrystalReservoir() against the empty-reservoir floor.
   const upgradeCrystalTapMultRef = useRef(1);
+  // Blood Lotus Shop buff multipliers — written by App.jsx from
+  // useShopInventory.getActiveBuffMult(type). Default 1 = no active buff.
+  //   shopBuffQiMultRef        applies to total qi/s in the rate formula
+  //   shopBuffCrystalTapMultRef applies to crystal-tap rewards
+  // (Producer-rate buff is folded in via the extraMult callback passed to
+  //  producers.getRate() — no separate ref needed here.)
+  const shopBuffQiMultRef         = useRef(1);
+  const shopBuffCrystalTapMultRef = useRef(1);
   // Upgrade-driven focus-mult adder (percentage points, 0..N). Added to the
   // stat-driven focus mult inside App.jsx's focusMult-write interval. Phase D.
   const upgradeFocusMultAddRef = useRef(0);
@@ -579,6 +587,7 @@ export default function useCultivation() {
         pillQiMultRef.current * sparkQiMultRef.current *
         treeQiMultRef.current * rebirthCultBuffRef.current *
         sparkLegendaryGlobalMultRef.current *
+        shopBuffQiMultRef.current *
         debugQiMultRef.current;
       const transientMult =
         boostMult * consecutiveMult *
@@ -946,7 +955,11 @@ export default function useCultivation() {
     const cap = sparkCrystalClickCapMinRef.current * 60 * rate;
     const fillPct = cap > 0 ? Math.min(1, reservoir / cap) : 0;
     const effectiveReservoir = cap * fillPct * fillPct;
-    const granted = Math.max(effectiveReservoir, floor);
+    // Shop "Crystal Resonance" buff — multiplies both the diminished
+    // reservoir and the floor uniformly so the buff scales every tap
+    // outcome, not just one of the two paths.
+    const shopTapMult = shopBuffCrystalTapMultRef.current || 1;
+    const granted = Math.max(effectiveReservoir, floor) * shopTapMult;
     // Always zero the reservoir on tap — the diminished portion is the
     // cost of mistiming; refunding it would defeat the purpose.
     crystalReservoirRef.current = 0;
@@ -1060,6 +1073,9 @@ export default function useCultivation() {
     treeProducerOutputMultRef,
     // Upgrade-driven crystal-tap floor mult — updated by App.jsx
     upgradeCrystalTapMultRef,
+    // Blood Lotus Shop buff mults — updated by App.jsx from useShopInventory
+    shopBuffQiMultRef,
+    shopBuffCrystalTapMultRef,
     upgradeFocusMultAddRef,
     // Artefact qi_speed aggregate ref — updated by App.jsx each second
     artefactQiMultRef,
