@@ -151,22 +151,11 @@ function AppInner() {
     return () => clearInterval(id);
   }, []);
 
-  // Blood Lotus Shop — "Decisive Heart" QoL. When the player owns this
-  // and a major breakthrough is pending, auto-fire confirm so the
-  // celebratory pause is skipped. The cultivation hook is already idem-
-  // potent on confirmMajorBreakthrough (no-op if nothing pending), and
-  // the post-confirm banner / spark-offer flow still runs — we're just
-  // saving a tap.
-  useEffect(() => {
-    if (!cultivation.pendingMajorBreakthrough) return;
-    if (!shopInventory.hasQol('qol_skip_bt_confirm')) return;
-    cultivation.confirmMajorBreakthrough?.();
-  }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
-
   // Blood Lotus Shop — "Disciple's Diligence" QoL state (toggle persists
-  // separately from the QoL ownership flag). The effect that uses these
-  // is declared lower in the file, after `producers` enters scope, to
-  // avoid a TDZ on the dependency array.
+  // separately from the QoL ownership flag). The effects that USE
+  // `cultivation` / `producers` (Decisive Heart auto-confirm + the
+  // auto-buy tick) live lower in the file, after those hooks enter
+  // scope, to avoid TDZ on their dependency arrays.
   const [autoBuyEnabled, setAutoBuyEnabled] = useState(() => {
     try { return localStorage.getItem('mai_autobuy_enabled') === '1'; } catch { return false; }
   });
@@ -292,6 +281,20 @@ function AppInner() {
     }, 1000);
     return () => clearInterval(id);
   }, [autoBuyEnabled, shopInventory, producers, cultivation]);
+
+  // Blood Lotus Shop — "Decisive Heart" QoL. When the player owns this
+  // and a major breakthrough is pending, auto-fire confirm so the
+  // celebratory pause is skipped. Declared here (after `cultivation`
+  // is in scope) to avoid a TDZ on the dep array. confirmMajorBreakthrough
+  // is already idempotent (no-op if nothing pending), and the post-
+  // confirm banner / spark-offer flow still runs — we're just saving
+  // the player a tap.
+  useEffect(() => {
+    if (!cultivation.pendingMajorBreakthrough) return;
+    if (!shopInventory.hasQol('qol_skip_bt_confirm')) return;
+    cultivation.confirmMajorBreakthrough?.();
+  }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
+
   const { clearedRegions, clearRegion } = useClearedRegions();
   const selections      = useLawOffers({ cultivation });
   // featureFlags is declared further down — useQiSparks reads its unlock
