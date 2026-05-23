@@ -12969,7 +12969,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   100%      { transform: translateX(230%);  }  /* HOLD off-screen */
 }
 /* Procession — pseudo on each stage wrapper, z above the two img
-   layers (color z:1, silhouette z:2) so the shine renders on top. */
+   layers (color z:1, silhouette z:2) so the shine renders on top.
+   `mask-image: var(--sprite-src)` clips the shine to the sprite's
+   actual alpha — the sweep only paints over the visible silhouette
+   pixels, never over the surrounding transparent box. Mask sizing
+   matches the sprite's object-fit/object-position so it aligns
+   pixel-perfect with the colour/silhouette image layers. */
 .bls-procession[data-slot="crystal"] .bls-proc-stage::before {
   content: '';
   position: absolute;
@@ -12982,13 +12987,23 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     rgba(255, 255, 255, 0.55) 50%,
     transparent 65%
   );
+  /* Mask the sweep to the sprite's alpha channel — uses --sprite-src
+     supplied per-stage via inline style on the stage wrapper. */
+  -webkit-mask-image: var(--sprite-src);
+          mask-image: var(--sprite-src);
+  -webkit-mask-size: contain;
+          mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: bottom center;
+          mask-position: bottom center;
   transform: translateX(-130%);
   animation: bls-crystal-shine 7s ease-out infinite;
   animation-delay: calc(var(--stage-index, 0) * -0.5s);
 }
 /* Regular tint card — pseudo on .bls-card-preview, but we already
-   use ::after for the glow halo. The card-body sits in the same
-   stacking context, so use ::before here instead. */
+   use ::after for the glow halo. Use ::before here for the shine.
+   Mask sized to match .bls-card-preview-sprite (88%, centred). */
 .bls-card[data-slot="crystal"] .bls-card-preview::before {
   content: '';
   position: absolute;
@@ -13001,6 +13016,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     rgba(255, 255, 255, 0.55) 50%,
     transparent 65%
   );
+  -webkit-mask-image: var(--sprite-src);
+          mask-image: var(--sprite-src);
+  /* Sprite renders at max 88% of preview box, centred — mask matches. */
+  -webkit-mask-size: 88% 88%;
+          mask-size: 88% 88%;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+          mask-position: center;
   transform: translateX(-130%);
   animation: bls-crystal-shine 7s ease-out infinite;
 }
