@@ -485,6 +485,112 @@ ELEMENTS = {
         ),
     },
 
+    # ── Idle Cultivation (offline_rate) — passive qi accrues while away ───────
+    "upgrade_offline_rate": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art emblem icon for a xianxia cultivation game upgrade — Idle Cultivation. "
+            "Match the reference image's overall composition: a circular jade-green and bronze "
+            "badge framing a clear centred subject. "
+            ""
+            "BORDER: a thick aged bronze-gold circular ring filling the outer ~20% of the icon, "
+            "carved with cloud-scroll relief in slightly darker bronze. Four small dark jade-"
+            "green square stud notches at N/S/E/W. A tiny bronze-gold tear-drop gem sits "
+            "centred at the very top (12 o'clock). The interior of the ring is fully transparent. "
+            ""
+            "SUBJECT (inside the ring): a small upright BRONZE CENSER / DING CAULDRON viewed "
+            "front-on, sitting at the bottom-centre of the field. It has three short squat legs, "
+            "an ornate handled lid, and a single small pale-cyan qi GLOW visible through the "
+            "seam where the lid meets the body. From the lid, three thin SMOKE CURLS of pale "
+            "cyan qi rise upward in graceful S-curves, spreading slightly as they ascend toward "
+            "the top of the icon — the qi smouldering quietly while the cultivator is away. "
+            "The cauldron is rendered in aged bronze with darker bronze shadow lines and small "
+            "1-pixel bright highlights catching the cauldron's curves. "
+            "Background behind the cauldron is deep charcoal-black so the bronze + cyan pop. "
+            ""
+            "Treatment: thick charcoal outlines, flat colour fills, no gradients. "
+            "Symmetrical horizontally. Reads as 'qi accrues slowly and steadily while idle'. "
+            ""
+            "Palette: aged bronze-gold (#8a5a2a) cauldron, ring border, gem; "
+            "dark jade green (#0f2520) ring studs; "
+            "pale cyan qi highlight (#7adcc4) smoke curls + cauldron seam glow; "
+            "deep charcoal (#0a0a0a) interior background; charcoal outline (#111). "
+            "No red, no purple, no human figure. "
+            f"{S}"
+        ),
+    },
+
+    # ── Deeper Slumber (offline_cap) — longer offline window ──────────────────
+    "upgrade_offline_cap": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art emblem icon for a xianxia cultivation game upgrade — Deeper Slumber. "
+            "Match the reference image's overall composition: a circular jade-green and bronze "
+            "badge framing a clear centred subject. "
+            ""
+            "BORDER: a thick aged bronze-gold circular ring filling the outer ~20% of the icon, "
+            "carved with cloud-scroll relief in slightly darker bronze. Four small dark jade-"
+            "green square stud notches at N/S/E/W. A tiny bronze-gold tear-drop gem sits "
+            "centred at the very top (12 o'clock). The interior of the ring is fully transparent. "
+            ""
+            "SUBJECT (inside the ring): a large CRESCENT MOON facing right (open side to the "
+            "right), rendered in pale bronze-gold (#c08a3a) with a slightly darker bronze "
+            "shadow on its lower edge. The crescent is fat and stylised, occupying the upper "
+            "two-thirds of the field. In the hollow of the crescent, a single bright pale-cyan "
+            "QI STAR sparkles — a 4-point star about 8 pixels wide with a 1-pixel cyan glow "
+            "around it. Below the moon, a thin layer of stylised RUYI CLOUD silhouettes drift "
+            "horizontally — two small bronze-shaded scroll-cloud puffs side by side at the "
+            "bottom of the field. "
+            "Background behind the moon is deep charcoal-black so the bronze moon and cyan "
+            "star pop with strong contrast. "
+            ""
+            "Treatment: thick charcoal outlines, flat colour fills, no gradients. "
+            "Reads as 'deeper night, qi pools longer while you slumber'. "
+            ""
+            "Palette: aged bronze-gold (#8a5a2a / #c08a3a) moon + ring + gem + cloud puffs; "
+            "dark jade green (#0f2520) ring studs; "
+            "pale cyan qi highlight (#7adcc4) star + glow; "
+            "deep charcoal (#0a0a0a) interior background; charcoal outline (#111). "
+            "No red, no purple, no human figure. "
+            f"{S}"
+        ),
+    },
+
+    # ── Shop nav button (Blood Lotus Shop on the top bar) ─────────────────────
+    # Match the simple bold-silhouette style of qi.png / karma.png. NO jade
+    # medallion frame, NO ring border, NO carved studs. Just one clean
+    # iconographic shape that reads instantly at small nav-button size.
+    "shop_nav": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon for a top-bar SHOP button in a xianxia cultivation game — the "
+            "Blood Lotus Shop. Match the bold-silhouette style of qi.png and karma.png — ONE "
+            "CLEAR SUBJECT filling the icon, NO outer ring frame, NO jade-bronze badge border, "
+            "NO studs. Just the subject on a transparent background, readable at small "
+            "nav-button size. "
+            ""
+            "SUBJECT: a single ornate CHINESE RED SILK COIN POUCH viewed front-on, filling "
+            "the icon. Plump and rounded, cinched at the top with a thin gold cord tied in a "
+            "neat bow. Body is deep BLOOD RED with darker red shading on the lower half "
+            "(suggesting weight from coins inside). On the front centre, a small stylised "
+            "PINK BLOOD-LOTUS blossom is embroidered (4-5 petals around a pink-gold centre) "
+            "— the shop's emblem. From the cinched top, a single pale-cyan qi MOTE drifts "
+            "upward (one small spark). Below the pouch, a short red SILK TASSEL hangs (knot "
+            "with two short strands). "
+            ""
+            "Treatment: thick charcoal outline around the pouch silhouette, flat colour fills, "
+            "no gradients, simple 1-pixel highlights along the upper-left edge for form. "
+            "Pixel-art style, 16-bit clean lines. Reads INSTANTLY as 'merchant pouch / shop'. "
+            ""
+            "Palette: deep BLOOD RED (#8a1a1a) pouch body, darker red (#5a1010) shadow side, "
+            "warm pink (#d05060) lotus embroidery, soft gold (#c89548) drawstring cord and "
+            "tassel knot, pale cyan (#7adcc4) qi mote, charcoal outline (#111). "
+            "NO ring border, NO jade frame, NO bronze studs, NO charcoal background fill — "
+            "background fully transparent. No human figure. "
+            f"{S}"
+        ),
+    },
+
     "upgrade_crystal_tap": {
         "size": (128, 128),
         "desc": (
@@ -741,6 +847,11 @@ def _style_ref_for(element_id):
     """
     if element_id.startswith("upgrade_") and element_id != "upgrade_focus":
         p = OUT_DIR / "upgrade_focus.png"
+        return p if p.exists() else None
+    if element_id == "shop_nav":
+        # Top-bar nav button — match the simple bold-silhouette orb style of
+        # qi.png / karma.png, NOT the framed upgrade-icon style.
+        p = OUT_DIR / "qi.png"
         return p if p.exists() else None
     if element_id == "karma":
         p = OUT_DIR / "qi.png"

@@ -4027,6 +4027,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .home-hud-lotus-shop:hover {
   background: rgba(220, 60, 80, 0.22);
 }
+.home-hud-lotus-shop-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: brightness(1.1);
+}
 
 /* Qi + Karma currency rows — sit right of the Blood Lotus button.
    Stacked vertically (2 rows) to fit the top bar's 48px height. */

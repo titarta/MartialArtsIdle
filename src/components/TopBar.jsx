@@ -64,7 +64,12 @@ export default function TopBar({
         onClick={onOpenLotusShop}
         aria-label="Blood Lotus Shop"
       >
-        🛍️
+        <img
+          src={`${BASE}ui/shop_nav.png`}
+          className="home-hud-lotus-shop-icon"
+          alt=""
+          draggable="false"
+        />
       </button>
       <div className="topbar-currencies">
         <div className="topbar-currency-row" aria-label="Current Qi">
