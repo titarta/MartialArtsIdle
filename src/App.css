@@ -16131,6 +16131,55 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: #ffe8a0;
 }
 
+/* Auto-buy toggle (Blood Lotus Shop QoL — Disciple's Diligence). Lives
+   in the buy-mode row but is a stand-alone toggle, not part of the
+   mutually-exclusive ×1/×10/×100 chip set. Pulsing dot signals "active"
+   so the player can spot from a glance that qi is being spent in the
+   background. */
+.cs-autobuy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 999px;
+  color: rgba(230, 235, 240, 0.75);
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  margin-left: 6px;
+}
+.cs-autobuy-chip:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.cs-autobuy-chip-on {
+  background: rgba(120, 230, 160, 0.14);
+  border-color: rgba(120, 230, 160, 0.5);
+  color: rgba(180, 250, 200, 1);
+}
+.cs-autobuy-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(180, 250, 200, 0.55);
+}
+.cs-autobuy-chip-on .cs-autobuy-dot {
+  background: rgba(120, 230, 160, 0.95);
+  box-shadow: 0 0 8px rgba(120, 230, 160, 0.65);
+  animation: cs-autobuy-pulse 1.6s ease-in-out infinite;
+}
+@keyframes cs-autobuy-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.18); }
+}
+
 .cs-list {
   display: flex;
   flex-direction: column;
@@ -17157,6 +17206,69 @@ button.pl-leader.pl-leader-clickable:focus-visible {
 .home-major-breakthrough-btn:focus-visible {
   outline: 2px solid rgba(255, 215, 130, 0.9);
   outline-offset: 2px;
+}
+
+/* Gate Bypass button — appears in the same .home-bar-wrap zone as the
+   BREAKTHROUGH button but is rendered only when the player is gated AND
+   has a Heaven's Pardon token in inventory. Visually distinct from the
+   BT button (cooler palette, dimmer glow) so they don't compete when
+   both could theoretically show. */
+.home-gate-bypass-btn {
+  position: absolute;
+  top: 4px;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc((100% - 32px) * 0.95);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 18px;
+  margin: 0;
+  border: 1px solid rgba(150, 200, 255, 0.55);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(28, 38, 70, 0.95), rgba(14, 18, 36, 0.95));
+  color: #d8e8ff;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 18px rgba(120, 180, 255, 0.25);
+  transition: transform 0.08s ease-out, filter 0.15s;
+}
+.home-gate-bypass-btn:hover  { filter: brightness(1.12); }
+.home-gate-bypass-btn:active { transform: translateX(-50%) scale(0.97); }
+.home-gate-bypass-icon {
+  font-size: 22px;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(150, 200, 255, 0.85);
+}
+.home-gate-bypass-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+}
+.home-gate-bypass-cta {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #f0f6ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+.home-gate-bypass-sub {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(200, 220, 255, 0.75);
+  font-variant-numeric: tabular-nums;
 }
 .home-mb-icon {
   color: #ffd66b;

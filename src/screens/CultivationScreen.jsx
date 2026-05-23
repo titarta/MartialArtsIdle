@@ -17,7 +17,13 @@ import { TUTORIAL_IDS } from '../data/tutorialCards';
  * Sticky header shows live qi + qi/s readouts (polled from refs to avoid
  * triggering useCultivation re-renders).
  */
-export default function CultivationScreen({ cultivation, producers, upgrades, crystal, qiSparks, initialTab, legendaryPoolInfo }) {
+export default function CultivationScreen({
+  cultivation, producers, upgrades, crystal, qiSparks, initialTab, legendaryPoolInfo,
+  // Blood Lotus Shop — "Disciple's Diligence" wiring. `autoBuyOwned` is
+  // the QoL ownership flag (hides the chip when false); `autoBuyEnabled`
+  // is the player's toggle state; `onToggleAutoBuy` flips it.
+  autoBuyOwned = false, autoBuyEnabled = false, onToggleAutoBuy,
+}) {
   // Default tab is 'producers' unless App.jsx navigated here with a specific
   // target ('sparks' from the home buff-chip's "View all sparks →" link).
   const [tab, setTab]         = useState(() => (initialTab === 'upgrades' || initialTab === 'sparks') ? initialTab : 'producers');
@@ -223,6 +229,23 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
               className={`cs-buy-mode-chip${buyMode === 100 ? ' cs-buy-mode-chip-active' : ''}`}
               onClick={() => setBuyMode(100)}
             >×100</button>
+            {/* Disciple's Diligence (Blood Lotus Shop QoL) — separate
+                toggle, not part of the mutually-exclusive buy-mode set.
+                Stays hidden until the player owns the unlock. Visual
+                emphasis when active so the player knows qi is being
+                spent in the background. */}
+            {autoBuyOwned && (
+              <button
+                type="button"
+                className={`cs-autobuy-chip${autoBuyEnabled ? ' cs-autobuy-chip-on' : ''}`}
+                onClick={onToggleAutoBuy}
+                aria-pressed={autoBuyEnabled}
+                aria-label={autoBuyEnabled ? 'Auto-buy is ON. Tap to disable.' : 'Auto-buy is OFF. Tap to enable.'}
+              >
+                <span className="cs-autobuy-dot" aria-hidden="true" />
+                Auto
+              </button>
+            )}
           </div>
           <div className="cs-list">
             {(() => {

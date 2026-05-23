@@ -988,6 +988,25 @@ export default function useCultivation() {
     // to render the BREAKTHROUGH button; tap fires `confirmMajorBreakthrough()`.
     pendingMajorBreakthrough,
     confirmMajorBreakthrough,
+    /**
+     * Blood Lotus Shop — "Heaven's Pardon" bypass token. Force-clears the
+     * qi/s gate. When the cleared gate was a major transition, this also
+     * flips `pendingMajorBreakthrough` to true so the BREAKTHROUGH button
+     * appears immediately for the player to confirm. Returns true iff a
+     * gate was active and got cleared. Caller is responsible for
+     * decrementing the consumable count BEFORE invoking this.
+     */
+    bypassGate: () => {
+      if (!gateRef.current) return false;
+      gateRef.current = null;
+      const idx = indexRef.current;
+      const isMajor = isMajorTransition(idx);
+      if (isMajor && !pendingMajorBreakthroughRef.current) {
+        pendingMajorBreakthroughRef.current = true;
+        setPendingMajorBreakthrough(true);
+      }
+      return true;
+    },
     ascended,
     // True only at the very final realm (Open Heaven Layer 6) so peak-stage
     // bar treatment is reserved for the actual endgame pinnacle. Per-realm

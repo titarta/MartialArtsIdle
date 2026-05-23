@@ -162,6 +162,21 @@ function AppInner() {
     cultivation.confirmMajorBreakthrough?.();
   }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
 
+  // Blood Lotus Shop — "Disciple's Diligence" QoL state (toggle persists
+  // separately from the QoL ownership flag). The effect that uses these
+  // is declared lower in the file, after `producers` enters scope, to
+  // avoid a TDZ on the dependency array.
+  const [autoBuyEnabled, setAutoBuyEnabled] = useState(() => {
+    try { return localStorage.getItem('mai_autobuy_enabled') === '1'; } catch { return false; }
+  });
+  const toggleAutoBuy = useCallback(() => {
+    setAutoBuyEnabled(prev => {
+      const next = !prev;
+      try { localStorage.setItem('mai_autobuy_enabled', next ? '1' : '0'); } catch {}
+      return next;
+    });
+  }, []);
+
   // Progress hub migration card — fires once per existing player who
   // remembers the old separate Journey + Achievements TopBar buttons.
   // Gated on having seen WELCOME so brand-new players don't get an
@@ -251,6 +266,31 @@ function AppInner() {
   }, [currentEvent]);
   const producers       = useProducers();
   const upgrades        = useUpgrades();
+
+  // Blood Lotus Shop — "Disciple's Diligence" auto-buy tick. Declared
+  // here (after `producers` enters scope) so the effect's dependency
+  // array doesn't TDZ. Runs only when the QoL is owned AND the toggle
+  // is enabled. Buys ONE cheapest-affordable producer per second so the
+  // tick doesn't fully drain qi the player wanted to save for crystal
+  // refines / breakthrough buffer.
+  useEffect(() => {
+    if (!autoBuyEnabled) return;
+    if (!shopInventory.hasQol('qol_autobuy_cheapest')) return;
+    const id = setInterval(() => {
+      let best = null;
+      for (const p of Object.values(PRODUCERS_BY_ID)) {
+        if (!producers.isUnlocked(p.id, cultivation.realmIndex)) continue;
+        const cost = producers.getCost(p.id, 1);
+        if (cost <= 0) continue;
+        if (cultivation.qiRef.current < cost) continue;
+        if (!best || cost < best.cost) best = { id: p.id, cost };
+      }
+      if (best && cultivation.spendQi?.(best.cost)) {
+        producers.buy(best.id, 1);
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [autoBuyEnabled, shopInventory, producers, cultivation]);
   const { clearedRegions, clearRegion } = useClearedRegions();
   const selections      = useLawOffers({ cultivation });
   // featureFlags is declared further down — useQiSparks reads its unlock
@@ -1328,7 +1368,7 @@ function AppInner() {
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
     // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} />,
     // Combat-adjacent screens are mounted only when FEATURES.combat is true.
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
@@ -1359,7 +1399,7 @@ function AppInner() {
       ? <ProductionScreen inventory={inventory} pills={pills} tree={tree} />
       : null,
     // The qi-investment shop — main loop of v1, always visible.
-    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} />,
+    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
     settings:   null,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}

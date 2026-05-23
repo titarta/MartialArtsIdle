@@ -154,6 +154,39 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
   );
 }
 
+/**
+ * Heaven's Pardon bypass button — appears beside the BREAKTHROUGH area
+ * ONLY when the player is currently gated on a major-realm transition
+ * AND has at least one Pardon token in inventory. Polls gateRef at
+ * 500 ms (the same cadence the existing tutorial-gate poll uses) so it
+ * shows/hides without forcing the host into per-frame re-renders.
+ */
+function GateBypassButton({ gateRef, tokenCount, onUse }) {
+  const [gateActive, setGateActive] = useState(false);
+  useEffect(() => {
+    if (!gateRef) return;
+    const tick = () => setGateActive(!!gateRef.current);
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [gateRef]);
+  if (!gateActive || tokenCount <= 0 || !onUse) return null;
+  return (
+    <button
+      type="button"
+      className="home-gate-bypass-btn"
+      onClick={onUse}
+      aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
+    >
+      <span className="home-gate-bypass-icon">☁️</span>
+      <span className="home-gate-bypass-body">
+        <span className="home-gate-bypass-cta">Bypass Gate</span>
+        <span className="home-gate-bypass-sub">Heaven&rsquo;s Pardon · ×{tokenCount}</span>
+      </span>
+    </button>
+  );
+}
+
 /** Current / target qi — single chip updated via rAF.
  *  During a major-realm gate, switches to showing Qi/s current / required. */
 function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, ascended }) {
@@ -1846,6 +1879,12 @@ function HomeScreen({
   crystalReservoirRef,
   crystalClickCapMinRef,
   collectCrystalReservoir,
+  // Blood Lotus Shop — Heaven's Pardon (major-BT gate bypass) wiring.
+  // bypassTokenCount = number of unused Pardon consumables in inventory;
+  // onUseBypassToken = decrement-and-clear-gate callback supplied by
+  // App.jsx (couples consumable use + cultivation.bypassGate atomically).
+  bypassTokenCount = 0,
+  onUseBypassToken,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -2625,6 +2664,12 @@ function HomeScreen({
                 <span className="home-mb-icon">▲</span>
               </button>
             )}
+            <GateBypassButton
+              gateRef={gateRef}
+              tokenCount={bypassTokenCount}
+              onUse={onUseBypassToken}
+            />
+
             <RealmProgressBar
               qiRef={qiRef}
               progressRef={qiEarnedThisRealmRef}
