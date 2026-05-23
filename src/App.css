@@ -12833,16 +12833,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .bls-proc-sprite-hidden {
-  /* True-black silhouette via the global SVG filter. */
+  /* True-black silhouette via the global SVG filter. Full opacity —
+     every silhouette is fully visible, no depth-fade. The recession
+     read comes entirely from the subtle scale ramp + z-stacking. */
   filter:
     url(#mai-silhouette)
     drop-shadow(0 3px 8px rgba(0, 0, 0, 0.8));
-  /* Gentler opacity fade than before — silhouettes stay clearly
-     visible to the back of the procession (0.85 → 0.7). The user
-     wants the late silhouettes READABLE; heavy fade would lose them. */
-  opacity: calc(
-    0.85 - (var(--stage-index, 0) * (0.15 / max(1, calc(var(--stage-count, 1) - 1))))
-  );
 }
 
 .bls-strip-footer {
