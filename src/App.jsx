@@ -1688,7 +1688,15 @@ function AppInner() {
                        onBack={() => navigate('home')}
                        onOpenTopUp={() => openModal('shop')}
                      />,
-    settings:   <SettingsScreen onBack={() => navigate('home')} />,
+    settings:   <SettingsScreen
+                  onBack={() => navigate('home')}
+                  realmName={cultivation.realmMajor}
+                  realmStage={cultivation.realmStage}
+                  realmIndex={cultivation.realmIndex}
+                  totalRealms={cultivation.totalRealms}
+                  lifeIndex={karma.lives}
+                  timePlayedSec={stats.lifetime?.timePlayed ?? 0}
+                />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
                      karmaEarnedThisLife={karma.karmaEarnedThisLife}

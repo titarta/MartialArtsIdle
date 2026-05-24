@@ -16,9 +16,35 @@ import {
   isResolutionSelectorAvailable,
 } from '../systems/desktopResolution';
 
+const BASE = import.meta.env.BASE_URL;
+
+// Mirrors JourneyBody.jsx REALM_ICONS. Kept local so SettingsScreen
+// renders the identity plaque without importing the journey body component.
+const REALM_ICONS = {
+  'Tempered Body':          `${BASE}ui/realms/tempered_body.png`,
+  'Qi Transformation':      `${BASE}ui/realms/qi_transformation.png`,
+  'True Element':           `${BASE}ui/realms/true_element.png`,
+  'Separation & Reunion':   `${BASE}ui/realms/separation_reunion.png`,
+  'Immortal Ascension':     `${BASE}ui/realms/immortal_ascension.png`,
+  'Saint':                  `${BASE}ui/realms/saint.png`,
+  'Saint King':             `${BASE}ui/realms/saint_king.png`,
+  'Origin Returning':       `${BASE}ui/realms/origin_returning.png`,
+  'Origin King':            `${BASE}ui/realms/origin_king.png`,
+  'Void King':              `${BASE}ui/realms/void_king.png`,
+  'Dao Source':             `${BASE}ui/realms/dao_source.png`,
+  'Emperor Realm':          `${BASE}ui/realms/emperor_realm.png`,
+  'Open Heaven':            `${BASE}ui/realms/open_heaven.png`,
+};
+
 const RENDERING_MODES = [
   { mode: 'auto',      label: 'Smooth',    sub: 'bilinear',  icon: '〜' },
   { mode: 'pixelated', label: 'Crisp',     sub: 'pixelated', icon: '▦' },
+];
+
+const AUDIO_CHANNELS = [
+  { channel: 'master', label: 'Master', volKey: 'masterVol', muteKey: 'masterMuted' },
+  { channel: 'bgm',    label: 'Music',  volKey: 'bgmVol',    muteKey: 'bgmMuted'    },
+  { channel: 'sfx',    label: 'Effects',volKey: 'sfxVol',    muteKey: 'sfxMuted'    },
 ];
 
 function SegmentedControl({ options, value, onChange }) {
@@ -55,10 +81,10 @@ function OptionGrid({ options, value, onChange }) {
   );
 }
 
-function ActionRow({ icon, label, sublabel, onClick, danger, disabled }) {
+function ActionRow({ icon, label, sublabel, onClick, disabled }) {
   return (
     <button
-      className={`stg-action-row${danger ? ' stg-action-danger' : ''}`}
+      className="stg-action-row"
       onClick={onClick}
       disabled={disabled}
     >
@@ -72,22 +98,40 @@ function ActionRow({ icon, label, sublabel, onClick, danger, disabled }) {
   );
 }
 
-const AUDIO_CHANNELS = [
-  { channel: 'master', label: 'Master', volKey: 'masterVol', muteKey: 'masterMuted' },
-  { channel: 'bgm',    label: 'Music',  volKey: 'bgmVol',    muteKey: 'bgmMuted'    },
-  { channel: 'sfx',    label: 'Effects',volKey: 'sfxVol',    muteKey: 'sfxMuted'    },
-];
+// Compact human duration for the identity plaque ("2.4d", "5h", "12m").
+function formatDuration(sec) {
+  if (!Number.isFinite(sec) || sec <= 0) return '0m';
+  const day = sec / 86400;
+  if (day >= 1) return `${day.toFixed(day < 10 ? 1 : 0)}d`;
+  const hr = sec / 3600;
+  if (hr >= 1) return `${Math.round(hr)}h`;
+  const m = Math.round(sec / 60);
+  return `${m}m`;
+}
 
 /**
- * Settings — full screen (post nav-audit). Lives in src/screens/ and routes via
- * navigate('settings'). The TopBar ⚙ entry pushes a real screen now instead of
- * a modal overlay; sections (Audio / Visuals / Rendering / Language / Save Data /
- * Danger Zone) all render full-bleed inside the standard .screen-container chrome.
+ * Settings — Cultivator Tablet (post visual-redesign).
  *
- * Visual treatment mirrors _design/nav-audit-mockups/settings-screen.html —
- * lacquer panel sections with a sticky-feeling header and a discrete back chip.
+ * Identity Plaque at the top: large Ma Shan Zheng "道" watermark, Cinzel
+ * "Settings" headline, current realm icon + name + stage, then three
+ * lifetime micro-stats (Lives, Realms Crossed, Time Cultivating). Below
+ * the plaque, six grouped cards: Audio, Visual Effects, Rendering Mode,
+ * Language, Save Data, Danger Path (quarantined, two-tap commit). All
+ * data-touching functionality preserved from the previous bare port.
+ *
+ * State plumbed as props from App.jsx — realm/lifeIndex/timePlayed are
+ * owned by useCultivation / useReincarnationKarma / useStats. Settings
+ * doesn't reach into the store from inside the component.
  */
-function SettingsScreen({ onBack }) {
+function SettingsScreen({
+  onBack,
+  realmName,
+  realmStage,
+  realmIndex = 0,
+  totalRealms = 0,
+  lifeIndex = 0,
+  timePlayedSec = 0,
+}) {
   const { t, i18n } = useTranslation('ui');
   const audio = useAudio();
 
@@ -155,30 +199,63 @@ function SettingsScreen({ onBack }) {
     window.location.reload();
   };
 
+  const realmIcon = realmName ? REALM_ICONS[realmName] : null;
+  const livesCount = (lifeIndex ?? 0) + 1;
+  const stagesCrossed = Math.max(0, realmIndex ?? 0);
+  const cultivatingDuration = formatDuration(timePlayedSec);
+
   return (
     <div className="settings-screen">
 
-      {/* Screen header — back chip + title block */}
-      <div className="stg-screen-head">
-        <button
-          className="stg-back-chip"
-          onClick={onBack}
-          aria-label={t('common.back')}
-        >
-          <span className="stg-back-arrow">‹</span> {t('common.back')}
-        </button>
-        <div className="stg-screen-title-block">
-          <div className="stg-screen-title">
-            <span className="stg-title-icon" aria-hidden="true">⚙</span>
-            {t('settings.title')}
+      {/* Back chip — sits above the plaque */}
+      <button
+        className="stg-back-chip"
+        onClick={onBack}
+        aria-label={t('common.back')}
+      >
+        <span className="stg-back-arrow">‹</span> {t('common.back')}
+      </button>
+
+      {/* IDENTITY PLAQUE */}
+      <div className="stg-identity" aria-label="Cultivator Tablet">
+        <div className="stg-identity-eyebrow">Cultivator Tablet</div>
+        <div className="stg-identity-title">{t('settings.title')}</div>
+        {realmName && (
+          <div className="stg-identity-realm">
+            {realmIcon ? (
+              <img
+                src={realmIcon}
+                alt=""
+                className="stg-identity-realm-icon"
+                draggable="false"
+              />
+            ) : (
+              <span className="stg-identity-realm-glyph" aria-hidden="true" />
+            )}
+            <span className="stg-identity-realm-name">{realmName}</span>
+            {realmStage && (
+              <span className="stg-identity-realm-stage">· {realmStage}</span>
+            )}
           </div>
-          <div className="stg-screen-sub">Audio · Visuals · Save Data</div>
+        )}
+        <div className="stg-identity-meta">
+          <span className="stg-identity-stat">
+            <b>{livesCount}</b> Lives
+          </span>
+          <span className="stg-identity-divider" aria-hidden="true" />
+          <span className="stg-identity-stat">
+            <b>{stagesCrossed}</b>{totalRealms > 0 ? ` / ${totalRealms - 1}` : ''} Realms
+          </span>
+          <span className="stg-identity-divider" aria-hidden="true" />
+          <span className="stg-identity-stat">
+            <b>{cultivatingDuration}</b> Cultivating
+          </span>
         </div>
       </div>
 
-      {/* Audio */}
+      {/* AUDIO */}
       <section className="stg-section">
-        <div className="stg-section-label">Audio</div>
+        <div className="stg-section-label stg-cinzel-label">Audio</div>
         <div className="stg-panel">
           {AUDIO_CHANNELS.map(({ channel, label, muteKey }) => {
             const muted    = audio.settings[muteKey];
@@ -220,7 +297,7 @@ function SettingsScreen({ onBack }) {
 
       {/* Visual effects */}
       <section className="stg-section">
-        <div className="stg-section-label">Visual Effects</div>
+        <div className="stg-section-label stg-cinzel-label">Visual Effects</div>
         <div className="stg-panel">
           <div className="stg-row">
             <div className="stg-row-info">
@@ -237,7 +314,7 @@ function SettingsScreen({ onBack }) {
 
       {/* Rendering mode */}
       <section className="stg-section">
-        <div className="stg-section-label">Rendering Mode</div>
+        <div className="stg-section-label stg-cinzel-label">Rendering Mode</div>
         <OptionGrid
           options={RENDERING_MODES}
           value={graphics.renderingMode}
@@ -248,7 +325,7 @@ function SettingsScreen({ onBack }) {
       {/* Resolution — desktop only */}
       {isDesktop && (
         <section className="stg-section">
-          <div className="stg-section-label">Window Resolution</div>
+          <div className="stg-section-label stg-cinzel-label">Window Resolution</div>
           <OptionGrid
             options={RESOLUTIONS}
             value={resolution}
@@ -259,7 +336,7 @@ function SettingsScreen({ onBack }) {
 
       {/* Language */}
       <section className="stg-section">
-        <div className="stg-section-label">{t('settings.language')}</div>
+        <div className="stg-section-label stg-cinzel-label">{t('settings.language')}</div>
         <div className="stg-panel">
           <div className="stg-lang-row">
             {SUPPORTED_LANGUAGES.map(lang => (
@@ -277,7 +354,7 @@ function SettingsScreen({ onBack }) {
 
       {/* Save data */}
       <section className="stg-section">
-        <div className="stg-section-label">{t('settings.saveData')}</div>
+        <div className="stg-section-label stg-cinzel-label">{t('settings.saveData')}</div>
 
         {message && (
           <div className={`stg-flash ${message.isError ? 'stg-flash-error' : 'stg-flash-ok'}`}>
@@ -316,10 +393,10 @@ function SettingsScreen({ onBack }) {
         )}
       </section>
 
-      {/* Danger zone */}
+      {/* Danger Path — quarantined card with two-tap commit */}
       <section className="stg-section stg-section-last">
-        <div className="stg-section-label stg-label-danger">Danger Zone</div>
-        <div className="stg-action-list">
+        <div className="stg-section-label stg-cinzel-label stg-label-danger">Danger Path</div>
+        <div className="stg-danger-card">
           {confirmWipe ? (
             <div className="stg-wipe-confirm">
               <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
@@ -329,13 +406,17 @@ function SettingsScreen({ onBack }) {
               </div>
             </div>
           ) : (
-            <ActionRow
-              icon="🗑"
-              label={t('settings.wipeSave')}
-              sublabel="Permanently delete all progress"
+            <button
+              className="stg-danger-row"
               onClick={() => setConfirmWipe(true)}
-              danger
-            />
+            >
+              <span className="stg-danger-icon">🗑</span>
+              <span className="stg-danger-body">
+                <span className="stg-danger-label">{t('settings.wipeSave')}</span>
+                <span className="stg-danger-sub">Permanently delete all progress. Requires two taps.</span>
+              </span>
+              <span className="stg-danger-chev">›</span>
+            </button>
           )}
         </div>
       </section>

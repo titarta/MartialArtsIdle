@@ -21391,3 +21391,261 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     animation: none !important;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SETTINGS — "Cultivator Tablet" visual redesign (2026-05-24)
+   Adds the IDENTITY PLAQUE at the top, applies Cinzel + gold filigree to
+   section labels, and introduces a quarantined Danger Path card with a
+   two-tap commit. All controls keep the legacy .stg-* primitives; this
+   block adds the new ornament without re-bikeshedding sliders or pills.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Identity plaque — lacquer face with a faint Ma Shan Zheng "道" watermark.
+   The plaque is the central design move: the screen reads as the player's
+   tablet, not a system form. */
+.stg-identity {
+  position: relative;
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 230, 200, 0.10), rgba(245, 230, 200, 0) 30%),
+    linear-gradient(160deg, rgba(46, 36, 24, 0.96) 0%, rgba(26, 20, 14, 0.96) 100%);
+  border: 1px solid rgba(212, 184, 136, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.05),
+    0 12px 28px -18px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+.stg-identity::before {
+  /* The "道" (Dao) calligraphy watermark — pinned top-right, very low
+     opacity so it reads as texture, not a label. */
+  content: "\9053";
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  position: absolute;
+  right: -10px;
+  top: -22px;
+  font-size: 120px;
+  color: rgba(220, 175, 110, 0.10);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.stg-identity-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  margin-bottom: 6px;
+  position: relative;
+  z-index: 1;
+}
+.stg-identity-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+  line-height: 1.1;
+  position: relative;
+  z-index: 1;
+}
+.stg-identity-realm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--ui-purple-soft);
+  position: relative;
+  z-index: 1;
+}
+.stg-identity-realm-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+.stg-identity-realm-glyph {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, #5d4426 0%, #2d2014 100%);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.stg-identity-realm-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+}
+.stg-identity-realm-stage {
+  color: rgba(var(--ui-label-rgb), 0.65);
+}
+.stg-identity-meta {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+.stg-identity-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.stg-identity-stat b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ui-purple-strong);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.stg-identity-divider {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: var(--ui-border, rgba(75, 60, 40, 0.6));
+  align-self: center;
+}
+
+/* Override the legacy .stg-section-label rule for the screen so each
+   section gets a Cinzel headline + thin gold filigree underline.
+   .stg-cinzel-label is the marker class — the legacy modal style still
+   wins where the marker isn't present. */
+.settings-screen .stg-section-label.stg-cinzel-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ui-purple-strong);
+  margin: 18px 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.settings-screen .stg-section-label.stg-cinzel-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(220, 175, 110, 0.45),
+    rgba(220, 175, 110, 0.05) 60%,
+    transparent
+  );
+}
+.settings-screen .stg-section-label.stg-cinzel-label.stg-label-danger {
+  color: #ff7878;
+}
+.settings-screen .stg-section-label.stg-cinzel-label.stg-label-danger::after {
+  background: linear-gradient(
+    90deg,
+    rgba(199, 72, 72, 0.45),
+    rgba(199, 72, 72, 0.05) 60%,
+    transparent
+  );
+}
+
+/* Cinzel-fy the audio labels so the screen reads as crafted lacquer
+   instead of a settings.app form. */
+.settings-screen .stg-audio-label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--ui-purple-light);
+  width: 60px;
+}
+.settings-screen .stg-row-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ui-purple-light);
+}
+.settings-screen .stg-option-label {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+.settings-screen .stg-option-sub {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Danger Path — quarantined card. Warm-red wash background, larger
+   tap target, two-tap commit flow handled by the JSX. */
+.stg-danger-card {
+  background:
+    linear-gradient(180deg, rgba(199, 72, 72, 0.10), transparent 60%),
+    rgba(var(--ui-bg-panel-rgb), 0.85);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 12px;
+  padding: 4px;
+}
+.stg-danger-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: #ffb4b4;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.stg-danger-row:hover {
+  background: rgba(199, 72, 72, 0.08);
+}
+.stg-danger-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(199, 72, 72, 0.15);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 8px;
+  color: #ff7878;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.stg-danger-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.stg-danger-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: #ff7878;
+  letter-spacing: 0.05em;
+}
+.stg-danger-sub {
+  font-size: 11px;
+  color: rgba(255, 180, 180, 0.65);
+}
+.stg-danger-chev {
+  font-size: 18px;
+  color: rgba(255, 180, 180, 0.55);
+  flex-shrink: 0;
+}
+
