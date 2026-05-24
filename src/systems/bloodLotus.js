@@ -50,13 +50,30 @@ export function spendBloodLotus(amount) {
 
 // ── IAP stubs — replace with platform SDK calls when ready ───────────────────
 
+// 2026-05-23 — Re-priced to create a real bonus ladder vs. the Handful baseline.
+// Tier 1 anchors the BL-per-$ rate; every successive tier adds a real, honest
+// bonus over baseline so the marketing chips in the IAP modal aren't lying.
+//
+//   tier              $        amount   BL/$    bonus vs T1
+//   Handful           0.99     300      303     —
+//   Pouch             4.99     1,750    351     +16%
+//   Chest            14.99     5,500    367     +21%
+//   Vault            29.99    11,700    390     +29%
+//   Treasury         49.99    21,000    420     +39%
+//   Heaven's Fortune 99.99    45,500    455     +50%
+//
+// Existing player balances on disk are untouched — this only changes the
+// amount granted on FUTURE purchases. The bigger packs now feel like real
+// deals (which is the point — the prior amounts gave almost-identical BL/$
+// across all tiers, so a Heaven's Fortune wasn't actually a better deal
+// than a Handful).
 export const BLOOD_LOTUS_PACKAGES = [
-  { id: 'blood_lotus_60',   amount: 300,   price: '$0.99',  label: 'Handful of Blood Lotus'  },
-  { id: 'blood_lotus_330',  amount: 1650,  price: '$4.99',  label: 'Pouch of Blood Lotus'    },
-  { id: 'blood_lotus_980',  amount: 4900,  price: '$14.99', label: 'Chest of Blood Lotus'    },
-  { id: 'blood_lotus_1980', amount: 9900,  price: '$29.99', label: 'Vault of Blood Lotus'    },
-  { id: 'blood_lotus_3280', amount: 16400, price: '$49.99', label: 'Treasury of Blood Lotus' },
-  { id: 'blood_lotus_6480', amount: 32400, price: '$99.99', label: 'Heaven\'s Fortune'       },
+  { id: 'blood_lotus_60',   amount: 300,    price: '$0.99',  label: 'Handful of Blood Lotus'  },
+  { id: 'blood_lotus_330',  amount: 1750,   price: '$4.99',  label: 'Pouch of Blood Lotus'    },
+  { id: 'blood_lotus_980',  amount: 5500,   price: '$14.99', label: 'Chest of Blood Lotus'    },
+  { id: 'blood_lotus_1980', amount: 11700,  price: '$29.99', label: 'Vault of Blood Lotus'    },
+  { id: 'blood_lotus_3280', amount: 21000,  price: '$49.99', label: 'Treasury of Blood Lotus' },
+  { id: 'blood_lotus_6480', amount: 45500,  price: '$99.99', label: 'Heaven\'s Fortune'       },
 ];
 
 export async function purchaseBloodLotus(packageId) {

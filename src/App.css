@@ -13180,164 +13180,572 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   margin-left: 6px;
 }
 
-/* ── Jade Shop Card ──────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────
+   Vermillion Bazaar — IAP "Top Up Blood Lotus" modal
+   ────────────────────────────────────────────────────────────────────────
+   The IAP modal that opens from the TopBar BL counter. Was previously a
+   floating top-left card; now centred in a standard modal-overlay so it
+   matches ProducerDetailModal / SelectionModal / BloodLotusSpendShopModal
+   chrome.
 
-/* Floating card — anchored below the HUD, no overlay */
+   Three pack layouts coexist in one grid:
+     .blshop-pack--small   → 2-col tile (T1–T4)
+     .blshop-pack--banner  → full-row mid-tier banner (T5 Treasury)
+     .blshop-pack--hero    → full-row premium card with shimmer (T6)
+
+   Per-tier metal escalation runs through the --tone modifier classes:
+     bronze → silver → gold → radiant
+   matching the realm-badge metal progression in JourneyBody.
+   The shop palette tokens (--shop-vermillion / --shop-ember / etc.) are
+   already defined further down the file for both .bls-modal and
+   .blood-lotus-shop-card — we reuse them here. */
+
+/* Modal panel — sits inside .modal-overlay, centred, breathes wider on
+   tablets/desktop to give the hero card room. */
 .blood-lotus-shop-card {
-  position: fixed;
-  top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 4px);
-  left: 8px;
-  z-index: 200;
-  background: rgba(14, 12, 30, 0.97);
-  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.35);
-  border-radius: 16px;
-  width: min(380px, calc(100vw - 16px));
-  max-height: calc(100svh - var(--top-bar-h) - var(--nav-h) - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);
-  overflow-y: auto;
-  padding: 16px;
+  position: relative;        /* overrides the legacy fixed positioning */
+  width: min(96vw, 520px);
+  max-height: var(--modal-max-h);
+  border-radius: 18px;
+  padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-  animation: blood-lotus-shop-in 0.18s ease-out;
+  overflow-y: auto;
+  animation: blshop-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Background, border, shadow are set by the shop-palette override block
+     further down the file (`.bls-modal, .blood-lotus-shop-card`). */
+}
+@keyframes blshop-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
 }
 
-@keyframes blood-lotus-shop-in {
-  from { opacity: 0; transform: translateY(-8px); }
+/* ── Header — eyebrow + Cinzel title + balance pip ─────────────────── */
+.blshop-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 36px 12px 4px;  /* right gap reserved for .modal-close */
+  border-bottom: 1px solid rgba(212, 168, 102, 0.18);
+}
+.blshop-title-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.blshop-eyebrow {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(212, 168, 102, 0.72);
+}
+.blshop-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #ffe8d4;
+  margin: 0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+.blshop-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(122, 16, 24, 0.32), rgba(74, 8, 16, 0.32));
+  border: 1px solid rgba(212, 168, 102, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 180, 0.16),
+              0 0 10px rgba(122, 16, 24, 0.22);
+  flex-shrink: 0;
+}
+.blshop-balance-icon {
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+.blshop-balance-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+.blshop-balance-label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 232, 212, 0.6);
+}
+.blshop-balance-amount {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #ffe8d4;
+  margin-top: 2px;
+}
+
+/* ── Toast strips for success/error after a purchase attempt ───────── */
+.blshop-toast {
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-align: center;
+  animation: blshop-toast-in 0.18s ease-out;
+}
+.blshop-toast--success {
+  background: linear-gradient(180deg, rgba(80, 200, 120, 0.18), rgba(40, 110, 70, 0.12));
+  border: 1px solid rgba(80, 200, 120, 0.45);
+  color: #b8f5ce;
+}
+.blshop-toast--error {
+  background: linear-gradient(180deg, rgba(220, 80, 80, 0.18), rgba(110, 30, 30, 0.12));
+  border: 1px solid rgba(220, 80, 80, 0.45);
+  color: #ffc8c8;
+}
+@keyframes blshop-toast-in {
+  from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.blood-lotus-shop-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  /* right padding reserved for the absolute .modal-close button */
-  padding: 0 44px 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  margin-bottom: 2px;
-}
-
-.blood-lotus-shop-icon {
-  width: 32px;
-  height: 32px;
-  filter: brightness(1.3) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
-}
-
-.blood-lotus-shop-title {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--ui-purple-light);
-}
-
-.blood-lotus-shop-success {
-  background: rgba(80, 200, 120, 0.12);
-  border: 1px solid rgba(80, 200, 120, 0.4);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  color: #6ee7a0;
-  text-align: center;
-}
-
-.blood-lotus-shop-error {
-  background: rgba(220, 80, 80, 0.12);
-  border: 1px solid rgba(220, 80, 80, 0.4);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  color: #f08080;
-  text-align: center;
-}
-
-.blood-lotus-shop-grid {
+/* ── Grid — 2 cols for small tiles, banner + hero span both ───────── */
+.blshop-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.blshop-pack--banner,
+.blshop-pack--hero {
+  grid-column: 1 / -1;
+}
 
-.blood-lotus-shop-item {
+/* ── Pack card — base ──────────────────────────────────────────────── */
+.blshop-pack {
   position: relative;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.2);
-  border-radius: 12px;
-  padding: 14px 10px;
+  /* overflow: visible so the top-centre badge can poke above the card.
+     The shimmer is contained via its own clip-path/border-radius below. */
+  overflow: visible;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  display: grid;
+  gap: 10px;
+  padding: 16px 14px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 168, 102, 0.28);
+  background:
+    linear-gradient(168deg, rgba(58, 14, 22, 0.85) 0%, rgba(28, 8, 12, 0.92) 100%);
+  transition: transform 0.16s ease, border-color 0.16s, box-shadow 0.16s, background 0.16s;
+}
+.blshop-pack:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(212, 168, 102, 0.6);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45),
+              0 0 16px rgba(212, 168, 102, 0.18),
+              inset 0 1px 0 rgba(255, 220, 180, 0.16);
+}
+.blshop-pack:disabled { cursor: default; }
+.blshop-pack.is-pending { opacity: 0.7; }
+
+/* Small (T1-T4) layout — stacked vertical card */
+.blshop-pack--small {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  text-align: center;
+}
+.blshop-pack--small .blshop-pack-icon {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.blshop-pack--small .blshop-pack-icon img {
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
+}
+.blshop-pack--small .blshop-pack-body {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
 }
-.blood-lotus-shop-item:hover:not(:disabled) {
-  background: rgba(var(--ui-purple-strong-rgb), 0.08);
-  border-color: rgba(var(--ui-purple-strong-rgb), 0.5);
-}
-.blood-lotus-shop-item:disabled { opacity: 0.5; cursor: default; }
-.blood-lotus-shop-item-pending { opacity: 0.7; }
 
-.blood-lotus-shop-badge {
+/* Banner (T5) — horizontal layout, mid-height, slightly richer trim */
+.blshop-pack--banner {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 14px 16px;
+}
+.blshop-pack--banner .blshop-pack-icon img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+}
+.blshop-pack--banner .blshop-pack-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Hero (T6 Heaven's Fortune) — full-width, richest treatment */
+.blshop-pack--hero {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 22px 20px 20px;
+  border-width: 1.5px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 215, 130, 0.18) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(74, 16, 22, 0.94) 0%, rgba(36, 10, 14, 0.95) 100%);
+}
+.blshop-pack--hero .blshop-pack-icon img {
+  width: 80px;
+  height: 80px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.7))
+          drop-shadow(0 0 14px rgba(255, 200, 120, 0.35));
+}
+.blshop-pack--hero .blshop-pack-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Tone variants — metal escalation across the ladder ───────────── */
+.blshop-pack--bronze {
+  border-color: rgba(160, 110, 60, 0.45);
+}
+.blshop-pack--silver {
+  border-color: rgba(170, 180, 195, 0.4);
+  box-shadow: inset 0 1px 0 rgba(200, 215, 230, 0.12);
+}
+.blshop-pack--gold {
+  border-color: rgba(212, 168, 102, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 160, 0.16),
+              0 0 18px rgba(212, 168, 102, 0.15);
+}
+.blshop-pack--radiant {
+  border-color: rgba(255, 215, 120, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.22),
+              0 0 28px rgba(255, 200, 120, 0.3),
+              0 12px 32px rgba(0, 0, 0, 0.55);
+}
+.blshop-pack--radiant:hover:not(:disabled) {
+  box-shadow: inset 0 1px 0 rgba(255, 235, 180, 0.32),
+              0 0 38px rgba(255, 200, 120, 0.45),
+              0 16px 36px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Hero shimmer — diagonal gold sweep across the card ───────────
+   Self-contained: inherits the card's border-radius so the shimmer
+   stays inside the rounded corners even though the pack itself uses
+   overflow: visible (to let the top-centre badge poke above). */
+.blshop-pack-shimmer {
   position: absolute;
-  top: -8px;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 230, 170, 0.18) 48%,
+    rgba(255, 245, 210, 0.32) 50%,
+    rgba(255, 230, 170, 0.18) 52%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  background-position: 200% 0;
+  mix-blend-mode: screen;
+  animation: blshop-shimmer 4.5s ease-in-out infinite;
+}
+@keyframes blshop-shimmer {
+  0%   { background-position: 200% 0; }
+  55%  { background-position: -120% 0; }
+  100% { background-position: -120% 0; }
+}
+
+/* ── Marketing badge — top-centre chip ─────────────────────────────── */
+.blshop-pack-badge {
+  position: absolute;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--ui-purple-light);
-  color: #12112a;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  z-index: 2;
+}
+.blshop-pack-badge--bronze {
+  background: linear-gradient(180deg, #d4a866 0%, #8a6a35 100%);
+  color: #1a0e08;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45),
+              inset 0 1px 0 rgba(255, 235, 180, 0.4);
+}
+.blshop-pack-badge--silver {
+  background: linear-gradient(180deg, #c8d0dc 0%, #6a7488 100%);
+  color: #14171f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45),
+              inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.blshop-pack-badge--gold {
+  background: linear-gradient(180deg, #ffd87a 0%, #b8862c 100%);
+  color: #1a0f04;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5),
+              0 0 12px rgba(255, 200, 100, 0.4),
+              inset 0 1px 0 rgba(255, 245, 200, 0.55);
+}
+.blshop-pack-badge--radiant {
+  padding: 4px 14px;
+  font-size: 11px;
+  background: linear-gradient(180deg, #fff0a8 0%, #ffd060 45%, #c89030 100%);
+  color: #1a0a02;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55),
+              0 0 20px rgba(255, 215, 120, 0.6),
+              inset 0 1px 0 rgba(255, 250, 220, 0.7);
+  animation: blshop-badge-pulse 2.6s ease-in-out infinite;
+}
+@keyframes blshop-badge-pulse {
+  0%, 100% { box-shadow: 0 3px 12px rgba(0, 0, 0, 0.55),
+                         0 0 20px rgba(255, 215, 120, 0.6),
+                         inset 0 1px 0 rgba(255, 250, 220, 0.7); }
+  50%      { box-shadow: 0 3px 14px rgba(0, 0, 0, 0.55),
+                         0 0 32px rgba(255, 215, 120, 0.85),
+                         inset 0 1px 0 rgba(255, 250, 220, 0.85); }
+}
+.blshop-pack-badge-flare {
+  font-size: 9px;
+  color: #fffacc;
+  text-shadow: 0 0 4px rgba(255, 220, 140, 0.9);
+}
+
+/* ── Bonus chip — top-right corner ─────────────────────────────────── */
+.blshop-pack-bonus {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #4a9778 0%, #1f5740 100%);
+  color: #e9fff1;
+  border: 1px solid rgba(180, 255, 210, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(220, 255, 230, 0.32);
+  z-index: 2;
+}
+.blshop-pack--radiant .blshop-pack-bonus {
+  padding: 4px 10px;
+  font-size: 13px;
+  background: linear-gradient(180deg, #6dd9a4 0%, #1a6a4a 100%);
+  border-color: rgba(220, 255, 235, 0.45);
+}
+
+/* ── Body content (label, amount, rate) ────────────────────────────── */
+.blshop-pack-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 232, 212, 0.85);
+  margin: 0;
+}
+.blshop-pack--banner .blshop-pack-label,
+.blshop-pack--hero   .blshop-pack-label {
+  font-size: 14px;
+}
+.blshop-pack--hero .blshop-pack-label {
+  font-size: 16px;
+  color: #ffe8b8;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5),
+               0 0 12px rgba(255, 200, 120, 0.35);
+}
+
+.blshop-pack-amount-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1;
+}
+.blshop-pack-amount {
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #ffe8d4;
+  letter-spacing: 0.01em;
+}
+.blshop-pack-amount-unit {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(255, 215, 170, 0.55);
+}
+.blshop-pack--banner .blshop-pack-amount { font-size: 26px; }
+.blshop-pack--hero   .blshop-pack-amount {
+  font-size: 32px;
+  background: linear-gradient(180deg, #fff5d0 0%, #f5c878 60%, #b8862c 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+          color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55));
+}
+
+.blshop-pack-rate {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 215, 170, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+.blshop-pack--gold    .blshop-pack-rate { color: rgba(255, 220, 150, 0.7); }
+.blshop-pack--radiant .blshop-pack-rate { color: rgba(255, 235, 180, 0.85); }
+
+/* ── Buy / price column ───────────────────────────────────────────── */
+.blshop-pack-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 88px;
+}
+.blshop-pack--small .blshop-pack-buy {
+  border-top: 1px solid rgba(212, 168, 102, 0.18);
+  padding-top: 8px;
+  margin-top: 4px;
+  width: 100%;
+}
+.blshop-pack--hero .blshop-pack-buy { min-width: 130px; }
+
+.blshop-pack-price-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.blshop-pack-strike {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 180, 180, 0.45);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 120, 120, 0.7);
+  text-decoration-thickness: 1.5px;
+}
+.blshop-pack-price {
+  font-size: 18px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #ffe8d4;
+  letter-spacing: 0.01em;
+}
+.blshop-pack--hero .blshop-pack-price {
+  font-size: 22px;
+  color: #fff5d0;
+  text-shadow: 0 0 10px rgba(255, 200, 120, 0.5);
+}
+.blshop-pack-price-pending {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 232, 212, 0.7);
+  letter-spacing: 0.06em;
+}
+.blshop-pack-save {
   font-size: 10px;
   font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6dd9a4;
   padding: 2px 8px;
-  border-radius: 10px;
-  white-space: nowrap;
+  border-radius: 6px;
+  background: rgba(74, 151, 120, 0.18);
+  border: 1px solid rgba(109, 217, 164, 0.35);
 }
-
-.blood-lotus-shop-item-icon {
-  width: 36px;
-  height: 36px;
-  filter: brightness(1.3);
-}
-
-.blood-lotus-shop-item-amount {
-  font-size: 20px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--ui-purple-light);
-}
-
-.blood-lotus-shop-item-label {
+.blshop-pack--hero .blshop-pack-save {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(var(--ui-label-rgb), 0.55);
-  text-align: center;
+  color: #b8ffd6;
+  background: rgba(74, 151, 120, 0.28);
+  border-color: rgba(180, 255, 210, 0.5);
+  box-shadow: 0 0 10px rgba(109, 217, 164, 0.35);
 }
 
-.blood-lotus-shop-item-price {
+/* ── Footer (fineprint + restore) ─────────────────────────────────── */
+.blshop-footer {
   margin-top: 4px;
-  font-size: 14px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: #fff;
+  padding-top: 12px;
+  border-top: 1px solid rgba(212, 168, 102, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-
-.blood-lotus-shop-restore {
+.blshop-fineprint {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 215, 170, 0.45);
+  flex: 1;
+  min-width: 0;
+}
+.blshop-restore {
   background: none;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(212, 168, 102, 0.4);
   border-radius: 999px;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 11px;
+  color: rgba(255, 232, 212, 0.7);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  padding: 9px 16px;
+  padding: 7px 14px;
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
+  font-family: inherit;
+  flex-shrink: 0;
 }
-.blood-lotus-shop-restore:hover {
-  color: rgba(255, 255, 255, 0.85);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.04);
+.blshop-restore:hover:not(:disabled) {
+  color: #ffe8d4;
+  border-color: rgba(212, 168, 102, 0.7);
+  background: rgba(212, 168, 102, 0.08);
+}
+.blshop-restore:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Mobile tightening — modal is full-width-ish on narrow screens. */
+@media (max-width: 420px) {
+  .blood-lotus-shop-card { padding: 14px 12px; gap: 12px; }
+  .blshop-header       { padding-right: 32px; gap: 8px; }
+  .blshop-title        { font-size: 17px; }
+  .blshop-pack--small  { padding: 14px 10px 12px; }
+  .blshop-pack--small .blshop-pack-icon img { width: 48px; height: 48px; }
+  .blshop-pack--hero   { padding: 18px 16px; }
+  .blshop-pack--hero .blshop-pack-icon img { width: 64px; height: 64px; }
+  .blshop-pack--hero .blshop-pack-amount   { font-size: 26px; }
+  .blshop-pack--hero .blshop-pack-price    { font-size: 18px; }
+  .blshop-footer { flex-direction: column; align-items: stretch; gap: 8px; }
+  .blshop-restore { align-self: center; }
 }
 
 /* ─── Progress hub HUD button ───────────────────────────────────────────
