@@ -8,7 +8,7 @@ import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './s
 import useShopInventory from './hooks/useShopInventory';
 import { SHOP_ITEMS_BY_ID } from './data/shopItems';
 import PillDrawer from './components/PillDrawer';
-import AnnalsModal from './components/AnnalsModal';
+import CodexModal from './components/CodexModal';
 import JourneyScreen from './screens/JourneyScreen';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
@@ -114,7 +114,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['shop', 'annals', 'pills', 'daily']);
+    const ours = new Set(['shop', 'codex', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -181,6 +181,19 @@ function AppInner() {
       !hasSeenTutorial(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION)
     ) {
       fireTutorialOnce(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION, enqueue);
+    }
+  }, [enqueue]);
+
+  // Annals → Codex migration card. Fires once per existing save (gated
+  // on WELCOME so new players never see it). Same precedent as the
+  // PROGRESS_HUB_MIGRATION fire above; the rename added a Wardrobe tab
+  // and we want returning players to know nothing was deleted.
+  useEffect(() => {
+    if (
+      hasSeenTutorial(TUTORIAL_IDS.WELCOME) &&
+      !hasSeenTutorial(TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION)
+    ) {
+      fireTutorialOnce(TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION, enqueue);
     }
   }, [enqueue]);
 
@@ -1750,7 +1763,7 @@ function AppInner() {
            dedicated spend surface. */
         onOpenShop={() => openModal('shop')}
         onOpenLotusShop={() => navigate('spirit-bazaar')}
-        onOpenProgress={() => openModal('annals', () => setHasNewAch(false))}
+        onOpenProgress={() => openModal('codex', () => setHasNewAch(false))}
         onOpenSettings={() => navigate('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
@@ -1855,12 +1868,14 @@ function AppInner() {
         />
       )}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
-      {activeModal === 'annals'       && (
-        <AnnalsModal
+      {activeModal === 'codex'        && (
+        <CodexModal
           achievements={achievements}
           stats={stats}
           qiRef={cultivation.qiRef}
           rateRef={cultivation.rateRef}
+          inventory={shopInventory}
+          onNavigateBazaar={() => navigate('spirit-bazaar')}
           onClose={() => setActiveModal(null)}
         />
       )}

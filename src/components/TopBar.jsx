@@ -158,14 +158,14 @@ export default function TopBar({
           ☸
         </button>
       )}
-      {/* Progress hub — single 📊 entry point that opens a tabbed modal
-          (Achievements + Stats; Journey was promoted to a bottom-nav screen
-          in the nav-audit pass). Achievement badge dot lives on this button
-          so the unread signal stays surfaced after consolidation. */}
+      {/* Codex — single 📊 entry point that opens a tabbed modal
+          (Wardrobe + Achievements + Stats). Achievement badge dot lives on
+          this button so the unread signal stays surfaced even after the
+          content-audit rename from "Annals" to "Codex". */}
       <button
-        className={`home-hud-progress${activeModal === 'annals' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-progress${activeModal === 'codex' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenProgress}
-        aria-label="Annals"
+        aria-label="Codex"
       >
         📊
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}

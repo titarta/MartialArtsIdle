@@ -1,26 +1,39 @@
 import { useState } from 'react';
 import AchievementsBody  from './AchievementsBody';
 import StatsBody         from './StatsBody';
+import WardrobeTab       from './WardrobeTab';
 
 /**
- * Annals — TopBar 📊 modal (post nav-audit).
+ * Codex — TopBar paper-roll modal (post content-audit).
  *
- * The old ProgressHubModal had three tabs (Journey / Achievements / Stats).
- * Journey was promoted to a full bottom-nav screen (see JourneyScreen.jsx);
- * Achievements + Stats are review surfaces that the player checks on briefly,
- * so they stay as a chip-anchored modal. Two tabs, default Achievements
- * (that's where the badge dot points to).
+ * Renamed from AnnalsModal. The audit added a third surface: Wardrobe.
+ * Owned cosmetics now live here (grouped by slot, equip / unequip in
+ * place) so the Bazaar can hide owned cards from its main grid. The
+ * Achievements + Stats tabs stay unchanged from the Annals build.
  *
- * Renamed from ProgressHubModal so the modal name matches the player-facing
- * label and so the activeModal key ('annals') doesn't lie about contents.
+ * Tab order: Wardrobe first (fashion is the most-visited surface after
+ * a cosmetic purchase), Achievements second (badge dot lives on the
+ * TopBar button), Stats third. Default tab is Wardrobe.
+ *
+ * A one-shot migration tutorial fires once per existing save to explain
+ * the rename (see ANNALS_TO_CODEX_MIGRATION in tutorialCards.js).
  */
 const TABS = [
+  { id: 'wardrobe',     label: 'Wardrobe'     },
   { id: 'achievements', label: 'Achievements' },
   { id: 'stats',        label: 'Stats'        },
 ];
 
-function AnnalsModal({ achievements, stats, qiRef, rateRef, onClose }) {
-  const [tab, setTab] = useState('achievements');
+function CodexModal({
+  achievements,
+  stats,
+  qiRef,
+  rateRef,
+  inventory,
+  onNavigateBazaar,
+  onClose,
+}) {
+  const [tab, setTab] = useState('wardrobe');
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -40,6 +53,15 @@ function AnnalsModal({ achievements, stats, qiRef, rateRef, onClose }) {
         </div>
 
         <div className="progress-hub-body">
+          {tab === 'wardrobe' && (
+            <WardrobeTab
+              inventory={inventory}
+              onBrowseBazaar={() => {
+                onClose?.();
+                onNavigateBazaar?.();
+              }}
+            />
+          )}
           {tab === 'achievements' && achievements && <AchievementsBody achievements={achievements} />}
           {tab === 'stats'        && (
             <StatsBody
@@ -55,4 +77,4 @@ function AnnalsModal({ achievements, stats, qiRef, rateRef, onClose }) {
   );
 }
 
-export default AnnalsModal;
+export default CodexModal;

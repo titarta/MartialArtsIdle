@@ -48,6 +48,12 @@ export const TUTORIAL_IDS = Object.freeze({
   // new Stats panel). New players never see it (they don't have prior
   // muscle memory to undo).
   PROGRESS_HUB_MIGRATION: 'progress_hub_migration',
+  // One-shot card for players upgrading from the build where the 📊 modal
+  // was called "Annals" and held only Achievements + Stats. The content-
+  // audit renamed it to "Codex" and added a Wardrobe tab as the first
+  // entry. Fires once per existing save so returning players know their
+  // Achievements and Stats are still there, just behind a new front door.
+  ANNALS_TO_CODEX_MIGRATION: 'annals_to_codex_migration',
 });
 
 /**
@@ -114,6 +120,12 @@ const CARDS = {
     kicker:  'Layout update',
     title:   'Journey, Achievements & Stats',
     body:    'Your Cultivation Journey and Achievements panels now live behind the 📊 Progress button at the top of the screen, alongside the new Statistics panel. One button, three tabs. Tap it whenever you want to see how far you\'ve climbed.',
+    ctaText: 'Got it',
+  },
+  [TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION]: {
+    kicker:  'Layout update',
+    title:   'Annals is now the Codex',
+    body:    'The 📊 button at the top is now your Codex. Your Achievements and Stats are still here, plus a new Wardrobe tab where every cosmetic you own lives. Tap any owned skin to equip it.',
     ctaText: 'Got it',
   },
 };
