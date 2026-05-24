@@ -8,7 +8,8 @@ import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './s
 import useShopInventory from './hooks/useShopInventory';
 import { SHOP_ITEMS_BY_ID } from './data/shopItems';
 import PillDrawer from './components/PillDrawer';
-import ProgressHubModal from './components/ProgressHubModal';
+import AnnalsModal from './components/AnnalsModal';
+import JourneyScreen from './screens/JourneyScreen';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
@@ -113,7 +114,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['shop', 'lotus-shop', 'progress', 'pills', 'daily']);
+    const ours = new Set(['shop', 'lotus-shop', 'annals', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -1679,6 +1680,7 @@ function AppInner() {
       : null,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
+    journey:    <JourneyScreen realmIndex={cultivation.realmIndex} />,
     settings:   <SettingsScreen onBack={() => navigate('home')} />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
@@ -1733,7 +1735,7 @@ function AppInner() {
            dedicated spend surface. */
         onOpenShop={() => openModal('shop')}
         onOpenLotusShop={() => openModal('lotus-shop')}
-        onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
+        onOpenProgress={() => openModal('annals', () => setHasNewAch(false))}
         onOpenSettings={() => navigate('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
@@ -1845,9 +1847,8 @@ function AppInner() {
           onOpenTopUp={() => openModal('shop')}
         />
       )}
-      {activeModal === 'progress'     && (
-        <ProgressHubModal
-          realmIndex={cultivation.realmIndex}
+      {activeModal === 'annals'       && (
+        <AnnalsModal
           achievements={achievements}
           stats={stats}
           qiRef={cultivation.qiRef}

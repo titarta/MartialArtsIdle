@@ -8,6 +8,10 @@ const SCREENS = [
   // The qi-investment shop (Cookie-Clicker-style producers + upgrades).
   // Reuses training.png as a placeholder sprite until a dedicated icon ships.
   { id: 'cultivation',  tKey: 'nav.cultivation', sprite: 'training'  },
+  // Journey — chronicle screen promoted out of the ProgressHubModal during
+  // the nav-audit (verdict: place-you-live-in, not a check-on surface).
+  // Emoji glyph until a dedicated 📜 pixel-art nav icon ships.
+  { id: 'journey',      tKey: 'nav.journey',     emoji: '📜'         },
   { id: 'worlds',       tKey: 'nav.worlds'                            },
   { id: 'character',    tKey: 'nav.character'                         },
   { id: 'collection',   tKey: 'nav.collection', sprite: 'inventory'  },

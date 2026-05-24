@@ -1,34 +1,26 @@
 import { useState } from 'react';
-import JourneyBody       from './JourneyBody';
 import AchievementsBody  from './AchievementsBody';
 import StatsBody         from './StatsBody';
 
 /**
- * Progress Hub modal — consolidates the three "look at how I'm doing"
- * surfaces (Cultivation Journey, Achievements, and the new Stats panel)
- * into a single modal with a three-tab chip row at the top.
+ * Annals — TopBar 📊 modal (post nav-audit).
  *
- * Net effect on the TopBar: replaces the previous 🗺️ Journey + 🏆
- * Achievements buttons with one 📊 Progress button — small wins on
- * mobile screen real estate, and a place to land the new Stats screen
- * without claiming a 7th nav slot.
+ * The old ProgressHubModal had three tabs (Journey / Achievements / Stats).
+ * Journey was promoted to a full bottom-nav screen (see JourneyScreen.jsx);
+ * Achievements + Stats are review surfaces that the player checks on briefly,
+ * so they stay as a chip-anchored modal. Two tabs, default Achievements
+ * (that's where the badge dot points to).
  *
- * Tab state is local — no persistence. Default landing is "Journey"
- * because it's the most-used of the three; players opening the hub
- * usually want to see "where am I at" most of the time.
- *
- * Reuses the existing .achievements-modal panel chrome + the .ach-tabs
- * chip-row pattern, both of which are already canonical after the
- * visual-consistency pass.
+ * Renamed from ProgressHubModal so the modal name matches the player-facing
+ * label and so the activeModal key ('annals') doesn't lie about contents.
  */
 const TABS = [
-  { id: 'journey',      label: 'Journey'      },
   { id: 'achievements', label: 'Achievements' },
   { id: 'stats',        label: 'Stats'        },
 ];
 
-function ProgressHubModal({ realmIndex, achievements, stats, qiRef, rateRef, onClose }) {
-  const [tab, setTab] = useState('journey');
+function AnnalsModal({ achievements, stats, qiRef, rateRef, onClose }) {
+  const [tab, setTab] = useState('achievements');
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -48,7 +40,6 @@ function ProgressHubModal({ realmIndex, achievements, stats, qiRef, rateRef, onC
         </div>
 
         <div className="progress-hub-body">
-          {tab === 'journey'      && <JourneyBody realmIndex={realmIndex} />}
           {tab === 'achievements' && achievements && <AchievementsBody achievements={achievements} />}
           {tab === 'stats'        && (
             <StatsBody
@@ -64,4 +55,4 @@ function ProgressHubModal({ realmIndex, achievements, stats, qiRef, rateRef, onC
   );
 }
 
-export default ProgressHubModal;
+export default AnnalsModal;

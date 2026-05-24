@@ -55,6 +55,15 @@ const BASELINE = {
     hint: null,
     unlockMsg: null,
   },
+  // Journey — chronicle screen promoted out of the ProgressHub modal during
+  // the nav-audit. Always available since the realm list is meaningful even
+  // at realm 0 (gives the player a sense of the road ahead).
+  journey: {
+    gate: { type: 'always' },
+    desc: null,
+    hint: null,
+    unlockMsg: null,
+  },
   worlds: {
     // Wrapped behind FEATURES.combat — hidden in v1.
     gate: flagged({ type: 'realm', minRealmIndex: 2 }, 'combat'),

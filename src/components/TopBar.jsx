@@ -104,9 +104,9 @@ export default function TopBar({
           in the nav-audit pass). Achievement badge dot lives on this button
           so the unread signal stays surfaced after consolidation. */}
       <button
-        className={`home-hud-progress${activeModal === 'progress' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-progress${activeModal === 'annals' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenProgress}
-        aria-label="Progress"
+        aria-label="Annals"
       >
         📊
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
