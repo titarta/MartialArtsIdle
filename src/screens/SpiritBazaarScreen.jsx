@@ -492,6 +492,13 @@ export default function SpiritBazaarScreen({
   const bodyRef = useRef(null);
   const railRef = useRef(null);
   const indicatorRef = useRef(null);
+  // After a tap-driven jumpTo, the smooth scroll passes through other
+  // sections. During that window we lock the active tab to whatever the
+  // tap chose, so the IntersectionObserver can't "steal" the indicator
+  // onto a neighbour section before the scroll settles. Cleared 600ms
+  // after the tap (enough for smooth scrolls under normal section
+  // distances at the default browser easing).
+  const scrollLockUntilRef = useRef(0);
 
   const itemsByCategory = useMemo(() => {
     const out = new Map();
@@ -537,12 +544,17 @@ export default function SpiritBazaarScreen({
 
   const jumpTo = (id, cat) => {
     const target = bodyRef.current?.querySelector(`#${id}`);
-    if (!target || !bodyRef.current) return;
-    if (cat) setActiveCat(cat);
-    bodyRef.current.scrollTo({
-      top: target.offsetTop - 8,
-      behavior: 'smooth',
-    });
+    if (!target) return;
+    if (cat) {
+      setActiveCat(cat);
+      // Lock the active state for 600ms so the IO can't steal it onto
+      // a short neighbour section while the smooth scroll is en route.
+      scrollLockUntilRef.current = Date.now() + 600;
+    }
+    // scrollIntoView respects scroll-margin-top on .bls-section (52px
+    // for the sticky rail clearance), landing the section header
+    // exactly below the rail rather than buried behind it.
+    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
   };
 
   // Track which aisle is on screen so the rail's active chip follows the
@@ -562,6 +574,10 @@ export default function SpiritBazaarScreen({
       'sec-cosmetic':   'cosmetic',
     };
     const io = new IntersectionObserver((entries) => {
+      // While a tap-driven smooth scroll is in flight, respect the locked
+      // active state — don't let the scroll passing through neighbouring
+      // sections steal the indicator before it lands.
+      if (Date.now() < scrollLockUntilRef.current) return;
       // Pick the entry with the largest intersection ratio that's actually
       // intersecting; ignore entries that just exited the viewport.
       const visible = entries.filter(e => e.isIntersecting);
@@ -572,8 +588,11 @@ export default function SpiritBazaarScreen({
       if (cat) setActiveCat(cat);
     }, {
       root,
-      // top sticky-rail clears ~50px so push the trigger band down a bit
-      rootMargin: '-60px 0px -45% 0px',
+      // Trigger band starts just below the sticky rail (52px) and ends
+      // at 60% from the bottom. Tight enough that short sections
+      // (Consumables, QoL with 1 tile each) can still win the band when
+      // the player has explicitly scrolled them into the upper viewport.
+      rootMargin: '-52px 0px -60% 0px',
       threshold: [0, 0.25, 0.5, 0.75, 1],
     });
     targets.forEach(t => io.observe(t));
