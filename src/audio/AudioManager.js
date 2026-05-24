@@ -182,29 +182,67 @@ function _getSfxHowls(sfxId) {
   return howls;
 }
 
-// ── Page Visibility ───────────────────────────────────────────────────────────
+// ── AudioContext lifecycle (iOS Safari hardening) ────────────────────────────
+// iOS Safari forcibly puts the AudioContext into 'suspended' (or its own
+// 'interrupted' state) when the page is backgrounded via the app switcher.
+// When the player returns, the context is still suspended unless explicitly
+// resumed. Howler.play() on a suspended context is a silent no-op. The fix
+// is a small ladder of safeguards:
+//
+//   1. visibilitychange: pause BGM on hide, ensure context + resume BGM on
+//      show. Same as before, with the explicit context resume added.
+//   2. pagehide / pageshow: iOS bfcache path can fire these even when
+//      visibilitychange does not. Idempotent; safe to layer with (1).
+//   3. ensureContextRunning() as a safety net inside playBgm and playSfx
+//      so a stale suspended context can never silently swallow audio
+//      after a future user gesture.
+//
+// The original "crash sound" reported on iOS came from the AudioContext
+// being yanked mid-buffer; pausing BGM proactively in pagehide silences
+// the buffer before iOS can interrupt it.
+
+function ensureContextRunning() {
+  const ctx = Howler.ctx;
+  if (!ctx) return;
+  // 'running' is the only state where audio actually plays. Any other
+  // state ('suspended', iOS-only 'interrupted', or 'closed') needs an
+  // explicit resume(). Idempotent on 'running' contexts.
+  if (ctx.state !== 'running') {
+    ctx.resume().catch(() => {});
+  }
+}
+
+function pauseAllBgmForBackground() {
+  // Pause EVERY cached BGM howl, not just bgmHowl. A rapid screen swap
+  // can leave a previous track mid-fadeout; once bgmHowl moves on, that
+  // orphan keeps playing audibly in the hidden tab until its stop timer
+  // eventually fires (and timers are throttled in hidden tabs).
+  for (const howl of Object.values(bgmCache)) {
+    if (howl.playing()) howl.pause();
+  }
+  bgmPaused = !!bgmHowl;
+}
+
+function resumeBgmFromBackground() {
+  ensureContextRunning();
+  if (bgmPaused && !adPlaying && bgmHowl) {
+    bgmHowl.play();
+    bgmHowl.fade(bgmHowl.volume(), effectiveBgmVol(), 400);
+  }
+  bgmPaused = false;
+}
 
 if (typeof document !== 'undefined') {
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      // Pause EVERY cached BGM howl, not just bgmHowl. A rapid screen swap
-      // can leave a previous track mid-fadeout — once bgmHowl moves on, that
-      // orphan would keep playing audibly in the hidden tab until its stop
-      // timer eventually fires (and timers are throttled in hidden tabs).
-      for (const howl of Object.values(bgmCache)) {
-        if (howl.playing()) howl.pause();
-      }
-      bgmPaused = !!bgmHowl;
-    } else if (bgmPaused && !adPlaying) {
-      // Resume only the current bgmHowl. Orphans stay paused — their
-      // pending stop timers will clean them up.
-      if (bgmHowl) {
-        bgmHowl.play();
-        bgmHowl.fade(bgmHowl.volume(), effectiveBgmVol(), 400);
-      }
-      bgmPaused = false;
-    }
+    if (document.hidden) pauseAllBgmForBackground();
+    else                 resumeBgmFromBackground();
   });
+}
+if (typeof window !== 'undefined') {
+  // iOS Safari bfcache path. Fires reliably on app-switcher background
+  // and return, even in cases where visibilitychange does not.
+  window.addEventListener('pagehide', pauseAllBgmForBackground);
+  window.addEventListener('pageshow', resumeBgmFromBackground);
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -223,6 +261,10 @@ const AudioManager = {
       pendingBgmTrackId = trackId;
       return;
     }
+    // Safety net: if iOS Safari (or any browser) suspended the context
+    // while the app was backgrounded and our visibility/pageshow handlers
+    // missed the resume for some reason, the next BGM call still wakes it.
+    ensureContextRunning();
     if (bgmTrackId === trackId && bgmHowl?.playing()) return;
 
     // Fade out old track simultaneously with new one fading in (true crossfade)
@@ -277,6 +319,10 @@ const AudioManager = {
    */
   playSfx(sfxId, { rate } = {}) {
     if (!unlocked) return;
+    // Safety net (see playBgm). Cheap idempotent check that keeps SFX
+    // alive even if a backgrounding event somehow left the context
+    // suspended without our handlers seeing it.
+    ensureContextRunning();
 
     const vol = effectiveSfxVol();
     if (vol === 0) return;
