@@ -123,7 +123,12 @@ function SparkCardSlot({ sparkId, onPick }) {
 
         {(isUncommon || isLegendary) && (
           <span className="spk-seal" aria-hidden="true">
-            {sealGlyph ?? (isLegendary ? '灵' : '玉')}
+            {/* Fallback glyphs are picked from the bundled Ma Shan Zheng
+                subset (~200 common Simplified chars). 道 (dao, the way)
+                visually rhymes with the picker's watermark; 玉 (jade)
+                matches the uncommon rarity name. Per-spark overrides
+                via SPARK_COPY[id].sealGlyph still take precedence. */}
+            {sealGlyph ?? (isLegendary ? '道' : '玉')}
           </span>
         )}
       </article>

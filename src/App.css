@@ -2991,23 +2991,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 /* Giant faint 灵 (líng / spirit) watermark behind the modal. */
 .spk-overlay::before {
-  content: '灵';
+  /* 道 (dào, the way / path of cultivation). Switched from 灵 because
+     灵 was not in the bundled Ma Shan Zheng subset, so browsers fell
+     through to a system serif and rendered with squareish printed
+     strokes instead of brush calligraphy. 道 IS in the bundle (also
+     used on the Identity plaque) and lands as the intended brush
+     stroke style. Thematically still right: the picker is a moment
+     of dao realisation. */
+  content: '道';
   position: absolute;
   top: 8%;
   left: 50%;
   transform: translateX(-50%);
-  /* Ma Shan Zheng is the bundled Chinese brush-calligraphy font;
-     covers ~200 common Simplified chars including 灵. Explicit
-     font-weight 400 matches the single weight in the loaded woff2
-     and prevents browsers from synthesising a fake bold. */
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
   font-weight: 400;
   font-size: clamp(320px, 90vw, 520px);
   line-height: 1;
-  /* Slightly more visible than the previous 0.030 so the brush
-     strokes can actually read against the incense beams (which sit
-     at 0.08). Still well below "decorative" intensity — the
-     character is a quiet signature, not a focal element. */
+  /* Quiet brush signature; sits at parity with the incense beams
+     (which are 0.08) so it reads as deliberate background, not a
+     focal element. */
   color: rgba(200, 151, 100, 0.075);
   pointer-events: none;
   z-index: 0;
