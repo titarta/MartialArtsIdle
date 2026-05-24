@@ -116,21 +116,15 @@ function SparkCardSlot({ sparkId, onPick }) {
           </div>
           <hr className="spk-rule" />
           <h3 className="spk-name">{card.name}</h3>
-          <p className="spk-effect">{renderEffect(effectText)}</p>
+          <div className="spk-effect-wrap">
+            <p className="spk-effect">{renderEffect(effectText)}</p>
+          </div>
         </div>
 
         {(isUncommon || isLegendary) && (
           <span className="spk-seal" aria-hidden="true">{sealGlyph ?? (isLegendary ? '✦' : '玉')}</span>
         )}
       </article>
-
-      <button
-        type="button"
-        className="spk-pick"
-        onClick={(e) => { e.stopPropagation(); onPick(sparkId); }}
-      >
-        Pick
-      </button>
     </div>
   );
 }

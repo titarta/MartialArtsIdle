@@ -3071,7 +3071,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* ── The card itself ─────────────────────────────────────────────── */
 .spk-card {
   position: relative;
-  height: 282px;
+  /* Was 282 plus a separate 56px pick button beneath. The dedicated
+     button is gone; the card is the action target, and it absorbs
+     the freed vertical space so long descriptions get the room they
+     need. Slot footprint stays roughly the same. */
+  height: 340px;
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
@@ -3088,8 +3092,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     0 -2px 0 rgba(0, 0, 0, 0.5)       inset,
     0 8px 20px -10px rgba(0, 0, 0, 0.85);
 }
-.spk-card:hover            { transform: translateY(-3px); }
-.spk-card:focus-visible    {
+.spk-card:hover         { transform: translateY(-3px); }
+/* Press feedback. With the explicit Pick button gone the card IS
+   the button, so a tactile settle on tap matters. The transition is
+   faster than the hover lift so the press feels immediate. */
+.spk-card:active {
+  transform: translateY(-1px) scale(0.992);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.5)       inset,
+    0 3px 8px -3px rgba(0, 0, 0, 0.75);
+}
+.spk-card:focus-visible {
   outline: none;
   box-shadow:
     0 1px 0 rgba(244, 230, 200, 0.06) inset,
@@ -3481,44 +3496,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     0 0 6px  rgba(212, 80, 50, 0.5);
 }
 
-/* ── Pick button ─────────────────────────────────────────────────── */
-.spk-pick {
-  margin-top: 12px;
-  padding: 13px 8px;
-  min-height: 44px;
-  width: 100%;
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--spk-cream);
-  background: linear-gradient(180deg, #2c2418 0%, #1a140c 100%);
-  border: 1px solid var(--spk-bronze-soft);
-  border-radius: 7px;
-  cursor: pointer;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
-  padding-left: calc(8px + 0.28em);
-  transition: filter 120ms ease, transform 80ms ease;
-  box-shadow:
-    0 1px 0 rgba(244, 230, 200, 0.10) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.5)       inset,
-    0 4px 10px -4px rgba(0, 0, 0, 0.75);
-}
-.spk-pick:hover  { filter: brightness(1.18); }
-.spk-pick:active {
-  transform: translateY(1px);
-  box-shadow:
-    0 1px 0 rgba(244, 230, 200, 0.06) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.5)       inset,
-    0 1px 4px -2px rgba(0, 0, 0, 0.7);
-}
-.spk-slot-uncommon  .spk-pick { border-color: var(--spk-jade-soft); }
-.spk-slot-legendary .spk-pick {
-  border-color: var(--spk-gold-soft);
-  background: linear-gradient(180deg, #3a2c14 0%, #1f1608 100%);
-  color: #fff4d4;
-}
+/* The explicit Pick button was removed. The card itself is the
+   action target now (role="button" with onClick on .spk-card). The
+   .spk-card :hover / :active / :focus-visible rules above handle
+   the full press affordance; no separate button needed. */
 
 /* ── Actions row (reroll + meta) ─────────────────────────────────── */
 .spk-actions {
@@ -3548,22 +3529,24 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--spk-bronze);
-  background: rgba(200, 151, 100, 0.08);
+  color: #e8c184;
+  /* Bumped from 0.08 to 0.18: was a ghost film, now reads as an
+     actual button surface against the dark overlay. */
+  background: rgba(200, 151, 100, 0.18);
   border: 1px solid var(--spk-bronze-soft);
   border-radius: 999px;
   cursor: pointer;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
   transition: filter 120ms ease, background 120ms ease, color 120ms ease;
   padding-left: calc(22px + 0.24em);
 }
-.spk-reroll:hover         { filter: brightness(1.2); background: rgba(200, 151, 100, 0.14); }
+.spk-reroll:hover         { filter: brightness(1.18); background: rgba(200, 151, 100, 0.26); }
 .spk-reroll:disabled      { cursor: not-allowed; opacity: 0.55; filter: grayscale(0.4); }
 .spk-reroll-locked        { opacity: 0.5; cursor: not-allowed; }
 .spk-reroll-free {
-  color: var(--spk-jade);
-  background: rgba(110, 201, 138, 0.10);
-  border-color: rgba(110, 201, 138, 0.55);
+  color: #a5e7be;
+  background: rgba(110, 201, 138, 0.20);
+  border-color: rgba(110, 201, 138, 0.60);
 }
 .spk-reroll-cost {
   font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
@@ -3576,8 +3559,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .spk-meta {
   font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
-  font-size: 11px;
-  color: var(--spk-cream-fade);
+  font-size: 11.5px;
+  /* Was --spk-cream-fade (42% opacity), barely readable on the dark
+     altar background. Bumped to a brighter cream plus a small text
+     shadow for crispness against the gradient. */
+  color: rgba(244, 230, 200, 0.82);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
   letter-spacing: 0.02em;
   display: flex;
   flex-wrap: wrap;
@@ -3591,7 +3578,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   max-width: 320px;
 }
 .spk-meta strong { color: var(--spk-gold-bright); font-weight: 600; }
-.spk-meta-sep    { color: rgba(200, 151, 100, 0.3); }
+.spk-meta-sep    { color: rgba(200, 151, 100, 0.55); }
 .spk-meta-locked { color: var(--spk-bronze); }
 .spk-meta-pity-now {
   color: var(--spk-gold-bright);
@@ -3604,7 +3591,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    the focal point but scales down proportionally with the card. */
 @media (max-width: 380px) {
   .spk-slot       { width: 148px; }
-  .spk-card       { height: 274px; padding: 14px 10px; }
+  .spk-card       { height: 318px; padding: 14px 10px; }
   .spk-pair       { gap: 12px; }
   .spk-icon-area  { width: 80px; height: 80px; }
   .spk-icon-glyph { font-size: 54px; }
@@ -4104,8 +4091,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 
-  .sc-fullbleed,
-  .screen-container:has(.home-screen) {
+  .sc-fullbleed {
     padding: 0;
     max-width: 100%;
     margin: 0;
@@ -4648,9 +4634,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    ignoring body padding.  The HUD bar handles its own safe-area-inset-top;
    .home-bg covers the full screen behind it.  No scroll, no clipping.        */
 
-/* Screen-container still strips its padding so the fixed child doesn't
-   create a tall empty scrollable gap in the underlying document flow. */
-.screen-container:has(.home-screen),
+/* Fullbleed screens (home, reincarnation) strip the screen-container padding
+   and disable its own scroll so their content can manage layout edge-to-edge.
+   App.jsx toggles .sc-fullbleed based on currentScreen.
+   PREVIOUSLY also paired with `.screen-container:has(.home-screen)`, but
+   HomeScreen is now always-mounted (kept in DOM with display:none when
+   inactive — see commit 4ec8a9e for the divine-qi orb persistence fix).
+   That made :has() always match and killed scroll on every non-home
+   screen. Selector dropped — .sc-fullbleed alone is correct. */
 .sc-fullbleed {
   padding: 0;
   max-width: 100%;
@@ -11073,8 +11064,7 @@ body.sheet-open {
     margin: 0 auto;
   }
 
-  .sc-fullbleed,
-  .screen-container:has(.home-screen) {
+  .sc-fullbleed {
     padding: 0;
     max-width: 100%;
     margin: 0;
@@ -11192,8 +11182,7 @@ body.sheet-open {
     padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 
-  .sc-fullbleed,
-  .screen-container:has(.home-screen) {
+  .sc-fullbleed {
     padding: 0;
     max-width: 100%;
     margin: 0;
@@ -11233,8 +11222,7 @@ body.sheet-open {
     padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 
-  .sc-fullbleed,
-  .screen-container:has(.home-screen) {
+  .sc-fullbleed {
     padding: 0;
     max-width: 100%;
     margin: 0;
@@ -15386,7 +15374,9 @@ body.sheet-open {
    Layout: header + jump rail stay anchored near the top; the storefront
    .bls-body scrolls on its own so jumpTo() keeps working. Outer
    .spirit-bazaar-screen takes the full available viewport (clears top-bar
-   and bottom-nav). */
+   and bottom-nav). The outer overflow:hidden is intentional: the screen
+   itself is a fixed-height flex column whose .bls-body child owns the
+   scroll. Verified .bls-body has overflow-y:auto + flex:1 + min-height:0. */
 .spirit-bazaar-screen {
   width: 100%;
   height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
@@ -15606,10 +15596,10 @@ body.sheet-open {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  /* HomeScreen is always mounted inside <main>, which triggers
-     `.screen-container:has(.home-screen)` (padding: 0). So every non-home
-     screen has to own its own clearance from the fixed top-bar + bottom-nav
-     and side gutters. */
+  /* Non-home screens own their own clearance from the fixed top-bar +
+     bottom-nav and side gutters. The screen-container provides scroll
+     (overflow-y:auto + min-height:0); .sc-fullbleed strips padding +
+     scroll for home/reincarnation only. */
   padding:
     calc(var(--top-bar-h) + env(safe-area-inset-top) + 16px)
     16px
