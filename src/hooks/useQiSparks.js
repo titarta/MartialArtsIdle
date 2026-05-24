@@ -941,5 +941,28 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     isPhoenixRebornActive: () => isPhoenixRebornActive(activeSparks),
     // Direct-apply for debug bridges — bypasses the offer modal flow.
     applySpark: applySparkChoice,
+    /**
+     * Debug-only: inject an arbitrary pending offer to preview the
+     * picker modal without going through a real breakthrough. Pair
+     * with gd.previewSparkOffer in src/debug/gameDebug.js. Pass an
+     * array of 1-2 spark ids; unknown ids are dropped silently.
+     */
+    _debugSetOffer: (sparkIds) => {
+      const cards = (sparkIds ?? []).filter(id => !!QI_SPARK_BY_ID[id]).slice(0, 2);
+      if (cards.length === 0) {
+        setPendingOffer(null);
+        return false;
+      }
+      setPendingOffer({
+        id:                   `gd-preview-${++instanceCounter}`,
+        cards,
+        offerFreeRerollsLeft: 1,
+        offerPaidRerollsUsed: 0,
+        cardFreeRerollsLeft:  [0, 0],
+        cardPaidRerollsUsed:  [0, 0],
+        rolledAtRealm:        cultivation.realmIndex ?? 0,
+      });
+      return true;
+    },
   };
 }

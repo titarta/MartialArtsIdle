@@ -509,6 +509,49 @@ export function initDebug(hooksRef) {
     },
 
     /**
+     * Preview the spark picker modal with arbitrary card ids. Skips the
+     * breakthrough flow entirely; useful for inspecting the new card
+     * design across rarity combinations.
+     *
+     * Examples:
+     *   gd.previewSparkOffer('quick_burst', 'phoenix_reborn')
+     *   gd.previewSparkOffer('phoenix_reborn', 'azure_dragon')
+     *   gd.previewSparkOffer()                  → list ids and exit
+     *
+     * Run gd.listQiSparkIds() to see every available id grouped by
+     * rarity. Pick the spark, then Reroll, or Skip in the modal to
+     * dismiss; the preview offer is treated like any real offer, so
+     * picking applies the card to your run.
+     */
+    previewSparkOffer(idA, idB) {
+      const setOffer = g().qiSparks?._debugSetOffer;
+      if (typeof setOffer !== 'function') {
+        console.warn('[debug] _debugSetOffer not exposed.');
+        return;
+      }
+      if (!idA && !idB) {
+        console.log('[debug] Usage: gd.previewSparkOffer(idA, idB)');
+        console.log('[debug] Run gd.listQiSparkIds() to see every id.');
+        return;
+      }
+      const cards = [idA, idB].filter(Boolean);
+      const unknown = cards.filter(id => !QI_SPARK_BY_ID[id]);
+      if (unknown.length > 0) {
+        console.warn(`[debug] Unknown spark id(s): ${unknown.join(', ')}`);
+      }
+      const ok = setOffer(cards);
+      if (ok) {
+        const labels = cards.map(id => {
+          const c = QI_SPARK_BY_ID[id];
+          return c ? `${c.name} (${c.rarity})` : `?${id}?`;
+        });
+        console.log(`[debug] Preview offer set: ${labels.join(' vs ')}`);
+      } else {
+        console.warn('[debug] No valid cards in the preview request.');
+      }
+    },
+
+    /**
      * Consecutive Focus tester — toggles a bypass that makes the bonus
      * fire the instant Focus is held, ignoring the tier's hold-duration
      * threshold. Call again with `false` to restore normal behaviour.
