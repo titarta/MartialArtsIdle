@@ -1332,7 +1332,9 @@ function AppInner() {
     });
   };
 
-  const reincarnationUnlocked = cultivation.realmIndex >= 24;
+  // Tree screen: accessible once the player reaches Saint realm (so they can
+  // spend karma before reincarnating) OR in any subsequent life (lives ≥ 1).
+  const reincarnationUnlocked = cultivation.realmIndex >= 24 || (karma.lives ?? 0) >= 1;
 
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
