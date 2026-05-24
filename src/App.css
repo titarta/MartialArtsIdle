@@ -9128,88 +9128,51 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: var(--ui-purple-light);
 }
 
-/* ─── Bottom Sheet primitive ────────────────────────────────────────────────
-   Inspector overlay that slides up from the bottom and keeps the world
-   visible behind a translucent scrim. Used by Crystal Detail + Producer
-   Detail per the nav-audit verdict (those are inspectors over a world,
-   not transactions). Backdrop is dimmer than .modal-overlay (modals are
-   meant to fully take over; sheets should feel attached to context). */
+/* ─── Detail Modal ──────────────────────────────────────────────────────────
+   Centered modal used by Crystal Detail + Producer Detail. Both surfaces
+   are "inspectors" over the world. The earlier bottom-sheet treatment
+   (slide-up + grab handle) over-promised: swipe-to-dismiss / drag-to-
+   expand were never wired up, so the handle was a lie, and the 70vh cap
+   clipped the producer stat list on shorter viewports with no visible
+   scroll affordance. A centered modal sizes naturally to content (within
+   the shared .modal-overlay padding that already reserves nav + safe-area),
+   never overlaps the nav, and presents the same "tap outside to dismiss"
+   behavior with no decorative gestures we don't honor. */
 
-.sheet-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  z-index: 200;
-  animation: sheet-fade-in 0.18s ease-out;
-  /* Bottom-anchored sheets need to clear the bottom nav. The sheet itself
-     sits ABOVE the nav (.navbar has z-index < 200 in this project) and
-     paddings inside the sheet body handle the safe-area. */
-}
-
-@keyframes sheet-fade-in {
-  from { background: rgba(0, 0, 0, 0); }
-  to   { background: rgba(0, 0, 0, 0.45); }
-}
-
-.sheet {
+.detail-modal {
   background: rgba(var(--ui-bg-panel-rgb), 0.97);
-  border-top: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 22px 22px 0 0;
-  box-shadow: 0 -10px 32px rgba(0, 0, 0, 0.55);
-  max-height: 75vh;
-  max-height: 75dvh; /* prefer dynamic viewport on mobile so iOS bottom URL bar doesn't clip */
-  min-height: 280px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  width: min(420px, 100%);
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: sheet-slide-up 0.22s cubic-bezier(.2,.7,.2,1);
-  padding-bottom: env(safe-area-inset-bottom);
+  animation: modal-pop 0.2s ease-out;
 }
 
-@keyframes sheet-slide-up {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-
-.sheet-handle {
-  width: 38px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: 4px;
-  margin: 10px auto 4px auto;
-  flex-shrink: 0;
-}
-
-/* Body scroll lock — applied to <body> while a sheet is mounted. The
-   <main> region already manages its own scroll; the body itself only
-   ever scrolls under iOS bounce, which would otherwise drag the sheet
-   off its anchor. */
+/* Body scroll lock — applied to <body> while a detail modal is mounted.
+   The class name is .sheet-open for historical reasons; the rule itself
+   just prevents the page underneath from scrolling while the player
+   drags inside the modal. */
 body.sheet-open {
   overflow: hidden;
   touch-action: none;
 }
 
-/* Sheet body — children render here. Provides scroll + padding so callers
-   don't have to. Each detail surface adds its own .pdm-* / .cdm-* internal
-   layout on top of this scroll surface. position: relative so the standard
-   .modal-close (top-right absolute) anchors here, not the viewport. */
-.sheet-body {
+/* Inner scroll surface for the detail modal. Holds the .pdm-* internal
+   layout (hero sprite + tier badge + stat rows). position: relative so the
+   absolute .modal-close anchors here, not the viewport. */
+.pdm-modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 18px 22px 18px;
+  padding: 22px 22px 22px;
   position: relative;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Producer / Crystal detail sheets: re-use the existing .pdm-* internal
-   layout (hero sprite + tier badge + stat rows) verbatim — the sheet just
-   replaces the modal frame. Close button needs a small right pad bump so
-   it doesn't sit under the safe-area / Cinzel ascender on iOS. */
-.pdm-sheet { max-height: 70vh; max-height: 70dvh; }
-.pdm-sheet-close { top: 12px; right: 10px; }
+.pdm-modal-close { top: 10px; right: 10px; }
 
 /* Item Modal */
 .modal-overlay {
