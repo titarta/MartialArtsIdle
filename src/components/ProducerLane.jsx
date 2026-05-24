@@ -49,6 +49,11 @@ export default function ProducerLane({
   producers,
   onBuy,
   onShowDetail,
+  // 2026-05-21 Dial-9 — Tinker's Bargain (uncommon spark) gives -30% on the
+  // next 5 producer purchases. CultivationScreen passes the active discount
+  // fraction (0..1) so the displayed cost matches what spendQi will actually
+  // bill. Defaults to 0 → identity / no discount.
+  costDiscount = 0,
 }) {
   // Resolve current tier + sprite. Tier null when 0 owned.
   const tier = unlocked ? getSpriteTier(owned) : null;
@@ -76,22 +81,36 @@ export default function ProducerLane({
     prevTierNameRef.current = next;
   }, [tier?.name]);
 
-  // Resolve the effective buy count for the active mode.
+  // Resolve the effective buy count for the active mode (1 | 10 | 100).
+  // All-or-nothing: the buy succeeds only if the player can afford every
+  // unit in the batch. Affordability is enforced by the button-enable
+  // check below; this resolver just returns the count.
   const resolvedCount = useMemo(() => {
     if (!unlocked) return 0;
-    if (buyMode === 'max') return producers.getMaxAffordable(producer.id, qi);
     return buyMode;
-  }, [buyMode, qi, producer.id, producers, unlocked]);
+  }, [buyMode, unlocked]);
 
   const displayCost = useMemo(() => {
     if (!unlocked) return 0;
     const n = Math.max(1, resolvedCount);
-    return producers.getCost(producer.id, n);
-  }, [producer.id, producers, resolvedCount, unlocked]);
+    const raw = producers.getCost(producer.id, n);
+    if (costDiscount > 0) {
+      // Match the rounding used in CultivationScreen.handleBuy so the shown
+      // cost matches what spendQi will actually deduct on click.
+      return Math.max(1, Math.ceil(raw * (1 - costDiscount)));
+    }
+    return raw;
+  }, [producer.id, producers, resolvedCount, unlocked, costDiscount]);
 
-  // Locked state — render a muted placeholder with the unlock hint.
+  // Locked state — Cookie-Clicker-style "teaser" reveal. Show the actual
+  // producer sprite as a black silhouette so the player sees the shape but
+  // not the detail, paired with a "???" name and an unlock-realm hint.
+  // Falls back to the lock emoji if the producer has no sprite (shouldn't
+  // happen with current data, but defensive). Click still opens the detail
+  // modal so the player can read what they're working toward.
   if (!unlocked) {
     const minRealm = producer.unlock?.minRealmIndex ?? '?';
+    const teaserSprite = producer.sprites?.[0] ?? '🔒';
     return (
       <div className="pl-lane pl-locked" aria-disabled="true">
         <button
@@ -100,13 +119,16 @@ export default function ProducerLane({
           aria-label={`${producer.name} details`}
           type="button"
         >
-          <Sprite sprite="🔒" className="pl-leader-sprite" />
+          <Sprite sprite={teaserSprite} className="pl-leader-sprite pl-leader-silhouette" />
         </button>
-        <div className="pl-info">
-          <div className="pl-name pl-name-locked">??? Locked</div>
-          <div className="pl-meta">Unlocks at realm {minRealm}</div>
+        <div className="pl-body">
+          <div className="pl-caption">
+            <span className="pl-name pl-name-locked">??? Locked</span>
+            <span className="pl-sep">·</span>
+            <span className="pl-rate">Unlocks at realm {minRealm}</span>
+          </div>
+          <div className="pl-stack pl-stack-empty" aria-hidden="true"></div>
         </div>
-        <div className="pl-stack pl-stack-empty" aria-hidden="true"></div>
         <div className="pl-buy-zone pl-buy-zone-locked">Locked</div>
       </div>
     );
@@ -116,10 +138,11 @@ export default function ProducerLane({
   const totalQiPerSec = owned * producer.startQiPerSec;
   const tierClass = tier ? `pl-tier-${tier.name}` : 'pl-tier-empty';
 
-  // Stack — visible units cap. When owned > MAX_VISIBLE_UNITS, the rest is
-  // surfaced as an overflow chip ("+18", "+198") on the right edge.
+  // Visible-units cap — `overflow: hidden` on .pl-stack clips the right side
+  // when more sprites fit than the row can hold. The always-visible ×N chip
+  // (positioned at the right edge of the stack, z-index above the sprites)
+  // carries the real count regardless of how many fit visually.
   const visible = Math.min(owned, MAX_VISIBLE_UNITS);
-  const overflow = owned - visible;
 
   return (
     <div className={`pl-lane ${tierClass}${celebrating ? ' pl-celebrate' : ''}`}>
@@ -132,29 +155,22 @@ export default function ProducerLane({
         <Sprite sprite={sprite} className="pl-leader-sprite" />
       </button>
 
-      <div className="pl-info">
-        <div className="pl-name">{producer.name}</div>
-        <div className="pl-meta">
-          <span className="pl-owned">×{owned}</span>
+      <div className="pl-body">
+        <div className="pl-caption">
+          <span className="pl-name">{producer.name}</span>
           {owned > 0 && (
             <>
               <span className="pl-sep">·</span>
               <span className="pl-rate">{fmtRate(totalQiPerSec)} Qi/s</span>
             </>
           )}
-          {tier && (
-            <span className={`pl-badge pl-badge-${tier.name}`}>{tier.label}</span>
-          )}
         </div>
-      </div>
-
-      <div className="pl-stack">
-        {Array.from({ length: visible }).map((_, i) => (
-          <Sprite key={i} sprite={sprite} className="pl-unit" />
-        ))}
-        {overflow > 0 && (
-          <div className="pl-overflow">+{overflow}</div>
-        )}
+        <div className="pl-stack">
+          {Array.from({ length: visible }).map((_, i) => (
+            <Sprite key={i} sprite={sprite} className="pl-unit" />
+          ))}
+          {owned > 0 && <div className="pl-total">×{owned}</div>}
+        </div>
       </div>
 
       <button
@@ -162,11 +178,7 @@ export default function ProducerLane({
         onClick={() => onBuy(producer.id, resolvedCount)}
         disabled={!affordable}
       >
-        <span className="pl-buy-count">
-          {buyMode === 'max'
-            ? (resolvedCount > 0 ? `×${resolvedCount}` : '×0')
-            : `×${buyMode}`}
-        </span>
+        <span className="pl-buy-count">×{buyMode}</span>
         <span className="pl-buy-cost">{fmt(displayCost)} Qi</span>
       </button>
     </div>

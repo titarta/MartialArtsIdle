@@ -1,28 +1,79 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { BLOOD_LOTUS_PACKAGES, purchaseBloodLotus, getBloodLotusBalance } from '../systems/bloodLotus';
+import { useState, useCallback, useEffect } from 'react';
+import {
+  BLOOD_LOTUS_PACKAGES,
+  purchaseBloodLotus,
+  getBloodLotusBalance,
+} from '../systems/bloodLotus';
 import { restorePurchases } from '../iap/iapService';
 
 const BASE = import.meta.env.BASE_URL;
 
-const BADGE = {
-  blood_lotus_330:  'Popular',
-  blood_lotus_6480: 'Best Value',
+/**
+ * Per-tier presentation metadata. The pack DATA lives in
+ * src/systems/bloodLotus.js (id / amount / price / label) — this file
+ * only declares how each tier *presents* itself in the IAP shop:
+ *
+ *   rank   — 1..6 ladder position, drives the metal tier escalation
+ *   badge  — small marketing label centred on the card top (Popular /
+ *            Best Value etc.). null = no badge for this tier.
+ *   tone   — bronze / silver / gold / radiant. Toggles CSS variants on
+ *            the card (border, gem colour, badge background, shimmer).
+ *   layout — 'small' | 'banner' | 'hero'
+ *              small  → compact tile in the 2-col grid (T1–T4)
+ *              banner → single-row stretched tile (T5 Treasury)
+ *              hero   → full-width premium card with shimmer (T6 only)
+ */
+const TIER_META = {
+  blood_lotus_60:   { rank: 1, badge: null,         tone: 'bronze',  layout: 'small'  },
+  blood_lotus_330:  { rank: 2, badge: 'Popular',    tone: 'bronze',  layout: 'small'  },
+  blood_lotus_980:  { rank: 3, badge: null,         tone: 'silver',  layout: 'small'  },
+  blood_lotus_1980: { rank: 4, badge: 'Big Saver',  tone: 'silver',  layout: 'small'  },
+  blood_lotus_3280: { rank: 5, badge: 'Mega Value', tone: 'gold',    layout: 'banner' },
+  blood_lotus_6480: { rank: 6, badge: 'Best Value', tone: 'radiant', layout: 'hero'   },
 };
 
-export default function BloodLotusShopCard({ onClose, onBalanceChange }) {
+/** $4.99 → 4.99 */
+function parseUsd(price) {
+  return parseFloat(String(price).replace(/[^0-9.]/g, ''));
+}
+
+/** Bonus % of this pack's BL/$ rate over the baseline (smallest) pack. */
+function bonusPctOver(pkg, basePkg) {
+  const rate     = pkg.amount     / parseUsd(pkg.price);
+  const baseRate = basePkg.amount / parseUsd(basePkg.price);
+  return Math.round(((rate / baseRate) - 1) * 100);
+}
+
+/**
+ * What this pack's BL would have cost if priced at the baseline rate —
+ * rounded up to the next .99 so it reads as a believable strike-through
+ * "original" price (e.g. $109.99 → $99.99 for Heaven's Fortune).
+ */
+function fakeBasePrice(pkg, basePkg) {
+  const baseRate    = basePkg.amount / parseUsd(basePkg.price);
+  const equivalent  = pkg.amount / baseRate;
+  const ceilDollars = Math.ceil(equivalent);
+  return Math.max(parseUsd(pkg.price) + 1, ceilDollars) - 0.01;
+}
+
+/** Round per-pack BL/$ rate for display ("455 BL / $"). */
+function ratePerDollar(pkg) {
+  return Math.round(pkg.amount / parseUsd(pkg.price));
+}
+
+export default function BloodLotusShopModal({ onClose, onBalanceChange }) {
   const [pending, setPending] = useState(null);
   const [error,   setError]   = useState(null);
   const [success, setSuccess] = useState(null);
-  const cardRef = useRef(null);
+  const [balance, setBalance] = useState(() => getBloodLotusBalance());
 
-  // Close on outside click
+  // Live-sync the balance pip in the header. Balance changes (purchases,
+  // milestones, perk grants) all dispatch this event from bloodLotus.js.
   useEffect(() => {
-    const handler = (e) => {
-      if (cardRef.current && !cardRef.current.contains(e.target)) onClose();
-    };
-    document.addEventListener('pointerdown', handler, true);
-    return () => document.removeEventListener('pointerdown', handler, true);
-  }, [onClose]);
+    const refresh = () => setBalance(getBloodLotusBalance());
+    window.addEventListener('blood-lotus-changed', refresh);
+    return () => window.removeEventListener('blood-lotus-changed', refresh);
+  }, []);
 
   const buy = useCallback(async (pkg) => {
     setError(null);
@@ -31,7 +82,8 @@ export default function BloodLotusShopCard({ onClose, onBalanceChange }) {
     const result = await purchaseBloodLotus(pkg.id);
     setPending(null);
     if (result.ok) {
-      setSuccess(`+${pkg.amount} Blood Lotus added!`);
+      setSuccess(`+${pkg.amount.toLocaleString()} Blood Lotus added!`);
+      setBalance(getBloodLotusBalance());
       onBalanceChange?.(getBloodLotusBalance());
     } else if (!result.cancelled) {
       setError(result.error ?? 'Something went wrong.');
@@ -46,45 +98,151 @@ export default function BloodLotusShopCard({ onClose, onBalanceChange }) {
     finally { setPending(null); }
   }, []);
 
+  const basePkg = BLOOD_LOTUS_PACKAGES[0];
+
   return (
-    <div className="blood-lotus-shop-card" ref={cardRef}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="blood-lotus-shop-card" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
-      <div className="blood-lotus-shop-header">
-        <img src={`${BASE}sprites/items/blood_lotus.png`} className="blood-lotus-shop-icon" alt="" draggable="false" />
-        <span className="blood-lotus-shop-title">Blood Lotus Shop</span>
-        <button className="blood-lotus-shop-close" onClick={onClose} aria-label="Close">✕</button>
-      </div>
+        <header className="blshop-header">
+          <div className="blshop-title-block">
+            <span className="blshop-eyebrow">Vermillion Bazaar</span>
+            <h2 className="blshop-title">Top Up Blood Lotus</h2>
+          </div>
+          <div className="blshop-balance" aria-label="Current Blood Lotus balance">
+            <img
+              src={`${BASE}sprites/items/blood_lotus.png`}
+              className="blshop-balance-icon"
+              alt=""
+              draggable="false"
+            />
+            <div className="blshop-balance-stack">
+              <span className="blshop-balance-label">Current</span>
+              <span className="blshop-balance-amount">{balance.toLocaleString()}</span>
+            </div>
+          </div>
+        </header>
 
-      {success && <div className="blood-lotus-shop-success">{success}</div>}
-      {error   && <div className="blood-lotus-shop-error">{error}</div>}
+        {success && <div className="blshop-toast blshop-toast--success">{success}</div>}
+        {error   && <div className="blshop-toast blshop-toast--error">{error}</div>}
 
-      <div className="blood-lotus-shop-grid">
-        {BLOOD_LOTUS_PACKAGES.map(pkg => (
+        <div className="blshop-grid">
+          {BLOOD_LOTUS_PACKAGES.map((pkg) => {
+            const meta   = TIER_META[pkg.id] ?? { rank: 0, badge: null, tone: 'bronze', layout: 'small' };
+            const bonus  = bonusPctOver(pkg, basePkg);
+            const strike = bonus > 0 ? fakeBasePrice(pkg, basePkg) : null;
+            const rate   = ratePerDollar(pkg);
+            return (
+              <PackCard
+                key={pkg.id}
+                pkg={pkg}
+                meta={meta}
+                bonus={bonus}
+                strike={strike}
+                rate={rate}
+                pending={pending === pkg.id}
+                disabled={pending !== null}
+                onBuy={() => buy(pkg)}
+              />
+            );
+          })}
+        </div>
+
+        <footer className="blshop-footer">
+          <span className="blshop-fineprint">
+            All purchases unlock instantly. Prices in USD.
+          </span>
           <button
-            key={pkg.id}
-            className={`blood-lotus-shop-item${pending === pkg.id ? ' blood-lotus-shop-item-pending' : ''}`}
-            onClick={() => buy(pkg)}
-            disabled={!!pending}
+            className="blshop-restore"
+            onClick={restore}
+            disabled={pending !== null}
+            type="button"
           >
-            {BADGE[pkg.id] && <span className="blood-lotus-shop-badge">{BADGE[pkg.id]}</span>}
-            <img src={`${BASE}sprites/items/${pkg.id}.png`} className="blood-lotus-shop-item-icon" alt="" draggable="false" />
-            <span className="blood-lotus-shop-item-amount">{pkg.amount.toLocaleString()}</span>
-            <span className="blood-lotus-shop-item-label">{pkg.label}</span>
-            <span className="blood-lotus-shop-item-price">
-              {pending === pkg.id ? '…' : pkg.price}
-            </span>
+            {pending === 'restore' ? 'Restoring…' : 'Restore Purchases'}
           </button>
-        ))}
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Pack card — one of three layouts (small / banner / hero), driven by
+   meta.layout. The hero card adds an animated gold-shimmer sweep + a
+   stronger "SAVE $X" callout below the strikethrough.
+   ──────────────────────────────────────────────────────────────────────── */
+function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) {
+  const isHero   = meta.layout === 'hero';
+  const isBanner = meta.layout === 'banner';
+  const savedDollars = strike != null ? (strike - parseUsd(pkg.price)).toFixed(0) : null;
+
+  return (
+    <button
+      type="button"
+      className={[
+        'blshop-pack',
+        `blshop-pack--${meta.tone}`,
+        `blshop-pack--${meta.layout}`,
+        pending ? 'is-pending' : '',
+      ].filter(Boolean).join(' ')}
+      onClick={onBuy}
+      disabled={disabled}
+      data-rank={meta.rank}
+    >
+      {/* Hero-only: animated shimmer sweep across the card */}
+      {isHero && <span className="blshop-pack-shimmer" aria-hidden="true" />}
+
+      {/* Top-centre marketing badge (Popular / Best Value etc.) */}
+      {meta.badge && (
+        <span className={`blshop-pack-badge blshop-pack-badge--${meta.tone}`}>
+          {isHero && <span className="blshop-pack-badge-flare" aria-hidden="true">✦</span>}
+          {meta.badge}
+          {isHero && <span className="blshop-pack-badge-flare" aria-hidden="true">✦</span>}
+        </span>
+      )}
+
+      {/* Top-right bonus chip — only when there's a real bonus over baseline */}
+      {bonus > 0 && (
+        <span className="blshop-pack-bonus" aria-label={`Bonus ${bonus}% over baseline`}>
+          +{bonus}%
+        </span>
+      )}
+
+      <div className="blshop-pack-icon" aria-hidden="true">
+        <img
+          src={`${BASE}sprites/items/${pkg.id}.png`}
+          alt=""
+          draggable="false"
+        />
       </div>
 
-      <button
-        className="blood-lotus-shop-restore"
-        onClick={restore}
-        disabled={!!pending}
-      >
-        {pending === 'restore' ? 'Restoring…' : 'Restore Purchases'}
-      </button>
+      <div className="blshop-pack-body">
+        <span className="blshop-pack-label">{pkg.label}</span>
+        <div className="blshop-pack-amount-row">
+          <span className="blshop-pack-amount">{pkg.amount.toLocaleString()}</span>
+          <span className="blshop-pack-amount-unit">BL</span>
+        </div>
+        <span className="blshop-pack-rate">{rate} BL / $</span>
+      </div>
 
-    </div>
+      <div className="blshop-pack-buy">
+        {pending ? (
+          <span className="blshop-pack-price-pending">Processing…</span>
+        ) : (
+          <>
+            <div className="blshop-pack-price-row">
+              {strike != null && (
+                <span className="blshop-pack-strike">${strike.toFixed(2)}</span>
+              )}
+              <span className="blshop-pack-price">{pkg.price}</span>
+            </div>
+            {(isHero || (isBanner && savedDollars > 0)) && savedDollars > 0 && (
+              <span className="blshop-pack-save">Save ${savedDollars}</span>
+            )}
+          </>
+        )}
+      </div>
+    </button>
   );
 }

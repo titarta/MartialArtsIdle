@@ -38,8 +38,16 @@ import PRODUCERS from './producers';
 
 // ── A. Producer doubling (2 per producer) ────────────────────────────────────
 
+// 2026-05-21 Dial-10 producer-double pricing — t1 multiplier cut 250 → 40
+// (~6.25× cheaper across the board). Old ratio was 37× worse than Cookie
+// Clicker's Reinforced Index Finger pattern (cursor base 15, upgrade 100,
+// ratio ~6.67×). Disciple T1 used to demand 63 min of pure self-payback at
+// 10 owned; now ~10 min, matching CC's early-mid upgrade feel.
+// T2 keeps the T1 × 5 ratio (mirrors CC's "Carpal Tunnel Prevention" jump),
+// so the relative shape of the upgrade ladder is preserved — only the
+// absolute prices come down.
 const PRODUCER_DOUBLES = PRODUCERS.flatMap(p => {
-  const t1Cost = Math.ceil(p.startCost * 250);
+  const t1Cost = Math.ceil(p.startCost * 40);
   const t2Cost = Math.ceil(t1Cost * 5);
   return [
     {
@@ -79,18 +87,31 @@ const CRYSTAL_TAP = [
   name:      u.name,
   desc:      `Doubles the qi granted by tapping the crystal when its reservoir is empty.`,
   cost:      u.cost,
-  unlock:    { type: 'crystal_level', min: u.crystalLevel },
+  // Crystal-level ramp AND the Crystal Reservoir mechanic must be unlocked —
+  // the upgrade's effect ("tap when reservoir is empty") is meaningless
+  // before crystal_click T1 is granted at crystal tier 2 (level 10).
+  unlock: {
+    type: 'all',
+    gates: [
+      { type: 'crystal_level', min: u.crystalLevel },
+      { type: 'mechanic_tier', mechanicId: 'crystal_click', min: 1 },
+    ],
+  },
   effect:    { type: 'crystal_tap', mult: 2 },
   _tier:     i + 1,
 }));
 
 // ── C. Boost / focus mult (4 tiers) ──────────────────────────────────────────
 
+// 2026-05-21 Dial-7: per-tier focus_mult bonuses cut to reduce the active-
+// play rate stack. With the base also cut 300→250, maxed focus is now
+//   250 + 35+35+35+75 = 430 (×4.30) — was 550 (×5.50).
+// Net active-rate cut ~22% at maxed upgrades.
 const FOCUS_MULT = [
-  { id: 'u_focus_1', name: 'Deeper Breath I',   cost:           5_000, realm:  9, add: 50  },
-  { id: 'u_focus_2', name: 'Deeper Breath II',  cost:         100_000, realm: 17, add: 50  },
-  { id: 'u_focus_3', name: 'Deeper Breath III', cost:       2_000_000, realm: 29, add: 50  },
-  { id: 'u_focus_4', name: 'Deeper Breath IV',  cost: 100_000_000_000, realm: 44, add: 100 },
+  { id: 'u_focus_1', name: 'Deeper Breath I',   cost:           5_000, realm:  9, add: 35  },
+  { id: 'u_focus_2', name: 'Deeper Breath II',  cost:         100_000, realm: 17, add: 35  },
+  { id: 'u_focus_3', name: 'Deeper Breath III', cost:       2_000_000, realm: 29, add: 35  },
+  { id: 'u_focus_4', name: 'Deeper Breath IV',  cost: 100_000_000_000, realm: 44, add: 75  },
 ].map(u => ({
   id:        u.id,
   category:  'focus_mult',
@@ -153,10 +174,10 @@ const MECHANIC_TIER_CONFIG = [
   {
     mechanicId: 'crystal_click',
     label:      'Crystal Reservoir',
-    descTier:   { 2: 'Reservoir fills 50% of qi/s (up to 10 min).',
-                  3: 'Reservoir fills 70% of qi/s (up to 20 min).',
-                  4: 'Reservoir fills 85% of qi/s (up to 40 min).',
-                  5: 'Reservoir fills 100% of qi/s (up to 60 min).' },
+    descTier:   { 2: 'Reservoir fills 50% of qi/s (up to 3 min).',
+                  3: 'Reservoir fills 70% of qi/s (up to 4 min).',
+                  4: 'Reservoir fills 85% of qi/s (up to 5 min).',
+                  5: 'Reservoir fills 100% of qi/s (up to 6 min).' },
     costs:      { 2: 25_000, 3: 200_000, 4: 1_600_000, 5: 13_000_000 },
   },
   {
@@ -171,19 +192,19 @@ const MECHANIC_TIER_CONFIG = [
   {
     mechanicId: 'divine_qi',
     label:      'Divine Qi',
-    descTier:   { 2: 'Orb every ~2.5 min, 10s window. Tap for 40s of qi.',
-                  3: 'Orb every ~2 min, 12s window. Tap for 50s of qi.',
-                  4: 'Orb every ~90s, 15s window. Tap for 60s of qi.',
-                  5: 'Two orbs every ~60s. Collect both for 60s qi + ×1.5 qi/s for 30s.' },
+    descTier:   { 2: 'Orb every ~9 min, 10s window. Tap for 35s of qi.',
+                  3: 'Orb every ~8 min, 12s window. Tap for 50s of qi.',
+                  4: 'Orb every ~7 min, 15s window. Tap for 65s of qi.',
+                  5: 'Two orbs every ~6 min. Collect both for 75s qi + ×1.25 qi/s for 20s.' },
     costs:      { 2: 1_600_000, 3: 13_000_000, 4: 100_000_000, 5: 800_000_000 },
   },
   {
     mechanicId: 'pattern_click',
     label:      'Tracing Meridians',
-    descTier:   { 2: 'Spark every ~100s. 4 dots, 12s window. Full clear: 40s of qi.',
-                  3: 'Spark every ~80s. 5 dots, 14s window. Full clear: 50s of qi.',
-                  4: 'Spark every ~60s. 6 dots, 16s window. Full clear: 60s of qi.',
-                  5: 'Spark every ~45s. 7 dots, 18s window. Full clear: 120s qi + ×2 qi/s for 15s.' },
+    descTier:   { 2: 'Spark every ~11 min. 4 dots, 12s window. Full clear: 40s of qi.',
+                  3: 'Spark every ~10 min. 5 dots, 14s window. Full clear: 55s of qi.',
+                  4: 'Spark every ~9 min. 6 dots, 16s window. Full clear: 70s of qi.',
+                  5: 'Spark every ~8 min. 7 dots, 18s window. Full clear: 90s qi + ×1.5 qi/s for 20s.' },
     costs:      { 2: 13_000_000, 3: 100_000_000, 4: 800_000_000, 5: 6_400_000_000 },
   },
 ];

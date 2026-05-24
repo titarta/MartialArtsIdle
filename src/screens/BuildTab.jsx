@@ -131,7 +131,7 @@ function LawPickerModal({ ownedLaws, activeLaw, onSelect, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content law-picker-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         <h2 className="modal-title">{t('build.selectLaw')}</h2>
         {ownedLaws.length === 0 ? (
           <p className="law-picker-empty">

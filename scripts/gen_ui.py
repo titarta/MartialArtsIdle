@@ -292,6 +292,43 @@ ELEMENTS = {
         ),
     },
 
+    "karma": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a single perfectly round translucent VIOLET pearl-sphere "
+            "of karmic essence. Match the style of the reference pearl exactly — same "
+            "translucent pearl material, same composition, same outline, same halo, same "
+            "specular highlight position. Only the colour family changes (blue → violet) "
+            "and the bright inner glow is replaced by a yin-yang motif. "
+            ""
+            "Standalone subject on transparent background. NO rays, NO wisps, NO frame, "
+            "NO ring, NO ornaments — just the sphere, centred, filling 60-70% of the "
+            "image. Perfectly circular. "
+            ""
+            "Translucent sapphire-style sphere but in deep saturated VIOLET (#5a2a8a), "
+            "with a thin deep-purple crescent (#2a0a4a) at the bottom-right edge for the "
+            "underside, a small white-violet specular highlight (#fbf0ff, ~4-5 px) at "
+            "top-left for glass material, and a subtle 1-2 px lavender halo (#c8a0f0) "
+            "hugging the outside of the sphere. "
+            ""
+            "INSIDE the sphere — replacing the bright inner glow seen on the reference — "
+            "a LARGE clear YIN-YANG occupying 55-60% of the sphere's diameter. The two "
+            "halves use a strong palette contrast: bright pale-lavender half (#f0e0ff) "
+            "and dark deep-violet half (#2a0a4a). Clean S-curve boundary divides them. "
+            "Each half holds the classic small opposing-colour dot. The yin-yang must "
+            "read crisp and unmistakable at 24x24. "
+            ""
+            "Treatment: thick charcoal outline (#111) around the sphere AND around the "
+            "yin-yang, flat colour fills, no gradients (volume built from 3-4 colour "
+            "bands). "
+            ""
+            "Palette: pale lavender highlight (#f0e0ff), violet midtone (#5a2a8a), deep "
+            "purple shadow (#2a0a4a), white specular (#fbf0ff), lavender halo (#c8a0f0), "
+            "charcoal outline (#111). NO blue, NO cyan, NO gold, NO red. "
+            f"{S}"
+        ),
+    },
+
     # ── Cultivation upgrade icons (128×128, sit in cs-up-card top-centre) ─────
     # Style anchor for all upgrade_* icons:
     #   - Same "carved jade + bronze" treatment as card_frame / btn_stone.
@@ -444,6 +481,116 @@ ELEMENTS = {
             "Palette: jade green (#0f2520) badge ring only, bronze-gold (#8a5a2a) nodes/gem/studs, "
             "pale cyan qi highlight (#7adcc4) qi lines and node centres, deep charcoal (#0a0a0a) "
             "interior background, charcoal outline (#111). No red, no purple, no grey stone. "
+            f"{S}"
+        ),
+    },
+
+    # ── Idle Cultivation (offline_rate) — passive qi accrues while away ───────
+    "upgrade_offline_rate": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art emblem icon for a xianxia cultivation game upgrade — Idle Cultivation. "
+            "Match the reference image's overall composition: a circular jade-green and bronze "
+            "badge framing a clear centred subject. "
+            ""
+            "BORDER: a thick aged bronze-gold circular ring filling the outer ~20% of the icon, "
+            "carved with cloud-scroll relief in slightly darker bronze. Four small dark jade-"
+            "green square stud notches at N/S/E/W. A tiny bronze-gold tear-drop gem sits "
+            "centred at the very top (12 o'clock). The interior of the ring is fully transparent. "
+            ""
+            "SUBJECT (inside the ring): a small upright BRONZE CENSER / DING CAULDRON viewed "
+            "front-on, sitting at the bottom-centre of the field. It has three short squat legs, "
+            "an ornate handled lid, and a single small pale-cyan qi GLOW visible through the "
+            "seam where the lid meets the body. From the lid, three thin SMOKE CURLS of pale "
+            "cyan qi rise upward in graceful S-curves, spreading slightly as they ascend toward "
+            "the top of the icon — the qi smouldering quietly while the cultivator is away. "
+            "The cauldron is rendered in aged bronze with darker bronze shadow lines and small "
+            "1-pixel bright highlights catching the cauldron's curves. "
+            "Background behind the cauldron is deep charcoal-black so the bronze + cyan pop. "
+            ""
+            "Treatment: thick charcoal outlines, flat colour fills, no gradients. "
+            "Symmetrical horizontally. Reads as 'qi accrues slowly and steadily while idle'. "
+            ""
+            "Palette: aged bronze-gold (#8a5a2a) cauldron, ring border, gem; "
+            "dark jade green (#0f2520) ring studs; "
+            "pale cyan qi highlight (#7adcc4) smoke curls + cauldron seam glow; "
+            "deep charcoal (#0a0a0a) interior background; charcoal outline (#111). "
+            "No red, no purple, no human figure. "
+            f"{S}"
+        ),
+    },
+
+    # ── Deeper Slumber (offline_cap) — longer offline window ──────────────────
+    "upgrade_offline_cap": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art emblem icon for a xianxia cultivation game upgrade — Deeper Slumber. "
+            "Match the reference image's overall composition: a circular jade-green and bronze "
+            "badge framing a clear centred subject. "
+            ""
+            "BORDER: a thick aged bronze-gold circular ring filling the outer ~20% of the icon, "
+            "carved with cloud-scroll relief in slightly darker bronze. Four small dark jade-"
+            "green square stud notches at N/S/E/W. A tiny bronze-gold tear-drop gem sits "
+            "centred at the very top (12 o'clock). The interior of the ring is fully transparent. "
+            ""
+            "SUBJECT (inside the ring): a large CRESCENT MOON facing right (open side to the "
+            "right), rendered in pale bronze-gold (#c08a3a) with a slightly darker bronze "
+            "shadow on its lower edge. The crescent is fat and stylised, occupying the upper "
+            "two-thirds of the field. In the hollow of the crescent, a single bright pale-cyan "
+            "QI STAR sparkles — a 4-point star about 8 pixels wide with a 1-pixel cyan glow "
+            "around it. Below the moon, a thin layer of stylised RUYI CLOUD silhouettes drift "
+            "horizontally — two small bronze-shaded scroll-cloud puffs side by side at the "
+            "bottom of the field. "
+            "Background behind the moon is deep charcoal-black so the bronze moon and cyan "
+            "star pop with strong contrast. "
+            ""
+            "Treatment: thick charcoal outlines, flat colour fills, no gradients. "
+            "Reads as 'deeper night, qi pools longer while you slumber'. "
+            ""
+            "Palette: aged bronze-gold (#8a5a2a / #c08a3a) moon + ring + gem + cloud puffs; "
+            "dark jade green (#0f2520) ring studs; "
+            "pale cyan qi highlight (#7adcc4) star + glow; "
+            "deep charcoal (#0a0a0a) interior background; charcoal outline (#111). "
+            "No red, no purple, no human figure. "
+            f"{S}"
+        ),
+    },
+
+    # ── Shop nav button (Blood Lotus Shop on the top bar) ─────────────────────
+    # Designed to read at 16-24 pixel display size. Match the bold-silhouette
+    # punch of qi.png / karma.png. EVERYTHING is sacrificed for legibility at
+    # small size: chunky compact pouch, big dominant lotus emblem, no tassel,
+    # no qi mote, no drawstring detail. The 128×128 source is a MEDIUM for
+    # pixel-art clarity, NOT a canvas to fill with ornament.
+    "shop_nav": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon for a top-bar shop button in a xianxia cultivation game — the "
+            "Blood Lotus Shop. CRITICAL: this icon will be displayed at 16-24 pixels in the "
+            "live UI. Every design choice must prioritise LEGIBILITY at that tiny size over "
+            "detail. ONE chunky compact subject + ONE prominent emblem inside it, nothing else. "
+            ""
+            "SUBJECT: a CHUNKY ROUND coin pouch viewed front-on, almost square-shaped "
+            "(slightly taller than wide), filling most of the icon. Simple rounded silhouette "
+            "like a drawstring bag — flat top with small gold knot, wide round body. Deep "
+            "BLOOD RED (#8a1a1a) fill with darker shadow on lower-right (#5a1010). Strong "
+            "thick CHARCOAL OUTLINE (#111, 2px) around the entire silhouette for contrast. "
+            ""
+            "CENTRAL EMBLEM (the recognisable feature): a single LARGE bold lotus blossom "
+            "dominates the pouch centre — about 40-50% of the pouch width, front-on stylised "
+            "lotus with 5 broad clear petals in WARM PINK (#e07090) radiating from a small "
+            "bright YELLOW-GOLD centre dot. Petals are simple rounded shapes outlined in dark "
+            "red. This emblem must be the dominant element — visible even at 16 pixels. "
+            ""
+            "AT THE TOP: a small flat gold KNOT (4-5 pixels, simple trapezoid). "
+            "OMITTED: no tassel, no qi mote, no cord loops, no extra ornament. "
+            ""
+            "Treatment: thick charcoal outline, flat colour fills, no gradients, no texture. "
+            "Pixel-art 16-bit. Reads as 'red pouch with a lotus stamp' from across the room. "
+            ""
+            "Palette: BLOOD RED (#8a1a1a) body, darker red (#5a1010) shadow, warm pink "
+            "(#e07090) lotus petals, yellow-gold (#f0c850) lotus centre + knot, charcoal "
+            "(#111) outline, transparent background. "
             f"{S}"
         ),
     },
@@ -694,18 +841,24 @@ def carve_bar_channel(img, scan_x_pct=(0.25, 0.75), lip_threshold=30):
 
 def _style_ref_for(element_id):
     """
-    Auto-resolve a style-only reference for upgrade_* icons (all upgrades
-    except the tone-setter `upgrade_focus` itself). Returns the finalised
-    upgrade_focus.png so the model echoes its palette/border treatment.
+    Auto-resolve a style-only reference image. Passed as `style_image`
+    (palette/treatment hint), NOT `reference_images` (subject lock).
 
-    NOTE: we pass this ONLY as `style_image`, not as `reference_images`.
-    `reference_images` locks the SUBJECT (it caused PixelLab to copy the
-    third-eye motif in earlier tests); `style_image` just hints at palette
-    and line treatment, letting the subject described in the prompt come
-    through cleanly.
+    - upgrade_* icons (except upgrade_focus): style off upgrade_focus.png
+      so every upgrade shares its carved-jade-and-bronze border treatment.
+    - karma: styles off qi.png so the pearl material/composition/outline
+      matches the qi/qi_divine currency family.
     """
     if element_id.startswith("upgrade_") and element_id != "upgrade_focus":
         p = OUT_DIR / "upgrade_focus.png"
+        return p if p.exists() else None
+    if element_id == "shop_nav":
+        # Top-bar nav button — match the simple bold-silhouette orb style of
+        # qi.png / karma.png, NOT the framed upgrade-icon style.
+        p = OUT_DIR / "qi.png"
+        return p if p.exists() else None
+    if element_id == "karma":
+        p = OUT_DIR / "qi.png"
         return p if p.exists() else None
     return None
 

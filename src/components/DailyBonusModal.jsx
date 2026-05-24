@@ -19,7 +19,7 @@ export default function DailyBonusModal({ streak, todayReward, isAvailable, onCo
     <div className="daily-modal-overlay" onClick={onClose}>
       <div className="daily-modal" onClick={e => e.stopPropagation()}>
 
-        <button className="daily-modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="daily-modal-header">
           <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-modal-icon" alt="" draggable="false" />

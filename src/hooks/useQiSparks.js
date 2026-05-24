@@ -23,9 +23,86 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { QI_SPARKS, QI_SPARK_BY_ID, drawOffer } from '../data/qiSparks';
+import {
+  QI_SPARKS,
+  QI_SPARK_BY_ID,
+  drawOffer,
+  drawSingleCard,                 // legacy — no longer used in reroll path
+  TRINITY_SPARK_IDS,
+  TRINITY_CONVERGENCE_MULT,
+  LEGENDARY_PER_OFFER_CHANCE,
+  LEGENDARY_PER_CARD_CHANCE,      // legacy alias of PER_OFFER — kept for back-compat
+  LEGENDARY_PITY_THRESHOLD,
+} from '../data/qiSparks';
+import { isMajorTransition, stageHasSpark } from '../data/realms';
 import { spendBloodLotus, getBloodLotusBalance } from '../systems/bloodLotus';
 import { trackSparkPicked, trackSparkRerolled, trackSparkExpired } from '../analytics';
+
+// ── Legendary producer-synergy helpers ─────────────────────────────────────
+// Pure functions that compose the per-producer + global multipliers from
+// the active spark set + current owned counts. Called from App.jsx every
+// time producers.owned or activeSparks changes.
+
+/** Per-producer mult from active legendary sparks. Returns 1 if no sparks apply. */
+function computeProducerSparkMult(pid, sparks, owned) {
+  let mult = 1;
+  for (const s of sparks) {
+    const card = QI_SPARK_BY_ID[s.sparkId];
+    const eff = card?.effect;
+    if (!eff) continue;
+    if (eff.type === 'producer_self_mult' && eff.target === pid) {
+      mult *= eff.mult;
+    } else if (eff.type === 'producer_count_mult' && eff.target === pid) {
+      const sourceCount = owned[eff.source] ?? 0;
+      mult *= (1 + sourceCount * eff.perEach);
+    } else if (eff.type === 'producer_count_threshold_mult' && eff.target === pid) {
+      const sourceCount = owned[eff.source] ?? 0;
+      if (sourceCount >= eff.threshold) mult *= eff.mult;
+    } else if (eff.type === 'producer_pair_synergy' && (eff.producerA === pid || eff.producerB === pid)) {
+      const numPairs = Math.min(owned[eff.producerA] ?? 0, owned[eff.producerB] ?? 0);
+      // Each pair adds (mult - 1) to the per-producer multiplier additively
+      // so 3 pairs at mult=2 → ×(1 + 3×1) = ×4 (not ×8).
+      if (numPairs > 0) mult *= (1 + numPairs * (eff.mult - 1));
+    } else if (eff.type === 'phoenix_reborn' && pid !== 'p_phoenix') {
+      // Phoenix Reborn: every major realm transition since this spark was
+      // drawn adds +50% (Dial-4.1 2026-05-21 — was ×2/stack exponential).
+      // Hard exponential was wildly game-breaking: 10 majors = ×1024 on
+      // every non-Phoenix producer. Additive caps the runaway:
+      //   10 majors = ×6, 20 majors = ×11. Still legendary-tier impact.
+      const stacks = s.phoenixRebornStacks ?? 0;
+      if (stacks > 0) mult *= (1 + 0.5 * stacks);
+    }
+  }
+  return mult;
+}
+
+/** Global mult from active legendary sparks: trinity convergence + pair-global. */
+function computeGlobalSparkMult(sparks, owned) {
+  let mult = 1;
+  // Trinity Convergence — all 3 beast sparks simultaneously → +500% global.
+  const activeIds = new Set(sparks.map(s => s.sparkId));
+  if (TRINITY_SPARK_IDS.every(id => activeIds.has(id))) {
+    mult *= TRINITY_CONVERGENCE_MULT;
+  }
+  for (const s of sparks) {
+    const eff = QI_SPARK_BY_ID[s.sparkId]?.effect;
+    if (eff?.type === 'producer_pair_global_mult') {
+      const numPairs = Math.min(owned[eff.producerA] ?? 0, owned[eff.producerB] ?? 0);
+      if (numPairs > 0) mult *= (1 + numPairs * (eff.mult - 1));
+    }
+  }
+  return mult;
+}
+
+/** True iff Phoenix Reborn (E2) is active in the spark set. */
+function isPhoenixRebornActive(sparks) {
+  return sparks.some(s => QI_SPARK_BY_ID[s.sparkId]?.effect?.type === 'phoenix_reborn');
+}
+
+/** True iff any id in `ids` is a legendary spark. Used by pity reset. */
+function containsLegendary(ids) {
+  return (ids ?? []).some(id => QI_SPARK_BY_ID[id]?.rarity === 'legendary');
+}
 
 const ACTIVE_KEY           = 'mai_qi_sparks_active';
 const PENDING_KEY          = 'mai_qi_sparks_pending';
@@ -33,6 +110,10 @@ const PITY_KEY             = 'mai_qi_sparks_pity';
 // Mirrored to localStorage so the offline qi calc (which runs in a useState
 // initializer before React mounts) can pick up the Heaven's Bond bonus.
 const OFFLINE_SNAPSHOT_KEY = 'mai_qi_sparks_offline_snapshot';
+// Master's Patience — cumulative focus-seconds held this run. Persisted so a
+// reload mid-run doesn't reset the bonus. Reset to 0 on reincarnation via
+// clearAll(). Independent of activeSparks; the spark instance only reads it.
+const FOCUS_SECONDS_KEY    = 'mai_qi_sparks_focus_seconds_run';
 
 // Cap on the major-realm gate reduction from Patience of Stone stacks.
 // Keeps the gate from collapsing entirely with extreme stacking.
@@ -59,11 +140,16 @@ function saveJSON(key, value) {
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
-  // Stable ref so drawOffer can read the latest gate state without forcing
+export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked }) {
+  // Stable refs so drawOffer can read the latest gate state without forcing
   // the breakthrough effect to re-subscribe.
   const isFeatureUnlockedRef = useRef(isFeatureUnlocked);
   useEffect(() => { isFeatureUnlockedRef.current = isFeatureUnlocked; }, [isFeatureUnlocked]);
+  // Producer-unlock gate (legendary producer-synergy sparks). The callback
+  // identity churns on realmIndex change — that's fine, the effect just
+  // resyncs the ref. drawOffer reads via the ref so it always sees current.
+  const producerUnlockedRef  = useRef(producerUnlocked);
+  useEffect(() => { producerUnlockedRef.current = producerUnlocked; }, [producerUnlocked]);
   const [activeSparks, setActiveSparks] = useState(() => {
     // Reassign every instanceId on rehydrate. Older saves can contain
     // duplicate ids (the counter used to reset to 0 on reload), and the
@@ -73,7 +159,18 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
     const loaded = loadJSON(ACTIVE_KEY, []);
     return loaded.map(s => ({ ...s, instanceId: ++instanceCounter }));
   });
-  const [pendingOffer, setPendingOffer] = useState(() => loadJSON(PENDING_KEY, null));
+  const [pendingOffer, setPendingOffer] = useState(() => {
+    // Filter pending-offer cards through QI_SPARK_BY_ID so a save migration
+    // that retires a card (Dial-9 dropped inner_calm / focus_surge / etc.)
+    // doesn't leave the modal staring at undefined card ids. Drops the offer
+    // entirely if both cards have been retired.
+    const raw = loadJSON(PENDING_KEY, null);
+    if (!raw || !Array.isArray(raw.cards)) return raw;
+    const filtered = raw.cards.filter(id => !!QI_SPARK_BY_ID[id]);
+    if (filtered.length === 0) return null;
+    if (filtered.length === raw.cards.length) return raw;
+    return { ...raw, cards: filtered };
+  });
   const [pityCounter,  setPityCounter]  = useState(() => loadJSON(PITY_KEY, 0));
   const [bloodLotusBalance, setBloodLotusBalance] = useState(() => {
     try { return getBloodLotusBalance(); } catch { return 0; }
@@ -105,13 +202,38 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
   // Both are 0 when the mechanic isn't unlocked.
   const crystalClickRateRef       = useRef(0);
   const crystalClickCapMinRef     = useRef(0);
+  // 2026-05-21 Dial-9 — Sect Discipline (common timed) adds this many qi/s
+  // per-unit to every producer's base rate while active. Read by App.jsx
+  // when composing the producer rate. Default 0 (no spark active).
+  const producerFlatPerUnitRef    = useRef(0);
+  // 2026-05-21 Dial-9 — Master's Patience cumulative focus-seconds held this
+  // run. Ticks every second when cultivation.boosting is true. Reset on
+  // clearAll(). Persisted across reloads so the bonus survives F5.
+  const focusSecondsThisRunRef    = useRef(
+    (() => { const v = Number(loadJSON(FOCUS_SECONDS_KEY, 0)); return Number.isFinite(v) ? v : 0; })()
+  );
+  // Mirror of cultivation.boosting (a state, not a ref) so the 1-second
+  // interval below can read the latest value without re-subscribing every
+  // time the player taps Focus on/off.
+  const cultivationBoostingRef    = useRef(!!cultivation?.boosting);
+  useEffect(() => {
+    cultivationBoostingRef.current = !!cultivation?.boosting;
+  }, [cultivation?.boosting]);
 
   const prevRealmIndexRef = useRef(cultivation.realmIndex);
+  // Dial-8 used a non-persisted global counter to gate sub-stage sparks
+  // every-other BT. Dial-12 replaced that with `stageHasSpark(curr)`
+  // (data/realms.js) — same rough cadence but stable per stage index, so
+  // the roadmap can mark which BTs reward a spark. The counter ref is gone.
 
   // Persist
   useEffect(() => { saveJSON(ACTIVE_KEY,  activeSparks); }, [activeSparks]);
   useEffect(() => { saveJSON(PENDING_KEY, pendingOffer); }, [pendingOffer]);
   useEffect(() => { saveJSON(PITY_KEY,    pityCounter);  }, [pityCounter]);
+  // Ref mirror for pity — setState updaters need fresh value (the breakthrough
+  // effect calls drawOffer() with forceLegendary based on the current pity).
+  const pityCounterRef = useRef(pityCounter);
+  useEffect(() => { pityCounterRef.current = pityCounter; }, [pityCounter]);
 
   // Keep BL balance in sync
   useEffect(() => {
@@ -146,7 +268,15 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
     // Crystal Click — highest active tier drives rate + cap.
     let crystalClickRate   = 0;
     let crystalClickCapMin = 0;
+    // 2026-05-21 Dial-9 — Sect Discipline accumulates +per-unit qi/s additively
+    // across simultaneously-active instances (rare but legal; refresh-in-place
+    // by applySparkChoice means we usually have one instance).
+    let producerFlatPerUnit = 0;
     const now = Date.now();
+    // 2026-05-21 Dial-9 — Master's Patience reads run-level focus-seconds for
+    // every stack. Capture once outside the loop so all instances see the
+    // same value within this recompute.
+    const focusSecondsThisRun = focusSecondsThisRunRef.current;
     for (const s of sparks) {
       if (s.expiresAt && s.expiresAt <= now) continue;
       const card = QI_SPARK_BY_ID[s.sparkId];
@@ -188,12 +318,28 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
           // by the breakthrough effect below.
           permQiMultBonus += eff.value * stacks * (s.breakthroughsAccrued ?? 0);
         }
+        if (eff.type === 'qi_mult_per_focus_second_per_stack') {
+          // Master's Patience: each stack contributes
+          //   min(perStackCap, value × focusSecondsThisRun)
+          // The cap is per-stack, so multiple stacks scale linearly past it.
+          const perStack = Math.min(
+            eff.perStackCap ?? Infinity,
+            (eff.value ?? 0) * focusSecondsThisRun,
+          );
+          permQiMultBonus += perStack * stacks;
+        }
         continue;
       }
+      // 'charges' kind (Tinker's Bargain) doesn't affect any rate ref directly
+      // — the discount is consumed by CultivationScreen.handleBuy via
+      // consumeProducerCostDiscount() and the instance stays in activeSparks
+      // until exhausted. recomputeRefs just skips it.
+      if (card.kind === 'charges') continue;
       const eff = card.effect;
       if (!eff) continue;
-      if (eff.type === 'qi_mult')         qiMult     *= (1 + eff.value);
-      if (eff.type === 'focus_mult_bonus') focusBonus += eff.value;
+      if (eff.type === 'qi_mult')              qiMult     *= (1 + eff.value);
+      if (eff.type === 'focus_mult_bonus')      focusBonus += eff.value;
+      if (eff.type === 'producer_flat_per_unit') producerFlatPerUnit += eff.value ?? 0;
     }
     // Permanents stack additively with each other; the combined permanent
     // bonus then multiplies with the temp-buff product.
@@ -227,6 +373,10 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
     // reservoir each tick without caring about spark internals.
     crystalClickRateRef.current   = crystalClickRate;
     crystalClickCapMinRef.current = crystalClickCapMin;
+    // 2026-05-21 Dial-9 — Sect Discipline per-unit qi/s additive. App.jsx
+    // reads this when composing the producer rate via producers.getRate(...,
+    // flatPerUnit). 0 when no Sect Discipline is active.
+    producerFlatPerUnitRef.current = producerFlatPerUnit;
     // Offline calc runs before React mounts, so mirror its inputs to
     // localStorage every time the spark set changes.
     saveJSON(OFFLINE_SNAPSHOT_KEY, { offlineQiMult: 1 + permOfflineMult });
@@ -246,12 +396,32 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
   const drawOfferCtx = useCallback(() => ({
     activeSparks:      activeSparksRef.current,
     isFeatureUnlocked: isFeatureUnlockedRef.current,
+    producerUnlocked:  producerUnlockedRef.current,
   }), []);
 
   // ── Expiry tick — runs every second to prune timed sparks ───────────────
+  // Also handles Master's Patience focus-second accumulation (Dial-9). The
+  // run-level counter ticks +1 every second cultivation.boosting is true and
+  // recomputeRefs is re-invoked so the qiMult bonus updates live without
+  // forcing a setState churn on activeSparks.
   useEffect(() => {
     const id = setInterval(() => {
       const now = Date.now();
+      // Master's Patience focus-second counter — increments when Focus is held.
+      // Use the latest cultivation.boosting via a closure-captured ref so the
+      // interval doesn't need to re-subscribe when boost toggles.
+      if (cultivationBoostingRef.current) {
+        focusSecondsThisRunRef.current += 1;
+        saveJSON(FOCUS_SECONDS_KEY, focusSecondsThisRunRef.current);
+        // Master's Patience changes live based on this counter — re-derive
+        // refs from the current spark set so qiMultRef picks up the bump.
+        // Only worth the recompute when at least one MP instance is active.
+        const hasMP = activeSparksRef.current.some(s => {
+          const c = QI_SPARK_BY_ID[s.sparkId];
+          return c?.effect?.type === 'qi_mult_per_focus_second_per_stack';
+        });
+        if (hasMP) recomputeRefs(activeSparksRef.current);
+      }
       setActiveSparks(prev => {
         const filtered = prev.filter(s => !s.expiresAt || s.expiresAt > now);
         if (filtered.length === prev.length) return prev;
@@ -264,7 +434,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
       });
     }, 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [recomputeRefs]);
 
   // ── Layer breakthrough hooks ────────────────────────────────────────────
   // Fires on every realmIndex change. Decrements event_count sparks,
@@ -296,10 +466,38 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
           next.push({ ...s, breakthroughsAccrued: (s.breakthroughsAccrued ?? 0) + 1 });
           continue;
         }
+        // Phoenix Reborn (legendary E2) — each MAJOR realm transition between
+        // `prev` and `curr` bumps the stack counter (mult = 2^stacks applied
+        // to every non-phoenix producer) and fires the reset event so App.jsx
+        // can zero out the player's Phoenix count.
+        if (card.kind === 'permanent' && card.effect?.type === 'phoenix_reborn') {
+          let majorCount = 0;
+          for (let i = prev; i < curr; i++) {
+            if (isMajorTransition(i)) majorCount++;
+          }
+          if (majorCount > 0) {
+            next.push({ ...s, phoenixRebornStacks: (s.phoenixRebornStacks ?? 0) + majorCount });
+            try {
+              window.dispatchEvent(new CustomEvent('mai:phoenix-reborn', { detail: { count: majorCount } }));
+            } catch {}
+          } else {
+            next.push(s);
+          }
+          continue;
+        }
         next.push(s);
       }
       return next;
     });
+
+    // 2026-05-21 Dial-12: spark eligibility is now deterministic per stage
+    // index, computed by `stageHasSpark(curr)` in data/realms.js. Replaces
+    // the Dial-8 global counter that wasn't persisted across reloads and
+    // couldn't be surfaced on the roadmap. Same rough rate (~half of
+    // sub-stage BTs + every major) but now stable: the same stage always
+    // does or doesn't give a spark, so JourneyBody can mark them.
+    const shouldDrawSpark = stageHasSpark(curr);
+    if (!shouldDrawSpark) return;  // skip the draw entirely this BT
 
     // Roll a new offer if none is pending. If one is pending (player took too
     // long on the previous breakthrough), auto-resolve it to the leftmost so
@@ -315,24 +513,32 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
           queueMicrotask(() => applySparkChoice(leftmostId));
         }
       }
-      const cards = drawOffer(2, drawOfferCtx());
+      // Pity: if the counter has reached the threshold, force the FIRST
+      // card slot to be a legendary on this draw. Counter resets below.
+      const pityNow = pityCounterRef.current ?? 0;
+      const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
+      const ctxBase = drawOfferCtx();
+      const cards = drawOffer(2, { ...ctxBase, forceLegendary });
       if (cards.length === 0) return null;
+      // After draw: reset pity if a legendary appeared (forced or natural),
+      // else increment by 1. We do this here (not in a separate setPity call)
+      // to make pity advancement deterministic with respect to the draw.
+      const sawLegendary = containsLegendary(cards);
+      setPityCounter(c => sawLegendary ? 0 : (c + 1));
       return {
-        id:               `qs-offer-${++instanceCounter}-${curr}`,
+        id:                   `qs-offer-${++instanceCounter}-${curr}`,
         cards,
-        rerollsUsed:      0,
-        freeRerollsLeft:  1,
-        rolledAtRealm:    curr,
+        // 2026-05-21: offer-level reroll state (tier-locked redesign). The
+        // player rerolls the WHOLE pair, not individual cards. 1 free
+        // reroll per offer, then escalating PAID_REROLL_COSTS.
+        offerFreeRerollsLeft: 1,
+        offerPaidRerollsUsed: 0,
+        // Legacy per-card fields kept zeroed so any in-flight UI that
+        // still reads them resolves to "no free rerolls" gracefully.
+        cardFreeRerollsLeft:  [0, 0],
+        cardPaidRerollsUsed:  [0, 0],
+        rolledAtRealm:        curr,
       };
-    });
-
-    // Pity counter increments on every offer. Resets when a rare draws.
-    // Phase 1 has no rares so this just climbs harmlessly until rare cards
-    // are added.
-    setPityCounter(c => {
-      const cards = pendingRollPreviewRef.current;
-      const containsRare = cards?.some(id => QI_SPARK_BY_ID[id]?.rarity === 'rare');
-      return containsRare ? 0 : c + 1;
     });
   }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -438,6 +644,30 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
       return;
     }
 
+    // 2026-05-21 Dial-9 — Tinker's Bargain ('charges' kind). Refreshes any
+    // existing instance back to full charges if drawn again (rather than
+    // stacking past the original 5-charge cap), matching the design intent
+    // of "a fresh bargain, not a bonus on top of one already running."
+    if (card.kind === 'charges') {
+      const startingCharges = card.effect?.charges ?? 0;
+      setActiveSparks(prev => {
+        const existing = prev.find(p => p.sparkId === card.id);
+        if (existing) {
+          return prev.map(p => (
+            p.instanceId === existing.instanceId
+              ? { ...p, chargesRemaining: startingCharges }
+              : p
+          ));
+        }
+        return [...prev, {
+          instanceId:       ++instanceCounter,
+          sparkId:          card.id,
+          chargesRemaining: startingCharges,
+        }];
+      });
+      return;
+    }
+
     // Fallback for any future kinds
     setActiveSparks(prev => [...prev, {
       instanceId: ++instanceCounter,
@@ -457,55 +687,60 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
   }, [applySparkChoice]);
 
   /**
-   * Rerolls all cards in the offer.
-   * - First reroll is free (`freeRerollsLeft` decrements)
-   * - Subsequent rerolls cost escalating Blood Lotus (3, 6, 12; cap at 12)
-   * - Returns true if reroll happened, false if blocked by cost.
+   * Reroll the entire offer (tier-locked model, 2026-05-21 redesign).
+   *   - First reroll per offer is free (`offerFreeRerollsLeft` decrements 1→0).
+   *   - Subsequent rerolls cost escalating Blood Lotus (PAID_REROLL_COSTS).
+   *   - Re-rolls the rarity tier — gamble for higher rarity.
+   *   - Pity: if counter has reached threshold, the new offer's tier is
+   *     forced to legendary (drawOffer with forceLegendary=true).
+   *   - Returns true if reroll happened, false if blocked by cost or no draw.
    */
-  const reroll = useCallback(() => {
+  const rerollOffer = useCallback(() => {
     let result = false;
     setPendingOffer(prev => {
       if (!prev) return prev;
-      const isFree = (prev.freeRerollsLeft ?? 0) > 0;
-      let nextFreeLeft = prev.freeRerollsLeft ?? 0;
-      let nextRerollsUsed = prev.rerollsUsed ?? 0;
+      const freeLeft = prev.offerFreeRerollsLeft ?? 1;
+      const paidUsed = prev.offerPaidRerollsUsed ?? 0;
+      const isFree = freeLeft > 0;
 
-      if (isFree) {
-        nextFreeLeft = nextFreeLeft - 1;
-      } else {
-        const paidIdx = Math.min(
-          (prev.rerollsUsed - (prev.freeRerollsLeft === undefined ? 1 : 0)),
-          PAID_REROLL_COSTS.length - 1,
-        );
+      if (!isFree) {
+        const paidIdx = Math.min(paidUsed, PAID_REROLL_COSTS.length - 1);
         const cost = PAID_REROLL_COSTS[Math.max(0, paidIdx)];
         if (!spendBloodLotus(cost)) return prev;
         try { setBloodLotusBalance(getBloodLotusBalance()); } catch {}
         try { trackSparkRerolled(false, cost); } catch {}
+      } else {
+        try { trackSparkRerolled(true, 0); } catch {}
       }
-      if (isFree) { try { trackSparkRerolled(true, 0); } catch {} }
-      const fresh = drawOffer(2, drawOfferCtx());
-      if (fresh.length === 0) return prev;
+
+      // Pity-driven force-legendary still applies on the reroll.
+      const pityNow = pityCounterRef.current ?? 0;
+      const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
+      const newCards = drawOffer(2, { ...drawOfferCtx(), forceLegendary });
+      if (newCards.length === 0) return prev;
+      // Reset pity if any card in the new offer is legendary.
+      const sawLegendary = containsLegendary(newCards);
+      if (sawLegendary) setPityCounter(0);
       result = true;
       return {
         ...prev,
-        cards:           fresh,
-        rerollsUsed:     nextRerollsUsed + 1,
-        freeRerollsLeft: nextFreeLeft,
+        cards:                  newCards,
+        offerFreeRerollsLeft:   isFree ? 0 : freeLeft,
+        offerPaidRerollsUsed:   isFree ? paidUsed : paidUsed + 1,
       };
     });
     return result;
   }, []);
 
   /**
-   * Cost of the next reroll. Returns 0 if a free reroll is available, else
-   * the next escalating BL cost.
+   * Cost of the next reroll (Blood Lotus). 0 if a free reroll is available.
    */
   const nextRerollCost = useCallback(() => {
     if (!pendingOffer) return 0;
-    if ((pendingOffer.freeRerollsLeft ?? 0) > 0) return 0;
-    // After the free is spent, paid index = (rerollsUsed - 1) so first paid is index 0
+    const freeLeft = pendingOffer.offerFreeRerollsLeft ?? 1;
+    if (freeLeft > 0) return 0;
     const paidIdx = Math.min(
-      Math.max(0, (pendingOffer.rerollsUsed ?? 0) - 1),
+      Math.max(0, pendingOffer.offerPaidRerollsUsed ?? 0),
       PAID_REROLL_COSTS.length - 1,
     );
     return PAID_REROLL_COSTS[paidIdx];
@@ -513,14 +748,26 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
 
   /**
    * Discard the current offer without picking. Used by the modal's auto-
-   * timeout when the player ignores the choice.
+   * timeout when the player ignores the choice. Auto-resolves to the
+   * LEFTMOST card so the player isn't punished for ignoring.
+   *
+   * 2026-05-21 bug-fix: fires a `mai:spark-auto-picked` window event so the
+   * UI can surface a toast — previously the modal would just disappear and
+   * the player wouldn't know which spark they got.
    */
   const skip = useCallback(() => {
     setPendingOffer(prev => {
       if (!prev) return null;
-      // Auto-resolve to leftmost so the player isn't punished for ignoring
       const leftmostId = prev.cards?.[0];
-      if (leftmostId) applySparkChoice(leftmostId);
+      if (leftmostId) {
+        applySparkChoice(leftmostId);
+        // Notify UI so a toast can confirm the auto-pick.
+        try {
+          window.dispatchEvent(new CustomEvent('mai:spark-auto-picked', {
+            detail: { sparkId: leftmostId },
+          }));
+        } catch {}
+      }
       return null;
     });
   }, [applySparkChoice]);
@@ -533,7 +780,53 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
     // Reset the mirrored offline-qi multiplier so the next run starts at 1×
     // even if the page is reloaded before any new permanent draws.
     saveJSON(OFFLINE_SNAPSHOT_KEY, { offlineQiMult: 1 });
+    // 2026-05-21 Dial-9 — Master's Patience counter is run-scoped; reset on
+    // reincarnation so the per-stack bonus starts over.
+    focusSecondsThisRunRef.current = 0;
+    saveJSON(FOCUS_SECONDS_KEY, 0);
   }, []);
+
+  // 2026-05-21 Dial-9 — Tinker's Bargain charge consumer. Called by
+  // CultivationScreen.handleBuy after a successful producer purchase.
+  // Decrements the active 'charges'-kind spark; removes the instance when
+  // depleted. No-op if no Tinker's Bargain is active.
+  const consumeProducerCostDiscount = useCallback(() => {
+    setActiveSparks(prev => {
+      let touched = false;
+      const next = [];
+      for (const s of prev) {
+        const card = QI_SPARK_BY_ID[s.sparkId];
+        const isDiscount = card?.kind === 'charges'
+          && card?.effect?.type === 'producer_cost_discount';
+        if (!isDiscount || touched) { next.push(s); continue; }
+        // Consume one charge from the first matching instance.
+        const remaining = (s.chargesRemaining ?? 0) - 1;
+        touched = true;
+        if (remaining > 0) next.push({ ...s, chargesRemaining: remaining });
+        // remaining ≤ 0 → drop the instance (spark expired).
+      }
+      return touched ? next : prev;
+    });
+  }, []);
+
+  /**
+   * Inspect (without consuming) the currently-active Tinker's Bargain
+   * discount, if any. Returns `{ fraction, charges }` or null. Used by the
+   * cultivation/buy UI to compute the discounted display cost and decide
+   * whether to call `consumeProducerCostDiscount()` after a successful buy.
+   */
+  const getProducerCostDiscount = useCallback(() => {
+    for (const s of activeSparks) {
+      const card = QI_SPARK_BY_ID[s.sparkId];
+      const eff  = card?.effect;
+      if (card?.kind === 'charges'
+          && eff?.type === 'producer_cost_discount'
+          && (s.chargesRemaining ?? 0) > 0) {
+        return { fraction: eff.fraction ?? 0, charges: s.chargesRemaining ?? 0 };
+      }
+    }
+    return null;
+  }, [activeSparks]);
 
   // Listen for painless-consumed event from useCultivation. Removes the
   // active painless spark so a fresh card is needed for the next free
@@ -565,11 +858,25 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
     consecutiveFocusDeepRef,
     crystalClickRateRef,
     crystalClickCapMinRef,
+    // 2026-05-21 Dial-9 — Sect Discipline (common timed) per-unit qi/s bonus.
+    // App.jsx composes this into the producer rate via producers.getRate(...,
+    // flatPerUnit). 0 when no Sect Discipline is active.
+    producerFlatPerUnitRef,
+    // 2026-05-21 Dial-9 — Tinker's Bargain helpers. CultivationScreen reads
+    // the discount fraction + remaining charges to display the discounted
+    // price and consumes one charge per successful producer purchase.
+    getProducerCostDiscount,
+    consumeProducerCostDiscount,
     choose,
-    reroll,
+    rerollOffer,                  // 2026-05-21 tier-locked redesign
+    rerollCard: rerollOffer,      // legacy alias — old consumers fall through
     nextRerollCost,
     skip,
     clearAll,
+    // Pity counter — exposed so the choice modal can show "Pity in N realms".
+    pityCounter,
+    pityThreshold: LEGENDARY_PITY_THRESHOLD,
+    legendaryChance: LEGENDARY_PER_OFFER_CHANCE,
     // Round 3 — bypass the offer flow entirely. `grant` is used by:
     //   - crystal evolution (HomeScreen.handleCrystalEvolve) to unlock
     //     mechanic T1s when the crystal crosses a visual tier
@@ -603,6 +910,22 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked }) {
       }
       return max;
     },
+    /**
+     * Per-producer multiplier composed from active legendary sparks.
+     * Caller passes the current owned map (from useProducers). Returns 1
+     * when no legendary sparks apply to this producer.
+     */
+    getProducerSparkMult: (pid, ownedMap) =>
+      computeProducerSparkMult(pid, activeSparks, ownedMap ?? {}),
+    /**
+     * Global multiplier composed from active legendary sparks (trinity
+     * convergence + producer-pair global mults). Folded into useCultivation's
+     * rate calc via sparkLegendaryGlobalMultRef.
+     */
+    getGlobalSparkMult: (ownedMap) =>
+      computeGlobalSparkMult(activeSparks, ownedMap ?? {}),
+    /** True iff Phoenix Reborn is active — App.jsx uses this to gate the reset listener. */
+    isPhoenixRebornActive: () => isPhoenixRebornActive(activeSparks),
     // Direct-apply for debug bridges — bypasses the offer modal flow.
     applySpark: applySparkChoice,
   };

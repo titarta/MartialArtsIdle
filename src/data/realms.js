@@ -9,26 +9,44 @@
 import { mergeArrayByIndex } from './config/loader';
 
 const REALMS_RAW = [
-  // 2026-05-18 rebalance — crystal multiplier bumped to +1%/lvl (was +0.3%).
-  // To preserve the 1–2 month casual pacing target, every cost from Qi
-  // Transformation onwards is scaled ×4 from the prior table. Tempered Body
-  // is untouched — early game stays brisk so new players don't bounce.
-  // Audit: `scripts/sim-cultivation.mjs` should land at ~15d optimal-greedy
-  // to OH L6 (≈ 1–2 months casual real-player).
-  // ── Tempered Body (10 Layers) — onboarding, unchanged ──────────────────────
-  { name: 'Tempered Body',    stage: 'Layer 1',      cost: 50 },
-  { name: 'Tempered Body',    stage: 'Layer 2',      cost: 100 },
-  { name: 'Tempered Body',    stage: 'Layer 3',      cost: 175 },
-  { name: 'Tempered Body',    stage: 'Layer 4',      cost: 300 },
-  { name: 'Tempered Body',    stage: 'Layer 5',      cost: 500 },
-  { name: 'Tempered Body',    stage: 'Layer 6',      cost: 850 },
-  { name: 'Tempered Body',    stage: 'Layer 7',      cost: 1_400 },
-  { name: 'Tempered Body',    stage: 'Layer 8',      cost: 2_400 },
-  { name: 'Tempered Body',    stage: 'Layer 9',      cost: 4_000 },
-  { name: 'Tempered Body',    stage: 'Layer 10',     cost: 6_500 },
+  // 2026-05-21 rebalance — Dial-3 v4 progressive steepening from Saint Early
+  // (realm 24) onward. Designed to create natural rebirth-loop walls every
+  // ~7 realms so players cycle through 4-5 reincarnations before entering
+  // Open Heaven. Past realm 35 the curve deliberately FLATTENS so the
+  // accumulated Eternal Tree mult pulls the player through into the OH
+  // plateau, which is the "infinite endgame" zone where future content
+  // (sprite-tier bonuses, click mini-games, OH L7+) lands.
+  //
+  // 2026-05-18 prior rebalance — crystal multiplier bumped to +1%/lvl (was
+  // +0.3%). Every cost from Qi Transformation onwards is scaled ×4 from the
+  // prior table. Tempered Body untouched — early game stays brisk.
+  // Audit: `scripts/sim-multilife.mjs` should land at 4-5 rebirths reaching
+  // Emperor 1st / OH L1 at hardcore pacing.
+  // ── Tempered Body (10 Layers) — 2026-05-21 Dial-8 ──────────────────────────
+  //    Costs bumped ×2 from the original onboarding values. Playtest showed
+  //    the player hitting first major BT in ~5 min with crystal still at L5
+  //    — they didn't have enough breathing room in TB to explore producers
+  //    + refine crystal to T2 (L10 = Crystal Reservoir unlock). Doubling TB
+  //    cumulative (16K → 32K) gives ~10 min in the first realm so the player
+  //    can naturally invest in BOTH producers and crystal, and the L10 / T2
+  //    unlock lands around or just after the first major BT.
+  { name: 'Tempered Body',    stage: 'Layer 1',      cost: 100 },
+  { name: 'Tempered Body',    stage: 'Layer 2',      cost: 200 },
+  { name: 'Tempered Body',    stage: 'Layer 3',      cost: 350 },
+  { name: 'Tempered Body',    stage: 'Layer 4',      cost: 600 },
+  { name: 'Tempered Body',    stage: 'Layer 5',      cost: 1_000 },
+  { name: 'Tempered Body',    stage: 'Layer 6',      cost: 1_700 },
+  { name: 'Tempered Body',    stage: 'Layer 7',      cost: 2_800 },
+  { name: 'Tempered Body',    stage: 'Layer 8',      cost: 4_800 },
+  { name: 'Tempered Body',    stage: 'Layer 9',      cost: 8_000 },
+  { name: 'Tempered Body',    stage: 'Layer 10',     cost: 13_000 },
 
   // ── Qi Transformation (4 Stages) ───────────────────────────────────────────
-  { name: 'Qi Transformation', stage: 'Early Stage',  cost: 150_000 },
+  //    QT Early bumped ×1.3 too (150K → 200K) so the first major BT moment
+  //    is a slightly bigger achievement — and the player has time during
+  //    QT Early to push crystal across the L10 threshold if they didn't
+  //    make it during TB.
+  { name: 'Qi Transformation', stage: 'Early Stage',  cost: 200_000 },
   { name: 'Qi Transformation', stage: 'Middle Stage', cost: 305_000 },
   { name: 'Qi Transformation', stage: 'Late Stage',   cost: 570_000 },
   { name: 'Qi Transformation', stage: 'Peak Stage',   cost: 1_000_000 },
@@ -49,60 +67,103 @@ const REALMS_RAW = [
   { name: 'Immortal Ascension', stage: '2nd Stage',   cost: 165_000_000 },
   { name: 'Immortal Ascension', stage: '3rd Stage',   cost: 300_000_000 },
 
-  // ── Saint (3 Stages) ───────────────────────────────────────────────────────
-  { name: 'Saint',              stage: 'Early Stage',  cost: 500_000_000 },
-  { name: 'Saint',              stage: 'Middle Stage', cost: 880_000_000 },
-  { name: 'Saint',              stage: 'Late Stage',   cost: 1_500_000_000 },
+  // ── Saint (3 Stages) — Dial-3 v4 steepening starts here (×1.3 → ×2.0) ──
+  //    Life 1 walls land in this band — see `scripts/sim-multilife.mjs`.
+  { name: 'Saint',              stage: 'Early Stage',  cost: 650_000_000 },
+  { name: 'Saint',              stage: 'Middle Stage', cost: 1_400_000_000 },
+  { name: 'Saint',              stage: 'Late Stage',   cost: 3_000_000_000 },
 
-  // ── Saint King (3 Stages) ──────────────────────────────────────────────────
-  { name: 'Saint King',         stage: '1st Stage',   cost: 2_550_000_000 },
-  { name: 'Saint King',         stage: '2nd Stage',   cost: 4_300_000_000 },
-  { name: 'Saint King',         stage: '3rd Stage',   cost: 7_600_000_000 },
+  // ── Saint King (3 Stages) — Dial-3 v4 (×2.5 → ×3.5) ────────────────────────
+  { name: 'Saint King',         stage: '1st Stage',   cost: 6_400_000_000 },
+  { name: 'Saint King',         stage: '2nd Stage',   cost: 13_000_000_000 },
+  { name: 'Saint King',         stage: '3rd Stage',   cost: 27_000_000_000 },
 
-  // ── Origin Returning (3 Stages) ────────────────────────────────────────────
-  { name: 'Origin Returning',   stage: '1st Stage',   cost: 12_500_000_000 },
-  { name: 'Origin Returning',   stage: '2nd Stage',   cost: 22_000_000_000 },
-  { name: 'Origin Returning',   stage: '3rd Stage',   cost: 36_000_000_000 },
+  // ── Origin Returning (3 Stages) — Dial-3 v4 (×4.0 → ×4.8) ──────────────────
+  { name: 'Origin Returning',   stage: '1st Stage',   cost: 50_000_000_000 },
+  { name: 'Origin Returning',   stage: '2nd Stage',   cost: 95_000_000_000 },
+  { name: 'Origin Returning',   stage: '3rd Stage',   cost: 175_000_000_000 },
 
-  // ── Origin King (3 Stages) ─────────────────────────────────────────────────
-  { name: 'Origin King',        stage: '1st Stage',   cost: 62_000_000_000 },
-  { name: 'Origin King',        stage: '2nd Stage',   cost: 105_000_000_000 },
-  { name: 'Origin King',        stage: '3rd Stage',   cost: 185_000_000_000 },
+  // ── Origin King (3 Stages) — Dial-3 v4 (×5.1 → ×5.4) — peak of the wall ──
+  { name: 'Origin King',        stage: '1st Stage',   cost: 320_000_000_000 },
+  { name: 'Origin King',        stage: '2nd Stage',   cost: 560_000_000_000 },
+  { name: 'Origin King',        stage: '3rd Stage',   cost: 1_000_000_000_000 },
 
-  // ── Void King (3 Stages) ───────────────────────────────────────────────────
-  { name: 'Void King',          stage: '1st Stage',   cost: 305_000_000_000 },
-  { name: 'Void King',          stage: '2nd Stage',   cost: 515_000_000_000 },
-  { name: 'Void King',          stage: '3rd Stage',   cost: 860_000_000_000 },
+  // ── Void King (3 Stages) — Dial-3 v4 (×5.0 → ×4.0, curve flattens) ─────────
+  //    Past realm 35, the curve relaxes so accumulated tree-mult carries
+  //    the player through into Open Heaven.
+  { name: 'Void King',          stage: '1st Stage',   cost: 1_525_000_000_000 },
+  { name: 'Void King',          stage: '2nd Stage',   cost: 2_320_000_000_000 },
+  { name: 'Void King',          stage: '3rd Stage',   cost: 3_440_000_000_000 },
 
-  // ── Dao Source (3 Stages) ──────────────────────────────────────────────────
-  { name: 'Dao Source',         stage: '1st Stage',   cost: 1_500_000_000_000 },
-  { name: 'Dao Source',         stage: '2nd Stage',   cost: 2_450_000_000_000 },
-  { name: 'Dao Source',         stage: '3rd Stage',   cost: 4_150_000_000_000 },
+  // ── Dao Source (3 Stages) — Dial-3 v4 (×3.5 → ×2.5) ────────────────────────
+  { name: 'Dao Source',         stage: '1st Stage',   cost: 5_250_000_000_000 },
+  { name: 'Dao Source',         stage: '2nd Stage',   cost: 7_350_000_000_000 },
+  { name: 'Dao Source',         stage: '3rd Stage',   cost: 10_400_000_000_000 },
 
-  // ── Emperor Realm (3 Stages) ───────────────────────────────────────────────
-  { name: 'Emperor Realm',      stage: '1st Stage',   cost: 6_900_000_000_000 },
-  { name: 'Emperor Realm',      stage: '2nd Stage',   cost: 12_000_000_000_000 },
-  { name: 'Emperor Realm',      stage: '3rd Stage',   cost: 20_000_000_000_000 },
+  // ── Emperor Realm (3 Stages) — Dial-3 v4 (×2.2 → ×1.8) ─────────────────────
+  { name: 'Emperor Realm',      stage: '1st Stage',   cost: 15_200_000_000_000 },
+  { name: 'Emperor Realm',      stage: '2nd Stage',   cost: 24_000_000_000_000 },
+  { name: 'Emperor Realm',      stage: '3rd Stage',   cost: 36_000_000_000_000 },
 
-  // ── Open Heaven (6 Layers) ─────────────────────────────────────────────────
-  { name: 'Open Heaven',        stage: 'Layer 1',     cost: 34_000_000_000_000 },   // Low-Rank
-  { name: 'Open Heaven',        stage: 'Layer 2',     cost: 57_000_000_000_000 },   // Low-Rank
-  { name: 'Open Heaven',        stage: 'Layer 3',     cost: 91_500_000_000_000 },   // Low-Rank
-  { name: 'Open Heaven',        stage: 'Layer 4',     cost: 157_000_000_000_000 },  // Mid-Rank
-  { name: 'Open Heaven',        stage: 'Layer 5',     cost: 264_000_000_000_000 },  // Mid-Rank
-  { name: 'Open Heaven',        stage: 'Layer 6',     cost: 448_500_000_000_000 },  // High-Rank
+  // ── Open Heaven (6 Layers) — Dial-3 v4 (×1.5, post-loop plateau zone) ──
+  //    The "Cookie Clicker endgame" — gentle climb, future mechanics drop here.
+  { name: 'Open Heaven',        stage: 'Layer 1',     cost: 51_000_000_000_000 },   // Low-Rank
+  { name: 'Open Heaven',        stage: 'Layer 2',     cost: 85_500_000_000_000 },   // Low-Rank
+  { name: 'Open Heaven',        stage: 'Layer 3',     cost: 137_250_000_000_000 },  // Low-Rank
+  { name: 'Open Heaven',        stage: 'Layer 4',     cost: 235_500_000_000_000 },  // Mid-Rank
+  { name: 'Open Heaven',        stage: 'Layer 5',     cost: 396_000_000_000_000 },  // Mid-Rank
+  { name: 'Open Heaven',        stage: 'Layer 6',     cost: 672_750_000_000_000 },  // High-Rank
 ];
 
-const REALMS = mergeArrayByIndex(REALMS_RAW, 'realms');
+/**
+ * Global steepness factor (2026-05-22 Dial-3.1).
+ *
+ * Compounds across stage index: stage `i` is scaled by COST_STEEPNESS^i.
+ * A small per-step factor barely moves the needle early (×1.01^10 ≈ +10%
+ * by end of Tempered Body) but compounds into a meaningful late-game
+ * wall (×1.01^50 ≈ +64% at Origin Returning Late, ×1.01^56 ≈ +74% at
+ * Open Heaven Layer 6). Tunes the curve in one knob without re-touching
+ * every per-stage cost.
+ *
+ * Lower to 1.005 for a gentler curve, raise to 1.015 for harder. The
+ * scaling is applied BEFORE designer overrides (mergeArrayByIndex)
+ * so any per-stage override in realms.override.json still wins as the
+ * final authority.
+ */
+export const COST_STEEPNESS = 1.01;
+
+const REALMS_SCALED = REALMS_RAW.map((r, i) => ({
+  ...r,
+  cost: Math.round(r.cost * Math.pow(COST_STEEPNESS, i)),
+}));
+
+const REALMS = mergeArrayByIndex(REALMS_SCALED, 'realms');
 
 // ── Major breakthrough qi/s gate ─────────────────────────────────────────────
 // Ascending between major realms (i.e. `realm.name` changes) requires a
 // minimum sustained qi/s. The threshold is expressed as a percentage of the
-// NEXT realm's qi cost and decays with each successive major transition — the
-// early gates squeeze hardest, late realms soften because the cost is already
-// enormous.
-export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.0025; // 0.25% at the first gate
-export const MAJOR_BREAKTHROUGH_DECAY    = 0.5;    // multiplicative per major gate
+// NEXT realm's qi cost and decays with each successive major transition.
+//
+// 2026-05-22 Dial-3.1 — DECAY relaxed from 0.5 → 0.9. The previous halving
+// made every gate past the first one functionally invisible (gate at major
+// 5 was 0.0078% of cost — fraction of a second of production). 0.9 keeps
+// the first gate identical at 0.25% but holds subsequent gates near
+// 0.1-0.2% of next-realm cost, so players actually need to push
+// (focus-hold, divine qi orbs, ad boost, future paid multiplier boosts)
+// to clear them instead of breaking through the moment the bar fills.
+//
+//   ord   gate %      example next   gate qi/s     (at relaxed 0.9 decay)
+//   0     0.25%       200 K          500
+//   1     0.225%      1.65 M         3.7 K
+//   3     0.182%      95 M           173 K
+//   5     0.148%      6.4 B          9.4 M
+//   7     0.12%       320 B          384 M
+//   9     0.097%      5.25 T         5.1 B
+//
+// Compare to the old 0.5 decay where ord-5 was 500 K qi/s — invisible
+// late game.
+export const MAJOR_BREAKTHROUGH_BASE_PCT = 0.0025; // 0.25% at the first gate (unchanged)
+export const MAJOR_BREAKTHROUGH_DECAY    = 0.9;    // multiplicative per major gate
 
 /** Is the transition `fromIndex → fromIndex+1` a major-realm change? */
 export function isMajorTransition(fromIndex) {
@@ -113,18 +174,70 @@ export function isMajorTransition(fromIndex) {
 
 /**
  * Is the transition `fromIndex → fromIndex+1` a "peak" event?
- * Two cases:
- *   1. Entering a Peak Stage within the same realm (name unchanged).
- *   2. Entering the absolute last realm in the array (no entry after it) —
- *      that layer is the endgame pinnacle before the final ascension.
+ *
+ * Only one case now: entering the absolute last realm in the array (no
+ * entry after it) — that layer is the endgame pinnacle before the final
+ * ascension and gets its own banner.
+ *
+ * REMOVED (2026-05-20): same-name Peak Stage entries (e.g. Qi Transformation
+ * Late Stage → Peak Stage) used to count as peak transitions and triggered
+ * both the qi/s gate and the old BreakthroughBanner. That was wrong — the
+ * peak stage is a normal sub-stage; the gate + banner belong only at the
+ * EXIT of the realm (handled by isMajorTransition when the realm name
+ * changes). Without this, the player got gated AND celebrated twice
+ * (entering peak + exiting peak to the next realm).
  */
 export function isPeakTransition(fromIndex) {
   const a = REALMS[fromIndex];
   const b = REALMS[fromIndex + 1];
   if (!a || !b) return false;
-  if (a.name === b.name && (b.stage?.includes('Peak') ?? false)) return true;
   if (!REALMS[fromIndex + 2]) return true; // entering the very last realm
   return false;
+}
+
+/**
+ * 0-based position of REALMS[stageIndex] within its realm name group.
+ * E.g. Tempered Body L1 → 0, L2 → 1, ..., L10 → 9.
+ * Returns 0 for the first stage of any realm (or an out-of-range index).
+ */
+export function getRealmStageOrdinal(stageIndex) {
+  const s = REALMS[stageIndex];
+  if (!s) return 0;
+  let ord = 0;
+  for (let i = stageIndex - 1; i >= 0; i--) {
+    if (REALMS[i]?.name !== s.name) break;
+    ord++;
+  }
+  return ord;
+}
+
+/**
+ * True iff the breakthrough INTO `stageIndex` rewards a Qi Spark selection.
+ *
+ * Rule (Dial-12, deterministic by stage index):
+ *   - Major transition (entering a new realm name): YES.
+ *   - Sub-stage at an even realm-internal ordinal (2, 4, 6, …): YES, UNLESS
+ *     `stageIndex` is the last stage of its realm (in which case the immediate
+ *     next BT will be the major and gives the spark; we don't double-up).
+ *   - Everything else (1st, 3rd, 5th... sub-stage, plus stage 0 of the entire
+ *     game which has no incoming BT): NO.
+ *
+ * Replaces the old global-counter approach in useQiSparks (which wasn't
+ * persisted across reloads and so couldn't be visualised on the roadmap).
+ */
+export function stageHasSpark(stageIndex) {
+  if (stageIndex <= 0) return false;          // first stage of the game has no incoming BT
+  const prev = REALMS[stageIndex - 1];
+  const curr = REALMS[stageIndex];
+  if (!prev || !curr) return false;
+  // Major transition: always spark.
+  if (prev.name !== curr.name) return true;
+  // Sub-stage: even ordinal AND not the realm's last stage.
+  const ord = getRealmStageOrdinal(stageIndex);
+  if (ord <= 0 || ord % 2 !== 0) return false;
+  const next = REALMS[stageIndex + 1];
+  const isLastInRealm = !next || next.name !== curr.name;
+  return !isLastInRealm;
 }
 
 /**

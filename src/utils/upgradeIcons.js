@@ -17,8 +17,10 @@
 const BASE = import.meta.env.BASE_URL ?? '/';
 
 const CATEGORY_ICON = {
-  crystal_tap: 'ui/upgrade_crystal_tap.png',
-  focus_mult:  'ui/upgrade_focus.png',
+  crystal_tap:  'ui/upgrade_crystal_tap.png',
+  focus_mult:   'ui/upgrade_focus.png',
+  offline_rate: 'ui/upgrade_offline_rate.png',
+  offline_cap:  'ui/upgrade_offline_cap.png',
 };
 
 export function upgradeIconSrc(upgrade) {

@@ -161,14 +161,7 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
               {q.label ?? rarity}{slotLabel && ` · ${slotLabel}`}
             </div>
           </div>
-          <button
-            type="button"
-            className="modal-close artefact-upgrade-close"
-            aria-label="Close"
-            onClick={onClose}
-          >
-            ✕
-          </button>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </header>
 
         <div className="artefact-upgrade-body">

@@ -154,7 +154,7 @@ function SettingsScreen({ onClose }) {
             <span className="stg-title-icon">⚙</span>
             {t('settings.title')}
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         {/* ── Body ── */}

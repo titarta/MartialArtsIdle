@@ -3,7 +3,12 @@ import PRODUCERS from '../data/producers';
 import ProducerLane from '../components/ProducerLane';
 import ProducerDetailModal from '../components/ProducerDetailModal';
 import UpgradeCard, { OwnedUpgradeChip } from '../components/UpgradeCard';
+import SparksTab from '../components/SparksTab';
 import { fmt, fmtRate } from '../utils/format';
+import { useEventQueue } from '../contexts/EventQueueContext';
+import { fireTutorialOnce } from '../systems/fireTutorial';
+import { markTutorialSeen } from '../systems/tutorialSeen';
+import { TUTORIAL_IDS } from '../data/tutorialCards';
 
 /**
  * The qi-investment shop. Cookie-Clicker model — producers are stackable
@@ -12,9 +17,34 @@ import { fmt, fmtRate } from '../utils/format';
  * Sticky header shows live qi + qi/s readouts (polled from refs to avoid
  * triggering useCultivation re-renders).
  */
-export default function CultivationScreen({ cultivation, producers, upgrades, crystal, qiSparks }) {
-  const [tab, setTab]         = useState('producers');     // 'producers' | 'upgrades'
-  const [buyMode, setBuyMode] = useState(1);             // 1 | 10 | 'max'
+export default function CultivationScreen({
+  cultivation, producers, upgrades, crystal, qiSparks, initialTab, legendaryPoolInfo,
+  // Blood Lotus Shop — "Disciple's Diligence" wiring. `autoBuyOwned` is
+  // the QoL ownership flag (hides the chip when false); `autoBuyEnabled`
+  // is the player's toggle state; `onToggleAutoBuy` flips it.
+  autoBuyOwned = false, autoBuyEnabled = false, onToggleAutoBuy,
+}) {
+  // Default tab is 'producers' unless App.jsx navigated here with a specific
+  // target ('sparks' from the home buff-chip's "View all sparks →" link).
+  const [tab, setTab]         = useState(() => (initialTab === 'upgrades' || initialTab === 'sparks') ? initialTab : 'producers');
+  // If navigation changes initialTab while mounted, honour it.
+  useEffect(() => {
+    if (initialTab === 'producers' || initialTab === 'upgrades' || initialTab === 'sparks') {
+      setTab(initialTab);
+    }
+  }, [initialTab]);
+  // Buy mode — 1 | 10 | 100. Player's last pick is persisted across
+  // sessions so they don't have to re-toggle on every load.
+  const [buyMode, setBuyMode] = useState(() => {
+    try {
+      const v = Number(localStorage.getItem('mai_producer_buy_mode'));
+      if (v === 1 || v === 10 || v === 100) return v;
+    } catch {}
+    return 1;
+  });
+  useEffect(() => {
+    try { localStorage.setItem('mai_producer_buy_mode', String(buyMode)); } catch {}
+  }, [buyMode]);
   const [qi, setQi]           = useState(() => cultivation.qiRef?.current ?? 0);
   const [rate, setRate]       = useState(() => cultivation.rateRef?.current ?? 0);
   // Producer detail modal — opens when the player taps a lane's leader sprite.
@@ -33,33 +63,70 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
     return () => clearInterval(id);
   }, [cultivation.qiRef, cultivation.rateRef]);
 
-  // Auto-promote the default buy chip to ×10 once the player owns 10+ of any
-  // producer they can currently afford — kills thumb-tendinitis at scale.
-  // Only fires the FIRST time the threshold is crossed; the player can still
-  // override their pick afterwards.
-  const [autoPromoted, setAutoPromoted] = useState(false);
+  // ── Tier-A tutorial cards (2026-05-21) ─────────────────────────────────
+  // Two cards fire from this screen: "Producers" tab introduction (when
+  // the player lands on the producers tab for the first time) and "first
+  // producer purchase" (after their first successful buy). Both go via
+  // the shared event queue + fireTutorialOnce idempotency.
+  const { enqueue } = useEventQueue();
+  // #3 Producers tab — fire shortly after we render the producers tab the
+  // first time. Small delay so the tab transition lands first.
+  // Also marks PRODUCERS_HINT seen so the proactive "you do not climb
+  // alone" nudge (App.jsx) doesn't fire later — the two are mutually
+  // exclusive: voluntary visit OR proactive nudge, never both.
   useEffect(() => {
-    if (autoPromoted || buyMode !== 1) return;
-    const anyTen = PRODUCERS.some(p => (producers.getOwned(p.id) ?? 0) >= 10);
-    if (anyTen) {
-      setBuyMode(10);
-      setAutoPromoted(true);
+    if (tab !== 'producers') return undefined;
+    const id = window.setTimeout(() => {
+      if (fireTutorialOnce(TUTORIAL_IDS.PRODUCERS_TAB, enqueue)) {
+        markTutorialSeen(TUTORIAL_IDS.PRODUCERS_HINT);
+      }
+    }, 400);
+    return () => window.clearTimeout(id);
+  }, [tab, enqueue]);
+  // #4 First producer purchase — derive from the owned map. If the sum of
+  // all owned counts is ≥ 1 the player has bought at least one producer
+  // (this run or any previous). Fires once and short-circuits forever via
+  // the seen-set.
+  useEffect(() => {
+    const total = Object.values(producers.owned ?? {}).reduce((s, n) => s + (n || 0), 0);
+    if (total >= 1) {
+      fireTutorialOnce(TUTORIAL_IDS.FIRST_PRODUCER, enqueue);
     }
-  }, [autoPromoted, buyMode, producers]);
+  }, [producers.owned, enqueue]);
+
+  // Auto-promote removed — player's saved buyMode (above) is the source
+  // of truth. They control which mode is active; we never override.
+
+  // 2026-05-21 Dial-9 — Tinker's Bargain (uncommon, charges-kind spark). When
+  // active, the next 5 producer purchase TRANSACTIONS cost -30% (one ×1 or
+  // one ×10 buy each consume one charge). Read the active discount from the
+  // spark hook (returns null when no Bargain is active) and apply it to both
+  // the displayed cost and the qi-spend amount.
+  const producerCostDiscount = qiSparks?.getProducerCostDiscount?.() ?? null;
+  const producerCostDiscountFrac = producerCostDiscount?.fraction ?? 0;
 
   const handleBuy = useMemo(() => (id, count) => {
     if (!Number.isFinite(count) || count <= 0) return;
-    const cost = producers.getCost(id, count);
-    if (cost <= 0) return;
+    const rawCost = producers.getCost(id, count);
+    if (rawCost <= 0) return;
+    // Apply Tinker's Bargain discount if a charge is available.
+    const cost = producerCostDiscountFrac > 0
+      ? Math.max(1, Math.ceil(rawCost * (1 - producerCostDiscountFrac)))
+      : rawCost;
     // Atomic: spendQi succeeds only if the player can afford it. Producer
     // count is incremented only on a successful spend.
     if (cultivation.spendQi(cost)) {
       producers.buy(id, count);
+      // Consume one Tinker's Bargain charge on a successful transaction.
+      // If no Bargain is active (frac === 0) the call is a no-op.
+      if (producerCostDiscountFrac > 0) {
+        qiSparks?.consumeProducerCostDiscount?.();
+      }
       // Refresh the local qi display so the buy button's "affordable" state
       // updates immediately (the 100 ms poll would lag the click).
       setQi(cultivation.qiRef.current);
     }
-  }, [cultivation, producers]);
+  }, [cultivation, producers, qiSparks, producerCostDiscountFrac]);
 
   // Shared upgrade evaluation context — both visibility filter and unlock
   // check read the same shape. Memoised on realm/crystal/producer/mechanic
@@ -105,7 +172,9 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
   //
   // Buyables sort by cost ascending so the cheapest next thing always lives
   // in slot 0 — the player can spam-click the same screen position to buy
-  // in price order without moving the cursor.
+  // in price order without moving the cursor. Locked (unmet prereq) upgrades
+  // ALWAYS sit after every unlocked one, regardless of price — price only
+  // matters when the player can actually buy it.
   const { availableUpgrades, ownedUpgrades } = useMemo(() => {
     const available = [];
     const owned     = [];
@@ -113,9 +182,14 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
       if (upgrades.isOwned(u.id)) owned.push(u);
       else available.push(u);
     }
-    available.sort((a, b) => a.cost - b.cost);
+    available.sort((a, b) => {
+      const aLocked = !upgrades.checkUnlocked(a, upgradeCtx);
+      const bLocked = !upgrades.checkUnlocked(b, upgradeCtx);
+      if (aLocked !== bLocked) return aLocked ? 1 : -1;
+      return a.cost - b.cost;
+    });
     return { availableUpgrades: available, ownedUpgrades: owned };
-  }, [visibleUpgrades, upgrades]);
+  }, [visibleUpgrades, upgrades, upgradeCtx]);
 
   return (
     <div className="cultivation-screen">
@@ -133,6 +207,10 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
           className={`cs-tab${tab === 'upgrades' ? ' cs-tab-active' : ''}`}
           onClick={() => setTab('upgrades')}
         >Upgrades</button>
+        <button
+          className={`cs-tab${tab === 'sparks' ? ' cs-tab-active' : ''}`}
+          onClick={() => setTab('sparks')}
+        >Sparks</button>
       </div>
 
       {tab === 'producers' && (
@@ -148,38 +226,85 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
               onClick={() => setBuyMode(10)}
             >×10</button>
             <button
-              className={`cs-buy-mode-chip${buyMode === 'max' ? ' cs-buy-mode-chip-active' : ''}`}
-              onClick={() => setBuyMode('max')}
-            >Max</button>
+              className={`cs-buy-mode-chip${buyMode === 100 ? ' cs-buy-mode-chip-active' : ''}`}
+              onClick={() => setBuyMode(100)}
+            >×100</button>
+            {/* Disciple's Diligence (Blood Lotus Shop QoL) — separate
+                toggle, not part of the mutually-exclusive buy-mode set.
+                Stays hidden until the player owns the unlock. Visual
+                emphasis when active so the player knows qi is being
+                spent in the background. */}
+            {autoBuyOwned && (
+              <button
+                type="button"
+                className={`cs-autobuy-chip${autoBuyEnabled ? ' cs-autobuy-chip-on' : ''}`}
+                onClick={onToggleAutoBuy}
+                aria-pressed={autoBuyEnabled}
+                aria-label={autoBuyEnabled ? 'Auto-buy is ON. Tap to disable.' : 'Auto-buy is OFF. Tap to enable.'}
+              >
+                <span className="cs-autobuy-dot" aria-hidden="true" />
+                Auto
+              </button>
+            )}
           </div>
           <div className="cs-list">
-            {PRODUCERS.map(p => (
-              <ProducerLane
-                key={p.id}
-                producer={p}
-                owned={producers.getOwned(p.id)}
-                unlocked={producers.isUnlocked(p.id, realmIndex)}
-                buyMode={buyMode}
-                qi={qi}
-                producers={producers}
-                onBuy={handleBuy}
-                onShowDetail={setDetailProducer}
-              />
-            ))}
+            {(() => {
+              // Cookie-Clicker reveal pattern — show every unlocked producer
+              // plus a single silhouetted "teaser" for the next locked one.
+              // Everything past the first locked stays hidden until each
+              // unlocks in turn. Inline so the list isn't snapshotted as a
+              // stale memo when realmIndex / owned counts change.
+              const list = [];
+              let teaserShown = false;
+              for (const p of PRODUCERS) {
+                if (producers.isUnlocked(p.id, realmIndex)) {
+                  list.push(p);
+                } else if (!teaserShown) {
+                  list.push(p);
+                  teaserShown = true;
+                }
+              }
+              return list.map(p => (
+                <ProducerLane
+                  key={p.id}
+                  producer={p}
+                  owned={producers.getOwned(p.id)}
+                  unlocked={producers.isUnlocked(p.id, realmIndex)}
+                  buyMode={buyMode}
+                  qi={qi}
+                  producers={producers}
+                  onBuy={handleBuy}
+                  onShowDetail={setDetailProducer}
+                  costDiscount={producerCostDiscountFrac}
+                />
+              ));
+            })()}
           </div>
         </>
       )}
 
-      {detailProducer && (
-        <ProducerDetailModal
-          producer={detailProducer}
-          owned={producers.getOwned(detailProducer.id)}
-          unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
-          upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
-          totalGameRate={rate}
-          onClose={() => setDetailProducer(null)}
-        />
-      )}
+      {detailProducer && (() => {
+        // Base production rate = sum of every producer's raw output (incl.
+        // per-producer Refined Tap-style upgrade doubles) + the BASE_RATE
+        // baseline (1 qi/s). Percent multipliers (crystal, sparks, focus,
+        // pills, etc.) apply equally to every producer, so the most
+        // meaningful "contribution" reading is share of base — not share
+        // of live total qi/s. That way the percentages across all
+        // producers actually add up to ~100%.
+        const perProducerMult = (pid) => upgrades?.getProducerMult?.(pid) ?? 1;
+        const producerSum     = producers.getRate(perProducerMult);
+        const baseProductionRate = 1 /* BASE_RATE */ + producerSum;
+        return (
+          <ProducerDetailModal
+            producer={detailProducer}
+            owned={producers.getOwned(detailProducer.id)}
+            unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
+            upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
+            baseGameRate={baseProductionRate}
+            onClose={() => setDetailProducer(null)}
+          />
+        );
+      })()}
 
       {tab === 'upgrades' && (
         visibleUpgrades.length === 0 ? (
@@ -218,6 +343,10 @@ export default function CultivationScreen({ cultivation, producers, upgrades, cr
             )}
           </div>
         )
+      )}
+
+      {tab === 'sparks' && (
+        <SparksTab qiSparks={qiSparks} producers={producers} cultivation={cultivation} />
       )}
     </div>
   );

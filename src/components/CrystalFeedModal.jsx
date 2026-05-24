@@ -6,8 +6,10 @@ import { fmt as fmtQi } from '../utils/format';
 
 const BASE = import.meta.env.BASE_URL;
 
-const TIER_THRESHOLDS = [1000, 750, 500, 350, 200, 100, 50, 25, 10, 1];
-const TIER_VALUES     = [  10,   9,   8,   7,   6,   5,  4,  3,  2, 1];
+// 2026-05-21 Dial-6: 10 visual tiers, evolutions every 10 levels (T10 at L100).
+// Mirrors useQiCrystal.js + HomeScreen.jsx — keep in sync.
+const TIER_THRESHOLDS = [100, 80, 70, 60, 50, 40, 30, 20, 10, 1];
+const TIER_VALUES     = [ 10,  9,  8,  7,  6,  5,  4,  3,  2, 1];
 const RARITY_ORDER    = ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
 
 function getCrystalTier(level) {
@@ -230,7 +232,7 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
               </span>
             </div>
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="cfm-modal-body">
@@ -456,7 +458,7 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
               </span>
             </div>
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         <div className="cfm-modal-body">

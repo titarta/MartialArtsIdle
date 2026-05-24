@@ -3,19 +3,23 @@ import { getSpriteTier, SPRITE_TIERS } from '../data/producers';
 
 const BASE = import.meta.env.BASE_URL;
 
-/** Render the leader sprite at large size for the modal header. */
-function HeroSprite({ sprite }) {
+/** Render the leader sprite at large size for the modal header. When
+ *  `silhouette` is true, the sprite renders as a hard-edged black cutout
+ *  via the inline SVG filter — preserves the "what's coming next?" tease
+ *  even when the player taps a locked producer to read its unlock info. */
+function HeroSprite({ sprite, silhouette }) {
+  const cls = `pdm-hero-sprite${silhouette ? ' pdm-hero-silhouette' : ''}`;
   if (typeof sprite === 'string' && sprite.startsWith('/')) {
     return (
       <img
         src={`${BASE}${sprite.replace(/^\//, '')}`}
         alt=""
-        className="pdm-hero-sprite"
+        className={cls}
         draggable={false}
       />
     );
   }
-  return <span className="pdm-hero-sprite pdm-hero-emoji" aria-hidden="true">{sprite}</span>;
+  return <span className={`${cls} pdm-hero-emoji`} aria-hidden="true">{sprite}</span>;
 }
 
 /**
@@ -33,7 +37,7 @@ export default function ProducerDetailModal({
   owned,
   unlocked,
   upgradeMult,         // multiplier from producer-doubling upgrades for this id
-  totalGameRate,       // total qi/s across all producers (post-mult)
+  baseGameRate,        // base production qi/s = BASE_RATE + sum(producer raw outputs)
   onClose,
 }) {
   const tier      = unlocked ? getSpriteTier(owned) : null;
@@ -42,8 +46,14 @@ export default function ProducerDetailModal({
 
   const perUnitRate   = producer.startQiPerSec * (upgradeMult ?? 1);
   const totalFromHere = owned * perUnitRate;
-  const sharePct      = totalGameRate > 0
-    ? (totalFromHere / totalGameRate) * 100
+  // Share is computed against BASE production (sum of all producer raw
+  // outputs + the BASE_RATE baseline), not the live qi/s. Percent
+  // multipliers (crystal, sparks, focus, pills, etc.) apply equally to
+  // every producer, so they cancel out of the share calc. This way the
+  // numbers across all producers actually add up — and the player sees
+  // each producer's TRUE relative contribution to their loadout.
+  const sharePct = baseGameRate > 0
+    ? (totalFromHere / baseGameRate) * 100
     : 0;
 
   // Find the next-tier threshold for the "X more to reach Silver/Gold/Mythic" line.
@@ -56,10 +66,10 @@ export default function ProducerDetailModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="pdm-modal" onClick={e => e.stopPropagation()}>
-        <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="pdm-hero">
-          <HeroSprite sprite={sprite} />
+          <HeroSprite sprite={sprite} silhouette={!unlocked} />
           {tier && (
             <span className={`pdm-tier-badge pdm-badge-${tier.name}`}>
               {tier.label}
@@ -67,7 +77,12 @@ export default function ProducerDetailModal({
           )}
         </div>
 
-        <div className="pdm-name">{producer.name}</div>
+        {/* Spoiler-free name for locked producers — the silhouette + "???"
+            keeps the Cookie-Clicker mystery; the unlock-realm hint below
+            tells the player when to expect it without revealing what. */}
+        <div className={`pdm-name${!unlocked ? ' pdm-name-locked' : ''}`}>
+          {unlocked ? producer.name : '???'}
+        </div>
 
         {!unlocked ? (
           <div className="pdm-locked">
@@ -95,13 +110,13 @@ export default function ProducerDetailModal({
                 </span>
               </div>
               <div className="pdm-stat-row pdm-stat-row-emph">
-                <span className="pdm-stat-label">Total contribution</span>
+                <span className="pdm-stat-label">Base contribution</span>
                 <span className="pdm-stat-value">
                   {fmtRate(totalFromHere)} Qi/s
                 </span>
               </div>
               <div className="pdm-stat-row">
-                <span className="pdm-stat-label">Share of total qi/s</span>
+                <span className="pdm-stat-label">Share of base production</span>
                 <span className="pdm-stat-value">
                   {sharePct < 0.05 && totalFromHere > 0 ? '<0.1' : sharePct.toFixed(1)}%
                 </span>

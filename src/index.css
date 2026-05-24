@@ -12,9 +12,16 @@
   --gold:          #f5c842;   /* semantic rarity color — do NOT use for UI chrome */
   --border:        var(--ui-border-light);
 
-  /* ── UI Purple family ─────────────────────────────────────────────────
-     The hero colour of the game's UI chrome: borders, glows, active
-     states, hover emphasis. Everything that "reads as the game's colour".
+  /* ── UI Jade family (formerly Purple) ────────────────────────────────
+     2026-05-23: Theme refresh — the entire UI chrome palette migrated
+     from translucent violet to jade. The variable NAMES kept their
+     `--ui-purple-*` ids so every consumer across App.css / JSX
+     continued to work without a global rename; only the VALUES below
+     changed. The hue is now bright jade (cultivation-theme appropriate)
+     while the dark/light ramp + role semantics are preserved.
+
+     Old purple values are preserved at the bottom of this block for
+     fast revert; uncomment them and comment the jade block to swap back.
 
      These are SEPARATE from palette/rarity purples in `data/*.js`
      (Transcendent = #c084fc, Epic rarity, psychic damage, Yin-Yang node,
@@ -30,53 +37,96 @@
        -wash    pale uppercase labels, subtle backgrounds
        -pale    palest ultra-soft backgrounds, very diffuse tints                                            */
 
-  /* BRIGHT PURPLE — the main glow/accent hue. Used as solid hex OR as the
-     rgb channel inside rgba() for translucent fills, glows, shadows.       */
-  --ui-purple-rgb:         139,  92, 246;  /* base — equivalent of #8b5cf6 */
-  --ui-purple-deep-rgb:    124,  58, 237;  /* rgb form of #7c3aed  */
-  --ui-purple-strong-rgb:  168,  85, 247;  /* rgb form of #a855f7  */
-  --ui-purple-soft-rgb:    167, 139, 250;  /* rgb form of #a78bfa  */
-  --ui-purple-light-rgb:   196, 181, 253;  /* rgb form of #c4b5fd  */
+  /* WARM CREAM ACCENT family — 2026-05-23 lacquer theme.
+     The PANEL backgrounds stay dark (the game's text rules expect
+     it). These vars provide WARM CREAM/TAN/GOLD accent colours
+     used for borders, highlights, glows, and emphasis text. Bright
+     enough to read as warmth on the dark panels. */
+  --ui-purple-rgb:         200, 170, 120;  /* base — warm tan (#c8aa78) */
+  --ui-purple-deep-rgb:    155, 125,  80;  /* sandalwood (#9b7d50) */
+  --ui-purple-strong-rgb:  220, 175, 110;  /* lantern amber (#dcaf6e) */
+  --ui-purple-soft-rgb:    232, 213, 168;  /* soft cream (#e8d5a8) */
+  --ui-purple-light-rgb:   245, 230, 200;  /* pale cream highlight (#f5e6c8) */
 
   /* Discrete shades (dark → light) used as solid colors */
-  --ui-purple-darker:  #5b21b6;   /* darkest — gradient starts */
-  --ui-purple-deep:    #7c3aed;   /* pressed, emphasised outlines */
-  --ui-purple-strong:  #a855f7;   /* loud callouts, strong accents */
-  --ui-purple-soft:    #a78bfa;   /* secondary accents, softer glow */
-  --ui-purple-light:   #c4b5fd;   /* highlights, emphasis text */
-  --ui-purple-wash:    #e0d8ff;   /* pale label / uppercase text */
-  --ui-purple-pale:    #e9d5ff;   /* ultra-soft backgrounds */
+  --ui-purple-darker:  #4a3520;   /* deepest sandalwood */
+  --ui-purple-deep:    #9b7d50;   /* pressed accent */
+  --ui-purple-strong:  #dcaf6e;   /* loud callouts (lantern amber) */
+  --ui-purple-soft:    #e8d5a8;   /* secondary cream accent */
+  --ui-purple-light:   #f5e6c8;   /* highlights, emphasis text */
+  --ui-purple-wash:    #f8edd4;   /* pale label / uppercase text */
+  --ui-purple-pale:    #fcf5e2;   /* ultra-soft tints */
 
   /* ── UI chrome tints ──────────────────────────────────────────────────
-     These are the "atmosphere" colours that make the UI read as purple
-     even when not using the bright --ui-purple-*. Store as rgb triples
-     so alpha varies per usage via rgba(). */
+     2026-05-23: re-tinted for the lacquer theme. Text/label colours
+     remain LIGHT cream/tan family so they read on the dark lacquer
+     panels. Atmosphere stays warm-toned for the oriental feel. */
 
-  /* Hover / pale interactive text (220, 200, 255 — pale lavender) */
+  /* Hover / pale interactive text (245, 230, 200 — pale cream) */
+  --ui-hover-rgb:      245, 230, 200;
+
+  /* Secondary text / labels / captions (210, 195, 170 — warm cream-grey) */
+  --ui-label-rgb:      210, 195, 170;
+
+  /* Muted / disabled text (175, 160, 140 — desaturated warm grey) */
+  --ui-muted-rgb:      175, 160, 140;
+
+  /* Deep brown shadow for tooltip/modal drop-shadows (40, 30, 18) */
+  --ui-shadow-rgb:      40,  30,  18;
+
+  /* ── UI surface backgrounds — dark lacquer ──────────────────────────
+     Dark backbone for the whole game. Subtle warm tinge keeps the
+     lacquer-and-cream-trim aesthetic; cream borders/accents from
+     the --ui-purple-* family above are what carry the "cultivation
+     scroll" warmth on top of these dark surfaces. */
+
+  /* Deepest surface (nav, deepest panels) — near-black with warm cast. */
+  --ui-bg-deep-rgb:     14,  12,   8;
+
+  /* Panel / modal / card background — dark warm-charcoal. */
+  --ui-bg-panel-rgb:    32,  26,  18;
+
+  /* Border / divider tint between panels — warm medium. */
+  --ui-border-rgb:      75,  60,  40;
+
+  /* ── Old purple palette (revert by uncommenting + commenting jade above) ─
+  --ui-purple-rgb:         139,  92, 246;
+  --ui-purple-deep-rgb:    124,  58, 237;
+  --ui-purple-strong-rgb:  168,  85, 247;
+  --ui-purple-soft-rgb:    167, 139, 250;
+  --ui-purple-light-rgb:   196, 181, 253;
+  --ui-purple-darker:  #5b21b6;
+  --ui-purple-deep:    #7c3aed;
+  --ui-purple-strong:  #a855f7;
+  --ui-purple-soft:    #a78bfa;
+  --ui-purple-light:   #c4b5fd;
+  --ui-purple-wash:    #e0d8ff;
+  --ui-purple-pale:    #e9d5ff;
   --ui-hover-rgb:      220, 200, 255;
-
-  /* Secondary text / labels / captions (180, 160, 220 — lavender-grey) */
   --ui-label-rgb:      180, 160, 220;
-
-  /* Muted / disabled text (160, 155, 190 — desaturated purple-grey) */
   --ui-muted-rgb:      160, 155, 190;
-
-  /* Deep purple shadow for tooltip/modal drop-shadows (60, 20, 160) */
   --ui-shadow-rgb:      60,  20, 160;
-
-  /* ── UI surface backgrounds (near-black with purple tint) ─────────────
-     Dark atmospheric backgrounds. The purple cast is subtle at opacity
-     0.85–1.0, but it's what makes the game read as "dark purple" instead
-     of pure black. Hue-shifting these changes the whole game mood.      */
-
-  /* Deepest surface (nav, deepest panels) — rgb(5, 2, 14) */
   --ui-bg-deep-rgb:      5,   2,  14;
-
-  /* Panel / modal / card background — rgb(10, 8, 28) */
   --ui-bg-panel-rgb:    10,   8,  28;
-
-  /* Border / divider tint between panels — rgb(30, 18, 48) */
   --ui-border-rgb:      30,  18,  48;
+  */
+
+  /* ── First jade pass (low-saturation, kept here for revert / reference) ─
+  --ui-purple-rgb:          95, 175, 130;
+  --ui-purple-deep-rgb:     56, 120,  85;
+  --ui-purple-strong-rgb:  110, 200, 150;
+  --ui-purple-soft-rgb:    140, 220, 175;
+  --ui-purple-light-rgb:   180, 235, 205;
+  --ui-purple-darker:  #1d4a32;
+  --ui-purple-deep:    #387855;
+  --ui-purple-strong:  #6ec896;
+  --ui-purple-soft:    #8cdcaf;
+  --ui-purple-light:   #b4ebcd;
+  --ui-purple-wash:    #d2f0dc;
+  --ui-purple-pale:    #ddf3e2;
+  --ui-bg-panel-rgb:     8,  20,  14;
+  --ui-border-rgb:      20,  45,  30;
+  */
 
   /* ── Accent RGB decomposition ─────────────────────────────────────────────
      --accent (#e94560) as an rgb triple so rgba() can vary the opacity.
@@ -112,6 +162,15 @@
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-primary);
+
+  /* ── Display font for LORE-NAMED text surfaces ─────────────────────────
+     Cinzel Roman serif (bundled at src/assets/fonts/cinzel-latin.woff2),
+     used for realm names, breakthrough banner, modal titles, achievement
+     / tutorial names. NEVER use this for buttons, body text, tooltips,
+     micro-labels, or anything <12 px — those keep the default system
+     sans for instant legibility. See the typography audit at
+     _design/typography-audit.md for the full rationale. */
+  --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 
 * {

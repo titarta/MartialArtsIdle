@@ -7,6 +7,7 @@ import { evaluateLawUniques, buildContext } from '../systems/lawEngine';
 import { computeStat, MOD } from '../data/stats';
 import { MAX_OFFLINE_HOURS } from '../systems/autoFarm';
 import { trackRealmAdvance, trackQiSink, trackAscension, trackActiveLawSwitch, trackFirstTime, trackOfflineQiCollected } from '../analytics';
+import { recordStat, eventStat, peakStat } from '../systems/statsRecorder';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -25,7 +26,7 @@ function loadOwnedLaws() {
 
 const BASE_RATE       = 1; // qi per second at 1x
 const BOOST_MULTIPLIER = 3; // legacy fallback when focusMult ref isn't wired
-const AD_BOOST_MULT   = 2; // rewarded-ad cultivation boost
+const AD_BOOST_MULT   = 1.5; // rewarded-ad cultivation boost (Dial-4 2026-05-21: 2→1.5)
 const MIN_OFFLINE_SEC = 5 * 60; // only show offline popup after 5 min away
 
 // Crystal Click tap policy.
@@ -34,8 +35,17 @@ const MIN_OFFLINE_SEC = 5 * 60; // only show offline popup after 5 min away
 //   EMPTY_FLOOR — when the reservoir is dry, a tap still grants this many
 //     seconds of current qi/s. Stops the "tap = nothing" silent zero while
 //     keeping waiting strictly more profitable than spam-tapping.
-const CRYSTAL_TAP_COOLDOWN_MS   = 150;
-const CRYSTAL_EMPTY_TAP_FLOOR_S = 0.25;
+// CRYSTAL_TAP_COOLDOWN_MS removed 2026-05-22 — taps are unthrottled now.
+// CRYSTAL_FLOOR_RECHARGE_S — full empty-tap floor is only available 1 sec
+// after the last tap. Spam-tapping gets the floor scaled by
+// secSinceLastTap so the throughput-per-second of pure spam ≈ one
+// full-floor tap per second (instead of one full floor per spam tap).
+const CRYSTAL_FLOOR_RECHARGE_S  = 1;
+// Was 0.25 (= 0.25s of qi/s per tap base, up to 8× rate at max Refined Tap).
+// Lowered to 0.03 (= 0.03s base, ~1× rate at max Refined Tap) so the
+// spam-tap floor matches the intended reservoir throughput (1× rate/sec
+// at full T5) instead of overshooting it by 8×.
+const CRYSTAL_EMPTY_TAP_FLOOR_S = 0.03;
 
 const label = (r) => (r.stage ? `${r.name} - ${r.stage}` : r.name);
 
@@ -149,9 +159,22 @@ export default function useCultivation() {
                            + (hasUp('u_offline_cap_2') ? 4 : 0)
                            + (hasUp('u_offline_cap_3') ? 4 : 0)
                            + (hasUp('u_offline_cap_4') ? 4 : 0);
+    // Blood Lotus Shop — "Patient Mind +2h" stackable purchase. Read
+    // directly from localStorage since this branch runs pre-React-mount
+    // (offline calc) and there's no useShopInventory available yet.
+    let shopOfflineCapBonusH = 0;
+    try {
+      const rawInv = localStorage.getItem('mai_shop_inventory');
+      if (rawInv) {
+        const inv = JSON.parse(rawInv);
+        const stacks = inv?.stacks ?? {};
+        const n = Math.max(0, parseInt(stacks.qol_offline_cap_2h ?? 0, 10) || 0);
+        shopOfflineCapBonusH = n * 2;
+      }
+    } catch {}
     // Cap at MAX_OFFLINE_HOURS so a week-long absence doesn't trivialise
     // progression. Same constant as gather/mine offline cap.
-    const awaySeconds = Math.min(rawAwaySeconds, (MAX_OFFLINE_HOURS + offlineCapBonusH) * 3600);
+    const awaySeconds = Math.min(rawAwaySeconds, (MAX_OFFLINE_HOURS + offlineCapBonusH + shopOfflineCapBonusH) * 3600);
     const realm = REALMS[saved.realmIndex];
     if (!realm || !REALMS[saved.realmIndex + 1]) return 0; // maxed
 
@@ -218,15 +241,16 @@ export default function useCultivation() {
       if (raw) producerOfflineRate = JSON.parse(raw).rate ?? 0;
     } catch {}
 
-    // Crystal multiplier (2026-05-17) — reads `mai_qi_crystal` directly so
-    // offline calc applies the global crystal mult without needing React to
-    // mount first. Mirrors the online rate formula structure.
+    // Crystal multiplier — reads `mai_qi_crystal` directly so offline calc
+    // applies the global crystal mult without needing React to mount first.
+    // Mirrors useQiCrystal.getCrystalQiMult (2026-05-21 Dial-7):
+    //   capped at L100, mult = 1 + min(level, 100) × 0.015 (max ×2.5).
     let crystalMult = 1;
     try {
       const raw = localStorage.getItem('mai_qi_crystal');
       if (raw) {
         const lvl = JSON.parse(raw).level ?? 0;
-        crystalMult = 1 + lvl * 0.01;
+        crystalMult = lvl <= 0 ? 1 : 1 + Math.min(lvl, 100) * 0.015;
       }
     } catch {}
 
@@ -286,6 +310,14 @@ export default function useCultivation() {
   // useUpgrades.getCrystalTapMult(). Each owned crystal_tap upgrade ×2.
   // Applied inside collectCrystalReservoir() against the empty-reservoir floor.
   const upgradeCrystalTapMultRef = useRef(1);
+  // Blood Lotus Shop buff multipliers — written by App.jsx from
+  // useShopInventory.getActiveBuffMult(type). Default 1 = no active buff.
+  //   shopBuffQiMultRef        applies to total qi/s in the rate formula
+  //   shopBuffCrystalTapMultRef applies to crystal-tap rewards
+  // (Producer-rate buff is folded in via the extraMult callback passed to
+  //  producers.getRate() — no separate ref needed here.)
+  const shopBuffQiMultRef         = useRef(1);
+  const shopBuffCrystalTapMultRef = useRef(1);
   // Upgrade-driven focus-mult adder (percentage points, 0..N). Added to the
   // stat-driven focus mult inside App.jsx's focusMult-write interval. Phase D.
   const upgradeFocusMultAddRef = useRef(0);
@@ -335,6 +367,13 @@ export default function useCultivation() {
   // Written by the 'mai:pattern-click-buff' event handler below.
   const patternClickMultRef = useRef(1);
 
+  // Legendary producer-synergy sparks — global multiplier from trinity
+  // convergence + producer_pair_global_mult cards. Per-producer multipliers
+  // are folded into producerRateRef directly by App.jsx (via the perProducer
+  // callback to producers.getRate). This ref carries only the GLOBAL
+  // contributions (factors that apply to the whole rate).
+  const sparkLegendaryGlobalMultRef = useRef(1);
+
   // Crystal Click mechanic — rate/cap mirrored from useQiSparks by App.jsx.
   // crystalReservoirRef holds the accumulated qi waiting to be collected.
   const sparkCrystalClickRateRef   = useRef(0);
@@ -345,8 +384,9 @@ export default function useCultivation() {
       return Number.isFinite(v) && v > 0 ? v : 0;
     } catch { return 0; }
   })());
-  // Tracks the last successful crystal tap time so the cooldown can throttle
-  // autoclickers without affecting passive accrual.
+  // Tracks the last crystal-tap timestamp so the empty-tap floor can
+  // decay-scale with the gap since the previous tap (no cooldown, but
+  // spam-taps don't get full floor every time).
   const lastCrystalTapAtRef = useRef(0);
   const prevBoostStateRef            = useRef(false);
   // Consecutive Focus mechanic — every unlocked tier adds a rung to a
@@ -366,9 +406,11 @@ export default function useCultivation() {
   // no rungs met). UI reads it to fold into the multiplier badge.
   const sparkConsecutiveCurrentBonusRef = useRef(0);
   // Hold-to-cultivate boost multiplier (qi_focus_mult stat, expressed as %).
-  // Default 300% = the legacy 3× behavior; App.jsx writes the player's actual
-  // focus mult into this ref each second.
-  const focusMultRef = useRef(300);
+  // 2026-05-21 Dial-7: base 300 → 250 (×3.0 → ×2.5). With focus_mult upgrades
+  // each cut 50→35 (and final 100→75), the maxed-stack now caps at:
+  //   250 + 35+35+35+75 = 430 (×4.30) — was 550 (×5.5).
+  // Active-play rate stack drops ~22% at max upgrades.
+  const focusMultRef = useRef(250);
   const boostRef    = useRef(false);
   const adBoostRef  = useRef(
     (saved?.adBoostEndsAt ?? 0) > Date.now() ? AD_BOOST_MULT : 1
@@ -391,6 +433,25 @@ export default function useCultivation() {
   const indexRef   = useRef(savedIndex);
   // Live cultivation rate (qi/s) — updated every tick for the HUD readout.
   const rateRef    = useRef(0);
+  // Baseline rate (qi/s) — `rateRef` divided by transient short-term boosts
+  // (focus hold, consecutive-focus rungs, divine-qi buff, pattern-click buff).
+  // Used by visuals that should NOT shift when the player toggles focus —
+  // e.g. the crystal-reservoir fill % drives the spark spawn-rate, and we
+  // don't want sparks dropping out the moment the player starts boosting.
+  // Includes everything ad-boost related (those last 30 min so they're
+  // effectively "base" for the player's current session).
+  const baseRateRef = useRef(0);
+  // Monotone counter of qi accrued ONLY by the cultivation tick (not by
+  // crystal collects, divine-qi rewards, pattern clicks, etc.). The
+  // "+N Qi" floaters on the cultivator read deltas from this so a crystal
+  // tap doesn't spike the next floater. Reset cycles (reincarnation,
+  // breakthrough leftover) don't matter — the floater tracks against its
+  // own snapshot of this counter, not the absolute value.
+  const passiveQiAccruedRef = useRef(0);
+  // Stats — per-tick qi accumulator. Flushed to recordStat('qiEarned')
+  // once per second by an interval below so we don't hit the singleton at
+  // 60 Hz from inside the tick loop.
+  const statsQiAccumRef = useRef(0);
   // When the player is qi-capped waiting for enough qi/s to ascend between
   // MAJOR realms, this holds { required, current }. Null otherwise. Read by
   // the UI via rAF to render the gate indicator without React re-renders.
@@ -432,7 +493,7 @@ export default function useCultivation() {
       }
       // Boost multiplier: focusMult is in %, fall back to legacy 3× if unset.
       // Qi Spark "Focus Surge" cards layer additively on top via sparkFocusMultBonusRef.
-      const baseFocusMult = (focusMultRef.current ?? 300) / 100;
+      const baseFocusMult = (focusMultRef.current ?? 250) / 100;
       const focusMultWithSpark = baseFocusMult * (1 + sparkFocusMultBonusRef.current);
 
       // Record every focus release time. Cheap, and lets Lingering Focus
@@ -514,21 +575,40 @@ export default function useCultivation() {
       const producerFlat = producerRateRef.current * upgradeProducerMultRef.current * treeProducerOutputMultRef.current;
       // 2026-05-17 — crystalQiBonusRef now holds a MULTIPLIER (1 + level × 0.003).
       // Multiplies the base-rate sum so it applies to every flat source equally.
-      const rate = (BASE_RATE + sparkQiFlatRef.current + producerFlat) * crystalQiBonusRef.current * lawMult * qiUniqueMult *
+      // Split: baseRate excludes transient short-term boosts (focus hold, CF
+      // rung, divine qi, pattern click). rate is baseRate × transientMult.
+      // baseRateRef is read by visuals that should stay stable across boost
+      // toggles (e.g. the crystal reservoir VFX spark-rate).
+      const baseRate =
+        (BASE_RATE + sparkQiFlatRef.current + producerFlat) *
+        crystalQiBonusRef.current * lawMult * qiUniqueMult *
         artefactQiMultRef.current *
-        boostMult * consecutiveMult *
         adBoostRef.current * heavenlyTree * heavenlyArt *
         pillQiMultRef.current * sparkQiMultRef.current *
         treeQiMultRef.current * rebirthCultBuffRef.current *
-        divineQiMultRef.current *
-        patternClickMultRef.current *
+        sparkLegendaryGlobalMultRef.current *
+        shopBuffQiMultRef.current *
         debugQiMultRef.current;
-      rateRef.current = rate;
+      const transientMult =
+        boostMult * consecutiveMult *
+        divineQiMultRef.current *
+        patternClickMultRef.current;
+      const rate = baseRate * transientMult;
+      baseRateRef.current = baseRate;
+      rateRef.current     = rate;
       const dQi = rate * dt;
       qiRef.current += dQi;
+      // Passive-only accrual counter — used by the cultivator "+N Qi"
+      // floaters so one-shot grants (crystal taps, divine-qi rewards,
+      // pattern clicks) don't spike a floater on the next interval.
+      passiveQiAccruedRef.current += dQi;
       // Realm meter (Cookie-Clicker pivot) — fills with cumulative income
       // for this realm; never decreases via spending.
       qiEarnedThisRealmRef.current += dQi;
+      // Stats — accumulate passive qi here; flushed to the stats recorder
+      // once per second by the interval below so we don't hammer the
+      // singleton at 60 Hz.
+      statsQiAccumRef.current += dQi;
 
       // Crystal Click reservoir accrual — fill at (rate × clickRate) per second
       // up to (capMinutes × 60 × rate). Paused when mechanic is not unlocked.
@@ -552,6 +632,7 @@ export default function useCultivation() {
           // Sound is played by BreakthroughBanner on mount so it stays in sync
           // with the reveal animation (avoids firing during the qi update tick).
           try {
+            eventStat('breakthroughs');
             trackRealmAdvance(indexRef.current, REALMS[indexRef.current].name, false, true);
             trackAscension(indexRef.current);
             trackFirstTime('Ascension', indexRef.current);
@@ -626,6 +707,7 @@ export default function useCultivation() {
               qiEarnedThisRealmRef.current += bonus;
             }
             setRealmIndex(nextIndex);
+            try { eventStat('breakthroughs'); } catch {}
             try { trackQiSink(REALMS[fromIndex].cost, 'Breakthrough', `r${nextIndex}`); } catch {}
             try { trackFirstTime('RealmAdvance', nextIndex); } catch {}
             if (isMajor || isPeak) {
@@ -688,19 +770,42 @@ export default function useCultivation() {
     };
   }, []);
 
+  // Stats — flush the per-tick qi accumulator into the recorder once per
+  // second. Sub-1qi increments are still flushed (the recorder's own state
+  // accepts floats; the Stats tab formatter handles display rounding).
+  // Same tick also samples the current rate into the qiPerSecPeak peak
+  // counter (one-call-per-second instead of per-frame keeps the hot path
+  // clean while still capturing the highest sustained rate).
+  useEffect(() => {
+    const id = setInterval(() => {
+      const v = statsQiAccumRef.current;
+      if (v > 0) {
+        statsQiAccumRef.current = 0;
+        recordStat('qiEarned', v);
+      }
+      const rate = rateRef.current ?? 0;
+      if (rate > 0) peakStat('qiPerSecPeak', rate);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
   // Auto-save every 2 seconds
   const adBoostEndsAtRef = useRef(adBoostEndsAt);
   useEffect(() => { adBoostEndsAtRef.current = adBoostEndsAt; }, [adBoostEndsAt]);
 
   useEffect(() => {
     const interval = setInterval(() => {
+      // Round to 0.1 (not floor) so each save doesn't drop up to 0.99 qi —
+      // at early-game rates of ~1-2 qi/s that was a meaningful loss every
+      // 2 sec. Display still shows integers; the underlying math stays as
+      // accurate as the dial supports.
       saveGame({
         realmIndex:         indexRef.current,
-        qi:                 Math.floor(qiRef.current),
+        qi:                 Math.round(qiRef.current * 10) / 10,
         // Realm-progress meter — Cookie-Clicker pivot. Missing on legacy
         // saves; defaults to 0 on next load (realm bar starts empty, no
         // breakthrough blocked).
-        qiEarnedThisRealm:  Math.floor(qiEarnedThisRealmRef.current),
+        qiEarnedThisRealm:  Math.round(qiEarnedThisRealmRef.current * 10) / 10,
         adBoostEndsAt:      adBoostEndsAtRef.current,
         ascended:           ascendedRef.current,
       });
@@ -751,6 +856,7 @@ export default function useCultivation() {
     }
     setRealmIndex(nextIndex);
 
+    try { eventStat('breakthroughs'); } catch {}
     try { trackQiSink(REALMS[fromIndex].cost, 'Breakthrough', `r${nextIndex}`); } catch {}
     try { trackFirstTime('RealmAdvance', nextIndex); } catch {}
     try {
@@ -793,11 +899,12 @@ export default function useCultivation() {
   }, [offlineEarnings]);
 
   /**
-   * Tap the crystal. When the reservoir has accrued qi, drains it. When the
-   * reservoir is empty, grants a small floor (rate × CRYSTAL_EMPTY_TAP_FLOOR_S)
-   * so the tap never feels like a no-op. Throttled by CRYSTAL_TAP_COOLDOWN_MS.
+   * Tap the crystal. Always grants max(reservoir, floor) — the floor is
+   * `rate × CRYSTAL_EMPTY_TAP_FLOOR_S × tapMult` so a tap is never a
+   * pittance even if the reservoir is empty or tiny. No cooldown — taps
+   * are unthrottled.
    *
-   * @returns {number} qi granted by this tap (0 if throttled).
+   * @returns {number} qi granted by this tap (0 only if mechanic is locked).
    */
   /**
    * Spend qi atomically. Used by the Cultivation shop (producers + upgrades)
@@ -815,25 +922,48 @@ export default function useCultivation() {
   }, []);
 
   const collectCrystalReservoir = useCallback(() => {
-    const now = performance.now();
-    if (now - lastCrystalTapAtRef.current < CRYSTAL_TAP_COOLDOWN_MS) return 0;
     if (sparkCrystalClickRateRef.current <= 0) return 0;
+    // 2026-05-22: tap cooldown removed. Players can spam-tap freely, but
+    // the empty-tap floor decay-scales with secSinceLastTap so spamming
+    // doesn't run away with throughput.
+    try { eventStat('crystalTaps'); } catch {}
+
+    const now = performance.now();
+    const lastTap = lastCrystalTapAtRef.current;
+    const secSinceLastTap = lastTap > 0
+      ? Math.max(0, (now - lastTap) / 1000)
+      : CRYSTAL_FLOOR_RECHARGE_S; // first ever tap gets full floor
     lastCrystalTapAtRef.current = now;
 
     const reservoir = crystalReservoirRef.current;
-    let granted;
-    if (reservoir > 0) {
-      granted = reservoir;
-      crystalReservoirRef.current = 0;
-      try { localStorage.setItem('mai_crystal_reservoir', '0'); } catch {}
-    } else {
-      // Floor at 1 qi so the floater never displays "+0" (fmt() floors values
-      // <1000 to integers). At low realms the 1-qi minimum dominates the
-      // rate × 0.25 calc; once rate ≥ 4, the calc takes over.
-      // upgradeCrystalTapMultRef multiplies the floor (Refined Tap I–V upgrades).
-      const tapMult = upgradeCrystalTapMultRef.current || 1;
-      granted = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
-    }
+    // Empty-tap floor — base 0.03s of qi/s × Refined Tap mult (×32 at full
+    // set). DECAY: floor scales by secSinceLastTap / 1 (capped at 1) so
+    // spam-tapping 100ms after the last tap gets 10% floor; waiting 1+ sec
+    // gets full floor. Throughput-per-second of spam ≈ one full floor / sec.
+    const tapMult = upgradeCrystalTapMultRef.current || 1;
+    const floorMult = Math.min(1, secSinceLastTap / CRYSTAL_FLOOR_RECHARGE_S);
+    const baseFloor = Math.max(1, (rateRef.current ?? 0) * CRYSTAL_EMPTY_TAP_FLOOR_S * tapMult);
+    const floor = baseFloor * floorMult;
+
+    // Diminishing returns on partial reservoirs — quadratic falloff. At
+    // fill %, the player gets cap × fillPct² instead of the raw reservoir
+    // (which is cap × fillPct). Discourages mid-taps: 50% full → only 25%
+    // of cap; 75% full → 56% of cap; ≥90% full barely loses anything.
+    // Floor still applies via max(), so empty/near-empty taps grant the
+    // floor instead of the tiny diminished amount.
+    const rate = rateRef.current ?? 0;
+    const cap = sparkCrystalClickCapMinRef.current * 60 * rate;
+    const fillPct = cap > 0 ? Math.min(1, reservoir / cap) : 0;
+    const effectiveReservoir = cap * fillPct * fillPct;
+    // Shop "Crystal Resonance" buff — multiplies both the diminished
+    // reservoir and the floor uniformly so the buff scales every tap
+    // outcome, not just one of the two paths.
+    const shopTapMult = shopBuffCrystalTapMultRef.current || 1;
+    const granted = Math.max(effectiveReservoir, floor) * shopTapMult;
+    // Always zero the reservoir on tap — the diminished portion is the
+    // cost of mistiming; refunding it would defeat the purpose.
+    crystalReservoirRef.current = 0;
+    try { localStorage.setItem('mai_crystal_reservoir', '0'); } catch {}
     qiRef.current += granted;
     // Cookie-Clicker pivot — tap qi counts toward realm progress too.
     qiEarnedThisRealmRef.current += granted;
@@ -862,6 +992,8 @@ export default function useCultivation() {
     costRef,
     indexRef,
     rateRef,
+    baseRateRef,
+    passiveQiAccruedRef,
     gateRef,
     majorBreakthrough,
     clearMajorBreakthrough: () => setMajorBreakthrough(null),
@@ -869,6 +1001,25 @@ export default function useCultivation() {
     // to render the BREAKTHROUGH button; tap fires `confirmMajorBreakthrough()`.
     pendingMajorBreakthrough,
     confirmMajorBreakthrough,
+    /**
+     * Blood Lotus Shop — "Heaven's Pardon" bypass token. Force-clears the
+     * qi/s gate. When the cleared gate was a major transition, this also
+     * flips `pendingMajorBreakthrough` to true so the BREAKTHROUGH button
+     * appears immediately for the player to confirm. Returns true iff a
+     * gate was active and got cleared. Caller is responsible for
+     * decrementing the consumable count BEFORE invoking this.
+     */
+    bypassGate: () => {
+      if (!gateRef.current) return false;
+      gateRef.current = null;
+      const idx = indexRef.current;
+      const isMajor = isMajorTransition(idx);
+      if (isMajor && !pendingMajorBreakthroughRef.current) {
+        pendingMajorBreakthroughRef.current = true;
+        setPendingMajorBreakthrough(true);
+      }
+      return true;
+    },
     ascended,
     // True only at the very final realm (Open Heaven Layer 6) so peak-stage
     // bar treatment is reserved for the actual endgame pinnacle. Per-realm
@@ -900,6 +1051,9 @@ export default function useCultivation() {
     divineQiMultRef,
     // Pattern Click rate-buff ref — written by the mai:pattern-click-buff event listener
     patternClickMultRef,
+    // Legendary producer-synergy global mult — written by App.jsx from
+    // qiSparks.getGlobalSparkMult() whenever activeSparks or producers.owned changes.
+    sparkLegendaryGlobalMultRef,
     // Crystal Click refs — rate/cap written by App.jsx, reservoir updated each tick
     sparkCrystalClickRateRef,
     sparkCrystalClickCapMinRef,
@@ -919,6 +1073,9 @@ export default function useCultivation() {
     treeProducerOutputMultRef,
     // Upgrade-driven crystal-tap floor mult — updated by App.jsx
     upgradeCrystalTapMultRef,
+    // Blood Lotus Shop buff mults — updated by App.jsx from useShopInventory
+    shopBuffQiMultRef,
+    shopBuffCrystalTapMultRef,
     upgradeFocusMultAddRef,
     // Artefact qi_speed aggregate ref — updated by App.jsx each second
     artefactQiMultRef,

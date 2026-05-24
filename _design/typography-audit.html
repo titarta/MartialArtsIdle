@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Typography Audit — MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Typography audit — 3 paired comparisons
+   Tokens lifted from the live lacquer palette so the demo
+   reads exactly like the in-game panels.
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        rgb(14, 12, 8);
+  --bg-panel:       rgb(32, 26, 18);
+  --bg-panel-2:     rgb(26, 21, 16);
+
+  --cream:          #f5e6c8;
+  --cream-soft:     #e8d5a8;
+  --cream-pale:     #fcf5e2;
+  --tan:            #c8aa78;
+  --tan-deep:       #9b7d50;
+  --tan-darker:     #4a3520;
+
+  --ember:          #dcaf6e;
+  --ember-hot:      #ffcf83;
+  --ember-deep:     #6b3f1a;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  --font-display: 'Cinzel', 'Segoe UI', sans-serif;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{
+  min-height:100vh;
+  background:
+    radial-gradient(900px 600px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(220,175,110,.04) 0%, transparent 60%),
+    linear-gradient(180deg, #0c0a07 0%, #15110b 60%, #0c0a07 100%);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+header{
+  text-align:center;
+  padding: 44px 20px 8px;
+}
+header h1{
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: .14em;
+  color: var(--ember);
+  font-weight: 600;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+}
+header p{
+  margin-top: 8px;
+  color: rgba(245,230,200,.55);
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* Section block — left = current, right = proposed */
+.section{
+  max-width: 1180px;
+  margin: 36px auto;
+  padding: 0 24px;
+}
+.section-head{
+  display:flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(212,184,136,.22);
+}
+.section-head .num{
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ember);
+  letter-spacing: .04em;
+}
+.section-head h2{
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.section-head .meta{
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(245,230,200,.45);
+}
+
+.pair{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.cell{
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.04) 0%, rgba(220,175,110,0) 70%),
+    linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
+  border: 1px solid rgba(212,184,136,.30);
+  border-radius: 12px;
+  padding: 24px 22px;
+  min-height: 220px;
+  box-shadow:
+    0 1px 0 rgba(255,225,170,.06) inset,
+    0 18px 36px -22px rgba(0,0,0,.9);
+}
+.cell .tag{
+  display:inline-block;
+  font-size: 9.5px;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: rgba(245,230,200,.55);
+  margin-bottom: 18px;
+  padding: 3px 9px;
+  border: 1px solid rgba(212,184,136,.25);
+  border-radius: 999px;
+}
+.cell.after .tag{
+  color: var(--ember);
+  border-color: rgba(220,175,110,.45);
+  background: rgba(220,175,110,.06);
+}
+.cell .caption{
+  margin-top: 18px;
+  font-size: 11px;
+  color: rgba(245,230,200,.45);
+  letter-spacing: .03em;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   1) Journey list — realm group name + stage rows
+   ──────────────────────────────────────────────────────────── */
+.jr-card{
+  background: rgba(20,16,11,.55);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.jr-head{
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 14px;
+  background: rgba(100, 180, 255, 0.08);
+  border-bottom: 1px solid rgba(100, 180, 255, 0.15);
+}
+.jr-head .ic{
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #3a2916, #1f160c);
+  border: 1px solid rgba(220,175,110,.35);
+  display: grid; place-items: center;
+  font-size: 14px;
+  color: var(--ember);
+}
+.jr-name-sys{
+  flex:1;
+  font-size: 14px;
+  font-weight: 700;
+  color: #c8e4ff;
+  letter-spacing: .02em;
+}
+.jr-name-cin{
+  flex:1;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: #c8e4ff;
+  letter-spacing: .04em;
+}
+.jr-row{
+  display:flex; align-items: baseline;
+  gap: 10px;
+  padding: 8px 14px;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.jr-dot{
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(220,175,110,.4);
+  background: rgba(220,175,110,.1);
+  flex-shrink: 0;
+  transform: translateY(2px);
+}
+.jr-label-sys{
+  flex:1;
+  font-size: 13px;
+  color: var(--cream);
+}
+.jr-label-cin{
+  flex:1;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .03em;
+  color: var(--cream);
+}
+.jr-num{
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  color: var(--cream-soft);
+  font-feature-settings: "tnum";
+}
+.jr-num-wobble{
+  font-size: 12px;
+  color: var(--cream-soft);
+}
+.jr-stage-num{
+  font-size: 10.5px;
+  color: rgba(245,230,200,.35);
+  margin-left: 6px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2) Breakthrough banner — the loud moment
+   ──────────────────────────────────────────────────────────── */
+.bth{
+  display:grid;
+  place-items: center;
+  min-height: 220px;
+  text-align: center;
+}
+.bth-kicker-sys{
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .35em;
+  color: #ffe4a0;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,.8);
+  margin-bottom: 10px;
+}
+.bth-kicker-cin{
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .42em;
+  color: #ffe4a0;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,.8);
+  margin-bottom: 10px;
+}
+.bth-name-sys{
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  color: #fff4c8;
+  text-shadow:
+    0 0 14px rgba(255,210,80,.85),
+    0 0 28px rgba(255,170,40,.6),
+    0 2px 6px rgba(0,0,0,.85);
+}
+.bth-name-cin{
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: #fff4c8;
+  text-shadow:
+    0 0 14px rgba(255,210,80,.85),
+    0 0 28px rgba(255,170,40,.6),
+    0 2px 6px rgba(0,0,0,.85);
+  text-transform: uppercase;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   3) Modal title — the most-frequently-seen "named noun"
+   ──────────────────────────────────────────────────────────── */
+.modal{
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.04) 0%, rgba(220,175,110,0) 60%),
+    linear-gradient(180deg, #221a11 0%, #15110b 100%);
+  border: 1px solid rgba(212,184,136,.45);
+  border-radius: 10px;
+  padding: 18px 22px 16px;
+  position: relative;
+}
+.modal::after{
+  content: '×';
+  position: absolute;
+  top: 8px; right: 14px;
+  font-size: 18px;
+  color: rgba(245,230,200,.35);
+}
+.m-title-sys{
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  margin: 0 32px 6px 0;
+}
+.m-title-cin{
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--cream);
+  margin: 0 32px 6px 0;
+}
+.m-rarity{
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: 10px;
+}
+.m-desc{
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: rgba(245,230,200,.78);
+  letter-spacing: .015em;
+}
+.m-stats{
+  margin-top: 12px;
+  display: grid; gap: 4px;
+  font-size: 12px;
+  color: rgba(245,230,200,.68);
+}
+.m-stat-row{ display:flex; justify-content: space-between; }
+.m-stat-row .val{
+  color: var(--cream-pale);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Footer summary
+   ──────────────────────────────────────────────────────────── */
+.summary{
+  max-width: 1180px;
+  margin: 50px auto 70px;
+  padding: 24px 28px;
+  border: 1px dashed rgba(212,184,136,.25);
+  border-radius: 12px;
+}
+.summary h3{
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  color: var(--ember);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.summary p{
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(245,230,200,.7);
+  max-width: 70ch;
+}
+.summary table{
+  margin-top: 16px;
+  width: 100%;
+  max-width: 580px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.summary td, .summary th{
+  text-align: left;
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(212,184,136,.18);
+}
+.summary th{
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(245,230,200,.5);
+  font-weight: 600;
+}
+.summary td:last-child, .summary th:last-child{
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--cream-pale);
+}
+.summary tfoot td{
+  border-bottom: none;
+  padding-top: 10px;
+  font-weight: 700;
+  color: var(--ember);
+}
+
+@media (max-width: 800px){
+  .pair{ grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Typography Audit</h1>
+  <p>Three side-by-side comparisons · Cinzel proposal · ~29 KB total bundle add</p>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────
+     1. Journey list
+     ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-head">
+    <span class="num">1</span>
+    <h2>Journey List — realm groups + stage rows</h2>
+    <span class="meta">Cultivation screen · ~60 visible rows</span>
+  </div>
+  <div class="pair">
+
+    <div class="cell before">
+      <span class="tag">Current · system sans</span>
+      <div class="jr-card">
+        <div class="jr-head">
+          <span class="ic">凡</span>
+          <span class="jr-name-sys">Qi Transformation</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-sys">Early Stage <span class="jr-stage-num">#11</span></span>
+          <span class="jr-num-wobble">200 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-sys">Middle Stage <span class="jr-stage-num">#12</span></span>
+          <span class="jr-num-wobble">305 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-sys">Late Stage <span class="jr-stage-num">#13</span></span>
+          <span class="jr-num-wobble">570 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-sys">Peak Stage <span class="jr-stage-num">#14</span></span>
+          <span class="jr-num-wobble">1.00 M Qi</span>
+        </div>
+      </div>
+      <div class="caption">
+        Reads as a generic list. Numbers don't line up; "K" and "M"
+        wobble in width because the digits use proportional metrics.
+      </div>
+    </div>
+
+    <div class="cell after">
+      <span class="tag">Proposed · Cinzel 600 + tabular-nums</span>
+      <div class="jr-card">
+        <div class="jr-head">
+          <span class="ic">凡</span>
+          <span class="jr-name-cin">Qi Transformation</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-cin">Early Stage <span class="jr-stage-num">#11</span></span>
+          <span class="jr-num">200 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-cin">Middle Stage <span class="jr-stage-num">#12</span></span>
+          <span class="jr-num">305 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-cin">Late Stage <span class="jr-stage-num">#13</span></span>
+          <span class="jr-num">570 K Qi</span>
+        </div>
+        <div class="jr-row">
+          <span class="jr-dot"></span>
+          <span class="jr-label-cin">Peak Stage <span class="jr-stage-num">#14</span></span>
+          <span class="jr-num">1.00 M Qi</span>
+        </div>
+      </div>
+      <div class="caption">
+        Group + stage names carry the temple-scroll tone. Costs use
+        tabular numerics — the digit column is now rock-solid as it
+        scrolls past during cultivation.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────
+     2. Breakthrough banner
+     ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-head">
+    <span class="num">2</span>
+    <h2>Breakthrough Celebration — the loudest text in the game</h2>
+    <span class="meta">On-screen 2.6 s · once per major realm</span>
+  </div>
+  <div class="pair">
+
+    <div class="cell before">
+      <span class="tag">Current · system sans 900</span>
+      <div class="bth">
+        <div>
+          <div class="bth-kicker-sys">Ascension</div>
+          <div class="bth-name-sys">True Element</div>
+        </div>
+      </div>
+      <div class="caption">
+        Loud, glowy, but the type-face itself is the same Segoe UI
+        the player has seen for the last 20 minutes. No tonal lift.
+      </div>
+    </div>
+
+    <div class="cell after">
+      <span class="tag">Proposed · Cinzel 700</span>
+      <div class="bth">
+        <div>
+          <div class="bth-kicker-cin">Ascension</div>
+          <div class="bth-name-cin">True Element</div>
+        </div>
+      </div>
+      <div class="caption">
+        Carved-Roman uppercase. Same colour, same glow — only the
+        face changes. The moment now feels like a relic emerging
+        from the dark instead of a UI toast.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────
+     3. Modal title
+     ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="section-head">
+    <span class="num">3</span>
+    <h2>Modal Title — the most frequently seen "named noun"</h2>
+    <span class="meta">Tech / pill / gear / artefact modals</span>
+  </div>
+  <div class="pair">
+
+    <div class="cell before">
+      <span class="tag">Current · system sans 700</span>
+      <div class="modal">
+        <div class="m-title-sys">Heavenly Crane Step</div>
+        <div class="m-rarity">Epic · Movement Art</div>
+        <div class="m-desc">
+          Sidestep through space. Each successful evasion grants
+          one stack of <em>Crane's Poise</em>, increasing dodge
+          chance by 4% (max 5 stacks).
+        </div>
+        <div class="m-stats">
+          <div class="m-stat-row"><span>Cooldown</span><span class="val">12.0 s</span></div>
+          <div class="m-stat-row"><span>Qi cost</span><span class="val">450</span></div>
+          <div class="m-stat-row"><span>Scaling</span><span class="val">+ 8% / lvl</span></div>
+        </div>
+      </div>
+      <div class="caption">
+        Title competes with the rarity tag. Reads as another
+        settings-row label rather than a named technique.
+      </div>
+    </div>
+
+    <div class="cell after">
+      <span class="tag">Proposed · Cinzel 600</span>
+      <div class="modal">
+        <div class="m-title-cin">Heavenly Crane Step</div>
+        <div class="m-rarity">Epic · Movement Art</div>
+        <div class="m-desc">
+          Sidestep through space. Each successful evasion grants
+          one stack of <em>Crane's Poise</em>, increasing dodge
+          chance by 4% (max 5 stacks).
+        </div>
+        <div class="m-stats">
+          <div class="m-stat-row"><span>Cooldown</span><span class="val">12.0 s</span></div>
+          <div class="m-stat-row"><span>Qi cost</span><span class="val">450</span></div>
+          <div class="m-stat-row"><span>Scaling</span><span class="val">+ 8% / lvl</span></div>
+        </div>
+      </div>
+      <div class="caption">
+        Title now reads as a named relic. Body copy stays system
+        sans for instant legibility. Numeric column lines up.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────
+     Bundle summary
+     ───────────────────────────────────────────────────────── -->
+<section class="summary">
+  <h3>Proposed bundle</h3>
+  <p>
+    One face, two weights, four selectors. Every other text surface
+    stays system sans — buttons, body copy, tooltips, nav labels,
+    counters. Tabular numerics are free and unrelated to the font
+    add; they ship in the same patch.
+  </p>
+  <table>
+    <thead>
+      <tr><th>File</th><th>Used by</th><th>Size</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>cinzel-latin-600.woff2</td><td>Journey, modals, tutorial names</td><td>~14.5 KB</td></tr>
+      <tr><td>cinzel-latin-700.woff2</td><td>Breakthrough banner</td><td>~14.5 KB</td></tr>
+      <tr><td>(already bundled) ma-shan-zheng-common.woff2</td><td>天 glyph + future hanzi</td><td>68 KB</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="2">New typography weight to ship</td><td>~29 KB</td></tr>
+    </tfoot>
+  </table>
+</section>
+
+</body>
+</html>

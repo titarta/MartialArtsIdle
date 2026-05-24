@@ -1,13 +1,32 @@
 import { useRef, useEffect, useState } from 'react';
 import { FEATURES } from '../data/featureFlags';
+import { fmt as fmtNum } from '../utils/format';
 
 const BASE = import.meta.env.BASE_URL;
 
+// Live QI readout — qiRef is a mutable ref updated outside React (no state
+// re-renders), so we poll it via rAF and write directly to the DOM. Same
+// pattern as QiProgressChip in HomeScreen.
+function QiLiveText({ qiRef }) {
+  const spanRef = useRef(null);
+  useEffect(() => {
+    if (!qiRef) return;
+    let raf;
+    const tick = () => {
+      if (spanRef.current) spanRef.current.textContent = fmtNum(qiRef.current ?? 0);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [qiRef]);
+  return <span ref={spanRef}>—</span>;
+}
+
 export default function TopBar({
   bloodLotusBalance,
-  onOpenShop,
-  onOpenJourney,
-  onOpenAchievements,
+  onOpenShop,        // IAP "Top Up Blood Lotus" modal
+  onOpenLotusShop,   // SPEND shop (buffs / consumables / QoL / cosmetics)
+  onOpenProgress,
   onOpenSettings,
   hasNewAchievement,
   activeModal,
@@ -15,15 +34,18 @@ export default function TopBar({
   reincarnationUnlocked,
   onOpenCrystal,
   crystalUnlocked,
-  realmName,
-  realmStage,
+  qiRef,
+  karma,
 }) {
   return (
     <div className="top-bar">
+      {/* Top Up button — opens the IAP modal where Blood Lotus is bought
+          with real money. Shows the player's current balance so it
+          doubles as the balance readout. */}
       <button
         className={`home-hud-blood-lotus${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenShop}
-        aria-label="Blood Lotus Shop"
+        aria-label="Top Up Blood Lotus"
       >
         <img
           src={`${BASE}sprites/items/blood_lotus.png`}
@@ -33,12 +55,42 @@ export default function TopBar({
         />
         <span className="home-hud-blood-lotus-amount">{bloodLotusBalance ?? 0}</span>
       </button>
-      {realmName && (
-        <div className="topbar-realm">
-          <span className="topbar-realm-name">{realmName.split(' - ')[0]}</span>
-          {realmStage && <span className="topbar-realm-stage">{realmStage}</span>}
+      {/* Spend Shop button — sits right next to the Top Up button. Opens
+          the Blood Lotus Shop where the balance is SPENT on buffs /
+          consumables / QoL / cosmetics. Icon-only (the balance lives on
+          the Top Up button just to the left). */}
+      <button
+        className={`home-hud-lotus-shop${activeModal === 'lotus-shop' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenLotusShop}
+        aria-label="Blood Lotus Shop"
+      >
+        <img
+          src={`${BASE}ui/shop_nav.png`}
+          className="home-hud-lotus-shop-icon"
+          alt=""
+          draggable="false"
+        />
+      </button>
+      <div className="topbar-currencies">
+        <div className="topbar-currency-row" aria-label="Current Qi">
+          <img
+            src={`${BASE}ui/qi.png`}
+            className="topbar-currency-icon"
+            alt=""
+            draggable="false"
+          />
+          <QiLiveText qiRef={qiRef} />
         </div>
-      )}
+        <div className="topbar-currency-row" aria-label="Current Karma">
+          <img
+            src={`${BASE}ui/karma.png`}
+            className="topbar-currency-icon"
+            alt=""
+            draggable="false"
+          />
+          <span>{karma ?? 0}</span>
+        </div>
+      </div>
       <div className="home-hud-spacer" />
       {reincarnationUnlocked && (
         <button
@@ -60,19 +112,17 @@ export default function TopBar({
           🪨
         </button>
       )}
+      {/* Progress hub — replaces the previous Journey + Achievements
+          buttons with a single 📊 entry point that opens a 3-tab modal
+          (Journey / Achievements / Stats). Achievement badge dot now
+          surfaces on this button so the unread signal survives the
+          consolidation. */}
       <button
-        className={`home-hud-journey${activeModal === 'journey' ? ' top-bar-btn--active' : ''}`}
-        onClick={onOpenJourney}
-        aria-label="Cultivation Journey"
+        className={`home-hud-progress${activeModal === 'progress' ? ' top-bar-btn--active' : ''}`}
+        onClick={onOpenProgress}
+        aria-label="Progress"
       >
-        🗺️
-      </button>
-      <button
-        className={`home-hud-trophy${activeModal === 'achievements' ? ' top-bar-btn--active' : ''}`}
-        onClick={onOpenAchievements}
-        aria-label="Achievements"
-      >
-        🏆
+        📊
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
       <button

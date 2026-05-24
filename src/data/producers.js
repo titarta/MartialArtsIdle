@@ -6,14 +6,23 @@
  *
  * Shape rationale: each tier is ~10× the previous in both cost and output,
  * giving identical payback time across tiers (no producer becomes obsolete).
- * 1.15× scaling per owned unit gives roughly:
- *   - 10 owned ≈ 4× cumulative cost / 10× cumulative output (sweet spot)
- *   - 25 owned ≈ 32× cumulative cost / 25× cumulative output (saturation)
  *
- * All numbers are STARTING VALUES — validate via scripts/sim-cultivation.js
- * (TODO Phase F) before locking in. Tweak `startCost` / `startQiPerSec` only;
- * `costScaling` must stay at 1.15 to preserve the curve shape used by the
- * upgrades plan.
+ * 2026-05-21 Dial-7: cost scaling bumped 1.18 → 1.22 to slow top-tier
+ * accumulation in mid-late game. Playtest showed players buying a top-tier
+ * producer every ~1 second at Saint Late — way faster than Cookie Clicker's
+ * "hours per top-tier" pacing. The 1.22× curve makes successive top-tier
+ * units progressively much pricier:
+ *   - 5 owned  ≈ 2.36× start  (was 1.94× at 1.18)
+ *   - 10 owned ≈ 7.30× start  (was 5.23×)
+ *   - 25 owned ≈ 174×  start  (was 62.7×)
+ * Equilibrium staircase gaps tighten further (15 → ~12) — the descending
+ * shape still holds but is more compressed.
+ *
+ * (2026-05-21 Dial-5.1: prior bump 1.15 → 1.18 to address "buy 5 of new
+ * tier on unlock" issue. Kept history for the audit trail.)
+ *
+ * All numbers are STARTING VALUES — validate via scripts/sim-cultivation.js.
+ * Tweak `startCost` / `startQiPerSec` only.
  *
  * Unlock conditions reference realm INDEX (0-based) in `data/realms.js`.
  *
@@ -55,8 +64,14 @@ const PRODUCERS = [
     name:          'Body Tempering Disciple',
     desc:          'An apprentice kneels in your courtyard, breath even, palms warm. The qi they draw from the air is one thin thread. Every thread strengthens the loom.',
     startCost:     15,
-    startQiPerSec: 0.1,
-    costScaling:   1.15,
+    // 2026-05-21 Dial-10: 0.1 → 0.2 qi/s. Sim showed TB completion dropping
+    // ~14% at every engagement level (54m → 46m at light engagement), with
+    // the biggest perceived shortening in the first 5 minutes (L1: 2.1m →
+    // 1.5m). BASE_RATE deliberately stays at 1 qi/s — only the producer
+    // ramp moves. Kept at one-decimal precision (0.1) to avoid float-noise
+    // accumulating across producer purchases.
+    startQiPerSec: 0.2,
+    costScaling:   1.22,
     unlock:        { type: 'always' },
     sprites:       [
       '/sprites/producers/p_disciple_bronze.png',
@@ -71,8 +86,10 @@ const PRODUCERS = [
     desc:          'Jade leaves uncurl in the dawn and quietly drink the heavens dry. What the spirit herbs cannot use, they offer up to you.',
     startCost:     100,
     startQiPerSec: 1,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 4 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 4 → 2 (TB L3). Player has ~150-250 qi when
+    // it unlocks instead of 400-600 — can afford 1-2 instead of 4+. Grindy.
+    unlock:        { type: 'realm', minRealmIndex: 2 },
     sprites:       [
       '/sprites/producers/p_herb_garden_bronze.png',
       '/sprites/producers/p_herb_garden_silver.png',
@@ -86,8 +103,10 @@ const PRODUCERS = [
     desc:          'Bronze legs, sealed lid, a fire that never gutters. Raw qi enters muddy and bitter; what reaches your meridians is denser than gold.',
     startCost:     1100,
     startQiPerSec: 8,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 9 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 9 → 7 (TB L8). Player still grinding through
+    // TB layers when it unlocks — natural "stretch goal" alongside refining.
+    unlock:        { type: 'realm', minRealmIndex: 7 },
     sprites:       [
       '/sprites/producers/p_meridian_furnace_bronze.png',
       '/sprites/producers/p_meridian_furnace_silver.png',
@@ -101,8 +120,9 @@ const PRODUCERS = [
     desc:          'A jade pendant your ancestors carried for a hundred lifetimes. Every breath they took left a trace, and every trace bleeds back into you now, patient as a tide.',
     startCost:     12000,
     startQiPerSec: 47,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 13 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 13 → 11 (QT Middle instead of QT Peak).
+    unlock:        { type: 'realm', minRealmIndex: 11 },
     sprites:       [
       '/sprites/producers/p_treasure_bronze.png',
       '/sprites/producers/p_treasure_silver.png',
@@ -116,8 +136,9 @@ const PRODUCERS = [
     desc:          'You whistle once and they return from places no mortal could walk. Tigers with qi-storms tangled in their fur. Foxes with starlight on their tongues. They bring the harvest to your door.',
     startCost:     130000,
     startQiPerSec: 260,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 17 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 17 → 15 (TE Middle instead of TE Peak).
+    unlock:        { type: 'realm', minRealmIndex: 15 },
     sprites:       [
       '/sprites/producers/p_beast_pact_bronze.png',
       '/sprites/producers/p_beast_pact_silver.png',
@@ -131,8 +152,9 @@ const PRODUCERS = [
     desc:          'Carved before your grandfather\'s grandfather, the pillar climbs until the clouds forget it began as stone. Through its length, the heavens themselves bleed down into your dantian.',
     startCost:     1400000,
     startQiPerSec: 1400,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 20 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 20 → 18 (Sep 1st instead of Sep 3rd).
+    unlock:        { type: 'realm', minRealmIndex: 18 },
     sprites:       [
       '/sprites/producers/p_pillar_bronze.png',
       '/sprites/producers/p_pillar_silver.png',
@@ -146,8 +168,9 @@ const PRODUCERS = [
     desc:          'Ten thousand disciples wake at dawn and bow toward the hall that bears your sigil. A grain of rice from each becomes a mountain. A breath of qi from each becomes a river.',
     startCost:     20000000,
     startQiPerSec: 7800,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 23 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 23 → 21 (IA 1st instead of IA 3rd).
+    unlock:        { type: 'realm', minRealmIndex: 21 },
     sprites:       [
       '/sprites/producers/p_sect_followers_bronze.png',
       '/sprites/producers/p_sect_followers_silver.png',
@@ -161,8 +184,9 @@ const PRODUCERS = [
     desc:          'A wound in reality, never closing, never bleeding less. Through it, qi from a world that is not yours pours into a world that is. Another universe is a generous tithe.',
     startCost:     330000000,
     startQiPerSec: 44000,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 29 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 29 → 27 (SK 1st instead of SK 3rd).
+    unlock:        { type: 'realm', minRealmIndex: 27 },
     sprites:       [
       '/sprites/producers/p_void_bronze.png',
       '/sprites/producers/p_void_silver.png',
@@ -176,8 +200,9 @@ const PRODUCERS = [
     desc:          'It dreams in your dantian, and one of its dreams is you. The pearl it coils around is older than mountains. Each slow exhalation gilds your meridians with cultivation you never had to earn.',
     startCost:     5100000000,
     startQiPerSec: 260000,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 35 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 35 → 33 (OK 1st instead of OK 3rd).
+    unlock:        { type: 'realm', minRealmIndex: 33 },
     sprites:       [
       '/sprites/producers/p_dragon_bronze.png',
       '/sprites/producers/p_dragon_silver.png',
@@ -191,8 +216,9 @@ const PRODUCERS = [
     desc:          'The Fenghuang descends only when the cosmos itself agrees. It folds its rainbow wings around your soul. Every feather is a river. Every cry, a sutra older than heaven.',
     startCost:     75000000000,
     startQiPerSec: 1600000,
-    costScaling:   1.15,
-    unlock:        { type: 'realm', minRealmIndex: 44 },
+    costScaling:   1.22,
+    // 2026-05-21 Dial-8: realm 44 → 42 (Emperor 1st instead of Emperor 3rd).
+    unlock:        { type: 'realm', minRealmIndex: 42 },
     sprites:       [
       '/sprites/producers/p_phoenix_bronze.png',
       '/sprites/producers/p_phoenix_silver.png',

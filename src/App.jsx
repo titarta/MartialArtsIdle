@@ -3,10 +3,12 @@ import NavBar from './components/NavBar';
 import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
 import BloodLotusShopModal from './components/BloodLotusShopModal';
-import { addBloodLotus as addBloodLotusBalance } from './systems/bloodLotus';
-import AchievementsModal from './components/AchievementsModal';
+import BloodLotusSpendShopModal from './components/BloodLotusSpendShopModal';
+import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './systems/bloodLotus';
+import useShopInventory from './hooks/useShopInventory';
+import { SHOP_ITEMS_BY_ID } from './data/shopItems';
 import PillDrawer from './components/PillDrawer';
-import JourneyModal from './components/JourneyModal';
+import ProgressHubModal from './components/ProgressHubModal';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
@@ -39,6 +41,8 @@ import useQiCrystal  from './hooks/useQiCrystal';
 import useProducers  from './hooks/useProducers';
 import useUpgrades   from './hooks/useUpgrades';
 import useAutoFarm    from './hooks/useAutoFarm';
+import useStats       from './hooks/useStats';
+import { recordStat } from './systems/statsRecorder';
 import WORLDS         from './data/worlds';
 import { PHASE_TECHNIQUE_LAW, PHASE_TECHNIQUE_ID } from './data/laws';
 import { mineralForRarity } from './data/materials';
@@ -56,7 +60,12 @@ import useFeatureFlags from './hooks/useFeatureFlags';
 import useAchievements from './hooks/useAchievements';
 import { FEATURES } from './data/featureFlags';
 import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
-import { QI_SPARK_BY_ID } from './data/qiSparks';
+import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
+import { PRODUCERS_BY_ID } from './data/producers';
+import { fireTutorialOnce } from './systems/fireTutorial';
+import { hasSeenTutorial, markTutorialSeen } from './systems/tutorialSeen';
+import { TUTORIAL_IDS } from './data/tutorialCards';
+import TutorialModal from './components/TutorialModal';
 
 // Which screens are hidden by which build-time feature flag. Routes to a
 // blocked screen are silently rewritten to `home` by navigate() below, so
@@ -103,7 +112,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['settings', 'shop', 'journey', 'achievements', 'pills', 'daily']);
+    const ours = new Set(['settings', 'shop', 'lotus-shop', 'progress', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -132,6 +141,47 @@ function AppInner() {
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
   useEffect(() => { applyGraphics(loadGraphics()); }, []);
 
+  // Stats — wall-clock time-played counter. Ticks 1 second per second of
+  // foreground time. setInterval pauses naturally when the tab is
+  // backgrounded (mobile browsers throttle background timers heavily),
+  // which is the desired behaviour — "time the player actually spent in
+  // the game", not real-world elapsed time.
+  useEffect(() => {
+    const id = setInterval(() => { recordStat('timePlayed', 1); }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Blood Lotus Shop — "Disciple's Diligence" QoL state (toggle persists
+  // separately from the QoL ownership flag). The effects that USE
+  // `cultivation` / `producers` (Decisive Heart auto-confirm + the
+  // auto-buy tick) live lower in the file, after those hooks enter
+  // scope, to avoid TDZ on their dependency arrays.
+  const [autoBuyEnabled, setAutoBuyEnabled] = useState(() => {
+    try { return localStorage.getItem('mai_autobuy_enabled') === '1'; } catch { return false; }
+  });
+  const toggleAutoBuy = useCallback(() => {
+    setAutoBuyEnabled(prev => {
+      const next = !prev;
+      try { localStorage.setItem('mai_autobuy_enabled', next ? '1' : '0'); } catch {}
+      return next;
+    });
+  }, []);
+
+  // Progress hub migration card — fires once per existing player who
+  // remembers the old separate Journey + Achievements TopBar buttons.
+  // Gated on having seen WELCOME so brand-new players don't get an
+  // explanation for buttons they never had. Marks itself seen on fire so
+  // it never repeats. Runs once on mount; if the EventQueueContext is
+  // backed up, fireTutorialOnce enqueues normally and waits its turn.
+  useEffect(() => {
+    if (
+      hasSeenTutorial(TUTORIAL_IDS.WELCOME) &&
+      !hasSeenTutorial(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION)
+    ) {
+      fireTutorialOnce(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION, enqueue);
+    }
+  }, [enqueue]);
+
   // Save schema version stamp. Set on first launch (and after any future
   // migrations). On v1 (Cookie-Clicker pivot) no data migration is needed —
   // combat-tied keys are preserved on disk and hidden by FEATURES flags.
@@ -149,6 +199,11 @@ function AppInner() {
   // body class letterboxes the inner game viewport). See desktopResolution.js.
   useEffect(() => { restoreResolution(); }, []);
 
+  // useStats MUST mount before any hook that records stats so the
+  // singleton recorder is bound when those hooks fire their first events.
+  // See src/systems/statsRecorder.js for the binding mechanism.
+  const stats           = useStats();
+  const shopInventory   = useShopInventory();
   const cultivation     = useCultivation();
   const inventory       = useInventory();
   const karma           = useReincarnationKarma();
@@ -160,8 +215,86 @@ function AppInner() {
   const pills           = usePills();
   const totalOwnedPills = Object.values(pills.ownedPills).reduce((s, n) => s + n, 0);
   const crystal         = useQiCrystal({ getQuantity: inventory.getQuantity, removeItem: inventory.removeItem });
+  // Mirror current crystal tier into a body class so the qi-VFX colour
+  // bundle (--qi-aura-*, --qi-text-*, --qi-bar-*) cascades from there.
+  // App.css `body.crystal-tier-{1..10}` blocks set the palette; aura,
+  // floaters, and Qi-bar fill all read from those vars.
+  //
+  // Tier mapping mirrors useQiCrystal.js (2026-05-21 Dial-6, 10 tiers,
+  // evolutions every 10 levels, T10 at L100):
+  //   T1=L1, T2=L10, T3=L20, T4=L30, T5=L40,
+  //   T6=L50, T7=L60, T8=L70, T9=L80, T10=L100.
+  useEffect(() => {
+    const TIERS = [
+      [100, 10], [80, 9], [70, 8], [60, 7], [50, 6],
+      [40, 5],   [30, 4], [20, 3], [10, 2], [1, 1],
+    ];
+    const level = crystal?.level ?? 0;
+    let tier = 1;
+    for (const [thresh, t] of TIERS) {
+      if (level >= thresh) { tier = t; break; }
+    }
+    const cls = `crystal-tier-${tier}`;
+    document.body.classList.add(cls);
+    return () => document.body.classList.remove(cls);
+  }, [crystal?.level]);
+
+  // Cinematic lock — while a breakthrough banner, character-evolution, or
+  // crystal-evolution overlay is on screen, block every other interaction
+  // (top bar, nav bar tabs, hold-to-focus, crystal/divine taps). The user
+  // shouldn't be able to navigate away mid-animation or trigger a side
+  // effect that fights the cinematic for screen real estate. CSS does the
+  // actual gating via `body.event-cinematic` rules in App.css.
+  useEffect(() => {
+    const kind = currentEvent?.kind;
+    const lock = kind === 'breakthrough'
+              || kind === 'character-evolution'
+              || kind === 'crystal-evolution';
+    if (!lock) return undefined;
+    document.body.classList.add('event-cinematic');
+    return () => document.body.classList.remove('event-cinematic');
+  }, [currentEvent]);
   const producers       = useProducers();
   const upgrades        = useUpgrades();
+
+  // Blood Lotus Shop — "Disciple's Diligence" auto-buy tick. Declared
+  // here (after `producers` enters scope) so the effect's dependency
+  // array doesn't TDZ. Runs only when the QoL is owned AND the toggle
+  // is enabled. Buys ONE cheapest-affordable producer per second so the
+  // tick doesn't fully drain qi the player wanted to save for crystal
+  // refines / breakthrough buffer.
+  useEffect(() => {
+    if (!autoBuyEnabled) return;
+    if (!shopInventory.hasQol('qol_autobuy_cheapest')) return;
+    const id = setInterval(() => {
+      let best = null;
+      for (const p of Object.values(PRODUCERS_BY_ID)) {
+        if (!producers.isUnlocked(p.id, cultivation.realmIndex)) continue;
+        const cost = producers.getCost(p.id, 1);
+        if (cost <= 0) continue;
+        if (cultivation.qiRef.current < cost) continue;
+        if (!best || cost < best.cost) best = { id: p.id, cost };
+      }
+      if (best && cultivation.spendQi?.(best.cost)) {
+        producers.buy(best.id, 1);
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [autoBuyEnabled, shopInventory, producers, cultivation]);
+
+  // Blood Lotus Shop — "Decisive Heart" QoL. When the player owns this
+  // and a major breakthrough is pending, auto-fire confirm so the
+  // celebratory pause is skipped. Declared here (after `cultivation`
+  // is in scope) to avoid a TDZ on the dep array. confirmMajorBreakthrough
+  // is already idempotent (no-op if nothing pending), and the post-
+  // confirm banner / spark-offer flow still runs — we're just saving
+  // the player a tap.
+  useEffect(() => {
+    if (!cultivation.pendingMajorBreakthrough) return;
+    if (!shopInventory.hasQol('qol_skip_bt_confirm')) return;
+    cultivation.confirmMajorBreakthrough?.();
+  }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
+
   const { clearedRegions, clearRegion } = useClearedRegions();
   const selections      = useLawOffers({ cultivation });
   // featureFlags is declared further down — useQiSparks reads its unlock
@@ -171,7 +304,74 @@ function AppInner() {
     (id) => featureFlagsRef.current?.isUnlocked?.(id) ?? false,
     [],
   );
-  const qiSparks        = useQiSparks({ cultivation, isFeatureUnlocked });
+  // Producer-unlock gate for legendary producer-synergy sparks. Cards with
+  // `requiresProducers: [...]` are filtered out of the offer pool unless
+  // every referenced producer is unlocked. Closes over the latest
+  // realmIndex — useQiSparks resyncs its ref on identity change.
+  const producerUnlocked = useCallback(
+    (pid) => producers.isUnlocked(pid, cultivation.realmIndex),
+    [producers, cultivation.realmIndex],
+  );
+  const qiSparks        = useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked });
+
+  // Legendary-pool transparency for the choice modal: tells the player how
+  // much of the legendary pool is currently in reach AND what to chase next
+  // when the pool is partial. Recomputes on realm changes so progress is
+  // reflected the instant a producer unlocks.
+  const legendaryPoolInfo = useMemo(() => {
+    const allLegendary = QI_SPARKS.filter(c => c.rarity === 'legendary');
+    const total        = allLegendary.length;
+    // Already-owned legendary ids — these are UNIQUE, the pool can't draw
+    // them again, so they shouldn't be counted as "available" to the player.
+    // The footer label was reading "X of Y unlocked" including owned ones,
+    // making rerolls feel like they had a real shot when in fact zero
+    // legendaries were left to draw.
+    const ownedIds = new Set(
+      (qiSparks?.activeSparks ?? [])
+        .filter(s => QI_SPARK_BY_ID[s.sparkId]?.rarity === 'legendary')
+        .map(s => s.sparkId)
+    );
+    const eligible = allLegendary.filter(c => {
+      if (ownedIds.has(c.id)) return false; // already owned, can't draw again
+      return (c.requiresProducers ?? []).every(pid => producers.isUnlocked(pid, cultivation.realmIndex));
+    });
+    let nextUnlock = null;
+    if (eligible.length < total - ownedIds.size) {
+      // For each ineligible+unowned legendary, find the BLOCKER producer
+      // with the highest unlock-realm requirement (that's what gates it).
+      // Then find the legendary whose blocker comes up SOONEST — that's
+      // the next unlock the player will see when they progress.
+      let bestRealm = Infinity;
+      let bestProducer = null;
+      for (const card of allLegendary) {
+        if (ownedIds.has(card.id)) continue;
+        if ((card.requiresProducers ?? []).every(pid => producers.isUnlocked(pid, cultivation.realmIndex))) continue;
+        let highestRealm = -1;
+        let highestProducer = null;
+        for (const pid of card.requiresProducers ?? []) {
+          if (!producers.isUnlocked(pid, cultivation.realmIndex)) {
+            const p = PRODUCERS_BY_ID[pid];
+            const r = p?.unlock?.minRealmIndex ?? 0;
+            if (r > highestRealm) { highestRealm = r; highestProducer = p; }
+          }
+        }
+        if (highestRealm >= 0 && highestRealm < bestRealm) {
+          bestRealm = highestRealm;
+          bestProducer = highestProducer;
+        }
+      }
+      if (bestProducer) {
+        nextUnlock = { producerName: bestProducer.name, realmIndex: bestRealm };
+      }
+    }
+    // totalCount now reports remaining draws (total - owned), matching
+    // what the footer label needs to show "X of Y available" honestly.
+    return {
+      eligibleCount: eligible.length,
+      totalCount:    total - ownedIds.size,
+      nextUnlock,
+    };
+  }, [producers, cultivation.realmIndex, qiSparks?.activeSparks]);
 
   // Record every new realm reached so karma awards are first-time-only.
   useEffect(() => {
@@ -304,13 +504,48 @@ function AppInner() {
   // upgrade change.
   useEffect(() => {
     if (!cultivation.producerRateRef) return;
-    const perProducer = (pid) => upgrades.getProducerMult(pid);
-    const effective = producers.getRate(perProducer);
+    // Per-producer multiplier composes the upgrade-doubling mult with the
+    // legendary spark per-producer mult (pair synergies, count-based bonuses,
+    // single-producer ×N, Phoenix Reborn). Both contribute multiplicatively.
+    const ownedMap = producers.owned;
+    // Blood Lotus Shop — "Producer Surge" buff. Multiplies every
+    // producer's contribution uniformly. Folded into the perProducer
+    // callback so it stacks naturally with upgrade-driven and spark-
+    // driven per-producer multipliers (multiplicative chain).
+    const shopProducerMult = shopInventory.getActiveBuffMult('producer_mult');
+    const perProducer = (pid) =>
+      upgrades.getProducerMult(pid)
+        * qiSparks.getProducerSparkMult(pid, ownedMap)
+        * shopProducerMult;
+    // 2026-05-21 Dial-9 — Sect Discipline (common timed spark) adds +N to
+    // every producer's per-unit qi/s while active. Read from the spark ref
+    // (default 0). The bonus flows through per-producer mults and all
+    // downstream global mults the same way the producer's own base does.
+    const flatPerUnit = qiSparks.producerFlatPerUnitRef?.current ?? 0;
+    const effective = producers.getRate(perProducer, flatPerUnit);
     cultivation.producerRateRef.current = effective;
+    // Trinity Convergence + producer_pair_global_mult — global multipliers
+    // from legendary sparks, folded into the rate calc downstream.
+    if (cultivation.sparkLegendaryGlobalMultRef) {
+      cultivation.sparkLegendaryGlobalMultRef.current = qiSparks.getGlobalSparkMult(ownedMap);
+    }
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, cultivation.producerRateRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Phoenix Reborn (legendary E2) — useQiSparks dispatches this event when
+  // a major realm transition fires while the spark is active. Reset the
+  // player's Phoenix count to 0 (the permanent +mult bonus on other producers
+  // is already accounted for in qiSparks.getProducerSparkMult via the
+  // per-instance stack counter).
+  useEffect(() => {
+    const handler = () => {
+      try { producers.setOwnedCount?.('p_phoenix', 0); } catch {}
+    };
+    window.addEventListener('mai:phoenix-reborn', handler);
+    return () => window.removeEventListener('mai:phoenix-reborn', handler);
+  }, [producers]);
 
   // Mirror remaining upgrade effects into cultivation refs. crystal-tap mult
   // is applied inside collectCrystalReservoir; gate-reduction mult into the
@@ -328,6 +563,65 @@ function AppInner() {
       cultivation.upgradeFocusMultAddRef.current = upgrades.getFocusMultAdd();
     }
   }, [upgrades.owned, tree.modifiers, cultivation.upgradeCrystalTapMultRef, cultivation.upgradeFocusMultAddRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Blood Lotus Shop — equipped cosmetics. Each cosmetic declares a
+  // `effect.bodyClass`; this effect syncs the currently-equipped class
+  // per slot to the document body so CSS selectors in App.css can
+  // tint the relevant element (cultivator sprite, crystal, particles,
+  // background) without touching JSX. Re-runs when inv changes
+  // (equip / unequip / purchase / reincarnation rehydrate).
+  useEffect(() => {
+    const equippedMap = shopInventory.inv?.equipped ?? {};
+    // Collect the bodyClass for every currently-equipped cosmetic.
+    const desired = new Set();
+    for (const [, itemId] of Object.entries(equippedMap)) {
+      const item = SHOP_ITEMS_BY_ID[itemId];
+      if (item?.effect?.bodyClass) desired.add(item.effect.bodyClass);
+    }
+    // Sync body.classList: remove any cosmetic-* classes not in the
+    // desired set; add desired ones not present. We only touch
+    // classes starting with `cosmetic-` so unrelated body classes
+    // (event-cinematic, vfx-disabled, …) are left alone.
+    const toRemove = [];
+    for (const cls of document.body.classList) {
+      if (cls.startsWith('cosmetic-') && !desired.has(cls)) toRemove.push(cls);
+    }
+    toRemove.forEach((cls) => document.body.classList.remove(cls));
+    desired.forEach((cls) => document.body.classList.add(cls));
+  }, [shopInventory.inv]);
+
+  // Crimson Aura VFX — toggles `body.body-crimson-aura-active` while
+  // any Crimson Aura buff is active. CSS (App.css) attaches the halo
+  // pseudo-element + drop-shadow to .home-cultivator-sprite via this
+  // class. Polls the active buffs list (already refreshed by
+  // useShopInventory's 1 Hz tick) so the VFX appears the moment a buff
+  // is purchased and clears the moment it expires.
+  useEffect(() => {
+    const active = (shopInventory.activeBuffs ?? []).some(
+      (b) => b.item?.effect?.vfx === 'crimson-aura'
+    );
+    if (active) {
+      document.body.classList.add('body-crimson-aura-active');
+      return () => document.body.classList.remove('body-crimson-aura-active');
+    }
+    return undefined;
+  }, [shopInventory.activeBuffs]);
+
+  // Mirror Blood Lotus Shop timed-buff multipliers into cultivation refs.
+  // Re-runs whenever the shopInventory state changes (purchase, expiry).
+  //   qi_mult         → cultivation.shopBuffQiMultRef
+  //   crystal_tap_mult→ cultivation.shopBuffCrystalTapMultRef
+  // Producer surge is folded into the producer-rate effect above via
+  // shopInventory.getActiveBuffMult('producer_mult') in the perProducer
+  // callback — keeps producer composition in one place.
+  useEffect(() => {
+    if (cultivation.shopBuffQiMultRef) {
+      cultivation.shopBuffQiMultRef.current = shopInventory.getActiveBuffMult('qi_mult');
+    }
+    if (cultivation.shopBuffCrystalTapMultRef) {
+      cultivation.shopBuffCrystalTapMultRef.current = shopInventory.getActiveBuffMult('crystal_tap_mult');
+    }
+  }, [shopInventory.inv, cultivation.shopBuffQiMultRef, cultivation.shopBuffCrystalTapMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mirror Qi Sparks multipliers + flags into cultivation refs each render.
   // Cheap; runs only when activeSparks identity changes (the hook returns
@@ -370,6 +664,118 @@ function AppInner() {
       cultivation.sparkCrystalClickCapMinRef.current = qiSparks.crystalClickCapMinRef.current;
     }
   }, [qiSparks.activeSparks]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Tier-A jade tutorial cards (2026-05-21) ─────────────────────────────
+  // Five of the eight cards fire from App-level state (welcome, hold-to-
+  // focus, first layer breakthrough, first spark offer, first Saint Realm).
+  // The other three (Producers tab opened, first producer bought, first
+  // major-realm gate appearing) live next to their trigger events in
+  // CultivationScreen + HomeScreen so we read fresh state without
+  // ferrying it back up through props. Each effect uses
+  // `fireTutorialOnce` — idempotent, marks-then-enqueues, no-op if
+  // already seen this account.
+
+  // #1 Welcome — first ever app launch with no save state. Defer one
+  // animation frame so Home renders the world before the modal slides in.
+  useEffect(() => {
+    const hasSave = !!localStorage.getItem('mai_save');
+    if (hasSave) return undefined;
+    const id = window.setTimeout(() => {
+      fireTutorialOnce(TUTORIAL_IDS.WELCOME, enqueue);
+    }, 1500);
+    return () => window.clearTimeout(id);
+  }, [enqueue]);
+
+  // #2 Hold to Focus — player has accumulated some idle qi but never held
+  // Focus. We poll cultivation.qiRef and boostStartTimeRef every 2 seconds;
+  // when qi ≥ 15 AND boost has never started AND we're still in realm 0,
+  // fire the card. Interval clears itself once the card fires.
+  useEffect(() => {
+    if (cultivation.realmIndex > 0) return undefined;
+    const tick = () => {
+      const qi    = cultivation.qiRef?.current ?? 0;
+      const ever  = (cultivation.boostStartTimeRef?.current ?? 0) > 0;
+      if (qi >= 15 && !ever) {
+        if (fireTutorialOnce(TUTORIAL_IDS.HOLD_TO_FOCUS, enqueue)) {
+          window.clearInterval(intervalId);
+        }
+      }
+    };
+    const intervalId = window.setInterval(tick, 2000);
+    return () => window.clearInterval(intervalId);
+  }, [enqueue, cultivation.realmIndex, cultivation.qiRef, cultivation.boostStartTimeRef]);
+
+  // #3b PRODUCERS_HINT — proactive nudge toward the Cultivation tab. Polls
+  // every 2s for the first moment the player ever holds focus, then waits
+  // 90s and fires the lore-toned hint if they still haven't visited the
+  // Cultivation tab. Mutually exclusive with PRODUCERS_TAB — voluntary
+  // visit marks both seen (see CultivationScreen), so a player who
+  // explores on their own NEVER sees this card.
+  const producersHintStartedRef = useRef(false);
+  useEffect(() => {
+    if (hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_TAB) || hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_HINT)) {
+      return undefined;
+    }
+    let timeoutId = null;
+    const intervalId = window.setInterval(() => {
+      if (hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_TAB) || hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_HINT)) {
+        window.clearInterval(intervalId);
+        if (timeoutId) window.clearTimeout(timeoutId);
+        return;
+      }
+      if (producersHintStartedRef.current) return;
+      const boostNow = (cultivation.boostStartTimeRef?.current ?? 0) > 0;
+      if (boostNow) {
+        producersHintStartedRef.current = true;
+        timeoutId = window.setTimeout(() => {
+          if (hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_TAB) || hasSeenTutorial(TUTORIAL_IDS.PRODUCERS_HINT)) return;
+          if (fireTutorialOnce(TUTORIAL_IDS.PRODUCERS_HINT, enqueue)) {
+            markTutorialSeen(TUTORIAL_IDS.PRODUCERS_TAB);
+          }
+        }, 90 * 1000);
+        window.clearInterval(intervalId);
+      }
+    }, 2000);
+    return () => {
+      window.clearInterval(intervalId);
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, [enqueue, cultivation.boostStartTimeRef]);
+
+  // #5 First layer breakthrough — track previous realmIndex; on first
+  // increment, fire once. Skip if the player loaded a save mid-progression
+  // (they've already broken through; no point teaching the basics).
+  const prevRealmForTutorialRef = useRef(cultivation.realmIndex);
+  useEffect(() => {
+    const prev = prevRealmForTutorialRef.current;
+    const curr = cultivation.realmIndex;
+    prevRealmForTutorialRef.current = curr;
+    if (curr > prev && prev === 0) {
+      // Only fire from realm 0 → 1 transition so a returning player past
+      // that point doesn't get the "first breakthrough" copy.
+      fireTutorialOnce(TUTORIAL_IDS.FIRST_LAYER_BT, enqueue);
+    }
+  }, [cultivation.realmIndex, enqueue]);
+
+  // #7 First spark offer — fires the first time pendingOffer becomes
+  // non-null after launch. Uses `_currentlyShowing` so a stale offer
+  // restored from a previous session also counts (the player still needs
+  // the explanation if it's their first time seeing one).
+  useEffect(() => {
+    if (qiSparks.pendingOffer) {
+      fireTutorialOnce(TUTORIAL_IDS.FIRST_SPARK_OFFER, enqueue);
+    }
+  }, [qiSparks.pendingOffer, enqueue]);
+
+  // #8 First Saint Realm — reincarnation gate. realmIndex 24 is the Saint
+  // entry per the game data; fire the card the moment the player crosses
+  // it for the first time. Guard with > 0 prev so a save-load straight
+  // into Saint doesn't fire on every render.
+  useEffect(() => {
+    if (cultivation.realmIndex >= 24) {
+      fireTutorialOnce(TUTORIAL_IDS.FIRST_SAINT, enqueue);
+    }
+  }, [cultivation.realmIndex, enqueue]);
 
   // Consecutive Focus rung escalation — toggle body classes that CSS keys
   // off to drive per-rung aura/glow/tint + a brief upward "pop" burst.
@@ -723,6 +1129,22 @@ function AppInner() {
     return () => window.removeEventListener('mai:crystal-tier-crossed', handler);
   }, [qiSparks, notifications]);
 
+  // 2026-05-21 bug-fix: surface a toast when the spark modal auto-picks the
+  // leftmost card on inactivity timeout. Previously the modal would silently
+  // vanish and the player wouldn't know which spark they got.
+  useEffect(() => {
+    const handler = (e) => {
+      const { sparkId } = e.detail ?? {};
+      const card = QI_SPARK_BY_ID[sparkId];
+      notifications.addToast({
+        message: `⌛ Auto-selected: ${card?.name ?? 'spark'} (modal timed out)`,
+        duration: 7000,
+      });
+    };
+    window.addEventListener('mai:spark-auto-picked', handler);
+    return () => window.removeEventListener('mai:spark-auto-picked', handler);
+  }, [notifications]);
+
   // Round 3 — one-shot backfill for combat-alpha saves whose crystal is
   // already past a mechanic-grant threshold but who never rolled the rare
   // spark (now retired). Walks 0→currentTier through CRYSTAL_TIER_GRANTS;
@@ -904,6 +1326,17 @@ function AppInner() {
     try { trackScreenView(target); } catch {}
   };
 
+  // Cross-component nav events — keeps callsites (like the home sparks chip)
+  // decoupled from prop-drilling the navigate fn. ActiveSparksBar dispatches
+  // `mai:nav-sparks` when the player taps "View all sparks →"; route them
+  // to Cultivation > Sparks tab here.
+  useEffect(() => {
+    const handler = () => navigate('cultivation', 'sparks');
+    window.addEventListener('mai:nav-sparks', handler);
+    return () => window.removeEventListener('mai:nav-sparks', handler);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleReincarnate = useCallback(() => {
     // Safety net — the button is already disabled below Saint, but we
     // refuse here too so any future callsite can't bypass the gate.
@@ -949,6 +1382,12 @@ function AppInner() {
     // Give React a tick to flush the karma state to localStorage before we
     // wipe the rest of the save + hard-reload.
     setTimeout(() => {
+      // Stats — wipe the in-memory run bucket BEFORE wipeReincarnation
+      // so the beforeunload flush (triggered by reload below) doesn't
+      // restore the old run counters. resetRun also persists, so when
+      // wipeReincarnation reads mai_stats it sees the correct lifetime
+      // (including the +1 livesLived just fired by karma.reincarnate()).
+      try { stats.resetRun(); } catch {}
       wipeReincarnation();
 
       // Restore al_2 Echo of Mastery snapshot.
@@ -985,7 +1424,7 @@ function AppInner() {
 
       window.location.reload();
     }, 50);
-  }, [karma, cultivation.realmIndex, tree.modifiers]);
+  }, [karma, cultivation.realmIndex, tree.modifiers, stats]);
 
   const goBack = () => {
     navigate('worlds', {
@@ -999,7 +1438,7 @@ function AppInner() {
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
     // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} dailyBonus={dailyBonus} onOpenDailyBonus={() => setActiveModal('daily')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} />,
     // Combat-adjacent screens are mounted only when FEATURES.combat is true.
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
@@ -1030,7 +1469,7 @@ function AppInner() {
       ? <ProductionScreen inventory={inventory} pills={pills} tree={tree} />
       : null,
     // The qi-investment shop — main loop of v1, always visible.
-    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} />,
+    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
     settings:   null,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
@@ -1049,6 +1488,25 @@ function AppInner() {
 
   return (
     <div className="app" style={{ '--screen-bg-url': `url(${BASE}backgrounds/ui_screens.png)` }}>
+      {/* Inline SVG filter — referenced by .pl-leader-silhouette (Cookie-
+          Clicker producer-teaser). feColorMatrix crushes RGB to 0 (black);
+          feComponentTransfer's discrete alpha table snaps every non-zero
+          alpha to 1, killing the anti-aliased grey halo on the PNG edges
+          so the silhouette comes out as a hard-edged true-black cutout. */}
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+        <filter id="mai-silhouette" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 1 0"
+          />
+          <feComponentTransfer>
+            <feFuncA type="discrete" tableValues="0 1 1 1 1 1 1 1 1 1 1" />
+          </feComponentTransfer>
+        </filter>
+      </svg>
       {currentScreen !== 'home' && (
         <>
           <div
@@ -1060,9 +1518,15 @@ function AppInner() {
       )}
       <TopBar
         bloodLotusBalance={selections.bloodLotusBalance}
+        /* Top-left has TWO separate buttons now:
+             onOpenShop      → IAP modal (Top Up — buy more Blood Lotus)
+             onOpenLotusShop → spend shop (buffs / QoL / cosmetics)
+           The lotus chip shows the player's balance and acts as the
+           Top Up entry point; the shop button right next to it is the
+           dedicated spend surface. */
         onOpenShop={() => openModal('shop')}
-        onOpenJourney={() => openModal('journey')}
-        onOpenAchievements={() => openModal('achievements', () => setHasNewAch(false))}
+        onOpenLotusShop={() => openModal('lotus-shop')}
+        onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
         onOpenSettings={() => openModal('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
@@ -1070,8 +1534,8 @@ function AppInner() {
         reincarnationUnlocked={reincarnationUnlocked}
         onOpenCrystal={() => navigate('home', { openCrystal: Date.now() })}
         crystalUnlocked={featureFlags.isUnlocked('qi_crystal')}
-        realmName={cultivation.realmName}
-        realmStage={cultivation.realmStage}
+        qiRef={cultivation.qiRef}
+        karma={karma.karma}
       />
       <NavBar
         currentScreen={currentScreen}
@@ -1083,9 +1547,18 @@ function AppInner() {
         getDesc={featureFlags.getDesc}
       />
       <main className={`screen-container${(currentScreen === 'home' || currentScreen === 'reincarnation') ? ' sc-fullbleed' : ''}`}>
-        {/* Safety net: if currentScreen happens to land on a flag-null entry
-            (e.g. mid-render after a flag flip) render the home fallback. */}
-        {screens[currentScreen] ?? screens.home}
+        {/* HomeScreen is ALWAYS mounted — the divine-qi orb and pattern-click
+            minigame both live as local state inside HomeScreen (see
+            usePatternClick / divine-qi spawn controllers). Unmounting on tab
+            switch would destroy any active spawn, so a player who pops into
+            another tab the moment an orb appears loses it on return. Hiding
+            via display:none keeps the spawn timers + state alive while still
+            removing the visuals from layout. `display: contents` when active
+            so HomeScreen renders as if it were the direct child of <main>. */}
+        <div style={{ display: currentScreen === 'home' ? 'contents' : 'none' }}>
+          {screens.home}
+        </div>
+        {currentScreen !== 'home' && (screens[currentScreen] ?? null)}
       </main>
       <ToastStack
         toasts={notifications.toastQueue}
@@ -1125,16 +1598,58 @@ function AppInner() {
         <QiSparkChoiceModal
           offer={qiSparks.pendingOffer}
           bloodLotusBalance={qiSparks.bloodLotusBalance}
-          nextRerollCost={qiSparks.nextRerollCost()}
+          nextRerollCostFor={qiSparks.nextRerollCost}
           onChoose={qiSparks.choose}
-          onReroll={qiSparks.reroll}
+          onRerollOffer={qiSparks.rerollOffer}
           onSkip={qiSparks.skip}
+          pityCounter={qiSparks.pityCounter}
+          pityThreshold={qiSparks.pityThreshold}
+          legendaryChance={qiSparks.legendaryChance}
+          legendaryPoolInfo={legendaryPoolInfo}
+        />
+      )}
+      {/* Tutorial cards (Tier A onboarding + crystal-tier mechanic unlocks).
+          Rendered at App.jsx level so they fire regardless of active screen
+          — e.g. first_producer triggers while still on Cultivation, not
+          after navigating Home. Suppressed while the spark choice modal or
+          a major-realm breakthrough cinematic is showing so we don't stack
+          modals on top of each other. */}
+      {currentEvent?.kind === 'tutorial'
+        && !qiSparks.pendingOffer
+        && !cultivation.majorBreakthrough
+        && (
+        <TutorialModal
+          key={currentEvent.id}
+          kicker={currentEvent.payload?.kicker}
+          title={currentEvent.payload?.title}
+          body={currentEvent.payload?.body}
+          iconSrc={currentEvent.payload?.iconSrc}
+          ctaText={currentEvent.payload?.ctaText}
+          glowA={currentEvent.payload?.glowA}
+          glowB={currentEvent.payload?.glowB}
+          onDone={() => dismiss(currentEvent.id)}
         />
       )}
       {activeModal === 'settings'     && <SettingsScreen onClose={() => setActiveModal(null)} />}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
-      {activeModal === 'journey'      && <JourneyModal   realmIndex={cultivation.realmIndex} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'achievements' && achievements && <AchievementsModal achievements={achievements} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'lotus-shop'   && (
+        <BloodLotusSpendShopModal
+          inventory={shopInventory}
+          balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
+          onClose={() => setActiveModal(null)}
+          onOpenTopUp={() => openModal('shop')}
+        />
+      )}
+      {activeModal === 'progress'     && (
+        <ProgressHubModal
+          realmIndex={cultivation.realmIndex}
+          achievements={achievements}
+          stats={stats}
+          qiRef={cultivation.qiRef}
+          rateRef={cultivation.rateRef}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
       {activeModal === 'pills'        && pills        && <PillDrawer open pills={pills} onClose={() => setActiveModal(null)} />}
       {(activeModal === 'daily' || currentEvent?.kind === 'daily-bonus') && (
         <DailyBonusModal

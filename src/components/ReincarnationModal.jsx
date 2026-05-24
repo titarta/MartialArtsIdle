@@ -117,7 +117,7 @@ function ReincarnationModal({
             <span className="reinc-karma-gem">◈</span>
             {karma} Karma
           </div>
-          <button className="journey-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
         {/* Phase tabs */}

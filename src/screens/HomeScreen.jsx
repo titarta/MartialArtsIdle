@@ -3,17 +3,24 @@ import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
+import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
-import DailyBonusWidget from '../components/DailyBonusWidget';
 import ActiveSparksBar from '../components/ActiveSparksBar';
 import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue } from '../contexts/EventQueueContext';
 import { QI_SPARK_BY_ID } from '../data/qiSparks';
+import { sparksToGrantOnEvolution } from '../data/crystalMechanicGrants';
+// TutorialModal render lives in App.jsx so onboarding cards work on every
+// screen, not just Home. Trigger sites here just call fireTutorialOnce.
+import { fireTutorialOnce } from '../systems/fireTutorial';
+import { hasSeenTutorial } from '../systems/tutorialSeen';
+import { TUTORIAL_IDS } from '../data/tutorialCards';
 import WORLDS from '../data/worlds';
 import AudioManager from '../audio/AudioManager';
+import { eventStat } from '../systems/statsRecorder';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -22,34 +29,82 @@ const HOME_BG_W = 1376;
 const HOME_BG_H = 768;
 
 // ── Cultivator sprite tier mapping ──────────────────────────────────────────
-// 8 character tiers (T0..T7), each spans 1-2 major realms. Each tier has two
+// 13 character tiers (T0..T12), one per major realm name. Each tier has two
 // static 256×256 sprites: `<tier>_normal.png` (idle cultivation) and
 // `<tier>_focused.png` (Avatar-mode glow). When the rewarded-ad boost is
 // active, a 4-frame `heavenly_aura.png` underlay renders behind the sprite.
-// As more tiers are generated, bump CULTIVATOR_MAX_TIER below — until then,
-// higher-realm players see the T0 sprite (no missing-file 404s).
+// As more tiers are generated, add the tier index to CULTIVATOR_DONE_TIERS —
+// players on a not-yet-generated tier fall back to the highest done tier
+// below their realm (no missing-file 404s).
 const CULTIVATOR_TIER_NAMES = [
-  't0_novice',     // Tempered Body (idx 0-9)
-  't1_cultivator', // Qi Transformation + True Element (10-17)
-  't2_adept',      // Separation & Reunion + Immortal Ascension (18-23)
-  't3_saint',      // Saint + Saint King (24-29)
-  't4_sage',       // Origin Returning + Origin King (30-35)
-  't5_sovereign',  // Void King + Dao Source (36-41)
-  't6_emperor',    // Emperor Realm (42-44)
-  't7_heavenly',   // Open Heaven (45-50)
+  't0_novice',              // Tempered Body          (idx  0-9)
+  't1_qi_transformation',   // Qi Transformation      (idx 10-13)
+  't2_true_element',        // True Element           (idx 14-17)
+  't3_separation',          // Separation & Reunion   (idx 18-20)
+  't4_immortal_ascension',  // Immortal Ascension     (idx 21-23)
+  't5_saint',               // Saint                  (idx 24-26)
+  't6_saint_king',          // Saint King             (idx 27-29)
+  't7_origin_returning',    // Origin Returning       (idx 30-32)
+  't8_origin_king',         // Origin King            (idx 33-35)
+  't9_void_king',           // Void King              (idx 36-38)
+  't10_dao_source',         // Dao Source             (idx 39-41)
+  't11_emperor_realm',      // Emperor Realm          (idx 42-44)
+  't12_open_heaven',         // Open Heaven           (idx 45-50)
 ];
-const CULTIVATOR_MAX_TIER = 0; // bump as more tiers are generated
+// Tiers with sprite files in public/sprites/cultivator/. Players on a tier
+// that isn't in this set see the highest done tier below their realm.
+const CULTIVATOR_DONE_TIERS = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+
+// Cultivator tier display names — mirrors the `name` field in
+// scripts/cultivator_prompts.py TIERS. Shown as the sub-line in the major-
+// breakthrough cinematic so the player has a recognisable "title" for the
+// new form (the realm name above it is the gameplay identifier).
+const CULTIVATOR_TIER_DISPLAY_NAMES = [
+  'Novice Disciple',          // T0
+  'Inner Sect Disciple',      // T1
+  'True-Element Cultivator',  // T2
+  'Sect Adept',               // T3
+  'Ascending Immortal',       // T4
+  'Sect Master',              // T5
+  'Saint King',               // T6
+  'Immortal Sage',            // T7
+  'Origin King',              // T8
+  'Divine Sovereign',         // T9
+  'Dao Source Cultivator',    // T10
+  'Dao Emperor',              // T11
+  'Heavenly Sovereign',       // T12
+];
+
+// Module-scoped set of breakthrough event ids that have already been enqueued
+// into the event queue. Lifted out of the component so it survives HomeScreen
+// unmount/remount cycles (e.g. tab navigation away and back while the banner
+// is still pending). Without this, navigating away mid-banner would cause the
+// effect to re-enqueue the same breakthrough on remount, popping a stale
+// "BREAKTHROUGH — True Element · Peak Stage" banner on a screen the player
+// already finished. See useCultivation.majorBreakthrough — that state lives at
+// App level so it persists across HomeScreen unmounts; this set is the App-
+// scoped peer that prevents the effect from re-acting on it.
+const _enqueuedBreakthroughIds = new Set();
 
 function getCultivatorTier(realmIndex) {
   let t = 0;
   if (realmIndex >= 10) t = 1;
-  if (realmIndex >= 18) t = 2;
-  if (realmIndex >= 24) t = 3;
-  if (realmIndex >= 30) t = 4;
-  if (realmIndex >= 36) t = 5;
-  if (realmIndex >= 42) t = 6;
-  if (realmIndex >= 45) t = 7;
-  return Math.min(t, CULTIVATOR_MAX_TIER);
+  if (realmIndex >= 14) t = 2;
+  if (realmIndex >= 18) t = 3;
+  if (realmIndex >= 21) t = 4;
+  if (realmIndex >= 24) t = 5;
+  if (realmIndex >= 27) t = 6;
+  if (realmIndex >= 30) t = 7;
+  if (realmIndex >= 33) t = 8;
+  if (realmIndex >= 36) t = 9;
+  if (realmIndex >= 39) t = 10;
+  if (realmIndex >= 42) t = 11;
+  if (realmIndex >= 45) t = 12;
+  // Fall back to the highest done tier ≤ t (avoids 404s for tiers not yet generated)
+  for (let i = t; i >= 0; i--) {
+    if (CULTIVATOR_DONE_TIERS.has(i)) return i;
+  }
+  return 0;
 }
 
 
@@ -71,7 +126,7 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
         textRef.current.textContent = `+${fmtRateNum(r)} Qi/s`;
       }
       if (boostRef.current && focusMultRef) {
-        const baseMult  = (focusMultRef.current ?? 300) / 100;
+        const baseMult  = (focusMultRef.current ?? 250) / 100;
         const sparkBonus = sparkFocusMultBonusRef?.current ?? 0;
         // Consecutive Focus folds in multiplicatively on top of the focus
         // mult — same shape as the rate calc, so the badge matches reality.
@@ -95,6 +150,39 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
       {boosting      && <span ref={boostRef} className="qi-rate-badge qi-rate-badge-cf">×3</span>}
       {adBoostActive && <span className="qi-rate-badge qi-rate-badge-ad">×2</span>}
     </div>
+  );
+}
+
+/**
+ * Heaven's Pardon bypass button — appears beside the BREAKTHROUGH area
+ * ONLY when the player is currently gated on a major-realm transition
+ * AND has at least one Pardon token in inventory. Polls gateRef at
+ * 500 ms (the same cadence the existing tutorial-gate poll uses) so it
+ * shows/hides without forcing the host into per-frame re-renders.
+ */
+function GateBypassButton({ gateRef, tokenCount, onUse }) {
+  const [gateActive, setGateActive] = useState(false);
+  useEffect(() => {
+    if (!gateRef) return;
+    const tick = () => setGateActive(!!gateRef.current);
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [gateRef]);
+  if (!gateActive || tokenCount <= 0 || !onUse) return null;
+  return (
+    <button
+      type="button"
+      className="home-gate-bypass-btn"
+      onClick={onUse}
+      aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
+    >
+      <span className="home-gate-bypass-icon">☁️</span>
+      <span className="home-gate-bypass-body">
+        <span className="home-gate-bypass-cta">Bypass Gate</span>
+        <span className="home-gate-bypass-sub">Heaven&rsquo;s Pardon · ×{tokenCount}</span>
+      </span>
+    </button>
   );
 }
 
@@ -139,41 +227,122 @@ function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, 
   );
 }
 
-// ── Heavenly Qi chip — redesigned as a pill floating in the scene (top-right) ──
-/** Purple pill chip — replaces the old circular button.  Shows a pulsing dot,
- *  a label, and an optional countdown when an ad boost is running or on CD. */
+// ── Heavenly Qi — Petition Tablet ───────────────────────────────────────────
+/**
+ *  Vertical hanging plaque that lives in the top-right of the cultivation
+ *  scene like a temple petition tablet. The offer (×2 qi/s · 30 min) is
+ *  *inscribed on the plaque* so first-time players don't have to tap to
+ *  discover what it does. Three states share one frame:
+ *
+ *    READY    — sways gently, glyph (天) pulses gold, ember motes rise.
+ *               The whole plaque is a button; tap triggers ad.show.
+ *    ACTIVE   — wood reads warmer, glyph blazes amber, mm:ss countdown
+ *               replaces the CTA line. Not interactive.
+ *    COOLDOWN — desaturated, glyph dims to moonlight, ☾ floats above
+ *               the cord, hh:mm:ss "returns at" timer in place of CTA.
+ *
+ *  Props signature is unchanged from the old chip so the parent call site
+ *  needs no edits. Replaces the old purple-pill <HeavenlyQiButton>.
+ */
 function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
   const { t } = useTranslation('ui');
   if (maxed) return null;
 
+  // ACTIVE — boost is currently running. Bottom row is the countdown
+  // (the CTA slot), so the duration sub-line is dropped; the timer IS
+  // the duration playing out.
   if (adBoostActive) {
     return (
-      <div className="home-hq-chip home-hq-chip-active" title={t('home.heavenlyQiActive')}>
-        <span className="home-hq-dot" />
-        <span className="home-hq-text">×2</span>
-        <span className="home-hq-timer">{adBoostRemaining}</span>
-      </div>
+      <HQTablet
+        state="active"
+        kicker={t('home.channeling', { defaultValue: 'Channeling' })}
+        offer="×2 QI/S"
+        cta={adBoostRemaining}
+        title={t('home.heavenlyQiActive', { defaultValue: 'Heavenly Qi active' })}
+      />
     );
   }
 
-  const isCd      = ad.isCooldown;
+  // COOLDOWN — petition spent, waiting. Single-line "REST" placeholder
+  // (no duration sub-line needed).
+  if (ad.isCooldown) {
+    return (
+      <HQTablet
+        state="cd"
+        kicker={t('home.returnsAt', { defaultValue: 'Returns in' })}
+        offer="— REST —"
+        cta={formatCooldown(ad.cooldownRemaining)}
+        title={formatCooldown(ad.cooldownRemaining)}
+      />
+    );
+  }
+
+  // READY (+ loading sub-case) — show the full pitch: rate on top of the
+  // offer block, duration below a thin internal divider. Vertical stack
+  // matches the temple-plaque "couplet" tradition and keeps both pieces
+  // of info legible on a narrow mobile plaque.
   const isLoading = ad.isLoading;
-  const label = isCd
-    ? formatCooldown(ad.cooldownRemaining)
-    : isLoading
-    ? t('home.channeling')
-    : t('home.heavenlyQi');
+  const isReady   = ad.isReady && !isLoading;
 
   return (
-    <button
-      className={`home-hq-chip${ad.isReady ? ' home-hq-chip-ready' : ''}${isCd ? ' home-hq-chip-cd' : ''}`}
-      onClick={ad.show}
-      disabled={!ad.isReady}
-      title={ad.isReady ? t('home.channelTitle') : label}
+    <HQTablet
+      state="ready"
+      kicker={t('home.heavenlyQi', { defaultValue: 'Heavenly Qi' })}
+      offer="×2 QI/S"
+      offerDur="30 MIN"
+      cta={isLoading
+        ? t('home.channeling', { defaultValue: 'Channeling…' })
+        : t('home.tapToPetition', { defaultValue: 'Tap to petition' })}
+      onClick={isReady ? ad.show : undefined}
+      disabled={!isReady}
+      title={isReady ? t('home.channelTitle', { defaultValue: 'Channel Heavenly Qi' }) : ''}
+    />
+  );
+}
+
+/**
+ *  Inner presentational tablet. Renders cord + cap + plaque body with
+ *  kicker / glyph / offer / cta. Becomes a <button> when onClick is
+ *  passed (READY), otherwise a <div> (ACTIVE / COOLDOWN). Ember motes
+ *  only render on READY + ACTIVE — the cooldown plaque is asleep.
+ *
+ *  The `offer` block stacks vertically when `offerDur` is provided:
+ *  rate sits on top, a hairline divider, then the duration. Without
+ *  `offerDur` (ACTIVE / COOLDOWN) only the single line renders.
+ */
+function HQTablet({ state, kicker, offer, offerDur, cta, onClick, disabled, title }) {
+  const Tag    = onClick ? 'button' : 'div';
+  const showEm = state === 'ready' || state === 'active';
+  return (
+    <Tag
+      className={`home-hq-tablet hq-${state}`}
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      type={onClick ? 'button' : undefined}
     >
-      <span className="home-hq-dot" />
-      <span className="home-hq-text">{label}</span>
-    </button>
+      <span className="hq-cord" />
+      <span className="hq-cap" />
+      <span className="hq-plaque">
+        <span className="hq-kicker">{kicker}</span>
+        <span className="hq-glyph" aria-hidden="true">天</span>
+        <span className={`hq-offer${offerDur ? ' hq-offer-stack' : ''}`}>
+          <span className="hq-offer-rate">{offer}</span>
+          {offerDur && (
+            <>
+              <span className="hq-offer-sep" aria-hidden="true" />
+              <span className="hq-offer-dur">{offerDur}</span>
+            </>
+          )}
+        </span>
+        <span className="hq-cta">{cta}</span>
+      </span>
+      {showEm && (
+        <span className="hq-embers" aria-hidden="true">
+          <span /><span /><span /><span />
+        </span>
+      )}
+    </Tag>
   );
 }
 
@@ -282,8 +451,10 @@ function ConsecutiveFocusMeter({ ladder, boostStartTimeRef }) {
   );
 }
 
-const CRYSTAL_TIER_THRESHOLDS = [1000, 750, 500, 350, 200, 100, 50, 25, 10, 1];
-const CRYSTAL_TIER_VALUES     = [  10,   9,   8,   7,   6,   5,  4,  3,  2, 1];
+// 2026-05-21 Dial-6: 10 visual tiers, evolutions every 10 levels (T10 stretched
+// to L100 for the final milestone). Mirrors useQiCrystal.js — keep in sync.
+const CRYSTAL_TIER_THRESHOLDS = [100, 80, 70, 60, 50, 40, 30, 20, 10, 1];
+const CRYSTAL_TIER_VALUES     = [ 10,  9,  8,  7,  6,  5,  4,  3,  2, 1];
 
 function getCrystalTier(level) {
   for (let i = 0; i < CRYSTAL_TIER_THRESHOLDS.length; i++) {
@@ -354,20 +525,49 @@ function CrystalEvolutionOverlay({ event, onDone }) {
     : `${BASE}crystals/crystal_locked.png`;
   const newSrc = `${BASE}crystals/crystal_${event.newTier}.png`;
   const tierName = CRYSTAL_TIER_NAMES[event.newTier] ?? `Tier ${event.newTier}`;
+  // If this evolution crosses one or more mechanic-granting thresholds, show
+  // a single-line hint on the celebration card so the player knows a tutorial
+  // is coming next. The actual TutorialModal queues separately and pops after
+  // dismissal. Multiple mechanics collapse to a count to keep the line tight.
+  const grantedSparkIds = sparksToGrantOnEvolution(event.previousTier ?? 0, event.newTier ?? 0);
+  const grantedNames    = grantedSparkIds
+    .map((id) => QI_SPARK_BY_ID[id]?.name)
+    .filter(Boolean);
+  let unlockLine = null;
+  if (grantedNames.length === 1) unlockLine = `✦ Mechanic Unlocked — ${grantedNames[0]}`;
+  else if (grantedNames.length > 1) unlockLine = `✦ ${grantedNames.length} Mechanics Unlocked`;
   const card = (
     <div className="crystal-evolve-card">
-      <div className="crystal-evolve-kicker">Evolution</div>
       <div className="crystal-evolve-name">{tierName}</div>
-      <div className="crystal-evolve-sub">Tier {event.newTier} · Level {event.newLevel}</div>
+      {unlockLine && <div className="crystal-evolve-unlock">{unlockLine}</div>}
     </div>
   );
 
   // Lift-and-return geometry — overlay stage starts at the home crystal's
   // rect and returns there at the end. Falls back to screen centre if no
   // origin was captured (e.g. gd trigger while crystal was off-screen).
-  const originX     = event.origin?.x ?? (typeof window !== 'undefined' ? window.innerWidth  / 2 - CES_STAGE_SIZE / 2 : 0);
-  const originY     = event.origin?.y ?? (typeof window !== 'undefined' ? window.innerHeight / 2 - CES_STAGE_SIZE / 2 : 0);
-  const originScale = event.origin?.w ? event.origin.w / CES_STAGE_SIZE : 1;
+  //
+  // The stage is a square (CES_STAGE_SIZE × CES_STAGE_SIZE) but the crystal
+  // PNG is NOT square (89 × 110 native → taller than wide). Naïvely scaling
+  // the stage by origin.w / CES_STAGE_SIZE gives a square that fits the
+  // home crystal's width, but the contained crystal inside is letterboxed
+  // and ends up SHORTER (e.g. 58×72 instead of the home's 72×89). At lift-
+  // off the crystal visibly shrinks, and inverse at landing — the visible
+  // "flicker". Pick the LARGER of width/height as the scaling base so the
+  // contained crystal matches the home crystal exactly, then offset X/Y to
+  // re-centre the (now-bigger) stage over the home crystal's actual rect.
+  let originX, originY, originScale;
+  if (event.origin?.w && event.origin?.h) {
+    const baseDim    = Math.max(event.origin.w, event.origin.h);
+    originScale      = baseDim / CES_STAGE_SIZE;
+    const scaledSize = baseDim;
+    originX          = event.origin.x - (scaledSize - event.origin.w) / 2;
+    originY          = event.origin.y - (scaledSize - event.origin.h) / 2;
+  } else {
+    originX     = typeof window !== 'undefined' ? window.innerWidth  / 2 - CES_STAGE_SIZE / 2 : 0;
+    originY     = typeof window !== 'undefined' ? window.innerHeight / 2 - CES_STAGE_SIZE / 2 : 0;
+    originScale = 1;
+  }
   const stageStyle  = {
     '--ce-a':         glowA,
     '--ce-b':         glowB,
@@ -390,6 +590,7 @@ function CrystalEvolutionOverlay({ event, onDone }) {
         aria-live="assertive"
         style={stageStyle}
       >
+        <div className="ces-backdrop" />
         <div className="ces-flash" />
         <div className="ces-stage">
           <div className="ces-stack">
@@ -431,17 +632,293 @@ function CrystalEvolutionOverlay({ event, onDone }) {
   );
 }
 
+/**
+ * Full-screen cinematic for MAJOR realm-name changes (every 1 of 13 over the
+ * full ladder; peak-stage transitions inside the same realm still use the
+ * lightweight BreakthroughBanner above). Mirrors CrystalEvolutionOverlay's
+ * lift-and-return rhythm: home cultivator hides → overlay flies to centre →
+ * old sprite glows, light pillar rises, old dissolves into the pillar → new
+ * tier sprite descends from above, lands with a shockwave → realm-name banner
+ * appears → tap to continue → overlay returns to anchor, home cultivator
+ * reveals as the new tier.
+ *
+ * Player must tap to continue (no auto-dismiss) — the game keeps farming qi
+ * in the background while the player savours the moment.
+ */
+const CES_CHAR_STAGE_SIZE = 256;  // cultivator sprites are 256×256
+const CES_CHAR_PLAY_MS    = 4200;
+const CES_CHAR_RETURN_MS  = 500;
+
+function CharacterEvolutionOverlay({ event, onDone }) {
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
+  const [phase, setPhase] = useState('playing');
+
+  useEffect(() => {
+    if (!event || phase !== 'playing') return undefined;
+    try { AudioManager.playSfx('cult_breakthrough'); } catch {}
+    const id = setTimeout(() => setPhase('settled'), CES_CHAR_PLAY_MS);
+    return () => clearTimeout(id);
+  }, [event, phase]);
+
+  useEffect(() => {
+    if (phase !== 'settled') return undefined;
+    const handler = () => setPhase('returning');
+    window.addEventListener('pointerdown', handler, { once: true });
+    return () => window.removeEventListener('pointerdown', handler);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== 'returning') return undefined;
+    const id = setTimeout(() => onDoneRef.current?.(), CES_CHAR_RETURN_MS);
+    return () => clearTimeout(id);
+  }, [phase]);
+
+  if (!event) return null;
+  const oldSrc = `${BASE}sprites/cultivator/${event.oldTier}_normal.png`;
+  const newSrc = `${BASE}sprites/cultivator/${event.newTier}_normal.png`;
+
+  // Match the crystal overlay's origin-x/y/scale geometry. Cultivator sprites
+  // are square (256×256) so no letterbox compensation is needed — uniform
+  // scale aligns the centred sprite with the home rect.
+  const originX     = event.origin?.x ?? (typeof window !== 'undefined' ? window.innerWidth  / 2 - CES_CHAR_STAGE_SIZE / 2 : 0);
+  const originY     = event.origin?.y ?? (typeof window !== 'undefined' ? window.innerHeight / 2 - CES_CHAR_STAGE_SIZE / 2 : 0);
+  const originScale = event.origin?.w ? event.origin.w / CES_CHAR_STAGE_SIZE : 1;
+
+  const stageStyle = {
+    '--origin-x':     `${originX}px`,
+    '--origin-y':     `${originY}px`,
+    '--origin-scale': originScale,
+  };
+
+  const kicker = event.isFinal ? 'Final Ascension' : 'Breakthrough';
+
+  return (
+    <div
+      className={`char-evolve-overlay che-phase-${phase}`}
+      aria-live="assertive"
+      style={stageStyle}
+    >
+      <div className="che-backdrop" />
+      <div className="che-flash" />
+      <div className="che-stage">
+        <div className="che-stack">
+          <img src={oldSrc} className="che-old" alt="" draggable="false" />
+          <div className="che-pillar" />
+          {/* Five ascension motes rising along the pillar */}
+          {Array.from({ length: 5 }, (_, i) => (
+            <span
+              key={i}
+              className="che-mote"
+              style={{ '--mote-delay': `${i * 0.10}s`, '--mote-x': `${(i - 2) * 14}px` }}
+            />
+          ))}
+          <div className="che-shockwave" />
+          <img src={newSrc} className="che-new" alt="" draggable="false" />
+        </div>
+      </div>
+      <div className="char-evolve-card">
+        <div className="char-evolve-kicker">{kicker}</div>
+        <div className="char-evolve-name">{event.realmName}</div>
+        {event.tierName && <div className="char-evolve-sub">{event.tierName}</div>}
+      </div>
+      {phase === 'settled' && (
+        <div className="ces-tap-hint">Tap to continue</div>
+      )}
+    </div>
+  );
+}
+
 // Glow and particle colors per visual tier.
 // glowA = inner/bright,  glowB = outer/dim,
 // textName = deeper saturated tier hue used for the evolution name/kicker,
 // particles = 5 shades for the stream.
+// ─────────────────────────────────────────────────────────────────────────────
+// Crystal Reservoir VFX — particle pool + per-tier spark tint.
+//
+// Sparks live in /public/sprites/vfx/qi_particles/ and are blue/cyan by default.
+// CSS `hue-rotate` + `saturate` on the spark layer tints them per-tier so each
+// crystal evolution's sparks match its colour family. Values dialled against
+// the crystal sprites; tweak by tier if any tier feels off.
+//   [hueDeg, satMult]
+// ─────────────────────────────────────────────────────────────────────────────
+const CRYSTAL_VFX_SPARK_POOL = ['spark_cross', 'spark_diamond', 'spark_burst'];
+const CRYSTAL_VFX_TIER_TINT = {
+   1: [   0, 0.40],   // blue-grey
+   2: [   0, 0.90],   // blue
+   3: [ -15, 1.10],   // cyan (greenish push)
+   4: [  10, 1.10],   // deep blue
+   5: [  20, 1.15],   // dark blue
+   6: [  55, 1.20],   // violet
+   7: [  85, 1.25],   // purple
+   8: [ 100, 1.10],   // pale lilac
+   9: [-130, 1.35],   // gold (negative rotates blue→gold)
+  10: [-140, 1.40],   // orange-gold
+};
+// Spark spawn-rate intensity model. Below 5% fill: no sparks. Between 5%-75%
+// (CAP_PCT): linear ramp from MAX_MS → MIN_MS interval. Above 75% (incl. 100%+
+// overcharged): rate stays at MIN_MS. No extra particles when overcharged —
+// the hue-pulse on the crystal sprite is the only additional cue.
+// Rate kept deliberately calm — this is an idle cultivation game, not a
+// fireworks display. ~3 sparks/sec at peak feels alive without being frenetic.
+const CRYSTAL_VFX_CAP_PCT      = 0.75;
+const CRYSTAL_VFX_OVER_PCT     = 1.00;
+const CRYSTAL_VFX_SPARK_MIN_MS = 350;
+const CRYSTAL_VFX_SPARK_MAX_MS = 1500;
+
+// Spawn one spark on the crystal surface. CSS owns the pop animation +
+// hue-tint cascade; this just appends a positioned <img> and removes it on
+// animationend. Random angle around the crystal centre, radius 28-50 px so
+// sparks land ON the silhouette rather than inside the empty centre or far
+// outside it.
+function spawnCrystalSpark(layer, intensity) {
+  const img = document.createElement('img');
+  img.className = 'home-crystal-vfx-p';
+  const key = CRYSTAL_VFX_SPARK_POOL[
+    Math.floor(Math.random() * CRYSTAL_VFX_SPARK_POOL.length)
+  ];
+  img.src = `${BASE}sprites/vfx/qi_particles/qi_${key}.png`;
+  img.alt = '';
+  img.draggable = false;
+  const w = layer.clientWidth;
+  const h = layer.clientHeight;
+  const cx = w / 2;
+  const cy = h / 2;
+  const angle = Math.random() * Math.PI * 2;
+  const r = 28 + Math.random() * 22;
+  img.style.left = `${cx + Math.cos(angle) * r}px`;
+  img.style.top  = `${cy + Math.sin(angle) * r}px`;
+  // CSS reads --srot for the end-of-pop rotation; --sscale-start scales the
+  // initial pop size with current intensity (less punchy when filling slowly).
+  // Rotation kept to a subtle ±20° wobble — sparks should *pop*, not spin.
+  // Scale caps at 0.70 with downward variation: smaller sparks mixed in
+  // alongside the larger ones so the surface reads as "alive with little
+  // glints" rather than uniform pops.
+  img.style.setProperty('--srot', `${(Math.random() - 0.5) * 40}deg`);
+  const sizeVar = 0.65 + Math.random() * 0.35; // 0.65 → 1.00 multiplier
+  img.style.setProperty('--sscale-start', ((0.30 + intensity * 0.25) * sizeVar).toFixed(2));
+  img.style.setProperty('--sscale-end',   ((0.40 + intensity * 0.30) * sizeVar).toFixed(2));
+  img.addEventListener('animationend', () => img.remove(), { once: true });
+  layer.appendChild(img);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Qi-flow VFX — orbs drift from a ring around the cultivator into the centre.
+//
+// Density + inflow speed scale with the effective rate multiplier
+//   (rateRef / baseRateRef) — i.e. the live transient boost (focus hold,
+//   consecutive-focus rungs, divine-qi buff, pattern-click buff). At
+//   baseline (eff ≈ 1) it's a calm ambient stream; focus tripling the rate
+//   visibly accelerates the inflow.
+//
+// CSS owns the per-particle motion: an orb is positioned on a ring,
+// CSS animates it inward via translate(--qf-dx, --qf-dy) over a duration
+// matched to dist/speed, with a fade tail in the last 25% so the orb is
+// fully invisible at the moment it hits the cultivator centre (= absorption).
+// No per-particle JS — a single rAF only handles spawn cadence.
+// ─────────────────────────────────────────────────────────────────────────────
+const QI_FLOW_ORB_POOL    = ['orb_small', 'orb_medium', 'orb_bright', 'orb_faint'];
+const QI_FLOW_RING_MIN_PX = 110;
+const QI_FLOW_RING_MAX_PX = 180;
+const QI_FLOW_BASE_RATE   = 1.5;  // particles/sec at effective ×1
+const QI_FLOW_RATE_K      = 3.0;  // sqrt(eff-1) coefficient — sub-linear ramp
+const QI_FLOW_BASE_SPEED  = 60;   // px/s baseline inflow
+const QI_FLOW_SPEED_K     = 24;   // sqrt(eff) coefficient on speed
+
+function spawnQiFlowOrb(layer, eff) {
+  const w = layer.clientWidth;
+  const h = layer.clientHeight;
+  const cx = w / 2;
+  const cy = h / 2;
+
+  const angle = Math.random() * Math.PI * 2;
+  const ringR = QI_FLOW_RING_MIN_PX
+    + Math.random() * (QI_FLOW_RING_MAX_PX - QI_FLOW_RING_MIN_PX);
+  const sx = cx + Math.cos(angle) * ringR;
+  const sy = cy + Math.sin(angle) * ringR;
+  // Small target jitter so paths spread out rather than all converging on
+  // the exact pixel centre.
+  const dx = (cx - sx) + (Math.random() - 0.5) * 24;
+  const dy = (cy - sy) + (Math.random() - 0.5) * 24;
+  const dist = Math.hypot(dx, dy);
+
+  const speed = QI_FLOW_BASE_SPEED + Math.sqrt(eff) * QI_FLOW_SPEED_K;
+  const life  = Math.max(700, Math.round((dist / speed) * 1000));
+
+  const orbKey = QI_FLOW_ORB_POOL[
+    Math.floor(Math.random() * QI_FLOW_ORB_POOL.length)
+  ];
+  const img = document.createElement('img');
+  img.className = 'home-qi-flow-p';
+  img.src = `${BASE}sprites/vfx/qi_particles/qi_${orbKey}.png`;
+  img.alt = '';
+  img.draggable = false;
+  img.style.left = `${sx}px`;
+  img.style.top  = `${sy}px`;
+  img.style.setProperty('--qf-dx',   `${dx}px`);
+  img.style.setProperty('--qf-dy',   `${dy}px`);
+  img.style.setProperty('--qf-life', `${life}ms`);
+  // Per-orb size variation so the inflow reads as a mix of small glints
+  // and larger orbs rather than uniform pops.
+  const sizeVar = 0.65 + Math.random() * 0.35;
+  img.style.setProperty('--qf-scale-start', (0.40 * sizeVar).toFixed(2));
+  img.style.setProperty('--qf-scale-end',   (0.78 * sizeVar).toFixed(2));
+  img.addEventListener('animationend', () => img.remove(), { once: true });
+  layer.appendChild(img);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Click-burst VFX — used for the crystal-tap and divine-qi-pickup feedback.
+//
+// Each burst spawns N orb particles at an anchor point. CSS keyframes drive
+// a quick arc up-and-outward then a gravity-fall, fading out as they land.
+// CSS-only motion (no per-particle JS tick); each particle self-removes on
+// animationend. Per-particle randomness (final dx, peak height, landing
+// depth, size) gives a varied splash without identical trails.
+//
+// Hue tint: by default cascades from body.crystal-tier-N (--spark-hue/sat).
+// Pass `tintFilter` to override (e.g. divine-qi uses gold regardless of tier).
+// ─────────────────────────────────────────────────────────────────────────────
+function spawnClickBurst({ parent, x, y, xUnit = 'px', yUnit = 'px', count = 4, src, tintFilter }) {
+  if (!parent) return;
+  if (typeof document !== 'undefined' && document.body.classList.contains('vfx-disabled')) return;
+  for (let i = 0; i < count; i++) {
+    const img = document.createElement('img');
+    img.className = 'home-click-burst-p';
+    img.src = src;
+    img.alt = '';
+    img.draggable = false;
+    img.style.left = `${x}${xUnit}`;
+    img.style.top  = `${y}${yUnit}`;
+    if (tintFilter) img.style.filter = tintFilter;
+    // Per-particle motion vars — CSS keyframes interpolate between these.
+    const bx = (Math.random() - 0.5) * 70;        // -35 → +35 px horizontal final
+    const byPeak = -22 - Math.random() * 22;      // -22 → -44 px peak height
+    const byLand = 28 + Math.random() * 24;       // +28 → +52 px landing depth
+    const sizeVar = 0.8 + Math.random() * 0.35;
+    img.style.setProperty('--bx-mid',  `${(bx * 0.5).toFixed(1)}px`);
+    img.style.setProperty('--bx-end',  `${bx.toFixed(1)}px`);
+    img.style.setProperty('--by-peak', `${byPeak.toFixed(1)}px`);
+    img.style.setProperty('--by-land', `${byLand.toFixed(1)}px`);
+    // Scales tuned down ~15% from the first cut so the splash reads as
+    // small bright orbs rather than chunky ones (was 0.45 / 0.85 / 0.65).
+    img.style.setProperty('--bscale-0', (0.38 * sizeVar).toFixed(2));
+    img.style.setProperty('--bscale-1', (0.72 * sizeVar).toFixed(2));
+    img.style.setProperty('--bscale-2', (0.55 * sizeVar).toFixed(2));
+    img.addEventListener('animationend', () => img.remove(), { once: true });
+    parent.appendChild(img);
+  }
+}
+
 const CRYSTAL_COLORS = {
   locked: { glowA: 'rgba(80,80,100,0)',    glowB: 'rgba(50,50,70,0)',     textName: '#aaaabb', particles: ['#555566','#444455','#666677','#333344','#777788'] },
   1:      { glowA: 'rgba(136,153,187,0.9)',glowB: 'rgba(100,120,160,0.5)',textName: '#c8d4e4', particles: ['#8899bb','#aabbcc','#99aacc','#778899','#bbccdd'] },
   2:      { glowA: 'rgba(68,136,187,1)',   glowB: 'rgba(50,100,150,0.55)',textName: '#8fc2e6', particles: ['#4488bb','#88bbdd','#66aacc','#3377aa','#99ccee'] },
   3:      { glowA: 'rgba(0,187,204,1)',    glowB: 'rgba(0,150,160,0.55)', textName: '#6ee0e8', particles: ['#00bbcc','#aaffee','#00ccdd','#00aaaa','#88eeff'] },
-  4:      { glowA: 'rgba(17,85,204,1)',    glowB: 'rgba(10,60,160,0.55)', textName: '#8ab1f2', particles: ['#1155cc','#55ddff','#2266dd','#0044bb','#66ccff'] },
-  5:      { glowA: 'rgba(34,51,170,1)',    glowB: 'rgba(20,40,140,0.55)', textName: '#9aa2ed', particles: ['#2233aa','#6699ff','#3344cc','#1122bb','#7788ff'] },
+  // 2026-05-21 tone fix — pulled red out of T4/T5 so the "blue family"
+  // stays solidly blue. Was reading as bluish-purple on glow/particles.
+  4:      { glowA: 'rgba(0,85,221,1)',     glowB: 'rgba(0,50,170,0.55)',  textName: '#7ab0ff', particles: ['#0055dd','#3388ee','#1166dd','#0044bb','#66bbff'] },
+  5:      { glowA: 'rgba(0,51,170,1)',     glowB: 'rgba(0,30,140,0.55)',  textName: '#7a8cff', particles: ['#0033aa','#2266dd','#1144cc','#0022aa','#5588ff'] },
   6:      { glowA: 'rgba(102,0,204,1)',    glowB: 'rgba(80,0,160,0.55)',  textName: '#be92f0', particles: ['#6600cc','#9966ff','#7711dd','#5500bb','#aa88ff'] },
   7:      { glowA: 'rgba(136,0,221,1)',    glowB: 'rgba(100,0,180,0.55)', textName: '#d094f5', particles: ['#8800dd','#aaddff','#9911ee','#7700cc','#bbaaff'] },
   8:      { glowA: 'rgba(204,153,255,1)',  glowB: 'rgba(170,100,240,0.55)',textName: '#e0c0ff', particles: ['#cc99ff','#eeddff','#bb88ee','#aa77dd','#ddbfff'] },
@@ -451,7 +928,7 @@ const CRYSTAL_COLORS = {
 
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tapable when
  *  Crystal Click mechanic is active). Reservoir fill tracked via rAF. */
-function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine }) {
+function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
   const unlockHint = FEATURE_GATES.qi_crystal?.hint ?? 'Reach a higher realm';
   // true only when the Crystal Click spark is active AND the crystal is unlocked
   const mechanicOn = !!(crystalClickCapMinRef && onCollect && isUnlocked);
@@ -479,32 +956,63 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
     onRefine?.();
   };
 
-  const fillBarRef = useRef(null);
-  const anchorRef  = useRef(null);
+  const vfxLayerRef = useRef(null);
+  const crystalImgRef = useRef(null);
+  const anchorRef   = useRef(null);
 
-  // rAF loop — drives the golden reservoir-fill glow overlay.
-  // When the reservoir is full, clear the inline opacity so the CSS pulse
-  // animation takes over; otherwise scale opacity with the fill fraction.
+  // rAF loop — drives the reservoir VFX (replaces the old golden halo). Reads
+  // the same fill fraction the halo used. Spawns sparks via DOM <img> append
+  // (no React re-render); each spark CSS-animates and self-removes on
+  // animationend. Above CAP_PCT the spawn-rate stops growing; at OVER_PCT the
+  // crystal sprite gets `.home-crystal-overcharged` for the hue-pulse.
   useEffect(() => {
     if (!mechanicOn) return;
     let raf;
-    const tick = () => {
+    let lastSpark = 0;
+    let lastOver  = null; // last applied overcharged state — avoids redundant DOM writes
+    const tick = (now) => {
       const rate   = rateRef?.current   ?? 0;
       const capMin = crystalClickCapMinRef?.current ?? 0;
       const cap    = capMin * 60 * rate;
       const reserv = reservoirRef?.current ?? 0;
       const fill   = cap > 0 ? Math.min(1, reserv / cap) : 0;
-      const isFull = fill >= 0.999;
-      if (fillBarRef.current) {
-        // isFull: remove inline so CSS @keyframes pulse wins the cascade
-        fillBarRef.current.style.opacity = isFull ? '' : String(fill * 0.85);
+
+      // Overcharge toggle on the crystal sprite (drives the hue-pulse).
+      const overcharged = fill >= CRYSTAL_VFX_OVER_PCT;
+      if (overcharged !== lastOver) {
+        crystalImgRef.current?.classList.toggle('home-crystal-overcharged', overcharged);
+        lastOver = overcharged;
       }
-      anchorRef.current?.classList.toggle('home-crystal-full', isFull);
+
+      // Spark spawn-rate intensity — 0 below 5%, ramps to 1 at CAP_PCT, stays
+      // at 1 above. Spawn-rate at >=100% deliberately matches the rate at 75%.
+      const intensity = fill <= 0.05
+        ? 0
+        : Math.min(1, (fill - 0.05) / (CRYSTAL_VFX_CAP_PCT - 0.05));
+
+      // Same zero-dimensions guard as the qi-flow spawner — when the layer
+      // is display:none'd (vfx-disabled body class), clientWidth=0 makes the
+      // spawn-position math collapse to (0,0), and re-enabling vfx would
+      // dump those misplaced sparks into the top-left corner.
+      // Also halts while the crystal is "lifted" for an evolution overlay
+      // (`hidden` prop true) — anchor fades to opacity:0 then back; without
+      // this guard, sparks would spawn invisibly through the overlay and
+      // pop into view mid-animation when the crystal returns.
+      const layer = vfxLayerRef.current;
+      if (intensity > 0 && !hidden && layer && layer.clientWidth > 0 && layer.clientHeight > 0) {
+        const interval = CRYSTAL_VFX_SPARK_MAX_MS
+          - (CRYSTAL_VFX_SPARK_MAX_MS - CRYSTAL_VFX_SPARK_MIN_MS) * intensity;
+        if (now - lastSpark > interval) {
+          spawnCrystalSpark(layer, intensity);
+          lastSpark = now;
+        }
+      }
+
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [mechanicOn, reservoirRef, crystalClickCapMinRef, rateRef]);
+  }, [mechanicOn, reservoirRef, crystalClickCapMinRef, rateRef, hidden]);
 
   if (!isUnlocked) {
     return (
@@ -530,6 +1038,7 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
   const { level, crystalQiBonus } = crystal;
   const tier = getCrystalTier(level);
   const { glowA, glowB } = CRYSTAL_COLORS[tier];
+  const [vfxHue, vfxSat] = CRYSTAL_VFX_TIER_TINT[tier] ?? CRYSTAL_VFX_TIER_TINT[1];
   // SFX + VFX are fired by the parent's onCollect handler so cooldown-blocked
   // taps don't produce sound or floaters. Empty taps still grant a small qi
   // floor — the parent decides what feedback to play based on the granted amount.
@@ -541,55 +1050,68 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
       onClick={handleCrystalTap}
     >
       <div className="home-crystal-float" style={{ '--cg-a': glowA, '--cg-b': glowB }}>
-        <span className="home-crystal-tag">Qi Crystal</span>
-        <span className="home-crystal-evolve">Lv {level}</span>
-        <div className="home-crystal-img-wrap">
+        {/* Level chip is a button that opens the crystal detail modal.
+            stopPropagation so the click doesn't bubble to the anchor's
+            crystal-tap collect handler. */}
+        <button
+          type="button"
+          className="home-crystal-tag home-crystal-tag-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenDetail?.();
+          }}
+          aria-label="Crystal details"
+        >
+          Qi Crystal
+          <span className="home-crystal-tag-divider">·</span>
+          <span className="home-crystal-tag-level">Lv {level}</span>
+        </button>
+        <div
+          className="home-crystal-img-wrap"
+          style={{ '--spark-hue': `${vfxHue}deg`, '--spark-sat': vfxSat }}
+        >
           <img
+            ref={crystalImgRef}
             src={`${BASE}crystals/crystal_${tier}.png`}
             className="home-crystal-img"
             alt="Qi Crystal"
             draggable="false"
           />
           {mechanicOn && (
-            <div ref={fillBarRef} className="home-crystal-reservoir-fill" style={{ opacity: 0 }} />
-          )}
-          {/* Inline refine — behaves like an upgrade buy. Absolutely positioned
-              below the crystal so it does not push surrounding layout. Click
-              spends qi, the crystal levels up, and if the visual tier changes,
-              the existing evolve overlay fires from HomeScreen. */}
-          {onRefine && refineCost > 0 && (
-            <button
-              className={`home-crystal-refine-btn${canAffordRefine ? '' : ' home-crystal-refine-btn-disabled'}`}
-              onClick={handleRefineClick}
-              disabled={!canAffordRefine}
-              aria-label={`Refine Qi Crystal to level ${level + 1} for ${fmtNum(refineCost)} qi`}
-            >
-              <span className="home-crystal-refine-icon">◆</span>
-              <span className="home-crystal-refine-label">
-                <span className="home-crystal-refine-lv">Lv {level + 1}</span>
-                <span className="home-crystal-refine-cost">{fmtNum(refineCost)} Qi</span>
-              </span>
-            </button>
+            <div ref={vfxLayerRef} className="home-crystal-vfx-layer" aria-hidden="true" />
           )}
         </div>
       </div>
+      {/* Refine lives OUTSIDE .home-crystal-float so it stays anchored while
+          the crystal sprite bobs above it. The anchor is the nearest
+          positioned ancestor; its height matches the float's resting height
+          (transform doesn't reflow), so `top: 100%` lands the button at the
+          exact spot the float's bottom edge sits at rest. */}
+      {onRefine && refineCost > 0 && (
+        <button
+          className={`home-crystal-refine-btn${canAffordRefine ? '' : ' home-crystal-refine-btn-disabled'}`}
+          onClick={handleRefineClick}
+          disabled={!canAffordRefine}
+          aria-label={`Refine Qi Crystal to level ${level + 1} for ${fmtNum(refineCost)} qi`}
+        >
+          <span className="home-crystal-refine-icon">▲</span>
+          <span className="home-crystal-refine-label">
+            <span className="home-crystal-refine-verb">Refine</span>
+            <span className="home-crystal-refine-sep">·</span>
+            <span className="home-crystal-refine-cost">{fmtNum(refineCost)} Qi</span>
+          </span>
+        </button>
+      )}
       {/* QiParticles intentionally not rendered in v1.5+ — we're rebuilding the
           crystal→player particle stream with pixel-art assets. The component
           definition stays in this file for now so the new system can reuse the
           existing path infrastructure once the new art lands. The gap variable
           --qi-particles-h still holds the layout open so the refine button has
           its breathing room. */}
-      <div className="crystal-tooltip">
-        <div className="ctt-title">Qi Crystal · Lv {level}</div>
-        <div className="ctt-desc">A crystallised vessel of refined Qi. Feed it QI stones to level it up and increase your cultivation speed.</div>
-        <div className="ctt-bonus">
-          <span className="ctt-gem">◆</span> Current bonus: <strong>+{crystalQiBonus} Qi/s</strong>
-        </div>
-        {mechanicOn
-          ? <div className="ctt-hint">Tap to collect stored Qi</div>
-          : <div className="ctt-hint">Tap the chip below to refine</div>
-        }
-      </div>
+      {/* Hover tooltip retired 2026-05-22 — replaced by the
+          CrystalDetailModal opened from the level chip above. Hovers don't
+          work well on mobile, and the modal gives us more room for the
+          "next evolution preview" the player actually wants to see. */}
     </div>
   );
 }
@@ -986,18 +1508,35 @@ function usePatternClick({ activeSparks, rateRef, qiRef }) {
 }
 
 // ── Spark coordinator ───────────────────────────────────────────────────────
-// Divine Qi and Pattern Click both demand the player's attention. Letting them
-// fire on top of each other forces context-switching and feels chaotic, so this
-// shared module-level latch ensures only one is active at a time. The losing
-// mechanic simply skips its spawn slot and re-arms on the next interval.
+// Divine Qi and Pattern Click both demand the player's attention. Two layers:
+//
+//  1. ATTENTION LATCH — only one mechanic active at a time. Losing mechanic
+//     skips its spawn slot.
+//  2. POST-EVENT COOLDOWN — after any mechanic resolves, neither can spawn
+//     again for MIN_SPACING_MS. Matches Cookie Clicker's Golden Cookie cadence
+//     (events are RARE and IMPACTFUL, not constant ambient noise). Without
+//     this, two mechanics with overlapping spawn timers fire back-to-back.
+//
+// 2026-05-21 Dial-6: spacing enforced. Per-event rewards bumped up to
+// compensate; net average contribution drops from ~1.6× to ~0.6× background.
 const sparkAttentionRef = { current: null }; // 'divine' | 'pattern' | null
+const sparkCooldownUntilRef = { current: 0 }; // ms timestamp (performance.now)
+const MIN_SPACING_MS = 90_000; // 1.5 min between any two mechanic events
+
 function tryClaimSparkAttention(id) {
   if (sparkAttentionRef.current !== null) return false;
+  // Respect the post-event cooldown so back-to-back spawns can't happen.
+  if (performance.now() < sparkCooldownUntilRef.current) return false;
   sparkAttentionRef.current = id;
   return true;
 }
 function releaseSparkAttention(id) {
-  if (sparkAttentionRef.current === id) sparkAttentionRef.current = null;
+  if (sparkAttentionRef.current === id) {
+    sparkAttentionRef.current = null;
+    // Start the post-event cooldown — next mechanic can't fire until this
+    // expires. Cheap insurance against perfectly-overlapping timers.
+    sparkCooldownUntilRef.current = performance.now() + MIN_SPACING_MS;
+  }
 }
 
 // ── Divine Qi — golden orb mechanic ─────────────────────────────────────────
@@ -1006,7 +1545,7 @@ function releaseSparkAttention(id) {
  * Single orb: self-destructs after `windowMs`; notifies parent on collect/expire.
  * Phases: 'alive' → 'expiring' (last 3s) → 'collected' | 'expired'
  */
-function DivineQiOrb({ orb, onResolve, spawnVFX, rateRef }) {
+function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
   const [phase, setPhase] = useState('alive');
   const phaseRef = useRef('alive');
 
@@ -1041,23 +1580,36 @@ function DivineQiOrb({ orb, onResolve, spawnVFX, rateRef }) {
     phaseRef.current = 'collected';
     setPhase('collected');
     try { AudioManager.playSfx('divine_qi_collect'); } catch {}
-    // Spawn "+N Qi" floater at the orb's screen position, offset into
-    // fighter-stage coordinates (where the VFX layer lives).
-    if (spawnVFX && rateRef) {
-      try {
-        const orbRect   = e.currentTarget.getBoundingClientRect();
-        const stageEl   = document.querySelector('.home-fighter-stage');
-        if (stageEl) {
-          const sr = stageEl.getBoundingClientRect();
-          const x  = (orbRect.left + orbRect.width  / 2) - sr.left;
-          const y  = (orbRect.top  + orbRect.height / 2) - sr.top;
-          const reward = orb.burstSeconds * (rateRef.current ?? 1);
-          const fmt = fmtDelta;
-          spawnVFX({ type: 'qi-tick', x, y, content: fmt(reward), duration: 1500,
-            style: { '--qi-drift-x': '0px' } });
-        }
-      } catch {}
+    // Stats — divine qi orbs are our golden-cookie equivalent. Only the
+    // successful click registers (auto-expire doesn't count).
+    try { eventStat('divineQiClicks'); } catch {}
+    // Spawn the "+N qi" floater as a SIBLING of the orb (not via the
+    // fighter-stage vfx-layer) so it shares the orb's stacking context.
+    // `.home-fighter-stage` is a stacking context at z-index 2 — anything
+    // rendered inside it (including the vfx-layer) is trapped below the
+    // orb (z-index 60) in the parent context. Rendering the floater
+    // alongside the orb lets a simple z-index > 60 sit it above.
+    if (onSpawnFloater && rateRef) {
+      const reward = orb.burstSeconds * (rateRef.current ?? 1);
+      onSpawnFloater({ x: orb.x, y: orb.y, content: fmtDelta(reward) });
     }
+    // Golden splash burst at the orb position — bigger than the crystal-tap
+    // splash (10 orbs) since divine qi is a rarer, more rewarding moment.
+    // Forced gold tint via inline filter — divine bursts ignore the active
+    // crystal tier so they always feel "divine" regardless of progression.
+    try {
+      const zone = document.querySelector('.home-cultivation-zone');
+      if (zone) {
+        spawnClickBurst({
+          parent: zone,
+          x: orb.x, y: orb.y,
+          xUnit: '%', yUnit: '%',
+          count: 10,
+          src: `${BASE}sprites/vfx/qi_particles/qi_orb_bright.png`,
+          tintFilter: 'hue-rotate(-130deg) saturate(1.5) brightness(1.1)',
+        });
+      }
+    } catch {}
   };
 
   return (
@@ -1081,7 +1633,11 @@ function DivineQiOrb({ orb, onResolve, spawnVFX, rateRef }) {
  */
 function useDivineQi({ activeSparks, rateRef, qiRef, spawnVFX }) {
   const [orbs, setOrbs] = useState([]);
+  // Pickup floaters render alongside the orbs (NOT via the fighter-stage
+  // vfx-layer) so they share the orb's stacking context. See spawnFloater.
+  const [floaters, setFloaters] = useState([]);
   const nextIdRef = useRef(0);
+  const nextFloaterIdRef = useRef(0);
 
   // Find the active divine_qi card — activeSparks items store only { sparkId, ... };
   // the kind/mechanicId fields live on the card object in QI_SPARK_BY_ID.
@@ -1189,7 +1745,21 @@ function useDivineQi({ activeSparks, rateRef, qiRef, spawnVFX }) {
     }
   }, [rateRef, qiRef]);
 
-  return { orbs, collectOrb };
+  /**
+   * Push a pickup floater (gold "+N qi" text) into render state. Lives
+   * 1500ms then self-removes. x/y are percentages within the same
+   * containing block as the orbs themselves, so a freshly-spawned floater
+   * lands exactly where the orb was when tapped.
+   */
+  const spawnFloater = useCallback(({ x, y, content }) => {
+    const id = ++nextFloaterIdRef.current;
+    setFloaters(prev => [...prev, { id, x, y, content }]);
+    setTimeout(() => {
+      setFloaters(prev => prev.filter(f => f.id !== id));
+    }, 1500);
+  }, []);
+
+  return { orbs, floaters, collectOrb, spawnFloater };
 }
 
 /** Flowing qi-particle stream — energy pours from the crystal and
@@ -1380,7 +1950,6 @@ function HomeScreen({
   selections, onOpenSelections,
   onNavigate,
   crystal, isCrystalUnlocked,
-  dailyBonus, onOpenDailyBonus,
   lastIdleAssignment,
   openCrystal,
   onOpenPills,
@@ -1389,6 +1958,12 @@ function HomeScreen({
   crystalReservoirRef,
   crystalClickCapMinRef,
   collectCrystalReservoir,
+  // Blood Lotus Shop — Heaven's Pardon (major-BT gate bypass) wiring.
+  // bypassTokenCount = number of unused Pardon consumables in inventory;
+  // onUseBypassToken = decrement-and-clear-gate callback supplied by
+  // App.jsx (couples consumable use + cultivation.bypassGate atomically).
+  bypassTokenCount = 0,
+  onUseBypassToken,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -1396,6 +1971,10 @@ function HomeScreen({
     realmStage,
     nextRealmName,
     qiRef,
+    // Monotone counter of qi accrued ONLY by the cultivation tick (no
+    // crystal/divine-qi/pattern-click grants). Used by the cultivator
+    // floater so one-shot grants don't spike the next "+N Qi" pop.
+    passiveQiAccruedRef,
     // Cookie-Clicker pivot — realm progress meter (cumulative qi earned this
     // realm). Drives the progress-bar fill and the "X / cost" numerator.
     // qiRef stays as the spendable balance display.
@@ -1426,12 +2005,23 @@ function HomeScreen({
 
   // Sprite scales with the rendered background height so the character stays
   // proportional to the art across every screen shape.
-  const [spriteScale, setSpriteScale] = useState(1);
+  // Lazy init so the FIRST render already paints the fighter-stage at its
+  // final size. Without this the layer would render at 128px on mount, then
+  // immediately re-render at the viewport-derived size — and any qi-flow
+  // particles spawned in that first frame would aim at the wrong centre
+  // (looked like orbs drifting toward the top-left for ~1.5s after every
+  // navigation back to Home).
+  const computeSpriteScale = () => {
+    if (typeof window === 'undefined') return 1;
+    const s = Math.max(window.innerWidth / HOME_BG_W, window.innerHeight / HOME_BG_H);
+    return (HOME_BG_H * s * 0.21) / 128;
+  };
+  const [spriteScale, setSpriteScale] = useState(computeSpriteScale);
+  // Crystal detail modal — opens when the player taps the level chip.
+  // Replaces the legacy hover tooltip (poor mobile UX).
+  const [crystalDetailOpen, setCrystalDetailOpen] = useState(false);
   useEffect(() => {
-    const update = () => {
-      const scale = Math.max(window.innerWidth / HOME_BG_W, window.innerHeight / HOME_BG_H);
-      setSpriteScale((HOME_BG_H * scale * 0.21) / 128);
-    };
+    const update = () => setSpriteScale(computeSpriteScale());
     update();
     window.addEventListener('resize', update);
     window.addEventListener('orientationchange', update);
@@ -1445,13 +2035,19 @@ function HomeScreen({
   // cadence so passive ticking reads as visible progress. Reuses the existing
   // vfx-float-up effect; gated off while qi is capped at a major-realm gate
   // or the run is finished without ascension.
-  const lastFloaterQiRef = useRef(qiRef.current);
+  // Reads from `passiveQiAccruedRef` (monotone passive-only counter) instead
+  // of `qiRef`. Otherwise one-shot grants (crystal collect, divine-qi
+  // reward, pattern click) would inflate the next floater by their full
+  // payout, making the cultivator briefly show a value much larger than
+  // the actual passive tick rate.
+  const passiveRef = passiveQiAccruedRef ?? qiRef;
+  const lastFloaterQiRef = useRef(passiveRef.current);
   useEffect(() => {
-    lastFloaterQiRef.current = qiRef.current;
+    lastFloaterQiRef.current = passiveRef.current;
     const id = setInterval(() => {
       if (maxed && !ascended)   return;
-      if (gateRef?.current)    { lastFloaterQiRef.current = qiRef.current; return; }
-      const now   = qiRef.current;
+      if (gateRef?.current)    { lastFloaterQiRef.current = passiveRef.current; return; }
+      const now   = passiveRef.current;
       const delta = now - lastFloaterQiRef.current;
       // Breakthrough drained qi to a leftover — reseed the tracker and
       // skip this tick so floaters resume cleanly on the next one.
@@ -1472,7 +2068,57 @@ function HomeScreen({
       });
     }, 500);
     return () => clearInterval(id);
-  }, [qiRef, gateRef, maxed, ascended, spawnVFX, spriteScale]);
+  }, [passiveRef, gateRef, maxed, ascended, spawnVFX, spriteScale]);
+
+  // ── Qi flow VFX — orbs drift in from a ring around the cultivator ─────
+  // Density + inflow speed scale with the effective transient multiplier
+  // (rateRef / baseRateRef). At baseline ≈ 1 spawn/sec; under focus the
+  // ratio jumps to ~3 and the stream visibly accelerates. CSS owns motion
+  // and fade-on-arrival; this rAF only governs spawn cadence.
+  const qiFlowLayerRef = useRef(null);
+  // Ref populated below (after useEventQueue destructure) — declared up
+  // front so the rAF effect can close over it. Starting value null means
+  // the rAF won't halt on first frame; the mirror effect populates it as
+  // soon as currentEvent is destructured downstream.
+  const currentEventKindRef = useRef(null);
+  useEffect(() => {
+    let raf;
+    let lastSpawn = 0;
+    const tick = (now) => {
+      const layer = qiFlowLayerRef.current;
+      const kind = currentEventKindRef.current;
+      // Halt spawning while the cultivator is being taken over by an
+      // overlay — breakthrough banner shows the realm-up text-blast, and
+      // character-evolution lifts the sprite out for the tier-up reveal.
+      // Letting particles keep spawning during these would dump them into
+      // an empty area (sprite gone) and pop a backlog on the way back.
+      const haltedForEvent = kind === 'breakthrough' || kind === 'character-evolution';
+      // Skip when the layer has zero dimensions — happens when .vfx-disabled
+      // body class hides it via display:none, or briefly during initial
+      // layout. Without this guard, particles would spawn around (0,0) and
+      // drift toward (0,0), then pop into view in the top-left corner when
+      // the player re-enables particles in Settings.
+      if (!haltedForEvent && layer && layer.clientWidth > 0 && layer.clientHeight > 0) {
+        const baseRate = cultivation.baseRateRef?.current ?? 0;
+        const rate     = cultivation.rateRef?.current     ?? 0;
+        const eff = baseRate > 0 ? Math.max(1, rate / baseRate) : 1;
+        const spawnRate = QI_FLOW_BASE_RATE
+          + Math.sqrt(Math.max(0, eff - 1)) * QI_FLOW_RATE_K;
+        const interval = 1000 / Math.max(0.1, spawnRate);
+        if (now - lastSpawn > interval) {
+          spawnQiFlowOrb(layer, eff);
+          lastSpawn = now;
+        }
+      } else {
+        // Hidden / not yet laid out — reset spawn timer so we don't dump a
+        // backlog the moment the layer becomes visible again.
+        lastSpawn = now;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [cultivation.rateRef, cultivation.baseRateRef]);
 
   // ── Rewarded ad ─────────────────────────────────────────────────────────
   const onCultivationReward = useCallback(() => {
@@ -1487,28 +2133,54 @@ function HomeScreen({
     // tap-spam past the 6.7/sec cap is silent — preserves ad-boost value.
     const granted = collectCrystalReservoir();
     if (granted <= 0) return;
-    const wasFull = document.querySelector('.home-crystal-anchor')?.classList.contains('home-crystal-full');
+    const wasFull = !!document.querySelector('.home-crystal-img.home-crystal-overcharged');
     try { AudioManager.playSfx(wasFull ? 'crystal_tap_max' : 'crystal_tap'); } catch {}
-    // Spawn a "+N Qi" floater at the crystal's screen position, offset into
-    // fighter-stage coordinates (where the VFX layer lives).
+    // Spawn the "+N Qi" floater DIRECTLY into the crystal-img-wrap (DOM-
+    // managed, like the click-burst orbs). Previously routed through the
+    // fighter-stage's vfx-layer, but in a layout where the crystal sits
+    // above the fighter-stage subtree the floater rendered behind both
+    // the crystal sprite and the burst orbs. Spawning into the crystal's
+    // own stacking context with a high z-index keeps it on top of every
+    // crystal-area VFX.
     try {
       const crystalEl = document.querySelector('.home-crystal-img-wrap');
-      const stageEl   = document.querySelector('.home-fighter-stage');
-      if (crystalEl && stageEl) {
-        const cr = crystalEl.getBoundingClientRect();
-        const sr = stageEl.getBoundingClientRect();
-        const x  = (cr.left + cr.width  / 2) - sr.left;
-        const y  = (cr.top  + cr.height / 2) - sr.top;
-        spawnVFX({ type: 'qi-tick', x, y, content: fmtDelta(granted), duration: 1600,
-          style: { '--qi-drift-x': '0px' } });
+      if (crystalEl) {
+        const f = document.createElement('div');
+        f.className = 'home-crystal-tap-floater';
+        // fmtDelta already prepends the '+'.
+        f.textContent = fmtDelta(granted);
+        f.addEventListener('animationend', () => f.remove(), { once: true });
+        crystalEl.appendChild(f);
+      }
+      // Click-burst orbs — jump up + fall, count scales with reservoir fill
+      // (1 for an empty-tap floor, up to ~5 for a fully-overcharged collect).
+      // Tint inherits the active crystal-tier hue via the body cascade.
+      if (crystalEl) {
+        const baseRate = cultivation.baseRateRef?.current ?? 1;
+        const capMin   = crystalClickCapMinRef?.current ?? 0;
+        const capMax   = capMin * 60 * baseRate;
+        const fillPct  = capMax > 0 ? Math.min(1, granted / capMax) : 0;
+        const count    = Math.max(1, Math.round(1 + fillPct * 4));
+        spawnClickBurst({
+          parent: crystalEl,
+          x: crystalEl.clientWidth  / 2,
+          y: crystalEl.clientHeight / 2,
+          count,
+          src: `${BASE}sprites/vfx/qi_particles/qi_orb_small.png`,
+        });
       }
     } catch {}
-  }, [collectCrystalReservoir, spawnVFX]);
+  }, [collectCrystalReservoir, spawnVFX, cultivation.baseRateRef, crystalClickCapMinRef]);
 
   const cultivationAd = useRewardedAd(onCultivationReward, 30 * 60 * 1000, 'mai_ad_cd_cultivation');
 
   // ── Divine Qi — golden orb mechanic ─────────────────────────────────────
-  const { orbs: divineOrbs, collectOrb } = useDivineQi({
+  const {
+    orbs:         divineOrbs,
+    floaters:     divineFloaters,
+    collectOrb,
+    spawnFloater: spawnDivineFloater,
+  } = useDivineQi({
     activeSparks,
     rateRef:   cultivation.rateRef,
     qiRef:     cultivation.qiRef,
@@ -1543,6 +2215,16 @@ function HomeScreen({
   // crystal evolution) all flow through one FIFO queue so they don't stack.
   const { enqueue, currentEvent, dismiss } = useEventQueue();
 
+  // Mirror currentEvent.kind into the ref declared above so the qi-flow
+  // rAF can halt spawning during cultivator-takeover overlays (breakthrough
+  // banner, character evolution) without re-mounting the loop on every
+  // event change. Lives down here because currentEvent is destructured
+  // from useEventQueue() on the previous line — moving the destructure up
+  // would shuffle a lot of unrelated wiring.
+  useEffect(() => {
+    currentEventKindRef.current = currentEvent?.kind ?? null;
+  }, [currentEvent]);
+
   // ── Crystal feed modal (v1: inlined into the crystal sprite) ────────────
   // Replaced by the inline refine button rendered inside <KeyCrystal>. The
   // modal still exists in CrystalFeedModal.jsx for v2 stone-fed reactivation.
@@ -1563,6 +2245,32 @@ function HomeScreen({
       }
     }
     enqueue('crystal-evolution', { ...info, origin }, { priority: 'high' });
+
+    // Queue a tutorial modal for every mechanic granted by crossing tiers in
+    // this evolution. They fire AFTER the player dismisses the celebration
+    // overlay (FIFO queue), so the flow is: shatter + reform → "tap to
+    // continue" → tutorial pop for each newly-unlocked mechanic in order.
+    // Crystal Reservoir → Consecutive Focus → Divine Qi → Tracing Meridians
+    // is the natural ladder defined in crystalMechanicGrants.js.
+    //
+    // Icon: each mechanic already ships with an existing upgrade-card icon
+    // at public/ui/upgrade_<mechanicId>.png (jade-medallion framed pixel
+    // art — same asset the upgrade screen uses, so the player recognises
+    // it when they encounter it again later). No tier colours passed —
+    // TutorialModal's jade-green default accent matches the icon frame
+    // and keeps the modal's identity consistent across all mechanics.
+    const newlyGranted = sparksToGrantOnEvolution(info?.previousTier ?? 0, info?.newTier ?? 0);
+    newlyGranted.forEach((sparkId) => {
+      const card = QI_SPARK_BY_ID[sparkId];
+      if (!card) return;
+      enqueue('tutorial', {
+        kicker:  'New Mechanic',
+        title:   card.name,
+        body:    card.description,
+        ctaText: 'Got it',
+        iconSrc: card.mechanicId ? `${BASE}ui/upgrade_${card.mechanicId}.png` : undefined,
+      });
+    });
 
     // Round 3 — Crystal Discovery. Re-broadcast the tier delta as a window
     // event so the App.jsx orchestrator can grant any mechanic-tier sparks
@@ -1586,6 +2294,64 @@ function HomeScreen({
     return () => window.removeEventListener('mai:crystal-evolve', handler);
   }, [handleCrystalEvolve]);
 
+  // #6 First major-realm gate (Tier-A tutorial). Fires the moment the
+  // player hits the cost cap on a major-realm transition — either while
+  // CAPPED waiting on the qi/s gate (gateRef.current non-null), or after
+  // the rate already cleared and the BREAKTHROUGH button has appeared
+  // (pendingMajorBreakthrough). Previously the trigger only fired on the
+  // latter, so a player stuck under the rate gate saw the warning AFTER
+  // they'd already beaten it instead of when it would actually help.
+  //
+  // gateRef is a ref (no React state mirror), so we poll at 500ms.
+  // fireTutorialOnce is idempotent — first match wins, interval clears.
+  useEffect(() => {
+    if (hasSeenTutorial(TUTORIAL_IDS.FIRST_MAJOR_GATE)) return undefined;
+    const id = window.setInterval(() => {
+      if (hasSeenTutorial(TUTORIAL_IDS.FIRST_MAJOR_GATE)) {
+        window.clearInterval(id);
+        return;
+      }
+      const atGate  = !!cultivation.gateRef?.current;
+      const pending = cultivation.pendingMajorBreakthrough;
+      if (atGate || pending) {
+        fireTutorialOnce(TUTORIAL_IDS.FIRST_MAJOR_GATE, enqueue);
+        window.clearInterval(id);
+      }
+    }, 500);
+    return () => window.clearInterval(id);
+  }, [enqueue, cultivation.gateRef, cultivation.pendingMajorBreakthrough]);
+
+  // Debug bridge — gd.charEvolve / window.dispatchEvent('mai:char-evolve')
+  // lets the major-breakthrough cinematic be demoed without grinding qi.
+  // Detail shape: { newRealmIndex, realmName, isFinal? }.
+  useEffect(() => {
+    const handler = (e) => {
+      const d = e.detail ?? {};
+      const newIdx = Math.max(0, Number(d.newRealmIndex ?? 0));
+      const oldIdx = Math.max(0, newIdx - 1);
+      const newTierIdx = getCultivatorTier(newIdx);
+      const oldTierIdx = getCultivatorTier(oldIdx);
+      let origin = null;
+      if (typeof document !== 'undefined') {
+        const el = document.querySelector('.home-cultivator-sprite');
+        if (el) {
+          const r = el.getBoundingClientRect();
+          origin = { x: r.left, y: r.top, w: r.width, h: r.height };
+        }
+      }
+      enqueue('character-evolution', {
+        oldTier:    CULTIVATOR_TIER_NAMES[oldTierIdx],
+        newTier:    CULTIVATOR_TIER_NAMES[newTierIdx],
+        realmName:  d.realmName ?? 'Ascension',
+        tierName:   CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
+        isFinal:    !!d.isFinal,
+        origin,
+      }, { priority: 'high' });
+    };
+    window.addEventListener('mai:char-evolve', handler);
+    return () => window.removeEventListener('mai:char-evolve', handler);
+  }, [enqueue]);
+
   // ── Inline crystal refine (replaces the v1 feed modal) ───────────────────
   // The crystal exposes `feedQi(amount, spendFn)`; under the v1 Cookie-Clicker
   // pivot, 1 qi == 1 RQI, so spending exactly `requiredForNext - refinedQi`
@@ -1606,14 +2372,50 @@ function HomeScreen({
     }
   }, [crystal, isCrystalUnlocked, cultivation, handleCrystalEvolve]);
 
-  // ── Breakthrough banner — enqueue when majorBreakthrough state appears ──
-  const enqueuedBreakthroughIdRef = useRef(null);
+  // ── Breakthrough — peak-stage entries use the lightweight text banner,
+  //    major realm-name changes (and the final ascension) pop the cinematic
+  //    Character Evolution overlay so the player gets a real emotional beat
+  //    every time their cultivator's appearance changes.
+  //
+  // The "already enqueued" tracker is module-scoped (_enqueuedBreakthroughIds
+  // above) so it survives HomeScreen unmount/remount; otherwise navigating
+  // away mid-banner and back re-enqueues the same event for an already-
+  // completed transition.
   useEffect(() => {
-    if (majorBreakthrough && enqueuedBreakthroughIdRef.current !== majorBreakthrough.id) {
-      enqueuedBreakthroughIdRef.current = majorBreakthrough.id;
+    if (!majorBreakthrough || _enqueuedBreakthroughIds.has(majorBreakthrough.id)) return;
+    _enqueuedBreakthroughIds.add(majorBreakthrough.id);
+    if (majorBreakthrough.isPeak) {
+      // Sub-realm peak — same realm name, same cultivator tier, no new
+      // visual identity. Lightweight 2.6 s text banner is right.
       enqueue('breakthrough', majorBreakthrough);
+      return;
     }
-  }, [majorBreakthrough, enqueue]);
+    // Major realm change (or final ascension) — cultivator tier sprite WILL
+    // change. Lift the home cultivator into a cinematic centred ascension
+    // and reveal the new tier when the player taps to continue.
+    const newRealmIndex = cultivation.realmIndex;
+    const oldRealmIndex = Math.max(0, newRealmIndex - 1);
+    const newTierIdx = getCultivatorTier(newRealmIndex);
+    const oldTierIdx = getCultivatorTier(oldRealmIndex);
+    // Measure the home cultivator's on-screen rect so the overlay lifts
+    // from there and returns to it (matches the crystal-evolution pattern).
+    let origin = null;
+    if (typeof document !== 'undefined') {
+      const el = document.querySelector('.home-cultivator-sprite');
+      if (el) {
+        const r = el.getBoundingClientRect();
+        origin = { x: r.left, y: r.top, w: r.width, h: r.height };
+      }
+    }
+    enqueue('character-evolution', {
+      oldTier:    CULTIVATOR_TIER_NAMES[oldTierIdx],
+      newTier:    CULTIVATOR_TIER_NAMES[newTierIdx],
+      realmName:  majorBreakthrough.label,
+      tierName:   CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
+      isFinal:    !!majorBreakthrough.isFinal,
+      origin,
+    }, { priority: 'high' });
+  }, [majorBreakthrough, enqueue, cultivation.realmIndex]);
 
   // ── Offline earnings — render via queue. App.jsx is already enqueueing. ─
   // (Render condition below combines queue head with cultivation state.)
@@ -1749,7 +2551,10 @@ function HomeScreen({
             )}
           </div>
 
-          {/* ── Top-right chip stack — reserved for timed/seasonal events ── */}
+          {/* ── Top-right chip stack — Petition Tablet stands alone ──
+              The Daily Gift chip was removed (the modal auto-opens via the
+              event queue on first login each day, so the chip provided no
+              value and only diluted the ceremonial weight of the plaque). */}
           <div className="home-chips-tr">
             <HeavenlyQiButton
               ad={cultivationAd}
@@ -1757,19 +2562,23 @@ function HomeScreen({
               adBoostRemaining={adBoostRemaining}
               maxed={maxed}
             />
-            {dailyBonus && (
-              <DailyBonusWidget
-                streak={dailyBonus.streak}
-                todayReward={dailyBonus.todayReward}
-                isAvailable={dailyBonus.isAvailable}
-                onOpen={onOpenDailyBonus}
-              />
-            )}
           </div>
 
           {/* Divine Qi orbs — float over the scene at random positions */}
           {divineOrbs.map(orb => (
-            <DivineQiOrb key={orb.id} orb={orb} onResolve={collectOrb} spawnVFX={spawnVFX} rateRef={cultivation.rateRef} />
+            <DivineQiOrb key={orb.id} orb={orb} onResolve={collectOrb} onSpawnFloater={spawnDivineFloater} rateRef={cultivation.rateRef} />
+          ))}
+          {/* Pickup floaters — siblings of the orbs (NOT inside the
+              fighter-stage vfx-layer) so a simple z-index sits them above
+              the orb. See useDivineQi.spawnFloater. */}
+          {divineFloaters.map(f => (
+            <div
+              key={f.id}
+              className="divine-qi-floater"
+              style={{ left: `${f.x}%`, top: `${f.y}%` }}
+            >
+              {f.content}
+            </div>
           ))}
 
           {/* Pattern Clicking opt-in prompt — small spark the player can tap to
@@ -1804,10 +2613,11 @@ function HomeScreen({
             cfRung={cfRung}
             reservoirRef={crystalReservoirRef}
             crystalClickCapMinRef={crystalClickCapMinRef}
-            rateRef={cultivation.rateRef}
+            rateRef={cultivation.baseRateRef ?? cultivation.rateRef}
             onCollect={handleCrystalCollect}
             qiRef={cultivation.qiRef}
             onRefine={handleCrystalRefine}
+            onOpenDetail={() => setCrystalDetailOpen(true)}
           />
 
           {/* Character + Consecutive-Focus meter group — grounded at scene bottom */}
@@ -1821,7 +2631,7 @@ function HomeScreen({
               </div>
             )}
             <div
-              className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${adBoostActive ? ' stage-ad-boosted' : ''}`}
+              className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${adBoostActive ? ' stage-ad-boosted' : ''}${currentEvent?.kind === 'character-evolution' ? ' home-fighter-stage-lifted' : ''}`}
               style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
               onPointerDown={handlePointerDown}
               onPointerUp={handlePointerUp}
@@ -1829,6 +2639,16 @@ function HomeScreen({
               onPointerCancel={handlePointerUp}
             >
               {vfxLayer}
+              {/* Qi flow — orbs drift from a ring around the cultivator
+                  inward to the centre. Sits BEFORE the cultivator sprite +
+                  aura in JSX so it stacks behind them (later siblings render
+                  on top). Density + inflow speed scale with the effective
+                  transient multiplier — see spawnQiFlowOrb above. */}
+              <div
+                ref={qiFlowLayerRef}
+                className="home-cultivator-qi-flow-layer"
+                aria-hidden="true"
+              />
               {/* Heavenly aura — only rendered when the rewarded-ad boost is
                   active. 4-frame loop at 6 fps. Sits BEHIND the cultivator
                   via z-index; alpha-zero center lets the character show
@@ -1845,13 +2665,26 @@ function HomeScreen({
                 />
               )}
               {/* Cultivator — static 256×256 PNG. CSS breathing pulse adds
-                  life without API-side animation. `key` forces a remount
-                  on tier/pose change so the breathing animation restarts. */}
+                  life without API-side animation. We render BOTH poses
+                  (normal + focused) stacked and toggle visibility via
+                  opacity so a pose change is a crossfade rather than a
+                  remount — the breathing-pulse keyframe keeps its phase
+                  across the swap, no jump back to scale 1.0. Keys are
+                  tier-only so both layers remount together (and re-sync
+                  the breathing) only when the tier itself changes. */}
               <img
-                key={`${cultivatorTierName}-${cultivatorPose}`}
-                src={spriteSrc}
+                key={`${cultivatorTierName}-normal`}
+                src={`${BASE}sprites/cultivator/${cultivatorTierName}_normal.png`}
                 alt="Cultivator"
-                className="home-cultivator-sprite"
+                className={`home-cultivator-sprite${cultivatorPose === 'normal' ? '' : ' home-cultivator-sprite-fade'}`}
+                draggable="false"
+              />
+              <img
+                key={`${cultivatorTierName}-focused`}
+                src={`${BASE}sprites/cultivator/${cultivatorTierName}_focused.png`}
+                alt=""
+                aria-hidden="true"
+                className={`home-cultivator-sprite${cultivatorPose === 'focused' ? '' : ' home-cultivator-sprite-fade'}`}
                 draggable="false"
               />
             </div>
@@ -1862,6 +2695,15 @@ function HomeScreen({
 
         {/* ── Bottom section: realm name + qi/s row + bar ──────────── */}
         <div className="home-scene-bottom">
+
+          {/* Realm name + stage header — mobile only; PC left panel shows the
+              same info at the top of the side rail at ≥900px. */}
+          {realmName && (
+            <div className="home-scene-realm-header">
+              <span className="home-scene-realm-name">{realmName.split(' - ')[0]}</span>
+              {realmStage && <span className="home-scene-realm-stage">{realmStage}</span>}
+            </div>
+          )}
 
           {/* Overlay row — hidden on PC (info lives in left panel instead) */}
           <div className="home-scene-overlay-row">
@@ -1896,6 +2738,12 @@ function HomeScreen({
                 <span className="home-mb-icon">▲</span>
               </button>
             )}
+            <GateBypassButton
+              gateRef={gateRef}
+              tokenCount={bypassTokenCount}
+              onUse={onUseBypassToken}
+            />
+
             <RealmProgressBar
               qiRef={qiRef}
               progressRef={qiEarnedThisRealmRef}
@@ -1924,6 +2772,38 @@ function HomeScreen({
           key={currentEvent.id}
           event={currentEvent.payload}
           onDone={() => dismiss(currentEvent.id)}
+        />
+      )}
+
+      {/* Character evolution cinematic — fires on major realm-name changes
+          (every cultivator-tier visual transition). Tap-to-continue.
+          clearMajorBreakthrough() mirrors BreakthroughBanner's onDone so the
+          cultivation hook's state doesn't leak across the dismiss; otherwise
+          a later tab-navigation cycle would see the stale majorBreakthrough
+          state and (combined with a remount-fresh enqueue tracker, were it
+          not module-scoped) re-enqueue a spurious cinematic. */}
+      {currentEvent?.kind === 'character-evolution' && (
+        <CharacterEvolutionOverlay
+          key={currentEvent.id}
+          event={currentEvent.payload}
+          onDone={() => {
+            dismiss(currentEvent.id);
+            clearMajorBreakthrough();
+          }}
+        />
+      )}
+
+      {/* TutorialModal moved to App.jsx (2026-05-21) so onboarding cards
+          fire on whichever screen the player is currently looking at —
+          e.g. first_producer fires while you're still on the Cultivation
+          tab, not after you navigate back to Home. */}
+
+      {/* Crystal detail modal — opens when the player taps the crystal
+          level chip. Replaces the legacy hover tooltip (poor mobile UX). */}
+      {crystalDetailOpen && isCrystalUnlocked && crystal && (
+        <CrystalDetailModal
+          level={crystal.level}
+          onClose={() => setCrystalDetailOpen(false)}
         />
       )}
 
