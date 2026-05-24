@@ -376,7 +376,7 @@ export default function EternalTreeScreen({
       }}>
         <div style={{ color: '#c4b5fd', fontSize: 13, marginBottom: 10 }}>
           Reincarnation resets your cultivation and producers but preserves
-          karma, tree nodes, and law library.
+          karma and tree nodes.
         </div>
         <button
           onClick={canReincarnate ? onReincarnate : undefined}
