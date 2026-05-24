@@ -2048,11 +2048,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   padding: 2px 10px;
   border-radius: 999px;
 }
-.abp-popover-header .modal-close {
-  position: static;
-  font-size: 14px;
-  padding: 2px 6px;
-}
+/* .modal-close intentionally NOT overridden here. The canonical rule
+   (App.css line ~9257) absolute-positions it at top:8 right:8 of the
+   nearest positioned ancestor with a 32x32 tap target, hover state,
+   and active feedback. The .modal-overlay > * safety net makes
+   .abp-popover position:relative, so the close button anchors to the
+   popover corner. The header's 44px right padding (set above) keeps
+   the count pill clear of the absolute button. */
 
 .abp-popover-list {
   list-style: none;
@@ -22565,26 +22567,13 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   align-items: stretch;
   padding: 8px 4px 0;
   margin: 0;
-  background: linear-gradient(180deg,
-    rgba(8, 6, 4, 0.96) 0%,
-    rgba(8, 6, 4, 0.96) 85%,
-    rgba(8, 6, 4, 0) 100%);
-}
-/* Hairline gold separator at the rail bottom — anchors the nav to
-   the content below so it doesn't read as floating. */
-.sbz-cat-rail::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 4px;
-  right: 4px;
-  height: 1px;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(220, 175, 110, 0.14) 12%,
-    rgba(220, 175, 110, 0.14) 88%,
-    transparent 100%);
-  pointer-events: none;
+  /* Solid lacquer bar with a hard hairline below. The earlier
+     gradient-fade-into-content treatment read as ghostly/amateur;
+     AAA mobile shop nav (LoL client, Genshin shop, Destiny vendor
+     tabs) uses a discrete solid bar with a defined edge. */
+  background: #100c08;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.20);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
 }
 .sbz-cat-tab {
   background: none;
@@ -22621,17 +22610,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    SpiritBazaarScreen, against the active tab's offsetWidth/offsetLeft. */
 .sbz-cat-indicator {
   position: absolute;
-  bottom: -1px;
+  bottom: 0;            /* sit on top of the bar's hairline border */
   left: 0;
   height: 2px;
   width: 0;
   transform: translateX(0);
   background: linear-gradient(90deg,
     transparent 0%,
-    #ffcf83 18%,
-    #ffcf83 82%,
+    #ffcf83 20%,
+    #ffcf83 80%,
     transparent 100%);
-  box-shadow: 0 0 6px rgba(255, 207, 131, 0.35);
+  box-shadow: 0 0 6px rgba(255, 207, 131, 0.40);
   border-radius: 1px;
   pointer-events: none;
   transition:
@@ -22877,13 +22866,9 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    The base rail styling is now in the upstream .sbz-cat-rail rule above
    (post-emoji-removal redesign); the previous fidelity-pass overrides
    here were shadowing the new active-state and have been removed. */
-.spirit-bazaar-screen .sbz-cat-rail {
-  background:
-    linear-gradient(180deg,
-      rgba(8, 6, 4, 0.96) 0%,
-      rgba(8, 6, 4, 0.96) calc(100% - 12px),
-      rgba(8, 6, 4, 0) 100%);
-}
+/* Bazaar-scoped rail bg override removed: the upstream .sbz-cat-rail
+   rule now uses a solid lacquer bar + hard hairline border, no gradient
+   fade. Keeping a scoped override would shadow that with the old fade. */
 
 /* Buff cards (the strip variant used inside .bls-buff-grid) — solidify the
    surface. Was rgba(...,0.85), now 0.94 + warm border. */
