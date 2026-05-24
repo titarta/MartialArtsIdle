@@ -2937,6 +2937,13 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    (unused by the picker; can be cleaned up later).
    ═══════════════════════════════════════════════════════════════════ */
 .spk-overlay {
+  /* Explicit viewport coverage so this modal never lets the
+     underlying screen bleed through. .modal-overlay defines fixed +
+     inset:0 normally, but a few callers wrap it in scrolling
+     containers; locking the positioning here is defensive. */
+  position: fixed;
+  inset: 0;
+  z-index: 100;
   /* Scoped color tokens, do not leak. Cultivation palette tuned for
      dark warm paper, bronze ember, jade soft, gold leaf. */
   --spk-cream:        #f4e6c8;
@@ -2960,7 +2967,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     radial-gradient(ellipse 96px 320px at 28% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
     radial-gradient(ellipse 96px 320px at 72% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
     radial-gradient(ellipse at 50% 100%, rgba(40, 30, 20, 0.55), transparent 60%),
-    linear-gradient(180deg, rgba(5, 7, 8, 0.96) 0%, rgba(10, 12, 16, 0.98) 100%);
+    linear-gradient(180deg, #050708 0%, #0a0c10 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3343,7 +3350,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* Effect text: legibility-tuned per author feedback. Slightly larger,
    higher contrast, no italic on strong, value highlights take the
-   rarity accent color. */
+   rarity accent color.
+   2026-05 fix: removed flex display from this element. renderEffect()
+   emits alternating <span> and <strong> children; a flex parent turned
+   every chunk into a non-wrapping flex item which overflowed the card
+   width on long descriptions. Plain block paragraph wraps naturally. */
 .spk-effect {
   font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
   font-size: 12.5px;
@@ -3351,12 +3362,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: rgba(244, 230, 200, 0.88);
   text-align: center;
   letter-spacing: 0;
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
   margin: 0;
-  padding: 2px 6px 0;
+  padding: 4px 8px 0;
+  width: 100%;
+  flex: 1;
+  align-self: stretch;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
 }
 .spk-effect strong {
   color: var(--spk-bronze);
@@ -3402,18 +3415,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   position: absolute;
   bottom: 7px;
   right: 7px;
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
-  font-size: 9.5px;
+  font-size: 11.5px;
   font-weight: 700;
-  color: rgba(0, 0, 0, 0.78);
-  border-radius: 1px;
+  color: rgba(0, 0, 0, 0.85);
+  border-radius: 2px;
   z-index: 2;
   line-height: 1;
   letter-spacing: 0;
+  padding-bottom: 1px; /* optical centering, the Chinese glyph sits high */
 }
 .spk-card-uncommon .spk-seal {
   background: rgba(110, 201, 138, 0.75);
