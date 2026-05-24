@@ -62,3 +62,9 @@ public/_screenshot_setup.html
 obsidian/.obsidian/graph.json
 obsidian/.obsidian/workspace.json
 obsidian/.obsidian/workspace-mobile.json
+
+# ── Graphify knowledge graph output — generated locally, not for source control ─
+graphify-out/
+graphify-out-*/
+obsidian/.obsidian/graphify-out/
+src/graphify-out/
