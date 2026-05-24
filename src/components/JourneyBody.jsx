@@ -1,5 +1,10 @@
 import { useEffect, useRef } from 'react';
-import REALMS, { stageHasSpark } from '../data/realms';
+import REALMS, {
+  stageHasSpark,
+  CHAPTERS,
+  REALM_NAMES,
+  toRoman,
+} from '../data/realms';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -24,6 +29,25 @@ const REALM_ICONS = {
   'Half-Step Open Heaven':  '🌅',
 };
 
+// Chinese single-character glyph for each realm name, used by the journey
+// row "icon" tile. Mirrors the calligraphy treatment from the mockup.
+const REALM_GLYPHS = {
+  'Tempered Body':         '体',
+  'Qi Transformation':     '气',
+  'True Element':          '元',
+  'Separation & Reunion':  '分',
+  'Immortal Ascension':    '仙',
+  'Saint':                 '圣',
+  'Saint King':            '王',
+  'Origin Returning':      '归',
+  'Origin King':           '源',
+  'Void King':             '虚',
+  'Dao Source':            '道',
+  'Emperor Realm':         '帝',
+  'Open Heaven':           '天',
+  'Half-Step Open Heaven': '半',
+};
+
 function fmtQi(n) {
   if (n >= 1e12) return (n / 1e12).toFixed(1) + 'T';
   if (n >= 1e9)  return (n / 1e9).toFixed(1)  + 'B';
@@ -32,13 +56,16 @@ function fmtQi(n) {
   return String(n);
 }
 
-// Group consecutive realm entries by name.
+// Group consecutive realm entries by name. Returned in source order so the
+// `realmNameIndex` we attach matches the position in REALM_NAMES.
 function groupRealms(realms) {
   const groups = [];
   let current = null;
+  let nameIdx = -1;
   realms.forEach((r, idx) => {
     if (!current || current.name !== r.name) {
-      current = { name: r.name, entries: [] };
+      nameIdx += 1;
+      current = { name: r.name, realmNameIndex: nameIdx, entries: [] };
       groups.push(current);
     }
     current.entries.push({ ...r, index: idx });
@@ -49,124 +76,136 @@ function groupRealms(realms) {
 const GROUPS = groupRealms(REALMS);
 
 /**
- * Journey tab body for the Progress Hub modal. Extracted from the old
- * standalone JourneyModal so it can be rendered as one of three tabs
- * (Journey / Achievements / Stats) without duplicating the realm list
- * logic. The hub tab chip already reads "Journey", so the body skips a
- * redundant title and surfaces just the "N / M stages" meta inline with
- * the progress bar.
+ * Journey "Chronicle" body — the realm list, rendered as 7 chapters
+ * (Roman-numeral dividers + Cinzel title) with the realm groups clustered
+ * under each chapter. Past chapters dim, current chapter is full opacity,
+ * future chapters fade out. Only the realm the player is currently in
+ * expands to show its sub-stages — everything else stays single-line so
+ * the screen reads as a "lore arc" instead of a flat ladder.
  */
 function JourneyBody({ realmIndex }) {
   const currentRef = useRef(null);
-  const listRef    = useRef(null);
 
+  // Scroll the current realm group into view on mount so returning players
+  // land on their place in the chronicle, not at chapter I.
   useEffect(() => {
-    if (currentRef.current && listRef.current) {
+    if (currentRef.current) {
       currentRef.current.scrollIntoView({ block: 'center', behavior: 'instant' });
     }
   }, []);
 
   return (
-    <>
-      <div className="journey-progress-meta">
-        <span className="journey-progress-label">
-          {realmIndex + 1} / {REALMS.length} stages
-        </span>
-      </div>
+    <div className="journey-chronicle">
+      {CHAPTERS.map((chapter) => {
+        const chapterGroups = GROUPS.filter(g => chapter.realmIndices.includes(g.realmNameIndex));
+        if (chapterGroups.length === 0) return null;
 
-      <div className="journey-progress-bar">
-        <div
-          className="journey-progress-fill"
-          style={{ width: `${((realmIndex + 1) / REALMS.length) * 100}%` }}
-        />
-      </div>
+        const lastIdxInChapter = Math.max(...chapterGroups.flatMap(g => g.entries.map(e => e.index)));
+        const firstIdxInChapter = Math.min(...chapterGroups.flatMap(g => g.entries.map(e => e.index)));
+        const chapterPast    = lastIdxInChapter  < realmIndex;
+        const chapterCurrent = realmIndex >= firstIdxInChapter && realmIndex <= lastIdxInChapter;
+        const chapterFuture  = firstIdxInChapter > realmIndex;
+        const chapterCls =
+          'jc-chapter' +
+          (chapterPast    ? ' jc-chapter-past'    : '') +
+          (chapterCurrent ? ' jc-chapter-current' : '') +
+          (chapterFuture  ? ' jc-chapter-future'  : '');
 
-      <div className="journey-list" ref={listRef}>
-        {GROUPS.map((group) => {
-          const groupPast    = group.entries.every(e => e.index < realmIndex);
-          const groupCurrent = group.entries.some(e => e.index === realmIndex);
-          const groupFuture  = group.entries.every(e => e.index > realmIndex);
-          // Single-entry groups with no sub-stage label (e.g. Half-Step Open Heaven)
-          const noSubStages  = group.entries.length === 1 && !group.entries[0].stage;
+        return (
+          <section key={chapter.id} className={chapterCls}>
+            <header className="jc-chapter-head">
+              <span className="jc-chapter-num">{toRoman(chapter.id)}</span>
+              <span className="jc-chapter-title">{chapter.title}</span>
+              <span className="jc-chapter-rule" aria-hidden="true" />
+            </header>
 
-          return (
-            <div
-              key={group.name}
-              className={`journey-group${groupPast ? ' jg-past' : ''}${groupCurrent ? ' jg-current' : ''}${groupFuture ? ' jg-future' : ''}`}
-            >
-              <div className="journey-group-header">
-                <span className="journey-group-icon">
-                  {(() => {
-                    const icon = REALM_ICONS[group.name];
-                    if (!icon) return '•';
-                    if (icon.startsWith('/')) {
-                      return <img src={icon} alt="" className="journey-group-icon-img" />;
-                    }
-                    return icon;
-                  })()}
-                </span>
-                <span className="journey-group-name">{group.name}</span>
-                {groupPast    && <span className="journey-group-done">✓</span>}
-                {groupCurrent && noSubStages && <span className="js-dot-pulse jg-header-pulse" />}
-              </div>
+            {chapterGroups.map((group) => {
+              const groupPast    = group.entries.every(e => e.index < realmIndex);
+              const groupCurrent = group.entries.some(e => e.index === realmIndex);
+              const groupFuture  = group.entries.every(e => e.index > realmIndex);
+              const noSubStages  = group.entries.length === 1 && !group.entries[0].stage;
+              const groupCls =
+                'jc-realm' +
+                (groupPast    ? ' jc-realm-past'    : '') +
+                (groupCurrent ? ' jc-realm-current' : '') +
+                (groupFuture  ? ' jc-realm-future'  : '');
+              const completedCount = group.entries.filter(e => e.index < realmIndex).length;
+              const totalCount = group.entries.length;
+              const icon = REALM_ICONS[group.name];
 
-              {!noSubStages && (
-                <div className="journey-stages">
-                  {group.entries.map((entry, i) => {
-                    const isCurrent = entry.index === realmIndex;
-                    const isPast    = entry.index < realmIndex;
-                    // Does the breakthrough INTO this stage reward a Qi
-                    // Spark? Computed deterministically from realms.js
-                    // (Dial-12). The marker shows on the row whose BT
-                    // grants the spark, i.e. the destination stage.
-                    const hasSpark  = stageHasSpark(entry.index);
-                    const cls = `journey-stage${i === 0 ? ' js-first' : ''}${isCurrent ? ' js-current' : ''}${isPast ? ' js-past' : ''}${hasSpark ? ' js-spark' : ''}`;
+              return (
+                <div
+                  key={group.name}
+                  className={groupCls}
+                  ref={groupCurrent ? currentRef : null}
+                >
+                  <div className="jc-realm-head">
+                    <span className="jc-realm-icon">
+                      {typeof icon === 'string' && icon.startsWith && icon.startsWith(BASE)
+                        ? <img src={icon} alt="" className="jc-realm-icon-img" draggable="false" />
+                        : <span className="jc-realm-icon-glyph">{REALM_GLYPHS[group.name] ?? icon ?? '•'}</span>}
+                    </span>
+                    <span className="jc-realm-name">{group.name}</span>
+                    <span className="jc-realm-tag">
+                      {groupPast
+                        ? `${totalCount} ${totalCount === 1 ? 'stage' : 'stages'}`
+                        : groupCurrent
+                          ? `${completedCount + 1} / ${totalCount}`
+                          : `${totalCount} ${totalCount === 1 ? 'stage' : 'stages'}`}
+                    </span>
+                    {groupPast && <span className="jc-realm-check" aria-hidden="true">✓</span>}
+                  </div>
 
-                    return (
-                      <div
-                        key={entry.index}
-                        className={cls}
-                        ref={isCurrent ? currentRef : null}
-                      >
-                        <div className="js-dot">
-                          {isPast    && <span className="js-dot-check">✓</span>}
-                          {isCurrent && <span className="js-dot-pulse" />}
-                        </div>
-                        <div className="js-body">
-                          <span className="js-label">
-                            {entry.stage}
-                            {/* Global stage number across the whole journey
-                                (#1 through #N). Dim secondary label so it
-                                doesn't compete with the stage name. */}
-                            <span className="js-stage-num">#{entry.index + 1}</span>
-                          </span>
-                          {/* Cost group: a fixed-width spark slot sits to
-                              the LEFT of the qi value so every row's qi
-                              number lines up in the same column whether
-                              or not it rewards a spark. */}
-                          <span className="js-cost-group">
-                            {hasSpark ? (
-                              <span
-                                className="js-spark-mark"
-                                title="Breaking through to this stage rewards a Qi Spark"
-                                aria-label="Qi Spark reward"
-                              >✦</span>
-                            ) : (
-                              <span className="js-spark-mark js-spark-empty" aria-hidden="true" />
-                            )}
-                            <span className="js-cost">{fmtQi(entry.cost)} Qi</span>
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {/* Only the CURRENT realm expands to show sub-stages — past
+                      and future stay collapsed so the chronicle reads as a
+                      compact arc. Single-entry no-stage groups (Half-Step
+                      Open Heaven) never expand. */}
+                  {groupCurrent && !noSubStages && (
+                    <div className="jc-stages">
+                      {group.entries.map((entry, i) => {
+                        const isCurrent = entry.index === realmIndex;
+                        const isPast    = entry.index < realmIndex;
+                        const hasSpark  = stageHasSpark(entry.index);
+                        const cls = 'jc-stage' +
+                          (i === 0 ? ' jc-stage-first' : '') +
+                          (isCurrent ? ' jc-stage-current' : '') +
+                          (isPast    ? ' jc-stage-past'    : '') +
+                          (hasSpark  ? ' jc-stage-spark'   : '');
+
+                        return (
+                          <div key={entry.index} className={cls}>
+                            <span className="jc-stage-dot">
+                              {isPast    && <span className="jc-stage-check">✓</span>}
+                              {isCurrent && <span className="jc-stage-pulse" />}
+                            </span>
+                            <span className="jc-stage-label">
+                              {entry.stage}
+                              <span className="jc-stage-num">#{entry.index + 1}</span>
+                            </span>
+                            <span className="jc-stage-cost-group">
+                              {hasSpark ? (
+                                <span
+                                  className="jc-stage-spark-mark"
+                                  title="Breaking through to this stage rewards a Qi Spark"
+                                  aria-label="Qi Spark reward"
+                                >✦</span>
+                              ) : (
+                                <span className="jc-stage-spark-mark jc-stage-spark-empty" aria-hidden="true" />
+                              )}
+                              <span className="jc-stage-cost">{fmtQi(entry.cost)} Qi</span>
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </>
+              );
+            })}
+          </section>
+        );
+      })}
+    </div>
   );
 }
 

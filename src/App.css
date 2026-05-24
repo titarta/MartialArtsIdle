@@ -21649,3 +21649,515 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   flex-shrink: 0;
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   JOURNEY — "Chronicle of the Cultivator" visual redesign (2026-05-24)
+   Locked hero header at the top with a pulsing realm icon + calligraphy
+   watermark + qi progress bar exposing the qi/s gate, then the realm list
+   clustered under 7 Roman-numeral chapter dividers (dim past, bright
+   current, faded future). Pulse animation respects `vfxEnabled` and
+   prefers-reduced-motion.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Override the legacy .js-screen-body blue-jade tint — the screen now lives
+   on a warm lacquer palette, and the body has its own panel chrome. */
+.journey-screen .js-screen-body {
+  background: transparent;
+  border: none;
+  padding: 0;
+  gap: 0;
+}
+.journey-screen { gap: 14px; }
+
+/* ── HERO HEADER ─────────────────────────────────────────────────────────── */
+.jc-hero {
+  position: relative;
+  padding: 18px 18px 16px;
+  background:
+    radial-gradient(120% 80% at 25% 30%, rgba(220, 175, 110, 0.22), transparent 55%),
+    linear-gradient(180deg, rgba(46, 36, 24, 0.96), rgba(20, 16, 10, 0.96));
+  border: 1px solid rgba(220, 175, 110, 0.30);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px -14px rgba(0, 0, 0, 0.7);
+}
+.jc-hero-glyph {
+  /* Big faint Ma Shan Zheng character pinned top-right */
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  position: absolute;
+  right: -16px;
+  top: -36px;
+  font-size: 200px;
+  color: rgba(220, 175, 110, 0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.jc-hero-row {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+.jc-hero-icon-wrap {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(220, 175, 110, 0.22), rgba(75, 50, 25, 0.50));
+  border: 1px solid rgba(220, 175, 110, 0.45);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.10),
+    0 6px 18px -10px rgba(0, 0, 0, 0.7);
+  flex-shrink: 0;
+}
+/* Pulsing gold halo — only animated when vfx is enabled (and the user
+   isn't asking for reduced motion). The .jc-hero-no-pulse class strips
+   the keyframe binding while keeping the static halo glow. */
+.jc-hero-icon-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 2px rgba(220, 175, 110, 0.45),
+    0 0 24px rgba(220, 175, 110, 0.30);
+  pointer-events: none;
+  animation: jc-hero-pulse 2.4s ease-in-out infinite;
+}
+.jc-hero-no-pulse.jc-hero-icon-wrap::before {
+  animation: none;
+}
+@keyframes jc-hero-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px rgba(220, 175, 110, 0.40),
+      0 0 22px rgba(220, 175, 110, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(220, 175, 110, 0.55),
+      0 0 32px rgba(220, 175, 110, 0.45);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jc-hero-icon-wrap::before { animation: none; }
+}
+.jc-hero-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+  position: relative;
+  z-index: 1;
+}
+.jc-hero-icon-fallback {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 44px;
+  color: var(--ui-purple-light);
+  line-height: 1;
+}
+.jc-hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.jc-hero-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+}
+.jc-hero-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.05em;
+  color: var(--ui-purple-light);
+  line-height: 1.05;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+.jc-hero-stage {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.10em;
+  color: var(--ui-purple-strong);
+}
+.jc-hero-chapter {
+  margin-top: 2px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-muted-rgb), 0.70);
+  font-variant-numeric: tabular-nums;
+}
+
+.jc-hero-meter {
+  margin-top: 14px;
+  position: relative;
+  z-index: 2;
+}
+.jc-hero-meter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+}
+.jc-hero-meter-head b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ui-purple-strong);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+.jc-hero-bar {
+  margin-top: 6px;
+  height: 10px;
+  background: rgba(14, 12, 8, 0.7);
+  border: 1px solid rgba(75, 60, 40, 0.6);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+.jc-hero-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #9b7d50 0%, #dcaf6e 60%, #ffcf83 100%);
+  box-shadow: 0 0 12px rgba(220, 175, 110, 0.55);
+  transition: width 0.4s ease-out;
+}
+.jc-hero-bar-gate {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 235, 200, 0.95);
+  box-shadow: 0 0 6px rgba(255, 235, 200, 0.8);
+  pointer-events: none;
+}
+.jc-hero-foot {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(var(--ui-label-rgb), 0.65);
+  font-variant-numeric: tabular-nums;
+}
+.jc-hero-foot b {
+  color: var(--ui-purple-light);
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+.jc-hero-foot .jc-hero-gate {
+  color: var(--ui-purple-strong);
+}
+.jc-hero-foot .jc-hero-gate-none {
+  color: rgba(var(--ui-muted-rgb), 0.6);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+/* ── CHRONICLE BODY ──────────────────────────────────────────────────────── */
+.journey-chronicle {
+  position: relative;
+  padding-left: 16px; /* room for the vertical gold rail */
+}
+/* Vertical gold rail down the left side of the chronicle. */
+.journey-chronicle::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 14px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(220, 175, 110, 0.10) 0%,
+    rgba(220, 175, 110, 0.45) 20%,
+    rgba(220, 175, 110, 0.45) 60%,
+    rgba(220, 175, 110, 0.12) 100%
+  );
+  border-radius: 1px;
+}
+
+.jc-chapter {
+  margin: 8px 0 14px;
+  position: relative;
+  transition: opacity 0.2s;
+}
+.jc-chapter-past    { opacity: 0.65; }
+.jc-chapter-current { opacity: 1; }
+.jc-chapter-future  { opacity: 0.40; }
+
+.jc-chapter-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 10px;
+  padding-left: 2px;
+  position: relative;
+}
+.jc-chapter-head::before {
+  /* Gold filigree dot on the rail at chapter boundaries */
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #ffcf83 30%, #6b4a10 70%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 225, 170, 0.8);
+  box-shadow: 0 0 8px rgba(220, 175, 110, 0.55);
+}
+.jc-chapter-future .jc-chapter-head::before {
+  background: radial-gradient(circle, #4a3520 30%, #2c1e0d 70%);
+  border-color: rgba(220, 175, 110, 0.25);
+  box-shadow: none;
+}
+.jc-chapter-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(var(--ui-muted-rgb), 0.85);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+}
+.jc-chapter-current .jc-chapter-num,
+.jc-chapter-current .jc-chapter-title {
+  color: var(--ui-purple-strong);
+}
+.jc-chapter-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.85);
+}
+.jc-chapter-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(220, 175, 110, 0.35),
+    rgba(220, 175, 110, 0.05) 70%,
+    transparent
+  );
+}
+
+.jc-realm {
+  background: rgba(var(--ui-bg-panel-rgb), 0.85);
+  border: 1px solid rgba(75, 60, 40, 0.6);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.03);
+}
+.jc-realm::before {
+  /* Realm node on the rail — a small dot per realm */
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(60, 45, 28, 1);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+}
+.jc-realm-past::before {
+  background: radial-gradient(circle, #dcaf6e 30%, #6b4a10 70%);
+}
+.jc-realm-current::before {
+  background: radial-gradient(circle, #ffcf83 30%, #dcaf6e 70%);
+  box-shadow: 0 0 0 4px rgba(220, 175, 110, 0.18), 0 0 14px rgba(220, 175, 110, 0.55);
+  animation: jc-rail-pulse 1.8s ease-in-out infinite;
+}
+@keyframes jc-rail-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.18); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jc-realm-current::before { animation: none; }
+}
+.jc-realm-past {
+  opacity: 0.70;
+  background: rgba(20, 16, 10, 0.7);
+}
+.jc-realm-current {
+  background:
+    linear-gradient(180deg, rgba(220, 175, 110, 0.10), transparent 50%),
+    rgba(var(--ui-bg-panel-rgb), 0.92);
+  border-color: rgba(220, 175, 110, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(220, 175, 110, 0.20) inset,
+    0 8px 26px -16px rgba(220, 175, 110, 0.30);
+}
+.jc-realm-future {
+  opacity: 0.55;
+}
+
+.jc-realm-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.jc-realm-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(60, 45, 28, 0.7);
+  border: 1px solid rgba(220, 175, 110, 0.30);
+  border-radius: 6px;
+  flex-shrink: 0;
+  color: var(--ui-purple-strong);
+  overflow: hidden;
+}
+.jc-realm-icon-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+}
+.jc-realm-icon-glyph {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 18px;
+  line-height: 1;
+}
+.jc-realm-past .jc-realm-icon { background: rgba(40, 30, 18, 0.5); }
+.jc-realm-name {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--ui-purple-light);
+}
+.jc-realm-past    .jc-realm-name { color: var(--ui-purple-soft); }
+.jc-realm-future  .jc-realm-name { color: rgba(var(--ui-label-rgb), 0.7); }
+.jc-realm-tag {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-muted-rgb), 0.75);
+  font-variant-numeric: tabular-nums;
+}
+.jc-realm-current .jc-realm-tag {
+  color: var(--ui-purple-strong);
+}
+.jc-realm-check {
+  font-size: 14px;
+  color: var(--ui-purple-strong);
+}
+
+.jc-stages {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px dashed rgba(75, 60, 40, 0.35);
+  margin-top: 8px;
+  padding-top: 6px;
+}
+.jc-stage {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.jc-stage + .jc-stage {
+  border-top: 1px solid rgba(75, 60, 40, 0.22);
+}
+.jc-stage-dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  background: transparent;
+  justify-self: center;
+}
+.jc-stage-past .jc-stage-dot {
+  background: var(--ui-purple-strong);
+  border-color: var(--ui-purple-strong);
+}
+.jc-stage-check {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: rgb(var(--ui-bg-deep-rgb));
+  font-weight: 700;
+}
+.jc-stage-current .jc-stage-dot {
+  background: var(--ui-purple-strong);
+  border-color: var(--ui-purple-strong);
+  box-shadow: 0 0 0 3px rgba(220, 175, 110, 0.20);
+  animation: jc-rail-pulse 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .jc-stage-current .jc-stage-dot { animation: none; }
+}
+.jc-stage-pulse { display: none; }
+.jc-stage-label {
+  color: var(--ui-purple-soft);
+  letter-spacing: 0.02em;
+}
+.jc-stage-past    .jc-stage-label { color: rgba(var(--ui-label-rgb), 0.55); }
+.jc-stage-current .jc-stage-label { color: var(--ui-purple-light); font-weight: 600; }
+.jc-stage-num {
+  font-size: 9px;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+.jc-stage-cost-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+.jc-stage-cost {
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.85);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.jc-stage-current .jc-stage-cost { color: var(--ui-purple-strong); font-weight: 600; }
+.jc-stage-spark-mark {
+  display: inline-block;
+  width: 14px;
+  text-align: center;
+  color: #ffd55a;
+  margin-right: 4px;
+  text-shadow: 0 0 4px rgba(255, 213, 90, 0.55);
+}
+.jc-stage-spark-mark.jc-stage-spark-empty { color: transparent; }
+
+

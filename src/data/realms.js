@@ -285,6 +285,52 @@ export function getMajorBreakthroughRate(fromIndex) {
   return next.cost * pct;
 }
 
+// ── Chapter grouping for the Journey "Chronicle" screen ─────────────────────
+// The 13 unique realm names cluster into 7 narrative chapters. The Journey
+// screen renders one Roman-numeral divider per chapter so the 49-stage list
+// reads as a 7-act epic rather than a flat ladder. `realmIndices` are the
+// REALM-NAME positions inside `REALM_NAMES` below (0 = Tempered Body, … ,
+// 12 = Open Heaven), NOT stage indices into REALMS — chapter boundaries
+// are a render concern keyed on the realm name groups.
+export const REALM_NAMES = [
+  'Tempered Body',
+  'Qi Transformation',
+  'True Element',
+  'Separation & Reunion',
+  'Immortal Ascension',
+  'Saint',
+  'Saint King',
+  'Origin Returning',
+  'Origin King',
+  'Void King',
+  'Dao Source',
+  'Emperor Realm',
+  'Open Heaven',
+];
+
+export const CHAPTERS = [
+  { id: 1, title: 'The Mortal Path',    glyph: '命', realmIndices: [0, 1, 2] },
+  { id: 2, title: 'Awakening Element',  glyph: '元', realmIndices: [3, 4]    },
+  { id: 3, title: 'The Saintly Path',   glyph: '圣', realmIndices: [5, 6]    },
+  { id: 4, title: 'Origin Returning',   glyph: '归', realmIndices: [7, 8]    },
+  { id: 5, title: 'The Void Crown',     glyph: '虚', realmIndices: [9]       },
+  { id: 6, title: 'The Dao Source',     glyph: '道', realmIndices: [10, 11]  },
+  { id: 7, title: 'Open Heaven',        glyph: '天', realmIndices: [12]      },
+];
+
+/**
+ * Returns the chapter object containing a given realm-name index, or
+ * `null` if the index is out of range. Used by JourneyScreen to find
+ * the "current chapter" for the hero header.
+ */
+export function chapterForRealmNameIndex(realmNameIndex) {
+  return CHAPTERS.find(c => c.realmIndices.includes(realmNameIndex)) ?? null;
+}
+
+// Roman numeral helper for chapter dividers ("I — The Mortal Path").
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII'];
+export function toRoman(n) { return ROMAN[n] ?? String(n); }
+
 // ── Major-realm → law-offer rarity band ──────────────────────────────────────
 // Each major realm name maps to the 2-rarity pool used when a breakthrough
 // offers law choices. Iron stops appearing once the player enters the

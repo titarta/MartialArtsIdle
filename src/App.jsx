@@ -1681,7 +1681,7 @@ function AppInner() {
       : null,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
-    journey:    <JourneyScreen realmIndex={cultivation.realmIndex} />,
+    journey:    <JourneyScreen cultivation={cultivation} />,
     'spirit-bazaar': <SpiritBazaarScreen
                        inventory={shopInventory}
                        balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
