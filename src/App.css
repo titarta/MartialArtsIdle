@@ -1750,9 +1750,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .qs-header { text-align: center; margin-bottom: 14px; }
 .qs-title {
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(230, 240, 238, 0.95);
   text-shadow: 0 0 12px rgba(167, 139, 250, 0.5);
@@ -1863,10 +1864,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 8px;
 }
 .qs-card-name {
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
   color: #fff;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   flex: 1;
   min-width: 0;
   white-space: nowrap;
@@ -2152,8 +2154,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 4px;
 }
 .asb-row-name {
+  font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: rgba(230, 240, 238, 0.95);
   white-space: nowrap;
   overflow: hidden;
@@ -2477,10 +2481,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .st-block-name {
+  font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   color: rgba(230, 240, 238, 0.97);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   line-height: 1.2;
   margin-top: 2px;
   overflow: hidden;
@@ -2646,11 +2651,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 14px;
 }
 .st-detail-name {
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   text-align: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 .st-detail-r-legendary .st-detail-name {
   color: #fff4d4;
@@ -2868,11 +2874,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 12px;
 }
 .qs-detail-name {
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: #fff;
   text-align: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 .qs-detail-r-legendary .qs-detail-name {
   color: #fff4d4;
@@ -2983,8 +2990,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .augment-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--cat-color);
   line-height: 1.2;
 }
@@ -3637,8 +3646,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .art-pick-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 .art-pick-quality {
@@ -3739,8 +3750,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .law-name {
+  font-family: var(--font-display);
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
   line-height: 1.2;
 }
@@ -3926,7 +3939,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .active-set-name {
+  font-family: var(--font-display);
   font-size: 0.78rem;
+  letter-spacing: 0.03em;
   color: rgba(var(--ui-muted-rgb), 0.85);
 }
 
@@ -4157,11 +4172,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 /* Realm / stage name — left side of overlay row above the QI bar.
-   Uses the global system font stack for visual consistency with the rest
-   of the app; weight 700 gives nameplate presence without a custom face. */
+   Named noun (realm name like "Tempered Body — Layer 7") so it gets the
+   shared display face — the same string MUST render in the same font
+   wherever it appears (Journey group, breakthrough banner, scene overlay,
+   PC sidebar). See _design/typography-audit-v2.md. */
 .home-realm-name {
+  font-family: var(--font-display);
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ui-purple-light);
   text-shadow:
     0 0 8px rgba(0,0,0,0.9),
@@ -4874,9 +4892,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .crystal-evolve-name {
   /* clamp keeps the title bold on PC but shrinks for narrow phones so long
-     crystal tier names fit on one line at 390-wide viewports. */
+     crystal tier names fit on one line at 390-wide viewports.
+     Cinzel matches the realm-evolve banner across all named-noun surfaces. */
+  font-family: var(--font-display);
   font-size: clamp(1.55rem, 5.8vw, 2.2rem);
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0.03em;
   line-height: 1.1;
   text-wrap: balance;
@@ -5256,8 +5276,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   line-height: 1.15;
 }
 .home-scene-realm-name {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: #ffffff;
   letter-spacing: 0.04em;
   text-shadow:
@@ -5353,8 +5374,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .home-pc-realm-name {
+  font-family: var(--font-display);
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--ui-purple-light);
   letter-spacing: 0.05em;
   text-shadow:
@@ -5433,11 +5455,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .ctt-title {
+  font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   color: var(--ui-purple-wash);
   margin-bottom: 5px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .crystal-tooltip-locked .ctt-title {
@@ -5605,8 +5628,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   min-width: 0;
 }
 .cdm-next-name {
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: #f4e9d5;
   margin-bottom: 4px;
 }
@@ -6172,8 +6197,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .cfm-header-text { flex: 1; }
 
 .cfm-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ui-purple-wash);
   letter-spacing: 0.03em;
 }
@@ -8027,8 +8054,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .inv-name {
+  font-family: var(--font-display);
   font-size: 0.65rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   text-align: center;
   line-height: 1.2;
   max-width: 80px;
@@ -8333,6 +8362,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .coll-page-header h1 { margin: 0; }
 .coll-page-subtitle {
+  /* Renders the current realm name (e.g. "Tempered Body — Layer 7") on
+     Collection / Character / Combat / Production / Reincarnation pages —
+     same string as the home HUD, so it uses the shared display face. */
+  font-family: var(--font-display);
   font-size: 0.74rem;
   color: var(--ui-text-meta);
   letter-spacing: 0.04em;
@@ -8531,8 +8564,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .build-tech-name {
+  font-family: var(--font-display);
   font-size: 0.88rem;
   font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
   display: block;
   margin-bottom: 4px;
@@ -8689,8 +8724,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .tech-item-name {
+  font-family: var(--font-display);
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
 }
 
@@ -8768,8 +8805,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .art-tooltip-name {
+  font-family: var(--font-display);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   /* --quality-color set on .art-tooltip root */
   color: var(--quality-color, var(--text-primary));
 }
@@ -8854,8 +8893,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .enemy-tooltip-name {
+  font-family: var(--font-display);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
 }
 
@@ -8909,6 +8950,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .enemy-tooltip-drop-name {
+  font-family: var(--font-display);
   font-size: 0.68rem;
   font-weight: 600;
   flex: 1;
@@ -8973,9 +9015,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .activity-tooltip-title {
+  font-family: var(--font-display);
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
 .activity-tooltip-section {
@@ -9049,6 +9092,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .activity-tooltip-drop-name {
   flex: 1;
+  font-family: var(--font-display);
   font-size: 0.68rem;
   font-weight: 600;
   min-width: 0;
@@ -9159,8 +9203,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .art-inline-card-name {
+  font-family: var(--font-display);
   font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   text-align: center;
   line-height: 1.3;
   word-break: break-word;
@@ -9266,8 +9312,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .law-picker-card-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--text-primary);
 }
 
@@ -9459,12 +9507,14 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 /* Label sits below the icon. Sized in line with other small card labels in
-   the app (.inv-name = 0.72rem, .build-tech-name = 0.7rem) — the previous
-   0.58rem was below the readable threshold on phones. Weight 500 keeps it
-   in the "label" tier rather than a heavier emphasis. */
+   the app — was 0.58rem (below readable threshold) before bumping to 0.7rem.
+   Cinzel because the rendered string is a technique name (a named noun);
+   weight 500 keeps it in the "label" tier rather than heavier emphasis. */
 .tech-icon-name {
+  font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 500;
+  letter-spacing: 0.02em;
   text-align: center;
   line-height: 1.2;
   padding: 3px 4px;
@@ -9585,15 +9635,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .stage-hud-player { left: 8px; }
 .stage-hud-enemy  { right: 8px; text-align: right; }
 
-/* Typography here uses the global system font stack so combat reads as
-   cleanly as every other screen. Weight 700 + a tight black outline keep
-   the nameplate legible against the parallax background. Sizes are rem-based
-   so they scale with user font preferences. */
+/* Combat HUD nameplate — enemy name is a named noun (same string also
+   appears as `.enemy-chip-name` / `.enemy-tooltip-name`) so it gets the
+   shared display face. Weight 600 + tight black outline keep it legible
+   against the parallax background. */
 .stage-hud-name {
   display: block;
+  font-family: var(--font-display);
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: #fff;
   text-shadow:
     0 0 4px rgba(0, 0, 0, 0.95),
@@ -10819,8 +10870,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .world-name {
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--ui-purple-light);
   text-shadow: 0 0 16px rgba(var(--ui-purple-strong-rgb), 0.2);
 }
@@ -10994,8 +11047,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .region-name {
+  font-family: var(--font-display);
   font-size: 0.92rem;
   font-weight: 600;
+  letter-spacing: 0.04em;
   color: rgba(var(--ui-hover-rgb), 0.92);
   white-space: nowrap;
   overflow: hidden;
@@ -11112,7 +11167,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .enemy-chip-name {
+  font-family: var(--font-display);
   font-size: 0.58rem;
+  letter-spacing: 0.02em;
   color: rgba(var(--ui-muted-rgb), 0.5);
   text-align: center;
   max-width: 56px;
@@ -11420,9 +11477,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .alc-forge-name {
+  font-family: var(--font-display);
   font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--rarity-color, var(--text-primary));
   line-height: 1.2;
   margin-bottom: 6px;
@@ -11608,8 +11666,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .alc-slot-name {
+  font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   line-height: 1.15;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -11727,9 +11787,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .alc-herb:active { background: rgba(255, 255, 255, 0.06); }
 
 .alc-herb-name {
+  font-family: var(--font-display);
   font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.03em;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -12006,10 +12067,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ui-purple-light);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.06em;
   flex: 1;
 }
 
@@ -12139,8 +12201,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: baseline;
 }
 .pill-drawer-card-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 .pill-drawer-card-qty {
   font-size: 12px;
@@ -12333,9 +12397,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .bls-header-title {
   flex: 1;
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--ui-purple-light);
 }
 .bls-header-balance {
@@ -12593,9 +12658,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   background: linear-gradient(180deg, rgba(20, 16, 32, 0), rgba(8, 6, 16, 0.85));
 }
 .bls-card-name {
+  font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: rgba(255, 255, 255, 0.92);
   text-align: center;
   line-height: 1.25;
@@ -12734,9 +12800,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .bls-strip-name {
   flex: 1;
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: rgba(255, 235, 200, 1);
 }
 .bls-strip-cta {
@@ -13006,10 +13073,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-variant-numeric: tabular-nums;
 }
 .bls-buff-card-name {
+  font-family: var(--font-display);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: rgba(220, 215, 255, 0.85);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 .bls-buff-card-meta {
   display: flex;
@@ -13075,8 +13143,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 3px;
 }
 .bls-item-name {
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: #eee;
   display: flex;
   align-items: baseline;
@@ -13449,30 +13519,57 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* ── Hero shimmer — diagonal gold sweep across the card ───────────
    Self-contained: inherits the card's border-radius so the shimmer
    stays inside the rounded corners even though the pack itself uses
-   overflow: visible (to let the top-centre badge poke above). */
+   overflow: visible (to let the top-centre badge poke above).
+
+   Implementation note: this used to animate background-position on a
+   wide linear-gradient with a "pause" keyframe at the end. The pause
+   worked but the loop boundary (jumping the background back to the
+   start position) triggered a visible flicker on every cycle. Replaced
+   with a transform-driven sweep on a ::before stripe, opacity-gated
+   at the boundaries so the reset happens while the stripe is fully
+   invisible. No flicker. */
 .blshop-pack-shimmer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
   overflow: hidden;
-  background: linear-gradient(
-    115deg,
-    transparent 30%,
-    rgba(255, 230, 170, 0.18) 48%,
-    rgba(255, 245, 210, 0.32) 50%,
-    rgba(255, 230, 170, 0.18) 52%,
-    transparent 70%
-  );
-  background-size: 220% 100%;
-  background-position: 200% 0;
-  mix-blend-mode: screen;
-  animation: blshop-shimmer 4.5s ease-in-out infinite;
 }
-@keyframes blshop-shimmer {
-  0%   { background-position: 200% 0; }
-  55%  { background-position: -120% 0; }
-  100% { background-position: -120% 0; }
+.blshop-pack-shimmer::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: -45%;
+  width: 45%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 230, 170, 0.22) 42%,
+    rgba(255, 250, 215, 0.45) 50%,
+    rgba(255, 230, 170, 0.22) 58%,
+    transparent 100%
+  );
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  transform: translateX(0);
+  opacity: 0;
+  animation: blshop-shimmer-sweep 5.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes blshop-shimmer-sweep {
+  /* Off-screen left, invisible — the loop boundary lives here so the
+     reset jump is never visible. */
+  0%   { transform: translateX(0);    opacity: 0; }
+  /* Fade in just before entering the card. */
+  10%  { transform: translateX(20%);  opacity: 0.55; }
+  /* Sweep across the card at full opacity. */
+  20%  { transform: translateX(60%);  opacity: 1; }
+  55%  { transform: translateX(280%); opacity: 1; }
+  /* Fade out as the stripe exits the right edge. */
+  65%  { transform: translateX(330%); opacity: 0.4; }
+  /* Hold off-screen right, invisible — long pause between sweeps. */
+  72%, 100% { transform: translateX(360%); opacity: 0; }
 }
 
 /* ── Marketing badge — top-centre chip ─────────────────────────────── */
@@ -15120,9 +15217,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .reinc-header-text { flex: 1; min-width: 0; }
 .reinc-title {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: rgba(210, 180, 255, 1);
   line-height: 1.2;
 }
@@ -15428,8 +15526,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   line-height: 1;
 }
 .reinc-node-label {
+  font-family: var(--font-display);
   font-size: 0.72rem;
   font-weight: 600;
+  letter-spacing: 0.02em;
   color: rgba(215, 200, 245, 0.88);
   line-height: 1.25;
 }
@@ -15575,8 +15675,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   flex-shrink: 0;
 }
 .et-branch-name {
+  font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 600;
+  letter-spacing: 0.03em;
   color: rgba(var(--branch-rgb), 0.9);
   white-space: nowrap;
 }
@@ -15619,8 +15721,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .et-card-icon { font-size: 1rem; color: rgba(var(--ui-purple-strong-rgb), 0.9); }
 .et-card-title {
+  font-family: var(--font-display);
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: rgba(210, 180, 255, 1);
   flex: 1;
   white-space: nowrap;
@@ -15827,7 +15931,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .et-node-tooltip-icon { font-size: 1.35rem; margin-bottom: 4px; display: block; text-align: center; }
 .et-node-tooltip-name {
-  font-size: 0.84rem; font-weight: 700;
+  font-family: var(--font-display);
+  font-size: 0.84rem; font-weight: 600;
+  letter-spacing: 0.03em;
   color: rgba(215, 195, 255, 0.98);
   display: flex; align-items: center; gap: 5px;
   justify-content: center; text-align: center;
@@ -16393,9 +16499,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .artefact-upgrade-titles { flex: 1; min-width: 0; }
 
 .artefact-upgrade-title {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -16582,6 +16689,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .artefact-upgrade-cost-gem { flex-shrink: 0; }
 .artefact-upgrade-cost-name {
   flex: 1;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -16676,8 +16785,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .artefact-upgrade-feed-gem { font-size: 0.95rem; line-height: 1; }
 
 .artefact-upgrade-feed-name {
+  font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: 0.03em;
   color: rgba(230, 235, 240, 0.92);
   white-space: nowrap;
   overflow: hidden;
@@ -16780,9 +16891,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .coll-modal-titles { flex: 1; min-width: 0; }
 
 .coll-modal-title {
+  font-family: var(--font-display);
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -17009,8 +17121,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .coll-set-card-gem { font-size: 0.95rem; flex-shrink: 0; }
 
 .coll-set-card-name {
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 0.85rem;
+  letter-spacing: 0.03em;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -17474,8 +17588,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .cs-up-name {
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.03em;
   color: #c2e6ff;
   line-height: 1.2;
 }
@@ -17607,6 +17723,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 .cs-up-chip-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
   opacity: 0.92;
 }
 
@@ -17777,9 +17895,13 @@ img.pl-leader-sprite {
 .pl-caption .pl-rate { color: rgba(167, 243, 196, 0.85); font-weight: 500; }
 
 .pl-name {
-  /* Generic name styling — caption overrides apply via the .pl-caption ancestor. */
+  /* Generic producer name styling — Cinzel because every producer has a
+     proper noun ("Apprentice", "Inner Disciple", …). Caption overrides
+     apply via the .pl-caption ancestor (see above). */
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.03em;
   color: #c2e6ff;
   line-height: 1.2;
   white-space: nowrap;
@@ -18052,8 +18174,10 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   text-shadow: 0 0 8px rgba(216, 168, 255, 0.5);
 }
 .pdm-name {
+  font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-align: center;
   margin: 6px 0 10px;
   color: #f4e9d5;
