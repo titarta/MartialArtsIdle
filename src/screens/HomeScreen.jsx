@@ -5,6 +5,7 @@ import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
+import ActiveBuffsChip from '../components/ActiveBuffsChip';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
@@ -1954,6 +1955,10 @@ function HomeScreen({
   onOpenPills,
   totalOwnedPills,
   activeSparks,
+  // Paid shop timed buffs (shopInventory.activeBuffs). Fed into the
+  // ActiveBuffsChip alongside activeSparks so the top-left chip
+  // surfaces every kind of temporary buff in one place.
+  activeBuffs,
   crystalReservoirRef,
   crystalClickCapMinRef,
   collectCrystalReservoir,
@@ -2513,11 +2518,14 @@ function HomeScreen({
             />
           )}
 
-          {/* Top-left chip stack. The active-buffs chip moved to the
-              TopBar (ActiveBuffsChip) so it's visible across every
-              screen, not just Home. The chip stack here still hosts
-              the selection-pending button and the idle-rewards chip. */}
+          {/* Top-left chip stack, mirrors the Heavenly Qi tablet on
+              the top-right. First slot is the unified active-buffs
+              chip (every temporary buff: timed sparks + paid shop
+              buffs + transient mechanic-tier procs). Hidden when
+              nothing is buffing. Below it: selection-pending, idle
+              rewards, pills shortcut. */}
           <div className="home-chips-tl">
+            <ActiveBuffsChip activeSparks={activeSparks} activeBuffs={activeBuffs} />
             {selections?.pendingCount > 0 && !majorBreakthrough && (
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>

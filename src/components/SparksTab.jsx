@@ -335,20 +335,23 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [openSpark]);
 
+  // 2026-05-25: timed sparks (entries with expiresAt) live exclusively
+  // on the HomeScreen ActiveBuffsChip popover now. This tab is the
+  // canonical view for PERSISTENT build state only: legendary
+  // producer-synergies, uncommon stacks, mechanic unlocks. Filtering
+  // timed entries out here avoids duplicating them in two places.
   const activeSparks = qiSparks?.activeSparks ?? [];
-  const live = activeSparks.filter(s => !s.expiresAt || s.expiresAt > now);
+  const live = activeSparks.filter(s => !s.expiresAt);
 
-  // Group by lifecycle / rarity
-  const groups = { timed: [], legendary: [], uncommon: [], mechanic: [] };
+  // Group by rarity / kind
+  const groups = { legendary: [], uncommon: [], mechanic: [] };
   for (const s of live) {
     const card = QI_SPARK_BY_ID[s.sparkId];
     if (!card) continue;
-    if (s.expiresAt) groups.timed.push(s);
-    else if (card.rarity === 'legendary') groups.legendary.push(s);
-    else if (card.kind === 'mechanic')    groups.mechanic.push(s);
-    else                                   groups.uncommon.push(s);
+    if (card.rarity === 'legendary') groups.legendary.push(s);
+    else if (card.kind === 'mechanic') groups.mechanic.push(s);
+    else groups.uncommon.push(s);
   }
-  groups.timed.sort((a, b) => a.expiresAt - b.expiresAt);
   groups.legendary.sort((a, b) => {
     const ai = TRINITY_SPARK_IDS.indexOf(a.sparkId);
     const bi = TRINITY_SPARK_IDS.indexOf(b.sparkId);
@@ -369,9 +372,9 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     // .cs-upgrades-empty.
     return (
       <div className="st-empty">
-        <div className="st-empty-title">No active sparks yet</div>
+        <div className="st-empty-title">No persistent sparks yet</div>
         <div className="st-empty-text">
-          You'll be offered a Qi Spark on every layer breakthrough. Your active sparks will live here.
+          A Qi Spark is offered on every layer breakthrough. Your permanent, legendary, and mechanic sparks will live here. Temporary buffs surface on the top-left chip while they're running.
         </div>
       </div>
     );
@@ -394,16 +397,9 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
         </div>
       )}
 
-      <Section
-        label="Active buffs"
-        sublabel="time-limited"
-        count={groups.timed.length}
-        tone="timed"
-      >
-        {groups.timed.map(s => (
-          <SparkBlock key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
-        ))}
-      </Section>
+      {/* Active buffs (timed) section removed 2026-05-25. Timed
+          entries live on the HomeScreen ActiveBuffsChip popover
+          exclusively now, so this tab doesn't duplicate them. */}
 
       <Section
         label="Legendary"

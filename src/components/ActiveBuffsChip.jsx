@@ -31,8 +31,9 @@ const MODAL_ID = 'active-buffs';
  *
  * Hidden entirely (returns null) when nothing is buffing the player.
  * Tap opens a portal modal popover listing each buff with its own
- * countdown bar; the footer routes to Cultivation > Sparks where the
- * canonical permanent + legendary build view lives.
+ * countdown bar. This popover is the ONLY place temporary buffs are
+ * surfaced; the Cultivation > Sparks tab no longer lists them since
+ * the chip already covers that surface comprehensively.
  */
 function BuffIcon({ icon, fallback = '✦' }) {
   const ic = icon ?? fallback;
@@ -122,15 +123,6 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
     setOpen(true);
   };
 
-  const handleViewAll = () => {
-    setOpen(false);
-    // App.jsx listens and routes to Cultivation > Sparks tab. The link
-    // is named "View all sparks" because that tab is the canonical
-    // permanent + legendary build view; shop buffs are short-lived and
-    // do not have a separate detail surface to deep-link to.
-    try { window.dispatchEvent(new CustomEvent('mai:nav-sparks')); } catch {}
-  };
-
   return (
     <>
       <button
@@ -190,14 +182,6 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
                 );
               })}
             </ul>
-
-            <button
-              type="button"
-              className="abp-popover-link"
-              onClick={handleViewAll}
-            >
-              View all sparks <span className="abp-arrow">→</span>
-            </button>
           </div>
         </div>,
         document.body,

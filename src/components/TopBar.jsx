@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
 import { fmt as fmtNum } from '../utils/format';
-import ActiveBuffsChip from './ActiveBuffsChip';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -35,11 +34,6 @@ export default function TopBar({
   reincarnationUnlocked,
   qiRef,
   karma,
-  // ActiveBuffsChip data sources. Both come from App.jsx (useShopInventory
-  // for the paid timed buffs, useQiSparks for everything spark-shaped
-  // including transient mechanic-tier procs like Divine Qi T5).
-  activeBuffs,
-  activeSparks,
 }) {
   return (
     <div className="top-bar">
@@ -95,10 +89,6 @@ export default function TopBar({
           <span>{karma ?? 0}</span>
         </div>
       </div>
-      {/* Unified active-buffs chip. Reads from both Qi Sparks and paid
-          shop timed buffs; hidden entirely when nothing is buffing. Tap
-          opens a popover listing every buff with its own countdown. */}
-      <ActiveBuffsChip activeSparks={activeSparks} activeBuffs={activeBuffs} />
       <div className="home-hud-spacer" />
       {reincarnationUnlocked && (
         <button

@@ -1605,16 +1605,12 @@ function AppInner() {
     try { trackScreenView(target); } catch {}
   };
 
-  // Cross-component nav events — keeps callsites (like the home sparks chip)
-  // decoupled from prop-drilling the navigate fn. ActiveSparksBar dispatches
-  // `mai:nav-sparks` when the player taps "View all sparks →"; route them
-  // to Cultivation > Sparks tab here.
-  useEffect(() => {
-    const handler = () => navigate('cultivation', 'sparks');
-    window.addEventListener('mai:nav-sparks', handler);
-    return () => window.removeEventListener('mai:nav-sparks', handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // The `mai:nav-sparks` deep-link listener was removed 2026-05-25.
+  // It used to route the old ActiveSparksBar popover's "View all
+  // sparks" footer to Cultivation > Sparks; that footer is gone now
+  // (the chip + popover IS the canonical surface for temporary
+  // buffs, and the Sparks tab is reachable through normal navigation).
+
 
   const handleReincarnate = useCallback(() => {
     // Safety net — the button is already disabled below Saint, but we
@@ -1663,7 +1659,7 @@ function AppInner() {
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
     // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} />,
     // Combat-adjacent screens are mounted only when FEATURES.combat is true.
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
@@ -1779,8 +1775,6 @@ function AppInner() {
         reincarnationUnlocked={reincarnationUnlocked}
         qiRef={cultivation.qiRef}
         karma={karma.karma}
-        activeBuffs={shopInventory.activeBuffs}
-        activeSparks={qiSparks.activeSparks}
       />
       <NavBar
         currentScreen={currentScreen}
