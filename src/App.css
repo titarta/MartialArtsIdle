@@ -21108,12 +21108,19 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    ═════════════════════════════════════════════════════════════════════════ */
 
 /* Ma Shan Zheng — Chinese brush-calligraphy font, licensed under the SIL
-   Open Font License (OFL). Used only for the 天 glyph on the Petition
-   Tablet (and reserved for any future plaque variants with 仙 / 道 / 命
-   etc. — the bundled chunk covers ~200 common Simplified Chinese chars).
-   Sourced from Google Fonts and bundled locally because the game ships as
-   an offline-first Capacitor build; a runtime Google Fonts dependency
-   would silently fall back to system serif on first offline launch.
+   Open Font License (OFL). The bundled woff2 is a PRECISE subset
+   containing only the glyphs actually rendered anywhere in the app:
+     命 元 圣 归 虚 道 天          : journey chapter glyphs
+     体 气 元 分 仙 圣 王 归 源 虚 道 帝 天 半 : realm-name glyphs
+     玉                             : uncommon spark seal fallback
+     灵 神                          : reserved for future plaques
+     凰 龍 玄                       : legendary spark per-card seals
+   To add a new brush glyph, edit CHARS in scripts/build_msz_font.py and
+   re-run. The full font is ~6 MB; this subset is under 10 KB because
+   brush calligraphy glyphs compress tightly under brotli.
+   Sourced from Google Fonts; bundled locally because the game ships as
+   an offline-first Capacitor build (a runtime Google Fonts dependency
+   would silently fall back to system serif on first offline launch).
    Relative path so Vite hashes the asset and rewrites the URL with the
    correct base prefix for every build mode (dev / Capacitor / Steam /
    GH Pages). */
