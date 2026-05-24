@@ -8,7 +8,6 @@ import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
-import ActiveSparksBar from '../components/ActiveSparksBar';
 import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue } from '../contexts/EventQueueContext';
 import { QI_SPARK_BY_ID } from '../data/qiSparks';
@@ -2514,9 +2513,11 @@ function HomeScreen({
             />
           )}
 
-          {/* ── Top-left chip stack — priority order: rewards → no law → idle ── */}
+          {/* Top-left chip stack. The active-buffs chip moved to the
+              TopBar (ActiveBuffsChip) so it's visible across every
+              screen, not just Home. The chip stack here still hosts
+              the selection-pending button and the idle-rewards chip. */}
           <div className="home-chips-tl">
-            <ActiveSparksBar activeSparks={activeSparks} />
             {selections?.pendingCount > 0 && !majorBreakthrough && (
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>

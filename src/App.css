@@ -1085,56 +1085,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .augment-card-rare   { border-color: rgba(96,165,250,0.35); box-shadow: 0 0 10px rgba(96,165,250,0.1); }
 .augment-card-epic   { border-color: rgba(192,132,252,0.45); box-shadow: 0 0 14px rgba(192,132,252,0.15); }
 
-/* ── Active Sparks chip — sibling of home-pill-chip / home-idle-chip.
-   Same shape, sizing and behaviour as the rest of the home-chips-tl stack;
-   tapping opens the Active Sparks modal listing every active bonus. */
-.home-sparks-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  background: rgba(var(--ui-purple-rgb), 0.18);
-  border: 1px solid rgba(var(--ui-purple-rgb), 0.45);
-  border-radius: 20px;
-  color: rgba(var(--ui-hover-rgb), 0.90);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 8px rgba(var(--ui-purple-rgb), 0.25);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.home-sparks-chip:hover {
-  transform: scale(1.04);
-  box-shadow: 0 0 14px rgba(var(--ui-purple-rgb), 0.45);
-}
-.home-sparks-chip-icon  { font-size: 12px; }
-.home-sparks-chip-label { white-space: nowrap; }
-/* Countdown badge shown on the chip when a timed spark is active */
-.home-sparks-chip-timer {
-  font-size:        10px;
-  font-weight:      700;
-  color:            #7ee8fa;
-  background:       rgba(var(--ui-bg-panel-rgb), 0.75);
-  border-radius:    8px;
-  padding:          1px 5px;
-  white-space:      nowrap;
-}
-/* Chip flashes amber when the soonest timer ≤ 10s */
-.home-sparks-chip-urgent {
-  border-color:     rgba(255, 160, 50, 0.7);
-  box-shadow:       0 0 10px rgba(255, 160, 50, 0.35);
-  animation:        sparks-chip-urgent-pulse 0.7s ease-in-out infinite alternate;
-}
-.home-sparks-chip-urgent .home-sparks-chip-timer {
-  color:            #fbbf24;
-  background:       rgba(80, 40, 0, 0.6);
-}
-@keyframes sparks-chip-urgent-pulse {
-  from { box-shadow: 0 0 6px rgba(255, 160, 50, 0.3); }
-  to   { box-shadow: 0 0 16px rgba(255, 160, 50, 0.6); }
-}
+/* The old .home-sparks-chip family was deleted when the chip moved
+   from the Home screen to the TopBar as ActiveBuffsChip. New chip
+   styles live under .tb-buffs-chip alongside the rest of the TopBar
+   rules. Its modal popover styles live under .abp-* further down. */
 
 /* ── Active Sparks panel — modal listing all current spark bonuses ──
    Adapts to phones via the shared .modal-overlay safe-area padding;
@@ -1410,20 +1364,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   50%      { filter: brightness(1.15); }
 }
 
-/* Home-screen sparks chip — gold accent when ANY legendary is active;
-   a stronger pulsing halo when Trinity Convergence is active. */
-.home-sparks-chip-legendary {
-  border-color: rgba(255, 215, 100, 0.65);
-  box-shadow: 0 0 10px rgba(255, 200, 80, 0.25);
-}
-.home-sparks-chip-trinity {
-  border-color: rgba(255, 215, 100, 0.9);
-  animation: sparks-chip-trinity-pulse 2.4s ease-in-out infinite;
-}
-@keyframes sparks-chip-trinity-pulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(255, 200, 80, 0.4); }
-  50%      { box-shadow: 0 0 24px rgba(255, 215, 130, 0.85); }
-}
+/* The .home-sparks-chip-legendary / .home-sparks-chip-trinity
+   variants were never wired into the live ActiveSparksBar JSX. Now
+   that the chip moved to the TopBar, the variants are gone. If you
+   want to reintroduce legendary/trinity emphasis on the new chip,
+   add a state class to .tb-buffs-chip and style it there. */
 
 /* ── Qi Spark choice modal ────────────────────────────────────────────────
    Pick-1-of-2 card UI that fires on every layer breakthrough. Distinct from
@@ -2046,60 +1991,70 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   ActiveSparksBar (home chip popover) — TIMED buffs only
-   The slim popover replaces the old full-sparks modal. Permanent and
-   legendary sparks now live in Cultivation > Sparks tab; the home chip
-   is purely a time-pressure surface.
+   ActiveBuffsChip popover (.abp-*)
+   Portal-mounted modal listing every active temporary buff with its
+   own countdown bar. Source-agnostic: timed Qi Sparks AND paid shop
+   buffs feed in through the same shape. Bronze ember palette matches
+   the TopBar chip that opens it. The popover sits above the standard
+   modal-overlay scrim with one z-index step above the rest so it can
+   open over almost anything except a forced full-screen modal.
+   Replaces the old .asb-* family (home-only, sparks-only) that lived
+   here before the consolidation.
    ──────────────────────────────────────────────────────────────────── */
-.asb-overlay { z-index: 220; }
+.abp-overlay { z-index: 220; }
 
-.asb-popover {
+.abp-popover {
   width: min(360px, 94vw);
-  background:
-    radial-gradient(ellipse at center top, rgba(167, 139, 250, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(18, 22, 30, 0.97), rgba(8, 12, 18, 0.99));
-  border: 1px solid rgba(167, 139, 250, 0.3);
-  border-radius: 14px;
-  padding: 12px;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.75), 0 0 22px rgba(167, 139, 250, 0.18);
+  padding: 12px;
+  background:
+    radial-gradient(ellipse at center top, rgba(200, 151, 100, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(20, 17, 12, 0.98), rgba(8, 7, 5, 0.99));
+  border: 1px solid rgba(200, 151, 100, 0.40);
+  border-radius: 14px;
+  box-shadow:
+    0 12px 36px rgba(0, 0, 0, 0.75),
+    0 0 22px rgba(200, 151, 100, 0.16);
   animation: modal-pop 0.18s ease-out;
 }
-.asb-popover-header {
+.abp-popover-header {
   display: flex;
   align-items: center;
   gap: 10px;
   /* right padding reserved for the absolute .modal-close button */
   padding: 2px 44px 6px 4px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(200, 151, 100, 0.14);
 }
-.asb-popover-title {
+.abp-popover-title {
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(230, 240, 238, 0.9);
+  color: rgba(245, 230, 200, 0.92);
   flex: 1;
+  padding-left: 0.22em; /* optical centering for tracked-out text */
 }
-.asb-popover-count {
+.abp-popover-count {
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: rgba(230, 240, 238, 0.7);
-  background: rgba(167, 139, 250, 0.12);
-  border: 1px solid rgba(167, 139, 250, 0.3);
+  color: rgba(245, 230, 200, 0.85);
+  background: rgba(200, 151, 100, 0.14);
+  border: 1px solid rgba(200, 151, 100, 0.40);
   padding: 2px 10px;
   border-radius: 999px;
 }
-.asb-popover-header .modal-close {
+.abp-popover-header .modal-close {
   position: static;
   font-size: 14px;
   padding: 2px 6px;
 }
 
-.asb-popover-list {
+.abp-popover-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -2111,94 +2066,93 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   -webkit-overflow-scrolling: touch;
 }
 
-.asb-row {
+.abp-row {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: rgba(20, 28, 36, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(30, 24, 16, 0.65);
+  border: 1px solid rgba(200, 151, 100, 0.16);
+  border-left: 3px solid rgba(200, 151, 100, 0.55);
 }
-.asb-row-common    { border-left: 3px solid rgba(156, 163, 175, 0.65); }
-.asb-row-uncommon  { border-left: 3px solid rgba(74, 222, 128, 0.7); }
-.asb-row-legendary { border-left: 3px solid rgba(255, 215, 100, 0.85); }
 
-.asb-row-icon {
+.abp-row-icon {
   flex-shrink: 0;
   width: 42px;
   height: 42px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(40, 48, 60, 0.6), rgba(20, 24, 32, 0.8));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(60, 45, 28, 0.6), rgba(28, 22, 14, 0.8));
+  border: 1px solid rgba(200, 151, 100, 0.18);
   display: grid;
   place-items: center;
 }
-.asb-row-icon-img {
+.abp-row-icon-img {
   width: 34px;
   height: 34px;
   object-fit: contain;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
 }
-.asb-row-icon-emoji {
+.abp-row-icon-emoji {
   font-size: 24px;
   line-height: 1;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
 }
 
-.asb-row-body {
+.abp-row-body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-.asb-row-name {
-  font-family: var(--font-display);
+.abp-row-name {
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  color: rgba(230, 240, 238, 0.95);
+  letter-spacing: 0.04em;
+  color: rgba(245, 230, 200, 0.95);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.asb-row-bar {
+.abp-row-bar {
   width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   overflow: hidden;
 }
-.asb-row-bar-fill {
+.abp-row-bar-fill {
   height: 100%;
   width: calc(var(--p, 1) * 100%);
-  background: linear-gradient(90deg, rgba(74, 222, 128, 0.85), rgba(110, 224, 181, 0.95));
+  background: linear-gradient(90deg, rgba(200, 151, 100, 0.85), rgba(255, 207, 131, 0.95));
   transition: width 0.25s linear;
 }
-.asb-row-urgent .asb-row-bar-fill {
+.abp-row-urgent { border-left-color: rgba(255, 160, 80, 0.85); }
+.abp-row-urgent .abp-row-bar-fill {
   background: linear-gradient(90deg, rgba(245, 158, 11, 0.95), rgba(255, 200, 80, 1));
 }
 
-.asb-row-timer {
+.abp-row-timer {
   font-size: 12px;
   font-weight: 700;
-  color: rgba(230, 240, 238, 0.85);
+  color: rgba(245, 230, 200, 0.85);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
-.asb-row-urgent .asb-row-timer { color: #fbbf24; }
+.abp-row-urgent .abp-row-timer { color: #fbbf24; }
 
-.asb-popover-link {
+.abp-popover-link {
   margin-top: 4px;
   padding: 10px 14px;
-  border: 1px solid rgba(167, 139, 250, 0.45);
-  background: linear-gradient(140deg, rgba(14, 12, 28, 0.95), rgba(8, 6, 18, 0.95));
-  color: rgba(230, 220, 255, 1);
-  font-family: inherit;
+  border: 1px solid rgba(200, 151, 100, 0.55);
+  background: linear-gradient(140deg, rgba(40, 30, 18, 0.95), rgba(20, 14, 8, 0.95));
+  color: #fff4d4;
+  font-family: 'Cinzel', Georgia, serif;
   font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-weight: 700;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   border-radius: 999px;
   cursor: pointer;
@@ -2207,23 +2161,21 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   justify-content: center;
   gap: 8px;
   box-shadow:
-    0 4px 16px rgba(80, 50, 150, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 4px 16px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 207, 131, 0.18);
   transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
 }
-.asb-popover-link:hover,
-.asb-popover-link:focus-visible {
+.abp-popover-link:hover,
+.abp-popover-link:focus-visible {
   filter: brightness(1.14);
   box-shadow:
-    0 6px 22px rgba(167, 139, 250, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 6px 22px rgba(200, 151, 100, 0.55),
+    inset 0 1px 0 rgba(255, 207, 131, 0.30);
   outline: none;
 }
-.asb-popover-link:active { transform: translateY(1px) scale(0.98); }
-.asb-popover-link .asb-arrow {
-  transition: transform 0.15s;
-}
-.asb-popover-link:hover .asb-arrow { transform: translateX(2px); }
+.abp-popover-link:active { transform: translateY(1px) scale(0.98); }
+.abp-popover-link .abp-arrow { transition: transform 0.15s; }
+.abp-popover-link:hover .abp-arrow { transform: translateX(2px); }
 
 /* ════════════════════════════════════════════════════════════════════
    Cultivation > Sparks tab — canonical "your build" view
@@ -4782,43 +4734,73 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    icons. Vermillion accent border + dim lacquer fill keeps it clearly
    buff-themed without bleeding the cinnabar across the whole bar. Tap
    routes to the Spirit Bazaar (see ActiveBuffChip in TopBar.jsx). */
-.topbar-buff-chip {
+/* ════════════════════════════════════════════════════════════════════
+   ActiveBuffsChip + popover (.tb-buffs-* + .abp-*)
+   Single TopBar surface for every kind of temporary buff (timed Qi
+   Sparks, paid shop buffs, transient mechanic-tier procs). Replaces
+   two older parallel surfaces: the .topbar-buff-chip vermillion stub
+   (showed only the strongest paid buff) and the home-only
+   .home-sparks-chip / .asb-* popover. One chip on the TopBar, one
+   popover, every buff source unified.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* The chip itself sits in the TopBar's flex row between currencies
+   and the spacer. Tight bronze pill so it reads as a state indicator
+   (not a currency, not a navigation button). */
+.tb-buffs-chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 24px;
-  padding: 3px 9px;
-  margin-left: 8px;
-  background: linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
-  border: 1px solid rgba(255, 104, 100, 0.55);
-  border-radius: 12px;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  margin-left: 6px;
+  background:
+    linear-gradient(180deg, rgba(200, 151, 100, 0.14), rgba(120, 90, 50, 0.10));
+  border: 1px solid rgba(200, 151, 100, 0.45);
+  border-radius: 999px;
   color: #f5e6c8;
   font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
   cursor: pointer;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s, border-color 0.15s;
-  box-shadow: 0 0 10px rgba(255, 104, 100, 0.12) inset;
+  box-shadow: 0 0 8px rgba(200, 151, 100, 0.18) inset;
+  transition: filter 0.15s, background 0.15s, border-color 0.15s, transform 0.08s;
 }
-.topbar-buff-chip:hover {
-  background: linear-gradient(160deg, #322618 0%, #1f1812 100%);
-  border-color: rgba(255, 104, 100, 0.75);
+.tb-buffs-chip:hover {
+  filter: brightness(1.12);
+  background:
+    linear-gradient(180deg, rgba(200, 151, 100, 0.22), rgba(120, 90, 50, 0.14));
 }
-.topbar-buff-chip-mult {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: #ff9a83;        /* keep the vermillion accent on the value itself */
-  font-variant-numeric: tabular-nums;
+.tb-buffs-chip:active { transform: translateY(1px); }
+.tb-buffs-chip-icon {
+  font-size: 12px;
   line-height: 1;
+  color: #ffcf83;
+  text-shadow: 0 0 6px rgba(255, 207, 131, 0.55);
 }
-.topbar-buff-chip-time {
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  color: rgba(245, 230, 200, 0.85);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
+.tb-buffs-chip-count  { color: #fff4d4; font-weight: 800; }
+.tb-buffs-chip-sep    { color: rgba(245, 230, 200, 0.35); font-weight: 400; }
+.tb-buffs-chip-timer  { color: rgba(245, 230, 200, 0.85); font-weight: 700; }
+/* Urgency: soonest expiry <= 10s. Palette warms to ember red. */
+.tb-buffs-chip-urgent {
+  border-color: rgba(255, 160, 80, 0.85);
+  background:
+    linear-gradient(180deg, rgba(255, 160, 80, 0.20), rgba(180, 60, 30, 0.14));
+  box-shadow: 0 0 12px rgba(255, 160, 80, 0.35) inset;
+  animation: tb-buffs-chip-urgent-pulse 0.85s ease-in-out infinite alternate;
+}
+.tb-buffs-chip-urgent .tb-buffs-chip-icon {
+  color: #ffd28a;
+  text-shadow: 0 0 8px rgba(255, 180, 100, 0.85);
+}
+.tb-buffs-chip-urgent .tb-buffs-chip-timer { color: #fbbf24; }
+@keyframes tb-buffs-chip-urgent-pulse {
+  from { box-shadow: 0 0 8px  rgba(255, 160, 80, 0.25) inset; }
+  to   { box-shadow: 0 0 18px rgba(255, 160, 80, 0.65) inset; }
 }
 
 .home-hud-spacer { flex: 1; }
@@ -22410,11 +22392,12 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-size: 11px;
   border-radius: 12px;
 }
-/* Active-buff rail removed 2026-05-24. The strongest active buff is now
-   surfaced on the global TopBar via .topbar-buff-chip so the player sees
-   their multiplier while CULTIVATING, not just while shopping. Per-tile
-   ACTIVE ribbons inside the Bazaar buff grid still convey ownership for
-   the buy/extend decision. */
+/* Active-buff rail removed 2026-05-24. Active buffs are now surfaced
+   on the global TopBar via .tb-buffs-chip (ActiveBuffsChip), which
+   shows every running buff regardless of source (paid shop, spark,
+   transient mechanic-tier proc) and opens a popover listing each
+   with its own countdown. Per-tile ACTIVE ribbons inside the Bazaar
+   buff grid still convey ownership for the buy/extend decision. */
 
 .sbz-featured-wrap {
   padding: 14px 0 0;

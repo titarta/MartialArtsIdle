@@ -1780,6 +1780,7 @@ function AppInner() {
         qiRef={cultivation.qiRef}
         karma={karma.karma}
         activeBuffs={shopInventory.activeBuffs}
+        activeSparks={qiSparks.activeSparks}
       />
       <NavBar
         currentScreen={currentScreen}
