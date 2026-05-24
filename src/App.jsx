@@ -29,6 +29,7 @@ import CollectionScreen from './screens/CollectionScreen';
 import ProductionScreen from './screens/ProductionScreen';
 import CultivationScreen from './screens/CultivationScreen';
 import SettingsScreen from './screens/SettingsScreen';
+import AboutScreen    from './screens/AboutScreen';
 import useReincarnationKarma from './hooks/useReincarnationKarma';
 import useReincarnationTree  from './hooks/useReincarnationTree';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
@@ -1703,9 +1704,7 @@ function AppInner() {
                      />,
     settings:   <SettingsScreen
                   onBack={() => navigate('home')}
-                  /* onOpenAbout intentionally omitted until Unit 4 lands
-                     the About screen — SettingsScreen hides the row when
-                     the prop is falsy. */
+                  onOpenAbout={() => navigate('about')}
                   onOpenBazaar={() => navigate('spirit-bazaar')}
                   realmName={cultivation.realmMajor}
                   realmStage={cultivation.realmStage}
@@ -1716,6 +1715,7 @@ function AppInner() {
                   shopInventory={shopInventory}
                   autoBuyEnabled={autoBuyEnabled}
                 />,
+    about:      <AboutScreen onBack={() => navigate('settings')} />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
                      karmaEarnedThisLife={karma.karmaEarnedThisLife}
