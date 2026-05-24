@@ -250,7 +250,7 @@ h1 {
       var(--paper-mid)  35%,
       var(--paper-dark) 100%);
   border: 1px solid var(--bronze-faint);
-  border-radius: 2px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -330,10 +330,10 @@ h1 {
   height: 14px;
   border: 1px solid var(--jade);
 }
-.card-unc .corner.tl { border-right: none; border-bottom: none; }
-.card-unc .corner.tr { border-left: none;  border-bottom: none; }
-.card-unc .corner.bl { border-right: none; border-top: none;    }
-.card-unc .corner.br { border-left: none;  border-top: none;    }
+.card-unc .corner.tl { border-right: none; border-bottom: none; border-top-left-radius:     4px; }
+.card-unc .corner.tr { border-left: none;  border-bottom: none; border-top-right-radius:    4px; }
+.card-unc .corner.bl { border-right: none; border-top: none;    border-bottom-left-radius:  4px; }
+.card-unc .corner.br { border-left: none;  border-top: none;    border-bottom-right-radius: 4px; }
 .card-unc .card-mark {
   position: absolute;
   top: 0;
@@ -342,7 +342,7 @@ h1 {
   width: 18px;
   height: 5px;
   background: var(--jade);
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 3px 3px;
   opacity: 0.85;
   box-shadow: 0 0 4px rgba(110, 201, 138, 0.45);
   z-index: 2;
@@ -404,14 +404,14 @@ h1 {
   border-color: var(--gold-bright);
   opacity: 0.65;
 }
-.card-leg .corner.tl::before { border-right: 0; border-bottom: 0; }
-.card-leg .corner.tl::after  { border-right: 0; border-bottom: 0; }
-.card-leg .corner.tr::before { border-left:  0; border-bottom: 0; }
-.card-leg .corner.tr::after  { border-left:  0; border-bottom: 0; }
-.card-leg .corner.bl::before { border-right: 0; border-top:    0; }
-.card-leg .corner.bl::after  { border-right: 0; border-top:    0; }
-.card-leg .corner.br::before { border-left:  0; border-top:    0; }
-.card-leg .corner.br::after  { border-left:  0; border-top:    0; }
+.card-leg .corner.tl::before { border-right: 0; border-bottom: 0; border-top-left-radius:     4px; }
+.card-leg .corner.tl::after  { border-right: 0; border-bottom: 0; border-top-left-radius:     2px; }
+.card-leg .corner.tr::before { border-left:  0; border-bottom: 0; border-top-right-radius:    4px; }
+.card-leg .corner.tr::after  { border-left:  0; border-bottom: 0; border-top-right-radius:    2px; }
+.card-leg .corner.bl::before { border-right: 0; border-top:    0; border-bottom-left-radius:  4px; }
+.card-leg .corner.bl::after  { border-right: 0; border-top:    0; border-bottom-left-radius:  2px; }
+.card-leg .corner.br::before { border-left:  0; border-top:    0; border-bottom-right-radius: 4px; }
+.card-leg .corner.br::after  { border-left:  0; border-top:    0; border-bottom-right-radius: 2px; }
 
 /* Legendary top cartouche, a small hanging title tag */
 .card-leg .card-mark {
@@ -425,7 +425,7 @@ h1 {
     linear-gradient(180deg, var(--gold) 0%, #8a6438 100%);
   border: 1px solid var(--gold);
   border-top: none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 5px 5px;
   box-shadow: 0 0 8px rgba(255, 214, 107, 0.55);
   z-index: 3;
 }
@@ -645,7 +645,7 @@ h1 {
   color: var(--cream);
   background: linear-gradient(180deg, #2c2418 0%, #1a140c 100%);
   border: 1px solid var(--bronze-soft);
-  border-radius: 2px;
+  border-radius: 7px;
   cursor: pointer;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
   box-shadow:

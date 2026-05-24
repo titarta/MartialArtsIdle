@@ -3071,7 +3071,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   align-items: center;
   background: linear-gradient(180deg, #2a241a 0%, #221e16 35%, #1a1812 100%);
   border: 1px solid var(--spk-bronze-faint);
-  border-radius: 2px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 250ms cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -3155,10 +3155,12 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   height: 14px;
   border: 1px solid var(--spk-jade);
 }
-.spk-card-uncommon .spk-corner-tl { border-right: 0; border-bottom: 0; }
-.spk-card-uncommon .spk-corner-tr { border-left:  0; border-bottom: 0; }
-.spk-card-uncommon .spk-corner-bl { border-right: 0; border-top:    0; }
-.spk-card-uncommon .spk-corner-br { border-left:  0; border-top:    0; }
+/* Outer corner of each L gets a 4px curve so the bracket reads as
+   sitting inside the card's 10px rounded edge instead of fighting it. */
+.spk-card-uncommon .spk-corner-tl { border-right: 0; border-bottom: 0; border-top-left-radius:     4px; }
+.spk-card-uncommon .spk-corner-tr { border-left:  0; border-bottom: 0; border-top-right-radius:    4px; }
+.spk-card-uncommon .spk-corner-bl { border-right: 0; border-top:    0; border-bottom-left-radius:  4px; }
+.spk-card-uncommon .spk-corner-br { border-left:  0; border-top:    0; border-bottom-right-radius: 4px; }
 .spk-card-uncommon .spk-mark {
   position: absolute;
   top: 0;
@@ -3167,7 +3169,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   width: 18px;
   height: 5px;
   background: var(--spk-jade);
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 3px 3px;
   opacity: 0.85;
   box-shadow: 0 0 4px rgba(110, 201, 138, 0.45);
   z-index: 2;
@@ -3215,14 +3217,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .spk-card-legendary .spk-corner::before { inset: 0; border-color: var(--spk-gold); }
 .spk-card-legendary .spk-corner::after  { inset: 4px; border-color: var(--spk-gold-bright); opacity: 0.65; }
-.spk-card-legendary .spk-corner-tl::before { border-right: 0; border-bottom: 0; }
-.spk-card-legendary .spk-corner-tl::after  { border-right: 0; border-bottom: 0; }
-.spk-card-legendary .spk-corner-tr::before { border-left:  0; border-bottom: 0; }
-.spk-card-legendary .spk-corner-tr::after  { border-left:  0; border-bottom: 0; }
-.spk-card-legendary .spk-corner-bl::before { border-right: 0; border-top:    0; }
-.spk-card-legendary .spk-corner-bl::after  { border-right: 0; border-top:    0; }
-.spk-card-legendary .spk-corner-br::before { border-left:  0; border-top:    0; }
-.spk-card-legendary .spk-corner-br::after  { border-left:  0; border-top:    0; }
+/* Outer bracket (::before) curves 4px to parallel the card's 10px
+   edge. Inner nested bracket (::after) sits 4px deeper, gets a tighter
+   2px curve, so the two brackets read as concentric arcs. */
+.spk-card-legendary .spk-corner-tl::before { border-right: 0; border-bottom: 0; border-top-left-radius:     4px; }
+.spk-card-legendary .spk-corner-tl::after  { border-right: 0; border-bottom: 0; border-top-left-radius:     2px; }
+.spk-card-legendary .spk-corner-tr::before { border-left:  0; border-bottom: 0; border-top-right-radius:    4px; }
+.spk-card-legendary .spk-corner-tr::after  { border-left:  0; border-bottom: 0; border-top-right-radius:    2px; }
+.spk-card-legendary .spk-corner-bl::before { border-right: 0; border-top:    0; border-bottom-left-radius:  4px; }
+.spk-card-legendary .spk-corner-bl::after  { border-right: 0; border-top:    0; border-bottom-left-radius:  2px; }
+.spk-card-legendary .spk-corner-br::before { border-left:  0; border-top:    0; border-bottom-right-radius: 4px; }
+.spk-card-legendary .spk-corner-br::after  { border-left:  0; border-top:    0; border-bottom-right-radius: 2px; }
 /* Gold cartouche at top center. */
 .spk-card-legendary .spk-mark {
   position: absolute;
@@ -3234,7 +3239,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   background: linear-gradient(180deg, var(--spk-gold) 0%, #8a6438 100%);
   border: 1px solid var(--spk-gold);
   border-top: none;
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 5px 5px;
   box-shadow: 0 0 8px rgba(255, 214, 107, 0.55);
   z-index: 3;
 }
@@ -3454,7 +3459,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: var(--spk-cream);
   background: linear-gradient(180deg, #2c2418 0%, #1a140c 100%);
   border: 1px solid var(--spk-bronze-soft);
-  border-radius: 2px;
+  border-radius: 7px;
   cursor: pointer;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
   padding-left: calc(8px + 0.28em);
