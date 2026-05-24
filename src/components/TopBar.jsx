@@ -58,9 +58,9 @@ export default function TopBar({
           consumables / QoL / cosmetics. Icon-only (the balance lives on
           the Top Up button just to the left). */}
       <button
-        className={`home-hud-lotus-shop${activeModal === 'lotus-shop' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-lotus-shop${currentScreen === 'spirit-bazaar' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenLotusShop}
-        aria-label="Blood Lotus Shop"
+        aria-label="Spirit Bazaar"
       >
         <img
           src={`${BASE}ui/shop_nav.png`}

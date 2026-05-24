@@ -111,6 +111,14 @@ const BASELINE = {
     hint: 'Gather a herb to unlock',
     unlockMsg: 'Alchemy unlocked.',
   },
+  // Spirit Bazaar — Blood Lotus spend storefront, promoted to a full screen
+  // during the nav-audit. TopBar 🏮 routes here via navigate('spirit-bazaar').
+  'spirit-bazaar': {
+    gate: { type: 'always' },
+    desc: null,
+    hint: null,
+    unlockMsg: null,
+  },
   settings: {
     gate: { type: 'always' },
     desc: null,

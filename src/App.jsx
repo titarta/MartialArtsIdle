@@ -3,7 +3,7 @@ import NavBar from './components/NavBar';
 import TopBar from './components/TopBar';
 import HomeScreen from './screens/HomeScreen';
 import BloodLotusShopModal from './components/BloodLotusShopModal';
-import BloodLotusSpendShopModal from './components/BloodLotusSpendShopModal';
+import SpiritBazaarScreen from './screens/SpiritBazaarScreen';
 import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './systems/bloodLotus';
 import useShopInventory from './hooks/useShopInventory';
 import { SHOP_ITEMS_BY_ID } from './data/shopItems';
@@ -114,7 +114,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['shop', 'lotus-shop', 'annals', 'pills', 'daily']);
+    const ours = new Set(['shop', 'annals', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -1330,14 +1330,15 @@ function AppInner() {
     if (isDoubleNinth(now))  achBus.fire('cal_double_ninth');
   }, []);
 
-  // Shop visit counter. We track the "spend" shop (lotus-shop), where
-  // the player browses skins / QoL, since the buy-currency modal
-  // (`shop`) is a different surface. Increments once per modal open.
+  // Shop visit counter. We track the Spirit Bazaar (post nav-audit: now a
+  // screen, was the 'lotus-shop' modal). The buy-currency modal (`shop`)
+  // is a different surface and is not counted here. Increments once per
+  // navigation TO the bazaar — re-entering after leaving counts again.
   useEffect(() => {
-    if (activeModal === 'lotus-shop') {
+    if (currentScreen === 'spirit-bazaar') {
       try { recordStat('shopVisits', 1); } catch {}
     }
-  }, [activeModal]);
+  }, [currentScreen]);
 
   // Screen switches in a rolling 5-minute window for the Restless
   // achievement. Keeps the last 100 switch timestamps; when 100 fit
@@ -1681,6 +1682,12 @@ function AppInner() {
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
     journey:    <JourneyScreen realmIndex={cultivation.realmIndex} />,
+    'spirit-bazaar': <SpiritBazaarScreen
+                       inventory={shopInventory}
+                       balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
+                       onBack={() => navigate('home')}
+                       onOpenTopUp={() => openModal('shop')}
+                     />,
     settings:   <SettingsScreen onBack={() => navigate('home')} />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
@@ -1734,7 +1741,7 @@ function AppInner() {
            Top Up entry point; the shop button right next to it is the
            dedicated spend surface. */
         onOpenShop={() => openModal('shop')}
-        onOpenLotusShop={() => openModal('lotus-shop')}
+        onOpenLotusShop={() => navigate('spirit-bazaar')}
         onOpenProgress={() => openModal('annals', () => setHasNewAch(false))}
         onOpenSettings={() => navigate('settings')}
         hasNewAchievement={hasNewAch}
@@ -1839,14 +1846,6 @@ function AppInner() {
         />
       )}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
-      {activeModal === 'lotus-shop'   && (
-        <BloodLotusSpendShopModal
-          inventory={shopInventory}
-          balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
-          onClose={() => setActiveModal(null)}
-          onOpenTopUp={() => openModal('shop')}
-        />
-      )}
       {activeModal === 'annals'       && (
         <AnnalsModal
           achievements={achievements}
