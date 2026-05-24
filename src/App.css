@@ -22036,7 +22036,13 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   position: relative;
   padding-left: 16px; /* room for the vertical gold rail */
 }
-/* Vertical gold rail down the left side of the chronicle. */
+/* Vertical gold rail down the left side of the chronicle. Explicit
+   z-index 0 anchors it as the bottom layer of the chronicle's
+   stacking context, so faded chapter/realm dots (which sit on
+   opacity-bearing parents and therefore composite as one group at
+   the parent's z-level) stack ABOVE the rail. Without this, the
+   opacity-grouped past/future chapters were co-z with the rail and
+   the rail bled through their faded dots. */
 .journey-chronicle::before {
   content: "";
   position: absolute;
@@ -22052,11 +22058,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     rgba(220, 175, 110, 0.12) 100%
   );
   border-radius: 1px;
+  z-index: 0;
 }
 
 .jc-chapter {
   margin: 8px 0 14px;
   position: relative;
+  /* Sits above the chronicle rail so EVERY chapter / realm dot
+     (descendant ::before pseudo-elements) reads as forward of the
+     line, including past and future chapters whose opacity creates
+     an isolated stacking context. */
+  z-index: 1;
   transition: opacity 0.2s;
 }
 .jc-chapter-past    { opacity: 0.65; }
@@ -22580,57 +22592,90 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+/* Category rail. Sticky to the top of the Bazaar body scroll so it stays
+   accessible while browsing aisles. Padding tightened (was 7x12 chip
+   padding + 12px font with emoji glyphs) so all four chips fit the
+   390x844 viewport gutters without horizontal scroll. The IntersectionObserver
+   in SpiritBazaarScreen toggles .sbz-cat-pill-active to mirror scroll
+   position. */
 .sbz-cat-rail {
   position: sticky;
   top: 0;
   z-index: 4;
   display: flex;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 4px;
   padding: 14px 0 10px;
   margin: 0;
-  background: linear-gradient(180deg, rgba(8, 6, 4, 0.92) 70%, transparent);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  background: linear-gradient(180deg, rgba(8, 6, 4, 0.96) 75%, transparent);
+  /* No horizontal scroll needed now that emojis are gone and padding is
+     tight enough; keep overflow:hidden to clip any rendering bleed. */
+  overflow: hidden;
 }
-.sbz-cat-rail::-webkit-scrollbar { display: none; }
 .sbz-cat-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 7px 12px;
-  background: rgba(14, 12, 8, 0.65);
-  border: 1px solid rgba(75, 60, 40, 0.6);
-  border-radius: 16px;
-  color: var(--ui-purple-soft);
+  padding: 6px 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  background: rgba(14, 12, 8, 0.75);
+  border: 1px solid rgba(75, 60, 40, 0.55);
+  border-radius: 999px;
+  color: rgba(245, 230, 200, 0.65);
   font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-.sbz-cat-glyph {
-  font-size: 13px;
-  line-height: 1;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
 }
 .sbz-cat-count {
   display: inline-block;
-  background: rgba(220, 175, 110, 0.18);
-  color: var(--ui-purple-strong);
+  background: rgba(220, 175, 110, 0.16);
+  color: rgba(245, 230, 200, 0.85);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
   font-size: 10px;
   font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 8px;
+  padding: 0 5px;
+  min-width: 16px;
+  text-align: center;
+  border-radius: 7px;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0;
 }
-.sbz-cat-pill:hover,
-.sbz-cat-pill:active {
-  background: linear-gradient(180deg, rgba(255, 104, 100, 0.18), rgba(150, 30, 30, 0.18));
-  border-color: rgba(255, 104, 100, 0.55);
-  color: #ffe3e3;
+.sbz-cat-pill:hover {
+  color: rgba(245, 230, 200, 0.95);
+  border-color: rgba(220, 175, 110, 0.45);
+}
+/* Active state — tracks the section currently in view via the IO. The
+   tab uses the cream/bronze accent rather than vermillion to stay calm;
+   vermillion is reserved for action affordances (Buy CTAs). Contrast is
+   intentionally a bit louder so the active chip clearly differentiates
+   from the inactive ones at a glance. */
+.sbz-cat-pill-active {
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.32), rgba(155, 125, 80, 0.22));
+  border-color: rgba(220, 175, 110, 0.85);
+  color: #fff5e0;
+  font-weight: 700;
+  box-shadow:
+    0 1px 0 rgba(255, 225, 170, 0.22) inset,
+    0 0 0 1px rgba(220, 175, 110, 0.20);
+}
+.sbz-cat-pill-active .sbz-cat-count {
+  background: rgba(220, 175, 110, 0.45);
+  color: #1f160b;
+}
+
+/* Section-header scroll margin so jumpTo() (and natural scroll
+   restoration) clears the sticky category rail and reveals the full
+   "BUFFS 5" / "CONSUMABLES 1" / etc header instead of hiding it
+   behind the rail. ~52px = rail height + a bit of breathing room. */
+.spirit-bazaar-screen .bls-section {
+  scroll-margin-top: 52px;
 }
 .spirit-bazaar-screen .bls-section {
   position: relative;
@@ -22855,30 +22900,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   padding: 0;
 }
 
-/* Category rail — the linear-gradient sticky bg was reading as a black slab
-   over the bleeding image. Now that the bg image is gone, give the rail a
-   solid lacquer floor under the chips with a soft fade-out tail underneath
-   so cards scrolling underneath fade gracefully behind it. */
+/* Category rail fade tail — extend the lacquer floor with a soft fade so
+   aisle cards scrolling underneath the sticky rail gradient gracefully.
+   The base rail styling is now in the upstream .sbz-cat-rail rule above
+   (post-emoji-removal redesign); the previous fidelity-pass overrides
+   here were shadowing the new active-state and have been removed. */
 .spirit-bazaar-screen .sbz-cat-rail {
   background:
     linear-gradient(180deg,
-      rgba(8, 6, 4, 0.95) 0%,
-      rgba(8, 6, 4, 0.95) calc(100% - 12px),
+      rgba(8, 6, 4, 0.96) 0%,
+      rgba(8, 6, 4, 0.96) calc(100% - 12px),
       rgba(8, 6, 4, 0) 100%);
-  padding: 10px 0 14px;
-}
-
-/* Active category pill — make the active state more obvious. The legacy
-   .sbz-cat-pill rule used :hover/:active which doesn't reflect persistent
-   selection. The JSX toggles a .sbz-cat-pill-active class for that. */
-.spirit-bazaar-screen .sbz-cat-pill {
-  background: rgba(14, 12, 8, 0.75);
-  border-color: rgba(75, 60, 40, 0.70);
-}
-.spirit-bazaar-screen .sbz-cat-pill.sbz-cat-pill-active {
-  background: linear-gradient(180deg, rgba(255, 104, 100, 0.22), rgba(150, 30, 30, 0.20));
-  border-color: rgba(255, 104, 100, 0.55);
-  color: #ffe3e3;
 }
 
 /* Buff cards (the strip variant used inside .bls-buff-grid) — solidify the

@@ -485,6 +485,10 @@ export default function SpiritBazaarScreen({
 }) {
   const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
+  // activeCat drives the .sbz-cat-pill-active class. Set by jumpTo (on tap)
+  // and updated by the IntersectionObserver below so the rail tracks
+  // whichever aisle is on screen as the player scrolls.
+  const [activeCat, setActiveCat] = useState('buff');
   const bodyRef = useRef(null);
 
   const itemsByCategory = useMemo(() => {
@@ -529,14 +533,50 @@ export default function SpiritBazaarScreen({
     }
   };
 
-  const jumpTo = (id) => {
+  const jumpTo = (id, cat) => {
     const target = bodyRef.current?.querySelector(`#${id}`);
     if (!target || !bodyRef.current) return;
+    if (cat) setActiveCat(cat);
     bodyRef.current.scrollTo({
       top: target.offsetTop - 8,
       behavior: 'smooth',
     });
   };
+
+  // Track which aisle is on screen so the rail's active chip follows the
+  // player's scroll position. IntersectionObserver fires when 35% of an
+  // aisle's header is visible; whichever fired most recently wins.
+  useEffect(() => {
+    const root = bodyRef.current;
+    if (!root) return undefined;
+    const targets = ['sec-buff', 'sec-consumable', 'sec-qol', 'sec-cosmetic']
+      .map(id => root.querySelector(`#${id}`))
+      .filter(Boolean);
+    if (targets.length === 0) return undefined;
+    const sectionToCat = {
+      'sec-buff':       'buff',
+      'sec-consumable': 'consumable',
+      'sec-qol':        'qol',
+      'sec-cosmetic':   'cosmetic',
+    };
+    const io = new IntersectionObserver((entries) => {
+      // Pick the entry with the largest intersection ratio that's actually
+      // intersecting; ignore entries that just exited the viewport.
+      const visible = entries.filter(e => e.isIntersecting);
+      if (visible.length === 0) return;
+      visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+      const id = visible[0].target.id;
+      const cat = sectionToCat[id];
+      if (cat) setActiveCat(cat);
+    }, {
+      root,
+      // top sticky-rail clears ~50px so push the trigger band down a bit
+      rootMargin: '-60px 0px -45% 0px',
+      threshold: [0, 0.25, 0.5, 0.75, 1],
+    });
+    targets.forEach(t => io.observe(t));
+    return () => io.disconnect();
+  }, []);
 
   const buffs       = itemsByCategory.get('buff')       ?? [];
   const consumables = itemsByCategory.get('consumable') ?? [];
@@ -612,29 +652,49 @@ export default function SpiritBazaarScreen({
           />
         </div>
 
-        {/* Sticky scrollable category chip rail */}
+        {/* Sticky scrollable category chip rail. Emojis intentionally
+            absent: the four categories are short ASCII labels that read
+            instantly without iconography, and removing the glyphs frees
+            ~16px per chip so all four fit at 390x844 without horizontal
+            scroll. Active state tracks scroll position via the
+            IntersectionObserver above. */}
         <nav className="sbz-cat-rail" aria-label="Bazaar sections">
-          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-buff')}>
-            <span className="sbz-cat-glyph">⚡</span> Buffs
+          <button
+            type="button"
+            className={`sbz-cat-pill${activeCat === 'buff' ? ' sbz-cat-pill-active' : ''}`}
+            onClick={() => jumpTo('sec-buff', 'buff')}
+          >
+            Buffs
             <span className="sbz-cat-count">{buffs.length}</span>
           </button>
-          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-consumable')}>
-            <span className="sbz-cat-glyph">✦</span> Consumables
+          <button
+            type="button"
+            className={`sbz-cat-pill${activeCat === 'consumable' ? ' sbz-cat-pill-active' : ''}`}
+            onClick={() => jumpTo('sec-consumable', 'consumable')}
+          >
+            Consumables
             <span className="sbz-cat-count">{consumables.length}</span>
           </button>
-          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-qol')}>
-            <span className="sbz-cat-glyph">⚙</span> QoL
+          <button
+            type="button"
+            className={`sbz-cat-pill${activeCat === 'qol' ? ' sbz-cat-pill-active' : ''}`}
+            onClick={() => jumpTo('sec-qol', 'qol')}
+          >
+            QoL
             <span className="sbz-cat-count">{qol.length}</span>
           </button>
-          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-cosmetic')}>
-            <span className="sbz-cat-glyph">❀</span> Cosmetics
+          <button
+            type="button"
+            className={`sbz-cat-pill${activeCat === 'cosmetic' ? ' sbz-cat-pill-active' : ''}`}
+            onClick={() => jumpTo('sec-cosmetic', 'cosmetic')}
+          >
+            Cosmetics
             <span className="sbz-cat-count">{cosmeticsCount}</span>
           </button>
         </nav>
         {/* Buffs aisle */}
         <section id="sec-buff" className="bls-section">
           <header className="bls-section-header">
-            <span className="bls-section-glyph">⚡</span>
             <h3 className="bls-section-title">Buffs</h3>
             <span className="bls-section-tag">Power-ups · stack with everything</span>
             <span className="bls-section-count">{buffs.length}</span>
@@ -656,7 +716,6 @@ export default function SpiritBazaarScreen({
         {/* Consumables aisle */}
         <section id="sec-consumable" className="bls-section">
           <header className="bls-section-header">
-            <span className="bls-section-glyph">✦</span>
             <h3 className="bls-section-title">Consumables</h3>
             <span className="bls-section-tag">One-shot talismans · keep until used</span>
             <span className="bls-section-count">{consumables.length}</span>
@@ -680,7 +739,6 @@ export default function SpiritBazaarScreen({
         {/* QoL aisle */}
         <section id="sec-qol" className="bls-section">
           <header className="bls-section-header">
-            <span className="bls-section-glyph">⚙</span>
             <h3 className="bls-section-title">Quality of Life</h3>
             <span className="bls-section-tag">Permanent unlocks · less friction, more cultivation</span>
             <span className="bls-section-count">{qol.length}</span>
@@ -704,7 +762,6 @@ export default function SpiritBazaarScreen({
         {/* Cosmetics aisle */}
         <section id="sec-cosmetic" className="bls-section">
           <header className="bls-section-header">
-            <span className="bls-section-glyph">❀</span>
             <h3 className="bls-section-title">Cosmetics</h3>
             <span className="bls-section-tag">Recolours · skins · backdrops</span>
             <span className="bls-section-count">{cosmeticsCount}</span>
