@@ -2940,18 +2940,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   /* Full viewport coverage. The picker is a forced choice on every
      breakthrough, so it commands the entire screen including the
      top bar (qi balance, currency) and bottom nav (Home, Cultivation,
-     Journey). z-index 5000 sits above everything app-level (chrome
-     uses values under 1500). The base .modal-overlay rule sets
-     padding that reserves space for those bars; we override to use
-     only the device safe-area inset, since we WANT to cover them. */
+     Journey). z-index 9999 sits well above any app chrome (top-bar
+     is 700, nav is 100, no app-level rules use values above 1500).
+     The base .modal-overlay rule sets padding that reserves space
+     for those bars; we override to use only the device safe-area
+     inset, since we WANT to cover them. */
   position: fixed;
   inset: 0;
-  z-index: 5000;
+  z-index: 9999;
   padding:
     env(safe-area-inset-top)
     env(safe-area-inset-right)
     env(safe-area-inset-bottom)
     env(safe-area-inset-left);
+  /* Belt-and-suspenders: even if a fragment of the home scene ever
+     leaks through (older WebView, transformed ancestor, etc.), the
+     blur scrubs it to abstraction so the player's focus stays on
+     the cards. Solid background still does the primary work below. */
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
   /* Scoped color tokens, do not leak. Cultivation palette tuned for
      dark warm paper, bronze ember, jade soft, gold leaf. */
   --spk-cream:        #f4e6c8;
@@ -2968,14 +2975,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   --spk-ember:        #ff9b3d;
   --spk-seal-red:     #b8412c;
 
-  /* Cultivation atmosphere: two incense beams behind the card slots,
-     altar dimness at the bottom. Floor is fully opaque so the home
-     scene never leaks through. */
+  /* Cultivation atmosphere: two faint incense beams behind the
+     card slots over a pure-black floor. Pure black (not "dark gray"
+     or "near-black") so any leftover wash from the underlying scene
+     reads as nothing. The bronze altar-dim radial that used to sit
+     near the bottom is gone; it was warming up the floor enough
+     that home-screen pixels behind it could still be picked out. */
   background:
-    radial-gradient(ellipse 96px 320px at 28% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
-    radial-gradient(ellipse 96px 320px at 72% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
-    radial-gradient(ellipse at 50% 100%, rgba(40, 30, 20, 0.55), transparent 60%),
-    linear-gradient(180deg, #050708 0%, #0a0c10 100%);
+    radial-gradient(ellipse 96px 320px at 28% 50%, rgba(200, 151, 100, 0.08), transparent 70%),
+    radial-gradient(ellipse 96px 320px at 72% 50%, rgba(200, 151, 100, 0.08), transparent 70%),
+    #000;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -143,11 +143,14 @@ h1 {
 .picker {
   position: relative;
   min-height: 680px;
+  /* Pure black floor with two faint incense beams behind the slots.
+     The brown altar-dim radial that used to live near the bottom was
+     warming the floor enough that pixels behind would read through;
+     pure #000 is the visual safety net. */
   background:
-    radial-gradient(ellipse 90px 320px at 27% 50%, rgba(200, 151, 100, 0.055), transparent 70%),
-    radial-gradient(ellipse 90px 320px at 73% 50%, rgba(200, 151, 100, 0.055), transparent 70%),
-    radial-gradient(ellipse at 50% 100%, rgba(40, 30, 20, 0.55), transparent 60%),
-    linear-gradient(180deg, #050708 0%, #0a0c10 100%);
+    radial-gradient(ellipse 90px 320px at 27% 50%, rgba(200, 151, 100, 0.08), transparent 70%),
+    radial-gradient(ellipse 90px 320px at 73% 50%, rgba(200, 151, 100, 0.08), transparent 70%),
+    #000;
   display: flex;
   flex-direction: column;
   align-items: center;
