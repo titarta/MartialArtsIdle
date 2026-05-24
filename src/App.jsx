@@ -1701,6 +1701,7 @@ function AppInner() {
                        balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
                        onBack={() => navigate('home')}
                        onOpenTopUp={() => openModal('shop')}
+                       onOpenCodex={() => openModal('codex')}
                      />,
     settings:   <SettingsScreen
                   onBack={() => navigate('home')}

@@ -481,6 +481,7 @@ export default function SpiritBazaarScreen({
   balance,
   onBack,
   onOpenTopUp,
+  onOpenCodex,
 }) {
   const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
@@ -539,7 +540,20 @@ export default function SpiritBazaarScreen({
 
   const buffs       = itemsByCategory.get('buff')       ?? [];
   const consumables = itemsByCategory.get('consumable') ?? [];
-  const qol         = itemsByCategory.get('qol')        ?? [];
+  // QoL filtering per content-audit rule: permanent QoL hides once
+  // owned (the perk surfaces in Settings → Active Perks now), and
+  // stackable QoL hides only when the stack is at its maxStack. The
+  // raw catalog still feeds the section header count so players see
+  // how the section shrinks as they buy.
+  const qolAll      = itemsByCategory.get('qol') ?? [];
+  const qol         = qolAll.filter(item => {
+    if (item.ownership === 'permanent') return !inventory.hasQol(item.id);
+    if (item.ownership === 'stackable') {
+      const cap = item.maxStack ?? Infinity;
+      return inventory.getStack(item.id) < cap;
+    }
+    return true; // unknown ownership shapes fall through
+  });
   const cosmeticsCount = (itemsByCategory.get('cosmetic') ?? []).length;
 
   // Featured "Today's Pick" — 7-day rotation keyed on local weekday.
@@ -699,13 +713,31 @@ export default function SpiritBazaarScreen({
             {Object.entries(cosmeticsBySlot).map(([slot, group]) => {
               if (group.tier1.length === 0 && group.premium.length === 0) return null;
               const isMultiTier = slot === COSMETIC_SLOTS.CHARACTER || slot === COSMETIC_SLOTS.CRYSTAL;
+              // Content-audit rule: hide a tier-1 cosmetic card the moment
+              // it's owned. The owned version moves to the Codex →
+              // Wardrobe tab; the Bazaar slot shows a "view in Codex"
+              // callout when ALL its tier-1 cards have been bought.
+              const tier1Available = group.tier1.filter(it => !inventory.isCosmeticOwned(it.id));
+              const tier1OwnedCount = group.tier1.length - tier1Available.length;
+              const tier1AllOwned   = group.tier1.length > 0 && tier1Available.length === 0;
               return (
                 <div key={slot} className="bls-cosmetic-slot-group">
-                  {group.tier1.length > 0 && (
+                  {group.tier1.length > 0 && !tier1AllOwned && (
                     <section className="bls-cosmetic-section">
-                      <div className="bls-cosmetic-section-label">{group.label}</div>
+                      <div className="bls-cosmetic-section-label">
+                        {group.label}
+                        {tier1OwnedCount > 0 && (
+                          <button
+                            type="button"
+                            className="bls-cosmetic-section-owned-chip"
+                            onClick={onOpenCodex}
+                          >
+                            {tier1OwnedCount} owned · in Codex →
+                          </button>
+                        )}
+                      </div>
                       <div className="bls-card-grid">
-                        {group.tier1.map(item => (
+                        {tier1Available.map(item => (
                           <CosmeticCard
                             key={item.id}
                             item={item}
@@ -718,6 +750,21 @@ export default function SpiritBazaarScreen({
                           />
                         ))}
                       </div>
+                    </section>
+                  )}
+                  {tier1AllOwned && (
+                    <section className="bls-cosmetic-section">
+                      <div className="bls-cosmetic-section-label">{group.label}</div>
+                      <button
+                        type="button"
+                        className="bls-cosmetic-all-owned-callout"
+                        onClick={onOpenCodex}
+                      >
+                        <span className="bls-cosmetic-all-owned-text">
+                          Owned: <b>{tier1OwnedCount}</b> · view in Codex
+                        </span>
+                        <span className="bls-cosmetic-all-owned-link">→</span>
+                      </button>
                     </section>
                   )}
                   {group.premium.length > 0 && isMultiTier && (

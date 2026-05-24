@@ -23667,3 +23667,76 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   color: rgba(var(--ui-muted-rgb), 0.55);
   text-transform: uppercase;
 }
+
+/* ─── Bazaar: owned-cosmetics chips / callouts ──────────────────────────
+   Per the content-audit filtering rule, cosmetic cards hide once owned
+   and the player has to look in Codex → Wardrobe to equip them. These
+   two affordances surface the missing cards so the player understands
+   where they went.
+
+   .bls-cosmetic-section-owned-chip — small chip in the section header
+     when some (but not all) cards in the slot are owned.
+   .bls-cosmetic-all-owned-callout — full-width replacement for the card
+     grid when every card in the slot is owned. */
+.bls-cosmetic-section-owned-chip {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(var(--ui-purple-strong-rgb), 0.12);
+  border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.45);
+  border-radius: 10px;
+  color: var(--ui-purple-strong);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.bls-cosmetic-section-owned-chip:hover {
+  background: rgba(var(--ui-purple-strong-rgb), 0.20);
+  color: var(--ui-purple-light);
+}
+
+.bls-cosmetic-all-owned-callout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background:
+    linear-gradient(90deg, rgba(var(--ui-purple-strong-rgb), 0.10), transparent 80%),
+    rgba(14, 12, 8, 0.55);
+  border: 1px dashed rgba(var(--ui-purple-strong-rgb), 0.45);
+  border-radius: 10px;
+  font-size: 12px;
+  color: rgba(var(--ui-label-rgb), 0.85);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  text-align: left;
+  gap: 12px;
+}
+.bls-cosmetic-all-owned-callout:hover {
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-light);
+}
+.bls-cosmetic-all-owned-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  font-size: 12px;
+}
+.bls-cosmetic-all-owned-text b {
+  font-family: var(--font-display);
+  color: var(--ui-purple-strong);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 0 2px;
+}
+.bls-cosmetic-all-owned-link {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--ui-purple-strong);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
