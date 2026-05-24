@@ -22606,3 +22606,257 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 
 
+/* ════════════════════════════════════════════════════════════════════════════
+   FIDELITY PASS — Settings, Journey, Spirit Bazaar (2026-05-24)
+   The 3 screens below were designed against a solid lacquer wash. They were
+   integrated on top of .screen-container::before which paints
+   /backgrounds/ui_screens.png at z-index -1 with cover sizing. The texture
+   bleeds through every panel that uses partial alpha, washing out the
+   crafted lacquer aesthetic and destroying card contrast. The fixes below:
+     (1) kill the bg-image bleed-through on these three screens via
+         :has() on .screen-container, paired with a solid lacquer wash.
+         Safe because Settings/Journey/Bazaar are conditionally mounted
+         (see App.jsx line ~1784: currentScreen !== 'home'), unlike the
+         always-mounted HomeScreen.
+     (2) bump panel surface alphas so cards read as opaque plaques.
+     (3) firm up the category rail strip on Spirit Bazaar so the pills
+         feel like a row of chips, not a black slab.
+   No JSX changes. Mockup parity, not redesign.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* (1) Kill the bg image for the 3 new screens. .screen-container ::before
+       paints the image; ::after paints the blur+darken layer. Both go away
+       and we paint a solid lacquer wash on the container instead. */
+.screen-container:has(.settings-screen)::before,
+.screen-container:has(.settings-screen)::after,
+.screen-container:has(.journey-screen)::before,
+.screen-container:has(.journey-screen)::after,
+.screen-container:has(.spirit-bazaar-screen)::before,
+.screen-container:has(.spirit-bazaar-screen)::after {
+  display: none;
+}
+
+/* Solid lacquer wash — same warm radial used in the mockups. Layered as
+   a background on the container itself so it can't be punched through. */
+.screen-container:has(.settings-screen),
+.screen-container:has(.journey-screen),
+.screen-container:has(.spirit-bazaar-screen) {
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 65%),
+    linear-gradient(180deg, rgba(20, 14, 8, 0.95), rgba(8, 6, 4, 0.98));
+}
+
+/* The bazaar's warm wash leans vermillion — match the mockup's tinted top. */
+.screen-container:has(.spirit-bazaar-screen) {
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(255, 104, 100, 0.10), transparent 60%),
+    radial-gradient(120% 80% at 50% 100%, rgba(80, 30, 24, 0.12), transparent 70%),
+    linear-gradient(180deg, rgba(20, 14, 10, 0.96), rgba(8, 6, 4, 0.98));
+}
+
+/* ═══ Fidelity pass: Settings ═══════════════════════════════════════════ */
+
+/* Lift the screen-container's own padding when Settings is mounted — the
+   .settings-screen already provides its own top/bottom clearance. With the
+   container's 20px padding stacked on top, every section gets unnecessary
+   inset. The screen owns its gutters; container only provides scroll. */
+.screen-container:has(.settings-screen) {
+  padding: 0;
+}
+
+/* Card panel surfaces — bump from 0.85 to 0.92 alpha, swap the white-tone
+   border for warm bronze so panels read as crafted plaques. */
+.settings-screen .stg-panel {
+  background: rgba(var(--ui-bg-panel-rgb), 0.92);
+  border: 1px solid rgba(212, 184, 136, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.04),
+    0 8px 24px -16px rgba(0, 0, 0, 0.7);
+}
+
+/* Identity plaque — already opaque internally but reinforce border tone. */
+.settings-screen .stg-identity {
+  background:
+    linear-gradient(180deg, rgba(245, 230, 200, 0.06), rgba(245, 230, 200, 0) 30%),
+    linear-gradient(160deg, rgba(46, 36, 24, 0.98) 0%, rgba(26, 20, 14, 0.98) 100%);
+  border-color: rgba(212, 184, 136, 0.30);
+}
+
+/* Rendering Mode option cards — bring up nested-bg alpha so they don't
+   look like transparent ghosts. */
+.settings-screen .stg-option-card {
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid rgba(75, 60, 40, 0.60);
+  color: var(--ui-purple-soft);
+}
+.settings-screen .stg-option-card.stg-option-active {
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.22), rgba(155, 125, 80, 0.18));
+  border-color: rgba(220, 175, 110, 0.55);
+  color: var(--ui-purple-light);
+  box-shadow: 0 0 0 1px rgba(220, 175, 110, 0.25) inset;
+}
+.settings-screen .stg-option-card .stg-option-icon {
+  color: var(--ui-purple-strong);
+  opacity: 1;
+}
+
+/* Action rows (Export/Import) — solid lacquer nested surface. */
+.settings-screen .stg-action-row {
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid rgba(75, 60, 40, 0.60);
+  color: var(--ui-purple-light);
+}
+.settings-screen .stg-action-row:hover {
+  background: rgba(14, 12, 8, 0.75);
+  border-color: rgba(220, 175, 110, 0.35);
+}
+.settings-screen .stg-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(220, 175, 110, 0.10);
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 8px;
+  color: var(--ui-purple-strong);
+}
+
+/* Language pills — bring up alpha + warm-bronze border. */
+.settings-screen .stg-lang-btn {
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid rgba(75, 60, 40, 0.60);
+  color: var(--ui-purple-soft);
+}
+.settings-screen .stg-lang-btn:hover {
+  background: rgba(14, 12, 8, 0.75);
+  border-color: rgba(220, 175, 110, 0.35);
+  color: var(--ui-purple-light);
+}
+.settings-screen .stg-lang-btn.stg-lang-active {
+  background: rgba(220, 175, 110, 0.22);
+  border-color: rgba(220, 175, 110, 0.55);
+  color: var(--ui-purple-light);
+}
+
+/* Segmented control (On/Off) — match the mockup's lacquer chip. */
+.settings-screen .stg-segment {
+  background: rgba(14, 12, 8, 0.65);
+  border: 1px solid rgba(75, 60, 40, 0.60);
+}
+.settings-screen .stg-segment-btn {
+  color: var(--ui-purple-soft);
+}
+.settings-screen .stg-segment-btn + .stg-segment-btn {
+  border-left-color: rgba(75, 60, 40, 0.60);
+}
+.settings-screen .stg-segment-btn.stg-segment-active {
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.30), rgba(155, 125, 80, 0.30));
+  color: var(--ui-purple-light);
+}
+
+/* ═══ Fidelity pass: Journey ════════════════════════════════════════════ */
+
+/* Same padding drop as Settings — .journey-screen owns its gutters. */
+.screen-container:has(.journey-screen) {
+  padding: 0;
+}
+
+/* Realm cards (.jc-realm) — already opaque-ish but the white-tone border
+   was too cool. Warm it. Also bump current-realm contrast. */
+.journey-screen .jc-realm {
+  background: rgba(var(--ui-bg-panel-rgb), 0.94);
+}
+.journey-screen .jc-realm-past {
+  background: rgba(20, 16, 10, 0.85);
+}
+.journey-screen .jc-realm-current {
+  background:
+    linear-gradient(180deg, rgba(220, 175, 110, 0.12), transparent 50%),
+    rgba(var(--ui-bg-panel-rgb), 0.96);
+}
+
+/* The .js-screen-head wraps the live "Journey" eyebrow title above the hero.
+   Drop its bottom border which now reads as a stray line against the solid
+   page bg. The hero header below provides enough visual anchor. */
+.journey-screen .js-screen-head {
+  border-bottom: none;
+  padding-bottom: 6px;
+}
+.journey-screen .js-screen-title {
+  color: var(--ui-purple-light);
+}
+
+/* ═══ Fidelity pass: Spirit Bazaar ══════════════════════════════════════ */
+
+/* Bazaar has overflow:hidden on its outer; the screen-container shouldn't
+   double-pad it. Strip container padding. */
+.screen-container:has(.spirit-bazaar-screen) {
+  padding: 0;
+}
+
+/* Category rail — the linear-gradient sticky bg was reading as a black slab
+   over the bleeding image. Now that the bg image is gone, give the rail a
+   solid lacquer floor under the chips with a soft fade-out tail underneath
+   so cards scrolling underneath fade gracefully behind it. */
+.spirit-bazaar-screen .sbz-cat-rail {
+  background:
+    linear-gradient(180deg,
+      rgba(8, 6, 4, 0.95) 0%,
+      rgba(8, 6, 4, 0.95) calc(100% - 12px),
+      rgba(8, 6, 4, 0) 100%);
+  padding: 10px 0 14px;
+}
+
+/* Active category pill — make the active state more obvious. The legacy
+   .sbz-cat-pill rule used :hover/:active which doesn't reflect persistent
+   selection. The JSX toggles a .sbz-cat-pill-active class for that. */
+.spirit-bazaar-screen .sbz-cat-pill {
+  background: rgba(14, 12, 8, 0.75);
+  border-color: rgba(75, 60, 40, 0.70);
+}
+.spirit-bazaar-screen .sbz-cat-pill.sbz-cat-pill-active {
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.22), rgba(150, 30, 30, 0.20));
+  border-color: rgba(255, 104, 100, 0.55);
+  color: #ffe3e3;
+}
+
+/* Buff cards (the strip variant used inside .bls-buff-grid) — solidify the
+   surface. Was rgba(...,0.85), now 0.94 + warm border. */
+.spirit-bazaar-screen .bls-buff-card {
+  background: rgba(var(--ui-bg-panel-rgb), 0.94);
+  border-color: rgba(75, 60, 40, 0.60);
+}
+.spirit-bazaar-screen .bls-buff-card-active {
+  background:
+    linear-gradient(180deg, rgba(120, 230, 160, 0.06), transparent 60%),
+    rgba(var(--ui-bg-panel-rgb), 0.94);
+  border-color: rgba(120, 230, 160, 0.40);
+}
+
+/* Cosmetic card strip variants — same solidification. */
+.spirit-bazaar-screen .bls-card,
+.spirit-bazaar-screen .bls-section-empty {
+  background: rgba(var(--ui-bg-panel-rgb), 0.94);
+}
+
+/* Aisle (.bls-section) header padding — the vermillion lantern bar sits
+   at top:14px / height:28px. Bring it down so it visually anchors to the
+   title (which is ~16px Cinzel + the .bls-section-tag uppercase row). */
+.spirit-bazaar-screen .bls-section::before {
+  top: 16px;
+  height: 26px;
+}
+
+/* Aisle section header — give it breathing room from the lantern bar and
+   make sure the title baseline aligns with the lantern center. */
+.spirit-bazaar-screen .bls-section .bls-section-header {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+/* Featured card — already opaque-correct, no change needed. */
+
