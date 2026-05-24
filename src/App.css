@@ -13700,55 +13700,59 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    stays inside the rounded corners even though the pack itself uses
    overflow: visible (to let the top-centre badge poke above).
 
-   Implementation note: this used to animate background-position on a
-   wide linear-gradient with a "pause" keyframe at the end. The pause
-   worked but the loop boundary (jumping the background back to the
-   start position) triggered a visible flicker on every cycle. Replaced
-   with a transform-driven sweep on a ::before stripe, opacity-gated
-   at the boundaries so the reset happens while the stripe is fully
-   invisible. No flicker. */
+   Implementation note: two earlier passes failed in different ways.
+     v1: animated background-position with a pause keyframe → the loop
+         boundary repaint was visible as a flicker every cycle.
+     v2: transform-driven ::before stripe → no flicker, but the stripe
+         was a finite rectangle and its hard edges read as a square box
+         crossing the card instead of a soft diagonal slash.
+
+   Current approach: back to a full-card background-position gradient
+   (so the bright stripe is a TRUE diagonal parallelogram with infinite
+   transparent tails), but with TWO parallel animations:
+     - position runs linearly + continuously across the whole cycle
+     - opacity is gated to 0 at the loop boundary so the position
+       reset is invisible
+   Smooth diagonal slash, no flicker, no box edges. */
 .blshop-pack-shimmer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   border-radius: inherit;
   overflow: hidden;
-}
-.blshop-pack-shimmer::before {
-  content: '';
-  position: absolute;
-  top: -20%;
-  bottom: -20%;
-  left: -45%;
-  width: 45%;
   background: linear-gradient(
-    105deg,
-    transparent 0%,
-    rgba(255, 230, 170, 0.22) 42%,
-    rgba(255, 250, 215, 0.45) 50%,
-    rgba(255, 230, 170, 0.22) 58%,
-    transparent 100%
+    115deg,
+    transparent 30%,
+    rgba(255, 230, 170, 0.22) 47%,
+    rgba(255, 250, 215, 0.5)  50%,
+    rgba(255, 230, 170, 0.22) 53%,
+    transparent 70%
   );
-  filter: blur(2px);
+  background-size: 220% 100%;
+  background-position: 200% 0;
   mix-blend-mode: screen;
-  transform: translateX(0);
   opacity: 0;
-  animation: blshop-shimmer-sweep 5.5s ease-in-out infinite;
-  will-change: transform, opacity;
+  animation:
+    blshop-shimmer-pos  5.5s linear      infinite,
+    blshop-shimmer-fade 5.5s ease-in-out infinite;
+  will-change: background-position, opacity;
 }
-@keyframes blshop-shimmer-sweep {
-  /* Off-screen left, invisible — the loop boundary lives here so the
-     reset jump is never visible. */
-  0%   { transform: translateX(0);    opacity: 0; }
-  /* Fade in just before entering the card. */
-  10%  { transform: translateX(20%);  opacity: 0.55; }
-  /* Sweep across the card at full opacity. */
-  20%  { transform: translateX(60%);  opacity: 1; }
-  55%  { transform: translateX(280%); opacity: 1; }
-  /* Fade out as the stripe exits the right edge. */
-  65%  { transform: translateX(330%); opacity: 0.4; }
-  /* Hold off-screen right, invisible — long pause between sweeps. */
-  72%, 100% { transform: translateX(360%); opacity: 0; }
+
+/* Continuous linear sweep across the gradient. The position reset at
+   the loop boundary is hidden by the opacity animation below. */
+@keyframes blshop-shimmer-pos {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -120% 0; }
+}
+
+/* Opacity gates the visible window so the cycle boundary (where the
+   position resets instantly) always happens while the shimmer is 0. */
+@keyframes blshop-shimmer-fade {
+  0%, 8%    { opacity: 0; }    /* invisible at start — reset lives here */
+  18%       { opacity: 1; }    /* fade in just as the stripe enters the card */
+  60%       { opacity: 1; }    /* full visibility through the sweep */
+  68%       { opacity: 0; }    /* fade out as the stripe exits */
+  100%      { opacity: 0; }    /* pause until the next cycle */
 }
 
 /* ── Marketing badge — top-centre chip ─────────────────────────────── */
