@@ -19690,7 +19690,11 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   filter: brightness(1.08);
 }
 .home-major-breakthrough-btn:active {
-  transform: scale(0.97);
+  /* MUST keep the translateX(-50%) centering from the base rule.
+     CSS transform replaces, not appends; writing just `scale(0.97)`
+     here would drop the translate and slide the button left by half
+     its width on press. */
+  transform: translateX(-50%) scale(0.97);
 }
 .home-major-breakthrough-btn:focus-visible {
   outline: 2px solid rgba(255, 215, 130, 0.9);
