@@ -18711,9 +18711,12 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 
 .char-evolve-kicker {
+  font-family: var(--font-display);
   font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.42em;
+  font-weight: 600;
+  /* Was 0.42em on system-sans — same reason as .home-breakthrough-kicker,
+     Cinzel's wide letterforms already carry rhythm, heavy tracking explodes. */
+  letter-spacing: 0.14em;
   color: rgba(255, 235, 180, 0.95);
   text-transform: uppercase;
   text-shadow:
@@ -18725,9 +18728,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   /* clamp keeps the title big on tablet/PC but shrinks gracefully on narrow
      phones — at 390px the long realm names ("Separation & Reunion", etc.)
      no longer wrap to 3 lines. */
+  font-family: var(--font-display);
   font-size: clamp(1.7rem, 6.4vw, 2.4rem);
-  font-weight: 900;
-  letter-spacing: 0.03em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   line-height: 1.1;
   text-wrap: balance;
   color: #ffffff;
@@ -18738,9 +18742,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 .char-evolve-sub {
   margin-top: 6px;
+  font-family: var(--font-display);
   font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   color: #ffffff;
   text-transform: uppercase;
   text-shadow:
