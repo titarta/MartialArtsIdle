@@ -21,6 +21,63 @@ function QiLiveText({ qiRef }) {
   return <span ref={spanRef}>—</span>;
 }
 
+// Lightweight 1s-tick countdown for the TopBar active-buff chip. Mirrors
+// the BuffCountdown logic in SpiritBazaarScreen but trims the format to a
+// single token (h+m or m+s or s) since the chip is space-constrained.
+function ChipCountdown({ expiresAtMs }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const remainingMs = Math.max(0, expiresAtMs - now);
+  const totalSec = Math.floor(remainingMs / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  // Compact form. Drop seconds once we're over a minute so the chip stays
+  // narrow and doesn't visibly reflow each second.
+  const label =
+    h > 0 ? `${h}h ${m}m`
+  : m > 0 ? `${m}m`
+  :         `${s}s`;
+  return <span className="topbar-buff-chip-time">{label}</span>;
+}
+
+/**
+ * ActiveBuffChip — surfaces the STRONGEST active timed buff inline with the
+ * TopBar so the player can see they have a multiplier running while
+ * cultivating (not just while shopping). Hidden entirely when no buffs are
+ * active. Tap routes to the Spirit Bazaar where the full buff list lives.
+ *
+ * Sort policy: highest multiplier wins; ties break to the closest-to-
+ * expiring buff so a stack of identical mults still shows real urgency.
+ */
+function ActiveBuffChip({ activeBuffs, onOpen }) {
+  if (!activeBuffs || activeBuffs.length === 0) return null;
+  const best = [...activeBuffs]
+    .filter(b => Number.isFinite(b?.item?.effect?.mult))
+    .sort((a, b) => {
+      const am = a.item.effect.mult;
+      const bm = b.item.effect.mult;
+      if (bm !== am) return bm - am;             // higher mult first
+      return a.expiresAtMs - b.expiresAtMs;      // then sooner-to-expire
+    })[0];
+  if (!best) return null;
+  const mult = best.item.effect.mult;
+  return (
+    <button
+      type="button"
+      className="topbar-buff-chip"
+      onClick={onOpen}
+      aria-label={`Active buff: ${best.item?.name ?? ''}, tap to view bazaar`}
+    >
+      <span className="topbar-buff-chip-mult">×{mult}</span>
+      <ChipCountdown expiresAtMs={best.expiresAtMs} />
+    </button>
+  );
+}
+
 export default function TopBar({
   bloodLotusBalance,
   onOpenShop,        // IAP "Top Up Blood Lotus" modal
@@ -34,6 +91,7 @@ export default function TopBar({
   reincarnationUnlocked,
   qiRef,
   karma,
+  activeBuffs,       // From useShopInventory — same source the Bazaar uses.
 }) {
   return (
     <div className="top-bar">
@@ -89,6 +147,7 @@ export default function TopBar({
           <span>{karma ?? 0}</span>
         </div>
       </div>
+      <ActiveBuffChip activeBuffs={activeBuffs} onOpen={onOpenLotusShop} />
       <div className="home-hud-spacer" />
       {reincarnationUnlocked && (
         <button

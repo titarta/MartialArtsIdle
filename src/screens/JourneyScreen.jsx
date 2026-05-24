@@ -157,14 +157,30 @@ function HeroHeader({ cultivation, vfxEnabled }) {
               <span className="jc-hero-bar-gate" aria-hidden="true" />
             )}
           </div>
-          <div className="jc-hero-foot">
-            {gateRate > 0 ? (
-              <span>Gate <b className="jc-hero-gate">≥ {fmtRate(gateRate)} qi/s</b></span>
-            ) : (
-              <span className="jc-hero-gate-none">No gate</span>
-            )}
-            <span>Now <b>{fmtRate(qiRate)} qi/s</b></span>
-          </div>
+          {/* Two-row gate readout. Splits the single "NO GATE  Now 4.2K QI/S"
+              line into label/value pairs so each datum parses on its own.
+              When a gate IS present, the value tone shifts via .jc-hero-gate
+              for a colored anchor; the no-gate state stays muted. The
+              "below-threshold" warn case lights the gate row when the
+              player's current rate hasn't cleared it yet. */}
+          <dl className="jc-hero-foot jc-hero-foot-stacked">
+            <div className="jc-hero-foot-row">
+              <dt className="jc-hero-foot-label">Gate</dt>
+              {gateRate > 0 ? (
+                <dd
+                  className={`jc-hero-foot-value jc-hero-gate${qiRate < gateRate ? ' jc-hero-gate-warn' : ''}`}
+                >
+                  {fmtRate(gateRate)} qi/s required
+                </dd>
+              ) : (
+                <dd className="jc-hero-foot-value jc-hero-gate-none">None</dd>
+              )}
+            </div>
+            <div className="jc-hero-foot-row">
+              <dt className="jc-hero-foot-label">Current</dt>
+              <dd className="jc-hero-foot-value">{fmtRate(qiRate)} qi/s</dd>
+            </div>
+          </dl>
         </div>
       )}
     </div>

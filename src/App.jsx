@@ -1759,6 +1759,7 @@ function AppInner() {
         reincarnationUnlocked={reincarnationUnlocked}
         qiRef={cultivation.qiRef}
         karma={karma.karma}
+        activeBuffs={shopInventory.activeBuffs}
       />
       <NavBar
         currentScreen={currentScreen}

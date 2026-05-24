@@ -4762,6 +4762,51 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   flex-shrink: 0;
 }
 
+/* TopBar active-buff chip — surfaces the strongest active timed buff so
+   the player sees their multiplier while cultivating, not just while
+   shopping. Sits between the currency strip and the right-side action
+   icons. Vermillion accent border + dim lacquer fill keeps it clearly
+   buff-themed without bleeding the cinnabar across the whole bar. Tap
+   routes to the Spirit Bazaar (see ActiveBuffChip in TopBar.jsx). */
+.topbar-buff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 3px 9px;
+  margin-left: 8px;
+  background: linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
+  border: 1px solid rgba(255, 104, 100, 0.55);
+  border-radius: 12px;
+  color: #f5e6c8;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s;
+  box-shadow: 0 0 10px rgba(255, 104, 100, 0.12) inset;
+}
+.topbar-buff-chip:hover {
+  background: linear-gradient(160deg, #322618 0%, #1f1812 100%);
+  border-color: rgba(255, 104, 100, 0.75);
+}
+.topbar-buff-chip-mult {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: #ff9a83;        /* keep the vermillion accent on the value itself */
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.topbar-buff-chip-time {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(245, 230, 200, 0.85);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
 .home-hud-spacer { flex: 1; }
 
 .home-hud-settings {
@@ -21733,13 +21778,16 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   box-shadow: 0 8px 24px -14px rgba(0, 0, 0, 0.7);
 }
 .jc-hero-glyph {
-  /* Big faint Ma Shan Zheng character pinned top-right */
+  /* Big faint Ma Shan Zheng character pinned top-right. 2026-05-24: bumped
+     from 0.08 to 0.15 so the chapter glyph reads as intentional texture
+     instead of dust. Capped where it sits to avoid competing with the
+     gold realm-icon halo on the left of the hero. */
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
   position: absolute;
   right: -16px;
   top: -36px;
   font-size: 200px;
-  color: rgba(220, 175, 110, 0.08);
+  color: rgba(220, 175, 110, 0.15);
   line-height: 1;
   pointer-events: none;
   user-select: none;
@@ -21904,27 +21952,62 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   pointer-events: none;
 }
 .jc-hero-foot {
-  margin-top: 8px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: rgba(var(--ui-label-rgb), 0.65);
+  margin-top: 10px;
   font-variant-numeric: tabular-nums;
 }
-.jc-hero-foot b {
-  color: var(--ui-purple-light);
+/* Stacked Gate / Current readout. Each row is a label/value pair with the
+   Cinzel uppercase label on the left and the value (tabular-nums) on the
+   right. Splitting the line surfaces each datum cleanly so neither has to
+   compete with the other for parse time. */
+.jc-hero-foot-stacked {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(14, 12, 8, 0.45);
+  border: 1px solid rgba(75, 60, 40, 0.45);
+  border-radius: 8px;
+}
+.jc-hero-foot-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.jc-hero-foot-label {
   font-family: var(--font-display);
-  letter-spacing: 0.03em;
   font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.60);
+  margin: 0;
+}
+.jc-hero-foot-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  color: var(--ui-purple-light);
+  font-variant-numeric: tabular-nums;
+  margin: 0;
 }
 .jc-hero-foot .jc-hero-gate {
   color: var(--ui-purple-strong);
+}
+/* Active warn state — the player's current rate is below the gate, so the
+   value lights vermillion to signal the wall. Keeps the rest of the layout
+   intact; this is a pure tone shift on the value text. */
+.jc-hero-foot .jc-hero-gate-warn {
+  color: #ff9a83;
+  text-shadow: 0 0 6px rgba(255, 104, 100, 0.20);
 }
 .jc-hero-foot .jc-hero-gate-none {
   color: rgba(var(--ui-muted-rgb), 0.6);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* ── CHRONICLE BODY ──────────────────────────────────────────────────────── */
@@ -22269,9 +22352,13 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   padding: 6px 10px;
   gap: 6px;
   border-radius: 14px;
-  background: rgba(255, 104, 100, 0.10);
-  border-color: rgba(255, 104, 100, 0.45);
-  box-shadow: 0 0 14px rgba(255, 104, 100, 0.10) inset;
+  /* 2026-05-24: vermillion was dominating the screen. Swap balance pill
+     to the warm-lacquer treatment shared with Settings cards so the eye
+     lands on the Buy CTAs + Featured ribbon (the things the player can
+     act on) instead of the static balance readout. */
+  background: linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
+  border-color: rgba(75, 60, 40, 0.6);
+  box-shadow: 0 0 14px rgba(220, 175, 110, 0.06) inset;
 }
 .sbz-balance-compact .sbz-balance-icon {
   width: 20px;
@@ -22283,80 +22370,19 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.04em;
-  color: #ffd3d3;
+  color: #f5e6c8;        /* warm cream over the lacquer ground */
 }
 .sbz-balance-compact .sbz-topup-chip {
   padding: 4px 9px;
   font-size: 11px;
   border-radius: 12px;
 }
-.sbz-buff-rail {
-  margin-top: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  background: rgba(14, 12, 8, 0.55);
-  border: 1px solid rgba(75, 60, 40, 0.35);
-  border-radius: 10px;
-  position: relative;
-  z-index: 1;
-}
-.sbz-buff-rail-label {
-  font-family: var(--font-display);
-  font-size: 9px;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  color: rgba(var(--ui-label-rgb), 0.65);
-  padding-right: 6px;
-  border-right: 1px solid rgba(75, 60, 40, 0.35);
-  flex-shrink: 0;
-}
-.sbz-buff-rail-scroll {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  flex: 1;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.sbz-buff-rail-scroll::-webkit-scrollbar { display: none; }
-.sbz-buff-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  background: rgba(255, 104, 100, 0.10);
-  border: 1px solid rgba(255, 104, 100, 0.35);
-  border-radius: 12px;
-  font-size: 10px;
-  color: #ffd3d3;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.sbz-buff-pill b {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 11px;
-  letter-spacing: 0.04em;
-}
-.sbz-buff-pill-name {
-  color: var(--ui-purple-light);
-}
-.sbz-buff-pill-timer {
-  color: rgba(255, 220, 220, 0.85);
-  font-weight: 500;
-  font-size: 9px;
-  padding-left: 5px;
-  margin-left: 2px;
-  border-left: 1px solid rgba(255, 255, 255, 0.10);
-}
-.sbz-buff-pill-timer .bls-buff-countdown {
-  color: inherit;
-  font-size: inherit;
-  letter-spacing: 0;
-}
+/* Active-buff rail removed 2026-05-24. The strongest active buff is now
+   surfaced on the global TopBar via .topbar-buff-chip so the player sees
+   their multiplier while CULTIVATING, not just while shopping. Per-tile
+   ACTIVE ribbons inside the Bazaar buff grid still convey ownership for
+   the buy/extend decision. */
+
 .sbz-featured-wrap {
   padding: 14px 0 0;
   position: relative;
@@ -22951,17 +22977,22 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-weight: 700;
   font-size: 16px;
   letter-spacing: 0.04em;
-  color: #ff6864;
-  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.30);
+  /* 2026-05-24: was vermillion (#ff6864). Cooled to cream so the eye lands
+     on the Buy CTA, not on every multiplier label simultaneously. Vermillion
+     was acting as the page's dominant tone instead of an accent. */
+  color: #f5e6c8;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .bls-buff-tile-name {
+  font-family: var(--font-display);
   font-size: 11px;
+  font-weight: 600;
   color: rgba(var(--ui-purple-rgb, 200, 170, 120), 0.95);
   margin: 4px 0 6px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   line-height: 1.2;
   /* Allow two lines, ellipsis if longer — protects against long real strings. */
   display: -webkit-box;

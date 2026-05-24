@@ -378,43 +378,6 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
 }
 
 /**
- * BuffRail — horizontal strip of currently-active buff pills, surfaced
- * inline with the bazaar header so players see what they already own
- * BEFORE deciding to spend more. Hidden entirely when no buffs are
- * active (no empty state). Each pill reuses BuffCountdown so the tick
- * logic stays in one place.
- */
-function BuffRail({ activeBuffs }) {
-  if (!activeBuffs || activeBuffs.length === 0) return null;
-  return (
-    <div className="sbz-buff-rail" aria-label="Active buffs">
-      <span className="sbz-buff-rail-label">Active</span>
-      <div className="sbz-buff-rail-scroll">
-        {activeBuffs.map(({ id, item, expiresAtMs }) => {
-          const eff = item?.effect;
-          const headline = (() => {
-            if (!eff) return '';
-            if (eff.type === 'qi_mult')          return `×${eff.mult}`;
-            if (eff.type === 'crystal_tap_mult') return `×${eff.mult}`;
-            if (eff.type === 'producer_mult')    return `×${eff.mult}`;
-            return '';
-          })();
-          return (
-            <span key={id} className="sbz-buff-pill">
-              {headline && <b>{headline}</b>}
-              <span className="sbz-buff-pill-name">{item?.name?.split(' — ')[0] ?? item?.name}</span>
-              <span className="sbz-buff-pill-timer">
-                <BuffCountdown expiresAtMs={expiresAtMs} />
-              </span>
-            </span>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/**
  * FeaturedHero — the "Today's Pick" hero card. Renders a vermillion-haloed
  * preview, ribbon, strike-through original price + discounted price, a
  * countdown to local-midnight reset, and the single Buy CTA. Sourced from
@@ -617,8 +580,6 @@ export default function SpiritBazaarScreen({
             </button>
           </div>
         </div>
-
-        <BuffRail activeBuffs={inventory.activeBuffs} />
       </header>
 
       {flash && (
