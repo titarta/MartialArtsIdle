@@ -1703,12 +1703,18 @@ function AppInner() {
                      />,
     settings:   <SettingsScreen
                   onBack={() => navigate('home')}
+                  /* onOpenAbout intentionally omitted until Unit 4 lands
+                     the About screen — SettingsScreen hides the row when
+                     the prop is falsy. */
+                  onOpenBazaar={() => navigate('spirit-bazaar')}
                   realmName={cultivation.realmMajor}
                   realmStage={cultivation.realmStage}
                   realmIndex={cultivation.realmIndex}
                   totalRealms={cultivation.totalRealms}
                   lifeIndex={karma.lives}
                   timePlayedSec={stats.lifetime?.timePlayed ?? 0}
+                  shopInventory={shopInventory}
+                  autoBuyEnabled={autoBuyEnabled}
                 />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}

@@ -123,14 +123,106 @@ function formatDuration(sec) {
  * owned by useCultivation / useReincarnationKarma / useStats. Settings
  * doesn't reach into the store from inside the component.
  */
+// Per-perk presentation for the Active Perks card. Each row is keyed by
+// the shopItem id so we can decide its label + effect string + stack/
+// stack-cap badge here, decoupled from shopItems.js copy (which is
+// shopper-facing). Ordering is purchase priority for now; if more perks
+// land we should split this into its own data file.
+const PERK_ROWS = [
+  {
+    id:    'qol_skip_bt_confirm',
+    kind:  'permanent',
+    icon:  '⚡',
+    name:  'Decisive Heart',
+    effect:'Auto-confirms major breakthroughs.',
+  },
+  {
+    id:    'qol_autobuy_cheapest',
+    kind:  'permanent',
+    icon:  '🤖',
+    name:  "Disciple's Diligence",
+    effect:'Auto-Buy toggle on the Cultivation screen.',
+  },
+  {
+    id:    'qol_offline_cap_2h',
+    kind:  'stackable',
+    icon:  '⏳',
+    name:  'Patient Mind',
+    // Effect string is templated with the live stack count so the row
+    // reads as "+4h offline cap" when 2 are stacked, not just the static
+    // shop blurb. maxStack comes from shopItems.js.
+    effectForStack: (stack) => `+${stack * 2}h offline qi cap (base 8h → ${8 + stack * 2}h current).`,
+    maxStack: 3,
+  },
+];
+
+function ActivePerks({ shopInventory, autoBuyEnabled }) {
+  if (!shopInventory) return null;
+  const owned = PERK_ROWS.map(row => {
+    if (row.kind === 'permanent') {
+      const has = shopInventory.hasQol(row.id);
+      return has ? { ...row, owned: true, stack: null } : null;
+    }
+    if (row.kind === 'stackable') {
+      const stack = shopInventory.getStack(row.id);
+      return stack > 0 ? { ...row, owned: true, stack } : null;
+    }
+    return null;
+  }).filter(Boolean);
+
+  // Per the spec: if no perks are owned, hide the whole section (don't
+  // render a "no perks" empty state). Section label and card together
+  // are suppressed by returning null here.
+  if (owned.length === 0) return null;
+
+  return (
+    <section className="stg-section">
+      <div className="stg-section-label stg-cinzel-label stg-label-perk">Active Perks</div>
+      <div className="stg-perk-card">
+        {owned.map(perk => (
+          <div key={perk.id} className="stg-perk-row">
+            <span className="stg-perk-icon">{perk.icon}</span>
+            <span className="stg-perk-body">
+              <span className="stg-perk-name">{perk.name}</span>
+              <span className="stg-perk-effect">
+                {perk.kind === 'stackable'
+                  ? perk.effectForStack(perk.stack)
+                  : perk.effect}
+              </span>
+            </span>
+            <span className="stg-perk-state">
+              {perk.kind === 'stackable' ? (
+                <span className="stg-perk-badge stg-perk-badge-stack">
+                  ×{perk.stack}{perk.maxStack ? ` / ${perk.maxStack}` : ''}
+                </span>
+              ) : (
+                <span className="stg-perk-badge">Active</span>
+              )}
+              {perk.id === 'qol_autobuy_cheapest' && (
+                <span className="stg-perk-toggle">
+                  {autoBuyEnabled ? 'Enabled' : 'Disabled'}
+                </span>
+              )}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function SettingsScreen({
   onBack,
+  onOpenAbout,
+  onOpenBazaar,
   realmName,
   realmStage,
   realmIndex = 0,
   totalRealms = 0,
   lifeIndex = 0,
   timePlayedSec = 0,
+  shopInventory = null,
+  autoBuyEnabled = false,
 }) {
   const { t, i18n } = useTranslation('ui');
   const audio = useAudio();
@@ -375,6 +467,23 @@ function SettingsScreen({
             sublabel="Paste a save code to restore"
             onClick={() => setShowImport(v => !v)}
           />
+          {/* About / Credits — pushed from this section per the audit. The
+              row sits at the bottom of Save Data so it stays visually
+              tucked under the config block, the standard mobile pattern. */}
+          {onOpenAbout && (
+            <button
+              type="button"
+              className="stg-action-row stg-action-row-about"
+              onClick={onOpenAbout}
+            >
+              <span className="stg-action-icon">ℹ</span>
+              <span className="stg-action-body">
+                <span className="stg-action-label">About this app</span>
+                <span className="stg-action-sub">Credits · fonts · licenses</span>
+              </span>
+              <span className="stg-action-chevron">›</span>
+            </button>
+          )}
         </div>
 
         {showImport && (
@@ -392,6 +501,14 @@ function SettingsScreen({
           </div>
         )}
       </section>
+
+      {/* Active Perks — green-tinted list of owned QoL items. Hidden
+          entirely when none are owned (no empty state). Sits between
+          Save Data and Danger Path per the content-audit recommendation. */}
+      <ActivePerks
+        shopInventory={shopInventory}
+        autoBuyEnabled={autoBuyEnabled}
+      />
 
       {/* Danger Path — quarantined card with two-tap commit */}
       <section className="stg-section stg-section-last">
