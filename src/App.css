@@ -13746,6 +13746,43 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   .blshop-pack--hero .blshop-pack-price    { font-size: 18px; }
   .blshop-footer { flex-direction: column; align-items: stretch; gap: 8px; }
   .blshop-restore { align-self: center; }
+
+  /* Hero card on narrow viewports: the auto/1fr/auto grid runs out of
+     room because the buy column needs ~150px (strike + bold price +
+     SAVE chip). Restack the buy section onto its OWN row below the
+     icon + body, full width, with a divider. The banner (T5) doesn't
+     have this problem because its strikethrough is shorter ($69.99). */
+  .blshop-pack--hero {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    row-gap: 10px;
+  }
+  .blshop-pack--hero .blshop-pack-icon { grid-row: 1; grid-column: 1; }
+  .blshop-pack--hero .blshop-pack-body {
+    grid-row: 1;
+    grid-column: 2;
+    min-width: 0;
+    /* The +50% bonus chip is absolutely positioned at top-right of the
+       card. On desktop it overlaps the (empty) buy column, but with the
+       mobile restack the body now occupies that area, so the label
+       runs UNDER the chip. Pad the body to clear the chip footprint
+       (~56px wide + 10px gap). */
+    padding-right: 70px;
+  }
+  .blshop-pack--hero .blshop-pack-buy {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(212, 168, 102, 0.22);
+  }
+  .blshop-pack--hero .blshop-pack-save { flex-shrink: 0; }
 }
 
 /* ─── Progress hub HUD button ───────────────────────────────────────────
