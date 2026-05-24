@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { QI_SPARK_BY_ID, SPARK_RARITY, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
-// Inactivity timeout — modal auto-resolves (picks leftmost) if the player
-// doesn't interact for this long. Bumped 30s → 60s 2026-05-21 after
-// playtest report: 30s was too tight when rerolling + reading detail
-// panels. Now ANY interaction (click, reroll, detail open) resets the
-// timer, so an engaged player effectively never times out.
+
+/**
+ * Inactivity timeout: the modal auto-resolves (picks leftmost) if the
+ * player does not interact. 60 seconds is calibrated against playtest
+ * data; any tap, reroll, or hover counts as activity and resets the
+ * timer, so an engaged player effectively never times out.
+ */
 const CHOICE_TIMEOUT_MS = 60_000;
 
-// Map markdown-ish `**bold**` to <strong>. Tiny renderer so we don't pull in
-// a markdown lib — the only formatting we use in effectText is bold.
+/** Bold-aware mini-renderer: `**foo**` becomes <strong>foo</strong>. */
 function renderEffect(text) {
   if (!text) return null;
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -21,22 +22,28 @@ function renderEffect(text) {
   );
 }
 
-/** Render an icon: pixel sprite if path-like, else emoji glyph. */
+/** Pixel sprite when icon looks like a path, emoji glyph otherwise. */
 function CardIcon({ icon }) {
   if (typeof icon === 'string' && icon.startsWith('/')) {
-    return <img src={`${BASE}${icon.replace(/^\//, '')}`} alt="" className="qs-card-icon-img" draggable={false} />;
+    return (
+      <img
+        src={`${BASE}${icon.replace(/^\//, '')}`}
+        alt=""
+        className="spk-icon-img"
+        draggable={false}
+      />
+    );
   }
-  return <span className="qs-card-icon-emoji" aria-hidden="true">{icon}</span>;
+  return <span className="spk-icon-emoji" aria-hidden="true">{icon}</span>;
 }
 
 /**
  * Resolve the display icon for a spark id. Priority:
- *   1. SPARK_COPY[id].icon — explicit override (producer sprite for
+ *   1. SPARK_COPY[id].icon (explicit override, e.g. producer sprite for
  *      legendaries, themed emoji for common/uncommon)
- *   2. mechanic-tier cards reuse the same medallion icon the upgrades
- *      shop already shows (ui/upgrade_<mechanicId>.png — Crystal
- *      Reservoir, Divine Qi, etc.)
- *   3. fallback to ✦
+ *   2. mechanic-tier cards reuse the medallion icon the upgrades shop
+ *      already shows (ui/upgrade_<mechanicId>.png)
+ *   3. fallback to a generic spark glyph
  */
 function iconFor(sparkId) {
   const copy = SPARK_COPY[sparkId];
@@ -48,138 +55,99 @@ function iconFor(sparkId) {
   return '✦';
 }
 
-// ── Vertical-stack card ─────────────────────────────────────────────────────
-
-function SparkCard({
-  sparkId,
-  cardIndex,
-  onPick,
-  onRerollCard,
-  onOpenDetail,
-  isFreeReroll,
-  rerollCost,
-  canAffordReroll,
-}) {
+/**
+ * A single inscribed-card slot: card body plus the Pick button below.
+ * Cards are the same dimensions regardless of rarity. Frame ornament,
+ * accent color, and motion escalate from common to legendary; see
+ * `.spk-card-*` rules in App.css for the rarity vocabulary.
+ *
+ * The whole card surface is clickable (picks this spark). The Pick
+ * button is a separate visual affordance reinforcing the same action,
+ * so players never have to hunt for the commit moment.
+ */
+function SparkCardSlot({ sparkId, onPick }) {
   const card = QI_SPARK_BY_ID[sparkId];
   if (!card) return null;
-  const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
-  const copy   = SPARK_COPY[sparkId];
-  // Effect text falls back to the legacy `description` field for any card
-  // that hasn't been migrated to plain-English copy yet.
+  const rarity     = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
+  const copy       = SPARK_COPY[sparkId];
   const effectText = copy?.effectText ?? card.description ?? '';
   const icon       = iconFor(sparkId);
+  const sealGlyph  = copy?.sealGlyph ?? null;
+
+  // Legendary gets the ember-mote layer for drift animation. The
+  // markup is the same across rarities so the React tree shape stays
+  // stable; CSS hides the embers on non-legendary cards.
+  const isLegendary = card.rarity === 'legendary';
+  const isUncommon  = card.rarity === 'uncommon';
 
   return (
-    <div
-      className={`qs-card qs-card-${card.rarity}`}
-      style={{ '--rarity-color': rarity.color }}
-    >
+    <div className={`spk-slot spk-slot-${card.rarity}`}>
+      <article
+        className={`spk-card spk-card-${card.rarity}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => onPick(sparkId)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onPick(sparkId);
+          }
+        }}
+        aria-label={`Pick ${card.name}`}
+      >
+        <span className="spk-grain" aria-hidden="true" />
+        <span className="spk-mark"  aria-hidden="true" />
+        <span className="spk-corner spk-corner-tl" aria-hidden="true" />
+        <span className="spk-corner spk-corner-tr" aria-hidden="true" />
+        <span className="spk-corner spk-corner-bl" aria-hidden="true" />
+        <span className="spk-corner spk-corner-br" aria-hidden="true" />
+
+        {isLegendary && (
+          <span className="spk-embers" aria-hidden="true">
+            <i /><i /><i /><i />
+          </span>
+        )}
+
+        <div className="spk-inner">
+          <div className="spk-kicker">{rarity.label}</div>
+          <div className="spk-icon-area">
+            <span className="spk-icon-glow" />
+            <span className="spk-icon-glyph"><CardIcon icon={icon} /></span>
+          </div>
+          <hr className="spk-rule" />
+          <h3 className="spk-name">{card.name}</h3>
+          <p className="spk-effect">{renderEffect(effectText)}</p>
+        </div>
+
+        {(isUncommon || isLegendary) && (
+          <span className="spk-seal" aria-hidden="true">{sealGlyph ?? (isLegendary ? '✦' : '玉')}</span>
+        )}
+      </article>
+
       <button
         type="button"
-        className="qs-card-tap"
-        onClick={() => onOpenDetail?.(sparkId)}
-        aria-label={`${card.name} — tap for details`}
+        className="spk-pick"
+        onClick={(e) => { e.stopPropagation(); onPick(sparkId); }}
       >
-        <div className="qs-card-img"><CardIcon icon={icon} /></div>
-        <div className="qs-card-info">
-          <div className="qs-card-head">
-            <span className="qs-card-name">{card.name}</span>
-            <span className={`qs-card-rarity-tag qs-rt-${card.rarity}`}>{rarity.label}</span>
-          </div>
-          <div className="qs-card-effect">{renderEffect(effectText)}</div>
-          <span className="qs-card-info-hint">tap for example + lore</span>
-        </div>
+        Pick
       </button>
-      <div className="qs-card-actions">
-        <button
-          type="button"
-          className="qs-btn qs-btn-pick"
-          onClick={() => onPick(sparkId)}
-        >
-          Pick
-        </button>
-      </div>
     </div>
   );
 }
-
-// ── Detail panel — opens when card body is tapped ───────────────────────────
-
-function DetailPanel({ sparkId, onClose, onPick }) {
-  const card = QI_SPARK_BY_ID[sparkId];
-  if (!card) return null;
-  const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
-  const copy   = SPARK_COPY[sparkId];
-  const icon   = iconFor(sparkId);
-  const effectText  = copy?.effectText  ?? card.description ?? '';
-  const exampleHtml = copy?.exampleText ?? null;
-  const loreHtml    = copy?.loreText    ?? null;
-
-  return (
-    <div
-      className="qs-detail-overlay"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className={`qs-detail-panel qs-detail-r-${card.rarity}`} style={{ '--rarity-color': rarity.color }}>
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
-        <div className="qs-detail-hero">
-          <CardIcon icon={icon} />
-          <div className={`qs-detail-rarity-banner qs-rt-${card.rarity}`}>{rarity.label}</div>
-        </div>
-        <div className="qs-detail-body">
-          <div className="qs-detail-name">{card.name}</div>
-          <div className="qs-detail-section">
-            <div className="qs-detail-section-label">Effect</div>
-            <div className="qs-detail-effect-text">{renderEffect(effectText)}</div>
-          </div>
-          {exampleHtml && (
-            <div className="qs-detail-section">
-              <div className="qs-detail-section-label">Example</div>
-              <div className="qs-detail-example" dangerouslySetInnerHTML={{ __html: exampleHtml }} />
-            </div>
-          )}
-          {loreHtml && (
-            <div className="qs-detail-section">
-              <div className="qs-detail-section-label">Lore</div>
-              <div className="qs-detail-lore">{loreHtml}</div>
-            </div>
-          )}
-          <div className="qs-detail-actions">
-            <button
-              type="button"
-              className="qs-btn qs-btn-pick"
-              onClick={() => { onPick(sparkId); onClose(); }}
-            >
-              Pick this spark
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Modal ─────────────────────────────────────────────────────────────────────
 
 /**
- * Two-card pick UI. Auto-resolves to the leftmost card after CHOICE_TIMEOUT_MS
- * if the player ignores it, so cultivation never blocks indefinitely.
- *
- * Per-card reroll model: each of the 2 cards has its own ↺ button and its
- * own free-reroll allowance + paid-cost escalator. The footer is a small
- * transparency strip showing the baseline legendary chance + pity counter
- * status so the player understands the surface mechanic.
+ * Two-card pick modal with the inscribed-cards aesthetic. Vertically
+ * centered on the screen via the overlay; cards live in a horizontal
+ * pair below the title. Reroll button + meta strip pin to the bottom.
  *
  * Props:
- *   offer:             { id, cards, cardFreeRerollsLeft, cardPaidRerollsUsed }
- *   bloodLotusBalance
- *   nextRerollCostFor: (cardIndex) → number (0 if free reroll available)
+ *   offer:             { id, cards, offerFreeRerollsLeft, offerPaidRerollsUsed }
+ *   bloodLotusBalance: number (for paid reroll affordability check)
+ *   nextRerollCostFor: (cardIndex) => number | () => number
  *   onChoose(sparkId)
- *   onRerollCard(cardIndex)
- *   onSkip()
- *   pityCounter:       number (breakthroughs since last legendary appeared)
- *   pityThreshold:     number (cap before pity triggers a guaranteed legendary)
- *   legendaryChance:   number (per-card baseline chance, 0..1)
+ *   onRerollOffer()    | onRerollCard()   (legacy alias)
+ *   onSkip()           (called on inactivity timeout, picks leftmost)
+ *   pityCounter, pityThreshold, legendaryChance, legendaryPoolInfo
  */
 function QiSparkChoiceModal({
   offer,
@@ -187,24 +155,21 @@ function QiSparkChoiceModal({
   nextRerollCostFor,
   onChoose,
   onRerollOffer,
-  // Legacy prop name — still accepted, treated as the offer-level reroll.
-  onRerollCard,
+  onRerollCard,         // legacy prop name; same shape
   onSkip,
   pityCounter = 0,
   pityThreshold = 17,
   legendaryChance = 0.06,
   legendaryPoolInfo = null,
 }) {
-  // 2026-05-21 redesign: tier-locked offers, single reroll for the pair.
   const rerollFn = onRerollOffer ?? onRerollCard;
 
-  // Auto-skip after timeout — captures onSkip via ref so the timer doesn't
-  // reset on every render of the parent.
+  // Auto-skip after timeout. onSkip is captured via ref so the timer
+  // does not reset on every parent render.
   const onSkipRef = useRef(onSkip);
   onSkipRef.current = onSkip;
 
-  // Activity nonce bumps on user interaction → resets the auto-timeout.
-  // Prevents the modal from vanishing mid-reroll or while reading details.
+  // Activity nonce bumps on user interaction so the timer resets.
   const [activityNonce, setActivityNonce] = useState(0);
   const bumpActivity = () => setActivityNonce(n => n + 1);
 
@@ -214,147 +179,121 @@ function QiSparkChoiceModal({
     return () => clearTimeout(id);
   }, [offer?.id, activityNonce]);
 
-  // Wrap reroll so it counts as activity (resets the timer).
-  const onRerollActive = () => { bumpActivity(); rerollFn?.(); };
-
-  // Detail panel state — tracks which card the player has tapped open.
-  const [detailIdx, setDetailIdx] = useState(null);
-  useEffect(() => { setDetailIdx(null); }, [offer?.id]); // close detail on new offer
+  // Wrap pick + reroll so they count as activity.
+  const handlePick = (sparkId) => { bumpActivity(); onChoose?.(sparkId); };
+  const handleReroll = () => { bumpActivity(); rerollFn?.(); };
 
   if (!offer) return null;
 
-  // 2026-05-21: tier-locked redesign. Offer carries one reroll cost (no
-  // per-card variant). Accept both new (no-arg) and legacy (cardIndex) callers.
-  const rerollCost  = typeof nextRerollCostFor === 'function'
-    ? (nextRerollCostFor(0) ?? 0)  // legacy signature falls back cleanly
+  // Reroll cost: tier-locked redesign uses one offer-level cost. The
+  // legacy per-card signature is accepted and resolved against index 0.
+  const rerollCost = typeof nextRerollCostFor === 'function'
+    ? (nextRerollCostFor(0) ?? 0)
     : 0;
-  const freeLeft    = offer.offerFreeRerollsLeft ?? 0;
-  const isFreeReroll = freeLeft > 0;
+  const freeLeft        = offer.offerFreeRerollsLeft ?? 0;
+  const isFreeReroll    = freeLeft > 0;
   const canAffordReroll = isFreeReroll || (bloodLotusBalance ?? 0) >= rerollCost;
 
-  // Offer rarity — all cards in a tier-locked offer share the same rarity.
-  const firstCard = offer.cards?.[0] ? QI_SPARK_BY_ID[offer.cards[0]] : null;
-  const offerRarity = firstCard?.rarity ?? 'common';
+  // Offer-level rarity (all cards share the same tier under tier-locked).
+  const firstCard        = offer.cards?.[0] ? QI_SPARK_BY_ID[offer.cards[0]] : null;
+  const offerRarity      = firstCard?.rarity ?? 'common';
   const offerRarityLabel = SPARK_RARITY[offerRarity]?.label ?? '';
 
-  const pityRemaining   = Math.max(0, pityThreshold - pityCounter);
-  const pityImminent    = pityRemaining <= 3;
-  const pityGuaranteed  = pityRemaining === 0;
-  const chancePct       = Math.round(legendaryChance * 100);
+  const pityRemaining  = Math.max(0, pityThreshold - pityCounter);
+  const pityImminent   = pityRemaining <= 3;
+  const pityGuaranteed = pityRemaining === 0;
+  const chancePct      = Math.round(legendaryChance * 100);
 
-  const openDetailForIdx = (sparkId) => {
-    bumpActivity(); // opening the detail panel counts as engaged play
-    const idx = offer.cards.indexOf(sparkId);
-    if (idx >= 0) setDetailIdx(idx);
+  // Footer composes one of three states depending on legendary pool
+  // visibility and pity status. Keeps players informed about why a
+  // legendary may or may not be reachable on this draw.
+  const renderFooter = () => {
+    const eligible = legendaryPoolInfo?.eligibleCount ?? 0;
+    const total    = legendaryPoolInfo?.totalCount    ?? 0;
+    const next     = legendaryPoolInfo?.nextUnlock;
+
+    if (eligible === 0 && next) {
+      return (
+        <div className="spk-meta spk-meta-locked">
+          <span>🔒 Legendaries unlock with <strong>{next.producerName}</strong></span>
+        </div>
+      );
+    }
+    if (eligible === 0) {
+      return (
+        <div className={`spk-meta${pityImminent ? ' spk-meta-pity-soon' : ''}${pityGuaranteed ? ' spk-meta-pity-now' : ''}`}>
+          <span>✦ <strong>{chancePct}%</strong> legendary</span>
+          <span className="spk-meta-sep">·</span>
+          <span>
+            {pityGuaranteed
+              ? <>⚡ <strong>Next: guaranteed legendary</strong></>
+              : pityImminent
+                ? <>⚡ Pity in <strong>{pityRemaining}</strong> {pityRemaining === 1 ? 'realm' : 'realms'}</>
+                : <>pity in <strong>{pityRemaining}</strong> realms</>}
+          </span>
+        </div>
+      );
+    }
+    const poolText = (total > 0 && eligible < total)
+      ? <><strong>{eligible} of {total}</strong> in pool</>
+      : <>full pool</>;
+    return (
+      <div className={`spk-meta${pityImminent ? ' spk-meta-pity-soon' : ''}${pityGuaranteed ? ' spk-meta-pity-now' : ''}`}>
+        <span>✦ <strong>{chancePct}%</strong> legendary</span>
+        <span className="spk-meta-sep">·</span>
+        <span>{poolText}</span>
+        <span className="spk-meta-sep">·</span>
+        <span>
+          {pityGuaranteed
+            ? <>⚡ <strong>guaranteed</strong></>
+            : <>pity in <strong>{pityRemaining}</strong></>}
+        </span>
+      </div>
+    );
   };
 
   return (
-    <div className="modal-overlay qi-spark-overlay">
-      <div className="qs-modal" onClick={e => e.stopPropagation()}>
-        <div className="qs-header">
-          <h2 className="qs-title">Qi Spark</h2>
-          <p className="qs-subtitle">
-            <span className={`qs-offer-tier qs-rt-${offerRarity}`}>{offerRarityLabel}</span>
-            {' '}offer — choose one of two.
+    <div className="modal-overlay spk-overlay" onMouseMove={bumpActivity}>
+      <div className="spk-modal" onClick={e => e.stopPropagation()}>
+
+        <div className="spk-head">
+          <h2 className="spk-title">Qi Spark</h2>
+          <p className="spk-sub">
+            a <span className={`spk-tier-pill spk-tier-${offerRarity}`}>{offerRarityLabel}</span> offer, choose one
           </p>
         </div>
 
-        <div className="qs-vstack">
+        <div className="spk-pair">
           {offer.cards.map((sparkId, idx) => (
-              <SparkCard
-                key={`${sparkId}-${idx}`}
-                sparkId={sparkId}
-                cardIndex={idx}
-                onPick={onChoose}
-                onOpenDetail={openDetailForIdx}
-              />
-            ))}
+            <SparkCardSlot
+              key={`${sparkId}-${idx}`}
+              sparkId={sparkId}
+              onPick={handlePick}
+            />
+          ))}
         </div>
 
-        {/* Offer-level reroll — 1 free per offer, then escalating Lotus. Re-rolls
-            the tier AND both cards (tier-locked redesign 2026-05-21). */}
-        <div className="qs-offer-reroll-row">
+        <div className="spk-actions">
           <button
             type="button"
-            className={`qs-btn qs-btn-reroll qs-btn-reroll-offer${isFreeReroll ? ' qs-btn-reroll-free' : ''}${!canAffordReroll ? ' qs-btn-reroll-locked' : ''}`}
+            className={`spk-reroll${isFreeReroll ? ' spk-reroll-free' : ''}${!canAffordReroll ? ' spk-reroll-locked' : ''}`}
             disabled={!canAffordReroll}
-            onClick={onRerollActive}
+            onClick={handleReroll}
             title={
-              isFreeReroll       ? 'Reroll both cards — free!'
+              isFreeReroll       ? 'Reroll both cards, free'
               : !canAffordReroll ? `Need ${rerollCost} Blood Lotus to reroll`
-              :                    `Reroll both cards — ${rerollCost} Blood Lotus`
+              :                    `Reroll both cards, ${rerollCost} Blood Lotus`
             }
           >
-            ↺ Reroll pair {isFreeReroll ? '(free)' : `· ${rerollCost} BL`}
+            ↺ Reroll pair{' '}
+            <span className="spk-reroll-cost">
+              {isFreeReroll ? 'free' : `· ${rerollCost} BL`}
+            </span>
           </button>
+
+          {renderFooter()}
         </div>
 
-        {(() => {
-          // Context-aware footer — protects players from spending Lotus
-          // when no legendaries are reachable, AND shows the pool growing
-          // as new producers unlock.
-          const eligible = legendaryPoolInfo?.eligibleCount ?? 0;
-          const total    = legendaryPoolInfo?.totalCount    ?? 0;
-          const next     = legendaryPoolInfo?.nextUnlock;
-
-          if (eligible === 0 && next) {
-            return (
-              <div className="qs-footer-meta qs-footer-meta-locked">
-                <span>🔒 Legendary sparks unlock with <strong>{next.producerName}</strong></span>
-              </div>
-            );
-          }
-          if (eligible === 0) {
-            // Fallback when legendaryPoolInfo isn't threaded (e.g. tests) —
-            // fall back to the original chance + pity readout.
-            return (
-              <div className={`qs-footer-meta${pityImminent ? ' qs-footer-meta-pity-soon' : ''}${pityGuaranteed ? ' qs-footer-meta-pity-now' : ''}`}>
-                <span className="qsfm-chance">✦ <strong>{chancePct}%</strong> legendary chance per card</span>
-                <span className="qsfm-sep">·</span>
-                <span className="qsfm-pity">
-                  {pityGuaranteed
-                    ? <>⚡ <strong>Next breakthrough: guaranteed legendary</strong></>
-                    : pityImminent
-                      ? <>⚡ Legendary guaranteed in <strong>{pityRemaining}</strong> {pityRemaining === 1 ? 'realm' : 'realms'}</>
-                      : <>Pity in <strong>{pityRemaining}</strong> realms</>}
-                </span>
-              </div>
-            );
-          }
-          // 1+ eligible — show chance, pool progress, and pity together.
-          // Pool readout is "available" (eligible AND not yet owned) over
-          // remaining draws (total minus already-claimed) — see App.jsx's
-          // legendaryPoolInfo memo for the math. Reads as "X of Y available"
-          // so a player rerolling doesn't expect cards they've already
-          // claimed (legendaries are unique).
-          const poolText = (total > 0 && eligible < total)
-            ? `${eligible} of ${total} available`
-            : 'full pool';
-          return (
-            <div className={`qs-footer-meta${pityImminent ? ' qs-footer-meta-pity-soon' : ''}${pityGuaranteed ? ' qs-footer-meta-pity-now' : ''}`}>
-              <span className="qsfm-chance">✦ <strong>{chancePct}%</strong> legendary · <span className="qsfm-pool">{poolText}</span></span>
-              <span className="qsfm-sep">·</span>
-              <span className="qsfm-pity">
-                {pityGuaranteed
-                  ? <>⚡ <strong>Next breakthrough: guaranteed legendary</strong></>
-                  : pityImminent
-                    ? <>⚡ Pity in <strong>{pityRemaining}</strong> {pityRemaining === 1 ? 'realm' : 'realms'}</>
-                    : <>Pity in <strong>{pityRemaining}</strong> realms</>}
-              </span>
-            </div>
-          );
-        })()}
-
-        {detailIdx !== null && (() => {
-          const sparkId = offer.cards[detailIdx];
-          return (
-            <DetailPanel
-              sparkId={sparkId}
-              onClose={() => setDetailIdx(null)}
-              onPick={onChoose}
-            />
-          );
-        })()}
       </div>
     </div>
   );

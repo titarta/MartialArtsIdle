@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mockup: Spark Picker, Plaque Pair</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-page:   #0f1418;
+      --text:      #e6f0ee;
+      --text-dim:  #8aa39e;
+      --ember:     #dcaf6e;
+      --cream:     #f5e6c8;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg-page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
+    body { padding: 24px; max-width: 1200px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 6px; letter-spacing: 0.02em; }
+    .intro {
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 780px;
+      margin: 0 0 28px;
+    }
+    .intro strong { color: var(--text); }
+    .intro code {
+      background: rgba(255,255,255,0.06);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .scenes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 32px;
+      margin-top: 16px;
+    }
+    .scene {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .scene-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 0 0 4px;
+    }
+    .scene-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin: 0 0 14px;
+      line-height: 1.5;
+      max-width: 360px;
+      text-align: center;
+    }
+    .device-frame {
+      width: 390px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #050708;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+    }
+    .device-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      padding: 6px 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       Picker overlay: temple-petition aesthetic. The two plaques
+       hang from cords above a stone altar. The header is small
+       gold serif text, the footer is the meta strip.
+       ───────────────────────────────────────────────────────────── */
+    .picker {
+      min-height: 620px;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(255, 207, 131, 0.07), transparent 55%),
+        radial-gradient(ellipse at 50% 90%, rgba(20, 14, 8, 0.6), transparent 60%),
+        linear-gradient(180deg, #06080c 0%, #08070a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 22px;
+      position: relative;
+    }
+    /* Faint hanging beam at the top, the wooden lintel the cords
+       anchor to. Pure CSS, no asset. */
+    .picker::before {
+      content: '';
+      position: absolute;
+      top: 60px;
+      left: 24px;
+      right: 24px;
+      height: 4px;
+      background: linear-gradient(180deg, #2a1d10 0%, #1a120a 100%);
+      border-top: 1px solid rgba(220, 175, 110, 0.32);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      border-radius: 1px;
+    }
+    .picker-title {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-shadow: 0 0 14px rgba(220, 175, 110, 0.45);
+      margin-bottom: 2px;
+    }
+    .picker-sub {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+    .picker-sub .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.16em;
+      font-weight: 800;
+      font-size: 9px;
+      margin: 0 4px;
+      vertical-align: 1px;
+    }
+    .pill.pill-com { background: rgba(140, 148, 160, 0.18); color: #c9d0d8; border: 1px solid rgba(140, 148, 160, 0.55); }
+    .pill.pill-unc { background: rgba(74, 222, 128, 0.14); color: #b4f0c8; border: 1px solid rgba(74, 222, 128, 0.55); }
+    .pill.pill-leg { background: rgba(255, 215, 100, 0.16); color: #ffe7a0; border: 1px solid rgba(255, 215, 100, 0.75); text-shadow: 0 0 8px rgba(255, 215, 100, 0.4); }
+
+    /* ── Plaque pair ─────────────────────────────────────────────── */
+    .plaque-pair {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      max-width: 360px;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 8px;
+    }
+
+    /* Each plaque slot is its own column: cord + cap + plaque + button.
+       Fixed width and height so common/uncommon/legendary all match. */
+    .plaque-slot {
+      width: 160px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .plaque-cord {
+      width: 2px;
+      height: 26px;
+      background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
+      border-radius: 1px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    }
+    .plaque-cap {
+      width: 36px;
+      height: 10px;
+      margin-top: -2px;
+      background: linear-gradient(180deg, #3a2a18 0%, #1a120a 100%);
+      border-radius: 4px 4px 2px 2px;
+      border: 1px solid rgba(220, 175, 110, 0.42);
+      box-shadow:
+        0 1px 0 rgba(255, 225, 170, 0.18) inset,
+        0 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Wood plaque body. Locked height 320 so every rarity matches.
+       Internal layout: rarity kicker, glyph (icon), name, effect,
+       all centered, separator hairlines between glyph and name and
+       between name and effect like the HQ tablet's offer block. */
+    .plaque-body {
+      width: 100%;
+      height: 320px;
+      margin-top: 2px;
+      padding: 12px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background:
+        linear-gradient(180deg,
+          rgba(220, 175, 110, 0.10) 0%,
+          rgba(220, 175, 110, 0)    18%,
+          rgba(220, 175, 110, 0)    82%,
+          rgba(220, 175, 110, 0.10) 100%),
+        linear-gradient(180deg,
+          #2a1d10 0%,
+          #3a2916 30%,
+          #2e2012 70%,
+          #1f160c 100%);
+      border: 1px solid rgba(220, 175, 110, 0.55);
+      border-radius: 4px 4px 6px 6px;
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 225, 170, 0.18) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.4)      inset,
+        0 10px 18px -10px rgba(0, 0, 0, 0.95);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Carved corner notches, identical to the HQ tablet detail. */
+    .plaque-body::before,
+    .plaque-body::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      width: 5px;
+      height: 5px;
+      border: 1px solid rgba(220, 175, 110, 0.45);
+      border-radius: 1px;
+    }
+    .plaque-body::before { left: 5px;  border-right:  none; border-bottom: none; }
+    .plaque-body::after  { right: 5px; border-left:   none; border-bottom: none; }
+
+    .plaque-kicker {
+      font-size: 8px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--ember);
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .plaque-glyph {
+      width: 78px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      margin-top: 2px;
+      background:
+        radial-gradient(circle at center, rgba(220, 175, 110, 0.20), transparent 70%);
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    }
+    .plaque-glyph .emoji {
+      font-size: 56px;
+      line-height: 1;
+      filter: drop-shadow(0 0 12px rgba(255, 207, 131, 0.35));
+    }
+    .plaque-glyph img {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .plaque-hr {
+      width: 60%;
+      height: 1px;
+      margin: 10px 0;
+      background: linear-gradient(90deg, transparent, rgba(220, 175, 110, 0.4), transparent);
+    }
+
+    .plaque-name {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--cream);
+      text-align: center;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+      line-height: 1.15;
+      margin-bottom: 8px;
+      min-height: 32px;       /* reserves space for 2 lines */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .plaque-effect {
+      font-size: 11px;
+      line-height: 1.42;
+      color: rgba(245, 230, 200, 0.78);
+      text-align: center;
+      letter-spacing: 0.01em;
+      flex: 1;                /* absorbs the variable space */
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 2px;
+    }
+    .plaque-effect strong {
+      color: var(--cream);
+      font-weight: 700;
+    }
+
+    /* Pick button sits BELOW the plaque, attached visually but not
+       part of the wood. Stone slab feel. */
+    .pick-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 8px;
+      border: 1px solid rgba(220, 175, 110, 0.55);
+      border-radius: 6px;
+      background:
+        linear-gradient(180deg, rgba(60, 44, 26, 0.95), rgba(28, 20, 12, 0.95));
+      color: var(--cream);
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+      box-shadow:
+        0 1px 0 rgba(255, 225, 170, 0.18) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.4)      inset,
+        0 2px 6px rgba(0, 0, 0, 0.7);
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .pick-btn:hover  { filter: brightness(1.15); }
+    .pick-btn:active { transform: translateY(1px); }
+
+    /* ── Rarity styling: plaque tint, kicker color, glyph aura ── */
+
+    /* Common: stone plaque, dim kicker, no animation */
+    .plaque-slot.r-common .plaque-body {
+      background:
+        linear-gradient(180deg,
+          rgba(180, 180, 190, 0.08) 0%,
+          rgba(180, 180, 190, 0)    18%,
+          rgba(180, 180, 190, 0)    82%,
+          rgba(180, 180, 190, 0.08) 100%),
+        linear-gradient(180deg,
+          #1d1f24 0%,
+          #2a2d34 30%,
+          #20232a 70%,
+          #15171c 100%);
+      border-color: rgba(180, 180, 190, 0.45);
+    }
+    .plaque-slot.r-common .plaque-kicker {
+      color: rgba(200, 210, 222, 0.85);
+    }
+    .plaque-slot.r-common .plaque-glyph {
+      background: radial-gradient(circle at center, rgba(180, 188, 200, 0.18), transparent 70%);
+    }
+    .plaque-slot.r-common .plaque-glyph .emoji {
+      filter: drop-shadow(0 0 10px rgba(200, 210, 222, 0.25));
+    }
+    .plaque-slot.r-common .plaque-name {
+      color: #e6ecf0;
+    }
+    .plaque-slot.r-common .plaque-hr {
+      background: linear-gradient(90deg, transparent, rgba(180, 190, 200, 0.35), transparent);
+    }
+    .plaque-slot.r-common .pick-btn {
+      background: linear-gradient(180deg, rgba(50, 54, 62, 0.95), rgba(22, 24, 28, 0.95));
+      border-color: rgba(180, 190, 200, 0.45);
+    }
+
+    /* Uncommon: jade-green plaque, ember kicker switched to jade */
+    .plaque-slot.r-uncommon .plaque-body {
+      background:
+        linear-gradient(180deg,
+          rgba(74, 222, 128, 0.10) 0%,
+          rgba(74, 222, 128, 0)    18%,
+          rgba(74, 222, 128, 0)    82%,
+          rgba(74, 222, 128, 0.10) 100%),
+        linear-gradient(180deg,
+          #0e2218 0%,
+          #18382a 30%,
+          #102a1f 70%,
+          #081610 100%);
+      border-color: rgba(74, 222, 128, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(180, 250, 210, 0.20) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.4)      inset,
+        0 0 18px -6px rgba(74, 222, 128, 0.35),
+        0 10px 18px -10px rgba(0, 0, 0, 0.95);
+    }
+    .plaque-slot.r-uncommon .plaque-kicker {
+      color: #98f0bc;
+    }
+    .plaque-slot.r-uncommon .plaque-glyph {
+      background: radial-gradient(circle at center, rgba(74, 222, 128, 0.22), transparent 70%);
+    }
+    .plaque-slot.r-uncommon .plaque-glyph .emoji {
+      filter: drop-shadow(0 0 14px rgba(74, 222, 128, 0.45));
+    }
+    .plaque-slot.r-uncommon .plaque-hr {
+      background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.4), transparent);
+    }
+    .plaque-slot.r-uncommon .pick-btn {
+      background: linear-gradient(180deg, rgba(34, 70, 50, 0.95), rgba(12, 30, 22, 0.95));
+      border-color: rgba(74, 222, 128, 0.55);
+    }
+
+    /* Legendary: warm amber plaque, breathing glow, more ember motes */
+    .plaque-slot.r-legendary .plaque-body {
+      background:
+        linear-gradient(180deg,
+          rgba(255, 207, 131, 0.16) 0%,
+          rgba(255, 207, 131, 0)    35%,
+          rgba(255, 207, 131, 0)    65%,
+          rgba(255, 207, 131, 0.16) 100%),
+        linear-gradient(180deg,
+          #4a2f15 0%,
+          #6b3f1a 30%,
+          #5a3318 70%,
+          #2e1a0a 100%);
+      border-color: rgba(255, 207, 131, 0.85);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 225, 170, 0.30) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.5)      inset,
+        0 0 24px -2px rgba(255, 207, 131, 0.55),
+        0 10px 22px -10px rgba(0, 0, 0, 0.95);
+      animation: plaque-breathe 2.8s ease-in-out infinite;
+    }
+    .plaque-slot.r-legendary .plaque-kicker { color: #ffcf83; }
+    .plaque-slot.r-legendary .plaque-glyph {
+      background: radial-gradient(circle at center, rgba(255, 207, 131, 0.30), transparent 65%);
+    }
+    .plaque-slot.r-legendary .plaque-glyph .emoji {
+      filter: drop-shadow(0 0 18px rgba(255, 207, 131, 0.60));
+      animation: plaque-glyph-glow 2.8s ease-in-out infinite;
+    }
+    .plaque-slot.r-legendary .plaque-name {
+      color: #fff4d4;
+      text-shadow: 0 0 10px rgba(255, 215, 100, 0.5);
+    }
+    .plaque-slot.r-legendary .plaque-hr {
+      background: linear-gradient(90deg, transparent, rgba(255, 207, 131, 0.5), transparent);
+    }
+    .plaque-slot.r-legendary .pick-btn {
+      background: linear-gradient(180deg, rgba(105, 65, 26, 0.98), rgba(50, 30, 12, 0.98));
+      border-color: rgba(255, 207, 131, 0.75);
+      color: #fff4d4;
+    }
+
+    /* Ember motes — only legendary tier */
+    .plaque-slot.r-legendary .plaque-body::before,
+    .plaque-slot.r-legendary .plaque-body::after {
+      border-color: rgba(255, 207, 131, 0.6);
+    }
+    .embers {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .embers > span {
+      position: absolute;
+      bottom: 8px;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: #ffcf83;
+      box-shadow: 0 0 6px #ffcf83;
+      opacity: 0;
+      animation: ember-rise 4.4s linear infinite;
+    }
+    .embers > span:nth-child(1) { left: 22%; animation-delay: 0s;   }
+    .embers > span:nth-child(2) { left: 48%; animation-delay: 1.5s; }
+    .embers > span:nth-child(3) { left: 72%; animation-delay: 2.7s; }
+    .embers > span:nth-child(4) { left: 36%; animation-delay: 3.6s; }
+
+    @keyframes ember-rise {
+      0%   { opacity: 0; transform: translateY(0)    scale(1);   }
+      10%  { opacity: 0.9; }
+      90%  { opacity: 0.9; }
+      100% { opacity: 0; transform: translateY(-160px) scale(0.7); }
+    }
+    @keyframes plaque-breathe {
+      0%, 100% { box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 225, 170, 0.30) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.5)      inset,
+        0 0 18px -2px rgba(255, 207, 131, 0.45),
+        0 10px 22px -10px rgba(0, 0, 0, 0.95); }
+      50%      { box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 225, 170, 0.30) inset,
+        0 -2px 0 rgba(0, 0, 0, 0.5)      inset,
+        0 0 32px 2px rgba(255, 220, 130, 0.7),
+        0 10px 22px -10px rgba(0, 0, 0, 0.95); }
+    }
+    @keyframes plaque-glyph-glow {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 207, 131, 0.45)); }
+      50%      { filter: drop-shadow(0 0 22px rgba(255, 220, 130, 0.75)); }
+    }
+
+    /* ── Bottom: reroll + footer meta ───────────────────────────── */
+    .picker-actions {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .reroll-btn {
+      padding: 8px 18px;
+      border: 1px solid rgba(167, 139, 250, 0.55);
+      border-radius: 999px;
+      background: rgba(167, 139, 250, 0.14);
+      color: #d6c7ff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .reroll-btn:hover { filter: brightness(1.2); }
+    .reroll-btn.free {
+      background: rgba(74, 222, 128, 0.16);
+      border-color: rgba(74, 222, 128, 0.55);
+      color: #b4f0c8;
+    }
+
+    .footer-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      letter-spacing: 0.02em;
+    }
+    .footer-meta strong { color: #ffd66b; }
+    .footer-meta .sep { opacity: 0.4; }
+  </style>
+</head>
+<body>
+  <h1>Spark Picker, Plaque Pair mockup</h1>
+  <p class="intro">
+    Two vertical wood plaques hanging from cords above a stone altar. Same
+    visual family as the home screen Heavenly Qi tablet (kicker, glyph,
+    hairline separators, ember motes), scaled up so two fit side by side
+    on a 390 px viewport.
+    <br><br>
+    <strong>Card content is bare essentials only:</strong>
+    rarity kicker, large icon (the glyph slot), name in Cinzel, single
+    effect line, Pick button. Lore and examples are dropped from the
+    picker entirely. The full story lives on the Sparks tab once a card
+    has been picked.
+    <br><br>
+    Locked at 160 px wide × 320 px tall regardless of effect length.
+    Common, Uncommon, Legendary share frame geometry; only color, glow,
+    and breathing differ. Pick button sits below the plaque, not on it,
+    so the wood reads as inscribed and the action feels like commitment.
+  </p>
+
+  <div class="scenes">
+
+    <!-- ─── Scene 1: Common vs Common ─── -->
+    <div class="scene">
+      <div class="scene-label">Scene 1: common pair</div>
+      <div class="scene-note">Most common draw. Pair stays calm: no animations, no glow.</div>
+      <div class="device-frame">
+        <div class="device-label">iPhone 13 / 390 px</div>
+        <div class="picker">
+          <div class="picker-title">Qi Spark</div>
+          <div class="picker-sub"><span class="pill pill-com">Common</span> offer, choose one</div>
+
+          <div class="plaque-pair">
+            <div class="plaque-slot r-common">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="plaque-kicker">Common</div>
+                <div class="plaque-glyph"><span class="emoji">⚡</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Quick Burst</div>
+                <div class="plaque-effect">Instant qi worth <strong>30 seconds</strong> of your current rate.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+
+            <div class="plaque-slot r-common">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="plaque-kicker">Common</div>
+                <div class="plaque-glyph"><span class="emoji">🌬️</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Sect Discipline</div>
+                <div class="plaque-effect"><strong>+0.5 qi/s</strong> per producer for 90s.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+          </div>
+
+          <div class="picker-actions">
+            <button class="reroll-btn free">↺ Reroll pair, free</button>
+            <div class="footer-meta">
+              <span>✦ <strong>6%</strong> legendary per card</span>
+              <span class="sep">·</span>
+              <span>Pity in <strong>9</strong> realms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Scene 2: Common + Uncommon ─── -->
+    <div class="scene">
+      <div class="scene-label">Scene 2: mixed common + uncommon</div>
+      <div class="scene-note">Jade plaque on the right has a soft green halo and warmer kicker.</div>
+      <div class="device-frame">
+        <div class="device-label">iPhone 13 / 390 px</div>
+        <div class="picker">
+          <div class="picker-title">Qi Spark</div>
+          <div class="picker-sub"><span class="pill pill-unc">Uncommon</span> offer, choose one</div>
+
+          <div class="plaque-pair">
+            <div class="plaque-slot r-common">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="plaque-kicker">Common</div>
+                <div class="plaque-glyph"><span class="emoji">🌀</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Focus Surge</div>
+                <div class="plaque-effect"><strong>+50%</strong> Focus multiplier for 60s.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+
+            <div class="plaque-slot r-uncommon">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="plaque-kicker">Uncommon</div>
+                <div class="plaque-glyph"><span class="emoji">🪷</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Resonant Soul</div>
+                <div class="plaque-effect"><strong>+2% qi/s</strong> for each major realm cleared this run.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+          </div>
+
+          <div class="picker-actions">
+            <button class="reroll-btn">↺ Reroll pair, 3 BL</button>
+            <div class="footer-meta">
+              <span>✦ <strong>6%</strong> legendary per card</span>
+              <span class="sep">·</span>
+              <span>Pity in <strong>5</strong> realms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Scene 3: Uncommon + Legendary ─── -->
+    <div class="scene">
+      <div class="scene-label">Scene 3: legendary, the big moment</div>
+      <div class="scene-note">Amber plaque pulses, ember motes drift up, name glows. The choice feels weighted.</div>
+      <div class="device-frame">
+        <div class="device-label">iPhone 13 / 390 px</div>
+        <div class="picker">
+          <div class="picker-title">Qi Spark</div>
+          <div class="picker-sub"><span class="pill pill-leg">Legendary</span> offer, choose one</div>
+
+          <div class="plaque-pair">
+            <div class="plaque-slot r-uncommon">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="plaque-kicker">Uncommon</div>
+                <div class="plaque-glyph"><span class="emoji">🪨</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Patience of Stone</div>
+                <div class="plaque-effect"><strong>-10%</strong> major realm gate cost, stacks.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+
+            <div class="plaque-slot r-legendary">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="embers"><span></span><span></span><span></span><span></span></div>
+                <div class="plaque-kicker">Legendary</div>
+                <div class="plaque-glyph"><span class="emoji">🔥</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Phoenix Reborn</div>
+                <div class="plaque-effect">Each major realm: Phoenix → 0, all other producers <strong>×2</strong> permanent.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+          </div>
+
+          <div class="picker-actions">
+            <button class="reroll-btn">↺ Reroll pair, 6 BL</button>
+            <div class="footer-meta">
+              <span>✦ <strong>6%</strong> legendary per card</span>
+              <span class="sep">·</span>
+              <span><strong>3 of 7</strong> in pool</span>
+              <span class="sep">·</span>
+              <span>Pity in <strong>0</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Scene 4: Legendary pair, pity guaranteed ─── -->
+    <div class="scene">
+      <div class="scene-label">Scene 4: pity-forced double legendary</div>
+      <div class="scene-note">Both plaques pulse. Footer shows the guaranteed-legendary state.</div>
+      <div class="device-frame">
+        <div class="device-label">iPhone 13 / 390 px</div>
+        <div class="picker">
+          <div class="picker-title">Qi Spark</div>
+          <div class="picker-sub"><span class="pill pill-leg">Legendary</span> offer, choose one</div>
+
+          <div class="plaque-pair">
+            <div class="plaque-slot r-legendary">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="embers"><span></span><span></span><span></span><span></span></div>
+                <div class="plaque-kicker">Legendary</div>
+                <div class="plaque-glyph"><span class="emoji">🐉</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Azure Dragon</div>
+                <div class="plaque-effect">Pair with Tiger or Tortoise to trigger <strong>Trinity Convergence</strong>.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+
+            <div class="plaque-slot r-legendary">
+              <div class="plaque-cord"></div>
+              <div class="plaque-cap"></div>
+              <div class="plaque-body">
+                <div class="embers"><span></span><span></span><span></span><span></span></div>
+                <div class="plaque-kicker">Legendary</div>
+                <div class="plaque-glyph"><span class="emoji">🐢</span></div>
+                <div class="plaque-hr"></div>
+                <div class="plaque-name">Black Tortoise</div>
+                <div class="plaque-effect">Each pair of Tortoise + Crane: both produce <strong>×1.5</strong>.</div>
+              </div>
+              <button class="pick-btn">Pick</button>
+            </div>
+          </div>
+
+          <div class="picker-actions">
+            <button class="reroll-btn">↺ Reroll pair, 12 BL</button>
+            <div class="footer-meta">
+              <span>⚡ <strong>Pity active, next legendary guaranteed</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mockup: Spark Picker, Inscribed Cards</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   TOKENS
+   Cultivation theme. Dark warm paper, bronze ember, jade soft, gold
+   leaf. Rarity drives FRAME ornamentation, not body repaint.
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --ink-deep:        #07090c;
+  --ink-mid:         #0d1014;
+
+  --paper-dark:      #1a1812;
+  --paper-mid:       #221e16;
+  --paper-warm:      #2a241a;
+  --paper-leg-1:     #2e2316;
+  --paper-leg-2:     #261d12;
+  --paper-leg-3:     #1a140c;
+
+  --cream:           #f4e6c8;
+  --cream-dim:       rgba(244, 230, 200, 0.72);
+  --cream-fade:      rgba(244, 230, 200, 0.42);
+
+  --bronze:          #c89764;
+  --bronze-soft:     rgba(200, 151, 100, 0.55);
+  --bronze-faint:    rgba(200, 151, 100, 0.18);
+
+  --jade:            #6ec98a;
+  --jade-soft:       rgba(110, 201, 138, 0.55);
+  --jade-faint:      rgba(110, 201, 138, 0.18);
+
+  --gold:            #d4a850;
+  --gold-bright:     #ffd66b;
+  --gold-soft:       rgba(212, 168, 80, 0.55);
+  --ember-glow:      #ff9b3d;
+  --seal-red:        #b8412c;
+
+  --font-display:    'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body:       'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
+  --font-kicker:     'Cinzel', Georgia, serif;
+  --font-chinese:    'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+}
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--ink-deep);
+  color: var(--cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+body {
+  padding: 36px 24px 72px;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0 0 10px;
+  color: var(--cream);
+}
+
+.lede {
+  color: var(--cream-dim);
+  font-size: 14px;
+  line-height: 1.65;
+  max-width: 780px;
+  margin: 0 0 40px;
+}
+.lede strong { color: var(--cream); font-weight: 600; }
+.lede em     { color: var(--gold);  font-style: italic; }
+.lede .hanzi { font-family: var(--font-chinese); font-style: normal; color: var(--gold); }
+
+.scenes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 40px;
+  align-items: start;
+}
+.scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.scene-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bronze);
+  margin: 0 0 6px;
+}
+.scene-note {
+  font-size: 12px;
+  color: var(--cream-dim);
+  font-style: italic;
+  margin: 0 0 18px;
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DEVICE FRAME
+   ═══════════════════════════════════════════════════════════════════ */
+.device {
+  width: 390px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--ink-deep);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 60px -20px rgba(0, 0, 0, 0.9);
+}
+.device-bar {
+  font-family: var(--font-kicker);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  color: rgba(244, 230, 200, 0.35);
+  text-align: center;
+  padding: 8px 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PICKER OVERLAY
+   Temple altar atmosphere. Faint 灵 watermark behind everything, two
+   incense-beam columns under the card positions, a hairline rule that
+   reads as the altar edge.
+   ═══════════════════════════════════════════════════════════════════ */
+.picker {
+  position: relative;
+  min-height: 680px;
+  background:
+    radial-gradient(ellipse 90px 320px at 27% 50%, rgba(200, 151, 100, 0.055), transparent 70%),
+    radial-gradient(ellipse 90px 320px at 73% 50%, rgba(200, 151, 100, 0.055), transparent 70%),
+    radial-gradient(ellipse at 50% 100%, rgba(40, 30, 20, 0.55), transparent 60%),
+    linear-gradient(180deg, #050708 0%, #0a0c10 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 38px 18px 26px;
+  overflow: hidden;
+}
+.picker::before {
+  content: '灵';
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-chinese);
+  font-size: 440px;
+  line-height: 1;
+  color: rgba(200, 151, 100, 0.028);
+  pointer-events: none;
+  z-index: 0;
+  user-select: none;
+}
+
+/* HEADER */
+.picker-head {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.picker-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-shadow: 0 0 18px rgba(212, 168, 80, 0.35);
+  margin: 0 0 8px;
+  padding-left: 0.42em; /* optical centering compensating for tracking */
+}
+.picker-sub {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--cream-fade);
+  margin: 0;
+  font-style: italic;
+}
+.picker-sub .tier-pill {
+  display: inline-block;
+  font-style: normal;
+  font-family: var(--font-kicker);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  vertical-align: 1px;
+  margin: 0 4px;
+  font-weight: 700;
+}
+.tier-pill.t-com { color: var(--bronze);       background: rgba(200, 151, 100, 0.10); border: 1px solid rgba(200, 151, 100, 0.40); }
+.tier-pill.t-unc { color: var(--jade);         background: rgba(110, 201, 138, 0.10); border: 1px solid rgba(110, 201, 138, 0.40); }
+.tier-pill.t-leg {
+  color: var(--gold-bright);
+  background: rgba(255, 214, 107, 0.10);
+  border: 1px solid rgba(255, 214, 107, 0.55);
+  text-shadow: 0 0 6px rgba(255, 214, 107, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PAIR LAYOUT
+   ═══════════════════════════════════════════════════════════════════ */
+.pair {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 162px;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD
+   Locked 162 x 282 across all rarities. Content layout identical;
+   frame ornament and accents change per rarity only.
+   ═══════════════════════════════════════════════════════════════════ */
+.card {
+  position: relative;
+  height: 282px;
+  padding: 16px 12px 16px;
+  background:
+    linear-gradient(180deg,
+      var(--paper-warm) 0%,
+      var(--paper-mid)  35%,
+      var(--paper-dark) 100%);
+  border: 1px solid var(--bronze-faint);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.06) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.5) inset,
+    0 8px 20px -10px rgba(0, 0, 0, 0.85);
+  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 250ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  cursor: pointer;
+}
+.card:hover  { transform: translateY(-3px); }
+
+/* Vertical paper-grain texture, barely visible. Common across rarities. */
+.card-grain {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 4px,
+      rgba(0, 0, 0, 0.04) 4px,
+      rgba(0, 0, 0, 0.04) 5px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* CORNERS: 4 absolutely-positioned span elements. Each rarity styles
+   them differently. Spans are present in DOM for all rarities for
+   structural symmetry. */
+.corner {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.corner.tl { top: 6px;    left: 6px;  }
+.corner.tr { top: 6px;    right: 6px; }
+.corner.bl { bottom: 6px; left: 6px;  }
+.corner.br { bottom: 6px; right: 6px; }
+
+/* ── COMMON ── single dot at top center, no corners. Paper sealed at top. */
+.card-com .corner { display: none; }
+.card-com .card-mark {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 3px;
+  background: var(--bronze);
+  border-radius: 50%;
+  opacity: 0.7;
+  z-index: 2;
+}
+
+/* ── UNCOMMON ── jade L-bracket corners, soft jade halo on whole card. */
+.card-unc {
+  border-color: rgba(110, 201, 138, 0.45);
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.08) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.5) inset,
+    0 0 16px -8px rgba(110, 201, 138, 0.40),
+    0 8px 20px -10px rgba(0, 0, 0, 0.85);
+}
+.card-unc:hover {
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.08) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.5) inset,
+    0 0 22px -4px rgba(110, 201, 138, 0.55),
+    0 12px 26px -10px rgba(0, 0, 0, 0.9);
+}
+.card-unc .corner {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--jade);
+}
+.card-unc .corner.tl { border-right: none; border-bottom: none; }
+.card-unc .corner.tr { border-left: none;  border-bottom: none; }
+.card-unc .corner.bl { border-right: none; border-top: none;    }
+.card-unc .corner.br { border-left: none;  border-top: none;    }
+.card-unc .card-mark {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 5px;
+  background: var(--jade);
+  border-radius: 0 0 2px 2px;
+  opacity: 0.85;
+  box-shadow: 0 0 4px rgba(110, 201, 138, 0.45);
+  z-index: 2;
+}
+
+/* ── LEGENDARY ── nested gold brackets, gold cartouche, breathing frame
+   glow, gold-leaf shimmer in body, drifting ember motes, glowing name.
+   This is the chase moment. */
+.card-leg {
+  border-color: rgba(212, 168, 80, 0.75);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(212, 168, 80, 0.10), transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(255, 155, 61, 0.06), transparent 50%),
+    linear-gradient(180deg,
+      var(--paper-leg-1) 0%,
+      var(--paper-leg-2) 35%,
+      var(--paper-leg-3) 100%);
+  animation: leg-frame-breathe 3.4s ease-in-out infinite;
+}
+.card-leg:hover { transform: translateY(-5px); }
+
+@keyframes leg-frame-breathe {
+  0%, 100% {
+    box-shadow:
+      0 1px 0 rgba(244, 230, 200, 0.12) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.55) inset,
+      0 0 18px -6px rgba(212, 168, 80, 0.42),
+      0 0 0 1px rgba(212, 168, 80, 0.22),
+      0 8px 22px -8px rgba(0, 0, 0, 0.9);
+  }
+  50% {
+    box-shadow:
+      0 1px 0 rgba(244, 230, 200, 0.14) inset,
+      0 -2px 0 rgba(0, 0, 0, 0.55) inset,
+      0 0 34px -2px rgba(255, 214, 107, 0.62),
+      0 0 0 1px rgba(212, 168, 80, 0.42),
+      0 8px 22px -8px rgba(0, 0, 0, 0.9);
+  }
+}
+
+/* Legendary nested-bracket corners: outer L and inner L per corner */
+.card-leg .corner {
+  width: 18px;
+  height: 18px;
+}
+.card-leg .corner::before,
+.card-leg .corner::after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 1px;
+}
+.card-leg .corner::before {
+  inset: 0;
+  border-color: var(--gold);
+}
+.card-leg .corner::after {
+  inset: 4px;
+  border-color: var(--gold-bright);
+  opacity: 0.65;
+}
+.card-leg .corner.tl::before { border-right: 0; border-bottom: 0; }
+.card-leg .corner.tl::after  { border-right: 0; border-bottom: 0; }
+.card-leg .corner.tr::before { border-left:  0; border-bottom: 0; }
+.card-leg .corner.tr::after  { border-left:  0; border-bottom: 0; }
+.card-leg .corner.bl::before { border-right: 0; border-top:    0; }
+.card-leg .corner.bl::after  { border-right: 0; border-top:    0; }
+.card-leg .corner.br::before { border-left:  0; border-top:    0; }
+.card-leg .corner.br::after  { border-left:  0; border-top:    0; }
+
+/* Legendary top cartouche, a small hanging title tag */
+.card-leg .card-mark {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 10px;
+  background:
+    linear-gradient(180deg, var(--gold) 0%, #8a6438 100%);
+  border: 1px solid var(--gold);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 0 8px rgba(255, 214, 107, 0.55);
+  z-index: 3;
+}
+.card-leg .card-mark::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 1px;
+  background: rgba(255, 240, 200, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CARD CONTENT
+   Identical layout for every rarity. Only colors shift.
+   ═══════════════════════════════════════════════════════════════════ */
+.card-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.kicker {
+  font-family: var(--font-kicker);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--bronze);
+  margin: 6px 0 14px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+  padding-left: 0.32em; /* optical centering */
+}
+.card-unc .kicker { color: var(--jade); }
+.card-leg .kicker {
+  color: var(--gold-bright);
+  text-shadow: 0 0 8px rgba(255, 214, 107, 0.4);
+}
+
+.icon-area {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 6px;
+}
+.icon-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(200, 151, 100, 0.18), transparent 65%);
+  border-radius: 50%;
+}
+.card-unc .icon-glow {
+  background: radial-gradient(circle at center, rgba(110, 201, 138, 0.24), transparent 60%);
+}
+.card-leg .icon-glow {
+  background: radial-gradient(circle at center, rgba(255, 214, 107, 0.32), transparent 60%);
+  animation: leg-icon-pulse 3.4s ease-in-out infinite;
+}
+@keyframes leg-icon-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1;   }
+  50%      { transform: scale(1.14); opacity: 0.78; }
+}
+.icon-glyph {
+  position: relative;
+  z-index: 1;
+  font-size: 52px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+.card-leg .icon-glyph {
+  filter:
+    drop-shadow(0 0 12px rgba(255, 214, 107, 0.55))
+    drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+}
+
+.rule {
+  width: 70%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-soft), transparent);
+  margin: 6px 0 10px;
+  border: none;
+}
+.card-unc .rule { background: linear-gradient(90deg, transparent, var(--jade-soft), transparent); }
+.card-leg .rule { background: linear-gradient(90deg, transparent, var(--gold-soft), transparent); }
+
+.name {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+  line-height: 1.18;
+  margin: 0 0 10px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-leg .name {
+  color: #fff4d4;
+  text-shadow:
+    0 0 10px rgba(255, 214, 107, 0.45),
+    0 1px 0  rgba(0, 0, 0, 0.7);
+}
+
+.effect {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(244, 230, 200, 0.88);
+  text-align: center;
+  letter-spacing: 0;
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 0;
+  padding: 2px 6px 0;
+}
+.effect strong {
+  color: var(--bronze);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.01em;
+}
+.card-unc .effect strong { color: var(--jade);        }
+.card-leg .effect strong { color: var(--gold-bright); }
+
+/* Legendary ember motes drift up from card base */
+.embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.embers > i {
+  position: absolute;
+  bottom: 0;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 5px var(--ember-glow);
+  opacity: 0;
+  animation: ember-rise 5.8s linear infinite;
+}
+.embers > i:nth-child(1) { left: 22%; animation-delay: 0s;   }
+.embers > i:nth-child(2) { left: 50%; animation-delay: 1.6s; }
+.embers > i:nth-child(3) { left: 75%; animation-delay: 3.2s; }
+.embers > i:nth-child(4) { left: 38%; animation-delay: 4.4s; }
+@keyframes ember-rise {
+  0%   { opacity: 0;    transform: translateY(0)     scale(1);   }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.55; }
+  100% { opacity: 0;    transform: translateY(-280px) scale(0.55); }
+}
+
+/* Tiny signature seal at the card's bottom-right.
+   Common has none. Uncommon: jade tile. Legendary: red chop. */
+.seal {
+  position: absolute;
+  bottom: 7px;
+  right: 7px;
+  width: 15px;
+  height: 15px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-chinese);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.78);
+  border-radius: 1px;
+  z-index: 2;
+  letter-spacing: 0;
+  line-height: 1;
+}
+.card-com .seal { display: none; }
+.card-unc .seal {
+  background: rgba(110, 201, 138, 0.75);
+  box-shadow: 0 0 0 1px rgba(80, 150, 100, 0.6);
+}
+.card-leg .seal {
+  background: var(--seal-red);
+  color: rgba(255, 240, 200, 0.95);
+  box-shadow:
+    0 0 0 1px rgba(140, 50, 35, 0.85),
+    0 0 6px rgba(212, 80, 50, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PICK BUTTON
+   Sits below the card. Stone tablet feel. Single family across
+   rarities; only the border tints (so the card itself does most of
+   the rarity work).
+   ═══════════════════════════════════════════════════════════════════ */
+.pick {
+  margin-top: 12px;
+  padding: 11px 8px;
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cream);
+  background: linear-gradient(180deg, #2c2418 0%, #1a140c 100%);
+  border: 1px solid var(--bronze-soft);
+  border-radius: 2px;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.10) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.5) inset,
+    0 4px 10px -4px rgba(0, 0, 0, 0.75);
+  transition: filter 120ms ease, transform 80ms ease;
+  padding-left: calc(8px + 0.28em);
+}
+.pick:hover  { filter: brightness(1.18); }
+.pick:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 1px 0 rgba(244, 230, 200, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.5) inset,
+    0 1px 4px -2px rgba(0, 0, 0, 0.7);
+}
+.slot.r-unc .pick {
+  border-color: var(--jade-soft);
+}
+.slot.r-leg .pick {
+  border-color: var(--gold-soft);
+  background: linear-gradient(180deg, #3a2c14 0%, #1f1608 100%);
+  color: #fff4d4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACTIONS: REROLL + META
+   Visually separated from the pair by a hairline shelf above.
+   ═══════════════════════════════════════════════════════════════════ */
+.actions {
+  position: relative;
+  z-index: 1;
+  margin-top: 28px;
+  padding-top: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+.actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 28%;
+  right: 28%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-faint), transparent);
+}
+
+.reroll {
+  padding: 9px 22px;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--bronze);
+  background: rgba(200, 151, 100, 0.08);
+  border: 1px solid var(--bronze-soft);
+  border-radius: 999px;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  transition: filter 120ms ease, background 120ms ease, color 120ms ease;
+  padding-left: calc(22px + 0.24em);
+}
+.reroll:hover { filter: brightness(1.2); background: rgba(200, 151, 100, 0.14); }
+.reroll.is-free {
+  color: var(--jade);
+  background: rgba(110, 201, 138, 0.10);
+  border-color: rgba(110, 201, 138, 0.55);
+}
+.reroll .cost {
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+
+.meta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--cream-fade);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-top:    1px solid var(--bronze-faint);
+  border-bottom: 1px solid var(--bronze-faint);
+}
+.meta strong  { color: var(--gold-bright); font-weight: 600; }
+.meta .sep    { color: rgba(200, 151, 100, 0.3); }
+.meta.pity-now {
+  color: var(--gold-bright);
+  border-color: var(--gold-soft);
+  text-shadow: 0 0 8px rgba(255, 214, 107, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LEGEND BOX (page-level reference)
+   ═══════════════════════════════════════════════════════════════════ */
+.legend {
+  margin: 64px auto 0;
+  max-width: 760px;
+  padding: 22px 26px;
+  border: 1px solid var(--bronze-faint);
+  background: linear-gradient(180deg, rgba(20, 18, 14, 0.7), rgba(10, 10, 12, 0.7));
+}
+.legend h3 {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bronze);
+  margin: 0 0 14px;
+}
+.legend dl { margin: 0; display: grid; grid-template-columns: 110px 1fr; gap: 8px 18px; }
+.legend dt {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.legend dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--cream-dim);
+  line-height: 1.55;
+}
+.legend dd em { color: var(--gold); font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Spark Picker: Inscribed Cards</h1>
+<p class="lede">
+  A refined take on the picker. Cards read as <strong>collected ritual
+  artifacts</strong> presented on a temple altar, not as fully painted
+  wood plaques. Card body, content layout, and dimensions stay identical
+  across rarities. Only the <em>frame ornament</em>, <em>accent color</em>,
+  and <em>presence of motion</em> escalate.
+  <br><br>
+  <strong>Common</strong> is intentionally austere: a single bronze
+  hairline border, a tiny paper marker at the top center, a thin rule
+  under the icon. No motion. <strong>Uncommon</strong> adds jade
+  L-bracket corners, a small green tag at the top, and a faint green
+  halo. <strong>Legendary</strong> earns its weight with nested gold
+  brackets, a small gold cartouche, a breathing frame glow, gold-leaf
+  shimmer in the body, drifting ember motes, and a red signature seal
+  at the corner. Same skeleton, four layers of escalation.
+  <br><br>
+  Picker background is intentionally dark and contemplative: a giant
+  faint <span class="hanzi">灵</span> (líng, spirit) watermark hovers
+  behind everything, with two soft incense-light columns placing each
+  card on its own pedestal of light.
+</p>
+
+<div class="scenes">
+
+  <!-- ═══════════════ Scene 1: Common pair ═══════════════ -->
+  <div class="scene">
+    <div class="scene-label">Calm: common pair</div>
+    <div class="scene-note">
+      Two simple cards. No motion, no glow. The pause between
+      major decisions.
+    </div>
+    <div class="device">
+      <div class="device-bar">390 × 680</div>
+      <div class="picker">
+        <div class="picker-head">
+          <h2 class="picker-title">Qi Spark</h2>
+          <p class="picker-sub">
+            a <span class="tier-pill t-com">Common</span> offer, choose one
+          </p>
+        </div>
+        <div class="pair">
+
+          <div class="slot r-com">
+            <article class="card card-com">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <div class="card-inner">
+                <div class="kicker">Common</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">⚡</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Quick Burst</h3>
+                <p class="effect">Instant qi worth <strong>30 seconds</strong> of your current rate.</p>
+              </div>
+              <span class="seal"></span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+          <div class="slot r-com">
+            <article class="card card-com">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <div class="card-inner">
+                <div class="kicker">Common</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🌬️</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Sect Discipline</h3>
+                <p class="effect"><strong>+0.5 qi/s</strong> per producer for 90 seconds.</p>
+              </div>
+              <span class="seal"></span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="reroll is-free">↺ Reroll pair <span class="cost">free</span></button>
+          <div class="meta">
+            <span>✦ <strong>6%</strong> legendary</span>
+            <span class="sep">·</span>
+            <span>pity in <strong>9</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ Scene 2: Common + Uncommon ═══════════════ -->
+  <div class="scene">
+    <div class="scene-label">Lift: uncommon appears</div>
+    <div class="scene-note">
+      Jade L-brackets, green halo, jade tag at the top, jade seal. Card
+      body is otherwise identical to common.
+    </div>
+    <div class="device">
+      <div class="device-bar">390 × 680</div>
+      <div class="picker">
+        <div class="picker-head">
+          <h2 class="picker-title">Qi Spark</h2>
+          <p class="picker-sub">
+            an <span class="tier-pill t-unc">Uncommon</span> offer, choose one
+          </p>
+        </div>
+        <div class="pair">
+
+          <div class="slot r-com">
+            <article class="card card-com">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <div class="card-inner">
+                <div class="kicker">Common</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🌀</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Focus Surge</h3>
+                <p class="effect"><strong>+50%</strong> Focus multiplier for 60 seconds.</p>
+              </div>
+              <span class="seal"></span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+          <div class="slot r-unc">
+            <article class="card card-unc">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <div class="card-inner">
+                <div class="kicker">Uncommon</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🪷</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Resonant Soul</h3>
+                <p class="effect"><strong>+2% qi/s</strong> per major realm cleared this run.</p>
+              </div>
+              <span class="seal">玉</span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="reroll">↺ Reroll pair <span class="cost">· 3 BL</span></button>
+          <div class="meta">
+            <span>✦ <strong>6%</strong> legendary</span>
+            <span class="sep">·</span>
+            <span>pity in <strong>5</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ Scene 3: Uncommon + Legendary ═══════════════ -->
+  <div class="scene">
+    <div class="scene-label">The chase: legendary appears</div>
+    <div class="scene-note">
+      Nested gold brackets, gold cartouche, breathing frame, drifting
+      embers, red signature seal. The right card commands the eye.
+    </div>
+    <div class="device">
+      <div class="device-bar">390 × 680</div>
+      <div class="picker">
+        <div class="picker-head">
+          <h2 class="picker-title">Qi Spark</h2>
+          <p class="picker-sub">
+            a <span class="tier-pill t-leg">Legendary</span> offer, choose one
+          </p>
+        </div>
+        <div class="pair">
+
+          <div class="slot r-unc">
+            <article class="card card-unc">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <div class="card-inner">
+                <div class="kicker">Uncommon</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🪨</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Patience of Stone</h3>
+                <p class="effect"><strong>-10%</strong> major realm gate cost, stacks.</p>
+              </div>
+              <span class="seal">玉</span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+          <div class="slot r-leg">
+            <article class="card card-leg">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <span class="embers"><i></i><i></i><i></i><i></i></span>
+              <div class="card-inner">
+                <div class="kicker">Legendary</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🔥</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Phoenix Reborn</h3>
+                <p class="effect">Each major realm: Phoenix to <strong>0</strong>, all others <strong>×2</strong> permanent.</p>
+              </div>
+              <span class="seal">凰</span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="reroll">↺ Reroll pair <span class="cost">· 6 BL</span></button>
+          <div class="meta">
+            <span>✦ <strong>6%</strong> legendary</span>
+            <span class="sep">·</span>
+            <span><strong>3 of 7</strong> in pool</span>
+            <span class="sep">·</span>
+            <span>pity in <strong>1</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ Scene 4: Double legendary, pity-forced ═══════════════ -->
+  <div class="scene">
+    <div class="scene-label">Both legendary, pity-forced</div>
+    <div class="scene-note">
+      Both cards breathing in sync. Footer shifts to the guaranteed-
+      legendary state. The moment players replay for.
+    </div>
+    <div class="device">
+      <div class="device-bar">390 × 680</div>
+      <div class="picker">
+        <div class="picker-head">
+          <h2 class="picker-title">Qi Spark</h2>
+          <p class="picker-sub">
+            a <span class="tier-pill t-leg">Legendary</span> offer, choose one
+          </p>
+        </div>
+        <div class="pair">
+
+          <div class="slot r-leg">
+            <article class="card card-leg">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <span class="embers"><i></i><i></i><i></i><i></i></span>
+              <div class="card-inner">
+                <div class="kicker">Legendary</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🐉</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Azure Dragon</h3>
+                <p class="effect">Pair with Tiger and Tortoise to trigger <strong>Trinity Convergence</strong>.</p>
+              </div>
+              <span class="seal">龍</span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+          <div class="slot r-leg">
+            <article class="card card-leg">
+              <span class="card-grain"></span>
+              <span class="card-mark"></span>
+              <span class="corner tl"></span>
+              <span class="corner tr"></span>
+              <span class="corner bl"></span>
+              <span class="corner br"></span>
+              <span class="embers"><i></i><i></i><i></i><i></i></span>
+              <div class="card-inner">
+                <div class="kicker">Legendary</div>
+                <div class="icon-area">
+                  <span class="icon-glow"></span>
+                  <span class="icon-glyph">🐢</span>
+                </div>
+                <hr class="rule" />
+                <h3 class="name">Black Tortoise</h3>
+                <p class="effect">Each Tortoise + Crane pair: both producers <strong>×1.5</strong>.</p>
+              </div>
+              <span class="seal">玄</span>
+            </article>
+            <button class="pick">Pick</button>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <button class="reroll">↺ Reroll pair <span class="cost">· 12 BL</span></button>
+          <div class="meta pity-now">
+            <span>⚡ <strong>Pity active, next legendary guaranteed</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ Page-level legend ═══════════════ -->
+<div class="legend">
+  <h3>Rarity Vocabulary</h3>
+  <dl>
+    <dt>Border</dt>
+    <dd>Common <em>bronze hairline</em>, uncommon <em>jade hairline + green halo</em>, legendary <em>gold hairline with double-stroke breathing glow</em>.</dd>
+
+    <dt>Corners</dt>
+    <dd>Common <em>none</em>, uncommon <em>single jade L-bracket</em>, legendary <em>nested double bracket</em> hinting the 回 (huí) motif.</dd>
+
+    <dt>Top marker</dt>
+    <dd>Common <em>3px bronze dot</em>, uncommon <em>jade tag</em>, legendary <em>gold cartouche</em>.</dd>
+
+    <dt>Seal</dt>
+    <dd>Common <em>none</em>, uncommon <em>jade tile</em> with 玉, legendary <em>red chop</em> with a character matching the spark (凰 for Phoenix, 龍 for Dragon).</dd>
+
+    <dt>Motion</dt>
+    <dd>Common and uncommon <em>static</em>. Legendary breathes a 3.4 second cycle on frame and icon, with ember motes drifting up on a 5.8 second loop.</dd>
+
+    <dt>Hover</dt>
+    <dd>Any card lifts 3px on hover. Legendary lifts 5px for extra weight.</dd>
+  </dl>
+</div>
+
+</body>
+</html>
