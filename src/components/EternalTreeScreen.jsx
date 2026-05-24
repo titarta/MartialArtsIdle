@@ -31,6 +31,33 @@ function buildEdges() {
 }
 const EDGES = buildEdges();
 
+const ARROW_SIZE = 10; // px — arrowhead length in user-space
+
+/** Border-to-border endpoints for an edge.
+ *  Since edges only go right (Δcol>0) or down (Δrow>0), we can snap
+ *  the exit/entry points to the exact node faces.
+ */
+function edgeEndpoints(fromNode, toNode) {
+  const fc = nodeCenter(fromNode);
+  const tc = nodeCenter(toNode);
+  const isRight = toNode.col > fromNode.col;
+  if (isRight) {
+    return {
+      x1: fc.cx + NODE_W / 2,
+      y1: fc.cy,
+      x2: tc.cx - NODE_W / 2,
+      y2: tc.cy,
+    };
+  }
+  // Downward
+  return {
+    x1: fc.cx,
+    y1: fc.cy + NODE_H / 2,
+    x2: tc.cx,
+    y2: tc.cy - NODE_H / 2,
+  };
+}
+
 // Canvas dimensions
 const NUM_COLS = Math.max(...NODES.map(n => n.col)) + 1;
 const NUM_ROWS = Math.max(...NODES.map(n => n.row)) + 1;
@@ -242,21 +269,65 @@ export default function EternalTreeScreen({
           height={CANVAS_H}
           style={{ display: 'block', overflow: 'visible' }}
         >
+          <defs>
+            {/* Lit arrow — both nodes purchased */}
+            <marker
+              id="arrow-lit"
+              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
+              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
+              orient="auto"
+              markerUnits="userSpaceOnUse"
+            >
+              <path
+                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
+                fill="#c084fc"
+              />
+            </marker>
+            {/* Mid arrow — source purchased, target not yet */}
+            <marker
+              id="arrow-mid"
+              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
+              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
+              orient="auto"
+              markerUnits="userSpaceOnUse"
+            >
+              <path
+                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
+                fill="#7c3aed"
+              />
+            </marker>
+            {/* Dim arrow — source not purchased */}
+            <marker
+              id="arrow-dim"
+              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
+              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
+              orient="auto"
+              markerUnits="userSpaceOnUse"
+            >
+              <path
+                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
+                fill="#2d1b4e"
+              />
+            </marker>
+          </defs>
+
           {/* Edges */}
           {EDGES.map(({ from, to }) => {
-            const fc = nodeCenter(NODES_BY_ID[from]);
-            const tc = nodeCenter(NODES_BY_ID[to]);
+            const bothPurchased = nodeStates[from] === 'purchased' && nodeStates[to] === 'purchased';
             const fromPurchased = nodeStates[from] === 'purchased';
-            const toUnlocked    = nodeStates[to]   !== 'locked';
+            const { x1, y1, x2, y2 } = edgeEndpoints(NODES_BY_ID[from], NODES_BY_ID[to]);
+            // Shorten line endpoint so arrowhead tip lands exactly on node border
+            const markerId = bothPurchased ? 'arrow-lit' : fromPurchased ? 'arrow-mid' : 'arrow-dim';
             return (
               <line
                 key={`${from}-${to}`}
-                x1={fc.cx} y1={fc.cy}
-                x2={tc.cx} y2={tc.cy}
-                stroke={fromPurchased && toUnlocked ? '#7c3aed' : '#2a1850'}
-                strokeWidth={fromPurchased && toUnlocked ? 2 : 1}
-                strokeDasharray={fromPurchased && toUnlocked ? undefined : '4 4'}
-                opacity={fromPurchased && toUnlocked ? 0.8 : 0.4}
+                x1={x1} y1={y1}
+                x2={x2} y2={y2}
+                stroke={bothPurchased ? '#c084fc' : fromPurchased ? '#7c3aed' : '#2d1b4e'}
+                strokeWidth={bothPurchased ? 2.5 : fromPurchased ? 1.5 : 1}
+                strokeDasharray={fromPurchased ? undefined : '5 4'}
+                opacity={bothPurchased ? 1 : fromPurchased ? 0.7 : 0.4}
+                markerEnd={`url(#${markerId})`}
               />
             );
           })}
