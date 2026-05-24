@@ -1,162 +1,130 @@
-# Reincarnation — Rebirth System
+# Reincarnation
 
-> *"The body is ash. The soul remembers. The next life begins wiser."*
-
----
-
-## Overview
-
-Reincarnation is the prestige mechanic. The player resets all progress in
-exchange for **Reincarnation Karma**, a permanent currency spent in the
-**Eternal Tree** to unlock powerful lifelong buffs.
-
-- **Tab name:** Rebirth (new entry in the main NavBar).
-- **Tab visibility:** unlocked the first time the player reaches **Saint Early Stage**
-  (realm index 24). Once unlocked it stays visible forever, even after reincarnating
-  (gate: `karma.unlocked === highestReached >= SAINT_UNLOCK_INDEX`).
-- **The Reincarnate button itself** is additionally gated on the **current**
-  realm — `cultivation.realmIndex >= 24` — so reborn characters cannot
-  immediately rebirth again until they cultivate back up to Saint. The Eternal
-  Tree remains spendable in the meantime.
-- **Karma is awarded immediately on reaching a new realm for the first time.**
-  Re-reaching a realm in a later life grants zero additional karma. Players
-  can spend their karma in the Eternal Tree at any point — rebirth is not
-  required to unlock nodes.
-
-### What a rebirth does to the law library
-
-Reincarnation wipes QI, realms, pills, inventory, artefacts, techniques, and selections — but the **entire owned-law library survives**. `activeLawId` is cleared, so the reborn character is unequipped and must pick a new active law from their persisted library. That unequip moment is the intentional identity reset — every life can be a different playstyle without losing past acquisitions. Karma and the Eternal Tree also persist.
+Reincarnation is the prestige system. After reaching the **Saint realm (index 24)**, the player can reincarnate: their cultivation, producers, and upgrades reset; karma and the Eternal Tree persist.
 
 ---
 
-## Karma per realm
+## Karma
 
-Awarded for the breakthrough *into* the realm. Starting realm (index 0) grants
-nothing — you only earn karma by progressing.
+Karma is earned **continuously** based on total Qi generated **this life** (not at realm milestones).
 
-| Major realm (index range)        | Karma / stage | Major total |
-|----------------------------------|--------------:|------------:|
-| Tempered Body Layer 2–10 (1–9)   | 1             | 9           |
-| Qi Transformation (10–13)        | 1             | 4           |
-| True Element (14–17)             | 1             | 4           |
-| Separation & Reunion (18–20)     | 2             | 6           |
-| Immortal Ascension (21–23)       | 2             | 6           |
-| Saint (24–26) — **unlock here**  | 2             | 6           |
-| Saint King (27–29)               | 3             | 9           |
-| Origin Returning (30–32)         | 3             | 9           |
-| Origin King (33–35)              | 4             | 12          |
-| Void King (36–38)                | 4             | 12          |
-| Dao Source (39–41)               | 5             | 15          |
-| Emperor Realm (42–44)            | 5             | 15          |
-| Open Heaven Layer 1–6 (45–50)    | 6             | 36          |
-| **Peak total**                   |               | **143**     |
+### Formula
 
-Reaching peak in a single life awards all 143 karma.
+The **k-th karma point** (0-indexed) costs:
 
-Karma state lives in `localStorage` key `mai_reincarnation` and tracks:
-- `karma` — current spendable balance
-- `highestReached` — highest realm index ever touched across all lives
-- `maxAwarded` — highest realm index that has already granted its karma
-- `lives` — number of completed reincarnations
+```
+cost(k) = 1,000,000 + k × 10,000  Qi earned this life
+```
 
-Pending karma (what would be awarded if the player reincarnated right now)
-= `Σ karmaForReachingIndex(i)` for `i` from `maxAwarded+1` to `highestReached`.
+Total Qi required for **n karma points**:
 
----
+```
+Q(n) = Σ(k=0..n-1)(1,000,000 + k × 10,000)
+     = 1,000,000·n + 10,000·n(n−1)/2
+     = 5,000n² + 995,000n
+```
 
-## The Eternal Tree
+**Inverse** (karma from total Qi earned this life):
 
-A **5-branch radial tree** rendered in an SVG canvas (pannable + scroll-to-zoom).
-Four main branches radiate from the root with a sealed fifth branch (Yin Yang)
-that unlocks once the player has bought ≥ 2 of the four main keystones.
+```
+n = floor(( −995,000 + √(990,025,000,000 + 20,000·Q) ) / 10,000)
+```
 
-> **Total tree cost = 143 karma** — exactly what one peak life awards. Players
-> reincarnate only when they have reached a *higher* realm than any previous
-> life (each realm grants karma once via `maxAwarded` tracking). Reincarnation
-> is a true progression milestone, not a karma-farming loop.
+### First few thresholds
 
-| Branch | Theme | Total |
-|---|---|---|
-| 🏛 **Ancestor's Legacy** | Head-start, recipe carry-over, offline cap, jade + cult buff | 25 |
-| ⚔ **Martial Dao** | Cooldowns, exploit, +1 slot, crafted-tech quality, post-kill exploit | 25 |
-| 🌟 **Fate's Path** | Craft-tier luck, gather/mine rarity, refine cost, +Selection options, dual auto-farm | 25 |
-| 💪 **Heavenly Will** | All-primaries / HP scaling, undying resolve, pill effect mult | 25 |
-| ☯ **Yin Yang** *(sealed: ≥ 2 keystones)* | Per-life scaling, qi-on-realm, HP regen, free-cast cycle, artefact value mult | 28 |
-| 🔗 **Cross-branch connectors** | typeMults bonus, kill-bonus gather drops, Phase Technique law | 15 |
-
-Each main branch has 4 sequential nodes + 1 keystone. Yin Yang has 5 nodes
-unlocked behind the keystone gate. **Cross-branch connectors** (`cb_*`)
-link main keystones with AND prereqs.
-
-Authoritative definitions: `NODES` array in [src/data/reincarnationTree.js](../src/data/reincarnationTree.js).
-Each node is `{ id, branch, step, label, icon, desc, cost, prereqs, prereqMode, keystone? }`
-with `prereqMode ∈ { 'or', 'and', 'yyUnlock' }`.
-
-Purchases persist in `localStorage` key `mai_reincarnation_tree` and are NOT
-wiped on reincarnation. Each node is a one-time purchase. Nodes can be
-bought at any time during a run — rebirth is not required.
-
-### Full node list
-
-| Node | Branch | Cost | Effect |
-|---|---|---|---|
-| Inherited Meridians (`al_1`) | Legacy | 3 | +25% qi/s permanently. |
-| Echo of Mastery (`al_2`) | Legacy | 4 | Each new life starts with all crafting/alchemy recipes still discovered. |
-| Ancestor's Shelter (`al_3`) | Legacy | 5 | Offline-gains cap raised 8h → 16h. |
-| Bloodline Vigor (`al_4`) | Legacy | 6 | Each new life starts with +50 jade and 1 banked free Selection re-roll. |
-| Living Memory ★ (`al_k`) | Legacy | 7 | At rebirth, gain a 1-hour ×2 cultivation buff. |
-| Steady Hands (`md_1`) | Martial | 3 | All technique cooldowns −10%. |
-| Combat Instinct (`md_2`) | Martial | 4 | +20% exploit chance permanently. |
-| The Fourth Form (`md_3`) | Martial | 5 | Unlocks a 4th technique slot. |
-| Veteran's Eye (`md_4`) | Martial | 6 | All crafted techniques arrive +1 quality tier. |
-| Killing Stride ★ (`md_k`) | Martial | 7 | After defeating an enemy, next cast is a guaranteed exploit and deals +50% damage. |
-| Lucky Star (`fp_1`) | Fate | 3 | +10% chance any artefact craft / pill brew rolls 1 tier higher. |
-| Heavenly Nose (`fp_2`) | Fate | 4 | 10% chance any gathered/mined material is +1 rarity. |
-| Connoisseur (`fp_3`) | Fate | 5 | All Refine operations cost −30% minerals. |
-| Sage's Foresight (`fp_4`) | Fate | 6 | Selection screens at every major-realm breakthrough show 4 options instead of 3. |
-| Twofold Path ★ (`fp_k`) | Fate | 7 | Auto-Farm can run two zone assignments simultaneously. |
-| Soul Tempering (`hw_1`) | Will | 3 | +20% to all primary stats. |
-| Iron Will (`hw_2`) | Will | 4 | +50% max HP permanently. |
-| Undying Resolve (`hw_3`) | Will | 5 | Once per fight, surviving a lethal hit leaves you at 1 HP. |
-| Soul Crucible (`hw_4`) | Will | 6 | All permanent pill stat bonuses are increased by 25%. |
-| Heavenly Constitution ★ (`hw_k`) | Will | 7 | +25% MORE all primary stats and +25% MORE max HP (multiplicative). |
-| Wisdom of Lives (`yy_1`) | Yin Yang | 4 | +5% to all damage and Health per completed life, capped +50%. |
-| Yin Reservoir (`yy_2`) | Yin Yang | 5 | Every realm starts with 20% of its breakthrough qi cost already accumulated. |
-| Yang Resolve (`yy_3`) | Yin Yang | 5 | Regenerate +5% max HP per second while above 50% HP. |
-| Equilibrium (`yy_4`) | Yin Yang | 6 | Every 5th technique cast is free (no cooldown). |
-| Primordial Balance ★ (`yy_k`) | Yin Yang | 8 | +10% engine-side multiplier on every artefact affix value you own. |
-| Inherited Strength (`cb_is`) | cross — `al_k` + `hw_1` | 4 | Active law's typeMults are permanently +25%. |
-| Veteran's Hunt (`cb_ts`) | cross — `md_k` + `fp_k` | 5 | After 10 enemy kills in a region, next gather/mine in that region drops at +1 rarity. |
-| Phase Technique (`cb_pt`) | cross — all 4 main keystones | 6 | Grants the Phase Technique law: Transcendent, all 9 types, cannot be unequipped, crafting on it stays at base cost. |
+| Karma earned | Qi needed (total this life) |
+|:---:|:---|
+| 1  | 1,000,000 |
+| 2  | 2,010,000 |
+| 3  | 3,030,000 |
+| 5  | 5,100,000 |
+| 10 | 10,450,000 |
+| 20 | 21,900,000 |
 
 ---
 
-## The reincarnate flow
+## Eternal Tree
 
-1. Player clicks **Reincarnate** in the Rebirth tab.
-2. Confirmation modal explains what is wiped vs what survives.
-3. On confirm:
-   - `karma.reincarnate()` bumps the life counter (karma itself was already
-     granted incrementally as realms were reached).
-   - `wipeReincarnation()` snapshots the **entire** owned-laws library,
-     calls `wipeSave()` (which clears the standard set; `mai_jade`,
-     `mai_lang`, `mai_reincarnation`, and `mai_reincarnation_tree` are
-     untouched), then re-seeds `mai_owned_laws` from the snapshot.
-     `mai_active_law` is intentionally **not** restored — the reborn
-     character must re-equip a law from the persisted library.
-   - `window.location.reload()` boots a fresh run — karma, tree and the
-     full owned-laws library load back from their keys.
+7 nodes in a 2-column grid. Each node costs **1 karma**.
+
+### Layout
+
+```
+Col:  0                    1
+Row0: [n_1 Devoted Path] → [n_2 Star Disciple]
+       ↓
+Row1: [n_3 Crystalline Focus] → [n_4 Discerning Eye]
+       ↓
+Row2: [n_5 Frugal Cultivation]
+       ↓
+Row3: [n_6 Sect Resonance]
+       ↓
+Row4: [n_7 Senior's Guidance]
+```
+
+Edges only go **right** or **down**. A node is purchasable when all its prereqs are owned.
+
+### Node Table
+
+| # | ID | Name | Effect | Prereq |
+|---|---|---|---|---|
+| 1 | `n_1` | Devoted Path | +0.1% Qi/s per karma spent on the tree | — |
+| 2 | `n_2` | Star Disciple | Unlock Star Disciple Cultivation *(coming soon)* | n_1 |
+| 3 | `n_3` | Crystalline Focus | +20% INCREASED Qi Crystal bonus multiplier | n_1 |
+| 4 | `n_4` | Discerning Eye | Common Qi Sparks are 40% less likely (weight ×0.6) | n_3 |
+| 5 | `n_5` | Frugal Cultivation | 10% reduced producer purchase cost | n_3 |
+| 6 | `n_6` | Sect Resonance | Each producer: +1% INCREASED Qi/s per owned of that same type | n_5 |
+| 7 | `n_7` | Senior's Guidance | Each producer: +0.5% INCREASED Qi/s per owned of the previous producer type | n_6 |
+
+#### Node 1 — Devoted Path
+The `treeQiMult` grows as the player buys more nodes: with all 7 purchased the tree Qi bonus is **+0.7%** (7 × 0.1%).
+
+#### Node 2 — Star Disciple
+Purchasable but has no functional effect until a future update.
+
+#### Node 3 — Crystalline Focus
+The standard crystal bonus (level × 1.5%) is multiplied by 1.20 → effective rate per level becomes **1.8%**.
+
+#### Node 4 — Discerning Eye
+The common-spark weight is reduced from 65 to 39 (×0.6). Combined with the fixed uncommon weight (35), common draws go from ~65% to ~53% of outcomes.
+
+#### Node 6 — Sect Resonance (self-synergy)
+With 50 units of one producer type: bonus = 1 + 50 × 0.01 = **×1.50** to that producer's Qi/s.
+
+#### Node 7 — Senior's Guidance (cross-synergy)
+With 100 units of PRODUCERS[i−1]: bonus = 1 + 100 × 0.005 = **×1.50** to producer[i]'s Qi/s.
 
 ---
 
-## Code map
+## What Persists / Wipes on Reincarnation
 
-| Responsibility                               | File                                   |
-|----------------------------------------------|----------------------------------------|
-| Karma scaling + tree node definitions        | `src/data/reincarnationTree.js`        |
-| Karma state + per-realm tracking             | `src/hooks/useReincarnationKarma.js`   |
-| Tree purchases + derived modifiers           | `src/hooks/useReincarnationTree.js`    |
-| Tab UI                                       | `src/screens/ReincarnationScreen.jsx`  |
-| Save-key preservation                        | `src/systems/save.js` (`wipeReincarnation`) |
-| Nav tab entry                                | `src/components/NavBar.jsx`            |
-| Wiring into cultivation / combat / stats     | `src/App.jsx` + `useCultivation.js` + `useCombat.js` |
+### Persists
+- **Karma** (unspent balance)
+- **Tree purchases** (all purchased node IDs)
+- **Karma earned this life counter** resets to 0 (fresh life)
+- **Law library** (all owned laws; active selection resets)
+- **Pinned alchemy recipes**
+- **Lifetime stats**
+
+### Wipes
+- Cultivation progress (realm index, Qi)
+- Producers and upgrades
+- Qi Sparks active/pending
+- Crystal reservoir
+- Run stats
+
+---
+
+## Implementation Notes
+
+- Karma hook: `src/hooks/useReincarnationKarma.js`
+- Tree hook: `src/hooks/useReincarnationTree.js`
+- Tree data: `src/data/reincarnationTree.js`
+- Tree UI: `src/components/EternalTreeScreen.jsx`
+- Save wipe: `src/systems/save.js → wipeReincarnation()`
+
+---
+
+## Future
+
+- **Star Disciple Cultivation** (n_2) — new cultivation mode with a different Qi scaling curve, planned post-v1 launch.

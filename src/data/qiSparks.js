@@ -1032,14 +1032,15 @@ function eligiblePool({ activeSparks = [], isFeatureUnlocked, producerUnlocked }
 /**
  * Pick a single random non-legendary card by rarity weight from an array.
  * Returns the chosen card, or null if the array is empty / all-zero-weight.
+ * Accepts an optional `weights` override map for per-rarity weight overrides.
  */
-function pickWeightedNonLegendary(cards) {
+function pickWeightedNonLegendary(cards, weights = SPARK_RARITY_WEIGHTS) {
   if (cards.length === 0) return null;
-  const total = cards.reduce((s, c) => s + (SPARK_RARITY_WEIGHTS[c.rarity] ?? 0), 0);
+  const total = cards.reduce((s, c) => s + (weights[c.rarity] ?? 0), 0);
   if (total <= 0) return null;
   let r = Math.random() * total;
   for (let j = 0; j < cards.length; j++) {
-    r -= SPARK_RARITY_WEIGHTS[cards[j].rarity] ?? 0;
+    r -= weights[cards[j].rarity] ?? 0;
     if (r <= 0) return cards[j];
   }
   return cards[cards.length - 1];
@@ -1056,8 +1057,11 @@ function pickWeightedNonLegendary(cards) {
  * Falls back to the next-available tier when the chosen tier has fewer than
  * 2 eligible cards (can't fill 2 slots) — prevents the offer from being
  * empty when, e.g., legendaries are gated by un-unlocked producers.
+ *
+ * @param {object} [weights]  Per-rarity weight map. Defaults to SPARK_RARITY_WEIGHTS.
+ *   Pass `{ common: X }` to override just the common weight (node 4 Discerning Eye).
  */
-function rollOfferTier(pool, forceLegendary) {
+function rollOfferTier(pool, forceLegendary, weights = SPARK_RARITY_WEIGHTS) {
   const byRarity = {
     common:    pool.filter(c => c.rarity === 'common'),
     uncommon:  pool.filter(c => c.rarity === 'uncommon'),
@@ -1069,9 +1073,9 @@ function rollOfferTier(pool, forceLegendary) {
   const tryOrder = wantLegendary
     ? ['legendary', 'uncommon', 'common']
     : (() => {
-        // Weighted pick between common and uncommon
-        const cw = SPARK_RARITY_WEIGHTS.common ?? 0;
-        const uw = SPARK_RARITY_WEIGHTS.uncommon ?? 0;
+        // Weighted pick between common and uncommon using the (possibly overridden) weights.
+        const cw = weights.common ?? 0;
+        const uw = weights.uncommon ?? 0;
         const total = cw + uw;
         if (total <= 0) return ['common', 'uncommon'];
         const pickUncommon = Math.random() < (uw / total);
@@ -1096,12 +1100,16 @@ function rollOfferTier(pool, forceLegendary) {
  * @param {number} count                  Default 2 (the modal shows two cards).
  * @param {object} [ctx]                  Forwarded to eligiblePool.
  * @param {boolean} [ctx.forceLegendary]  Pity counter trigger from useQiSparks.
+ * @param {object} [weightOverrides]      Override per-rarity weights, e.g.
+ *   `{ common: 39 }` for node 4 Discerning Eye (common weight × 0.60).
+ *   Merged on top of SPARK_RARITY_WEIGHTS — only listed keys are changed.
  */
-export function drawOffer(count = 2, ctx = {}) {
+export function drawOffer(count = 2, ctx = {}, weightOverrides = {}) {
   const pool = eligiblePool(ctx);
   if (pool.length === 0) return [];
 
-  const tier = rollOfferTier(pool, !!ctx.forceLegendary);
+  const weights = { ...SPARK_RARITY_WEIGHTS, ...weightOverrides };
+  const tier = rollOfferTier(pool, !!ctx.forceLegendary, weights);
   if (!tier) return [];
 
   // Filter pool to just the chosen tier, then draw `count` distinct cards.

@@ -428,6 +428,10 @@ export default function useCultivation() {
   // left untouched (no more "drain qi on breakthrough" — Painless Ascension
   // spark retires alongside, see qiSparks.js).
   const qiEarnedThisRealmRef = useRef(saved?.qiEarnedThisRealm ?? 0);
+  // Lifetime qi counter — accumulates every qi tick and is reset to 0 when
+  // the main save is wiped on reincarnation. Used by useReincarnationKarma to
+  // continuously award karma based on total Qi generated this life.
+  const qiEarnedThisLifeRef  = useRef(saved?.qiEarnedThisLife  ?? 0);
   const costRef    = useRef(REALMS[savedIndex].cost);
   const maxedRef   = useRef(!REALMS[savedIndex + 1]);
   const indexRef   = useRef(savedIndex);
@@ -605,6 +609,9 @@ export default function useCultivation() {
       // Realm meter (Cookie-Clicker pivot) — fills with cumulative income
       // for this realm; never decreases via spending.
       qiEarnedThisRealmRef.current += dQi;
+      // Lifetime qi — accumulates across the entire current life; used by
+      // the karma hook to continuously award karma. Reset on reincarnation.
+      qiEarnedThisLifeRef.current  += dQi;
       // Stats — accumulate passive qi here; flushed to the stats recorder
       // once per second by the interval below so we don't hammer the
       // singleton at 60 Hz.
@@ -806,6 +813,7 @@ export default function useCultivation() {
         // saves; defaults to 0 on next load (realm bar starts empty, no
         // breakthrough blocked).
         qiEarnedThisRealm:  Math.round(qiEarnedThisRealmRef.current * 10) / 10,
+        qiEarnedThisLife:   Math.round(qiEarnedThisLifeRef.current  * 10) / 10,
         adBoostEndsAt:      adBoostEndsAtRef.current,
         ascended:           ascendedRef.current,
       });
@@ -891,6 +899,8 @@ export default function useCultivation() {
     // Cookie-Clicker pivot — offline grant also fills the realm meter so the
     // player can break through on the next tick if they crossed the cost line.
     qiEarnedThisRealmRef.current += total;
+    // Offline qi also counts toward this life's total for karma accrual.
+    qiEarnedThisLifeRef.current  += total;
     try {
       const lastSeen = saved?.lastSeen ?? Date.now();
       trackOfflineQiCollected(Math.floor(total), Date.now() - lastSeen, multiplier);
@@ -967,6 +977,7 @@ export default function useCultivation() {
     qiRef.current += granted;
     // Cookie-Clicker pivot — tap qi counts toward realm progress too.
     qiEarnedThisRealmRef.current += granted;
+    qiEarnedThisLifeRef.current  += granted;
     return granted;
   }, []);
 
@@ -989,6 +1000,9 @@ export default function useCultivation() {
     // Cookie-Clicker pivot: cumulative qi earned in the current realm. The
     // realm progress bar reads this; spending qi does NOT decrement it.
     qiEarnedThisRealmRef,
+    // Lifetime counter — used by the karma hook to award karma continuously.
+    // Reset when the main save is wiped on reincarnation.
+    qiEarnedThisLifeRef,
     costRef,
     indexRef,
     rateRef,

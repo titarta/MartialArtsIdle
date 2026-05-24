@@ -138,25 +138,23 @@ export function wipeReincarnation() {
   const snapshot = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
   const restore  = (key, val) => { if (val != null) { try { localStorage.setItem(key, val); } catch {} } };
 
-  const karma                 = snapshot('mai_reincarnation');
-  const tree                  = snapshot('mai_reincarnation_tree');
-  const ownedLawsRaw          = snapshot('mai_owned_laws');
-  const discoveredPills       = snapshot('mai_discovered_pills');
-  const pinnedRecipes         = snapshot('mai_pinned_recipes');
-  const bankedRerolls         = snapshot('mai_banked_rerolls');
-  const rebirthCultBuffUntil  = snapshot('mai_rebirth_cult_buff_until');
+  const karma        = snapshot('mai_reincarnation');
+  const tree         = snapshot('mai_reincarnation_tree');
+  const ownedLawsRaw = snapshot('mai_owned_laws');
+  const pinnedRecipes = snapshot('mai_pinned_recipes');
   // Cookie-Clicker stats — lifetime + sinceTs survive reincarnation; the
   // run bucket is wiped to zero and the player starts the new life with
   // fresh per-run counters.
-  const statsRaw              = snapshot('mai_stats');
+  const statsRaw     = snapshot('mai_stats');
 
   wipeSave();
 
-  // Re-seed prestige progression — karma, tree, and tree-driven carryovers.
-  restore('mai_reincarnation',          karma);
-  restore('mai_reincarnation_tree',     tree);
-  restore('mai_banked_rerolls',         bankedRerolls);
-  restore('mai_rebirth_cult_buff_until', rebirthCultBuffUntil);
+  // Re-seed prestige progression — karma and tree nodes.
+  // (Old carryovers mai_banked_rerolls, mai_rebirth_cult_buff_until, and
+  // mai_discovered_pills were driven by al_4, al_k, and al_2 respectively.
+  // Those nodes no longer exist — the keys are intentionally not restored.)
+  restore('mai_reincarnation',      karma);
+  restore('mai_reincarnation_tree', tree);
 
   // Re-seed stats — preserve lifetime + sinceTs, reset run + stamp a
   // fresh runStartedTs so the "run started X ago" readout starts from
@@ -185,9 +183,8 @@ export function wipeReincarnation() {
       }
     } catch {}
   }
-  // Re-seed the alchemy codex.
-  restore('mai_discovered_pills', discoveredPills);
-  restore('mai_pinned_recipes',   pinnedRecipes);
+  // Re-seed UX convenience keys.
+  restore('mai_pinned_recipes', pinnedRecipes);
   // mai_active_law was removed by wipeSave; leave it absent so activeLaw
   // derives to null on next load.
 }

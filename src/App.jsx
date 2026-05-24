@@ -44,7 +44,6 @@ import useAutoFarm    from './hooks/useAutoFarm';
 import useStats       from './hooks/useStats';
 import { recordStat } from './systems/statsRecorder';
 import WORLDS         from './data/worlds';
-import { PHASE_TECHNIQUE_LAW, PHASE_TECHNIQUE_ID } from './data/laws';
 import { mineralForRarity } from './data/materials';
 import { computeAllStats, computeStat, mergeModifiers } from './data/stats';
 import { evaluateLawUniques, buildContext } from './systems/lawEngine';
@@ -208,8 +207,7 @@ function AppInner() {
   const inventory       = useInventory();
   const karma           = useReincarnationKarma();
   const tree            = useReincarnationTree({ karma: karma.karma, spendKarma: karma.spendKarma, lives: karma.lives });
-  // md_3 The Fourth Form — +1 technique slot from the reincarnation tree.
-  const techniques      = useTechniques({ extraSlots: tree.modifiers.extraTechSlot ? 1 : 0 });
+  const techniques      = useTechniques({ extraSlots: 0 });
   const combat          = useCombat();
   const artefacts       = useArtefacts();
   const pills           = usePills();
@@ -312,7 +310,7 @@ function AppInner() {
     (pid) => producers.isUnlocked(pid, cultivation.realmIndex),
     [producers, cultivation.realmIndex],
   );
-  const qiSparks        = useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked });
+  const qiSparks        = useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked, sparkCommonWeightMult: tree.modifiers.sparkCommonWeightMult ?? 1 });
 
   // Legendary-pool transparency for the choice modal: tells the player how
   // much of the legendary pool is currently in reach AND what to chase next
@@ -373,10 +371,15 @@ function AppInner() {
     };
   }, [producers, cultivation.realmIndex, qiSparks?.activeSparks]);
 
-  // Record every new realm reached so karma awards are first-time-only.
+  // Award karma continuously based on total Qi earned this life.
+  // Checks every second; the karma hook computes the delta internally.
   useEffect(() => {
-    karma.noteRealmReached(cultivation.realmIndex);
-  }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!karma.noteQiEarned) return;
+    const id = setInterval(() => {
+      karma.noteQiEarned(cultivation.qiEarnedThisLifeRef?.current ?? 0);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [karma.noteQiEarned, cultivation.qiEarnedThisLifeRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep pill qi multiplier in sync with cultivation game loop.
   const pillQiMult = pills.getQiMult();
@@ -385,55 +388,24 @@ function AppInner() {
   }, [pillQiMult, cultivation.pillQiMultRef]);
 
   // Push reincarnation-tree cultivation speed bonus into the loop.
+  // n_1 Devoted Path: treeQiMult = 1 + 0.001 × karmaSpentOnTree.
   useEffect(() => {
-    cultivation.treeQiMultRef.current       = tree.modifiers.cultivSpeedMult ?? 1;
-    cultivation.treeHeavenlyMultRef.current = 1; // heavenly mult now at neutral
+    cultivation.treeQiMultRef.current       = tree.modifiers.treeQiMult ?? 1;
+    cultivation.treeHeavenlyMultRef.current = 1; // no tree node drives heavenly mult
+    // qiOnRealmFrac — no tree node; stays at 0 (Yin Reservoir was yy_2).
     if (cultivation.qiOnRealmFracRef) {
-      cultivation.qiOnRealmFracRef.current  = tree.modifiers.qiOnEveryRealmFrac ?? 0;
+      cultivation.qiOnRealmFracRef.current  = 0;
     }
-    // Cookie-Clicker pivot — Phase E. The producer/upgrade modifier surface.
+    // treeProducerOutputMultRef — no new node; stays at 1.
     if (cultivation.treeProducerOutputMultRef) {
-      cultivation.treeProducerOutputMultRef.current = tree.modifiers.producerOutputMult ?? 1;
+      cultivation.treeProducerOutputMultRef.current = 1;
     }
-  }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef, cultivation.qiOnRealmFracRef, cultivation.treeProducerOutputMultRef]);
+    // n_5 Frugal Cultivation — write producer cost discount ref.
+    if (producers.costMultRef) {
+      producers.costMultRef.current = tree.modifiers.producerCostMult ?? 1;
+    }
+  }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef, cultivation.qiOnRealmFracRef, cultivation.treeProducerOutputMultRef, producers.costMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // cb_pt Phase Technique — when the connector is purchased, grant the law
-  // (idempotent — addOwnedLaw is a no-op if the id is already in the
-  // library). Auto-equip if the player has no active law.
-  useEffect(() => {
-    if (!tree.modifiers.phaseTechniqueOwned) return;
-    const alreadyOwned = cultivation.ownedLaws?.some(l => l.id === PHASE_TECHNIQUE_ID);
-    if (!alreadyOwned) {
-      cultivation.addOwnedLaw(PHASE_TECHNIQUE_LAW);
-    }
-    if (!cultivation.activeLaw) {
-      cultivation.setActiveLaw(PHASE_TECHNIQUE_ID);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tree.modifiers.phaseTechniqueOwned, cultivation.ownedLaws.length]);
-
-  // al_k Living Memory — at mount, read the localStorage timestamp set by
-  // handleReincarnate; if the buff is still live, set rebirthCultBuffRef to 2
-  // and schedule a clear at expiry.
-  useEffect(() => {
-    if (!cultivation.rebirthCultBuffRef) return;
-    let until = 0;
-    try {
-      until = Number(localStorage.getItem('mai_rebirth_cult_buff_until') ?? 0);
-    } catch { /* localStorage unavailable */ }
-    const remainingMs = until - Date.now();
-    if (remainingMs <= 0) {
-      cultivation.rebirthCultBuffRef.current = 1;
-      return;
-    }
-    cultivation.rebirthCultBuffRef.current = 2;
-    const id = setTimeout(() => {
-      cultivation.rebirthCultBuffRef.current = 1;
-      try { localStorage.removeItem('mai_rebirth_cult_buff_until'); }
-      catch { /* localStorage unavailable */ }
-    }, remainingMs);
-    return () => clearTimeout(id);
-  }, [cultivation.rebirthCultBuffRef]);
 
   // Ref updated every render so effects always see the latest breakthrough state
   // without needing it as a dep (avoids stale-closure false-negatives).
@@ -488,10 +460,12 @@ function AppInner() {
   }, [selections.pendingCount, selectionModalOpen, currentEvent, dismiss]);
 
   // Keep QI crystal bonus in sync with cultivation game loop.
+  // n_3 Crystalline Focus multiplies the crystal's qi-rate contribution by 1.20.
   useEffect(() => {
     if (!cultivation.crystalQiBonusRef) return;
-    cultivation.crystalQiBonusRef.current = crystal.crystalQiBonus;
-  }, [crystal.crystalQiBonus, cultivation.crystalQiBonusRef]);
+    cultivation.crystalQiBonusRef.current =
+      crystal.crystalQiBonus * (tree.modifiers.crystalQiBonusMult ?? 1);
+  }, [crystal.crystalQiBonus, tree.modifiers.crystalQiBonusMult, cultivation.crystalQiBonusRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Mirror the producer-driven qi/sec into the cultivation tick — folding in
   // per-producer "doubling" upgrades at the source. Producer × upgrade-mult is
@@ -522,7 +496,10 @@ function AppInner() {
     // (default 0). The bonus flows through per-producer mults and all
     // downstream global mults the same way the producer's own base does.
     const flatPerUnit = qiSparks.producerFlatPerUnitRef?.current ?? 0;
-    const effective = producers.getRate(perProducer, flatPerUnit);
+    const effective = producers.getRate(perProducer, flatPerUnit, {
+      selfSynergyPct:  tree.modifiers.producerSelfSynergyPct  ?? 0,
+      crossSynergyPct: tree.modifiers.producerCrossSynergyPct ?? 0,
+    });
     cultivation.producerRateRef.current = effective;
     // Trinity Convergence + producer_pair_global_mult — global multipliers
     // from legendary sparks, folded into the rate calc downstream.
@@ -532,7 +509,7 @@ function AppInner() {
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phoenix Reborn (legendary E2) — useQiSparks dispatches this event when
   // a major realm transition fires while the spark is active. Reset the
@@ -556,8 +533,7 @@ function AppInner() {
     // Crystal-tap mult composes upgrade-driven (Refined Tap I–V) × tree-driven
     // (yy_3 Heart of Stone repurposed) so both contribute multiplicatively.
     if (cultivation.upgradeCrystalTapMultRef) {
-      cultivation.upgradeCrystalTapMultRef.current =
-        upgrades.getCrystalTapMult() * (tree.modifiers.crystalTapMult ?? 1);
+      cultivation.upgradeCrystalTapMultRef.current = upgrades.getCrystalTapMult();
     }
     if (cultivation.upgradeFocusMultAddRef) {
       cultivation.upgradeFocusMultAddRef.current = upgrades.getFocusMultAdd();
@@ -864,7 +840,7 @@ function AppInner() {
     // stack multiplicatively with the tree bonus.
     const artefactMods = artefacts?.getStatModifiers?.() ?? {};
     const artefactPillPct = (artefactMods.pill_effect_mult ?? []).reduce((s, m) => s + (m.value ?? 0), 0);
-    const pillMult = (tree?.modifiers?.pillEffectMult ?? 1) * (1 + artefactPillPct);
+    const pillMult = (1 + artefactPillPct);
     const scalePillBundle = (mods) => {
       if (!mods || pillMult === 1) return mods ?? {};
       const out = {};
@@ -879,9 +855,7 @@ function AppInner() {
     };
     const scaledPillMods = scalePillBundle(pills?.getStatModifiers?.() ?? {});
 
-    // yy_k Primordial Balance — +10% engine-side multiplier on every artefact
-    // affix value the player owns. Same shape as the pill scaler above.
-    const artefactMult = tree?.modifiers?.artefactValueMult ?? 1;
+    const artefactMult = 1;
     const scaleArtefactBundle = (mods) => {
       if (!mods || artefactMult === 1) return mods ?? {};
       const out = {};
@@ -1032,20 +1006,20 @@ function AppInner() {
       // Artefact-derived qi_speed aggregate — mirrored to useCultivation so
       // affix rolls affect the live cultivation rate.
       artefactQiMult,
-      // Reincarnation tree exposures consumed by autoFarm / combat / selections.
-      maxOfflineHours:        tree.modifiers.offlineCapHours,
-      cooldownMult:           tree.modifiers.cooldownMult ?? 1,
-      undyingResolve:         !!tree.modifiers.undyingResolve,
-      killingStride:          !!tree.modifiers.killingStride,
-      hpRegenPerSec:          tree.modifiers.hpRegenPerSec ?? 0,
-      freeCastEvery:          tree.modifiers.freeCastEvery ?? 0,
-      qiOnEveryRealmFrac:     tree.modifiers.qiOnEveryRealmFrac ?? 0,
-      gatherMineRarityUpChance: tree.modifiers.gatherMineRarityUpChance ?? 0,
-      regionKillBonus:        !!tree.modifiers.regionKillBonus,
+      // Reincarnation tree — combat/autoFarm modifiers (all removed from new tree).
+      maxOfflineHours:          undefined,
+      cooldownMult:             1,
+      undyingResolve:           false,
+      killingStride:            false,
+      hpRegenPerSec:            0,
+      freeCastEvery:            0,
+      qiOnEveryRealmFrac:       0,
+      gatherMineRarityUpChance: 0,
+      regionKillBonus:          false,
       // cb_ts Veteran's Hunt — pending bump *count*. autoFarm decrements
       // it explicitly when it consumes a bump (see useAutoFarm tick).
       huntBumpsPendingRef:    combat.huntBumpsPendingRef,
-      damageMult:             tree.modifiers.damageMult ?? 1,
+      damageMult:             1,
       // Context useCombat needs to evaluate artefact conditional flags.
       realmIndex,
       equippedArtefactCount:  Object.values(artefacts?.equipped ?? {}).filter(Boolean).length,
@@ -1263,17 +1237,6 @@ function AppInner() {
   });
   featureFlagsRef.current = featureFlags;
 
-  // Toast on karma award. The karma hook bumps `lastAwardedVersion` each
-  // time a realm grants karma; we watch that and surface the amount.
-  useEffect(() => {
-    if (!karma.lastAwarded?.amount) return;
-    notifications.addToast({
-      message: `+${karma.lastAwarded.amount} Karma earned ◈`,
-      targetScreen: 'reincarnation',
-      duration: 4000,
-    });
-  }, [karma.lastAwardedVersion]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Keep a live ref to all hooks so debug commands always see fresh state.
   const hooksRef = useRef({});
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm, crystal, qiSparks };
@@ -1345,39 +1308,8 @@ function AppInner() {
       trackReincarnation(cultivation.realmIndex, (karma.lives ?? 0) + 1);
       trackFirstTime('Reincarnation', cultivation.realmIndex);
     } catch {}
+    // Sync-persist karma with karmaEarnedThisLife reset before the wipe.
     karma.reincarnate();
-
-    // ─── Reincarnation tree carry-overs (al_2 / al_4 / al_k) ───────────────
-    const treeMods = tree.modifiers ?? {};
-
-    // al_2 Echo of Mastery — snapshot discovered-recipe set so the wipe
-    // doesn't drop it. Restored after wipeReincarnation re-seeds the laws.
-    let recipeSnapshot = null;
-    if (treeMods.keepRecipes) {
-      try {
-        recipeSnapshot = localStorage.getItem('mai_discovered_pills');
-      } catch {}
-    }
-
-    // Producer-level carryover (Cookie-Clicker pivot — Phase E). Snapshot
-    // current owned counts × keepProducerLevelsFrac BEFORE the wipe so the
-    // restored counts pick up after wipeReincarnation clears `mai_producers`.
-    let producersSnapshot = null;
-    const keepFrac = treeMods.keepProducerLevelsFrac ?? 0;
-    if (keepFrac > 0) {
-      try {
-        const rawOwned = localStorage.getItem('mai_producers');
-        if (rawOwned) {
-          const ownedNow = JSON.parse(rawOwned) ?? {};
-          const kept = {};
-          for (const [id, count] of Object.entries(ownedNow)) {
-            const k = Math.floor((count ?? 0) * keepFrac);
-            if (k > 0) kept[id] = k;
-          }
-          if (Object.keys(kept).length > 0) producersSnapshot = kept;
-        }
-      } catch {}
-    }
 
     // Give React a tick to flush the karma state to localStorage before we
     // wipe the rest of the save + hard-reload.
@@ -1389,42 +1321,9 @@ function AppInner() {
       // (including the +1 livesLived just fired by karma.reincarnate()).
       try { stats.resetRun(); } catch {}
       wipeReincarnation();
-
-      // Restore al_2 Echo of Mastery snapshot.
-      if (recipeSnapshot != null) {
-        try { localStorage.setItem('mai_discovered_pills', recipeSnapshot); } catch {}
-      }
-
-      // Restore the producer-level carryover. wipeReincarnation must clear
-      // the upgrade set entirely (one-time purchases reset by design) — only
-      // the owned-count map of producers carries.
-      if (producersSnapshot) {
-        try { localStorage.setItem('mai_producers', JSON.stringify(producersSnapshot)); } catch {}
-      }
-
-      // al_4 Bloodline Vigor — +50 Blood Lotus + 1 banked Selection re-roll.
-      if (treeMods.bloodLotusOnRebirth > 0) {
-        addBloodLotusBalance(treeMods.bloodLotusOnRebirth);
-      }
-      if (treeMods.bankedRerollOnRebirth > 0) {
-        try {
-          const cur = Number(localStorage.getItem('mai_banked_rerolls') ?? 0);
-          localStorage.setItem('mai_banked_rerolls', String(cur + treeMods.bankedRerollOnRebirth));
-        } catch {}
-      }
-
-      // al_k Living Memory — set a 1-hour ×2 cultivation buff that the
-      // cultivation tick reads via the existing ad-boost code path.
-      if (treeMods.cultBuffOnRebirthSec > 0) {
-        try {
-          localStorage.setItem('mai_rebirth_cult_buff_until',
-            String(Date.now() + treeMods.cultBuffOnRebirthSec * 1000));
-        } catch {}
-      }
-
       window.location.reload();
     }, 50);
-  }, [karma, cultivation.realmIndex, tree.modifiers, stats]);
+  }, [karma, cultivation.realmIndex, stats]);
 
   const goBack = () => {
     navigate('worlds', {
@@ -1433,7 +1332,7 @@ function AppInner() {
     });
   };
 
-  const reincarnationUnlocked = karma.unlocked;
+  const reincarnationUnlocked = cultivation.realmIndex >= 24;
 
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
@@ -1443,7 +1342,7 @@ function AppInner() {
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
     worlds: isScreenAllowed('worlds')
-      ? <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} lastIdleAssignment={autoFarm.lastIdleAssignment} onSetIdle={(act, w, r) => autoFarm.setIdleActivity(act, w, r, !!tree.modifiers.dualAutoFarm)} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} getFullStats={getFullStats} />
+      ? <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} lastIdleAssignment={autoFarm.lastIdleAssignment} onSetIdle={(act, w, r) => autoFarm.setIdleActivity(act, w, r, false)} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} getFullStats={getFullStats} />
       : null,
     // Sub-screens launched from the Worlds hub
     'combat-arena': isScreenAllowed('combat-arena')
@@ -1473,11 +1372,9 @@ function AppInner() {
     settings:   null,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
-                     earnedTotal={karma.earnedTotal}
+                     karmaEarnedThisLife={karma.karmaEarnedThisLife}
                      tree={tree}
                      lives={karma.lives}
-                     highestReached={karma.highestReached}
-                     peakKarmaTotal={karma.peakKarmaTotal}
                      realmIndex={cultivation.realmIndex}
                      onReincarnate={handleReincarnate}
                      onClose={() => navigate('home')}

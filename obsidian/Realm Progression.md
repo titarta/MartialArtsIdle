@@ -6,21 +6,21 @@ Realm system based on **Martial Peak** (武炼巅峰). Each major realm has sub-
 
 ## Realm Overview
 
-| # | Major Realm | Sub-stages | Notes |
-|---|---|---|---|
-| 1 | Tempered Body | 10 Layers | Body-only stat |
-| 2 | Qi Transformation | Early / Middle / Late / Peak | First qi cultivation |
-| 3 | True Element | Early / Middle / Late / Peak | — |
-| 4 | Separation & Reunion | 1st / 2nd / 3rd Stage | — |
-| 5 | Immortal Ascension | 1st / 2nd / 3rd Stage | — |
-| 6 | Saint | Early / Middle / Late | — |
-| 7 | Saint King | 1st / 2nd / 3rd Stage | — |
-| 8 | Origin Returning | 1st / 2nd / 3rd Stage | — |
-| 9 | Origin King | 1st / 2nd / 3rd Stage | — |
-| 10 | Void King | 1st / 2nd / 3rd Stage | — |
-| 11 | Dao Source | 1st / 2nd / 3rd Stage | — |
-| 12 | Emperor Realm | 1st / 2nd / 3rd Stage | — |
-| 13 | Open Heaven | Layer 1–6 | Low (1-3) / Mid (4-5) / High (6) |
+| #   | Major Realm          | Sub-stages                   | Notes                            |
+| --- | -------------------- | ---------------------------- | -------------------------------- |
+| 1   | Tempered Body        | 10 Layers                    | ---                              |
+| 2   | Qi Transformation    | Early / Middle / Late / Peak | ---                              |
+| 3   | True Element         | Early / Middle / Late / Peak | —                                |
+| 4   | Separation & Reunion | 1st / 2nd / 3rd Stage        | —                                |
+| 5   | Immortal Ascension   | 1st / 2nd / 3rd Stage        | —                                |
+| 6   | Saint                | Early / Middle / Late        | —                                |
+| 7   | Saint King           | 1st / 2nd / 3rd Stage        | —                                |
+| 8   | Origin Returning     | 1st / 2nd / 3rd Stage        | —                                |
+| 9   | Origin King          | 1st / 2nd / 3rd Stage        | —                                |
+| 10  | Void King            | 1st / 2nd / 3rd Stage        | —                                |
+| 11  | Dao Source           | 1st / 2nd / 3rd Stage        | —                                |
+| 12  | Emperor Realm        | 1st / 2nd / 3rd Stage        | —                                |
+| 13  | Open Heaven          | Layer 1–6                    | Low (1-3) / Mid (4-5) / High (6) |
 
 Total sub-stages: **46**
 
@@ -165,26 +165,6 @@ Ascending **between major realms** (i.e. whenever `realm.name` changes — e.g. 
   - As soon as the rolling qi/s meets the requirement, the breakthrough fires on the next tick.
 - **Implementation:** `getMajorBreakthroughRate(fromIndex)` in `src/data/realms.js`; gate check in `useCultivation.js`'s tick loop; `gateRef` exposed to `RealmProgressBar.jsx` for the inline indicator.
 - **Note:** the rate compared is the **live** qi/s including boost/pill/selection multipliers, so players can temporarily hold boost to push through a gate.
-
----
-
-## Feature Unlocks by Major Realm
-
-| Major Realm | Features Unlocked |
-|---|---|
-| Tempered Body | Combat (gold & materials), Shop, Secret Techniques (Mortal rank) |
-| Qi Transformation | Laws, law-based default attack, Earth-rank techniques |
-| True Element | Improved laws, law passives |
-| Separation & Reunion | Sky-rank techniques |
-| Immortal Ascension | — TBD |
-| Saint | Saint-rank techniques |
-| Saint King | — TBD |
-| Origin Returning | Alchemy (pill crafting) |
-| Origin King | — TBD |
-| Void King | Multiplier upgrades, Emperor-rank techniques |
-| Dao Source | — TBD |
-| Emperor Realm | Artifact refining |
-| Open Heaven | Heaven-rank techniques, Esoteric elements (Space, Time...) |
 
 ---
 

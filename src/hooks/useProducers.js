@@ -38,6 +38,11 @@ function saveOwned(owned) {
 export default function useProducers() {
   const [owned, setOwned] = useState(loadOwned);
   const ownedRef = useRef(owned);
+  // n_5 Frugal Cultivation — written by App.jsx from tree.modifiers.producerCostMult.
+  // Applied in getCost / getMaxAffordable so the discounted price flows through
+  // every consumer (CultivationScreen buy, auto-buy, max-affordable calc)
+  // without any callsite changes.
+  const costMultRef = useRef(1);
 
   useEffect(() => {
     ownedRef.current = owned;
@@ -51,6 +56,8 @@ export default function useProducers() {
    * Geometric-sum cost for buying `n` units of `id` starting from the current
    * owned count. Formula: startCost × scaling^owned × (scaling^n − 1) / (scaling − 1).
    * Returns 0 for unknown ids or non-positive n.
+   * Multiplied by `costMultRef.current` so node 5 (Frugal Cultivation) and
+   * similar discounts apply automatically at every callsite.
    */
   const getCost = useCallback((id, n = 1) => {
     const p = PRODUCERS_BY_ID[id];
@@ -58,20 +65,26 @@ export default function useProducers() {
     const o = owned[id] ?? 0;
     const s = p.costScaling;
     const geomSum = (Math.pow(s, n) - 1) / (s - 1);
-    return Math.ceil(p.startCost * Math.pow(s, o) * geomSum);
+    const base = Math.ceil(p.startCost * Math.pow(s, o) * geomSum);
+    return Math.ceil(base * (costMultRef.current ?? 1));
   }, [owned]);
 
   /**
    * Max units of `id` purchasable with `qi`. Solves the cost-sum inequality:
    *   startCost × s^owned × (s^n − 1) / (s − 1)  ≤  qi
    * → n ≤ log( 1 + qi × (s−1) / (startCost × s^owned) ) / log(s)
+   * Inflates `qi` by (1 / costMultRef) before the inversion so the
+   * effective affordability matches the discounted cost.
    */
   const getMaxAffordable = useCallback((id, qi) => {
     const p = PRODUCERS_BY_ID[id];
     if (!p || qi <= 0) return 0;
     const o = owned[id] ?? 0;
     const s = p.costScaling;
-    const rhs = 1 + (qi * (s - 1)) / (p.startCost * Math.pow(s, o));
+    // Adjust effective qi upward by the cost discount factor so the
+    // geometric inversion sees the right spending power.
+    const effectiveQi = qi / (costMultRef.current ?? 1);
+    const rhs = 1 + (effectiveQi * (s - 1)) / (p.startCost * Math.pow(s, o));
     if (rhs <= 1) return 0;
     return Math.max(0, Math.floor(Math.log(rhs) / Math.log(s)));
   }, [owned]);
@@ -89,15 +102,30 @@ export default function useProducers() {
    * before the per-producer mult applies. Used by Sect Discipline (Dial-9
    * common timed spark) to temporarily boost every producer's base rate
    * by +1. Defaults to 0 → identity behaviour.
+   *
+   * Optional `selfSynergyPct` / `crossSynergyPct` — Eternal Tree node 6/7.
+   *   selfSynergyPct:  +% INCREASED qi/s per owned of the SAME producer type.
+   *                    e.g. 0.01 + 50 owned → ×1.50 on that producer.
+   *   crossSynergyPct: +% INCREASED qi/s per owned of the PREVIOUS producer
+   *                    type in the PRODUCERS array. First producer has no
+   *                    previous type (crossBonus = 1).
    */
-  const getRate = useCallback((extraMult, flatPerUnit = 0) => {
+  const getRate = useCallback((extraMult, flatPerUnit = 0, { selfSynergyPct = 0, crossSynergyPct = 0 } = {}) => {
     const mult = typeof extraMult === 'function' ? extraMult : null;
     let rate = 0;
-    for (const p of PRODUCERS) {
+    for (let i = 0; i < PRODUCERS.length; i++) {
+      const p = PRODUCERS[i];
       const o = owned[p.id] ?? 0;
       if (o > 0) {
         const m = mult ? mult(p.id) : 1;
-        rate += o * (p.startQiPerSec + flatPerUnit) * m;
+        // n_6 Sect Resonance — self-synergy: each owned unit of this type
+        // contributes +selfSynergyPct INCREASED to the producer's base rate.
+        const selfBonus  = selfSynergyPct  > 0 ? (1 + o * selfSynergyPct)  : 1;
+        // n_7 Senior's Guidance — cross-synergy: driven by the count of
+        // the PREVIOUS producer in the ordered PRODUCERS array.
+        const prevOwned  = i > 0 ? (owned[PRODUCERS[i - 1].id] ?? 0) : 0;
+        const crossBonus = crossSynergyPct > 0 ? (1 + prevOwned * crossSynergyPct) : 1;
+        rate += o * (p.startQiPerSec + flatPerUnit) * selfBonus * crossBonus * m;
       }
     }
     return rate;
@@ -176,5 +204,8 @@ export default function useProducers() {
     buy,
     setOwnedCount,
     resetToFraction,
+    // Ref written by App.jsx from tree.modifiers.producerCostMult (n_5).
+    // Default 1 = no discount. Set to 0.90 when Frugal Cultivation is active.
+    costMultRef,
   };
 }

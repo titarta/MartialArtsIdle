@@ -59,7 +59,14 @@
  * sim with adjusted constants.
  */
 
-import { karmaForReachingIndex } from '../data/reincarnationTree';
+// NOTE: This sim was written for the old 23-node realm-milestone karma system
+// (2026-05-24 reincarnation revamp removed it). The scenarios below are now
+// stale — karma is awarded continuously from total Qi generated this life,
+// not at realm thresholds. A new sim should be authored against the new formula.
+//
+// karmaForReachingIndex is stubbed here so the build doesn't break; all
+// computed outputs from this module should be treated as outdated.
+function karmaForReachingIndex(_idx) { return 0; }
 
 // ─── Validated Scenario A baseline (from audit, in seconds) ─────────────────
 // Cumulative time to reach realm idx N. T[0] = 0 (start at idx 0).

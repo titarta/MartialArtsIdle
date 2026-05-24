@@ -26,6 +26,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   QI_SPARKS,
   QI_SPARK_BY_ID,
+  SPARK_RARITY_WEIGHTS,
   drawOffer,
   drawSingleCard,                 // legacy — no longer used in reroll path
   TRINITY_SPARK_IDS,
@@ -140,7 +141,10 @@ function saveJSON(key, value) {
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
-export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked }) {
+export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked, sparkCommonWeightMult = 1 }) {
+  // Ref mirror so drawOffer always sees the latest value without re-subscribing.
+  const sparkCommonWeightMultRef = useRef(sparkCommonWeightMult);
+  useEffect(() => { sparkCommonWeightMultRef.current = sparkCommonWeightMult; }, [sparkCommonWeightMult]);
   // Stable refs so drawOffer can read the latest gate state without forcing
   // the breakthrough effect to re-subscribe.
   const isFeatureUnlockedRef = useRef(isFeatureUnlocked);
@@ -399,6 +403,13 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     producerUnlocked:  producerUnlockedRef.current,
   }), []);
 
+  /** Build weight overrides for drawOffer from currently active tree modifiers. */
+  const getWeightOverrides = useCallback(() => {
+    const mult = sparkCommonWeightMultRef.current ?? 1;
+    if (mult >= 1) return {}; // identity — no override needed
+    return { common: Math.max(0, SPARK_RARITY_WEIGHTS.common * mult) };
+  }, []);
+
   // ── Expiry tick — runs every second to prune timed sparks ───────────────
   // Also handles Master's Patience focus-second accumulation (Dial-9). The
   // run-level counter ticks +1 every second cultivation.boosting is true and
@@ -518,7 +529,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
       const pityNow = pityCounterRef.current ?? 0;
       const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
       const ctxBase = drawOfferCtx();
-      const cards = drawOffer(2, { ...ctxBase, forceLegendary });
+      const cards = drawOffer(2, { ...ctxBase, forceLegendary }, getWeightOverrides());
       if (cards.length === 0) return null;
       // After draw: reset pity if a legendary appeared (forced or natural),
       // else increment by 1. We do this here (not in a separate setPity call)
@@ -716,7 +727,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
       // Pity-driven force-legendary still applies on the reroll.
       const pityNow = pityCounterRef.current ?? 0;
       const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
-      const newCards = drawOffer(2, { ...drawOfferCtx(), forceLegendary });
+      const newCards = drawOffer(2, { ...drawOfferCtx(), forceLegendary }, getWeightOverrides());
       if (newCards.length === 0) return prev;
       // Reset pity if any card in the new offer is legendary.
       const sawLegendary = containsLegendary(newCards);
