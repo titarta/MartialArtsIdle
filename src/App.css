@@ -2143,39 +2143,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 .abp-row-urgent .abp-row-timer { color: #fbbf24; }
 
-.abp-popover-link {
-  margin-top: 4px;
-  padding: 10px 14px;
-  border: 1px solid rgba(200, 151, 100, 0.55);
-  background: linear-gradient(140deg, rgba(40, 30, 18, 0.95), rgba(20, 14, 8, 0.95));
-  color: #fff4d4;
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 207, 131, 0.18);
-  transition: filter 0.16s ease, box-shadow 0.16s ease, transform 0.08s ease;
-}
-.abp-popover-link:hover,
-.abp-popover-link:focus-visible {
-  filter: brightness(1.14);
-  box-shadow:
-    0 6px 22px rgba(200, 151, 100, 0.55),
-    inset 0 1px 0 rgba(255, 207, 131, 0.30);
-  outline: none;
-}
-.abp-popover-link:active { transform: translateY(1px) scale(0.98); }
-.abp-popover-link .abp-arrow { transition: transform 0.15s; }
-.abp-popover-link:hover .abp-arrow { transform: translateX(2px); }
+/* The .abp-popover-link "View all sparks" footer was removed: the
+   popover is the canonical surface for temporary buffs now, and the
+   Cultivation > Sparks tab no longer lists timed entries (those
+   live exclusively in this chip + popover). */
 
 /* ════════════════════════════════════════════════════════════════════
    Cultivation > Sparks tab — canonical "your build" view
@@ -22575,82 +22546,100 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-/* Category rail. Sticky to the top of the Bazaar body scroll so it stays
-   accessible while browsing aisles. Padding tightened (was 7x12 chip
-   padding + 12px font with emoji glyphs) so all four chips fit the
-   390x844 viewport gutters without horizontal scroll. The IntersectionObserver
-   in SpiritBazaarScreen toggles .sbz-cat-pill-active to mirror scroll
-   position. */
+/* Category nav. Plain text tabs with a sliding gold underline. The
+   nav's only job is to tell the player "these are the sections, here's
+   the one you're viewing"; everything else (Featured Hero, buff tiles,
+   Buy CTAs) carries the visual focus. Pattern reference: iOS Music /
+   Spotify / App Store. Active state driven by activeCat in
+   SpiritBazaarScreen (set on tap + IntersectionObserver on aisles);
+   the indicator's width + transform are measured against the active
+   tab in a useLayoutEffect.
+   See _design/screens-design-pass/bazaar-nav-redesign.html for the
+   isolated mockup that landed this redesign. */
 .sbz-cat-rail {
   position: sticky;
   top: 0;
   z-index: 4;
   display: flex;
   justify-content: space-between;
-  gap: 4px;
-  padding: 14px 0 10px;
+  align-items: stretch;
+  padding: 8px 4px 0;
   margin: 0;
-  background: linear-gradient(180deg, rgba(8, 6, 4, 0.96) 75%, transparent);
-  /* No horizontal scroll needed now that emojis are gone and padding is
-     tight enough; keep overflow:hidden to clip any rendering bleed. */
-  overflow: hidden;
+  background: linear-gradient(180deg,
+    rgba(8, 6, 4, 0.96) 0%,
+    rgba(8, 6, 4, 0.96) 85%,
+    rgba(8, 6, 4, 0) 100%);
 }
-.sbz-cat-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 6px 8px;
-  flex: 1 1 0;
-  min-width: 0;
-  background: rgba(14, 12, 8, 0.75);
-  border: 1px solid rgba(75, 60, 40, 0.55);
-  border-radius: 999px;
-  color: rgba(245, 230, 200, 0.65);
+/* Hairline gold separator at the rail bottom — anchors the nav to
+   the content below so it doesn't read as floating. */
+.sbz-cat-rail::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 4px;
+  right: 4px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(220, 175, 110, 0.14) 12%,
+    rgba(220, 175, 110, 0.14) 88%,
+    transparent 100%);
+  pointer-events: none;
+}
+.sbz-cat-tab {
+  background: none;
+  border: none;
+  padding: 8px 2px 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   font-family: var(--font-display);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.28);
   white-space: nowrap;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  transition: color 180ms ease;
 }
+.sbz-cat-tab:hover { color: rgba(245, 230, 200, 0.55); }
 .sbz-cat-count {
-  display: inline-block;
-  background: rgba(220, 175, 110, 0.16);
-  color: rgba(245, 230, 200, 0.85);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
-  padding: 0 5px;
-  min-width: 16px;
-  text-align: center;
-  border-radius: 7px;
-  font-variant-numeric: tabular-nums;
   letter-spacing: 0;
+  color: rgba(245, 230, 200, 0.35);
+  font-variant-numeric: tabular-nums;
+  transition: color 180ms ease;
 }
-.sbz-cat-pill:hover {
-  color: rgba(245, 230, 200, 0.95);
-  border-color: rgba(220, 175, 110, 0.45);
+.sbz-cat-tab-active { color: #f5e6c8; }
+.sbz-cat-tab-active .sbz-cat-count { color: #ffcf83; }
+/* Sliding gold underline. Sits over the hairline separator. width +
+   transform are set inline by the useLayoutEffect in
+   SpiritBazaarScreen, against the active tab's offsetWidth/offsetLeft. */
+.sbz-cat-indicator {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  transform: translateX(0);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #ffcf83 18%,
+    #ffcf83 82%,
+    transparent 100%);
+  box-shadow: 0 0 6px rgba(255, 207, 131, 0.35);
+  border-radius: 1px;
+  pointer-events: none;
+  transition:
+    transform 220ms cubic-bezier(.4, 0, .2, 1),
+    width     220ms cubic-bezier(.4, 0, .2, 1);
 }
-/* Active state — tracks the section currently in view via the IO. The
-   tab uses the cream/bronze accent rather than vermillion to stay calm;
-   vermillion is reserved for action affordances (Buy CTAs). Contrast is
-   intentionally a bit louder so the active chip clearly differentiates
-   from the inactive ones at a glance. */
-.sbz-cat-pill-active {
-  background: linear-gradient(180deg, rgba(220, 175, 110, 0.32), rgba(155, 125, 80, 0.22));
-  border-color: rgba(220, 175, 110, 0.85);
-  color: #fff5e0;
-  font-weight: 700;
-  box-shadow:
-    0 1px 0 rgba(255, 225, 170, 0.22) inset,
-    0 0 0 1px rgba(220, 175, 110, 0.20);
-}
-.sbz-cat-pill-active .sbz-cat-count {
-  background: rgba(220, 175, 110, 0.45);
-  color: #1f160b;
+@media (prefers-reduced-motion: reduce) {
+  .sbz-cat-indicator { transition: none; }
 }
 
 /* Section-header scroll margin so jumpTo() (and natural scroll
