@@ -7,7 +7,6 @@ import { loadGraphics, applyGraphics, saveGraphics } from '../systems/graphics';
 import useAudio from '../audio/useAudio';
 import { trackSettingChanged } from '../analytics';
 import { recordStat } from '../systems/statsRecorder';
-import bus from '../systems/achievementBus';
 import { noteSettingTouched } from '../systems/settingsTouched';
 import {
   RESOLUTIONS,
@@ -79,7 +78,16 @@ const AUDIO_CHANNELS = [
   { channel: 'sfx',    label: 'Effects',volKey: 'sfxVol',    muteKey: 'sfxMuted'    },
 ];
 
-function SettingsScreen({ onClose }) {
+/**
+ * Settings — full screen (post nav-audit). Lives in src/screens/ and routes via
+ * navigate('settings'). The TopBar ⚙ entry pushes a real screen now instead of
+ * a modal overlay; sections (Audio / Visuals / Rendering / Language / Save Data /
+ * Danger Zone) all render full-bleed inside the standard .screen-container chrome.
+ *
+ * Visual treatment mirrors _design/nav-audit-mockups/settings-screen.html —
+ * lacquer panel sections with a sticky-feeling header and a discrete back chip.
+ */
+function SettingsScreen({ onBack }) {
   const { t, i18n } = useTranslation('ui');
   const audio = useAudio();
 
@@ -148,181 +156,190 @@ function SettingsScreen({ onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="settings-modal" onClick={e => e.stopPropagation()}>
+    <div className="settings-screen">
 
-        {/* ── Header ── */}
-        <div className="stg-header">
-          <div className="stg-title">
-            <span className="stg-title-icon">⚙</span>
+      {/* Screen header — back chip + title block */}
+      <div className="stg-screen-head">
+        <button
+          className="stg-back-chip"
+          onClick={onBack}
+          aria-label={t('common.back')}
+        >
+          <span className="stg-back-arrow">‹</span> {t('common.back')}
+        </button>
+        <div className="stg-screen-title-block">
+          <div className="stg-screen-title">
+            <span className="stg-title-icon" aria-hidden="true">⚙</span>
             {t('settings.title')}
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
-        </div>
-
-        {/* ── Body ── */}
-        <div className="settings-modal-body">
-
-          {/* Audio */}
-          <div className="stg-section">
-            <div className="stg-section-label">Audio</div>
-            {AUDIO_CHANNELS.map(({ channel, label, muteKey }) => {
-              const muted   = audio.settings[muteKey];
-              const localVol = sliderVols[channel];
-              return (
-                <div key={channel} className="stg-audio-row">
-                  <span className="stg-audio-label">{label}</span>
-                  <input
-                    type="range"
-                    className={`stg-audio-slider${muted ? ' stg-audio-slider-muted' : ''}`}
-                    min="0" max="1" step="0.01"
-                    value={localVol}
-                    onChange={e => {
-                      const val = parseFloat(e.target.value);
-                      setSliderVols(prev => ({ ...prev, [channel]: val }));
-                    }}
-                    onMouseUp={e  => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
-                    onTouchEnd={e => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
-                    disabled={muted}
-                    aria-label={`${label} volume`}
-                  />
-                  <span className="stg-audio-pct">{muted ? '—' : `${Math.round(localVol * 100)}%`}</span>
-                  <button
-                    className={`stg-audio-mute${muted ? ' stg-audio-muted' : ''}`}
-                    onClick={() => {
-                      audio.setMuted(channel, !muted);
-                      try { recordStat('audioToggles', 1); } catch {}
-                      noteSettingTouched('audio_mute');
-                    }}
-                    aria-label={muted ? `Unmute ${label}` : `Mute ${label}`}
-                  >
-                    {muted ? '🔇' : '🔊'}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Visual effects */}
-          <div className="stg-section">
-            <div className="stg-section-label">Visual Effects</div>
-            <div className="stg-row">
-              <div className="stg-row-info">
-                <span className="stg-row-title">Particles &amp; Animations</span>
-              </div>
-              <SegmentedControl
-                options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]}
-                value={graphics.vfxEnabled}
-                onChange={v => { setGraphics({ ...graphics, vfxEnabled: v }); noteSettingTouched('particles'); }}
-              />
-            </div>
-          </div>
-
-          {/* Rendering mode */}
-          <div className="stg-section">
-            <div className="stg-section-label">Rendering Mode</div>
-            <OptionGrid
-              options={RENDERING_MODES}
-              value={graphics.renderingMode}
-              onChange={mode => { setGraphics({ ...graphics, renderingMode: mode }); noteSettingTouched('rendering'); }}
-            />
-          </div>
-
-          {/* Resolution — desktop only */}
-          {isDesktop && (
-            <div className="stg-section">
-              <div className="stg-section-label">Window Resolution</div>
-              <OptionGrid
-                options={RESOLUTIONS}
-                value={resolution}
-                onChange={handleResolutionChange}
-              />
-            </div>
-          )}
-
-          {/* Language */}
-          <div className="stg-section">
-            <div className="stg-section-label">{t('settings.language')}</div>
-            <div className="stg-lang-row">
-              {SUPPORTED_LANGUAGES.map(lang => (
-                <button
-                  key={lang.code}
-                  className={`stg-lang-btn${i18n.language === lang.code ? ' stg-lang-active' : ''}`}
-                  onClick={() => { setLanguage(lang.code); try { trackSettingChanged('language', lang.code); } catch {} noteSettingTouched('language'); }}
-                >
-                  {lang.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Save data */}
-          <div className="stg-section">
-            <div className="stg-section-label">{t('settings.saveData')}</div>
-
-            {message && (
-              <div className={`stg-flash ${message.isError ? 'stg-flash-error' : 'stg-flash-ok'}`}>
-                {message.text}
-              </div>
-            )}
-
-            <div className="stg-action-list">
-              <ActionRow
-                icon="📤"
-                label={t('settings.exportSave')}
-                sublabel="Copy save code to clipboard"
-                onClick={handleExport}
-              />
-              <ActionRow
-                icon="📥"
-                label={t('settings.importSave')}
-                sublabel="Paste a save code to restore"
-                onClick={() => setShowImport(v => !v)}
-              />
-            </div>
-
-            {showImport && (
-              <div className="stg-import-area">
-                <textarea
-                  className="stg-import-input"
-                  placeholder={t('settings.pastePlaceholder')}
-                  value={importText}
-                  onChange={e => setImportText(e.target.value)}
-                  rows={3}
-                />
-                <button className="stg-import-btn" onClick={handleImport}>
-                  {t('settings.loadSave')}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Danger zone */}
-          <div className="stg-section stg-section-last">
-            <div className="stg-section-label stg-label-danger">Danger Zone</div>
-            <div className="stg-action-list">
-              {confirmWipe ? (
-                <div className="stg-wipe-confirm">
-                  <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
-                  <div className="stg-wipe-btns">
-                    <button className="stg-wipe-yes" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
-                    <button className="stg-wipe-cancel" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
-                  </div>
-                </div>
-              ) : (
-                <ActionRow
-                  icon="🗑"
-                  label={t('settings.wipeSave')}
-                  sublabel="Permanently delete all progress"
-                  onClick={() => setConfirmWipe(true)}
-                  danger
-                />
-              )}
-            </div>
-          </div>
-
+          <div className="stg-screen-sub">Audio · Visuals · Save Data</div>
         </div>
       </div>
+
+      {/* Audio */}
+      <section className="stg-section">
+        <div className="stg-section-label">Audio</div>
+        <div className="stg-panel">
+          {AUDIO_CHANNELS.map(({ channel, label, muteKey }) => {
+            const muted    = audio.settings[muteKey];
+            const localVol = sliderVols[channel];
+            return (
+              <div key={channel} className="stg-audio-row">
+                <span className="stg-audio-label">{label}</span>
+                <input
+                  type="range"
+                  className={`stg-audio-slider${muted ? ' stg-audio-slider-muted' : ''}`}
+                  min="0" max="1" step="0.01"
+                  value={localVol}
+                  onChange={e => {
+                    const val = parseFloat(e.target.value);
+                    setSliderVols(prev => ({ ...prev, [channel]: val }));
+                  }}
+                  onMouseUp={e  => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
+                  onTouchEnd={e => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
+                  disabled={muted}
+                  aria-label={`${label} volume`}
+                />
+                <span className="stg-audio-pct">{muted ? '—' : `${Math.round(localVol * 100)}%`}</span>
+                <button
+                  className={`stg-audio-mute${muted ? ' stg-audio-muted' : ''}`}
+                  onClick={() => {
+                    audio.setMuted(channel, !muted);
+                    try { recordStat('audioToggles', 1); } catch {}
+                    noteSettingTouched('audio_mute');
+                  }}
+                  aria-label={muted ? `Unmute ${label}` : `Mute ${label}`}
+                >
+                  {muted ? '🔇' : '🔊'}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Visual effects */}
+      <section className="stg-section">
+        <div className="stg-section-label">Visual Effects</div>
+        <div className="stg-panel">
+          <div className="stg-row">
+            <div className="stg-row-info">
+              <span className="stg-row-title">Particles &amp; Animations</span>
+            </div>
+            <SegmentedControl
+              options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]}
+              value={graphics.vfxEnabled}
+              onChange={v => { setGraphics({ ...graphics, vfxEnabled: v }); noteSettingTouched('particles'); }}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Rendering mode */}
+      <section className="stg-section">
+        <div className="stg-section-label">Rendering Mode</div>
+        <OptionGrid
+          options={RENDERING_MODES}
+          value={graphics.renderingMode}
+          onChange={mode => { setGraphics({ ...graphics, renderingMode: mode }); noteSettingTouched('rendering'); }}
+        />
+      </section>
+
+      {/* Resolution — desktop only */}
+      {isDesktop && (
+        <section className="stg-section">
+          <div className="stg-section-label">Window Resolution</div>
+          <OptionGrid
+            options={RESOLUTIONS}
+            value={resolution}
+            onChange={handleResolutionChange}
+          />
+        </section>
+      )}
+
+      {/* Language */}
+      <section className="stg-section">
+        <div className="stg-section-label">{t('settings.language')}</div>
+        <div className="stg-panel">
+          <div className="stg-lang-row">
+            {SUPPORTED_LANGUAGES.map(lang => (
+              <button
+                key={lang.code}
+                className={`stg-lang-btn${i18n.language === lang.code ? ' stg-lang-active' : ''}`}
+                onClick={() => { setLanguage(lang.code); try { trackSettingChanged('language', lang.code); } catch {} noteSettingTouched('language'); }}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Save data */}
+      <section className="stg-section">
+        <div className="stg-section-label">{t('settings.saveData')}</div>
+
+        {message && (
+          <div className={`stg-flash ${message.isError ? 'stg-flash-error' : 'stg-flash-ok'}`}>
+            {message.text}
+          </div>
+        )}
+
+        <div className="stg-action-list">
+          <ActionRow
+            icon="📤"
+            label={t('settings.exportSave')}
+            sublabel="Copy save code to clipboard"
+            onClick={handleExport}
+          />
+          <ActionRow
+            icon="📥"
+            label={t('settings.importSave')}
+            sublabel="Paste a save code to restore"
+            onClick={() => setShowImport(v => !v)}
+          />
+        </div>
+
+        {showImport && (
+          <div className="stg-import-area">
+            <textarea
+              className="stg-import-input"
+              placeholder={t('settings.pastePlaceholder')}
+              value={importText}
+              onChange={e => setImportText(e.target.value)}
+              rows={3}
+            />
+            <button className="stg-import-btn" onClick={handleImport}>
+              {t('settings.loadSave')}
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* Danger zone */}
+      <section className="stg-section stg-section-last">
+        <div className="stg-section-label stg-label-danger">Danger Zone</div>
+        <div className="stg-action-list">
+          {confirmWipe ? (
+            <div className="stg-wipe-confirm">
+              <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
+              <div className="stg-wipe-btns">
+                <button className="stg-wipe-yes" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
+                <button className="stg-wipe-cancel" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+              </div>
+            </div>
+          ) : (
+            <ActionRow
+              icon="🗑"
+              label={t('settings.wipeSave')}
+              sublabel="Permanently delete all progress"
+              onClick={() => setConfirmWipe(true)}
+              danger
+            />
+          )}
+        </div>
+      </section>
+
     </div>
   );
 }

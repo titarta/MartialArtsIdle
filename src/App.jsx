@@ -113,7 +113,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['settings', 'shop', 'lotus-shop', 'progress', 'pills', 'daily']);
+    const ours = new Set(['shop', 'lotus-shop', 'progress', 'pills', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -1679,7 +1679,7 @@ function AppInner() {
       : null,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
-    settings:   null,
+    settings:   <SettingsScreen onBack={() => navigate('home')} />,
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
                      karmaEarnedThisLife={karma.karmaEarnedThisLife}
@@ -1734,13 +1734,12 @@ function AppInner() {
         onOpenShop={() => openModal('shop')}
         onOpenLotusShop={() => openModal('lotus-shop')}
         onOpenProgress={() => openModal('progress', () => setHasNewAch(false))}
-        onOpenSettings={() => openModal('settings')}
+        onOpenSettings={() => navigate('settings')}
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
+        currentScreen={currentScreen}
         onOpenReincarnation={() => navigate('reincarnation')}
         reincarnationUnlocked={reincarnationUnlocked}
-        onOpenCrystal={() => navigate('home', { openCrystal: Date.now() })}
-        crystalUnlocked={featureFlags.isUnlocked('qi_crystal')}
         qiRef={cultivation.qiRef}
         karma={karma.karma}
       />
@@ -1837,7 +1836,6 @@ function AppInner() {
           onDone={() => dismiss(currentEvent.id)}
         />
       )}
-      {activeModal === 'settings'     && <SettingsScreen onClose={() => setActiveModal(null)} />}
       {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
       {activeModal === 'lotus-shop'   && (
         <BloodLotusSpendShopModal

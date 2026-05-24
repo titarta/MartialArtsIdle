@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from 'react';
-import { FEATURES } from '../data/featureFlags';
 import { fmt as fmtNum } from '../utils/format';
 
 const BASE = import.meta.env.BASE_URL;
@@ -30,10 +29,9 @@ export default function TopBar({
   onOpenSettings,
   hasNewAchievement,
   activeModal,
+  currentScreen,
   onOpenReincarnation,
   reincarnationUnlocked,
-  onOpenCrystal,
-  crystalUnlocked,
   qiRef,
   karma,
 }) {
@@ -101,22 +99,10 @@ export default function TopBar({
           ☸
         </button>
       )}
-      {/* v1: Crystal feed lives inline beneath the crystal sprite. The 🪨
-          top-bar trigger is preserved for v2 (stone-fed combat flow). */}
-      {crystalUnlocked && FEATURES.combat && (
-        <button
-          className="home-hud-crystal"
-          onClick={onOpenCrystal}
-          aria-label="Qi Crystal"
-        >
-          🪨
-        </button>
-      )}
-      {/* Progress hub — replaces the previous Journey + Achievements
-          buttons with a single 📊 entry point that opens a 3-tab modal
-          (Journey / Achievements / Stats). Achievement badge dot now
-          surfaces on this button so the unread signal survives the
-          consolidation. */}
+      {/* Progress hub — single 📊 entry point that opens a tabbed modal
+          (Achievements + Stats; Journey was promoted to a bottom-nav screen
+          in the nav-audit pass). Achievement badge dot lives on this button
+          so the unread signal stays surfaced after consolidation. */}
       <button
         className={`home-hud-progress${activeModal === 'progress' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenProgress}
@@ -126,7 +112,7 @@ export default function TopBar({
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
       <button
-        className={`home-hud-settings${activeModal === 'settings' ? ' top-bar-btn--active' : ''}`}
+        className={`home-hud-settings${currentScreen === 'settings' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenSettings}
         aria-label="Settings"
       >

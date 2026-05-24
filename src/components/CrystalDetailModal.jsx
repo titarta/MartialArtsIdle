@@ -1,4 +1,5 @@
 import { fmt } from '../utils/format';
+import Sheet from './Sheet';
 import {
   getCrystalQiMult,
   CRYSTAL_MULT_PER_LEVEL,
@@ -79,9 +80,9 @@ export default function CrystalDetailModal({ level, onClose }) {
   const levelsAway = nextInfo ? Math.max(0, nextInfo.level - level) : 0;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="pdm-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+    <Sheet open onClose={onClose} className="pdm-sheet" ariaLabel="Qi Crystal details">
+      <div className="sheet-body">
+        <button className="modal-close pdm-sheet-close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="pdm-hero">
           <img
@@ -153,6 +154,6 @@ export default function CrystalDetailModal({ level, onClose }) {
           </div>
         )}
       </div>
-    </div>
+    </Sheet>
   );
 }
