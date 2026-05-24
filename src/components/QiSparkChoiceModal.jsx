@@ -122,7 +122,9 @@ function SparkCardSlot({ sparkId, onPick }) {
         </div>
 
         {(isUncommon || isLegendary) && (
-          <span className="spk-seal" aria-hidden="true">{sealGlyph ?? (isLegendary ? '✦' : '玉')}</span>
+          <span className="spk-seal" aria-hidden="true">
+            {sealGlyph ?? (isLegendary ? '灵' : '玉')}
+          </span>
         )}
       </article>
     </div>

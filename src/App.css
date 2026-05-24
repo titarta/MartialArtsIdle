@@ -3390,21 +3390,24 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 
 /* Effect text container.
-   The wrap is the flex item that absorbs whatever space remains in
-   the card column. It vertically centers the inner <p>, so short
-   descriptions feel anchored instead of stranded near the top, and
-   long descriptions still fill the space evenly. overflow:hidden
-   protects layout if a description ever exceeds the available
-   height (the card overall already has overflow:hidden). */
+   Column flex layout. The inner <p> uses `margin: auto 0` for
+   vertical placement: when text fits within the wrap, the auto
+   margins consume free space equally above and below (visual
+   center). When text overflows, the margins collapse to 0 and the
+   text top-aligns naturally, so LEADING words are always visible
+   and only the trailing words clip. A soft mask fade at the bottom
+   edge makes that clip read as graceful truncation rather than a
+   hard cut. */
 .spk-effect-wrap {
   flex: 1;
   width: 100%;
   min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   padding: 0 8px;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 14px), transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 calc(100% - 14px), transparent 100%);
 }
 /* The <p> stays a plain block. renderEffect() emits alternating
    <span> and <strong> children; a flex parent here would turn every
@@ -3419,7 +3422,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: rgba(244, 230, 200, 0.92);
   text-align: center;
   letter-spacing: 0;
-  margin: 0;
+  /* `margin: auto 0` is the trick that gives both behaviors:
+     centered when content fits, top-aligned when it overflows. */
+  margin: auto 0;
   width: 100%;
   word-break: normal;
   overflow-wrap: break-word;
