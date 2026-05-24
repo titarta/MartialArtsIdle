@@ -2996,13 +2996,25 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   top: 8%;
   left: 50%;
   transform: translateX(-50%);
+  /* Ma Shan Zheng is the bundled Chinese brush-calligraphy font;
+     covers ~200 common Simplified chars including 灵. Explicit
+     font-weight 400 matches the single weight in the loaded woff2
+     and prevents browsers from synthesising a fake bold. */
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-weight: 400;
   font-size: clamp(320px, 90vw, 520px);
   line-height: 1;
-  color: rgba(200, 151, 100, 0.030);
+  /* Slightly more visible than the previous 0.030 so the brush
+     strokes can actually read against the incense beams (which sit
+     at 0.08). Still well below "decorative" intensity — the
+     character is a quiet signature, not a focal element. */
+  color: rgba(200, 151, 100, 0.075);
   pointer-events: none;
   z-index: 0;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
+          font-smooth: always;
+  text-rendering: geometricPrecision;
 }
 
 .spk-modal {

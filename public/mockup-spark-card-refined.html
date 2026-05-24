@@ -164,12 +164,18 @@ h1 {
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-chinese);
+  font-weight: 400;
   font-size: 440px;
   line-height: 1;
-  color: rgba(200, 151, 100, 0.028);
+  /* Bumped from 0.028 so the brush strokes can read against the
+     incense beams (0.08); the watermark stays a quiet signature,
+     not a focal element. */
+  color: rgba(200, 151, 100, 0.075);
   pointer-events: none;
   z-index: 0;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
 }
 
 /* HEADER */
