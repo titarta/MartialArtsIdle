@@ -273,6 +273,18 @@ function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, bus
   );
 }
 
+/**
+ * BuffCard — compact 2-up tile per the bazaar mockup.
+ *
+ * Shape: ACTIVE ribbon (when applicable) at top-left, icon stamp centered
+ * top, headline (×2 QI/S) as the visual anchor, name as a soft purple
+ * line, duration chip + time-left meta, and a full-width Buy CTA at the
+ * bottom. Stacks neatly in a 2-col grid so 4 buffs fit in roughly the
+ * vertical space a single legacy strip used to occupy.
+ *
+ * The "1h" suffix already baked into item.name (e.g. "Crimson Aura — 1h")
+ * is stripped here, because the duration chip carries that information.
+ */
 function BuffCard({ item, ownership, balance, onBuy, busy }) {
   const activeBuff = ownership.activeBuffs.find(b => b.id === item.id);
   const headline   = (() => {
@@ -292,23 +304,25 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
     const m = Math.round(ms / 60_000);
     return `${m}m`;
   })();
-  const disabled = balance < item.cost || busy;
+  // Strip a trailing " — 1h" / " - 4h" duration suffix from the name; the
+  // duration chip below already carries that signal, and the tile is too
+  // narrow to repeat it without truncation.
+  const cleanName = (item.name ?? '').replace(/\s*[—-]\s*\d+\s*[hm]\s*$/i, '');
+  const disabled  = balance < item.cost || busy;
 
   return (
-    <div className={`bls-buff-card${activeBuff ? ' bls-buff-card-active' : ''}`}>
-      {activeBuff && <span className="bls-card-ribbon bls-card-ribbon-active">ACTIVE</span>}
-      <div className="bls-buff-card-icon">{item.icon}</div>
-      <div className="bls-buff-card-body">
-        <div className="bls-buff-card-headline">{headline}</div>
-        <div className="bls-buff-card-name">{item.name}</div>
-        <div className="bls-buff-card-meta">
-          <span className="bls-buff-card-duration">{durationLabel}</span>
-          {activeBuff && <BuffCountdown expiresAtMs={activeBuff.expiresAtMs} />}
-        </div>
+    <div className={`bls-buff-tile${activeBuff ? ' bls-buff-tile-active' : ''}`}>
+      {activeBuff && <span className="bls-buff-tile-ribbon">ACTIVE</span>}
+      <div className="bls-buff-tile-icon">{item.icon}</div>
+      <div className="bls-buff-tile-headline">{headline}</div>
+      <div className="bls-buff-tile-name">{cleanName}</div>
+      <div className="bls-buff-tile-meta">
+        <span className="bls-buff-tile-duration">{durationLabel}</span>
+        {activeBuff && <BuffCountdown expiresAtMs={activeBuff.expiresAtMs} />}
       </div>
       <button
         type="button"
-        className="bls-card-cta bls-card-cta-buyable"
+        className={`bls-buff-tile-buy${disabled ? ' bls-buff-tile-buy-dim' : ''}`}
         onClick={() => onBuy(item.id)}
         disabled={disabled}
       >

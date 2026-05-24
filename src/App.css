@@ -22860,3 +22860,167 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* Featured card — already opaque-correct, no change needed. */
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Bazaar buff tile — final fidelity pass.
+   Replaces the legacy horizontal strip (icon-left, body, CTA-right) with
+   a compact 2-up tile: icon centered on top, headline (×2 QI/S) as the
+   visual anchor, name + duration chip + time-left, full-width Buy CTA at
+   bottom. Matches _design/screens-design-pass/bazaar-mockup.html. The
+   parent `.bls-buff-grid` is restyled from flex-column to a 2-col grid.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Restyle the grid container to 2 columns. The legacy flex-column rules
+   above are still loaded for any non-bazaar consumer; we override here
+   inside the bazaar screen so legacy usage is unaffected. */
+.spirit-bazaar-screen .bls-buff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.bls-buff-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px 10px 10px;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(var(--accent-rgb), 0.08), transparent 60%),
+    rgba(var(--ui-bg-panel-rgb), 0.94);
+  border: 1px solid rgba(75, 60, 40, 0.60);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s ease, box-shadow 0.16s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.bls-buff-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22);
+}
+.bls-buff-tile-active {
+  border-color: rgba(120, 230, 160, 0.45);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45), 0 0 16px rgba(120, 230, 160, 0.22);
+}
+
+.bls-buff-tile-ribbon {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 2px 6px;
+  background: rgba(116, 255, 156, 0.18);
+  color: #98ffb4;
+  border: 1px solid rgba(116, 255, 156, 0.40);
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.bls-buff-tile-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--accent-rgb), 0.10);
+  border: 1px solid rgba(var(--accent-rgb), 0.30);
+  border-radius: 8px;
+  font-size: 18px;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.bls-buff-tile-headline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: #ff6864;
+  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.30);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.bls-buff-tile-name {
+  font-size: 11px;
+  color: rgba(var(--ui-purple-rgb, 200, 170, 120), 0.95);
+  margin: 4px 0 6px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  /* Allow two lines, ellipsis if longer — protects against long real strings. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.bls-buff-tile-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  font-size: 10px;
+  color: rgba(var(--ui-muted-rgb), 0.85);
+  font-variant-numeric: tabular-nums;
+  min-height: 16px;
+}
+
+.bls-buff-tile-duration {
+  background: rgba(14, 12, 8, 0.60);
+  border: 1px solid rgba(75, 60, 40, 0.35);
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(220, 215, 200, 0.85);
+  text-transform: uppercase;
+}
+
+/* BuffCountdown reuses .bls-buff-countdown. Override its color inside the
+   tile to the soft green echo so it pairs with the ACTIVE ribbon. */
+.bls-buff-tile .bls-buff-countdown {
+  color: #98ffb4;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bls-buff-tile-buy {
+  width: 100%;
+  padding: 7px 8px;
+  margin-top: auto;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.30), rgba(150, 30, 30, 0.25));
+  border: 1px solid rgba(var(--accent-rgb), 0.40);
+  color: #ffe3e3;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.bls-buff-tile-buy:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.40), rgba(150, 30, 30, 0.32));
+  border-color: rgba(var(--accent-rgb), 0.55);
+}
+.bls-buff-tile-buy:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.bls-buff-tile-buy:disabled,
+.bls-buff-tile-buy.bls-buff-tile-buy-dim {
+  background: rgba(40, 30, 18, 0.5);
+  border-color: rgba(75, 60, 40, 0.6);
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  cursor: not-allowed;
+}
