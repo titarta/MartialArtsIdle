@@ -1,5 +1,11 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { SHOP_ITEMS, SHOP_CATEGORIES, SHOP_ITEMS_BY_ID, COSMETIC_SLOTS } from '../data/shopItems';
+import {
+  SHOP_ITEMS,
+  SHOP_CATEGORIES,
+  SHOP_ITEMS_BY_ID,
+  COSMETIC_SLOTS,
+  getFeaturedItemForToday,
+} from '../data/shopItems';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -358,6 +364,128 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
 }
 
 /**
+ * BuffRail — horizontal strip of currently-active buff pills, surfaced
+ * inline with the bazaar header so players see what they already own
+ * BEFORE deciding to spend more. Hidden entirely when no buffs are
+ * active (no empty state). Each pill reuses BuffCountdown so the tick
+ * logic stays in one place.
+ */
+function BuffRail({ activeBuffs }) {
+  if (!activeBuffs || activeBuffs.length === 0) return null;
+  return (
+    <div className="sbz-buff-rail" aria-label="Active buffs">
+      <span className="sbz-buff-rail-label">Active</span>
+      <div className="sbz-buff-rail-scroll">
+        {activeBuffs.map(({ id, item, expiresAtMs }) => {
+          const eff = item?.effect;
+          const headline = (() => {
+            if (!eff) return '';
+            if (eff.type === 'qi_mult')          return `×${eff.mult}`;
+            if (eff.type === 'crystal_tap_mult') return `×${eff.mult}`;
+            if (eff.type === 'producer_mult')    return `×${eff.mult}`;
+            return '';
+          })();
+          return (
+            <span key={id} className="sbz-buff-pill">
+              {headline && <b>{headline}</b>}
+              <span className="sbz-buff-pill-name">{item?.name?.split(' — ')[0] ?? item?.name}</span>
+              <span className="sbz-buff-pill-timer">
+                <BuffCountdown expiresAtMs={expiresAtMs} />
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * FeaturedHero — the "Today's Pick" hero card. Renders a vermillion-haloed
+ * preview, ribbon, strike-through original price + discounted price, a
+ * countdown to local-midnight reset, and the single Buy CTA. Sourced from
+ * `getFeaturedItemForToday()` so the 7-day rotation lives in the data
+ * layer; this component is dumb.
+ */
+function FeaturedHero({ featured, balance, busy, onBuy }) {
+  if (!featured) return null;
+  const { item, originalCost, discountedCost, endsAtMs } = featured;
+  const owned = false; // featured items are not flagged owned even if the
+                       // player has bought them before — the discount is
+                       // the offer, not the ownership state. Cosmetic-
+                       // ownership is enforced inside onBuy.
+  const disabled = balance < discountedCost || busy;
+  const preview = getPreview(item);
+
+  return (
+    <div className="sbz-featured" aria-label="Today's pick">
+      <span className="sbz-featured-ribbon">Today's Pick</span>
+
+      <div className="sbz-featured-preview">
+        <span className="sbz-featured-halo" aria-hidden="true" />
+        {preview.kind === 'sprite' && (
+          <img
+            src={preview.src}
+            alt=""
+            draggable="false"
+            className="sbz-featured-preview-sprite"
+            style={preview.filter ? { filter: preview.filter } : undefined}
+          />
+        )}
+        {preview.kind === 'icon' && (
+          <span className="sbz-featured-preview-icon">{preview.icon}</span>
+        )}
+        {preview.kind === 'particle-icon' && (
+          <span className="sbz-featured-preview-icon">{preview.icon}</span>
+        )}
+        {preview.kind === 'gradient' && (
+          <div className="sbz-featured-preview-bg" style={{ background: preview.gradient }} />
+        )}
+        {preview.kind === 'bg-icon' && (
+          <span className="sbz-featured-preview-icon">{preview.icon}</span>
+        )}
+      </div>
+
+      <div className="sbz-featured-body">
+        <span className="sbz-featured-eyebrow">Limited Offering</span>
+        <span className="sbz-featured-name">{item.name}</span>
+        <span className="sbz-featured-desc">{item.desc}</span>
+
+        <div className="sbz-featured-cta">
+          <button
+            type="button"
+            className="sbz-featured-buy"
+            onClick={() => onBuy(item.id)}
+            disabled={disabled || owned}
+          >
+            <span className="sbz-featured-buy-lotus" aria-hidden="true" />
+            {discountedCost} <span className="sbz-featured-buy-unit">BL</span>
+          </button>
+          <div className="sbz-featured-meta">
+            <span className="sbz-featured-strike">{originalCost} BL</span>
+            <FeaturedCountdown endsAtMs={endsAtMs} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeaturedCountdown({ endsAtMs }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const remainingMs = Math.max(0, endsAtMs - now);
+  const totalSec = Math.floor(remainingMs / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const label = h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
+  return <span className="sbz-featured-timer">Resets in {label}</span>;
+}
+
+/**
  * Spirit Bazaar — full screen (post nav-audit).
  *
  * Was BloodLotusSpendShopModal; the audit promoted it to a screen because a
@@ -437,74 +565,83 @@ export default function SpiritBazaarScreen({
   const qol         = itemsByCategory.get('qol')        ?? [];
   const cosmeticsCount = (itemsByCategory.get('cosmetic') ?? []).length;
 
+  // Featured "Today's Pick" — 7-day rotation keyed on local weekday.
+  // Memoised once per render; the inner countdown handles the per-minute
+  // tick so we don't churn this object every second.
+  const featured = useMemo(() => getFeaturedItemForToday(), []);
+
   return (
     <div className="spirit-bazaar-screen">
 
-      <header className="sbz-screen-head">
-        <button
-          className="sbz-back-chip"
-          onClick={onBack}
-          aria-label="Back"
-        >
-          <span className="sbz-back-arrow">‹</span> Back
-        </button>
-
-        <div className="sbz-title-row">
-          <img
-            src={`${BASE}ui/shop_nav.png`}
-            className="sbz-title-icon"
-            alt=""
-            draggable="false"
-          />
-          <div className="sbz-title-block">
-            <div className="sbz-title">Spirit Bazaar</div>
-            <div className="sbz-sub">Spend Blood Lotus on boons, relics, and refinements</div>
-          </div>
-        </div>
-
-        <div className="sbz-balance">
-          <img
-            src={`${BASE}sprites/items/blood_lotus.png`}
-            className="sbz-balance-icon"
-            alt=""
-            draggable="false"
-          />
-          <div className="sbz-balance-stack">
-            <span className="sbz-balance-label">Blood Lotus</span>
-            <span className="sbz-balance-amount">{balance.toLocaleString()}</span>
-          </div>
-          <button type="button" className="sbz-topup-chip" onClick={onOpenTopUp}>
-            + Top Up
+      {/* Compact header — back · title · balance pill · top-up. The
+          calligraphy "市" watermark is painted by .sbz-screen-head::before. */}
+      <header className="sbz-screen-head sbz-screen-head-compact">
+        <div className="sbz-head-row">
+          <button
+            className="sbz-back-chip"
+            onClick={onBack}
+            aria-label="Back"
+          >
+            <span className="sbz-back-arrow">‹</span> Back
           </button>
-        </div>
-      </header>
 
-      {/* Jump rail — same shape as the legacy modal. The four pill buttons
-          scroll-anchor each storefront section into view. */}
-      <nav className="bls-jump sbz-jump" aria-label="Bazaar sections">
-        <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-buff')}>
-          <span className="bls-jump-glyph">⚡</span> Buffs
-          <span className="bls-jump-count">{buffs.length}</span>
-        </button>
-        <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-consumable')}>
-          <span className="bls-jump-glyph">✦</span> Consumables
-          <span className="bls-jump-count">{consumables.length}</span>
-        </button>
-        <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-qol')}>
-          <span className="bls-jump-glyph">⚙</span> QoL
-          <span className="bls-jump-count">{qol.length}</span>
-        </button>
-        <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-cosmetic')}>
-          <span className="bls-jump-glyph">❀</span> Cosmetics
-          <span className="bls-jump-count">{cosmeticsCount}</span>
-        </button>
-      </nav>
+          <div className="sbz-title-block sbz-title-block-compact">
+            <div className="sbz-eyebrow">The Spirit</div>
+            <div className="sbz-title">Bazaar</div>
+          </div>
+
+          <div className="sbz-balance sbz-balance-compact">
+            <img
+              src={`${BASE}sprites/items/blood_lotus.png`}
+              className="sbz-balance-icon"
+              alt=""
+              draggable="false"
+            />
+            <span className="sbz-balance-amount">{balance.toLocaleString()}</span>
+            <button type="button" className="sbz-topup-chip" onClick={onOpenTopUp}>
+              + Top Up
+            </button>
+          </div>
+        </div>
+
+        <BuffRail activeBuffs={inventory.activeBuffs} />
+      </header>
 
       {flash && (
         <div className={`bls-flash bls-flash-${flash.kind}`}>{flash.msg}</div>
       )}
 
       <div className="bls-body sbz-body" ref={bodyRef}>
+
+        {/* FEATURED HERO — "Today's Pick" */}
+        <div className="sbz-featured-wrap">
+          <FeaturedHero
+            featured={featured}
+            balance={balance}
+            busy={busy}
+            onBuy={handleBuy}
+          />
+        </div>
+
+        {/* Sticky scrollable category chip rail */}
+        <nav className="sbz-cat-rail" aria-label="Bazaar sections">
+          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-buff')}>
+            <span className="sbz-cat-glyph">⚡</span> Buffs
+            <span className="sbz-cat-count">{buffs.length}</span>
+          </button>
+          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-consumable')}>
+            <span className="sbz-cat-glyph">✦</span> Consumables
+            <span className="sbz-cat-count">{consumables.length}</span>
+          </button>
+          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-qol')}>
+            <span className="sbz-cat-glyph">⚙</span> QoL
+            <span className="sbz-cat-count">{qol.length}</span>
+          </button>
+          <button type="button" className="sbz-cat-pill" onClick={() => jumpTo('sec-cosmetic')}>
+            <span className="sbz-cat-glyph">❀</span> Cosmetics
+            <span className="sbz-cat-count">{cosmeticsCount}</span>
+          </button>
+        </nav>
         {/* Buffs aisle */}
         <section id="sec-buff" className="bls-section">
           <header className="bls-section-header">

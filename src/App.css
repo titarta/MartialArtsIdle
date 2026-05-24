@@ -2937,13 +2937,21 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    (unused by the picker; can be cleaned up later).
    ═══════════════════════════════════════════════════════════════════ */
 .spk-overlay {
-  /* Explicit viewport coverage so this modal never lets the
-     underlying screen bleed through. .modal-overlay defines fixed +
-     inset:0 normally, but a few callers wrap it in scrolling
-     containers; locking the positioning here is defensive. */
+  /* Full viewport coverage. The picker is a forced choice on every
+     breakthrough, so it commands the entire screen including the
+     top bar (qi balance, currency) and bottom nav (Home, Cultivation,
+     Journey). z-index 5000 sits above everything app-level (chrome
+     uses values under 1500). The base .modal-overlay rule sets
+     padding that reserves space for those bars; we override to use
+     only the device safe-area inset, since we WANT to cover them. */
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 5000;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
   /* Scoped color tokens, do not leak. Cultivation palette tuned for
      dark warm paper, bronze ember, jade soft, gold leaf. */
   --spk-cream:        #f4e6c8;
@@ -2961,8 +2969,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   --spk-seal-red:     #b8412c;
 
   /* Cultivation atmosphere: two incense beams behind the card slots,
-     altar dimness at the bottom. Sits over the standard .modal-overlay
-     scrim so it inherits the click-to-dismiss veil from there. */
+     altar dimness at the bottom. Floor is fully opaque so the home
+     scene never leaks through. */
   background:
     radial-gradient(ellipse 96px 320px at 28% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
     radial-gradient(ellipse 96px 320px at 72% 50%, rgba(200, 151, 100, 0.07), transparent 70%),
@@ -2971,7 +2979,6 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
 }
 /* Giant faint 灵 (líng / spirit) watermark behind the modal. */
 .spk-overlay::before {
@@ -3271,7 +3278,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--spk-bronze);
-  margin: 6px 0 14px;
+  margin: 4px 0 10px;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
   padding-left: 0.32em;
 }
@@ -3283,11 +3290,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 .spk-icon-area {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 88px;
+  height: 88px;
   display: grid;
   place-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .spk-icon-glow {
   position: absolute;
@@ -3307,44 +3314,58 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .spk-icon-glyph {
   position: relative;
   z-index: 1;
-  font-size: 52px;
+  font-size: 60px;
   line-height: 1;
   display: grid;
   place-items: center;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+  transition: transform 280ms cubic-bezier(0.2, 0.7, 0.3, 1);
 }
-.spk-icon-emoji { font-size: 52px; line-height: 1; }
-.spk-icon-img   { width: 64px; height: 64px; object-fit: contain; image-rendering: pixelated; }
+.spk-icon-emoji { font-size: 60px; line-height: 1; }
+.spk-icon-img   { width: 72px; height: 72px; object-fit: contain; image-rendering: pixelated; }
 .spk-card-legendary .spk-icon-glyph {
   filter:
     drop-shadow(0 0 12px rgba(255, 214, 107, 0.55))
     drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
 }
-
-.spk-rule {
-  width: 70%;
-  height: 1px;
-  margin: 6px 0 10px;
-  border: none;
-  background: linear-gradient(90deg, transparent, var(--spk-bronze-soft), transparent);
+/* Subtle press feedback. The card itself lifts on hover; the glyph
+   scales just a hair so the focal point feels alive when touched.
+   Reduced-motion users get a static glyph. */
+.spk-card:hover .spk-icon-glyph,
+.spk-card:focus-visible .spk-icon-glyph { transform: scale(1.04); }
+@media (prefers-reduced-motion: reduce) {
+  .spk-card:hover .spk-icon-glyph,
+  .spk-card:focus-visible .spk-icon-glyph { transform: none; }
 }
-.spk-card-uncommon  .spk-rule { background: linear-gradient(90deg, transparent, var(--spk-jade-soft), transparent); }
-.spk-card-legendary .spk-rule { background: linear-gradient(90deg, transparent, var(--spk-gold-soft), transparent); }
+
+/* Quiet tick mark between the icon zone and the title zone. Was a
+   wider gradient hairline; reduced to a fixed 44px width with a
+   softer accent so it reads as a marker rather than a divider. */
+.spk-rule {
+  width: 44px;
+  height: 1px;
+  margin: 4px 0 8px;
+  border: none;
+  background: linear-gradient(90deg, transparent, rgba(200, 151, 100, 0.40), transparent);
+}
+.spk-card-uncommon  .spk-rule { background: linear-gradient(90deg, transparent, rgba(110, 201, 138, 0.45), transparent); }
+.spk-card-legendary .spk-rule { background: linear-gradient(90deg, transparent, rgba(212, 168, 80,  0.55), transparent); }
 
 .spk-name {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.04em;
   color: var(--spk-cream);
   text-align: center;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
   line-height: 1.18;
-  margin: 0 0 10px;
-  min-height: 32px;
+  margin: 0 0 8px;
+  min-height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 4px;
 }
 .spk-card-legendary .spk-name {
   color: #fff4d4;
@@ -3353,25 +3374,38 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
     0 1px 0  rgba(0, 0, 0, 0.7);
 }
 
-/* Effect text: legibility-tuned per author feedback. Slightly larger,
-   higher contrast, no italic on strong, value highlights take the
-   rarity accent color.
-   2026-05 fix: removed flex display from this element. renderEffect()
-   emits alternating <span> and <strong> children; a flex parent turned
-   every chunk into a non-wrapping flex item which overflowed the card
-   width on long descriptions. Plain block paragraph wraps naturally. */
+/* Effect text container.
+   The wrap is the flex item that absorbs whatever space remains in
+   the card column. It vertically centers the inner <p>, so short
+   descriptions feel anchored instead of stranded near the top, and
+   long descriptions still fill the space evenly. overflow:hidden
+   protects layout if a description ever exceeds the available
+   height (the card overall already has overflow:hidden). */
+.spk-effect-wrap {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  overflow: hidden;
+}
+/* The <p> stays a plain block. renderEffect() emits alternating
+   <span> and <strong> children; a flex parent here would turn every
+   chunk into a non-wrapping flex item, so this is intentionally
+   block-level. Word wrap is normal; long single tokens fall back to
+   overflow-wrap. tabular-nums on strong keeps multi-digit values
+   like "+1.5%" aligned across cards. */
 .spk-effect {
   font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: rgba(244, 230, 200, 0.88);
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(244, 230, 200, 0.92);
   text-align: center;
   letter-spacing: 0;
   margin: 0;
-  padding: 4px 8px 0;
   width: 100%;
-  flex: 1;
-  align-self: stretch;
   word-break: normal;
   overflow-wrap: break-word;
   hyphens: none;
@@ -3381,6 +3415,7 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   font-weight: 700;
   font-style: normal;
   letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
 }
 .spk-card-uncommon  .spk-effect strong { color: var(--spk-jade);        }
 .spk-card-legendary .spk-effect strong { color: var(--spk-gold-bright); }
@@ -3449,7 +3484,8 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* ── Pick button ─────────────────────────────────────────────────── */
 .spk-pick {
   margin-top: 12px;
-  padding: 11px 8px;
+  padding: 13px 8px;
+  min-height: 44px;
   width: 100%;
   font-family: 'Cinzel', Georgia, serif;
   font-size: 11px;
@@ -3544,12 +3580,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: var(--spk-cream-fade);
   letter-spacing: 0.02em;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 4px 10px;
   padding: 6px 14px;
   border-top:    1px solid var(--spk-bronze-faint);
   border-bottom: 1px solid var(--spk-bronze-faint);
   text-align: center;
+  max-width: 320px;
 }
 .spk-meta strong { color: var(--spk-gold-bright); font-weight: 600; }
 .spk-meta-sep    { color: rgba(200, 151, 100, 0.3); }
@@ -3560,12 +3599,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   text-shadow: 0 0 8px rgba(255, 214, 107, 0.3);
 }
 
-/* Compact phones: shrink card width a touch so the pair fits with
-   side padding on viewports under 360px. */
+/* Compact phones: shrink card width and icon footprint so the pair
+   fits with side padding on viewports under 380px. The icon stays
+   the focal point but scales down proportionally with the card. */
 @media (max-width: 380px) {
-  .spk-slot { width: 148px; }
-  .spk-card { height: 274px; padding: 14px 10px; }
-  .spk-pair { gap: 12px; }
+  .spk-slot       { width: 148px; }
+  .spk-card       { height: 274px; padding: 14px 10px; }
+  .spk-pair       { gap: 12px; }
+  .spk-icon-area  { width: 80px; height: 80px; }
+  .spk-icon-glyph { font-size: 54px; }
+  .spk-icon-emoji { font-size: 54px; }
+  .spk-icon-img   { width: 64px; height: 64px; }
 }
 
 /* Rarity border glow — law cards */
@@ -22159,5 +22203,411 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   text-shadow: 0 0 4px rgba(255, 213, 90, 0.55);
 }
 .jc-stage-spark-mark.jc-stage-spark-empty { color: transparent; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SPIRIT BAZAAR — "Temple Storefront" visual redesign (2026-05-24)
+   Compact one-row header with calligraphy "市" watermark, active-buffs rail
+   inline, vermillion Featured Hero (Today's Pick) with discount + countdown,
+   sticky scrollable category rail, and vermillion lantern dividers on each
+   aisle so the screen reads as physical temple-bazaar aisles, not a list.
+   ════════════════════════════════════════════════════════════════════════ */
+.spirit-bazaar-screen .sbz-screen-head-compact {
+  position: relative;
+  overflow: visible;
+  padding-bottom: 6px;
+}
+.spirit-bazaar-screen .sbz-screen-head-compact::before {
+  content: "\5E02";
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  position: absolute;
+  right: -8px;
+  top: -22px;
+  font-size: 110px;
+  color: rgba(255, 104, 100, 0.07);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.sbz-head-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+.sbz-title-block-compact {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.sbz-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 180, 180, 0.55);
+}
+.sbz-title-block-compact .sbz-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+  line-height: 1.05;
+}
+.sbz-balance-compact {
+  padding: 6px 10px;
+  gap: 6px;
+  border-radius: 14px;
+  background: rgba(255, 104, 100, 0.10);
+  border-color: rgba(255, 104, 100, 0.45);
+  box-shadow: 0 0 14px rgba(255, 104, 100, 0.10) inset;
+}
+.sbz-balance-compact .sbz-balance-icon {
+  width: 20px;
+  height: 20px;
+}
+.sbz-balance-compact .sbz-balance-amount {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: #ffd3d3;
+}
+.sbz-balance-compact .sbz-topup-chip {
+  padding: 4px 9px;
+  font-size: 11px;
+  border-radius: 12px;
+}
+.sbz-buff-rail {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid rgba(75, 60, 40, 0.35);
+  border-radius: 10px;
+  position: relative;
+  z-index: 1;
+}
+.sbz-buff-rail-label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.65);
+  padding-right: 6px;
+  border-right: 1px solid rgba(75, 60, 40, 0.35);
+  flex-shrink: 0;
+}
+.sbz-buff-rail-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sbz-buff-rail-scroll::-webkit-scrollbar { display: none; }
+.sbz-buff-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  background: rgba(255, 104, 100, 0.10);
+  border: 1px solid rgba(255, 104, 100, 0.35);
+  border-radius: 12px;
+  font-size: 10px;
+  color: #ffd3d3;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.sbz-buff-pill b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.sbz-buff-pill-name {
+  color: var(--ui-purple-light);
+}
+.sbz-buff-pill-timer {
+  color: rgba(255, 220, 220, 0.85);
+  font-weight: 500;
+  font-size: 9px;
+  padding-left: 5px;
+  margin-left: 2px;
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
+}
+.sbz-buff-pill-timer .bls-buff-countdown {
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: 0;
+}
+.sbz-featured-wrap {
+  padding: 14px 0 0;
+  position: relative;
+  z-index: 1;
+}
+.sbz-featured {
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 14px;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 104, 100, 0.18) 0%, rgba(40, 14, 10, 0.0) 60%),
+    linear-gradient(160deg, rgba(46, 18, 14, 0.96), rgba(20, 12, 10, 0.96));
+  border: 1px solid rgba(255, 104, 100, 0.45);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.10),
+    0 12px 32px -18px rgba(255, 104, 100, 0.45);
+  overflow: hidden;
+}
+.sbz-featured-ribbon {
+  position: absolute;
+  top: 12px;
+  right: -36px;
+  transform: rotate(28deg);
+  background: linear-gradient(180deg, #ff6864, #b81e1e);
+  color: #fff5e2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  padding: 3px 40px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+.sbz-featured-preview {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 200, 100, 0.20), rgba(60, 20, 16, 0.85));
+  border: 1px solid rgba(255, 104, 100, 0.30);
+  border-radius: 12px;
+  position: relative;
+  z-index: 1;
+}
+.sbz-featured-halo {
+  position: absolute;
+  inset: -8px;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgba(255, 104, 100, 0.20),
+    0 0 28px rgba(255, 104, 100, 0.55);
+  pointer-events: none;
+}
+.sbz-featured-preview-sprite {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(255, 104, 100, 0.35));
+  position: relative;
+  z-index: 1;
+}
+.sbz-featured-preview-icon {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px rgba(255, 104, 100, 0.55));
+  position: relative;
+  z-index: 1;
+}
+.sbz-featured-preview-bg {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+.sbz-featured-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.sbz-featured-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 180, 180, 0.65);
+}
+.sbz-featured-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--ui-purple-light);
+  line-height: 1.2;
+}
+.sbz-featured-desc {
+  font-size: 11px;
+  color: rgba(var(--ui-label-rgb), 0.75);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+.sbz-featured-cta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sbz-featured-buy {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  background: linear-gradient(180deg, #ff8888 0%, #e63a3a 60%, #a82020 100%);
+  border: 1px solid rgba(255, 200, 200, 0.40);
+  border-radius: 10px;
+  color: #fff8ee;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 215, 0.30),
+    0 6px 18px -8px rgba(255, 104, 100, 0.55);
+  cursor: pointer;
+}
+.sbz-featured-buy:disabled {
+  filter: grayscale(0.6) brightness(0.7);
+  cursor: not-allowed;
+}
+.sbz-featured-buy-lotus {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #fff 30%, #ffd3d3 70%);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sbz-featured-buy-unit {
+  opacity: 0.8;
+  font-weight: 500;
+  margin-left: 2px;
+}
+.sbz-featured-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.sbz-featured-strike {
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  text-decoration: line-through;
+  font-variant-numeric: tabular-nums;
+}
+.sbz-featured-timer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: rgba(255, 220, 220, 0.85);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sbz-cat-rail {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  gap: 6px;
+  padding: 14px 0 10px;
+  margin: 0;
+  background: linear-gradient(180deg, rgba(8, 6, 4, 0.92) 70%, transparent);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.sbz-cat-rail::-webkit-scrollbar { display: none; }
+.sbz-cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  background: rgba(14, 12, 8, 0.65);
+  border: 1px solid rgba(75, 60, 40, 0.6);
+  border-radius: 16px;
+  color: var(--ui-purple-soft);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.sbz-cat-glyph {
+  font-size: 13px;
+  line-height: 1;
+}
+.sbz-cat-count {
+  display: inline-block;
+  background: rgba(220, 175, 110, 0.18);
+  color: var(--ui-purple-strong);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+.sbz-cat-pill:hover,
+.sbz-cat-pill:active {
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.18), rgba(150, 30, 30, 0.18));
+  border-color: rgba(255, 104, 100, 0.55);
+  color: #ffe3e3;
+}
+.spirit-bazaar-screen .bls-section {
+  position: relative;
+  padding-left: 4px;
+}
+.spirit-bazaar-screen .bls-section::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  width: 4px;
+  height: 28px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ff6864 0%, #b81e1e 100%);
+  box-shadow: 0 0 12px rgba(255, 104, 100, 0.50);
+  pointer-events: none;
+}
+.spirit-bazaar-screen .bls-section .bls-section-header {
+  padding-left: 14px;
+}
+.spirit-bazaar-screen .bls-section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+}
+.spirit-bazaar-screen .bls-section-tag {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  color: rgba(var(--ui-muted-rgb), 0.70);
+}
 
 

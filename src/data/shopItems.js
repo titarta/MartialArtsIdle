@@ -318,3 +318,52 @@ export function canAfford(itemId, balance) {
   const item = SHOP_ITEMS_BY_ID[itemId];
   return !!item && balance >= item.cost;
 }
+
+// ── Featured "Today's Pick" rotation ────────────────────────────────────────
+// A 7-day rotation keyed on `new Date().getDay()` (Sunday = 0). The Spirit
+// Bazaar's hero card renders one item per day at a discount; the discount
+// resets at the end of the local calendar day. v1 ships with a hardcoded
+// schedule — server-side rotation can land later without changing the
+// surface API (just update the helper).
+//
+// Picks are chosen for variety: cosmetics on weekends, buffs/QoL on
+// weekdays. Pure-cosmetic spotlighting helps players discover the visual
+// catalogue; weekday buffs are the impulse-buy moments where a discount
+// can flip a "maybe later" into a purchase.
+export const FEATURED_BY_WEEKDAY = [
+  'cos_char_crimson',           // Sun
+  'buff_crimson_aura_4h',       // Mon
+  'qol_skip_bt_confirm',        // Tue
+  'buff_producer_surge_4h',     // Wed
+  'consumable_major_bt_bypass', // Thu
+  'buff_crimson_aura_12h',      // Fri
+  'cos_crystal_amber',          // Sat
+];
+
+export const FEATURED_DISCOUNT = 0.20; // 20% off the daily pick
+
+/**
+ * Returns the featured item for the local current weekday, plus a discount
+ * factor + the unix-ms timestamp the offer expires (local midnight). Render
+ * surfaces should call this once per render and re-fetch on day rollover.
+ */
+export function getFeaturedItemForToday(now = new Date()) {
+  const dow = now.getDay(); // 0..6, Sun = 0
+  const itemId = FEATURED_BY_WEEKDAY[dow];
+  const item = SHOP_ITEMS_BY_ID[itemId] ?? null;
+  if (!item) return null;
+  // End of LOCAL day in ms (start of tomorrow at 00:00).
+  const tomorrow = new Date(now);
+  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const endsAtMs = tomorrow.getTime();
+  const baseCost = item.cost ?? 0;
+  const discountedCost = Math.max(1, Math.round(baseCost * (1 - FEATURED_DISCOUNT)));
+  return {
+    item,
+    discount: FEATURED_DISCOUNT,
+    originalCost: baseCost,
+    discountedCost,
+    endsAtMs,
+  };
+}
