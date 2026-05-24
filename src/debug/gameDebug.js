@@ -509,32 +509,78 @@ export function initDebug(hooksRef) {
     },
 
     /**
-     * Preview the spark picker modal with arbitrary card ids. Skips the
-     * breakthrough flow entirely; useful for inspecting the new card
-     * design across rarity combinations.
+     * Preview the spark picker modal. Skips the breakthrough flow
+     * entirely; useful for inspecting the card design across rarity
+     * combinations without grinding a real breakthrough.
      *
-     * Examples:
+     * Overloaded arg shape (rarities and spark ids never overlap, so
+     * a single argument disambiguates):
+     *
+     *   gd.previewSparkOffer()
+     *     Random pair, any rarity, uniform across the full pool.
+     *
+     *   gd.previewSparkOffer('legendary')
+     *     Random pair from the specified rarity. Valid rarities:
+     *     'common', 'uncommon', 'rare', 'legendary'.
+     *
+     *   gd.previewSparkOffer('quick_burst')
+     *     That spark plus a random partner from the same rarity.
+     *
      *   gd.previewSparkOffer('quick_burst', 'phoenix_reborn')
-     *   gd.previewSparkOffer('phoenix_reborn', 'azure_dragon')
-     *   gd.previewSparkOffer()                  → list ids and exit
+     *     Explicit pair, exactly as written.
      *
      * Run gd.listQiSparkIds() to see every available id grouped by
-     * rarity. Pick the spark, then Reroll, or Skip in the modal to
-     * dismiss; the preview offer is treated like any real offer, so
-     * picking applies the card to your run.
+     * rarity. The preview offer is treated like a real offer, so
+     * picking applies the card to your live run.
      */
-    previewSparkOffer(idA, idB) {
+    previewSparkOffer(a, b) {
       const setOffer = g().qiSparks?._debugSetOffer;
       if (typeof setOffer !== 'function') {
         console.warn('[debug] _debugSetOffer not exposed.');
         return;
       }
-      if (!idA && !idB) {
-        console.log('[debug] Usage: gd.previewSparkOffer(idA, idB)');
-        console.log('[debug] Run gd.listQiSparkIds() to see every id.');
+      const RARITIES = new Set(['common', 'uncommon', 'rare', 'legendary']);
+      const pickTwoDistinct = (pool) => {
+        if (pool.length === 0) return [];
+        if (pool.length === 1) return [pool[0].id, pool[0].id];
+        const i = Math.floor(Math.random() * pool.length);
+        let j = Math.floor(Math.random() * (pool.length - 1));
+        if (j >= i) j += 1;
+        return [pool[i].id, pool[j].id];
+      };
+      const randomPartner = (sparkId) => {
+        const seed = QI_SPARK_BY_ID[sparkId];
+        if (!seed) return null;
+        const same = QI_SPARKS.filter(c => c.rarity === seed.rarity && c.id !== sparkId);
+        if (same.length === 0) return sparkId;
+        return same[Math.floor(Math.random() * same.length)].id;
+      };
+
+      let cards;
+      let mode;
+      if (!a && !b) {
+        cards = pickTwoDistinct(QI_SPARKS);
+        mode  = 'random / any rarity';
+      } else if (a && !b && RARITIES.has(a)) {
+        const pool = QI_SPARKS.filter(c => c.rarity === a);
+        if (pool.length === 0) {
+          console.warn(`[debug] No sparks defined for rarity '${a}'.`);
+          return;
+        }
+        cards = pickTwoDistinct(pool);
+        mode  = `random / ${a}`;
+      } else if (a && !b && QI_SPARK_BY_ID[a]) {
+        const partner = randomPartner(a);
+        cards = [a, partner];
+        mode  = `${a} + random partner`;
+      } else if (a && b) {
+        cards = [a, b];
+        mode  = 'explicit pair';
+      } else {
+        console.warn(`[debug] Unknown spark id or rarity: '${a}'. Try gd.listQiSparkIds().`);
         return;
       }
-      const cards = [idA, idB].filter(Boolean);
+
       const unknown = cards.filter(id => !QI_SPARK_BY_ID[id]);
       if (unknown.length > 0) {
         console.warn(`[debug] Unknown spark id(s): ${unknown.join(', ')}`);
@@ -545,7 +591,7 @@ export function initDebug(hooksRef) {
           const c = QI_SPARK_BY_ID[id];
           return c ? `${c.name} (${c.rarity})` : `?${id}?`;
         });
-        console.log(`[debug] Preview offer set: ${labels.join(' vs ')}`);
+        console.log(`[debug] Preview offer (${mode}): ${labels.join(' vs ')}`);
       } else {
         console.warn('[debug] No valid cards in the preview request.');
       }
