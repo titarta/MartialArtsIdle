@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { SHOP_ITEMS, SHOP_CATEGORIES, SHOP_ITEMS_BY_ID, COSMETIC_SLOTS } from '../data/shopItems';
 
 const BASE = import.meta.env.BASE_URL;
@@ -449,16 +449,39 @@ export default function BloodLotusSpendShopModal({
   onClose,
   onOpenTopUp,
 }) {
-  const [tab, setTab] = useState('buff');
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
+  const bodyRef = useRef(null);
 
+  // Bucket items by category once. The whole shop is rendered as a single
+  // scrollable storefront now — no tabs, no per-category resize — so this
+  // map is the source of truth for every section render.
   const itemsByCategory = useMemo(() => {
     const out = new Map();
     for (const cat of SHOP_CATEGORIES) out.set(cat.id, []);
     for (const item of SHOP_ITEMS) out.get(item.category)?.push(item);
     return out;
   }, []);
+
+  // Cosmetics need an extra split: per slot (Character / Crystal /
+  // Particles / Background) and within each slot, tier-1 (CSS-tint)
+  // vs tier-2 (Coming Soon premium). Always computed since the panel
+  // is always visible.
+  const cosmeticsBySlot = useMemo(() => {
+    const groups = {
+      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   tier1: [], premium: [] },
+      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      tier1: [], premium: [] },
+      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   tier1: [], premium: [] },
+      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          tier1: [], premium: [] },
+    };
+    const cosmetics = itemsByCategory.get('cosmetic') ?? [];
+    for (const it of cosmetics) {
+      if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
+      if (it.comingSoon) groups[it.cosmeticSlot].premium.push(it);
+      else               groups[it.cosmeticSlot].tier1.push(it);
+    }
+    return groups;
+  }, [itemsByCategory]);
 
   useEffect(() => {
     if (!flash) return;
@@ -479,76 +502,162 @@ export default function BloodLotusSpendShopModal({
     }
   };
 
-  const items = itemsByCategory.get(tab) ?? [];
+  /** Smooth-scroll the body to a section anchor — used by the jump nav. */
+  const jumpTo = (id) => {
+    const target = bodyRef.current?.querySelector(`#${id}`);
+    if (!target || !bodyRef.current) return;
+    bodyRef.current.scrollTo({
+      top: target.offsetTop - 8,  // -8px so the sticky section header doesn't hide the previous one
+      behavior: 'smooth',
+    });
+  };
 
-  // Group cosmetics by slot AND by tier (Tier-1 vs premium Coming Soon)
-  // so the cosmetic tab can render multiple presentation layouts side
-  // by side for evaluation.
-  const cosmeticsBySlot = useMemo(() => {
-    if (tab !== 'cosmetic') return null;
-    const groups = {
-      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   tier1: [], premium: [] },
-      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      tier1: [], premium: [] },
-      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   tier1: [], premium: [] },
-      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          tier1: [], premium: [] },
-    };
-    for (const it of items) {
-      if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
-      if (it.comingSoon) groups[it.cosmeticSlot].premium.push(it);
-      else               groups[it.cosmeticSlot].tier1.push(it);
-    }
-    return groups;
-  }, [tab, items]);
+  const buffs       = itemsByCategory.get('buff')       ?? [];
+  const consumables = itemsByCategory.get('consumable') ?? [];
+  const qol         = itemsByCategory.get('qol')        ?? [];
+  const cosmeticsCount = (itemsByCategory.get('cosmetic') ?? []).length;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="bls-modal" onClick={e => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
-        <div className="bls-header">
+        <header className="bls-header">
           <img
             src={`${BASE}ui/shop_nav.png`}
             className="bls-header-icon"
             alt=""
             draggable="false"
           />
-          <span className="bls-header-title">Blood Lotus Shop</span>
-          <span className="bls-header-balance">
-            {balance.toLocaleString()} <span className="bls-header-balance-suffix">BL</span>
-          </span>
-        </div>
+          <div className="bls-header-title-block">
+            <span className="bls-header-eyebrow">Spirit Bazaar</span>
+            <h2 className="bls-header-title">Blood Lotus Shop</h2>
+          </div>
+          <div className="bls-header-balance" aria-label="Current balance">
+            <img
+              src={`${BASE}sprites/items/blood_lotus.png`}
+              className="bls-header-balance-icon"
+              alt=""
+              draggable="false"
+            />
+            <div className="bls-header-balance-stack">
+              <span className="bls-header-balance-label">Balance</span>
+              <span className="bls-header-balance-amount">
+                {balance.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </header>
 
-        <div className="ach-tabs bls-tabs">
-          {SHOP_CATEGORIES.map(cat => (
-            <button
-              key={cat.id}
-              className={`ach-tab${tab === cat.id ? ' ach-tab-active' : ''}`}
-              onClick={() => setTab(cat.id)}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        {/* Quick-jump nav — pill row that scrolls the body to each aisle. */}
+        <nav className="bls-jump" aria-label="Shop sections">
+          <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-buff')}>
+            <span className="bls-jump-glyph">⚡</span> Buffs
+            <span className="bls-jump-count">{buffs.length}</span>
+          </button>
+          <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-consumable')}>
+            <span className="bls-jump-glyph">✦</span> Consumables
+            <span className="bls-jump-count">{consumables.length}</span>
+          </button>
+          <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-qol')}>
+            <span className="bls-jump-glyph">⚙</span> QoL
+            <span className="bls-jump-count">{qol.length}</span>
+          </button>
+          <button type="button" className="bls-jump-pill" onClick={() => jumpTo('sec-cosmetic')}>
+            <span className="bls-jump-glyph">❀</span> Cosmetics
+            <span className="bls-jump-count">{cosmeticsCount}</span>
+          </button>
+        </nav>
 
         {flash && (
           <div className={`bls-flash bls-flash-${flash.kind}`}>{flash.msg}</div>
         )}
 
-        <div className="bls-body">
-          {/* ── Cosmetics — showcase grid ──────────────────────────────
-              Tier-1 (CSS-tint) cosmetics render in the regular grid.
-              Tier-2 premium "Coming Soon" cards render TWICE — once in
-              the Stack mockup and once in the Strip mockup — so the
-              two layout options can be compared side by side. Once
-              the user picks a layout, the loser is removed. */}
-          {tab === 'cosmetic' && cosmeticsBySlot && (
+        <div className="bls-body" ref={bodyRef}>
+          {/* ── Buffs aisle ───────────────────────────────────────── */}
+          <section id="sec-buff" className="bls-section">
+            <header className="bls-section-header">
+              <span className="bls-section-glyph">⚡</span>
+              <h3 className="bls-section-title">Buffs</h3>
+              <span className="bls-section-tag">Power-ups · stack with everything</span>
+              <span className="bls-section-count">{buffs.length}</span>
+            </header>
+            <div className="bls-buff-grid">
+              {buffs.map(item => (
+                <BuffCard
+                  key={item.id}
+                  item={item}
+                  ownership={inventory}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* ── Consumables aisle ─────────────────────────────────── */}
+          <section id="sec-consumable" className="bls-section">
+            <header className="bls-section-header">
+              <span className="bls-section-glyph">✦</span>
+              <h3 className="bls-section-title">Consumables</h3>
+              <span className="bls-section-tag">One-shot talismans · keep until used</span>
+              <span className="bls-section-count">{consumables.length}</span>
+            </header>
+            {consumables.length === 0 ? (
+              <div className="bls-empty">More relics coming to the shelves…</div>
+            ) : (
+              consumables.map(item => (
+                <CompactRow
+                  key={item.id}
+                  item={item}
+                  ownership={inventory}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))
+            )}
+          </section>
+
+          {/* ── Quality of Life aisle ─────────────────────────────── */}
+          <section id="sec-qol" className="bls-section">
+            <header className="bls-section-header">
+              <span className="bls-section-glyph">⚙</span>
+              <h3 className="bls-section-title">Quality of Life</h3>
+              <span className="bls-section-tag">Permanent unlocks · less friction, more cultivation</span>
+              <span className="bls-section-count">{qol.length}</span>
+            </header>
+            {qol.length === 0 ? (
+              <div className="bls-empty">More relics coming to the shelves…</div>
+            ) : (
+              qol.map(item => (
+                <CompactRow
+                  key={item.id}
+                  item={item}
+                  ownership={inventory}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))
+            )}
+          </section>
+
+          {/* ── Cosmetics aisle ───────────────────────────────────── */}
+          <section id="sec-cosmetic" className="bls-section">
+            <header className="bls-section-header">
+              <span className="bls-section-glyph">❀</span>
+              <h3 className="bls-section-title">Cosmetics</h3>
+              <span className="bls-section-tag">Recolours · skins · backdrops</span>
+              <span className="bls-section-count">{cosmeticsCount}</span>
+            </header>
             <div className="bls-cosmetic-sections">
               {Object.entries(cosmeticsBySlot).map(([slot, group]) => {
                 if (group.tier1.length === 0 && group.premium.length === 0) return null;
                 const isMultiTier = slot === COSMETIC_SLOTS.CHARACTER || slot === COSMETIC_SLOTS.CRYSTAL;
                 return (
                   <div key={slot} className="bls-cosmetic-slot-group">
-                    {/* Tier-1 tint variants — regular cards. */}
                     {group.tier1.length > 0 && (
                       <section className="bls-cosmetic-section">
                         <div className="bls-cosmetic-section-label">{group.label}</div>
@@ -568,10 +677,6 @@ export default function BloodLotusSpendShopModal({
                         </div>
                       </section>
                     )}
-
-                    {/* Premium Tier-2 multi-tier skins (cultivator +
-                        crystal) — full-width procession cards that show
-                        every evolution stage receding into depth. */}
                     {group.premium.length > 0 && isMultiTier && (
                       <section className="bls-cosmetic-section">
                         <div className="bls-cosmetic-section-label">{group.label} — Coming Soon</div>
@@ -591,9 +696,6 @@ export default function BloodLotusSpendShopModal({
                         </div>
                       </section>
                     )}
-
-                    {/* Single-form premium cosmetics (particles + backdrops)
-                        — keep the regular card layout for these. */}
                     {group.premium.length > 0 && !isMultiTier && (
                       <section className="bls-cosmetic-section">
                         <div className="bls-cosmetic-section-label">{group.label} — Coming Soon</div>
@@ -617,45 +719,12 @@ export default function BloodLotusSpendShopModal({
                 );
               })}
             </div>
-          )}
-
-          {/* ── Buffs — big effect cards ──────────────────────────── */}
-          {tab === 'buff' && (
-            <div className="bls-buff-grid">
-              {items.map(item => (
-                <BuffCard
-                  key={item.id}
-                  item={item}
-                  ownership={inventory}
-                  balance={balance}
-                  onBuy={handleBuy}
-                  busy={busy}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* ── Consumables + QoL — compact rows ──────────────────── */}
-          {(tab === 'consumable' || tab === 'qol') && (
-            items.length === 0 ? (
-              <div className="bls-empty">Nothing here yet.</div>
-            ) : (
-              items.map(item => (
-                <CompactRow
-                  key={item.id}
-                  item={item}
-                  ownership={inventory}
-                  balance={balance}
-                  onBuy={handleBuy}
-                  busy={busy}
-                />
-              ))
-            )
-          )}
+          </section>
         </div>
 
         <button type="button" className="bls-topup" onClick={onOpenTopUp}>
-          Need more Blood Lotus? <span className="bls-topup-cta">Top Up</span>
+          <span className="bls-topup-hint">Need more Blood Lotus?</span>
+          <span className="bls-topup-cta">Top Up →</span>
         </button>
       </div>
     </div>

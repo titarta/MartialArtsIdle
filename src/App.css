@@ -12373,6 +12373,9 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.3);
   border-radius: 16px;
   width: min(96vw, 480px);
+  /* FIXED height — modal no longer shrinks/expands when sections have
+     different content lengths. The body is the only scrollable area. */
+  height: var(--modal-max-h);
   max-height: var(--modal-max-h);
   display: flex;
   flex-direction: column;
@@ -12383,50 +12386,138 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .bls-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   /* Right padding reserved for the absolute .modal-close button. */
   padding: 14px 52px 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(212, 168, 102, 0.18);
   flex-shrink: 0;
 }
 .bls-header-icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55));
 }
-.bls-header-title {
+.bls-header-title-block {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.bls-header-eyebrow {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 9px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(212, 168, 102, 0.72);
+}
+.bls-header-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--ui-purple-light);
+  letter-spacing: 0.05em;
+  color: #ffe8d4;
+  margin: 0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
 }
 .bls-header-balance {
-  font-size: 13px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: rgba(255, 200, 200, 0.95);
-  background: rgba(200, 60, 80, 0.12);
-  border: 1px solid rgba(200, 60, 80, 0.28);
-  border-radius: 999px;
-  padding: 3px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 6px 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(122, 16, 24, 0.32), rgba(74, 8, 16, 0.32));
+  border: 1px solid rgba(212, 168, 102, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 180, 0.16),
+              0 0 10px rgba(122, 16, 24, 0.22);
   flex-shrink: 0;
 }
-.bls-header-balance-suffix {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: rgba(255, 200, 200, 0.6);
-  margin-left: 2px;
+.bls-header-balance-icon {
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
+.bls-header-balance-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+.bls-header-balance-label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 232, 212, 0.6);
+}
+.bls-header-balance-amount {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: #ffe8d4;
+  margin-top: 2px;
+}
+/* Legacy single-pill balance suffix — hidden now that the balance is
+   a two-line stack (label + amount). Kept defined so any stale render
+   from before this redesign doesn't crash on a missing class. */
+.bls-header-balance-suffix { display: none; }
 
-.bls-tabs {
-  /* Override .ach-tabs default padding so the tab row hugs the
-     header tighter inside the shop modal. */
-  padding: 8px 14px 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+/* ── Quick-jump nav — pill row that scrolls the body to each aisle.
+   Wraps to two rows on narrow viewports so all four aisles are always
+   visible. Stays a single row when there is room. ─────────────────── */
+.bls-jump {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(212, 168, 102, 0.12);
+  flex-shrink: 0;
+}
+.bls-jump-pill {
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 168, 102, 0.28);
+  background: rgba(36, 10, 14, 0.5);
+  color: rgba(255, 232, 212, 0.78);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.12s;
+}
+.bls-jump-pill:hover {
+  background: rgba(122, 16, 24, 0.28);
+  border-color: rgba(212, 168, 102, 0.55);
+  color: #ffe8d4;
+  transform: translateY(-1px);
+}
+.bls-jump-glyph {
+  font-size: 12px;
+  color: rgba(212, 168, 102, 0.92);
+}
+.bls-jump-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  background: rgba(212, 168, 102, 0.22);
+  color: #ffe8d4;
 }
 
 .bls-flash {
@@ -12456,10 +12547,83 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .bls-body {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 14px 12px;
+  padding: 4px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 8px;
+}
+
+/* ── Aisle (one per shop category) ─────────────────────────────────
+   All four sections are rendered in one scrollable column so the modal
+   never resizes when the player browses between them. */
+.bls-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  scroll-margin-top: 8px;
+}
+.bls-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 12px 4px 8px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(212, 168, 102, 0.18);
+  position: relative;
+}
+/* The very first section in the body has no divider above it (the jump
+   nav border already separates the header from the body). */
+.bls-section:first-child .bls-section-header {
+  border-top: none;
+  padding-top: 4px;
+  margin-top: 0;
+}
+.bls-section-glyph {
+  font-size: 16px;
+  line-height: 1;
+  color: rgba(212, 168, 102, 0.95);
+  filter: drop-shadow(0 0 6px rgba(212, 168, 102, 0.5));
+  flex-shrink: 0;
+}
+.bls-section-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #ffe8d4;
+  flex-shrink: 0;
+}
+.bls-section-tag {
+  flex: 1;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 215, 170, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.bls-section-count {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: rgba(122, 16, 24, 0.4);
+  color: rgba(255, 220, 200, 0.95);
+  border: 1px solid rgba(212, 168, 102, 0.35);
+}
+@media (max-width: 420px) {
+  .bls-section-tag { display: none; }
 }
 
 .bls-empty {
@@ -13226,28 +13390,43 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   margin: 0;
   padding: 12px 16px;
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(212, 168, 102, 0.18);
+  background: linear-gradient(180deg, rgba(122, 16, 24, 0.18) 0%, rgba(0, 0, 0, 0.28) 100%);
   color: rgba(var(--ui-muted-rgb), 0.7);
   font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.bls-topup-hint {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: rgba(255, 215, 170, 0.6);
+}
+.bls-topup {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.02em;
   cursor: pointer;
-  text-align: center;
   transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 .bls-topup:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, rgba(122, 16, 24, 0.32) 0%, rgba(0, 0, 0, 0.4) 100%);
   color: rgba(255, 255, 255, 0.9);
 }
 .bls-topup-cta {
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 200, 210, 0.95);
-  margin-left: 6px;
+  color: #ffe8d4;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(212, 168, 102, 0.32), rgba(122, 80, 36, 0.32));
+  border: 1px solid rgba(212, 168, 102, 0.55);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 180, 0.18);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
