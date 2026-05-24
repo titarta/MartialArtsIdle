@@ -1,6 +1,7 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
-import { ACHIEVEMENTS, CATEGORY_REQUIRES } from '../data/achievements';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { ACHIEVEMENTS, ACHIEVEMENTS_BY_ID, CATEGORY_REQUIRES } from '../data/achievements';
 import { FEATURES } from '../data/featureFlags';
+import bus from '../systems/achievementBus';
 
 const SAVE_KEY = 'mai_achievements';
 
@@ -18,13 +19,12 @@ function persist(set) {
   } catch {}
 }
 
-// True if an achievement's category requires a feature that's currently off.
-// Hidden achievements don't appear in the displayed list and aren't checked
-// (so a stray combat-era snapshot can't silently fire one that the player
-// will never see). Previously-unlocked achievements stay in the save —
-// they reappear in the modal when the gating flag flips on in v2.
+// Legacy gating: a few entries from earlier versions of the game used a
+// `category` field tied to a FEATURES flag. The new flat list does not
+// set `category`, so this returns false for every new entry and only
+// hides any straggler (none should exist after the v3 rewrite).
 function isHiddenInBuild(achievement) {
-  const req = CATEGORY_REQUIRES[achievement.category] ?? null;
+  const req = CATEGORY_REQUIRES[achievement?.category] ?? null;
   if (!req) return false;
   return !FEATURES[req];
 }
@@ -32,42 +32,77 @@ function isHiddenInBuild(achievement) {
 export default function useAchievements({ onUnlock } = {}) {
   const [unlocked, setUnlocked] = useState(load);
   const unlockedRef = useRef(unlocked);
+  unlockedRef.current = unlocked;
 
-  // The filtered list visible & checkable in this build. Memoised once —
-  // FEATURES is a frozen build-time const, so this never re-computes.
+  // Build the visible-in-this-build list once. Frozen at mount because
+  // FEATURES is a build-time constant.
   const visible = useMemo(
     () => ACHIEVEMENTS.filter(a => !isHiddenInBuild(a)),
     [],
   );
 
-  const check = useCallback((snapshot) => {
-    const newly = [];
-    for (const a of visible) {
-      if (unlockedRef.current.has(a.id)) continue;
-      try {
-        if (a.condition(snapshot)) newly.push(a);
-      } catch {}
-    }
-    if (newly.length === 0) return;
+  // Core unlock helper. Adds ids to the set, fires onUnlock for each,
+  // persists. Idempotent: re-firing an already-unlocked id is a no-op.
+  const unlockMany = useCallback((ids) => {
+    if (!ids || ids.length === 0) return;
+    const fresh = ids.filter(id => !unlockedRef.current.has(id) && ACHIEVEMENTS_BY_ID[id]);
+    if (fresh.length === 0) return;
     const next = new Set(unlockedRef.current);
-    for (const a of newly) {
-      next.add(a.id);
-      onUnlock?.(a);
+    for (const id of fresh) {
+      next.add(id);
+      onUnlock?.(ACHIEVEMENTS_BY_ID[id]);
     }
     unlockedRef.current = next;
     persist(next);
     setUnlocked(next);
-  }, [onUnlock, visible]);
+  }, [onUnlock]);
+
+  // Snapshot-poll check. Called by App.jsx whenever a tracked metric
+  // changes. We extend the snapshot with the virtual
+  // `unlockedCountExcludingThis` field for each entry under evaluation
+  // so the recursive "Achievement Unlocked" and the capstone can read
+  // a per-entry count.
+  const check = useCallback((snapshot) => {
+    const newly = [];
+    const currentUnlocked = unlockedRef.current;
+    for (const a of visible) {
+      if (currentUnlocked.has(a.id)) continue;
+      if (typeof a.condition !== 'function') continue;
+      try {
+        // Compute the per-entry virtual field. This is the count of
+        // OTHER currently-unlocked achievements plus any we have
+        // queued during this same check (so the recursive entry can
+        // fire on the same tick that another achievement unlocks).
+        const otherCount = currentUnlocked.size + newly.length
+          - (currentUnlocked.has(a.id) ? 1 : 0);
+        const ext = { ...snapshot, unlockedCountExcludingThis: otherCount };
+        if (a.condition(ext)) newly.push(a.id);
+      } catch {}
+    }
+    unlockMany(newly);
+  }, [visible, unlockMany]);
+
+  // Event-bus subscription. An entry with `event: 'foo'` unlocks the
+  // moment bus.fire('foo') runs anywhere in the app.
+  useEffect(() => {
+    const subs = [];
+    for (const a of visible) {
+      if (!a.event) continue;
+      const sub = bus.subscribe(a.event, () => unlockMany([a.id]));
+      subs.push(sub);
+    }
+    return () => { for (const u of subs) u(); };
+  }, [visible, unlockMany]);
 
   return {
     unlocked,
-    // Visible (unlocked count + total) reflect the FEATURE-filtered set so
-    // a v1 player doesn't see "7 / 23" with 16 unreachable entries — they
-    // see "0 / 7" (or however many cultivation achievements they've earned).
     unlockedCount: visible.filter(a => unlocked.has(a.id)).length,
     totalCount:    visible.length,
     visible,
     isUnlocked:    (id) => unlocked.has(id),
     check,
+    // Exposed so debug bridges or special flows (test panel etc.) can
+    // force-fire an unlock without going through the bus.
+    forceUnlock:   (id) => unlockMany([id]),
   };
 }

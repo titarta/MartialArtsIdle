@@ -38,6 +38,7 @@ import {
 import { isMajorTransition, stageHasSpark } from '../data/realms';
 import { spendBloodLotus, getBloodLotusBalance } from '../systems/bloodLotus';
 import { trackSparkPicked, trackSparkRerolled, trackSparkExpired } from '../analytics';
+import { recordStat } from '../systems/statsRecorder';
 
 // ── Legendary producer-synergy helpers ─────────────────────────────────────
 // Pure functions that compose the per-producer + global multipliers from
@@ -692,6 +693,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     setPendingOffer(prev => {
       if (!prev || !prev.cards.includes(sparkId)) return prev;
       try { trackSparkPicked(sparkId, prev.cards.length); } catch {}
+      try { recordStat('qiSparksCaught', 1); } catch {}
       applySparkChoice(sparkId);
       return null;
     });

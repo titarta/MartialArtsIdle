@@ -6,6 +6,9 @@ import { setLanguage, SUPPORTED_LANGUAGES } from '../i18n';
 import { loadGraphics, applyGraphics, saveGraphics } from '../systems/graphics';
 import useAudio from '../audio/useAudio';
 import { trackSettingChanged } from '../analytics';
+import { recordStat } from '../systems/statsRecorder';
+import bus from '../systems/achievementBus';
+import { noteSettingTouched } from '../systems/settingsTouched';
 import {
   RESOLUTIONS,
   getResolution,
@@ -178,15 +181,19 @@ function SettingsScreen({ onClose }) {
                       const val = parseFloat(e.target.value);
                       setSliderVols(prev => ({ ...prev, [channel]: val }));
                     }}
-                    onMouseUp={e  => audio.setVolume(channel, parseFloat(e.target.value))}
-                    onTouchEnd={e => audio.setVolume(channel, parseFloat(e.target.value))}
+                    onMouseUp={e  => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
+                    onTouchEnd={e => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
                     disabled={muted}
                     aria-label={`${label} volume`}
                   />
                   <span className="stg-audio-pct">{muted ? '—' : `${Math.round(localVol * 100)}%`}</span>
                   <button
                     className={`stg-audio-mute${muted ? ' stg-audio-muted' : ''}`}
-                    onClick={() => audio.setMuted(channel, !muted)}
+                    onClick={() => {
+                      audio.setMuted(channel, !muted);
+                      try { recordStat('audioToggles', 1); } catch {}
+                      noteSettingTouched('audio_mute');
+                    }}
                     aria-label={muted ? `Unmute ${label}` : `Mute ${label}`}
                   >
                     {muted ? '🔇' : '🔊'}
@@ -206,7 +213,7 @@ function SettingsScreen({ onClose }) {
               <SegmentedControl
                 options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]}
                 value={graphics.vfxEnabled}
-                onChange={v => setGraphics({ ...graphics, vfxEnabled: v })}
+                onChange={v => { setGraphics({ ...graphics, vfxEnabled: v }); noteSettingTouched('particles'); }}
               />
             </div>
           </div>
@@ -217,7 +224,7 @@ function SettingsScreen({ onClose }) {
             <OptionGrid
               options={RENDERING_MODES}
               value={graphics.renderingMode}
-              onChange={mode => setGraphics({ ...graphics, renderingMode: mode })}
+              onChange={mode => { setGraphics({ ...graphics, renderingMode: mode }); noteSettingTouched('rendering'); }}
             />
           </div>
 
@@ -241,7 +248,7 @@ function SettingsScreen({ onClose }) {
                 <button
                   key={lang.code}
                   className={`stg-lang-btn${i18n.language === lang.code ? ' stg-lang-active' : ''}`}
-                  onClick={() => { setLanguage(lang.code); try { trackSettingChanged('language', lang.code); } catch {} }}
+                  onClick={() => { setLanguage(lang.code); try { trackSettingChanged('language', lang.code); } catch {} noteSettingTouched('language'); }}
                 >
                   {lang.label}
                 </button>

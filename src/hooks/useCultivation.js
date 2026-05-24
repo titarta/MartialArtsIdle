@@ -8,6 +8,7 @@ import { computeStat, MOD } from '../data/stats';
 import { MAX_OFFLINE_HOURS } from '../systems/autoFarm';
 import { trackRealmAdvance, trackQiSink, trackAscension, trackActiveLawSwitch, trackFirstTime, trackOfflineQiCollected } from '../analytics';
 import { recordStat, eventStat, peakStat } from '../systems/statsRecorder';
+import bus from '../systems/achievementBus';
 
 const OWNED_LAWS_KEY   = 'mai_owned_laws';
 const ACTIVE_LAW_KEY   = 'mai_active_law';
@@ -665,7 +666,21 @@ export default function useCultivation() {
             // Major-realm gate: hold the realm meter at 100% until sustained
             // qi/s is enough. qi balance is untouched.
             qiEarnedThisRealmRef.current = costRef.current;
+            const wasNullBefore = !gateRef.current;
             gateRef.current = { required: requiredRate, current: rate };
+            // ── Achievement: Brick Wall (first gate ever) ──
+            // gateHitEverRef persists across this hook's lifetime via
+            // localStorage so a remount after F5 does not refire the
+            // event for the same player.
+            if (wasNullBefore) {
+              gatedThisRealmRef.current = true;
+              try {
+                if (!localStorage.getItem('mai_ach_gate_hit_ever')) {
+                  localStorage.setItem('mai_ach_gate_hit_ever', '1');
+                  bus.fire('gate_hit_first');
+                }
+              } catch {}
+            }
           } else if (
             isMajorTransition(indexRef.current) &&
             !pendingMajorBreakthroughRef.current
@@ -825,8 +840,110 @@ export default function useCultivation() {
     return () => clearInterval(interval);
   }, []);
 
-  const startBoost = useCallback(() => { boostRef.current = true;  setBoosting(true);  }, []);
-  const stopBoost  = useCallback(() => { boostRef.current = false; setBoosting(false); }, []);
+  // ── Achievement tracking refs (gates, taps, holds, rhythm) ──────────
+  // Set to true when a major-realm gate is encountered at the current
+  // realm; cleared after the player passes that gate (so we know they
+  // had to fight through, not breeze past).
+  const gatedThisRealmRef = useRef(false);
+  // ── Achievement tracking refs (taps, holds, rhythm) ──────────────────
+  // Rolling 1s window of tap timestamps for the peak-taps-per-second
+  // detector. Capped at 64 entries to keep eviction O(1) in practice.
+  const tapTimestampsRef = useRef([]);
+  // Last 100 tap timestamps for the 100-in-10s burst detector. Independent
+  // of the 1s window so we do not have to copy data between two views.
+  const tapBurstRef = useRef([]);
+  // Hold-start timestamp. 0 means not currently holding.
+  const holdStartRef = useRef(0);
+  // Threshold flags so we fire each hold event once per hold session
+  // (otherwise the 60s/5min/30min events would re-fire every interval tick).
+  const holdFlagsRef = useRef({ s60: false, s300: false, s1800: false });
+  // Last tap deltas (ms) for the 60-BPM rhythm detector. Rolling window
+  // of up to 32 intervals. A 60 BPM tap pattern has ~1000ms spacing.
+  const tapIntervalsRef = useRef([]);
+  // Rolling timestamp of the last detected on-beat tap. When the count
+  // of consecutive on-beat taps clears the 30-tap threshold (30 sec at
+  // 60 BPM), we fire the tap_dancer event.
+  const tapDancerRef = useRef({ lastTapTime: 0, consecutiveOnBeat: 0 });
+
+  const startBoost = useCallback(() => {
+    boostRef.current = true;
+    setBoosting(true);
+    holdStartRef.current = Date.now();
+    holdFlagsRef.current = { s60: false, s300: false, s1800: false };
+
+    const now = performance.now();
+    // ── Lifetime tap counter ──
+    try { eventStat('cultivatorTaps'); } catch {}
+
+    // ── Peak taps per second (rolling 1s window) ──
+    const buf = tapTimestampsRef.current;
+    buf.push(now);
+    while (buf.length > 0 && buf[0] < now - 1000) buf.shift();
+    try { peakStat('peakTapsPerSec', buf.length); } catch {}
+
+    // ── Tap burst detector (100 in 10 seconds) ──
+    const burst = tapBurstRef.current;
+    burst.push(now);
+    while (burst.length > 100) burst.shift();
+    if (burst.length >= 100 && burst[0] >= now - 10_000) {
+      try { bus.fire('tap_burst_100_in_10s'); } catch {}
+    }
+
+    // ── Witching Hour (tap at exactly 00:00:00) ──
+    const wall = new Date();
+    if (wall.getHours() === 0 && wall.getMinutes() === 0 && wall.getSeconds() === 0) {
+      try { bus.fire('tap_at_midnight'); } catch {}
+    }
+
+    // ── Tap-dancer 60 BPM detector ──
+    // Beat target: 1000 ms ± 80 ms tolerance. Counts consecutive on-beat
+    // taps; resets when an off-beat or long gap happens. 30 on-beat taps
+    // in a row equals ~30 sec at 60 BPM and fires the achievement.
+    const lastBeat = tapDancerRef.current.lastTapTime;
+    if (lastBeat > 0) {
+      const delta = now - lastBeat;
+      const onBeat = delta >= 920 && delta <= 1080;
+      tapDancerRef.current.consecutiveOnBeat = onBeat
+        ? tapDancerRef.current.consecutiveOnBeat + 1
+        : 0;
+      if (tapDancerRef.current.consecutiveOnBeat >= 30) {
+        try { bus.fire('tap_dancer_60bpm_30s'); } catch {}
+        tapDancerRef.current.consecutiveOnBeat = 0; // arm for re-fire only after a new run
+      }
+    }
+    tapDancerRef.current.lastTapTime = now;
+  }, []);
+
+  const stopBoost = useCallback(() => {
+    boostRef.current = false;
+    setBoosting(false);
+    const startMs = holdStartRef.current;
+    if (startMs > 0) {
+      const heldSec = Math.floor((Date.now() - startMs) / 1000);
+      if (heldSec > 0) {
+        try { peakStat('longestHoldSec', heldSec); } catch {}
+      }
+    }
+    holdStartRef.current = 0;
+  }, []);
+
+  // Hold-threshold ticker. While boosting, checks elapsed time once per
+  // second and fires the corresponding achievement events when each
+  // threshold crosses. Flags ensure each tier fires at most once per
+  // hold session.
+  useEffect(() => {
+    if (!boosting) return;
+    const id = setInterval(() => {
+      const startMs = holdStartRef.current;
+      if (startMs <= 0) return;
+      const heldSec = (Date.now() - startMs) / 1000;
+      const flags = holdFlagsRef.current;
+      if (!flags.s60   && heldSec >= 60)   { flags.s60   = true; try { peakStat('longestHoldSec', 60);   } catch {} }
+      if (!flags.s300  && heldSec >= 300)  { flags.s300  = true; try { peakStat('longestHoldSec', 300);  } catch {} }
+      if (!flags.s1800 && heldSec >= 1800) { flags.s1800 = true; try { peakStat('longestHoldSec', 1800); } catch {} }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [boosting]);
 
   /**
    * Player confirms a pending major-realm breakthrough. Runs the advance
@@ -872,6 +989,26 @@ export default function useCultivation() {
       trackFirstTime('RealmMajor', nextIndex);
     } catch {}
 
+    // ── Achievement: speed gate clear ──
+    // confirmMajorBreakthrough only runs on major-realm transitions, so
+    // every fire is a gate-clear candidate. The gatedThisRealmRef flag
+    // tells us whether the player actually fought through a gate (set
+    // when gateRef went from null → non-null at this realm) versus
+    // sailing through with surplus rate.
+    try {
+      if (gatedThisRealmRef.current) {
+        recordStat('speedGatesCleared', 1);
+        gatedThisRealmRef.current = false;
+      }
+      // Iron Gate: passing into Open Heaven is the highest-tier gate.
+      if (
+        REALMS[nextIndex]?.name === 'Open Heaven' &&
+        REALMS[fromIndex]?.name !== 'Open Heaven'
+      ) {
+        bus.fire('gate_pass_highest');
+      }
+    } catch {}
+
     // Fires the BreakthroughBanner + downstream spark-offer flow.
     setMajorBreakthrough({
       id:    Date.now(),
@@ -904,6 +1041,29 @@ export default function useCultivation() {
     try {
       const lastSeen = saved?.lastSeen ?? Date.now();
       trackOfflineQiCollected(Math.floor(total), Date.now() - lastSeen, multiplier);
+    } catch {}
+    // ── Achievement support ──
+    // Lifetime offline-qi counter feeds the Idle Empire entry. Long
+    // Slumber compares the size of this single collect against the
+    // player's total play time so a return from a long break has to
+    // pay out MORE than the entire prior session history to fire.
+    try { recordStat('offlineQiEarned', Math.floor(total)); } catch {}
+    try {
+      // We do not have direct access to stats in this hook closure
+      // without prop-drilling, so we read straight from localStorage.
+      // The single-key read is cheap and matches what useStats writes.
+      const statsRaw = localStorage.getItem('mai_stats');
+      if (statsRaw) {
+        const blob = JSON.parse(statsRaw);
+        const priorPlay = Math.floor((blob?.lifetime?.timePlayed) || 0);
+        // priorPlay is in seconds; total is in qi. The comparison is
+        // semantically "more qi earned in one nap than seconds played
+        // total" which is a fun way to phrase the threshold and was
+        // the original brainstorm framing.
+        if (priorPlay > 0 && total > priorPlay) {
+          bus.fire('long_slumber', { qi: total, priorPlaySec: priorPlay });
+        }
+      }
     } catch {}
     setOfflineEarnings(0);
   }, [offlineEarnings]);

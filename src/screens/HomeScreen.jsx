@@ -2699,7 +2699,7 @@ function HomeScreen({
           {/* Realm name + stage header — mobile only; PC left panel shows the
               same info at the top of the side rail at ≥900px. */}
           {realmName && (
-            <div className="home-scene-realm-header">
+            <div className="home-scene-realm-header" data-bonk="realm">
               <span className="home-scene-realm-name">{realmName.split(' - ')[0]}</span>
               {realmStage && <span className="home-scene-realm-stage">{realmStage}</span>}
             </div>

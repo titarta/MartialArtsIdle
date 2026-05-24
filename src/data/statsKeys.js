@@ -45,6 +45,30 @@ export const STATS_KEYS = [
   { key: 'livesLived',        label: 'Lives lived',          category: 'meta',        format: 'int',   lifetimeOnly: true },
   { key: 'karmaEarned',       label: 'Karma earned',         category: 'meta',        format: 'karma' },
   { key: 'karmaSpent',        label: 'Karma spent',          category: 'meta',        format: 'karma' },
+
+  // ── Achievement support (counters used by the achievements engine) ─────
+  // Tracked here so they participate in the run/lifetime save split.
+  // Not all of these are surfaced in the Stats tab UI (lifetimeOnly:false
+  // entries are visible by default; flag with `hidden:true` if a key is
+  // purely backing an achievement and not worth surfacing as a player stat).
+  { key: 'cultivatorTaps',         label: 'Cultivator taps',      category: 'economy', format: 'int',     hidden: true },
+  { key: 'peakTapsPerSec',         label: 'Peak taps per second', category: 'economy', format: 'int',   peak: true, hidden: true },
+  { key: 'longestHoldSec',         label: 'Longest crystal hold', category: 'economy', format: 'duration', peak: true, hidden: true },
+  { key: 'qiSparksCaught',         label: 'Qi sparks caught',     category: 'cultivation', format: 'int',  hidden: true },
+  { key: 'shopVisits',             label: 'Shop visits',          category: 'economy', format: 'int',     hidden: true },
+  { key: 'shopPurchases',          label: 'Shop purchases (non-cosmetic)', category: 'economy', format: 'int', hidden: true },
+  { key: 'cosmeticPurchases',      label: 'Cosmetic purchases',   category: 'economy', format: 'int',     hidden: true },
+  { key: 'audioToggles',           label: 'Audio toggles',        category: 'meta',    format: 'int',     hidden: true },
+  { key: 'tutorialsRead',          label: 'Tutorials read',       category: 'meta',    format: 'int',     hidden: true },
+  { key: 'achievementsPanelOpens', label: 'Achievements panel opens', category: 'meta', format: 'int',   hidden: true },
+  { key: 'cultivatorSpriteTaps',   label: 'Sprite taps',          category: 'meta',    format: 'int',     hidden: true },
+  { key: 'maxOfflineGapSec',       label: 'Longest offline gap',  category: 'meta',    format: 'duration', peak: true, hidden: true, lifetimeOnly: true },
+  { key: 'lastOfflineGapSec',      label: 'Last offline gap',     category: 'meta',    format: 'duration', peak: true, hidden: true, lifetimeOnly: true },
+  { key: 'offlineQiEarned',        label: 'Qi earned offline',    category: 'cultivation', format: 'qi', hidden: true },
+  { key: 'producerCountPeak',      label: 'Peak owned of one producer', category: 'economy', format: 'int', peak: true, hidden: true },
+  { key: 'speedGatesCleared',      label: 'Speed gates cleared',  category: 'cultivation', format: 'int', hidden: true },
+  { key: 'allInPurchases',         label: 'All-in purchases',     category: 'economy', format: 'int',     hidden: true },
+  { key: 'consecutiveDays',        label: 'Consecutive days played', category: 'meta', format: 'int',   peak: true, hidden: true, lifetimeOnly: true },
 ];
 
 export const STATS_KEYS_BY_ID = Object.fromEntries(STATS_KEYS.map(s => [s.key, s]));

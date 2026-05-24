@@ -1,67 +1,87 @@
-import { useState, useMemo } from 'react';
-import { CATEGORIES, CATEGORY_LABELS } from '../data/achievements';
+import { useState, useEffect } from 'react';
+import { recordStat } from '../systems/statsRecorder';
+
+const LOCKED_ICON = '?';
+const LOCKED_TITLE = '???';
+const LOCKED_DESC  = 'Keep cultivating to reveal this achievement.';
 
 /**
- * Single achievement square — Cookie-Clicker-style badge. Shows just the
- * icon (or a red "?" when locked) and packs many entries into a small
- * grid. Tap to select and reveal details in the sticky drawer below the
- * grid.
+ * Single achievement square. Cookie-Clicker-style badge: just the icon
+ * (or a red "?" when locked) so many entries fit in a small grid. Tap
+ * to surface the title and description in the sticky drawer.
+ *
+ * Locked rendering respects two hide modes:
+ *   hidden:true     title and desc both hidden as "???"
+ *   secretDesc:true title visible, desc hidden as "???"
  */
 function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
+  const isHidden = !unlocked && (achievement.hidden === true);
   const cls = [
     'ach-badge',
     unlocked ? 'ach-badge-unlocked' : 'ach-badge-locked',
     selected ? 'ach-badge-selected' : '',
   ].filter(Boolean).join(' ');
+  const tooltip = unlocked
+    ? achievement.title
+    : (isHidden ? LOCKED_TITLE : achievement.title);
+  const iconChar = unlocked ? achievement.icon : LOCKED_ICON;
   return (
     <button
       type="button"
       className={cls}
       onClick={() => onSelect(achievement.id)}
       aria-label={unlocked ? achievement.title : 'Locked achievement'}
-      title={unlocked ? achievement.title : '???'}
+      title={tooltip}
     >
-      <span className="ach-badge-icon">{unlocked ? achievement.icon : '?'}</span>
+      <span className="ach-badge-icon">{iconChar}</span>
       {unlocked && <span className="ach-badge-check" aria-hidden="true">✓</span>}
     </button>
   );
 }
 
 /**
- * Achievements tab body for the Progress Hub modal. Cookie-Clicker
- * pattern: grid of square icon badges instead of full-row cards. Tapping
- * a badge surfaces the title + description in a sticky drawer pinned to
- * the bottom of the scrollable area — info appears without scrolling
- * the grid away.
+ * Achievements tab body for the Progress Hub modal. Grid of badges
+ * with a sticky detail drawer below.
  *
- * Density win: ~6 badges per row instead of 1 card per row → roughly
- * 6× the entries visible at once on the same screen height.
- *
- * The hub chip already reads "Achievements" — body skips the redundant
- * header title and surfaces just the unlocked/total count.
+ * The legacy category tab strip is gone because the new flat list has
+ * no categories. If a future category dimension comes back (e.g.
+ * filter by "cultivation vs meta") we can reintroduce a chip row here.
  */
 function AchievementsBody({ achievements }) {
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [selectedId,     setSelectedId]     = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
-  // Use the FEATURE-filtered visible list from the hook so combat/laws/etc.
-  // achievements don't appear in v1. Falls back to an empty list if the
-  // hook hasn't surfaced one (older consumers).
   const visible = achievements?.visible ?? [];
 
-  // Hide category tabs that have no visible entries — keeps the chip row
-  // tight in v1 (only "Cultivation" survives there).
-  const categoriesWithEntries = useMemo(
-    () => CATEGORIES.filter(cat => visible.some(a => a.category === cat)),
-    [visible],
-  );
-
-  const filtered = activeCategory === 'all'
-    ? visible
-    : visible.filter(a => a.category === activeCategory);
+  // Count panel opens for the "Patience, Young Grasshopper" achievement.
+  // Fires once per mount (the modal mounts every time the tab opens).
+  useEffect(() => {
+    try { recordStat('achievementsPanelOpens', 1); } catch {}
+  }, []);
 
   const selected = selectedId ? visible.find(a => a.id === selectedId) : null;
   const selectedUnlocked = selected ? achievements.isUnlocked(selected.id) : false;
+
+  // Detail-drawer rendering: respect hidden / secretDesc on locked
+  // entries. Unlocked entries always show full content.
+  let detailTitle = '';
+  let detailDesc  = '';
+  let detailIcon  = LOCKED_ICON;
+  if (selected) {
+    if (selectedUnlocked) {
+      detailTitle = selected.title;
+      detailDesc  = selected.desc;
+      detailIcon  = selected.icon;
+    } else if (selected.hidden) {
+      detailTitle = LOCKED_TITLE;
+      detailDesc  = LOCKED_DESC;
+    } else if (selected.secretDesc) {
+      detailTitle = selected.title;
+      detailDesc  = LOCKED_TITLE;
+    } else {
+      detailTitle = selected.title;
+      detailDesc  = selected.desc;
+    }
+  }
 
   return (
     <>
@@ -74,30 +94,12 @@ function AchievementsBody({ achievements }) {
       <div className="ach-progress-bar">
         <div
           className="ach-progress-fill"
-          style={{ width: `${(achievements.unlockedCount / achievements.totalCount) * 100}%` }}
+          style={{ width: `${(achievements.unlockedCount / Math.max(1, achievements.totalCount)) * 100}%` }}
         />
       </div>
 
-      <div className="ach-tabs ach-subtabs">
-        <button
-          className={`ach-tab${activeCategory === 'all' ? ' ach-tab-active' : ''}`}
-          onClick={() => { setActiveCategory('all'); setSelectedId(null); }}
-        >
-          All
-        </button>
-        {categoriesWithEntries.map(cat => (
-          <button
-            key={cat}
-            className={`ach-tab${activeCategory === cat ? ' ach-tab-active' : ''}`}
-            onClick={() => { setActiveCategory(cat); setSelectedId(null); }}
-          >
-            {CATEGORY_LABELS[cat]}
-          </button>
-        ))}
-      </div>
-
       <div className="ach-grid">
-        {filtered.map(a => (
+        {visible.map(a => (
           <AchievementBadge
             key={a.id}
             achievement={a}
@@ -108,9 +110,6 @@ function AchievementsBody({ achievements }) {
         ))}
       </div>
 
-      {/* Sticky detail drawer — shows the selected achievement's full
-          card. `position: sticky; bottom: 0` keeps it visible regardless
-          of grid scroll. Tap the same badge again (or the ✕) to close. */}
       {selected && (
         <div className={`ach-detail${selectedUnlocked ? ' ach-detail-unlocked' : ' ach-detail-locked'}`}>
           <button
@@ -119,16 +118,10 @@ function AchievementsBody({ achievements }) {
             onClick={() => setSelectedId(null)}
             aria-label="Close achievement detail"
           >✕</button>
-          <div className="ach-detail-icon">
-            {selectedUnlocked ? selected.icon : '?'}
-          </div>
+          <div className="ach-detail-icon">{detailIcon}</div>
           <div className="ach-detail-body">
-            <div className="ach-detail-title">
-              {selectedUnlocked ? selected.title : 'Locked'}
-            </div>
-            <div className="ach-detail-desc">
-              {selectedUnlocked ? selected.desc : 'Keep cultivating to reveal this achievement.'}
-            </div>
+            <div className="ach-detail-title">{detailTitle}</div>
+            <div className="ach-detail-desc">{detailDesc}</div>
           </div>
         </div>
       )}

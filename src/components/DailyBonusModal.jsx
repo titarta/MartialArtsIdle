@@ -1,11 +1,21 @@
 import { useState } from 'react';
-import { DAILY_REWARDS } from '../systems/dailyBonus';
+import { DAILY_REWARDS, noteDailyBonusSkipped } from '../systems/dailyBonus';
 
 const BASE = import.meta.env.BASE_URL;
 
 export default function DailyBonusModal({ streak, todayReward, isAvailable, onCollect, onClose }) {
   const [collected, setCollected] = useState(false);
   const [awarded,   setAwarded]   = useState(0);
+
+  // Dismiss without collecting bumps the skip streak. Only relevant
+  // when the bonus was actually claimable today (otherwise dismissing
+  // a "come back tomorrow" panel should not count as a skip).
+  const handleDismiss = () => {
+    if (isAvailable && !collected) {
+      try { noteDailyBonusSkipped(); } catch {}
+    }
+    onClose?.();
+  };
 
   const handleCollect = () => {
     const amount = onCollect();
@@ -16,10 +26,10 @@ export default function DailyBonusModal({ streak, todayReward, isAvailable, onCo
   };
 
   return (
-    <div className="daily-modal-overlay" onClick={onClose}>
+    <div className="daily-modal-overlay" onClick={handleDismiss}>
       <div className="daily-modal" onClick={e => e.stopPropagation()}>
 
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={handleDismiss} aria-label="Close">✕</button>
 
         <div className="daily-modal-header">
           <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-modal-icon" alt="" draggable="false" />

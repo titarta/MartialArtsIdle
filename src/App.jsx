@@ -57,6 +57,8 @@ import useQiSparks  from './hooks/useQiSparks';
 import useClearedRegions from './hooks/useClearedRegions';
 import useFeatureFlags from './hooks/useFeatureFlags';
 import useAchievements from './hooks/useAchievements';
+import achBus from './systems/achievementBus';
+import { isLunarNewYear, isDoubleNinth } from './systems/calendarEvents';
 import { FEATURES } from './data/featureFlags';
 import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
@@ -1197,25 +1199,323 @@ function AppInner() {
     prevAchCountRef.current = count;
   }, [achievements?.unlockedCount]);
 
-  // Check achievements whenever key progression metrics change.
-  useEffect(() => {
-    achievements.check({
-      realmIndex:            cultivation.realmIndex,
-      ownedLawsCount:        cultivation.ownedLaws.length,
-      ownedTechniquesCount:  Object.keys(techniques.ownedTechniques).length,
-      clearedRegionsCount:   clearedRegions.size,
-      ownedArtefactsCount:   artefacts.owned.length,
-      discoveredPillsCount:  Object.keys(pills.discoveredPills).length,
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // ── Achievement snapshot ────────────────────────────────────────────────
+  // Pollers and event sources land in two paths:
+  //   1. condition-based achievements check this snapshot, polled on
+  //      a 2-second interval below. Cheap pass over the visible list.
+  //   2. event-based achievements fire via achievementBus from the
+  //      relevant subsystem (hold timer, calendar tick, etc.). Those
+  //      do not pass through this snapshot at all.
+  //
+  // Building the snapshot reads from stats.lifetime / stats.run, the
+  // karma + tree hooks, daily bonus, and a few computed fields
+  // (producer count parity, etc). Bound to a ref so the interval can
+  // always see the freshest values without re-subscribing.
+  const buildAchSnapshot = useCallback(() => {
+    const lifetime = stats.lifetime ?? {};
+    const run      = stats.run      ?? {};
+    const ownedVals = Object.values(producers?.owned ?? {});
+    const maxOwned  = ownedVals.length > 0 ? Math.max(...ownedVals) : 0;
+    const exact42   = ownedVals.includes(42);
+    return {
+      // ── Progression ──────────────────────────────────────────────────────
+      realmIndex:             cultivation.realmIndex,
+      // ── Crystal / tap ────────────────────────────────────────────────────
+      totalCrystalTaps:       lifetime.cultivatorTaps      ?? 0,
+      peakTapsPerSec:         lifetime.peakTapsPerSec      ?? 0,
+      longestHoldSec:         lifetime.longestHoldSec      ?? 0,
+      cultivatorSpriteTaps:   lifetime.cultivatorTaps      ?? 0,
+      // ── Sparks ───────────────────────────────────────────────────────────
+      qiSparksCaught:         lifetime.qiSparksCaught      ?? 0,
+      // ── Idle / offline ───────────────────────────────────────────────────
+      lastSessionGapSec:      lifetime.lastOfflineGapSec   ?? 0,
+      offlineQiEarned:        lifetime.offlineQiEarned     ?? 0,
+      // ── Time ─────────────────────────────────────────────────────────────
+      totalPlayTimeSec:       lifetime.timePlayed          ?? 0,
+      // ── Qi ───────────────────────────────────────────────────────────────
+      lifetimeQiEarned:       lifetime.qiEarned            ?? 0,
+      peakQiPerSec:           lifetime.qiPerSecPeak        ?? 0,
+      // ── Reincarnation / tree ─────────────────────────────────────────────
+      reincarnations:         karma.lives                  ?? 0,
+      karmaNodesUnlocked:     tree.purchased?.size         ?? 0,
+      karmaNodesTotal:        tree.nodes?.length           ?? 0,
+      // ── Shop ─────────────────────────────────────────────────────────────
+      shopVisits:             lifetime.shopVisits          ?? 0,
+      cosmeticPurchases:      lifetime.cosmeticPurchases   ?? 0,
+      shopPurchasesRun:       run.shopPurchases            ?? 0,
+      // ── Daily ────────────────────────────────────────────────────────────
+      consecutiveDays:        lifetime.consecutiveDays     ?? 0,
+      // ── Settings / discovery ─────────────────────────────────────────────
+      audioToggles:           lifetime.audioToggles        ?? 0,
+      tutorialsRead:          lifetime.tutorialsRead       ?? 0,
+      achievementsPanelOpens: lifetime.achievementsPanelOpens ?? 0,
+      // ── Speed gates / All In ─────────────────────────────────────────────
+      speedGatesCleared:      lifetime.speedGatesCleared   ?? 0,
+      allInPurchases:         lifetime.allInPurchases      ?? 0,
+      // ── Producer parity ──────────────────────────────────────────────────
+      maxProducerCount:       maxOwned,
+      exact42Producer:        exact42,
+      // ── Engine virtual fields (filled in by useAchievements.check) ──────
+      // unlockedCountExcludingThis is computed per-entry.
+      totalAchievementsCount: achievements.totalCount,
+      // Legacy v1 snapshot fields kept so any old condition referencing
+      // them still resolves to 0 / [] without throwing.
+      ownedLawsCount:         cultivation.ownedLaws.length,
+      ownedTechniquesCount:   Object.keys(techniques.ownedTechniques).length,
+      clearedRegionsCount:    clearedRegions.size,
+      ownedArtefactsCount:    artefacts.owned.length,
+      discoveredPillsCount:   Object.keys(pills.discoveredPills).length,
+    };
   }, [
+    stats.lifetime, stats.run,
     cultivation.realmIndex,
     cultivation.ownedLaws.length,
-    Object.keys(techniques.ownedTechniques).length,
+    karma.lives,
+    tree.purchased, tree.nodes,
+    producers?.owned,
+    achievements.totalCount,
+    techniques.ownedTechniques,
     clearedRegions.size,
     artefacts.owned.length,
-    Object.keys(pills.discoveredPills).length,
+    pills.discoveredPills,
   ]);
+
+  // Run the snapshot check on every relevant state change (cheap pass)
+  // plus a 2-second interval so slow-moving stats (timePlayed,
+  // longestHoldSec) trigger their thresholds without waiting for
+  // another React render.
+  useEffect(() => {
+    achievements.check(buildAchSnapshot());
+  }, [achievements, buildAchSnapshot]);
+
+  useEffect(() => {
+    const id = setInterval(() => achievements.check(buildAchSnapshot()), 2000);
+    return () => clearInterval(id);
+  }, [achievements, buildAchSnapshot]);
+
+  // ── Achievement supporting trackers ─────────────────────────────────────
+  // These wire bus.fire(...) and recordStat(...) for the achievements
+  // that don't fit cleanly into existing per-system hooks.
+
+  // Session gap on mount. Reads the saved lastSeen timestamp directly
+  // from localStorage so it captures the gap whether or not the
+  // offline-earnings modal fires (a player can return after a long
+  // gap without crossing the qi-cap line). Stamped into the lifetime
+  // stat (peakStat keeps the largest gap on record AND surfaces the
+  // most recent via the same key).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('mai_save');
+      if (raw) {
+        const data = JSON.parse(raw);
+        const lastSeen = Number(data?.lastSeen) || 0;
+        if (lastSeen > 0) {
+          const gap = Math.max(0, Math.floor((Date.now() - lastSeen) / 1000));
+          if (gap > 0) {
+            recordStat('lastOfflineGapSec', gap);
+            recordStat('maxOfflineGapSec',  gap);
+          }
+        }
+      }
+    } catch {}
+  }, []);
+
+  // Calendar events on mount. Fired once per page load if the local
+  // date matches. The bus listener in useAchievements unlocks the
+  // matching entry the first time the event arrives.
+  useEffect(() => {
+    const now = new Date();
+    if (isLunarNewYear(now)) achBus.fire('cal_lunar_new_year');
+    if (isDoubleNinth(now))  achBus.fire('cal_double_ninth');
+  }, []);
+
+  // Shop visit counter. We track the "spend" shop (lotus-shop), where
+  // the player browses skins / QoL, since the buy-currency modal
+  // (`shop`) is a different surface. Increments once per modal open.
+  useEffect(() => {
+    if (activeModal === 'lotus-shop') {
+      try { recordStat('shopVisits', 1); } catch {}
+    }
+  }, [activeModal]);
+
+  // Screen switches in a rolling 5-minute window for the Restless
+  // achievement. Keeps the last 100 switch timestamps; when 100 fit
+  // inside the 5-minute window the achievement fires.
+  const screenSwitchesRef = useRef([]);
+  useEffect(() => {
+    const buf = screenSwitchesRef.current;
+    const now = Date.now();
+    buf.push(now);
+    const cutoff = now - 5 * 60 * 1000;
+    while (buf.length > 0 && buf[0] < cutoff) buf.shift();
+    if (buf.length >= 100) {
+      try { achBus.fire('restless_100_5m'); } catch {}
+      // Trim back so a streak of 200 switches doesn't refire 100 times.
+      screenSwitchesRef.current = [];
+    }
+  }, [currentScreen]);
+
+  // Time-of-day on realm crossings. The bus consumes the event and
+  // unlocks the matching Night Owl / Early Bird entry.
+  const prevRealmForTimeRef = useRef(cultivation.realmIndex);
+  useEffect(() => {
+    const prev = prevRealmForTimeRef.current;
+    const curr = cultivation.realmIndex;
+    if (curr === prev) return;
+    prevRealmForTimeRef.current = curr;
+    const h = new Date().getHours();
+    if (h >= 1 && h <= 4)  achBus.fire('realm_cross_night');
+    if (h >= 5 && h <= 7)  achBus.fire('realm_cross_dawn');
+  }, [cultivation.realmIndex]);
+
+  // Sky Watcher: play during all four time brackets within 24h.
+  // We keep a Set of brackets seen, anchored to a sliding 24-hour
+  // window. Each tick advances the bracket pointer; whenever the
+  // set covers all four, fire and reset.
+  const skyWatcherRef = useRef({ seen: new Set(), windowStart: Date.now() });
+  useEffect(() => {
+    const tick = () => {
+      const now = Date.now();
+      const state = skyWatcherRef.current;
+      if (now - state.windowStart > 24 * 60 * 60 * 1000) {
+        state.seen = new Set();
+        state.windowStart = now;
+      }
+      const h = new Date().getHours();
+      const bracket = h < 5 ? 'night' : h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
+      state.seen.add(bracket);
+      if (state.seen.size >= 4) {
+        try { achBus.fire('time_all_brackets'); } catch {}
+        state.seen = new Set();
+        state.windowStart = now;
+      }
+    };
+    tick();
+    const id = setInterval(tick, 5 * 60 * 1000); // every 5 min is plenty
+    return () => clearInterval(id);
+  }, []);
+
+  // Lunch break detector: 10 cumulative minutes between 12:00 and
+  // 13:00 local time on a weekday (Mon-Fri). Counted in 60-second
+  // ticks across the noon hour, persisted to localStorage so a
+  // refresh mid-lunch does not reset progress.
+  useEffect(() => {
+    const KEY = 'mai_lunch_break_progress';
+    const tick = () => {
+      const now = new Date();
+      const dow = now.getDay();
+      const h   = now.getHours();
+      const isWeekday  = dow >= 1 && dow <= 5;
+      const isLunchHr  = h === 12;
+      if (!isWeekday || !isLunchHr) return;
+      let acc = 0;
+      try { acc = Number(localStorage.getItem(KEY)) || 0; } catch {}
+      acc += 1;
+      try { localStorage.setItem(KEY, String(acc)); } catch {}
+      if (acc >= 10) {
+        try { achBus.fire('lunch_break_10min'); } catch {}
+      }
+    };
+    const id = setInterval(tick, 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Bonk: consecutive taps on a `[data-bonk]` element that is not a
+  // real interactive control. Counter resets on a 2-second silence or
+  // on a tap that lands outside any data-bonk subtree. Fires at 20.
+  useEffect(() => {
+    let streak = 0;
+    let lastBonkAt = 0;
+    const onTap = (e) => {
+      const target = e.target?.closest?.('[data-bonk]');
+      const now = Date.now();
+      if (!target) {
+        // Reset only on taps that hit an obviously interactive surface.
+        // Plain background clicks should not punish the streak.
+        const interactive = e.target?.closest?.('button, a, input, [role="button"]');
+        if (interactive) streak = 0;
+        return;
+      }
+      // Reset if more than 2 seconds passed since the last bonk.
+      if (now - lastBonkAt > 2000) streak = 0;
+      streak += 1;
+      lastBonkAt = now;
+      if (streak >= 20) {
+        try { achBus.fire('bonk_20'); } catch {}
+        streak = 0;
+      }
+    };
+    document.addEventListener('pointerdown', onTap);
+    return () => document.removeEventListener('pointerdown', onTap);
+  }, []);
+
+  // Drought: 1 hour of play time with no spark caught. Polls the
+  // lifetime spark counter and resets the clock whenever it advances.
+  const droughtRef = useRef({ lastSparks: -1, anchor: Date.now() });
+  useEffect(() => {
+    const id = setInterval(() => {
+      const sparksNow = (stats.lifetime?.qiSparksCaught) ?? 0;
+      const state = droughtRef.current;
+      // First poll: just record the baseline.
+      if (state.lastSparks < 0) { state.lastSparks = sparksNow; state.anchor = Date.now(); return; }
+      if (sparksNow !== state.lastSparks) {
+        state.lastSparks = sparksNow;
+        state.anchor = Date.now();
+        return;
+      }
+      if (Date.now() - state.anchor >= 60 * 60 * 1000) {
+        try { achBus.fire('spark_drought_1h'); } catch {}
+        // Reset so it does not refire every second past the threshold.
+        state.anchor = Date.now();
+      }
+    }, 5000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Number of the Beast: hold exactly 666 qi/s for one full second.
+  // Polls the rate ref every 250ms; counts consecutive samples in the
+  // 660-672 inclusive band (1.8% tolerance so the achievement is
+  // achievable by a player tuning producers but does not require an
+  // implausible exact match).
+  useEffect(() => {
+    let onBeat = 0;
+    const id = setInterval(() => {
+      const rate = cultivation.rateRef?.current ?? 0;
+      const inBand = rate >= 660 && rate <= 672;
+      onBeat = inBand ? onBeat + 1 : 0;
+      if (onBeat >= 4) { // 4 × 250ms = 1 sec sustained
+        try { achBus.fire('qis_666_held'); } catch {}
+        onBeat = 0;
+      }
+    }, 250);
+    return () => clearInterval(id);
+  }, [cultivation]);
+
+  // 30-minute fully-muted detector. Increments a counter while every
+  // audio channel is muted and zeros it whenever any is unmuted.
+  // Persists to localStorage so a reload mid-muted carries progress.
+  useEffect(() => {
+    const KEY = 'mai_audio_muted_progress';
+    const tick = () => {
+      try {
+        const settings = JSON.parse(localStorage.getItem('mai_audio_settings') || '{}');
+        const allMuted = !!(settings.masterMuted || (settings.bgmMuted && settings.sfxMuted));
+        let acc = Number(localStorage.getItem(KEY)) || 0;
+        if (allMuted) {
+          acc += 1;
+          if (acc >= 30 * 60) {
+            achBus.fire('audio_muted_30m');
+          }
+        } else {
+          acc = 0;
+        }
+        localStorage.setItem(KEY, String(acc));
+      } catch {}
+    };
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   // Wired into useQiSparks above via featureFlagsRef so its mechanic-card
   // pool gating (Crystal Click T1 etc.) can query feature unlocks.
@@ -1309,6 +1609,14 @@ function AppInner() {
       trackFirstTime('Reincarnation', cultivation.realmIndex);
     } catch {}
     // Sync-persist karma with karmaEarnedThisLife reset before the wipe.
+    // ── Achievement: Lin Family Trash ──
+    // Reincarnating at the exact minimum threshold (Saint Early, the
+    // first realm where reincarnation is even allowed). Fires the bus
+    // event before karma.reincarnate() so the listener still sees the
+    // pre-wipe realm context for any future payload needs.
+    if (cultivation.realmIndex === 24) {
+      try { achBus.fire('reincarnate_at_lowest', { realmIndex: 24 }); } catch {}
+    }
     karma.reincarnate();
 
     // Give React a tick to flush the karma state to localStorage before we

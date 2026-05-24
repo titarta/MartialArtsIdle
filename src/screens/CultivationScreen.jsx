@@ -113,10 +113,23 @@ export default function CultivationScreen({
     const cost = producerCostDiscountFrac > 0
       ? Math.max(1, Math.ceil(rawCost * (1 - producerCostDiscountFrac)))
       : rawCost;
+    // ── Achievement: All In ──
+    // Capture the pre-spend qi pool so we can detect a ≥95% drain on a
+    // successful purchase. We measure against the discounted cost (the
+    // amount actually leaving the pool).
+    const poolBefore = cultivation.qiRef?.current ?? 0;
     // Atomic: spendQi succeeds only if the player can afford it. Producer
     // count is incremented only on a successful spend.
     if (cultivation.spendQi(cost)) {
       producers.buy(id, count);
+      try {
+        if (poolBefore > 0 && cost / poolBefore >= 0.95) {
+          // Use lazy import so this hook does not have to add the
+          // statsRecorder import — done dynamically to keep the diff
+          // minimal. The recorder is a global singleton so this is fine.
+          import('../systems/statsRecorder').then(m => m.recordStat('allInPurchases', 1));
+        }
+      } catch {}
       // Consume one Tinker's Bargain charge on a successful transaction.
       // If no Bargain is active (frac === 0) the call is a no-op.
       if (producerCostDiscountFrac > 0) {
@@ -144,8 +157,14 @@ export default function CultivationScreen({
     // Cost lives on the upgrade definition itself.
     const def = upgrades.getVisible(upgradeCtx).find(u => u.id === id);
     if (!def) return;
+    const poolBefore = cultivation.qiRef?.current ?? 0;
     if (cultivation.spendQi(def.cost)) {
       upgrades.buy(id);
+      try {
+        if (poolBefore > 0 && def.cost / poolBefore >= 0.95) {
+          import('../systems/statsRecorder').then(m => m.recordStat('allInPurchases', 1));
+        }
+      } catch {}
       // Round 3 — mechanic_tier upgrades grant a spark via useQiSparks.grant.
       // Effect.type === 'grant_spark' carries the sparkId to apply. Other
       // effect types are pure aggregator changes consumed elsewhere.

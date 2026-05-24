@@ -97,6 +97,10 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
     const out = new Map();
     for (const cat of STAT_CATEGORIES) out.set(cat.id, []);
     for (const def of STATS_KEYS) {
+      // Skip achievement-support keys flagged hidden. They use the same
+      // run/lifetime storage but should not appear in the player-facing
+      // Stats tab (peakTapsPerSec, longestHoldSec, audioToggles, etc).
+      if (def.hidden) continue;
       out.get(def.category)?.push(def);
     }
     return out;

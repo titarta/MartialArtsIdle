@@ -28,6 +28,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SHOP_ITEMS_BY_ID } from '../data/shopItems';
 import { getBloodLotusBalance, spendBloodLotus } from '../systems/bloodLotus';
+import { recordStat } from '../systems/statsRecorder';
 
 const SAVE_KEY = 'mai_shop_inventory';
 const SCHEMA_VERSION = 1;
@@ -124,6 +125,14 @@ export default function useShopInventory() {
     if (!spendBloodLotus(item.cost)) {
       return { ok: false, error: 'Not enough Blood Lotus' };
     }
+
+    // Achievement counters. Cosmetic and non-cosmetic split so the
+    // Ascetic-style "no boosts this run" check can read run-bucket
+    // `shopPurchases` without false positives from skin buys.
+    try {
+      if (item.ownership === 'cosmetic') recordStat('cosmeticPurchases', 1);
+      else                                recordStat('shopPurchases',     1);
+    } catch {}
 
     // Apply to inventory
     setInv(prev => {

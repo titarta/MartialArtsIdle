@@ -13,6 +13,10 @@
  * reincarnation but not factory reset.
  */
 
+import { recordStat } from './statsRecorder';
+import bus from './achievementBus';
+import { TUTORIAL_IDS } from '../data/tutorialCards';
+
 const STORAGE_KEY = 'mai_tutorial_seen';
 
 function loadSet() {
@@ -46,6 +50,14 @@ export function markTutorialSeen(id) {
   if (set.has(id)) return;
   set.add(id);
   saveSet(set);
+  // Achievement support: total tutorials read + the all-read fire.
+  try { recordStat('tutorialsRead', 1); } catch {}
+  try {
+    const knownIds = Object.values(TUTORIAL_IDS || {}).filter(Boolean);
+    if (knownIds.length > 0 && knownIds.every(t => set.has(t))) {
+      bus.fire('tutorials_all_read');
+    }
+  } catch {}
 }
 
 /** Wipe every "seen" marker. Exposed for the debug bridge so we can
