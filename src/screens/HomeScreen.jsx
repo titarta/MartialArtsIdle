@@ -2642,16 +2642,19 @@ function HomeScreen({
             onOpenDetail={() => setCrystalDetailOpen(true)}
           />
 
-          {/* Character + Consecutive-Focus meter group — grounded at scene bottom */}
+          {/* Character + Consecutive-Focus meter group — grounded at scene bottom.
+              The hint slot is ALWAYS rendered with a fixed reserved height so
+              when the CF meter appears (during focus-hold) nothing else moves.
+              Per the no-unexpected-movement UX rule. */}
           <div className="home-char-group">
-            {!maxed && boosting && sparkConsecutiveLadderRef?.current?.length > 0 && (
-              <div className="home-char-hint-slot">
+            <div className="home-char-hint-slot">
+              {!maxed && boosting && sparkConsecutiveLadderRef?.current?.length > 0 && (
                 <ConsecutiveFocusMeter
                   ladder={sparkConsecutiveLadderRef.current}
                   boostStartTimeRef={boostStartTimeRef}
                 />
-              </div>
-            )}
+              )}
+            </div>
             <div
               className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${adBoostActive ? ' stage-ad-boosted' : ''}${currentEvent?.kind === 'character-evolution' ? ' home-fighter-stage-lifted' : ''}`}
               style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
