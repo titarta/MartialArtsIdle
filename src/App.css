@@ -18451,8 +18451,12 @@ body.sheet-open {
   display: flex;
   flex-direction: column;
   height: 100%;
-  color: #e8e8f0;
-  background: linear-gradient(180deg, rgba(8, 14, 18, 0.55), rgba(4, 10, 14, 0.85));
+  color: #f5e6c8;
+  /* Background intentionally transparent — the screen-container :has()
+     override above paints the lacquer wash. The previous blue-grey
+     gradient here was a legacy pre-lacquer tint that competed with
+     the Estate Pavilions warm palette. */
+  background: transparent;
 }
 
 .cs-sticky-header {
@@ -22624,15 +22628,19 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    No JSX changes. Mockup parity, not redesign.
    ════════════════════════════════════════════════════════════════════════ */
 
-/* (1) Kill the bg image for the 3 new screens. .screen-container ::before
-       paints the image; ::after paints the blur+darken layer. Both go away
-       and we paint a solid lacquer wash on the container instead. */
+/* (1) Kill the bg image for the redesigned screens. .screen-container
+       ::before paints the image; ::after paints the blur+darken layer.
+       Both go away and we paint a solid lacquer wash on the container
+       instead. Cultivation joined this list — without it the scene
+       image bleeds through behind the Pavilion plaques. */
 .screen-container:has(.settings-screen)::before,
 .screen-container:has(.settings-screen)::after,
 .screen-container:has(.journey-screen)::before,
 .screen-container:has(.journey-screen)::after,
 .screen-container:has(.spirit-bazaar-screen)::before,
-.screen-container:has(.spirit-bazaar-screen)::after {
+.screen-container:has(.spirit-bazaar-screen)::after,
+.screen-container:has(.cultivation-screen)::before,
+.screen-container:has(.cultivation-screen)::after {
   display: none;
 }
 
@@ -22640,7 +22648,8 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    a background on the container itself so it can't be punched through. */
 .screen-container:has(.settings-screen),
 .screen-container:has(.journey-screen),
-.screen-container:has(.spirit-bazaar-screen) {
+.screen-container:has(.spirit-bazaar-screen),
+.screen-container:has(.cultivation-screen) {
   background:
     radial-gradient(120% 80% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 65%),
     linear-gradient(180deg, rgba(20, 14, 8, 0.95), rgba(8, 6, 4, 0.98));

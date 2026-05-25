@@ -13,47 +13,15 @@ function handleIconError(e) {
 }
 
 /**
- * Inscribed Tablet — Ma Shan Zheng glyph per upgrade category. The
- * producer-doubles keep their producer sprite (the established
- * "doubling this Garden / Furnace / Pillar" identity); every other
- * category gets a calligraphy glyph in the framed inset so the
- * tablet vocabulary reads consistently across the grid.
- */
-const CATEGORY_GLYPH = {
-  crystal_tap:    '珠', // pearl / qi-orb tap
-  focus_mult:     '息', // breath / focus
-  offline_rate:   '眠', // sleep / offline accrual
-  offline_cap:    '時', // time / duration
-};
-
-// Mechanic-tier glyphs — one per mechanic. Mechanic ids appear inside
-// upgrade ids like `u_crystal_reservoir_t1`; extract and look up.
-const MECHANIC_GLYPH = {
-  crystal_reservoir:  '蓄', // store / reservoir
-  divine_qi:          '神', // divine / spirit
-  crystal_click:      '击', // strike / click
-  pattern_click:      '連', // chain / pattern
-  consecutive_focus:  '持', // sustain / hold
-};
-
-function mechanicIdOf(upgrade) {
-  return upgrade.id.replace(/^u_/, '').replace(/_t\d+$/, '');
-}
-
-/**
- * Resolve the visual identity of an upgrade card.
- * Returns either { kind: 'sprite', src } (producer-doubles) or
- * { kind: 'glyph', char, accent } (calligraphy stamp).
+ * Resolve the visual identity of an upgrade card. Every upgrade has
+ * a dedicated sprite in public/ui/upgrade_*.png; the upgradeIconSrc()
+ * utility maps each category/mechanic/producer-double to its file and
+ * gracefully falls back to upgrade_default.png if art is missing.
+ * The Inscribed Tablet uses these real icons rather than calligraphy
+ * glyphs so the card reads as a CONCRETE upgrade, not a stylized stamp.
  */
 function identityFor(upgrade) {
-  if (upgrade.category === 'producer_double') {
-    return { kind: 'sprite', src: upgradeIconSrc(upgrade) };
-  }
-  if (upgrade.category === 'mechanic_tier') {
-    const mid = mechanicIdOf(upgrade);
-    return { kind: 'glyph', char: MECHANIC_GLYPH[mid] ?? '修', accent: false };
-  }
-  return { kind: 'glyph', char: CATEGORY_GLYPH[upgrade.category] ?? '修', accent: true };
+  return { kind: 'sprite', src: upgradeIconSrc(upgrade) };
 }
 
 /**
