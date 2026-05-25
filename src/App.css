@@ -22238,13 +22238,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   padding-bottom: 6px;
 }
 .spirit-bazaar-screen .sbz-screen-head-compact::before {
-  content: "\5E02";
+  content: "\5E02";                          /* 市 — market */
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
   position: absolute;
-  right: -8px;
-  top: -22px;
-  font-size: 110px;
-  color: rgba(255, 104, 100, 0.07);
+  right: -4px;
+  top: -10px;
+  font-size: 88px;
+  /* Bumped from rgba(255,104,100,0.07) which was invisible against the
+     dark-red header. Warm cream/bronze (matching every other watermark
+     in the game — About 道, Cultivation 炁, Settings 道) reads as
+     intentional decoration without competing with the vermillion CTAs. */
+  color: rgba(220, 175, 110, 0.18);
   line-height: 1;
   pointer-events: none;
   user-select: none;
