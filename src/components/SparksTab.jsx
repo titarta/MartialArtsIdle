@@ -193,21 +193,28 @@ function SparkBlock({ spark, ctx, isTrinityActive, onOpen }) {
   const stacks = spark.stacks ?? 1;
   const showStackBadge = card.kind === 'permanent' && stacks > 1;
 
+  // Estate Pavilions vocabulary: mechanic-kind sparks read as a fourth
+  // "rarity" with a jade ribbon so the player can tell mechanic unlocks
+  // apart from rolled rarities. Visual only; the underlying card.kind
+  // already carries the semantic.
+  const ribbonClass = card.kind === 'mechanic' ? 'mechanic' : card.rarity;
+  const ribbonLabel = card.kind === 'mechanic' ? 'Mechanic' : rarity.label;
+
   return (
     <button
       type="button"
-      className={`st-block st-block-${card.rarity}${isTrinityPiece ? ' st-block-trinity-piece' : ''}${isTrinityPiece && isTrinityActive ? ' st-block-trinity-active' : ''}`}
+      className={`st-block st-block-${card.rarity} st-block-pp st-block-pp-${ribbonClass}${isTrinityPiece ? ' st-block-trinity-piece' : ''}${isTrinityPiece && isTrinityActive ? ' st-block-trinity-active' : ''}`}
       style={{ '--rarity-color': rarity.color }}
       onClick={() => onOpen(spark)}
       aria-label={`${card.name} — tap for details`}
     >
-      <div className="st-block-icon-wrap">
+      <span className="st-block-ribbon" aria-hidden="true">{ribbonLabel}</span>
+      <div className="st-block-icon-wrap st-block-frame">
         <Icon icon={icon} className="st-block-icon-img" />
         {isTrinityPiece && <span className="st-block-trinity-badge">✦</span>}
         {showStackBadge && <span className="st-block-stack-badge">×{stacks}</span>}
       </div>
       <div className="st-block-name">{card.name}</div>
-      <div className={`st-block-rarity-tag st-rt-${card.rarity}`}>{rarity.label}</div>
       {contribution && <div className="st-block-line">{contribution}</div>}
       {isTimed && (
         <div className="st-block-timer">

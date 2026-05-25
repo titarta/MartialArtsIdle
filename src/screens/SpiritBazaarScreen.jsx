@@ -485,7 +485,7 @@ export default function SpiritBazaarScreen({
 }) {
   const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
-  // activeCat drives the .sbz-cat-tab-active class. Set by jumpTo (on tap)
+  // activeCat drives the .tab-rail-tab-active class. Set by jumpTo (on tap)
   // and updated by the IntersectionObserver below so the rail tracks
   // whichever aisle is on screen as the player scrolls.
   const [activeCat, setActiveCat] = useState('buff');
@@ -607,7 +607,7 @@ export default function SpiritBazaarScreen({
     const ind  = indicatorRef.current;
     if (!rail || !ind) return undefined;
     const place = () => {
-      const tab = rail.querySelector(`.sbz-cat-tab[data-cat="${activeCat}"]`);
+      const tab = rail.querySelector(`.tab-rail-tab[data-cat="${activeCat}"]`);
       if (!tab) return;
       // Indicator width tracks the label, not the tap-target; nudge in 2px
       // L+R so the underline lines up under the text rather than the padding.
@@ -704,40 +704,40 @@ export default function SpiritBazaarScreen({
             visual focus. Active state is driven by activeCat (set on
             tap + by the IntersectionObserver above); the indicator is
             measured against the active tab in the useLayoutEffect above. */}
-        <nav className="sbz-cat-rail" ref={railRef} aria-label="Bazaar sections">
+        <nav className="tab-rail tab-rail-sticky" ref={railRef} aria-label="Bazaar sections">
           <button
             type="button"
             data-cat="buff"
-            className={`sbz-cat-tab${activeCat === 'buff' ? ' sbz-cat-tab-active' : ''}`}
+            className={`tab-rail-tab${activeCat === 'buff' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-buff', 'buff')}
           >
-            Buffs <span className="sbz-cat-count">{buffs.length || '—'}</span>
+            Buffs <span className="tab-rail-count">{buffs.length || '—'}</span>
           </button>
           <button
             type="button"
             data-cat="consumable"
-            className={`sbz-cat-tab${activeCat === 'consumable' ? ' sbz-cat-tab-active' : ''}`}
+            className={`tab-rail-tab${activeCat === 'consumable' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-consumable', 'consumable')}
           >
-            Consumables <span className="sbz-cat-count">{consumables.length || '—'}</span>
+            Consumables <span className="tab-rail-count">{consumables.length || '—'}</span>
           </button>
           <button
             type="button"
             data-cat="qol"
-            className={`sbz-cat-tab${activeCat === 'qol' ? ' sbz-cat-tab-active' : ''}`}
+            className={`tab-rail-tab${activeCat === 'qol' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-qol', 'qol')}
           >
-            QoL <span className="sbz-cat-count">{qol.length || '—'}</span>
+            QoL <span className="tab-rail-count">{qol.length || '—'}</span>
           </button>
           <button
             type="button"
             data-cat="cosmetic"
-            className={`sbz-cat-tab${activeCat === 'cosmetic' ? ' sbz-cat-tab-active' : ''}`}
+            className={`tab-rail-tab${activeCat === 'cosmetic' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-cosmetic', 'cosmetic')}
           >
-            Cosmetics <span className="sbz-cat-count">{cosmeticsCount || '—'}</span>
+            Cosmetics <span className="tab-rail-count">{cosmeticsCount || '—'}</span>
           </button>
-          <span className="sbz-cat-indicator" ref={indicatorRef} aria-hidden="true" />
+          <span className="tab-rail-indicator" ref={indicatorRef} aria-hidden="true" />
         </nav>
         {/* Buffs aisle */}
         <section id="sec-buff" className="bls-section">

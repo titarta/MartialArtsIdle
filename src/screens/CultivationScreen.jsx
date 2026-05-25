@@ -1,8 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import PRODUCERS from '../data/producers';
-import ProducerLane from '../components/ProducerLane';
+import PavilionPlaque from '../components/PavilionPlaque';
 import ProducerDetailModal from '../components/ProducerDetailModal';
-import UpgradeCard, { OwnedUpgradeChip } from '../components/UpgradeCard';
+import InscribedTablet, { OwnedUpgradeChip } from '../components/UpgradeCard';
 import SparksTab from '../components/SparksTab';
 import { fmt, fmtRate } from '../utils/format';
 import { useEventQueue } from '../contexts/EventQueueContext';
@@ -210,49 +210,120 @@ export default function CultivationScreen({
     return { availableUpgrades: available, ownedUpgrades: owned };
   }, [visibleUpgrades, upgrades, upgradeCtx]);
 
+  // ── Sub-tab nav: sliding underline indicator ──────────────────────────
+  // Mirrors the SpiritBazaarScreen pattern verbatim so one tab vocabulary
+  // works the whole game. Re-measures the active label on tab change and
+  // again after Cinzel settles (woff2 metrics can shift mid-paint).
+  const railRef = useRef(null);
+  const indicatorRef = useRef(null);
+  useLayoutEffect(() => {
+    const rail = railRef.current;
+    const ind  = indicatorRef.current;
+    if (!rail || !ind) return undefined;
+    const place = () => {
+      const tEl = rail.querySelector(`.tab-rail-tab[data-tab="${tab}"]`);
+      if (!tEl) return;
+      ind.style.width = `${tEl.offsetWidth - 4}px`;
+      ind.style.transform = `translateX(${tEl.offsetLeft + 2}px)`;
+    };
+    place();
+    if (document.fonts?.ready) document.fonts.ready.then(place).catch(() => {});
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
+  }, [tab]);
+
+  // Cookie-Clicker reveal — show every unlocked producer plus one teaser
+  // for the next locked one. Counted here so the sub-tab badge stays
+  // honest as realm/owned change.
+  const visibleProducers = useMemo(() => {
+    const list = [];
+    let teaserShown = false;
+    for (const p of PRODUCERS) {
+      if (producers.isUnlocked(p.id, realmIndex)) {
+        list.push(p);
+      } else if (!teaserShown) {
+        list.push(p);
+        teaserShown = true;
+      }
+    }
+    return list;
+  }, [producers, realmIndex]);
+  // Producers tab count: unlocked producers only (teasers excluded).
+  const producerCount = useMemo(() => visibleProducers.filter(p =>
+    producers.isUnlocked(p.id, realmIndex)
+  ).length, [visibleProducers, producers, realmIndex]);
+  const upgradeCount = visibleUpgrades.length;
+  const sparkCount = qiSparks?.activeSparks?.filter(s => !s.expiresAt).length ?? 0;
+
   return (
     <div className="cultivation-screen">
-      <div className="cs-sticky-header">
-        <div className="cs-qi-display">{fmt(qi)} Qi</div>
-        <div className="cs-rate-display">+{fmtRate(rate)} / sec</div>
-      </div>
+      {/* ── QI RESERVOIR STRIP ─────────────────────────────────────────
+          The player's reservoir, always visible. Cinzel eyebrows on
+          either side, calligraphy "炁" (qi) watermark bleeding off
+          the right edge. Mirrors the Settings Identity Plaque warmth
+          so the player recognises "this is a tablet of mine" on land. */}
+      <header className="cs-qi-strip">
+        <div className="cs-qi-strip-l">
+          <div className="cs-qi-strip-eyebrow">Reservoir</div>
+          <div className="cs-qi-strip-amount">{fmt(qi)} Qi</div>
+        </div>
+        <div className="cs-qi-strip-r">
+          <div className="cs-qi-strip-rate-label">Flowing</div>
+          <div className="cs-qi-strip-rate">+{fmtRate(rate)} / sec</div>
+        </div>
+      </header>
 
-      <div className="cs-tabs">
+      {/* Sub-tab rail — shared .tab-rail primitive (same one the
+          Spirit Bazaar uses). Non-sticky here because each sub-tab
+          is its own scroll container, not a single long aisle. */}
+      <nav className="tab-rail" ref={railRef} aria-label="Cultivation sections">
         <button
-          className={`cs-tab${tab === 'producers' ? ' cs-tab-active' : ''}`}
+          type="button"
+          data-tab="producers"
+          className={`tab-rail-tab${tab === 'producers' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('producers')}
-        >Producers</button>
+        >
+          Producers <span className="tab-rail-count">{producerCount || '—'}</span>
+        </button>
         <button
-          className={`cs-tab${tab === 'upgrades' ? ' cs-tab-active' : ''}`}
+          type="button"
+          data-tab="upgrades"
+          className={`tab-rail-tab${tab === 'upgrades' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('upgrades')}
-        >Upgrades</button>
+        >
+          Upgrades <span className="tab-rail-count">{upgradeCount || '—'}</span>
+        </button>
         <button
-          className={`cs-tab${tab === 'sparks' ? ' cs-tab-active' : ''}`}
+          type="button"
+          data-tab="sparks"
+          className={`tab-rail-tab${tab === 'sparks' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('sparks')}
-        >Sparks</button>
-      </div>
+        >
+          Sparks <span className="tab-rail-count">{sparkCount || '—'}</span>
+        </button>
+        <span className="tab-rail-indicator" ref={indicatorRef} aria-hidden="true" />
+      </nav>
 
       {tab === 'producers' && (
         <>
+          {/* Buy-mode pill row. Carries ×1/×10/×100 plus the optional
+              Auto chip (Disciple's Diligence QoL). Lacquer chip
+              treatment to match the Bazaar's category vocabulary. */}
           <div className="cs-buy-mode-row">
-            <span className="cs-buy-mode-label">Buy:</span>
+            <span className="cs-buy-mode-label">Buy</span>
             <button
-              className={`cs-buy-mode-chip${buyMode === 1 ? ' cs-buy-mode-chip-active' : ''}`}
+              className={`cs-buy-chip${buyMode === 1 ? ' cs-buy-chip-on' : ''}`}
               onClick={() => setBuyMode(1)}
             >×1</button>
             <button
-              className={`cs-buy-mode-chip${buyMode === 10 ? ' cs-buy-mode-chip-active' : ''}`}
+              className={`cs-buy-chip${buyMode === 10 ? ' cs-buy-chip-on' : ''}`}
               onClick={() => setBuyMode(10)}
             >×10</button>
             <button
-              className={`cs-buy-mode-chip${buyMode === 100 ? ' cs-buy-mode-chip-active' : ''}`}
+              className={`cs-buy-chip${buyMode === 100 ? ' cs-buy-chip-on' : ''}`}
               onClick={() => setBuyMode(100)}
             >×100</button>
-            {/* Disciple's Diligence (Blood Lotus Shop QoL) — separate
-                toggle, not part of the mutually-exclusive buy-mode set.
-                Stays hidden until the player owns the unlock. Visual
-                emphasis when active so the player knows qi is being
-                spent in the background. */}
+            <span className="cs-buy-mode-spacer" />
             {autoBuyOwned && (
               <button
                 type="button"
@@ -266,38 +337,21 @@ export default function CultivationScreen({
               </button>
             )}
           </div>
-          <div className="cs-list">
-            {(() => {
-              // Cookie-Clicker reveal pattern — show every unlocked producer
-              // plus a single silhouetted "teaser" for the next locked one.
-              // Everything past the first locked stays hidden until each
-              // unlocks in turn. Inline so the list isn't snapshotted as a
-              // stale memo when realmIndex / owned counts change.
-              const list = [];
-              let teaserShown = false;
-              for (const p of PRODUCERS) {
-                if (producers.isUnlocked(p.id, realmIndex)) {
-                  list.push(p);
-                } else if (!teaserShown) {
-                  list.push(p);
-                  teaserShown = true;
-                }
-              }
-              return list.map(p => (
-                <ProducerLane
-                  key={p.id}
-                  producer={p}
-                  owned={producers.getOwned(p.id)}
-                  unlocked={producers.isUnlocked(p.id, realmIndex)}
-                  buyMode={buyMode}
-                  qi={qi}
-                  producers={producers}
-                  onBuy={handleBuy}
-                  onShowDetail={setDetailProducer}
-                  costDiscount={producerCostDiscountFrac}
-                />
-              ));
-            })()}
+          <div className="cs-pavilions">
+            {visibleProducers.map(p => (
+              <PavilionPlaque
+                key={p.id}
+                producer={p}
+                owned={producers.getOwned(p.id)}
+                unlocked={producers.isUnlocked(p.id, realmIndex)}
+                buyMode={buyMode}
+                qi={qi}
+                producers={producers}
+                onBuy={handleBuy}
+                onShowDetail={setDetailProducer}
+                costDiscount={producerCostDiscountFrac}
+              />
+            ))}
           </div>
         </>
       )}
@@ -336,29 +390,40 @@ export default function CultivationScreen({
         ) : (
           <div className="cs-up-sections">
             {availableUpgrades.length > 0 && (
-              <div className="cs-up-grid">
-                {availableUpgrades.map(u => (
-                  <UpgradeCard
-                    key={u.id}
-                    upgrade={u}
-                    unlocked={upgrades.checkUnlocked(u, upgradeCtx)}
-                    qi={qi}
-                    onBuy={handleBuyUpgrade}
-                  />
-                ))}
-              </div>
+              <section className="cs-up-section">
+                <header className="cs-up-section-head">
+                  <span className="cs-up-section-lantern" />
+                  <span className="cs-up-section-title">Available</span>
+                  <span className="cs-up-section-tag">Inscribed tablets · one-time tribute</span>
+                  <span className="cs-up-section-count">{availableUpgrades.length}</span>
+                </header>
+                <div className="cs-up-grid">
+                  {availableUpgrades.map(u => (
+                    <InscribedTablet
+                      key={u.id}
+                      upgrade={u}
+                      unlocked={upgrades.checkUnlocked(u, upgradeCtx)}
+                      qi={qi}
+                      onBuy={handleBuyUpgrade}
+                    />
+                  ))}
+                </div>
+              </section>
             )}
             {ownedUpgrades.length > 0 && (
-              <div className="cs-up-owned-section">
-                <div className="cs-up-owned-header">
-                  Purchased <span className="cs-up-owned-count">{ownedUpgrades.length}</span>
-                </div>
-                <div className="cs-up-owned-grid">
+              <section className="cs-up-section">
+                <header className="cs-up-section-head">
+                  <span className="cs-up-section-lantern" />
+                  <span className="cs-up-section-title">Inscribed</span>
+                  <span className="cs-up-section-tag">Permanent tribute received</span>
+                  <span className="cs-up-section-count">{ownedUpgrades.length}</span>
+                </header>
+                <div className="cs-up-chips">
                   {ownedUpgrades.map(u => (
                     <OwnedUpgradeChip key={u.id} upgrade={u} />
                   ))}
                 </div>
-              </div>
+              </section>
             )}
           </div>
         )

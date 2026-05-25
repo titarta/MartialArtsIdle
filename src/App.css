@@ -22477,34 +22477,36 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-/* Category nav. Plain text tabs with a sliding gold underline. The
-   nav's only job is to tell the player "these are the sections, here's
-   the one you're viewing"; everything else (Featured Hero, buff tiles,
-   Buy CTAs) carries the visual focus. Pattern reference: iOS Music /
-   Spotify / App Store. Active state driven by activeCat in
-   SpiritBazaarScreen (set on tap + IntersectionObserver on aisles);
-   the indicator's width + transform are measured against the active
-   tab in a useLayoutEffect.
-   See _design/screens-design-pass/bazaar-nav-redesign.html for the
-   isolated mockup that landed this redesign. */
-.sbz-cat-rail {
-  position: sticky;
-  top: 0;
-  z-index: 4;
+/* ── Shared text-tab rail ────────────────────────────────────────────
+   Plain Cinzel uppercase labels + sliding gold underline. The nav's
+   only job is to tell the player "these are the sections, here's the
+   one you're viewing"; the surrounding content carries the visual
+   focus. Pattern reference: iOS Music / Spotify / App Store.
+   Used by the Spirit Bazaar (sticky, IntersectionObserver-driven) and
+   the Cultivation screen sub-tabs (static, click-driven). The base
+   block below stays screen-agnostic; sticky behaviour and any
+   surface-tinted backgrounds are layered via modifier classes or
+   per-screen scoping below.
+   See _design/screens-design-pass/bazaar-nav-redesign.html and
+   _design/cultivation-design/cultivation-mockup.html for source. */
+.tab-rail {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: stretch;
   padding: 8px 4px 0;
   margin: 0;
-  /* Solid lacquer bar with a hard hairline below. The earlier
-     gradient-fade-into-content treatment read as ghostly/amateur;
-     AAA mobile shop nav (LoL client, Genshin shop, Destiny vendor
-     tabs) uses a discrete solid bar with a defined edge. */
   background: #100c08;
   border-bottom: 1px solid rgba(220, 175, 110, 0.20);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
 }
-.sbz-cat-tab {
+/* Bazaar (and any other sticky aisle-scroll nav) opts into stickiness. */
+.tab-rail-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.tab-rail-tab {
   background: none;
   border: none;
   padding: 8px 2px 14px;
@@ -22522,8 +22524,8 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   gap: 5px;
   transition: color 180ms ease;
 }
-.sbz-cat-tab:hover { color: rgba(245, 230, 200, 0.55); }
-.sbz-cat-count {
+.tab-rail-tab:hover { color: rgba(245, 230, 200, 0.55); }
+.tab-rail-count {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
   font-size: 9.5px;
   font-weight: 700;
@@ -22532,12 +22534,12 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   font-variant-numeric: tabular-nums;
   transition: color 180ms ease;
 }
-.sbz-cat-tab-active { color: #f5e6c8; }
-.sbz-cat-tab-active .sbz-cat-count { color: #ffcf83; }
+.tab-rail-tab-active { color: #f5e6c8; }
+.tab-rail-tab-active .tab-rail-count { color: #ffcf83; }
 /* Sliding gold underline. Sits over the hairline separator. width +
-   transform are set inline by the useLayoutEffect in
-   SpiritBazaarScreen, against the active tab's offsetWidth/offsetLeft. */
-.sbz-cat-indicator {
+   transform are set inline by the screen's useLayoutEffect against the
+   active tab's offsetWidth/offsetLeft. */
+.tab-rail-indicator {
   position: absolute;
   bottom: 0;            /* sit on top of the bar's hairline border */
   left: 0;
@@ -22557,7 +22559,7 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     width     220ms cubic-bezier(.4, 0, .2, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .sbz-cat-indicator { transition: none; }
+  .tab-rail-indicator { transition: none; }
 }
 
 /* Section-header scroll margin so jumpTo() (and natural scroll
@@ -22792,10 +22794,11 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* Category rail fade tail — extend the lacquer floor with a soft fade so
    aisle cards scrolling underneath the sticky rail gradient gracefully.
-   The base rail styling is now in the upstream .sbz-cat-rail rule above
-   (post-emoji-removal redesign); the previous fidelity-pass overrides
-   here were shadowing the new active-state and have been removed. */
-/* Bazaar-scoped rail bg override removed: the upstream .sbz-cat-rail
+   The base rail styling is now in the upstream .tab-rail rule above
+   (extracted into a shared text-tabs primitive); the previous
+   fidelity-pass overrides here were shadowing the active-state and
+   have been removed. */
+/* Bazaar-scoped rail bg override removed: the upstream .tab-rail
    rule now uses a solid lacquer bar + hard hairline border, no gradient
    fade. Keeping a scoped override would shadow that with the old fade. */
 
@@ -23657,4 +23660,854 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   color: var(--ui-purple-strong);
   letter-spacing: 0.05em;
   white-space: nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CULTIVATION SCREEN — Estate Pavilions redesign (2026-05-25)
+   Each producer becomes a NAMED PLACE on the player's grounds: vermillion
+   left-rail (qi-tide flowing in), framed pavilion emblem, Cinzel name carved
+   across a temple lintel, stamped vermillion cost cartouche on the right.
+   Locked producers stay visible as sealed shrines (crossed bamboo lattice
+   + wax "封" seal + dashed Sealed cartouche). Upgrades reuse the same
+   framed-inset chassis as Inscribed Tablets; sparks reuse it as Framed
+   Chassis with corner rarity ribbons. One estate, three rooms.
+   Source mockup: _design/cultivation-design/cultivation-mockup.html
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Qi reservoir strip ────────────────────────────────────────────────
+   Replaces the old .cs-sticky-header. Cinzel eyebrows ("Reservoir" /
+   "Flowing"), tabular qi amount + rate, calligraphy "炁" watermark
+   bleeding off the right edge. Mirrors the Settings Identity Plaque
+   warmth so the player recognises this is their tablet on land. */
+.cs-qi-strip {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    rgba(8, 6, 4, .96);
+  border-bottom: 1px solid rgba(220, 175, 110, .12);
+  overflow: hidden;
+}
+.cs-qi-strip::before {
+  content: '炁';
+  position: absolute;
+  right: -10px;
+  top: -22px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 110px;
+  line-height: 1;
+  color: rgba(220, 175, 110, .055);
+  pointer-events: none;
+  user-select: none;
+}
+.cs-qi-strip-l,
+.cs-qi-strip-r { position: relative; z-index: 1; }
+.cs-qi-strip-r { text-align: right; }
+.cs-qi-strip-eyebrow,
+.cs-qi-strip-rate-label {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #dcaf6e;
+  margin-bottom: 3px;
+}
+.cs-qi-strip-rate-label {
+  color: rgba(245, 230, 200, 0.32);
+  letter-spacing: .18em;
+}
+.cs-qi-strip-amount {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #f5e6c8;
+  font-variant-numeric: tabular-nums;
+}
+.cs-qi-strip-rate {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: #ffcf83;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Buy-mode pill row ─────────────────────────────────────────────────
+   Sits above the producer list. Lacquer chips for ×1/×10/×100, jade
+   Auto chip (Disciple's Diligence QoL). Replaces .cs-buy-mode-chip
+   with a chip vocabulary that matches the rest of the redesign. */
+.cs-buy-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 12px;
+  flex-shrink: 0;
+}
+.cs-buy-mode-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.32);
+  margin-right: 2px;
+}
+.cs-buy-chip {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: 5px 12px;
+  background: rgba(220, 175, 110, .08);
+  border: 1px solid rgba(220, 175, 110, .20);
+  color: rgba(245, 230, 200, 0.62);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.cs-buy-chip:hover {
+  background: rgba(220, 175, 110, .14);
+  color: rgba(245, 230, 200, 0.85);
+}
+.cs-buy-chip-on {
+  background: rgba(220, 175, 110, .20);
+  border-color: #dcaf6e;
+  color: #f5e6c8;
+}
+.cs-buy-mode-spacer { flex: 1; }
+
+/* ── Pavilion list ─────────────────────────────────────────────────────
+   The container that owns the scroll. Mobile-first 390x844 → ~4
+   plaques fit the first viewport. The user has explicitly accepted
+   this density trade-off vs the old .cs-list's 5-rows-per-viewport. */
+.cs-pavilions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 4px 96px;
+  overflow-y: auto;
+  flex: 1;
+  touch-action: pan-y;
+}
+/* Hide scrollbar visually but keep wheel/touch scroll behaviour. */
+.cs-pavilions::-webkit-scrollbar { display: none; }
+
+/* iOS-Safari scroll-lock fix: disabled buy buttons must pass touches
+   through to the .cs-pavilions scroll container behind them. */
+.pp-cart-btn:disabled { pointer-events: none; }
+
+/* ── Pavilion Plaque ───────────────────────────────────────────────────
+   Anatomy (L → R):  [vermillion rail] [framed emblem] [Cinzel lintel
+   + tier + rate] [tribute cartouche]. The right-edge slot is
+   intentionally agnostic so the future "Enter Pavilion →" mini-game
+   CTA can slide in without redesigning the chassis. */
+.pp {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4px 84px 1fr auto;
+  align-items: stretch;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 24%, rgba(220,175,110,0) 76%, rgba(220,175,110,.05) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 12px;
+  padding: 12px 14px 12px 0;
+  box-shadow:
+    0 1px 0 rgba(255,225,170,.06) inset,
+    0 8px 18px -10px rgba(0,0,0,.7);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+.pp-rail {
+  width: 4px;
+  align-self: stretch;
+  margin: 8px 12px 8px 8px;
+  border-radius: 2px;
+  background: linear-gradient(180deg,
+    #ffcf83 0%,
+    #ff5b5b 22%,
+    #c83838 78%,
+    #6a1818 100%);
+  box-shadow: 0 0 6px rgba(200, 56, 56, .35), 0 0 0 1px rgba(0,0,0,.5);
+}
+.pp-frame {
+  width: 64px; height: 64px;
+  align-self: center;
+  position: relative;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220, 175, 110, .30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* Frame corner notches — carved-finish detail */
+.pp-frame::before,
+.pp-frame::after {
+  content: '';
+  position: absolute;
+  width: 6px; height: 6px;
+  border: 1px solid rgba(220, 175, 110, .45);
+  border-radius: 1px;
+  top: 3px;
+  pointer-events: none;
+}
+.pp-frame::before { left: 3px;  border-right: none; border-bottom: none; }
+.pp-frame::after  { right: 3px; border-left: none;  border-bottom: none; }
+button.pp-frame-btn {
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.08s ease-out, box-shadow 0.15s ease-out;
+}
+button.pp-frame-btn:hover {
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 0 0 1px rgba(255, 207, 131, .45) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+}
+button.pp-frame-btn:active { transform: scale(0.96); }
+button.pp-frame-btn:focus-visible {
+  outline: 2px solid rgba(255, 215, 130, 0.6);
+  outline-offset: 2px;
+}
+.pp-emblem {
+  width: 52px; height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(220, 175, 110, .18));
+}
+img.pp-emblem { font-size: 0; }
+
+.pp-lintel {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding-left: 14px;
+  min-width: 0;
+}
+.pp-name {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #f5e6c8;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pp-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pp-tier-badge {
+  font-family: var(--font-display);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.pp-tier-bronze { color: #c08858; }
+.pp-tier-silver { color: #c9c6c0; }
+.pp-tier-gold   { color: #ffcf83; }
+.pp-tier-mythic { color: #c885ff; }
+.pp-owned {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(245, 230, 200, 0.62);
+  font-variant-numeric: tabular-nums;
+}
+.pp-rate {
+  font-size: 11px;
+  color: rgba(245, 230, 200, 0.32);
+  letter-spacing: .02em;
+  font-variant-numeric: tabular-nums;
+}
+.pp-rate b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: #dcaf6e;
+}
+
+/* Tribute cartouche — right-edge column */
+.pp-cart {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  margin-left: 10px;
+}
+.pp-cart-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 14px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 200, 200, .32);
+  background: linear-gradient(180deg, #ff5b5b 0%, #c83838 100%);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 0 10px rgba(200, 56, 56, .35);
+  min-width: 86px;
+  transition: filter 150ms ease, transform 0.08s ease-out;
+}
+.pp-cart-btn:hover { filter: brightness(1.08); }
+.pp-cart-btn:active { transform: scale(0.97); }
+.pp-cart-mult {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .92;
+}
+.pp-cart-cost {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0,0,0,.4);
+}
+.pp-cart-dim {
+  background: linear-gradient(180deg, rgba(60, 48, 32, .85) 0%, rgba(40, 32, 22, .92) 100%);
+  border-color: rgba(220, 175, 110, .22);
+  color: rgba(245, 230, 200, 0.62);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.pp-cart-dim .pp-cart-cost { color: rgba(245, 230, 200, 0.62); }
+.pp-cart-dim .pp-cart-mult { color: rgba(245, 230, 200, 0.32); }
+.pp-cart-dim:hover { filter: none; }
+
+/* Tier escalation — gold + mythic add a frame glow + border tint so the
+   highest-tier producers feel like the prize. Bronze/silver stay quiet. */
+.pp-frame-gold {
+  border-color: rgba(220, 175, 110, .38);
+}
+.pp-frame-gold .pp-frame {
+  box-shadow:
+    0 0 0 1px rgba(220, 175, 110, .18) inset,
+    0 0 14px -2px rgba(255, 207, 131, .30);
+}
+.pp-frame-mythic {
+  border-color: rgba(200, 133, 255, .40);
+}
+.pp-frame-mythic .pp-frame {
+  box-shadow:
+    0 0 0 1px rgba(200, 133, 255, .25) inset,
+    0 0 16px -2px rgba(200, 133, 255, .35);
+}
+
+/* Threshold-crossing celebration — fires on rank-up. Mirrors the old
+   .pl-celebrate so the player still gets the burst on tier-up. */
+.pp-celebrate {
+  animation: pp-celebrate-burst 1.4s ease-out;
+}
+@keyframes pp-celebrate-burst {
+  0%   { transform: scale(1); box-shadow: 0 1px 0 rgba(255,225,170,.06) inset, 0 8px 18px -10px rgba(0,0,0,.7); }
+  20%  { transform: scale(1.02); box-shadow: 0 1px 0 rgba(255,225,170,.06) inset, 0 0 40px rgba(255, 215, 130, 0.7); }
+  60%  { transform: scale(1.005); box-shadow: 0 1px 0 rgba(255,225,170,.06) inset, 0 0 24px rgba(255, 215, 130, 0.4); }
+  100% { transform: scale(1); box-shadow: 0 1px 0 rgba(255,225,170,.06) inset, 0 8px 18px -10px rgba(0,0,0,.7); }
+}
+
+/* ── Sealed Shrine (locked) ────────────────────────────────────────────
+   Same plaque chassis, frame overlaid with bamboo lattice, wax "封"
+   seal stamped over the bottom-right corner, dashed Sealed cartouche
+   where the realm number reads first. */
+.pp-locked {
+  filter: saturate(.6);
+}
+.pp-locked .pp-rail {
+  background: linear-gradient(180deg, rgba(150, 140, 120, .6) 0%, rgba(150, 140, 120, .25) 100%);
+  box-shadow: none;
+}
+.pp-locked .pp-frame {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(220, 175, 110, .06) 0px,
+      rgba(220, 175, 110, .06) 6px,
+      rgba(220, 175, 110, 0) 6px,
+      rgba(220, 175, 110, 0) 12px),
+    linear-gradient(180deg, #15110b 0%, #0a0805 100%);
+  border-color: rgba(220, 175, 110, .18);
+}
+.pp-locked .pp-frame::before,
+.pp-locked .pp-frame::after { border-color: rgba(220, 175, 110, .22); }
+/* Use the same SVG silhouette filter the producer detail modal uses —
+   produces a true black hard-edged cutout instead of a grey halo. */
+.pp-emblem-locked {
+  filter:
+    url(#mai-silhouette)
+    drop-shadow(0 0 4px rgba(0, 0, 0, 0.7));
+  opacity: .55;
+}
+img.pp-emblem-locked { font-size: 0; }
+.pp-locked .pp-name { color: rgba(245, 230, 200, 0.32); }
+.pp-owned-sealed {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: rgba(245, 230, 200, 0.32);
+  font-variant-numeric: tabular-nums;
+}
+.pp-gate {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  color: rgba(220, 175, 110, .6);
+}
+.pp-gate b {
+  color: #dcaf6e;
+  font-weight: 600;
+}
+/* Wax seal — vermillion stamp over the frame's bottom-right */
+.pp-seal {
+  position: absolute;
+  width: 28px; height: 28px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff5b5b 0%, #c83838 55%, #6a1818 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.55),
+    0 0 6px rgba(200, 56, 56, .45);
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.pp-seal-glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  color: #fff5e0;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+  line-height: 1;
+}
+
+/* Sealed cartouche — dashed border, no vermillion fill, realm number
+   reads first because the player's eye is "when do I unlock this". */
+.pp-sealed-cart {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px 7px;
+  margin-left: 10px;
+  border: 1px dashed rgba(220, 175, 110, .30);
+  border-radius: 8px;
+  min-width: 86px;
+  background: rgba(0, 0, 0, .18);
+}
+.pp-sealed-lab {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, .55);
+}
+.pp-sealed-realm {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(245, 230, 200, 0.62);
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+/* ── Mobile responsiveness ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .pp {
+    grid-template-columns: 4px 76px 1fr auto;
+    padding: 11px 12px 11px 0;
+  }
+  .pp-frame { width: 58px; height: 58px; }
+  .pp-emblem { width: 46px; height: 46px; }
+  .pp-rail { margin: 8px 10px 8px 8px; }
+  .pp-lintel { padding-left: 10px; }
+  .pp-name { font-size: 13px; }
+  .pp-cart { margin-left: 8px; }
+  .pp-cart-btn { min-width: 78px; padding: 8px 12px 7px; }
+  .pp-cart-cost { font-size: 12px; }
+  .pp-sealed-cart { min-width: 78px; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   INSCRIBED TABLET — upgrade card. Square framed inset (same chassis
+   as the pavilion emblem) stacked vertically, Cinzel name, system-sans
+   one-line effect, vermillion cost cartouche. The frame holds either
+   the producer sprite (producer-doubles) or a calligraphy glyph
+   (every other category) so the tablet vocabulary reads consistently.
+   ════════════════════════════════════════════════════════════════════ */
+.it {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 10px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.it-frame {
+  width: 56px; height: 56px;
+  position: relative;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220, 175, 110, .30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.it-frame::before,
+.it-frame::after {
+  content: '';
+  position: absolute;
+  width: 5px; height: 5px;
+  border: 1px solid rgba(220, 175, 110, .45);
+  border-radius: 1px;
+  top: 3px;
+  pointer-events: none;
+}
+.it-frame::before { left: 3px;  border-right: none; border-bottom: none; }
+.it-frame::after  { right: 3px; border-left: none;  border-bottom: none; }
+.it-glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 30px;
+  line-height: 1;
+  color: #f5e6c8;
+  text-shadow: 0 0 10px rgba(220, 175, 110, .35), 0 1px 0 rgba(0, 0, 0, .5);
+}
+.it-glyph-accent { color: #ffcf83; }
+.it-emblem {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(220, 175, 110, .18));
+}
+.it-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #f5e6c8;
+  line-height: 1.25;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+.it-desc {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: rgba(245, 230, 200, 0.32);
+  min-height: 30px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.it-cost {
+  margin-top: 2px;
+  align-self: stretch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #ff5b5b 0%, #c83838 100%);
+  color: white;
+  border: 1px solid rgba(255, 200, 200, .32);
+  box-shadow: 0 0 8px rgba(200, 56, 56, .32), 0 1px 0 rgba(255,255,255,.16) inset;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: filter 150ms ease, transform 0.08s ease-out;
+}
+.it-cost:hover { filter: brightness(1.08); }
+.it-cost:active { transform: scale(0.97); }
+.it-cost-dim {
+  background: linear-gradient(180deg, rgba(60, 48, 32, .85) 0%, rgba(40, 32, 22, .92) 100%);
+  border-color: rgba(220, 175, 110, .22);
+  color: rgba(245, 230, 200, 0.62);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.it-cost-dim:hover { filter: none; }
+.it-cost-sealed {
+  background: rgba(0, 0, 0, .18);
+  border: 1px dashed rgba(220, 175, 110, .30);
+  color: rgba(220, 175, 110, .55);
+  box-shadow: none;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .18em;
+  cursor: not-allowed;
+}
+.it-cost-sealed:hover { filter: none; }
+.it-locked {
+  filter: saturate(.55);
+}
+.it-locked .it-glyph { color: rgba(220, 175, 110, .45); text-shadow: none; }
+.it-locked .it-name { color: rgba(245, 230, 200, 0.32); }
+.it-locked .it-frame { border-color: rgba(220, 175, 110, .18); }
+
+/* Compact owned-upgrade chip — Ma Shan Zheng glyph (or producer sprite
+   for doubles) + Cinzel name. Pile at the bottom of the tab so the
+   buyable list stays scannable. */
+.it-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 7px;
+  border-radius: 999px;
+  background: rgba(126, 195, 143, .08);
+  border: 1px solid rgba(126, 195, 143, .25);
+  color: #f5e6c8;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  cursor: help;
+}
+.it-chip-glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 13px;
+  color: #7ec38f;
+  line-height: 1;
+}
+.it-chip-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.it-chip-name {
+  font-family: var(--font-display);
+  letter-spacing: .03em;
+}
+
+/* ── Upgrade tab sections (Available / Inscribed) ──────────────────────
+   Section heads use the same vermillion lantern + Cinzel uppercase
+   title as the rest of the lacquer system. */
+.cs-up-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 12px 80px;
+  overflow-y: auto;
+  border-top: none;
+  margin-top: 0;
+}
+.cs-up-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cs-up-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 14px;
+  position: relative;
+}
+.cs-up-section-lantern {
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(180deg,
+    #ffcf83 0%,
+    #ff5b5b 22%,
+    #c83838 78%,
+    #6a1818 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(200, 56, 56, .4), 0 0 0 1px rgba(0, 0, 0, .5);
+}
+.cs-up-section-title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #f5e6c8;
+}
+.cs-up-section-tag {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.32);
+  flex: 1;
+}
+.cs-up-section-count {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  background: rgba(220, 175, 110, .18);
+  color: rgba(245, 230, 200, .85);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.cs-up-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SPARK FRAMED CHASSIS — apply the framed inset + corner rarity ribbon
+   to the existing .st-block. The base .st-block rules (icon-wrap, name,
+   timer, etc) stay in place; the .st-block-pp modifier adds the frame
+   styling and ribbon decoration.
+   ════════════════════════════════════════════════════════════════════ */
+.st-block.st-block-pp {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  overflow: hidden;
+}
+.st-block.st-block-pp .st-block-frame {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220, 175, 110, .30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.st-block.st-block-pp .st-block-frame::before,
+.st-block.st-block-pp .st-block-frame::after {
+  content: '';
+  position: absolute;
+  width: 5px; height: 5px;
+  border: 1px solid rgba(220, 175, 110, .45);
+  border-radius: 1px;
+  top: 3px;
+  pointer-events: none;
+}
+.st-block.st-block-pp .st-block-frame::before { left: 3px;  border-right: none; border-bottom: none; }
+.st-block.st-block-pp .st-block-frame::after  { right: 3px; border-left: none;  border-bottom: none; }
+
+/* Corner rarity ribbon. Anchored top-right, rotated 35deg, gradient
+   filled per rarity. Keep ribbon text short — full rarity label, no
+   line breaks. */
+.st-block.st-block-pp .st-block-ribbon {
+  position: absolute;
+  top: 8px;
+  right: -22px;
+  transform: rotate(35deg);
+  padding: 2px 28px;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  color: #fff5e0;
+  text-transform: uppercase;
+  box-shadow: 0 0 6px rgba(0, 0, 0, .4);
+  z-index: 2;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.st-block-pp-common .st-block-ribbon {
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+}
+.st-block-pp-uncommon .st-block-ribbon {
+  background: linear-gradient(135deg, #c885ff, #6f3fb0);
+}
+.st-block-pp-rare .st-block-ribbon {
+  background: linear-gradient(135deg, #ffb060, #b46e1a);
+}
+.st-block-pp-legendary .st-block-ribbon {
+  background: linear-gradient(135deg, #f5b95a, #c98828);
+}
+.st-block-pp-mechanic .st-block-ribbon {
+  background: linear-gradient(135deg, #6ec896, #2c7a4b);
+}
+
+/* The framed-chassis treatment supersedes the old rarity-tag pill at
+   the top of the block — the corner ribbon now carries that signal. */
+.st-block.st-block-pp .st-block-rarity-tag { display: none; }
+
+/* Icon sizing inside the new frame */
+.st-block.st-block-pp .st-block-icon-img,
+.st-block.st-block-pp .st-block-icon-emoji {
+  width: 36px;
+  height: 36px;
+  font-size: 28px;
+  margin: 0;
+}
+
+/* Cinzel name inside the framed chassis */
+.st-block.st-block-pp .st-block-name {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #f5e6c8;
+  line-height: 1.25;
+  margin-top: 6px;
+}
+.st-block.st-block-pp .st-block-line {
+  font-size: 10px;
+  line-height: 1.35;
+  color: rgba(245, 230, 200, 0.32);
+}
+.st-block.st-block-pp .st-block-line b {
+  color: #dcaf6e;
+  font-weight: 600;
 }
