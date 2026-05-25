@@ -1,181 +1,161 @@
 # Realm Progression
 
-Realm system based on **Martial Peak** (武炼巅峰). Each major realm has sub-stages that must be cleared sequentially.
+Based on **Martial Peak** (武炼巅峰). 13 major realms, 46 total sub-stages.
 
 ---
 
 ## Realm Overview
 
-| #   | Major Realm          | Sub-stages                   | Notes                            |
-| --- | -------------------- | ---------------------------- | -------------------------------- |
-| 1   | Tempered Body        | 10 Layers                    | ---                              |
-| 2   | Qi Transformation    | Early / Middle / Late / Peak | ---                              |
-| 3   | True Element         | Early / Middle / Late / Peak | —                                |
-| 4   | Separation & Reunion | 1st / 2nd / 3rd Stage        | —                                |
-| 5   | Immortal Ascension   | 1st / 2nd / 3rd Stage        | —                                |
-| 6   | Saint                | Early / Middle / Late        | —                                |
-| 7   | Saint King           | 1st / 2nd / 3rd Stage        | —                                |
-| 8   | Origin Returning     | 1st / 2nd / 3rd Stage        | —                                |
-| 9   | Origin King          | 1st / 2nd / 3rd Stage        | —                                |
-| 10  | Void King            | 1st / 2nd / 3rd Stage        | —                                |
-| 11  | Dao Source           | 1st / 2nd / 3rd Stage        | —                                |
-| 12  | Emperor Realm        | 1st / 2nd / 3rd Stage        | —                                |
-| 13  | Open Heaven          | Layer 1–6                    | Low (1-3) / Mid (4-5) / High (6) |
-
-Total sub-stages: **46**
+| # | Major Realm | Sub-stages |
+|---|---|---|
+| 1 | Tempered Body | 10 Layers |
+| 2 | Qi Transformation | Early / Middle / Late / Peak |
+| 3 | True Element | Early / Middle / Late / Peak |
+| 4 | Separation & Reunion | 1st / 2nd / 3rd |
+| 5 | Immortal Ascension | 1st / 2nd / 3rd |
+| 6 | Saint | Early / Middle / Late |
+| 7 | Saint King | 1st / 2nd / 3rd |
+| 8 | Origin Returning | 1st / 2nd / 3rd |
+| 9 | Origin King | 1st / 2nd / 3rd |
+| 10 | Void King | 1st / 2nd / 3rd |
+| 11 | Dao Source | 1st / 2nd / 3rd |
+| 12 | Emperor Realm | 1st / 2nd / 3rd |
+| 13 | Open Heaven | Layer 1–6 (Low 1-3 / Mid 4-5 / High 6) |
 
 ---
 
-## Detailed Costs
+## Qi Costs
 
-> **Curve:** costs were halved vs. the original curve and additionally
-> compressed at the upper end so late-game stages aren't a brick wall.
-> Endgame (Open Heaven Layer 6) is ~11× cheaper than before.
+### Tempered Body
 
-### Tempered Body (10 Layers)
+| Stage | Cost | Stage | Cost |
+|---|---|---|---|
+| L1 | 50 | L6 | 850 |
+| L2 | 100 | L7 | 1,400 |
+| L3 | 175 | L8 | 2,400 |
+| L4 | 300 | L9 | 4,000 |
+| L5 | 500 | L10 | 6,500 |
 
-| Stage | Qi Cost |
+### Qi Transformation
+
+| Stage | Cost |
 |---|---|
-| Layer 1 | 50 |
-| Layer 2 | 100 |
-| Layer 3 | 175 |
-| Layer 4 | 300 |
-| Layer 5 | 500 |
-| Layer 6 | 850 |
-| Layer 7 | 1,400 |
-| Layer 8 | 2,400 |
-| Layer 9 | 4,000 |
-| Layer 10 | 6,500 |
+| Early | 10,000 |
+| Middle | 17,500 |
+| Late | 30,000 |
+| Peak | 50,000 |
 
-### Qi Transformation (4 Stages)
+### True Element
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| Early Stage | 10,000 |
-| Middle Stage | 17,500 |
-| Late Stage | 30,000 |
-| Peak Stage | 50,000 |
+| Early | 75,000 |
+| Middle | 130,000 |
+| Late | 225,000 |
+| Peak | 380,000 |
 
-### True Element (4 Stages)
+### Separation & Reunion
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| Early Stage | 75,000 |
-| Middle Stage | 130,000 |
-| Late Stage | 225,000 |
-| Peak Stage | 380,000 |
+| 1st | 625,000 |
+| 2nd | 1,000,000 |
+| 3rd | 1,700,000 |
 
-### Separation & Reunion (3 Stages)
+### Immortal Ascension
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 625,000 |
-| 2nd Stage | 1,000,000 |
-| 3rd Stage | 1,700,000 |
+| 1st | 2,800,000 |
+| 2nd | 4,700,000 |
+| 3rd | 8,000,000 |
 
-### Immortal Ascension (3 Stages)
+### Saint
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 2,800,000 |
-| 2nd Stage | 4,700,000 |
-| 3rd Stage | 8,000,000 |
+| Early | 13,000,000 |
+| Middle | 22,000,000 |
+| Late | 35,000,000 |
 
-### Saint (3 Stages)
+### Saint King
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| Early Stage | 13,000,000 |
-| Middle Stage | 22,000,000 |
-| Late Stage | 35,000,000 |
+| 1st | 58,000,000 |
+| 2nd | 95,000,000 |
+| 3rd | 160,000,000 |
 
-### Saint King (3 Stages)
+### Origin Returning
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 58,000,000 |
-| 2nd Stage | 95,000,000 |
-| 3rd Stage | 160,000,000 |
+| 1st | 260,000,000 |
+| 2nd | 430,000,000 |
+| 3rd | 700,000,000 |
 
-### Origin Returning (3 Stages)
+### Origin King
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 260,000,000 |
-| 2nd Stage | 430,000,000 |
-| 3rd Stage | 700,000,000 |
+| 1st | 1,150,000,000 |
+| 2nd | 1,900,000,000 |
+| 3rd | 3,200,000,000 |
 
-### Origin King (3 Stages)
+### Void King
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 1,150,000,000 |
-| 2nd Stage | 1,900,000,000 |
-| 3rd Stage | 3,200,000,000 |
+| 1st | 5,200,000,000 |
+| 2nd | 8,500,000,000 |
+| 3rd | 14,000,000,000 |
 
-### Void King (3 Stages)
+### Dao Source
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 5,200,000,000 |
-| 2nd Stage | 8,500,000,000 |
-| 3rd Stage | 14,000,000,000 |
+| 1st | 23,000,000,000 |
+| 2nd | 38,000,000,000 |
+| 3rd | 62,000,000,000 |
 
-### Dao Source (3 Stages)
+### Emperor Realm
 
-| Stage | Qi Cost |
+| Stage | Cost |
 |---|---|
-| 1st Stage | 23,000,000,000 |
-| 2nd Stage | 38,000,000,000 |
-| 3rd Stage | 62,000,000,000 |
+| 1st | 100,000,000,000 |
+| 2nd | 170,000,000,000 |
+| 3rd | 280,000,000,000 |
 
-### Emperor Realm (3 Stages)
+### Open Heaven
 
-| Stage | Qi Cost |
-|---|---|
-| 1st Stage | 100,000,000,000 |
-| 2nd Stage | 170,000,000,000 |
-| 3rd Stage | 280,000,000,000 |
-
-### Open Heaven (6 Layers)
-
-| Stage | Qi Cost | Tier |
+| Layer | Cost | Tier |
 |---|---|---|
-| Layer 1 | 460,000,000,000 | Low-Rank |
-| Layer 2 | 750,000,000,000 | Low-Rank |
-| Layer 3 | 1,200,000,000,000 | Low-Rank |
-| Layer 4 | 2,000,000,000,000 | Mid-Rank |
-| Layer 5 | 3,300,000,000,000 | Mid-Rank |
-| Layer 6 | 5,500,000,000,000 | High-Rank |
+| 1 | 460,000,000,000 | Low |
+| 2 | 750,000,000,000 | Low |
+| 3 | 1,200,000,000,000 | Low |
+| 4 | 2,000,000,000,000 | Mid |
+| 5 | 3,300,000,000,000 | Mid |
+| 6 | 5,500,000,000,000 | High |
 
 ---
 
 ## Major-Realm Breakthrough Gate (Qi/s Requirement)
 
-Ascending **between major realms** (i.e. whenever `realm.name` changes — e.g. Tempered Body → Qi Transformation, Peak Qi Transformation → Early True Element) requires the player to sustain a minimum **qi/s** rate. Sub-stage transitions within the same major realm have no gate.
+Ascending between major realms requires a minimum **qi/s** rate. Sub-stage transitions within the same major realm have no gate.
 
-- **Rule:** required qi/s = `nextRealm.cost × base × decay^ord`
-  - `base = 0.25%` (0.0025)
-  - `decay = 0.5` multiplicatively per successive major gate
-  - `ord = 0, 1, 2, …` — the 0-based ordinal of the major transition
-- **Intent:** early gates squeeze hardest (force investment in qi-rate sources before the first realm wall); later gates soften automatically because costs already dwarf what players can realistically accumulate per second.
-- **Behaviour when gated:**
-  - Qi accumulation is **clamped at 100%** of the current realm cost.
-  - The Home-screen progress bar sits full, pulses red, and shows an inline `⛔ Qi/s <current> / <required>` chip embedded in the existing track — no new UI block.
-  - As soon as the rolling qi/s meets the requirement, the breakthrough fires on the next tick.
-- **Implementation:** `getMajorBreakthroughRate(fromIndex)` in `src/data/realms.js`; gate check in `useCultivation.js`'s tick loop; `gateRef` exposed to `RealmProgressBar.jsx` for the inline indicator.
-- **Note:** the rate compared is the **live** qi/s including boost/pill/selection multipliers, so players can temporarily hold boost to push through a gate.
+**Formula:** `required qi/s = nextRealm.cost × 0.0025 × 0.5^ord`
+- `ord` = 0-based ordinal of the major transition
+- Early gates are strictest; later gates soften automatically as costs grow
+
+**Behaviour when gated:**
+- Qi accumulation clamped at 100% of current realm cost
+- Progress bar sits full, pulses red, shows inline `⛔ Qi/s <current> / <required>` chip
+- Gate clears on next tick once live qi/s meets requirement
+
+**Implementation:** `getMajorBreakthroughRate(fromIndex)` in `src/data/realms.js`; gate check in `useCultivation.js` tick; `gateRef` to `RealmProgressBar.jsx`.
 
 ---
 
 ## Related
 
-- [[Cultivation System]]
-- [[Primary Stats]]
-- [[Laws]]
-- [[Secret Techniques]]
-- [[Implementation Notes]]
-
----
-
-## Claude Commands
+- [[Cultivation System]] · [[Laws]] · [[Secret Techniques]]

@@ -1,27 +1,10 @@
 # Materials
 
-Raw crafting resources used in **pill crafting** (alchemy), the **[[Crafting|Refining Furnace]]**, and the **[[QI Crystal]]** upgrade. Acquired from combat, gathering, and mining — each activity drops its own material types.
+Raw crafting resources used in pill crafting, artefact refining, and QI Crystal upgrades. Acquired from combat, gathering, and mining.
 
 ---
 
-## Rarity Tiers
-
-All materials use the unified five-tier rarity system:
-
-| Tier | Color |
-|---|---|
-| Iron | `#9ca3af` (grey) |
-| Bronze | `#cd7f32` (bronze) |
-| Silver | `#c0c0c0` (silver) |
-| Gold | `#f5c842` (gold) |
-| Transcendent | `#c084fc` (purple) |
-
----
-
-## Herbs
-
-Botanical materials gathered from world regions. Used in alchemy (pill crafting).
-**Drop source: Gathering only.**
+## Herbs — Gathering only
 
 | ID | Name | Rarity |
 |---|---|---|
@@ -38,10 +21,7 @@ Botanical materials gathered from world regions. Used in alchemy (pill crafting)
 
 ---
 
-## Ores / Minerals
-
-Mineral resources mined from world regions. Used in artefact refining.
-**Drop source: Mining only.**
+## Ores / Minerals — Mining only
 
 | ID | Name | Rarity |
 |---|---|---|
@@ -58,62 +38,45 @@ Mineral resources mined from world regions. Used in artefact refining.
 
 ---
 
-## QI Stones (Cultivation Materials)
+## QI Stones — Bonus drops from all activities
 
-Ambient spiritual energy condensed into stone form. Drop as **bonus drops** from all three activities (gathering, mining, and combat). Used to upgrade the **[[QI Crystal]]**.
-
-Two variants per rarity tier (placeholder names until lore is finalised).
-
-| ID | Name | Rarity | Drop sources |
-|---|---|---|---|
-| iron_cultivation_1 | Iron QI Stone 1 | Iron | All activities |
-| iron_cultivation_2 | Iron QI Stone 2 | Iron | All activities |
-| bronze_cultivation_1 | Bronze QI Stone 1 | Bronze | All activities |
-| bronze_cultivation_2 | Bronze QI Stone 2 | Bronze | All activities |
-| silver_cultivation_1 | Silver QI Stone 1 | Silver | All activities |
-| silver_cultivation_2 | Silver QI Stone 2 | Silver | All activities |
-| gold_cultivation_1 | Gold QI Stone 1 | Gold | All activities |
-| gold_cultivation_2 | Gold QI Stone 2 | Gold | All activities |
-| transcendent_cultivation_1 | Transcendent QI Stone 1 | Transcendent | All activities |
-| transcendent_cultivation_2 | Transcendent QI Stone 2 | Transcendent | All activities |
-
----
-
-## Blood Cores
-
-Dense crystallised blood essence extracted from defeated enemies. **Combat drops only.**
-Rarity is determined by the enemy's power level, not the world number.
-
-| ID | Name | Rarity | Enemy power range |
-|---|---|---|---|
-| iron_blood_core_1 | Iron Blood Core 1 | Iron | World 1 (statMult avg ≤ 1.2) |
-| iron_blood_core_2 | Iron Blood Core 2 | Iron | World 1 |
-| bronze_blood_core_1 | Bronze Blood Core 1 | Bronze | Early World 2 (~1.5) |
-| bronze_blood_core_2 | Bronze Blood Core 2 | Bronze | Early World 2 |
-| silver_blood_core_1 | Silver Blood Core 1 | Silver | Mid World 2 (~1.5–2.5) |
-| silver_blood_core_2 | Silver Blood Core 2 | Silver | Mid World 2 |
-| gold_blood_core_1 | Gold Blood Core 1 | Gold | World 3 (~2.5–4.5) |
-| gold_blood_core_2 | Gold Blood Core 2 | Gold | World 3 |
-| transcendent_blood_core_1 | Transcendent Blood Core 1 | Transcendent | World 4–6 (> 4.0) |
-| transcendent_blood_core_2 | Transcendent Blood Core 2 | Transcendent | World 4–6 |
-
----
-
-## Drop Rules (Summary)
-
-| Activity | Primary drops | Bonus drops |
+| ID | Name | Rarity |
 |---|---|---|
-| **Gathering** | Herbs (matching region tier) | QI stones (cultivation) |
-| **Mining** | Ores (matching region tier) | QI stones (cultivation) |
-| **Combat** | Blood cores (per-enemy rarity) | QI stones (cultivation) |
-
-> **Key rule:** Minerals NEVER drop from combat. Blood cores NEVER drop from gathering or mining. QI stones drop everywhere as a consistent bonus resource.
+| iron_cultivation_1/2 | Iron QI Stone 1/2 | Iron |
+| bronze_cultivation_1/2 | Bronze QI Stone 1/2 | Bronze |
+| silver_cultivation_1/2 | Silver QI Stone 1/2 | Silver |
+| gold_cultivation_1/2 | Gold QI Stone 1/2 | Gold |
+| transcendent_cultivation_1/2 | Transcendent QI Stone 1/2 | Transcendent |
 
 ---
 
-## Gather / Mine Costs (Effective Speed = 0.3 pts/sec)
+## Blood Cores — Combat only
 
-Base 3 pts/sec × `RATE_MULTIPLIER` (0.10) = 0.3 effective pts/sec before stat bonuses. The throttle was tuned 2026-05-01 to slow the production loop by 10×.
+| ID | Name | Rarity | Enemy power |
+|---|---|---|---|
+| iron_blood_core_1/2 | Iron Blood Core 1/2 | Iron | World 1 |
+| bronze_blood_core_1/2 | Bronze Blood Core 1/2 | Bronze | Early W2 (~1.5) |
+| silver_blood_core_1/2 | Silver Blood Core 1/2 | Silver | Mid W2 (~1.5–2.5) |
+| gold_blood_core_1/2 | Gold Blood Core 1/2 | Gold | W3 (~2.5–4.5) |
+| transcendent_blood_core_1/2 | Transcendent Blood Core 1/2 | Transcendent | W4–6 (>4.0) |
+
+---
+
+## Drop Rules
+
+| Activity | Primary | Bonus |
+|---|---|---|
+| Gathering | Herbs | QI stones |
+| Mining | Ores | QI stones |
+| Combat | Blood cores | QI stones |
+
+**Key rule:** Minerals never drop from combat. Blood cores never drop from gathering/mining.
+
+---
+
+## Gather / Mine Costs
+
+Base 3 pts/sec × `RATE_MULTIPLIER` (0.10) = **0.3 effective pts/sec**.
 
 | Rarity | Cost (pts) | Time (base) |
 |---|---|---|
@@ -127,10 +90,4 @@ Base 3 pts/sec × `RATE_MULTIPLIER` (0.10) = 0.3 effective pts/sec before stat b
 
 ## Related
 
-- [[QI Crystal]]
-- [[Crafting]]
-- [[Items]]
-- [[Combat]]
-- [[Realm Progression]]
-- [[Worlds/Gathering]]
-- [[Worlds/Mining]]
+- [[QI Crystal]] · [[Items]] · [[Combat]]

@@ -1,141 +1,61 @@
 # Stats
 
-Reference for every stat in the game after the **Damage & Element System Overhaul** (2026-04-24). The pre-overhaul primary-stat layer (Essence / Soul / Body) is gone — see [[Primary Stats]] for the deprecation note.
-
----
+Full stat reference post **Damage & Element Overhaul** (2026-04-24). Primary stats (Essence/Soul/Body) removed — see [[Primary Stats]].
 
 ## Stacking Types
 
-Every modifier on every stat belongs to one of these stacking types. The order of operations is unchanged.
-
-| Type | Notation | How It Applies |
-|---|---|---|
-| **Increased Base** | `#% increased base` | Multiplies the base value of the stat (before anything else) |
-| **Base Flat** | `adds # to base` | Adds a flat amount to the base value of the stat |
-| **Flat** | `+#` | Adds a flat amount after all base calculations are done |
-| **Increased Value** | `#% increased` | Additive % bonus, all sources of this type sum then apply once |
-| **Multiplier** | `#% more` | Multiplicative — each `more` source multiplies independently |
-
-### Order of Operations
+| Type | How It Applies |
+|---|---|
+| **Increased** `#% increased` | Additive %; all sources sum then apply once |
+| **More** `#% more` | Multiplicative; each source multiplies independently |
+| **Flat** `+#` | Flat add after all base calculations |
 
 ```
-Final = ((Base × (1 + Σ increased_base%) + Σ base_flat) + Σ flat) × (1 + Σ increased%) × Π more_mult
+Final = base × (1 + Σ increased%) × Π more_mult + Σ flat
 ```
 
----
+## Qi Generation Speed
 
-## Special Resource: Qi
+`qi/s = BASE_RATE × lawCultMult × (1 + Σ qi_speed_increased) × Π qi_speed_more × focusMult (when focusing)`
 
-Qi is the raw cultivation energy. It cannot be increased directly — only its **generation speed** can be modified. Spent on realm breakthroughs.
-
-```
-qi/sec = BASE_RATE × (1 + Σ increased_qi_speed%) × Π more_qi_speed × focus_mult (when focusing)
-```
-
-- `BASE_RATE` = 1 qi/sec
-- `focus_mult` = the Qi Focus Multiplier stat (base 300%; modifiable)
-
----
+- `BASE_RATE = 1` qi/s
+- `focusMult` = `qi_focus_mult` stat (base 300%)
 
 ## Combat Stats
 
-### Health
-
-`health = max(100, realmIndex × 200)` — placeholder formula since primary stats were removed. Modifiers stack on top.
-
-### Physical / Elemental Damage
-
-The two **damage categories** (psychic was removed — see [[Damage Types]]):
-
-- `physical_damage` — flat bonus added to physical-bucket attacks (basic attack always; secret techniques tagged `damageType: 'physical'`).
-- `elemental_damage` — flat bonus added to elemental-bucket attacks (secret techniques tagged `damageType: 'elemental'`).
-
-### `damage_all`
-
-Whole-attack flat bonus; no damage-bucket gate. Stacks on basic attacks and all secret techniques.
-
-### `default_attack_damage`
-
-Multiplier applied **only to basic attacks**. Stacks multiplicatively with exploit and the reincarnation-tree damage multiplier.
-
-### `secret_technique_damage`
-
-Multiplier applied **only to secret-technique damage** in `calcDamage`.
-
-### Defense
-
-`defense` — physical defense. Reduces enemy physical attack damage via the PoE-style armour curve `mitigation = armour / (armour + 10 × damage)` (capped at 0.9). A live `defBuff` multiplies effective armour, boosting mitigation in the curve. See [[Combat#Mitigation Pipeline]].
-
-### Elemental Defense
-
-`elemental_defense` — reduces enemy elemental attack damage via the same armour curve, picked when the incoming hit's `damageType` is elemental.
-
-### Exploit Chance / Multiplier
-
-Per-attack roll % to flag an attack as an exploit hit. `exploit_chance` base 0; `exploit_attack_mult` base 150%.
-
-### Defense Penetration
-
-`defense_penetration` (added 2026-04-26 secret-tech overhaul) — fraction of enemy DEF / ELEM_DEF the player ignores. Applied **before** the armour mitigation curve: `effArmour = armour × (1 − totalDefPen)`. Stored as 0–1 fraction, capped at 1.0. Sources include artefact / law uniques and the Expose-buff `defPen` field.
-
-### Incoming Damage Reduction
-
-`incoming_damage_reduction` (added 2026-04-26 secret-tech overhaul) — fraction subtracted from incoming enemy damage **before** the armour mitigation curve: `preDef = enemyDmg × (1 − reduction)`. Stored as 0–1 fraction, capped at 0.9. Sources include artefact / law uniques and the Expose-buff `dmgReduction` field (enemy-clock).
-
----
+| Stat | Notes |
+|---|---|
+| `health` | `max(100, realmIndex × 200)` — placeholder |
+| `physical_damage` | Flat bonus to physical-bucket attacks |
+| `elemental_damage` | Flat bonus to elemental-bucket attacks |
+| `damage_all` | Flat bonus to all attacks |
+| `default_attack_damage` | Multiplier on basic attacks only |
+| `secret_technique_damage` | Multiplier on technique damage only |
+| `defense` | Armour curve: `mitigation = armour / (armour + 10 × damage)`, cap 0.9 |
+| `elemental_defense` | Same armour curve for elemental hits |
+| `exploit_chance` | Per-attack roll %; base 0 |
+| `exploit_attack_mult` | Exploit hit multiplier; base 150% |
+| `defense_penetration` | Fraction of enemy DEF ignored before armour curve; 0–1 |
+| `incoming_damage_reduction` | Fraction subtracted from incoming dmg before armour curve; cap 0.9 |
 
 ## Activity Stats
 
-### Qi Generation Speed
-See [[#Special Resource: Qi]] above.
-
-### Qi Focus Multiplier
-Base 300%; multiplier applied to qi/s while focusing.
-
-### Harvest Speed / Luck
-
-Used by gathering. `harvest_speed` is a flat additive on top of `BASE_GATHER_SPEED`. `harvest_luck` is per-cycle % chance for +1 quantity on a primary drop. The pre-overhaul Soul-derived base value is gone — `harvest_speed` starts from a flat baseline (no soul gate).
-
-### Mining Speed / Luck
-
-Mirror of harvest stats for mining.
-
-### Heavenly QI Multiplier
-
-`heavenly_qi_mult` — applies only while a rewarded-ad qi boost is live.
-
-### Buff Effect / Duration
-
-`buff_effect` scales Defend `defMult` and Dodge `dodgeChance` at cast time. `buff_duration` scales the buff's `buffAttacks` charge count.
-
----
-
-## Removed stats
-
-| Stat | Reason |
+| Stat | Notes |
 |---|---|
-| `essence`, `soul`, `body` | Primary-stat layer removed (see [[Primary Stats]]) |
-| `psychic_damage` | Damage buckets collapsed to physical + elemental (see [[Damage Types]]) |
-| `soul_toughness` | Paired with the removed psychic damage bucket |
-| `dmg_<pool>` (`dmg_physical` etc.) | Per-pool damage stats died with the 9-pool type system; new pool keys are the 5 elements but no per-element damage stat exists yet |
-| `all_primary_stats` | No primary stats to aggregate |
+| `qi_focus_mult` | Focus mode multiplier; base 300% |
+| `harvest_speed` | Flat additive on BASE_GATHER_SPEED |
+| `harvest_luck` | Per-cycle % chance for +1 quantity |
+| `mining_speed` / `mining_luck` | Mirror of harvest stats |
+| `heavenly_qi_mult` | Applies only during ad boost |
+| `buff_effect` | Scales Defend/Dodge buff magnitude |
+| `buff_duration` | Scales buff charge count |
 
----
+## Removed Stats
 
-## Modifiers
-
-Every stat above accepts all five stacking types. Affixes are emitted programmatically as `(slot, stat, mod_type)` tuples — see the per-slot allowlist in [[Artefacts]]. Unique modifiers were wiped during the overhaul; their archive lives at [[Deprecated_Unique_Modifiers]].
-
----
+`essence`, `soul`, `body`, `psychic_damage`, `soul_toughness` — all removed in 2026-04-24 overhaul.
 
 ## Related
 
-- [[Primary Stats]] — deprecation note
-- [[Damage Types]]
+- [[Primary Stats]]
 - [[Elements]]
 - [[Laws]]
-- [[Secret Techniques]]
-- [[Artefacts]]
-- [[Items]]
-- [[Cultivation System]]
-- [[Realm Progression]]

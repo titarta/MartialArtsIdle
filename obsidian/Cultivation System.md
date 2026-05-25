@@ -1,65 +1,42 @@
 # Cultivation System
 
-## Overview
-
-The player cultivates (gains Qi/energy) over time, progressing through **realms** and **sub-realms** via **breakthroughs**.
+The player gains Qi over time, progressing through **realms** and **sub-stages** via automatic **breakthroughs**.
 
 ## Cultivation Identity = Laws
 
-The "cultivation type" concept has been folded into [[Laws]]. Each law
-defines: element, rarity tier, cultivation-speed multiplier, primary-stat
-typeMults (Essence/Body/Soul slots), unique passives, and pool-based
-damage type bonuses. See [[Laws]] for the full schema.
+Laws define the cultivation type. Each law has: element, rarity, `cultivation_speed_mult`, primary-stat typeMults, unique passives, and pool-based damage type bonuses. See [[Realm Progression]] for realm list and costs.
 
-## Gaining Qi
-
-- Qi accumulates passively over time (idle)
-- Cultivation speed affected by current cultivation type and stats
-- Meditation room UI shows current law + cultivation type
-
-### Implemented: Qi Rates
+## Qi Rate
 
 | Mode | Rate |
 |---|---|
-| Passive (idle) | `BASE_RATE = 1` qi/sec |
-| Focused (hold-to-boost) | `BASE_RATE × focusMult` (focus mult = `qi_focus_mult` stat, base **300%** = 3×; modifiable by artefacts, pills, law uniques, selections) |
-| Offline | `BASE_RATE × law × artefact × spark × (1 + pill_qi_speed) × OFFLINE_QI_MULTIPLIER` — `OFFLINE_QI_MULTIPLIER = 0.20` (tuned 2026-05-01); offline qi is 20% of the equivalent online rate so being at the screen always pays the most. Away time is capped at `MAX_OFFLINE_HOURS = 8` (shared with gather/mine, defined in `src/systems/autoFarm.js`, tuned 2026-05-03) so week-long absences don't trivialise progression |
-
-The game loop runs via `requestAnimationFrame` with delta-time so rates are frame-rate independent.
+| Passive (idle) | `BASE_RATE = 1` qi/s |
+| Focused (hold) | `BASE_RATE × focusMult` (base 3×; modifiable by artefacts, pills, law uniques, sparks) |
+| Offline | Online rate × 0.20, capped at 8 hours |
 
 ```js
-// src/hooks/useCultivation.js (effective formula)
+// src/hooks/useCultivation.js
 qi += BASE_RATE
-    × lawCultMult                          // active law cultivation_speed_mult
+    × lawCultMult
     × (1 + Σ qi_speed_increased) × Π qi_speed_more
     × (focusing ? focusMult : 1)
     × pillQiMult × treeQiMult × selectionQiMult
-    × (adBoost ? 2 × (1 + heavenlyQiMult) × treeHeavenlyMult : 1)
+    × (adBoost ? 2 × (1 + heavenlyQiMult) : 1)
     × dt
-  + crystalQiBonus × dt                    // QI Crystal flat add (level × 2)
+  + crystalQiBonus × dt    // Qi Crystal flat add (online only)
+  + producerRate × dt      // Producer idle layer
 ```
 
 ## Breakthroughs
 
-- Breakthrough is **automatic** — when `qi >= cost`, realm increments and cost is deducted
-- Each major realm has **sub-realms** (stages) — design TBD, currently realms are flat
-- See [[Realm Progression]] for current realm list and costs
+Automatic: when `qi >= cost`, realm increments and cost is deducted. Major-realm transitions require a minimum sustained qi/s rate (see [[Realm Progression#Major-Realm Breakthrough Gate]]).
 
-## Reincarnation Gains
+## Reincarnation
 
-On reincarnation, the player carries over:
-- **Element affinity** (mental and physical)
-- **Talent**
-- At higher realms: **starting cultivation boost**
+On reincarnation the player's cultivation resets. Karma and the Eternal Tree persist. See [[Reincarnation]].
 
 ## Related
 
-- [[Primary Stats]]
 - [[Realm Progression]]
 - [[Reincarnation]]
-- [[Laws]]
-- [[Secret Techniques]]
-
----
-
-## Claude Commands
+- [[QI Crystal]]

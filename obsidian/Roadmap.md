@@ -1,57 +1,31 @@
 # Roadmap
 
-_Updated 2026-05-20. See [[Implementation Notes]] for file-level detail._
+Updated 2026-05-24.
 
-## Development Layers
+## Status
 
-### Layer 1 — Qi Cultivation Core ✅ DONE
-- [x] Realm progression (46 sub-stages, auto breakthrough)
-- [x] Qi cultivation loop (idle + focused + offline)
-- [x] QI Crystal, Qi Sparks, Selection events
-- [x] Ad boost (2× Heavenly Qi)
-- [x] Feature gates (tab unlock by realm)
+| Layer | Feature | Status |
+|---|---|---|
+| 1 | Qi cultivation, realms, offline Qi, focus mode | ✅ Done |
+| 1 | Qi Crystal, Qi Sparks, ad boost, feature gates | ✅ Done |
+| 1 | Producer/upgrade idle layer | ✅ Done |
+| 2 | Laws, Secret Techniques, Combat, Cleared regions | ✅ Done |
+| 2 | Artefacts (drop, equip, roll, sets, upgrades), unique modifiers | ✅ Done |
+| 3 | Gathering, Pills, Alchemy/Production | ✅ Done |
+| 4 | Ore data + world mineral mapping | ✅ Data only |
+| 4 | Mining hook + UI screen | ❌ Not started |
+| 4 | Artefact refinement (ore → material) | ❌ Not started |
+| Prestige | Reincarnation (karma, 7-node Eternal Tree) | ✅ Done |
+| Infra | Daily bonus, IAP/Blood Lotus, Achievements, Audio, EN+PT | ✅ Done |
 
-### Layer 2 — Combat / Techniques / Laws ✅ LARGELY DONE
-- [x] Laws (element, rarity, cult speed mult, typeMults, unique passives)
-- [x] Law discovery + offer rotation
-- [x] Secret Techniques (slots, drops, combat effects)
-- [x] Combat loop (zones, enemies, auto-fight)
-- [x] Artefacts (generation, equip, rolls, sets, upgrades)
-- [x] Unique modifiers + affix pools
-- [ ] World bosses
-- [ ] Domain drops
+## Not Started / Not Designed
 
-### Layer 3 — Harvesting / Alchemy ✅ LARGELY DONE
-- [x] Gathering (idle herb collection, region assignment)
-- [x] Pills (timed effects, consumption, DR curve)
-- [x] Crafting recipes
-- [x] Production / Alchemy screen
-
-### Layer 4 — Mining / Items ⚠️ IN PROGRESS
-- [x] Ore data (ORES, ORE_ITEMS, mine costs, rarity mapping)
-- [x] World region mineral mapping
-- [ ] Mining hook + UI screen
-- [ ] Artefact refinement (ore → artefact material)
-- [ ] Ore grade / refined variant system
-
-### Prestige ✅ CORE DONE
-- [x] Reincarnation (karma, eternal tree, wipe rules)
-- [ ] Per-realm reincarnation bonuses (modular expansion)
-
-### Not Designed Yet
-- [ ] Active play content / engagement pass (see [[Proposals/Early Game Hook — Engagement Pass]])
-- [ ] World bosses + domain drops
-- [ ] Return-visit signal (day-N hooks)
-- [ ] Set completion celebration
-
----
+- World bosses + domain drops
+- Active play content / engagement pass (see [[Proposals/Early Game Hook — Engagement Pass]])
+- Return-visit signal (day-N hooks)
+- Mining UI screen
 
 ## Related
 
 - [[Home]]
-- [[Game Vision]]
 - [[Implementation Notes]]
-
----
-
-## Claude Commands
