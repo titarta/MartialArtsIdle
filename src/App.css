@@ -27642,4 +27642,166 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v11 horizontal REFINE + CF lane. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v12: precision fixes per direct measurement.
+   1. REFINE pill off-centre (x=283 vs viewport-centre 195). Centre it.
+   2. Cultivator floating high (88px wasted space above identity).
+      Push the crystal-char-stack down to actually fill the zone.
+   3. Qi rate ×2 / ×3 badge was system-sans blue. Restyle to brass.
+   4. Bottom zone (realm header + qi numbers row + progress bar) was
+      reading as 3 disconnected divs. Visually unify as one plaque.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. REFINE centring. Force margin:auto + align-self so the pill
+      centres inside the crystal-anchor regardless of inline-flex
+      content-width quirks. */
+.home-crystal-anchor .home-crystal-refine-btn {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  align-self: center !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* 2. Cultivator: anchor the whole stack to the bottom of the
+      cultivation zone with NO offset so the cultivator sits as
+      low as possible, leaving the empty space ABOVE for crystal+
+      REFINE breathing room rather than below the cultivator. */
+.home-crystal-char-stack {
+  bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 3. Qi rate badges (×2 ad-boost, ×3 focus, etc.) restyled to
+      match the brass vocabulary instead of the system-sans blue. */
+.qi-rate-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 24px;
+  padding: 1px 6px 2px !important;
+  margin-left: 6px !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1 !important;
+  color: #1a0f06 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.30) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(220, 175, 110, 0.95) 0%, rgba(155, 125, 80, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 225, 170, 0.70) !important;
+  border-radius: 999px !important;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 0 6px rgba(255, 207, 131, 0.45);
+}
+.qi-rate-badge-cf {
+  /* Consecutive Focus badge slight tint warm */
+  background:
+    linear-gradient(180deg, rgba(255, 240, 200, 0.40) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 207, 131, 0.98) 0%, rgba(195, 145, 65, 0.98) 100%) !important;
+}
+.qi-rate-badge-ad {
+  /* Heavenly Qi ad-boost: vermillion accent to mark the IAP-economy
+     family per the codebase rule. */
+  color: #fff5e0 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 130, 130, 0.30) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(200, 56, 56, 0.95) 0%, rgba(140, 30, 30, 0.95) 100%) !important;
+  border-color: rgba(255, 130, 130, 0.70) !important;
+  text-shadow: 0 1px 0 rgba(80, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.30),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.40),
+    0 0 8px rgba(255, 91, 91, 0.45);
+}
+
+/* 4. Bottom zone unification: realm header + qi numbers row + bar
+      sit on one CONTINUOUS dark plate so the player reads it as one
+      identity block (the mockup's carved plaque pattern). */
+.home-scene-bottom {
+  position: relative;
+  margin: 0 14px;
+  padding: 12px 16px 14px !important;
+  background:
+    linear-gradient(180deg, rgba(50, 35, 22, 0.92) 0%, rgba(30, 22, 14, 0.92) 100%) !important;
+  border: 1px solid rgba(220, 175, 110, 0.55) !important;
+  border-radius: 6px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.7) !important;
+}
+/* The header inside the unified plate is now just a typographic
+   block; drop its individual chrome (border, bg) since the plate
+   provides them. KEEP the 道 / 印 seal corners on the WRAPPER not
+   the header. */
+.home-scene-bottom .home-scene-realm-header {
+  background: none !important;
+  border: none !important;
+  padding: 0 28px 6px !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+.home-scene-bottom .home-scene-realm-header::before,
+.home-scene-bottom .home-scene-realm-header::after {
+  display: none !important;
+}
+/* Seal corners are now on the scene-bottom plate itself. */
+.home-scene-bottom::before,
+.home-scene-bottom::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(180deg, #c83838 0%, #962020 100%);
+  border: 1px solid rgba(255, 120, 120, 0.65);
+  border-radius: 3px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 13px;
+  color: #ffe5cc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 1px rgba(80, 0, 0, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.30),
+    0 1px 2px rgba(0, 0, 0, 0.55);
+  z-index: 3;
+}
+.home-scene-bottom::before {
+  left: 12px;
+  content: '道';
+  transform: rotate(-4deg);
+}
+.home-scene-bottom::after {
+  right: 12px;
+  content: '印';
+  transform: rotate(4deg);
+}
+
+/* Qi numbers row tighter inside the unified plate. */
+.home-scene-bottom .home-scene-overlay-row {
+  margin: 4px 0 8px !important;
+  padding: 0 !important;
+}
+
+/* Bar-wrap inside the plate: tighten gutter, no extra padding. */
+.home-scene-bottom .home-bar-wrap {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.home-scene-bottom .home-bar-wrap .realm-track {
+  margin: 0 38px !important;
+}
+.home-scene-bottom .home-bar-wrap::before { left: 2px !important; }
+.home-scene-bottom .home-bar-wrap::after  { right: 2px !important; }
+
+/* End of SANCTUM v12 precision fixes. */
+
 /* End of HOME "The Sanctum" design pass. */
