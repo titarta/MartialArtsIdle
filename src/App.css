@@ -27556,4 +27556,90 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v10.5 fidelity fixes. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v11: REFINE as horizontal pill (replaces the vertical
+   bamboo slip) + CF marquee slotted cleanly below in the same lane.
+   The vertical slip was the wrong shape for the spatial constraint AND
+   would have blocked the consecutive focus meter from fitting.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Drop the v10 vertical bamboo-slip 提 watermark entirely. */
+.home-crystal-refine-btn::before {
+  content: none !important;
+}
+
+/* REFINE button: compact horizontal brass pill. */
+.home-crystal-refine-btn {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: auto !important;
+  padding: 7px 14px 8px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.18) 0%, transparent 35%, transparent 65%, rgba(0, 0, 0, 0.22) 100%),
+    linear-gradient(180deg, rgba(180, 130, 70, 0.96) 0%, rgba(125, 85, 38, 0.96) 100%) !important;
+  border: 1px solid rgba(255, 225, 170, 0.72) !important;
+  border-radius: 999px !important;
+  color: #1a0f06 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.40),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.30),
+    0 0 14px -2px rgba(255, 207, 131, 0.55),
+    0 4px 8px -4px rgba(0, 0, 0, 0.6) !important;
+  font-variant-numeric: tabular-nums;
+  overflow: visible !important;
+}
+.home-crystal-refine-btn .home-crystal-refine-icon {
+  font-size: 10px !important;
+  color: #1a0f06 !important;
+  margin: 0 !important;
+}
+.home-crystal-refine-btn .home-crystal-refine-label {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+.home-crystal-refine-btn .home-crystal-refine-label::after {
+  content: none !important; /* drop the hairline rule from the vertical slip layout */
+}
+.home-crystal-refine-btn .home-crystal-refine-verb {
+  font-family: 'Cinzel', serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: #1a0f06 !important;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
+  order: 1;
+}
+.home-crystal-refine-btn .home-crystal-refine-sep {
+  display: inline-block !important;
+  width: 1px !important;
+  height: 13px !important;
+  background: rgba(20, 14, 8, 0.42) !important;
+  margin: 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  order: 2;
+}
+.home-crystal-refine-btn .home-crystal-refine-cost {
+  font-family: 'Cinzel', serif !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  color: #1a0f06 !important;
+  order: 3;
+}
+
+/* CF marquee width: match the live REFINE pill's footprint so the two
+   read as sibling surfaces stacked in the same horizontal lane. */
+.home-cf-meter {
+  width: 264px !important;
+  margin-top: 10px !important;
+}
+
+/* End of SANCTUM v11 horizontal REFINE + CF lane. */
+
 /* End of HOME "The Sanctum" design pass. */
