@@ -28088,4 +28088,161 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v15.5. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v16: ship the bottom-plate states study to live.
+   Hard rule: NO element pushes/pulls another when content changes.
+
+   Achieved via:
+   . Qi-info row is a 3-column flex: [balance][spacer][rate+slot].
+     The rate-and-slot column has a fixed total width that
+     accommodates the rate + up-to-2 multiplier chips. Adding chips
+     never shifts the balance column.
+   . Bar zone has fixed 28px height. Breakthrough button positioned
+     to fully cover the bar in the same footprint - no height shift.
+   . Major-realm gate state restyles the qi-balance content in place
+     and tints the bar fill vermillion.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Qi-info row layout. Force three-column flex with reserved
+      right slot for multipliers. */
+.home-scene-bottom .home-scene-overlay-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 0 4px !important;
+  margin: 8px 0 10px !important;
+}
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half {
+  display: flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+/* Left half (qi balance): pinned left. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child {
+  margin-right: auto;
+}
+/* Right half (rate + multiplier slot): a fixed-layout group so
+   the rate position never shifts when chips appear. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child {
+  display: grid !important;
+  grid-template-columns: auto 84px !important; /* rate | reserved chip slot */
+  align-items: center !important;
+  gap: 6px !important;
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate {
+  display: contents !important; /* let the grid handle the layout */
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate-value {
+  grid-column: 1 !important;
+  justify-self: end !important;
+  font-family: 'Cinzel', serif !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+  letter-spacing: 0.04em !important;
+  text-shadow: 0 0 6px rgba(255, 207, 131, 0.35);
+  white-space: nowrap;
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge {
+  grid-column: 2 !important;
+  justify-self: start !important;
+}
+/* When the rate doesn't have a value-span (legacy fallback), the
+   text-node-only :first-child gets column 1. */
+.home-scene-bottom .home-scene-overlay-row .qi-rate > span:first-child:not(.qi-rate-value):not(.qi-rate-badge) {
+  grid-column: 1 !important;
+  justify-self: end !important;
+}
+
+/* Qi balance: keep it stable on the left. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child .qi-rate {
+  display: inline-flex !important;
+}
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child .qi-rate > span {
+  font-family: 'Cinzel', serif !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--ui-purple-cream-warm, #fff5e0) !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+/* Multiplier chip slot: max 2 chips fit in the reserved 84px. */
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge {
+  min-width: 28px !important;
+  height: 18px !important;
+  padding: 0 7px !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.04em !important;
+  margin: 0 !important;
+}
+
+/* 2. Bar zone fixed footprint. Wrap has explicit height so the
+      breakthrough button can replace the bar without height change. */
+.home-scene-bottom .home-bar-wrap {
+  position: relative !important;
+  height: 28px !important;
+  margin: 0 !important;
+}
+.home-scene-bottom .home-bar-wrap .realm-bar {
+  position: absolute !important;
+  inset: 7px 0 !important; /* 7px top/bottom margin centres the 14px bar in 28px */
+  width: 100% !important;
+}
+
+/* 3. Breakthrough button covers the bar zone exactly. */
+.home-scene-bottom .home-major-breakthrough-btn {
+  position: absolute !important;
+  inset: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border-radius: 14px !important;
+  z-index: 5;
+}
+.home-scene-bottom .home-major-breakthrough-btn:active {
+  transform: none !important;
+}
+
+/* 4. Major-realm gate state on the qi-balance column. When the
+      QiProgressChip flips into gate mode, it adds .qi-rate-gated
+      to the parent. Use that to restyle the qi numbers vermillion. */
+.home-scene-bottom .home-overlay-half:first-child .qi-rate.qi-rate-gated > span {
+  color: var(--vermillion-hot, #ff5b5b) !important;
+  text-shadow: 0 0 6px rgba(255, 91, 91, 0.5);
+}
+.home-scene-bottom .home-overlay-half:first-child .qi-rate.qi-rate-gated::before {
+  content: 'Gate';
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--vermillion-hot, #ff5b5b);
+  margin-right: 6px;
+  text-shadow: 0 0 6px rgba(255, 91, 91, 0.5);
+}
+/* And the bar fill turns vermillion when gated. */
+.home-scene-bottom .home-bar-wrap .realm-bar.realm-bar-gated .realm-fill,
+.home-scene-bottom .home-bar-wrap .realm-fill.realm-fill-gated {
+  background: linear-gradient(180deg, #ff8c5a 0%, #c83838 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.55),
+    0 0 8px rgba(200, 56, 56, 0.55) !important;
+}
+
+/* End of SANCTUM v16. */
+
 /* End of HOME "The Sanctum" design pass. */
