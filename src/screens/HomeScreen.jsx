@@ -388,15 +388,28 @@ function BreakthroughBanner({ event, onDone }) {
  *
  * Updates via rAF so the bar tracks every frame without re-renders.
  */
+/**
+ * ConsecutiveFocusMeter (V3: segmented rung bar)
+ *
+ * Each rung in the ladder gets its OWN pill segment. Segments fill
+ * sequentially as the player holds focus:
+ *   . Locked (elapsed < holdMs): dark brass empty pill
+ *   . Active (current rung being earned): partial gold fill via --p
+ *   . Lit (rung earned): full gold gradient + glow
+ *   . Deep meditation (all rungs lit): all segments pulse white-hot
+ *
+ * Label: hero bonus + caption next-bonus / countdown.
+ * Matches the cf-meter-study.html V3 spec verbatim.
+ */
 function ConsecutiveFocusMeter({ ladder, boostStartTimeRef }) {
-  const barRef   = useRef(null);
-  const labelRef = useRef(null);
-  const rootRef  = useRef(null);
-  const totalMs  = ladder[ladder.length - 1].holdMs;
+  const rootRef    = useRef(null);
+  const nowRef     = useRef(null);
+  const nextRef    = useRef(null);
+  const segsRef    = useRef([]);
 
   useEffect(() => {
     let raf;
-    let lastRung = -1;
+    let lastState = null;
     const tick = () => {
       const start = boostStartTimeRef?.current ?? performance.now();
       const elapsed = performance.now() - start;
@@ -406,44 +419,71 @@ function ConsecutiveFocusMeter({ ladder, boostStartTimeRef }) {
         else break;
       }
       const isMax = rung >= ladder.length;
-      const frac  = isMax ? 1 : Math.min(1, elapsed / totalMs);
+      const cumulative = ladder.slice(0, rung).reduce((s, r) => s + r.bonus, 0);
 
-      if (barRef.current) {
-        barRef.current.style.transform = `scaleX(${frac})`;
-      }
-      if (rootRef.current && rung !== lastRung) {
-        lastRung = rung;
-        rootRef.current.classList.toggle('home-cf-meter-deep', isMax);
-      }
-      if (labelRef.current) {
+      // Label
+      if (nowRef.current) nowRef.current.textContent = `+${Math.round(cumulative * 100)}%`;
+      if (nextRef.current) {
         if (isMax) {
-          const total = ladder.reduce((s, r) => s + r.bonus, 0);
-          labelRef.current.textContent = `Deep meditation · +${Math.round(total * 100)}% qi/s`;
+          nextRef.current.textContent = 'Deep Meditation';
         } else {
-          const next        = ladder[rung];
-          const cumulative  = ladder.slice(0, rung).reduce((s, r) => s + r.bonus, 0);
-          const remainingS  = Math.max(0, (next.holdMs - elapsed) / 1000).toFixed(1);
-          labelRef.current.textContent = rung > 0
-            ? `+${Math.round(cumulative * 100)}% · next +${Math.round(next.bonus * 100)}% in ${remainingS}s`
-            : `next +${Math.round(next.bonus * 100)}% in ${remainingS}s`;
+          const next = ladder[rung];
+          const remainingS = Math.max(0, (next.holdMs - elapsed) / 1000).toFixed(1);
+          nextRef.current.textContent = `next +${Math.round(next.bonus * 100)}% · ${remainingS}s`;
         }
       }
+
+      // Segments
+      segsRef.current.forEach((seg, i) => {
+        if (!seg) return;
+        if (i < rung) {
+          // Lit
+          if (seg.className !== 'home-cf-seg home-cf-seg-lit') {
+            seg.className = 'home-cf-seg home-cf-seg-lit';
+          }
+          if (seg.style.getPropertyValue('--p')) seg.style.removeProperty('--p');
+        } else if (i === rung && !isMax) {
+          // Active - within-rung progress
+          const prev = i > 0 ? ladder[i - 1].holdMs : 0;
+          const span = ladder[i].holdMs - prev;
+          const p = span > 0 ? Math.min(1, Math.max(0, (elapsed - prev) / span)) : 0;
+          if (seg.className !== 'home-cf-seg home-cf-seg-active') {
+            seg.className = 'home-cf-seg home-cf-seg-active';
+          }
+          seg.style.setProperty('--p', `${(p * 100).toFixed(1)}%`);
+        } else {
+          // Locked
+          if (seg.className !== 'home-cf-seg') {
+            seg.className = 'home-cf-seg';
+          }
+          if (seg.style.getPropertyValue('--p')) seg.style.removeProperty('--p');
+        }
+      });
+
+      const newState = isMax ? 'deep' : 'progress';
+      if (newState !== lastState) {
+        lastState = newState;
+        rootRef.current?.classList.toggle('home-cf-meter-deep', isMax);
+      }
+
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [ladder, totalMs, boostStartTimeRef]);
+  }, [ladder, boostStartTimeRef]);
 
   return (
     <div ref={rootRef} className="home-cf-meter">
-      <div ref={labelRef} className="home-cf-meter-label" />
-      <div className="home-cf-meter-track">
-        <div ref={barRef} className="home-cf-meter-bar" />
-        {ladder.map((step, i) => (
+      <div className="home-cf-meter-label">
+        <span ref={nowRef}  className="home-cf-now">+0%</span>
+        <span ref={nextRef} className="home-cf-next" />
+      </div>
+      <div className="home-cf-segs">
+        {ladder.map((_, i) => (
           <span
             key={i}
-            className="home-cf-meter-tick"
-            style={{ left: `${(step.holdMs / totalMs) * 100}%` }}
+            ref={(el) => { segsRef.current[i] = el; }}
+            className="home-cf-seg"
           />
         ))}
       </div>

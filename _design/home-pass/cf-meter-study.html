@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Consecutive Focus meter — design study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────────────────────
+   CONSECUTIVE FOCUS METER — design study
+   Goal: replace the off-theme violet/blue bar with a brass-themed
+   meter that reads as a SACRED CULTIVATION milestone tracker.
+   Four variants + the current baseline for comparison.
+   Constraints: must fit in the 44px reserved slot, ≤240px wide.
+   ────────────────────────────────────────────────────────────── */
+:root{
+  --cream:          #f5e6c8;
+  --cream-warm:     #fff5e0;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --gold-deep:      #a87a3a;
+  --bronze-rim:     rgba(220, 175, 110, 0.55);
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+  --jade:           #7ec38f;
+  --violet:         #a78bfa;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(1400px 900px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 80px;
+  gap: 36px;
+}
+.lead{
+  max-width: 980px;
+  text-align: center;
+  color: rgba(245,230,200,.65);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--cream-warm);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.grid{
+  display: grid;
+  grid-template-columns: repeat(2, 460px);
+  gap: 28px;
+}
+@media (max-width: 1000px){ .grid{ grid-template-columns: 460px; } }
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(30, 22, 14, 0.85) 0%, rgba(18, 14, 10, 0.85) 100%);
+  border: 1px solid rgba(220, 175, 110, 0.32);
+  border-radius: 10px;
+}
+.card-label{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--gold-hot);
+}
+.card-title{
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--cream-warm);
+}
+.card-sub{
+  font-size: 11.5px;
+  color: rgba(245,230,200,.55);
+  line-height: 1.6;
+}
+/* Faux cultivator zone backdrop so we can judge legibility */
+.stage{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 14px;
+  background:
+    radial-gradient(ellipse 280px 80px at 50% 80%, rgba(255, 207, 131, 0.18) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(40, 25, 15, 0.55) 0%, rgba(20, 14, 8, 0.65) 100%);
+  border-radius: 8px;
+  border: 1px dashed rgba(220, 175, 110, 0.18);
+}
+.state-row{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.state-label{
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.45);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V0 · BASELINE (current in-game)
+   ═════════════════════════════════════════════════════════════ */
+.v0{
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  width: 240px;
+}
+.v0 .label{
+  font-size: 11px; font-weight: 600; color: #fff;
+  padding: 3px 10px; border-radius: 10px;
+  background: rgba(0,0,0,.78); border: 1px solid rgba(255,255,255,.12);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,.85);
+}
+.v0 .track{
+  position: relative; width: 180px; height: 6px;
+  background: rgba(0,0,0,.78); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 3px;
+}
+.v0 .fill{
+  position: absolute; inset: 0; width: 60%;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  border-radius: 3px;
+  box-shadow: 0 0 6px rgba(167, 139, 250, .5);
+}
+.v0 .tick{
+  position: absolute; top: -2px; width: 2px; height: 10px;
+  background: rgba(255,255,255,.65); transform: translateX(-50%);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V1 · BRASS SCROLL with RUNG MEDALLIONS
+   The bar is a brass-bordered scroll matching the qi progress bar.
+   Each rung is a tiny gold medallion - reached = lit, locked = dim.
+   ═════════════════════════════════════════════════════════════ */
+.v1{
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  width: 240px;
+}
+.v1 .label{
+  display: inline-flex; align-items: baseline; gap: 8px;
+  font-family: 'Cinzel', serif;
+  padding: 2px 9px 3px;
+  background: rgba(20, 14, 8, 0.78);
+  border: 1px solid var(--bronze-rim);
+  border-radius: 999px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+  white-space: nowrap;
+}
+.v1 .label .now{
+  font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+  color: var(--gold-hot); font-variant-numeric: tabular-nums;
+}
+.v1 .label .next{
+  font-size: 8.5px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--cream-dim);
+  font-variant-numeric: tabular-nums;
+}
+.v1 .track{
+  position: relative; width: 220px; height: 7px;
+  background:
+    linear-gradient(180deg, rgba(8,6,4,.92) 0%, rgba(20,14,8,.92) 100%);
+  border: 1px solid rgba(120, 85, 50, .55);
+  border-radius: 999px;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.7);
+}
+.v1 .fill{
+  position: absolute; inset: 0; width: 62%;
+  background: linear-gradient(180deg, #ffcf83 0%, #dcaf6e 50%, #a87a3a 100%);
+  box-shadow: inset 0 1px 0 rgba(255,240,200,.55), 0 0 8px rgba(255,207,131,.6);
+  border-radius: 999px;
+}
+.v1 .rung{
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  width: 9px; height: 9px;
+  background: radial-gradient(circle at 30% 30%, #5a4a30 0%, #1a120a 100%);
+  border: 1px solid rgba(220,175,110,.35);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5);
+  transition: all .25s ease;
+}
+.v1 .rung.lit{
+  background: radial-gradient(circle at 30% 30%, #ffe5a0 0%, #ffcf83 50%, #a87a3a 100%);
+  border-color: rgba(255,225,170,.95);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 0 8px rgba(255, 207, 131, .85);
+}
+.v1.deep .fill{
+  background: linear-gradient(180deg, #fff5e0 0%, #ffcf83 40%, #ffaa22 100%);
+  animation: v1-deep-pulse 1.2s ease-in-out infinite;
+}
+.v1.deep .label{
+  border-color: rgba(255, 207, 131, .85);
+  background: rgba(45, 24, 8, 0.85);
+}
+.v1.deep .label .now{ color: #fff5e0; text-shadow: 0 0 8px rgba(255,207,131,.85); }
+@keyframes v1-deep-pulse {
+  0%,100% { box-shadow: inset 0 1px 0 rgba(255,240,200,.55), 0 0 10px rgba(255,207,131,.7); }
+  50%     { box-shadow: inset 0 1px 0 rgba(255,240,200,.85), 0 0 18px rgba(255,207,131,1); }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V2 · INCENSE STICK metaphor
+   A thin vertical-flat "stick" that visibly burns down. The
+   ember at the tip glows + emits a soft trail.
+   ═════════════════════════════════════════════════════════════ */
+.v2{
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  width: 240px;
+}
+.v2 .label{
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
+  color: var(--gold-hot);
+  text-shadow: 0 1px 2px rgba(0,0,0,.7), 0 0 6px rgba(255,207,131,.35);
+}
+.v2 .label .now{ color: var(--cream-warm); margin-right: 8px; }
+.v2 .stick{
+  position: relative;
+  width: 220px; height: 6px;
+  background:
+    repeating-linear-gradient(90deg,
+      #b8945a 0px, #c9a268 14px,
+      #b8945a 16px, #a07c46 18px),
+    linear-gradient(180deg, #c9a268 0%, #6e4f28 100%);
+  border-radius: 1px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,225,170,.32),
+    0 1px 2px rgba(0,0,0,.5);
+}
+.v2 .burn{
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 62%;
+  background: linear-gradient(90deg,
+    rgba(60, 30, 15, 0.85) 0%,
+    rgba(80, 40, 20, 0.75) 80%,
+    rgba(200, 100, 40, 0.65) 100%);
+  border-radius: 1px 0 0 1px;
+}
+.v2 .ember{
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  left: 62%;
+  width: 8px; height: 8px;
+  background: radial-gradient(circle, #fff5e0 0%, #ffcf83 30%, #ff7a22 70%, transparent 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,150,60,.95);
+  animation: ember-flicker .9s ease-in-out infinite alternate;
+}
+@keyframes ember-flicker {
+  from { transform: translate(-50%, -50%) scale(1);    opacity: 0.9; }
+  to   { transform: translate(-50%, -50%) scale(1.18); opacity: 1;   }
+}
+.v2 .rung-notch{
+  position: absolute; top: -4px;
+  width: 1px; height: 14px;
+  background: rgba(255,225,170,.55);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.v2 .rung-notch.passed{
+  background: rgba(255,180,80,.85);
+  box-shadow: 0 0 4px rgba(255,180,80,.75);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V3 · SEGMENTED RUNG bar (battery-like)
+   The bar is divided into N segments (one per rung). Each
+   segment fills + lights up gold when its rung is reached.
+   ═════════════════════════════════════════════════════════════ */
+.v3{
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  width: 240px;
+}
+.v3 .label{
+  display: inline-flex; align-items: baseline; gap: 8px;
+  font-family: 'Cinzel', serif;
+  padding: 2px 9px 3px;
+  background: rgba(20, 14, 8, 0.78);
+  border: 1px solid var(--bronze-rim);
+  border-radius: 999px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+  white-space: nowrap;
+}
+.v3 .label .now{
+  font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+  color: var(--gold-hot); font-variant-numeric: tabular-nums;
+}
+.v3 .label .next{
+  font-size: 8.5px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--cream-dim);
+  font-variant-numeric: tabular-nums;
+}
+.v3 .track{
+  display: flex; gap: 3px;
+  width: 220px; height: 8px;
+}
+.v3 .seg{
+  position: relative;
+  flex: 1;
+  background:
+    linear-gradient(180deg, rgba(8,6,4,.92) 0%, rgba(20,14,8,.92) 100%);
+  border: 1px solid rgba(120, 85, 50, .55);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.6);
+}
+.v3 .seg.lit{
+  background: linear-gradient(180deg, #ffcf83 0%, #dcaf6e 50%, #a87a3a 100%);
+  border-color: rgba(255, 225, 170, .85);
+  box-shadow: inset 0 1px 0 rgba(255,240,200,.55), 0 0 6px rgba(255,207,131,.65);
+}
+.v3 .seg.active{
+  background:
+    linear-gradient(90deg, rgba(255, 207, 131, .85) var(--p, 0%), rgba(8,6,4,.92) var(--p, 0%));
+  border-color: rgba(220, 175, 110, .85);
+}
+
+.v3.deep .seg{
+  background: linear-gradient(180deg, #fff5e0 0%, #ffcf83 40%, #ffaa22 100%);
+  border-color: rgba(255, 240, 200, .95);
+  box-shadow: inset 0 1px 0 rgba(255,250,230,.85), 0 0 10px rgba(255,207,131,.95);
+  animation: v3-deep-pulse 1.2s ease-in-out infinite;
+}
+@keyframes v3-deep-pulse {
+  0%, 100% { filter: brightness(1);    }
+  50%      { filter: brightness(1.18); }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   V4 · MEDITATION BEADS (prayer-bead row)
+   Each rung is a bead in a row. Beads light up sequentially.
+   No bar - just beads. Most distinct & poetic, but only
+   shows discrete state (not continuous progress to next).
+   ═════════════════════════════════════════════════════════════ */
+.v4{
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  width: 240px;
+}
+.v4 .label{
+  display: inline-flex; align-items: baseline; gap: 8px;
+  font-family: 'Cinzel', serif;
+  padding: 2px 9px 3px;
+  background: rgba(20, 14, 8, 0.78);
+  border: 1px solid var(--bronze-rim);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.v4 .label .now{
+  font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+  color: var(--gold-hot); font-variant-numeric: tabular-nums;
+}
+.v4 .label .next{
+  font-size: 8.5px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--cream-dim);
+}
+.v4 .beads{
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 4px 12px;
+}
+/* Connecting cord between beads */
+.v4 .beads::before{
+  content: '';
+  position: absolute;
+  left: 14px; right: 14px;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%, rgba(220,175,110,.55) 12%, rgba(220,175,110,.55) 88%, transparent 100%);
+  z-index: 0;
+}
+.v4 .bead{
+  position: relative;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #5a4a30 0%, #1a120a 100%);
+  border: 1px solid rgba(220,175,110,.35);
+  z-index: 1;
+  transition: all .3s ease;
+}
+.v4 .bead.lit{
+  background: radial-gradient(circle at 30% 30%, #ffe5a0 0%, #ffcf83 50%, #a87a3a 100%);
+  border-color: rgba(255,225,170,.95);
+  box-shadow: 0 0 8px rgba(255, 207, 131, .85);
+}
+.v4 .bead.active{
+  background: radial-gradient(circle at 30% 30%, #ffe5a0 0%, #ffcf83 50%, #a87a3a 100%);
+  border-color: rgba(255,225,170,.95);
+  box-shadow: 0 0 8px rgba(255, 207, 131, .85);
+  animation: bead-pulse .8s ease-in-out infinite;
+}
+@keyframes bead-pulse {
+  0%,100% { transform: scale(1);    box-shadow: 0 0 6px rgba(255,207,131,.6); }
+  50%     { transform: scale(1.18); box-shadow: 0 0 14px rgba(255,207,131,1); }
+}
+.v4.deep .bead{
+  background: radial-gradient(circle at 30% 30%, #fff5e0 0%, #ffcf83 40%, #ffaa22 100%);
+  animation: v4-deep-shine 1.2s ease-in-out infinite alternate;
+}
+@keyframes v4-deep-shine {
+  from { box-shadow: 0 0 6px rgba(255,207,131,.6);  }
+  to   { box-shadow: 0 0 16px rgba(255,207,131,1);  }
+}
+</style>
+</head>
+<body>
+
+  <div class="lead">
+    <h1>Consecutive Focus meter — design study</h1>
+    Current (V0) is a violet/blue bar with 2px white ticks - off-theme and easy
+    to miss. Four redesigns in the Sanctum brass vocabulary. Each shown in three
+    states: <em>just-started</em> (no rungs lit), <em>mid-progress</em> (2 of 4
+    rungs lit, advancing toward rung 3), and <em>deep meditation</em> (all rungs
+    lit, climax pulse).
+  </div>
+
+  <div class="grid">
+
+    <!-- ════════ V0 BASELINE ════════ -->
+    <div class="card">
+      <div class="card-label">V0 · Current (baseline)</div>
+      <div class="card-title">Violet/blue bar, white ticks</div>
+      <div class="stage">
+        <div class="state-row">
+          <div class="state-label">Just started</div>
+          <div class="v0">
+            <span class="label">next +5% in 1.2s</span>
+            <div class="track">
+              <div class="fill" style="width: 12%;"></div>
+              <span class="tick" style="left: 20%;"></span>
+              <span class="tick" style="left: 45%;"></span>
+              <span class="tick" style="left: 72%;"></span>
+              <span class="tick" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Mid-progress (2/4)</div>
+          <div class="v0">
+            <span class="label">+18% · next +12% in 3.4s</span>
+            <div class="track">
+              <div class="fill" style="width: 55%;"></div>
+              <span class="tick" style="left: 20%;"></span>
+              <span class="tick" style="left: 45%;"></span>
+              <span class="tick" style="left: 72%;"></span>
+              <span class="tick" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Deep meditation</div>
+          <div class="v0">
+            <span class="label">Deep meditation · +45% qi/s</span>
+            <div class="track">
+              <div class="fill" style="width: 100%; background: linear-gradient(90deg, #fcd34d, #fbbf24);"></div>
+              <span class="tick" style="left: 20%;"></span>
+              <span class="tick" style="left: 45%;"></span>
+              <span class="tick" style="left: 72%;"></span>
+              <span class="tick" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-sub">In-game today. Reads as a generic UI meter; the violet/blue gradient clashes with every other surface (all gold). Ticks are 2x10 white lines - easy to miss in scene clutter.</div>
+    </div>
+
+    <!-- ════════ V1 BRASS + MEDALLIONS ════════ -->
+    <div class="card">
+      <div class="card-label">V1 · Brass scroll + medallion rungs</div>
+      <div class="card-title">Matches the qi progress scroll; rungs are gold discs</div>
+      <div class="stage">
+        <div class="state-row">
+          <div class="state-label">Just started</div>
+          <div class="v1">
+            <span class="label">
+              <span class="now">+0%</span>
+              <span class="next">next +5% · 1.2s</span>
+            </span>
+            <div class="track">
+              <div class="fill" style="width: 12%;"></div>
+              <span class="rung" style="left: 20%;"></span>
+              <span class="rung" style="left: 45%;"></span>
+              <span class="rung" style="left: 72%;"></span>
+              <span class="rung" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Mid-progress (2/4)</div>
+          <div class="v1">
+            <span class="label">
+              <span class="now">+18%</span>
+              <span class="next">next +12% · 3.4s</span>
+            </span>
+            <div class="track">
+              <div class="fill" style="width: 55%;"></div>
+              <span class="rung lit"  style="left: 20%;"></span>
+              <span class="rung lit"  style="left: 45%;"></span>
+              <span class="rung"      style="left: 72%;"></span>
+              <span class="rung"      style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Deep meditation</div>
+          <div class="v1 deep">
+            <span class="label">
+              <span class="now">+45%</span>
+              <span class="next">Deep Meditation</span>
+            </span>
+            <div class="track">
+              <div class="fill" style="width: 100%;"></div>
+              <span class="rung lit" style="left: 20%;"></span>
+              <span class="rung lit" style="left: 45%;"></span>
+              <span class="rung lit" style="left: 72%;"></span>
+              <span class="rung lit" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-sub">Same brass-bordered scroll as the qi progress bar. Rung medallions LIGHT UP sequentially — feels like sacred milestone earning. Label splits current bonus (hero gold-hot) and next bonus (cream-dim caption). Deep meditation: pulsing white-hot gold fill + all medallions lit.</div>
+    </div>
+
+    <!-- ════════ V2 INCENSE STICK ════════ -->
+    <div class="card">
+      <div class="card-label">V2 · Incense-stick metaphor</div>
+      <div class="card-title">Stick burns down with a glowing ember</div>
+      <div class="stage">
+        <div class="state-row">
+          <div class="state-label">Just started</div>
+          <div class="v2">
+            <span class="label"><span class="now">+0%</span>next +5% · 1.2s</span>
+            <div class="stick">
+              <div class="burn" style="width: 12%;"></div>
+              <span class="ember" style="left: 12%;"></span>
+              <span class="rung-notch" style="left: 20%;"></span>
+              <span class="rung-notch" style="left: 45%;"></span>
+              <span class="rung-notch" style="left: 72%;"></span>
+              <span class="rung-notch" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Mid-progress (2/4)</div>
+          <div class="v2">
+            <span class="label"><span class="now">+18%</span>next +12% · 3.4s</span>
+            <div class="stick">
+              <div class="burn" style="width: 55%;"></div>
+              <span class="ember" style="left: 55%;"></span>
+              <span class="rung-notch passed" style="left: 20%;"></span>
+              <span class="rung-notch passed" style="left: 45%;"></span>
+              <span class="rung-notch"        style="left: 72%;"></span>
+              <span class="rung-notch"        style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Deep meditation</div>
+          <div class="v2">
+            <span class="label"><span class="now">+45%</span>Deep Meditation</span>
+            <div class="stick">
+              <div class="burn" style="width: 100%;"></div>
+              <span class="ember" style="left: 100%; transform: translate(-100%, -50%);"></span>
+              <span class="rung-notch passed" style="left: 20%;"></span>
+              <span class="rung-notch passed" style="left: 45%;"></span>
+              <span class="rung-notch passed" style="left: 72%;"></span>
+              <span class="rung-notch passed" style="left: 100%;"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-sub">Distinctive metaphor: burning incense stick. Ember at the tip flickers and slides as you focus. Very poetic, very on-theme. Downside: the "burning" colour palette (charcoal + ember) doesn't match the brass-only Sanctum strictness; reads as a different family.</div>
+    </div>
+
+    <!-- ════════ V3 SEGMENTED RUNG BAR ════════ -->
+    <div class="card">
+      <div class="card-label">V3 · Segmented rung bar</div>
+      <div class="card-title">Battery-like: 1 segment per rung, lit gold as earned</div>
+      <div class="stage">
+        <div class="state-row">
+          <div class="state-label">Just started</div>
+          <div class="v3">
+            <span class="label">
+              <span class="now">+0%</span>
+              <span class="next">next +5% · 1.2s</span>
+            </span>
+            <div class="track">
+              <div class="seg active" style="--p: 35%"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Mid-progress (2/4)</div>
+          <div class="v3">
+            <span class="label">
+              <span class="now">+18%</span>
+              <span class="next">next +12% · 3.4s</span>
+            </span>
+            <div class="track">
+              <div class="seg lit"></div>
+              <div class="seg lit"></div>
+              <div class="seg active" style="--p: 55%"></div>
+              <div class="seg"></div>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Deep meditation</div>
+          <div class="v3 deep">
+            <span class="label">
+              <span class="now">+45%</span>
+              <span class="next">Deep Meditation</span>
+            </span>
+            <div class="track">
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+              <div class="seg"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-sub">Each rung is its own pill segment - VERY clear how many rungs are left. Active segment fills from left to right (the within-rung progress). Deep meditation: all four pills shimmer in unison. Most "gamified" feel; reads more like a power meter than a meditative milestone.</div>
+    </div>
+
+    <!-- ════════ V4 PRAYER BEADS ════════ -->
+    <div class="card">
+      <div class="card-label">V4 · Meditation beads</div>
+      <div class="card-title">Prayer-bead row: beads light up sequentially</div>
+      <div class="stage">
+        <div class="state-row">
+          <div class="state-label">Just started</div>
+          <div class="v4">
+            <span class="label">
+              <span class="now">+0%</span>
+              <span class="next">next +5% · 1.2s</span>
+            </span>
+            <div class="beads">
+              <span class="bead active"></span>
+              <span class="bead"></span>
+              <span class="bead"></span>
+              <span class="bead"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Mid-progress (2/4)</div>
+          <div class="v4">
+            <span class="label">
+              <span class="now">+18%</span>
+              <span class="next">next +12% · 3.4s</span>
+            </span>
+            <div class="beads">
+              <span class="bead lit"></span>
+              <span class="bead lit"></span>
+              <span class="bead active"></span>
+              <span class="bead"></span>
+            </div>
+          </div>
+        </div>
+        <div class="state-row">
+          <div class="state-label">Deep meditation</div>
+          <div class="v4 deep">
+            <span class="label">
+              <span class="now">+45%</span>
+              <span class="next">Deep Meditation</span>
+            </span>
+            <div class="beads">
+              <span class="bead"></span>
+              <span class="bead"></span>
+              <span class="bead"></span>
+              <span class="bead"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-sub">Pure beads, no bar. Most distinctly "meditation cultivator" feel. Trade-off: no within-rung continuous progress (you only see discrete bead-lit states). Could lose the "approaching next milestone" feedback. Best paired with a tight countdown in the label.</div>
+    </div>
+
+  </div>
+
+  <div class="lead" style="margin-top: 8px; max-width: 780px;">
+    My pick: <strong style="color: var(--gold-hot)">V1 (brass scroll + medallion rungs)</strong>.
+    It matches the qi progress scroll vocabulary exactly (same brass border, same gold gradient,
+    same chassis) so the focus meter reads as a SIBLING of the realm progress bar - cultivator
+    surface family. The rung medallions light up as sacred milestones; the label splits
+    current bonus (hero) and next bonus (caption) for clean hierarchy.
+  </div>
+
+</body>
+</html>
