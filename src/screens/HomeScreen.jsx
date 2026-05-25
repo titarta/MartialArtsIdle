@@ -2649,6 +2649,11 @@ function HomeScreen({
               onPointerLeave={handlePointerUp}
               onPointerCancel={handlePointerUp}
             >
+              {/* Meditation mandala: a soft radial pulse beneath the cultivator
+                  that anchors the sprite to the scene so they read as sitting
+                  in a sacred composition rather than pasted onto wallpaper.
+                  Pauses with prefers-reduced-motion (see CSS guard). */}
+              <div className="home-mandala" aria-hidden="true" />
               {vfxLayer}
               {/* Qi flow — orbs drift from a ring around the cultivator
                   inward to the centre. Sits BEFORE the cultivator sprite +

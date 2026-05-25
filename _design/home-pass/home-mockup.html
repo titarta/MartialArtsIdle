@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Home · The Sanctum (v2, real assets)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   HOME, "The Sanctum" v2
+   Changes from v1:
+   - All sprite-based content now references real game assets
+     under ../../public/ (lotus pill, shop nav, qi icon, karma
+     icon, real crystal sprite, real cultivator sprite, real
+     home.png background, real nav sprites for Home/Cultivation/
+     Collection).
+   - Garden idle chip REMOVED. The early-realm cultivator has
+     no idle assignment yet, so the top-left starts empty.
+   - ActiveBuffsChip MOVED off the TopBar into the scene's
+     top-left zone (where idle assignments would also live).
+     Semantically right: a running buff is a SCENE STATE, not
+     TopBar chrome. Practically right: drops ~88px from the
+     TopBar so it no longer overflows at 390px viewport.
+   - TopBar tightened: smaller pills, smaller icons (28px ring),
+     tighter gaps. Math verified to fit at 390px.
+   - Right-side action icons keep emoji glyphs (no PNGs exist
+     for Reinc / Codex / Settings) but wrap them in the unified
+     warm-bronze ring so the bar still reads consistent.
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        #0e0c08;
+  --bg-bar:         #100c08;
+  --bg-card:        #1a1510;
+
+  --cream:          #f5e6c8;
+  --cream-warm:     #fff5e0;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+  --cream-faint:    rgba(245, 230, 200, 0.32);
+
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --bronze:         rgba(75, 60, 40, 0.55);
+  --bronze-line:    rgba(220, 175, 110, 0.22);
+
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+
+  --jade:           #7ec38f;
+  --jade-soft:      rgba(126, 195, 143, 0.18);
+  --jade-line:      rgba(126, 195, 143, 0.45);
+
+  --bar-h:          54px;
+  --nav-h:          70px;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(900px 700px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 80px;
+  gap: 24px;
+}
+img{ -webkit-user-drag: none; user-drag: none; }
+.lead{
+  max-width: 540px;
+  text-align: center;
+  color: rgba(245,230,200,.55);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* ── Phone shell ─────────────────────────────────────────── */
+.phone{
+  width: 390px;
+  height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 30px 80px -20px rgba(0,0,0,.9);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   THE THRESHOLD (TopBar, tight, no overflow)
+   At 390px viewport with 12px L + 10px R padding = 368px usable.
+   Lotus pill ~68 + 6 + Bazaar 28 + flex spacer + 3 actions
+   (28+5+28+5+28 = 94) = 196px hard content + spacer pushes the
+   currency strip into center. Currency floats in the middle of
+   the spacer, takes ~120px. Math: 196 + 120 + 10 internal gaps
+   = 326px. Fits cleanly with ~42px breathing room.
+   ═════════════════════════════════════════════════════════════ */
+.threshold{
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--bar-h);
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.04) 0%, rgba(220,175,110,0) 100%),
+    var(--bg-bar);
+  border-bottom: 1px solid var(--bronze-line);
+  box-shadow: 0 1px 0 rgba(0,0,0,.5);
+  display: flex;
+  align-items: center;
+  padding: 0 10px 0 12px;
+  gap: 6px;
+  z-index: 20;
+}
+
+/* Lotus balance: keeps its red identity */
+.threshold-lotus{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px 3px 3px;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(200, 56, 56, 0.30) 0%, transparent 60%),
+    rgba(40, 14, 14, 0.85);
+  border: 1px solid rgba(220, 80, 80, 0.45);
+  border-radius: 999px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--cream-warm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 0 8px rgba(200, 56, 56, 0.25);
+}
+.threshold-lotus img{
+  width: 22px; height: 22px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* Spirit Bazaar entry: uses real shop_nav.png inside a vermillion ring */
+.threshold-bazaar{
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(200, 56, 56, 0.18) 0%, transparent 60%),
+    rgba(28, 14, 10, 0.85);
+  border: 1px solid rgba(220, 80, 80, 0.35);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.threshold-bazaar img{
+  width: 18px; height: 18px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
+}
+
+/* Currency strip: inscribed on the bar, real qi.png + karma.png */
+.threshold-currency{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+  min-width: 0;
+}
+.curr-pair{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.curr-pair img{
+  width: 16px; height: 16px;
+  object-fit: contain;
+  opacity: .95;
+}
+.curr-value{
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+}
+
+/* Right-side action icons: unified warm-bronze ring frame.
+   Each glyph (☸ 📊 ⚙) sits inside the SAME ring so the bar
+   reads as one rhythm even though the inner shapes differ. */
+.threshold-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.threshold-icon{
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(220, 175, 110, 0.16) 0%, transparent 60%),
+    rgba(20, 16, 12, 0.85);
+  border: 1px solid var(--bronze-line);
+  color: var(--gold);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  font-size: 14px;
+  line-height: 1;
+  position: relative;
+  flex-shrink: 0;
+}
+.threshold-icon:hover{
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(220, 175, 110, 0.28) 0%, transparent 60%),
+    rgba(28, 22, 14, 0.95);
+  border-color: rgba(220, 175, 110, .50);
+  color: var(--gold-hot);
+}
+/* Unread dot for Codex when new achievements arrive */
+.threshold-icon.has-unread::after{
+  content: '';
+  position: absolute; top: 1px; right: 1px;
+  width: 7px; height: 7px;
+  background: var(--vermillion-hot);
+  border: 1.5px solid var(--bg-bar);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--vermillion-hot);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   THE SANCTUM (Home scene)
+   ═════════════════════════════════════════════════════════════ */
+.sanctum{
+  position: absolute;
+  top: var(--bar-h);
+  left: 0; right: 0;
+  bottom: var(--nav-h);
+  background:
+    radial-gradient(140% 90% at 50% 40%, transparent 0%, rgba(0,0,0,.45) 100%),
+    url('../../public/backgrounds/home.png') center/cover no-repeat,
+    linear-gradient(180deg, #2a1810 0%, #1a1510 50%, #0e0c08 100%);
+  overflow: hidden;
+}
+
+/* ── Top-left: Active Buffs chip (moved off TopBar) ───────
+   Lives here because an active buff is a SCENE STATE (qi is
+   tangibly flowing faster RIGHT NOW), not chrome. Auto-hides
+   when no buff is active so the corner is empty by default. */
+.sanctum-tl{
+  position: absolute;
+  top: 12px; left: 14px;
+  z-index: 6;
+}
+.scene-buff{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 7px;
+  background:
+    linear-gradient(180deg, rgba(126, 195, 143, 0.18) 0%, rgba(126, 195, 143, 0.08) 100%),
+    rgba(8, 6, 4, 0.85);
+  border: 1px solid var(--jade-line);
+  border-radius: 999px;
+  color: var(--jade);
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+.scene-buff .dot{
+  width: 5px; height: 5px;
+  background: var(--jade);
+  box-shadow: 0 0 5px var(--jade);
+  border-radius: 50%;
+  animation: buff-pulse 1.8s ease-in-out infinite;
+}
+.scene-buff strong{
+  color: #aedfb8;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+@keyframes buff-pulse{
+  0%, 100% { opacity: .55; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.18); }
+}
+
+/* ── Top-right Petition Tablet (Heavenly Qi) ─────────────── */
+.petition{
+  position: absolute;
+  top: 0; right: 16px;
+  width: 86px;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.petition-cord{
+  width: 2px; height: 22px;
+  background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
+  border-radius: 1px;
+}
+.petition-cap{
+  width: 18px; height: 6px;
+  margin-top: -2px;
+  background: linear-gradient(180deg, #3a2a18 0%, #1a120a 100%);
+  border: 1px solid rgba(220, 175, 110, 0.42);
+  border-radius: 3px 3px 1px 1px;
+}
+.petition-plaque{
+  width: 78px; height: 152px;
+  margin-top: 4px;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.10) 0%, rgba(220,175,110,0) 18%, rgba(220,175,110,0) 82%, rgba(220,175,110,.10) 100%),
+    linear-gradient(180deg, #2a1d10 0%, #3a2916 30%, #2e2012 70%, #1f160c 100%);
+  border: 1px solid rgba(220, 175, 110, 0.55);
+  border-radius: 4px 4px 6px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 6px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 1px 0 rgba(255,225,170,.18) inset,
+    0 -2px 0 rgba(0,0,0,.4) inset,
+    0 0 18px -4px rgba(220, 175, 110, .35),
+    0 8px 14px -8px rgba(0,0,0,.95);
+  animation: tablet-sway 5.4s ease-in-out infinite;
+  transform-origin: 50% -10%;
+}
+@keyframes tablet-sway{
+  0%, 100% { transform: rotate(-1.0deg); }
+  50%      { transform: rotate( 1.0deg); }
+}
+.petition-kicker{
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.petition-glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 44px;
+  line-height: 1;
+  color: var(--cream);
+  text-shadow: 0 0 14px rgba(220,175,110,.55), 0 1px 0 rgba(0,0,0,.6);
+  margin-top: -2px;
+}
+.petition-offer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 2px;
+  width: 100%;
+  border-top: 1px solid rgba(220, 175, 110, 0.28);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.28);
+}
+.petition-rate{
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  color: var(--cream-warm);
+}
+.petition-sep{ width: 28%; height: 1px; background: rgba(220, 175, 110, 0.28); }
+.petition-dur{
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .20em;
+  color: rgba(245, 230, 200, .72);
+  text-transform: uppercase;
+}
+.petition-cta{
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold-hot);
+}
+
+/* ── Center-top: Qi Crystal hangs from above ─────────────── */
+.crystal-hanger{
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+}
+.crystal-chain{
+  width: 1px;
+  height: 32px;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0px,
+      rgba(220, 175, 110, .55) 2px,
+      rgba(220, 175, 110, .55) 3px,
+      transparent 5px);
+}
+.crystal-mount{
+  position: relative;
+  margin-top: 4px;
+  width: 86px; height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.crystal-mount::before{
+  content: '';
+  position: absolute; inset: -6px;
+  background: radial-gradient(circle, rgba(180, 220, 255, 0.22) 0%, transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: crystal-glow 3.2s ease-in-out infinite;
+}
+@keyframes crystal-glow{
+  0%, 100% { opacity: .7; transform: scale(1); }
+  50%      { opacity: 1;  transform: scale(1.08); }
+}
+.crystal-sprite{
+  position: relative;
+  width: 68px; height: 68px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(120, 200, 255, .55));
+  animation: crystal-float 4s ease-in-out infinite;
+}
+@keyframes crystal-float{
+  0%, 100% { transform: translateY(0)    rotate(-1.5deg); }
+  50%      { transform: translateY(-3px) rotate( 1.5deg); }
+}
+.crystal-lv{
+  position: absolute;
+  right: -6px;
+  bottom: -2px;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold-hot);
+  padding: 2px 6px;
+  background: rgba(20, 14, 8, 0.78);
+  border: 1px solid var(--bronze-line);
+  border-radius: 6px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.9);
+  letter-spacing: .08em;
+}
+.refine-btn{
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px 5px;
+  background: linear-gradient(180deg, rgba(220, 175, 110, .92) 0%, rgba(155, 125, 80, .92) 100%);
+  border: 1px solid rgba(255, 225, 170, .55);
+  border-radius: 999px;
+  color: #1a120a;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.3) inset,
+    0 1px 0 rgba(255,255,255,.30) inset,
+    0 0 14px -2px rgba(255, 207, 131, .50),
+    0 4px 8px -4px rgba(0,0,0,.5);
+  font-variant-numeric: tabular-nums;
+}
+.refine-btn::before{ content: '▲'; font-size: 8px; opacity: .85; }
+
+/* ── Center: cultivator on a meditation mandala ──────────── */
+.cultivator-stage{
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 4;
+}
+.mandala{
+  position: relative;
+  width: 240px;
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.mandala::before{
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 4px;
+  width: 220px; height: 28px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 110px 14px at 50% 50%, rgba(220, 175, 110, .35) 0%, rgba(220, 175, 110, 0) 70%);
+  border-radius: 50%;
+  animation: mandala-pulse 3.6s ease-in-out infinite;
+}
+.mandala::after{
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 8px;
+  width: 130px; height: 16px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(220, 175, 110, .35);
+  border-radius: 50%;
+  background: radial-gradient(ellipse 65px 8px at 50% 50%, rgba(255, 207, 131, .25) 0%, transparent 80%);
+  box-shadow: 0 0 8px rgba(220, 175, 110, .25);
+  animation: mandala-pulse 3.6s ease-in-out infinite reverse;
+}
+@keyframes mandala-pulse{
+  0%, 100% { opacity: .7; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 1;  transform: translateX(-50%) scale(1.05); }
+}
+.cultivator-sprite{
+  position: relative;
+  z-index: 2;
+  width: 200px;
+  height: 200px;
+  margin-bottom: -10px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,.6));
+}
+
+/* ── Identity strip ──────────────────────────────────────── */
+.identity{
+  position: absolute;
+  left: 16px; right: 16px;
+  bottom: 78px;
+  z-index: 6;
+}
+.id-realm{
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  color: var(--cream-warm);
+  text-align: center;
+  text-shadow: 0 0 14px rgba(220,175,110,.30), 0 2px 4px rgba(0,0,0,.85);
+}
+.id-stage{
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-top: 2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.id-rule{
+  width: 80px;
+  height: 1px;
+  margin: 8px auto;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+}
+.id-qi-row{
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.id-qi-now{
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--cream-warm);
+  letter-spacing: .02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.id-qi-cap{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cream-dim);
+  letter-spacing: .02em;
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.id-rate{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold-hot);
+  letter-spacing: .04em;
+  text-shadow: 0 0 6px rgba(255,207,131,.35), 0 1px 2px rgba(0,0,0,.7);
+}
+
+/* ── Tier progress scroll ────────────────────────────────── */
+.progress-scroll{
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 6px;
+  z-index: 5;
+}
+.progress-cap{
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  background: radial-gradient(circle at 30% 30%, #ffd66b 0%, #9b7d50 100%);
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 13px;
+  color: rgba(0,0,0,.7);
+  box-shadow:
+    0 0 0 1px rgba(255,225,170,.30) inset,
+    0 1px 2px rgba(0,0,0,.6);
+}
+.progress-bar{
+  flex: 1;
+  height: 12px;
+  background: rgba(8, 6, 4, .8);
+  border: 1px solid var(--bronze);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0,0,0,.5) inset;
+}
+.progress-fill{
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 78%;
+  background: linear-gradient(180deg,
+    rgba(255, 207, 131, 1) 0%,
+    rgba(220, 175, 110, 1) 50%,
+    rgba(155, 125, 80, 1) 100%);
+  box-shadow: 0 0 8px rgba(255, 207, 131, .55);
+  border-radius: 999px;
+  transition: width 800ms ease-out;
+}
+.progress-fill::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.30) 50%, transparent 100%);
+  animation: sheen 2.6s ease-in-out infinite;
+}
+@keyframes sheen{
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   THE GATES (BottomNav)
+   Uses real nav sprites (home.png, training.png, inventory.png)
+   for the three tabs that have them; emoji 📜 for Journey
+   (no sprite exists yet per NavBar.jsx).
+   Active state = brass-rail underline at the TOP of the tab,
+   matching the Bazaar / Cultivation sub-tab pattern so the
+   active-state vocabulary is consistent across the game.
+   Locked tab = Sealed Pavilion treatment (desaturated + 封
+   wax-seal stamp).
+   ═════════════════════════════════════════════════════════════ */
+.gates{
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.04) 0%, rgba(220,175,110,0) 100%),
+    var(--bg-bar);
+  border-top: 1px solid var(--bronze-line);
+  box-shadow: 0 -1px 0 rgba(0,0,0,.5);
+  display: flex;
+  align-items: stretch;
+  z-index: 20;
+}
+.gate{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  font-family: 'Cinzel', serif;
+  color: rgba(245, 230, 200, .42);
+  transition: color 180ms ease;
+}
+.gate:hover{ color: rgba(245, 230, 200, .65); }
+.gate-icon{
+  width: 26px; height: 26px;
+  object-fit: contain;
+  opacity: .55;
+  filter: grayscale(.35) drop-shadow(0 1px 1px rgba(0,0,0,.6));
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+.gate-icon-emoji{
+  font-size: 22px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.6));
+  opacity: .6;
+  transition: opacity 180ms ease, filter 180ms ease;
+}
+.gate-label{
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.gate.active{
+  color: var(--cream-warm);
+}
+.gate.active .gate-icon,
+.gate.active .gate-icon-emoji{
+  opacity: 1;
+  filter: drop-shadow(0 0 6px rgba(255, 207, 131, .55)) drop-shadow(0 1px 1px rgba(0,0,0,.6));
+}
+.gate.active::before{
+  content: '';
+  position: absolute;
+  top: 0; left: 16%; right: 16%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-hot) 20%,
+    var(--gold-hot) 80%,
+    transparent 100%);
+  box-shadow: 0 0 8px rgba(255, 207, 131, .50);
+}
+.gate.locked{
+  color: rgba(150, 140, 120, .35);
+  cursor: default;
+}
+.gate.locked .gate-icon{
+  opacity: .25;
+  filter: grayscale(1) brightness(.65) drop-shadow(0 1px 1px rgba(0,0,0,.5));
+}
+.gate.locked::after{
+  content: '封';
+  position: absolute;
+  top: 10px; right: 18%;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 10px;
+  color: var(--vermillion);
+  background: rgba(200, 56, 56, .14);
+  border: 1px solid rgba(200, 56, 56, .35);
+  border-radius: 2px;
+  padding: 0 2px;
+  line-height: 1.2;
+}
+
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>Home · The Sanctum (v2, real assets)</h1>
+  Real game icons throughout. ActiveBuffsChip moved off the TopBar to the
+  scene's top-left zone (a running buff is a scene state, not chrome).
+  Idle-assignment chip removed (no garden / no idle activity at Tempered
+  Body realm). TopBar tightened: 28px ring icons, 6px gaps, currency
+  inscribed not pilled. Verified to fit at 390px viewport with breathing room.
+</div>
+
+<div class="phone">
+
+  <!-- ═══════════════════════════════════════════════════
+       THRESHOLD (TopBar)
+       ═══════════════════════════════════════════════════ -->
+  <div class="threshold">
+    <button class="threshold-lotus" type="button" title="Top Up Blood Lotus">
+      <img src="../../public/sprites/items/blood_lotus.png" alt="" />
+      4,950
+    </button>
+
+    <button class="threshold-bazaar" type="button" title="Spirit Bazaar">
+      <img src="../../public/ui/shop_nav.png" alt="" />
+    </button>
+
+    <div class="threshold-currency">
+      <span class="curr-pair">
+        <img src="../../public/ui/qi.png" alt="" />
+        <span class="curr-value">73.4K</span>
+      </span>
+      <span class="curr-pair">
+        <img src="../../public/ui/karma.png" alt="" />
+        <span class="curr-value">61</span>
+      </span>
+    </div>
+
+    <div class="threshold-actions">
+      <button class="threshold-icon" type="button" title="Reincarnation">☸</button>
+      <button class="threshold-icon has-unread" type="button" title="Codex">📊</button>
+      <button class="threshold-icon" type="button" title="Settings">⚙</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       THE SANCTUM (Home scene)
+       ═══════════════════════════════════════════════════ -->
+  <div class="sanctum">
+
+    <!-- Top-left: active buff chip (auto-hides when no buff active) -->
+    <div class="sanctum-tl">
+      <span class="scene-buff">
+        <span class="dot"></span>
+        Crimson Aura · <strong>26m</strong>
+      </span>
+    </div>
+
+    <!-- Top-right Petition Tablet -->
+    <div class="petition">
+      <span class="petition-cord"></span>
+      <span class="petition-cap"></span>
+      <div class="petition-plaque">
+        <div class="petition-kicker">Heavenly Qi</div>
+        <div class="petition-glyph">天</div>
+        <div class="petition-offer">
+          <span class="petition-rate">×2 QI/S</span>
+          <span class="petition-sep"></span>
+          <span class="petition-dur">30 MIN</span>
+        </div>
+        <div class="petition-cta">Tap to Petition</div>
+      </div>
+    </div>
+
+    <!-- Qi Crystal hung from above (real sprite) -->
+    <div class="crystal-hanger">
+      <span class="crystal-chain"></span>
+      <div class="crystal-mount">
+        <img class="crystal-sprite" src="../../public/crystals/crystal_1.png" alt="" />
+        <span class="crystal-lv">Lv 0</span>
+      </div>
+      <button class="refine-btn" type="button">Refine · 10 Qi</button>
+    </div>
+
+    <!-- Cultivator on mandala (real sprite) -->
+    <div class="cultivator-stage">
+      <div class="mandala">
+        <img class="cultivator-sprite" src="../../public/sprites/cultivator/t0_novice_normal.png" alt="" />
+      </div>
+    </div>
+
+    <!-- Identity strip -->
+    <div class="identity">
+      <div class="id-realm">Tempered Body</div>
+      <div class="id-stage">Layer 9</div>
+      <div class="id-rule"></div>
+      <div class="id-qi-row">
+        <span class="id-qi-now">73,400</span>
+        <span class="id-qi-cap">/ 87,000</span>
+        <span class="id-rate">+1,024 / sec</span>
+      </div>
+    </div>
+
+    <!-- Tier progress scroll -->
+    <div class="progress-scroll">
+      <span class="progress-cap">道</span>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <span class="progress-cap">道</span>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       BOTTOM NAV (The Gates, real sprites)
+       ═══════════════════════════════════════════════════ -->
+  <div class="gates">
+    <button class="gate active" type="button">
+      <img class="gate-icon" src="../../public/sprites/nav/home.png" alt="" />
+      <span class="gate-label">Home</span>
+    </button>
+    <button class="gate" type="button">
+      <img class="gate-icon" src="../../public/sprites/nav/training.png" alt="" />
+      <span class="gate-label">Cultivation</span>
+    </button>
+    <button class="gate" type="button">
+      <span class="gate-icon-emoji">📜</span>
+      <span class="gate-label">Journey</span>
+    </button>
+    <button class="gate locked" type="button" title="Locked">
+      <img class="gate-icon" src="../../public/sprites/nav/inventory.png" alt="" />
+      <span class="gate-label">Collection</span>
+    </button>
+  </div>
+
+</div>
+
+</body>
+</html>

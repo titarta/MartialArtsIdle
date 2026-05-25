@@ -52,7 +52,7 @@ function NavBar({ currentScreen, onNavigate, badges = {}, isUnlocked = () => tru
                 />
               )}
               {hasBadge   && <span className="nav-badge-dot" />}
-              {!unlocked  && <span className="nav-lock-icon">🔒</span>}
+              {!unlocked  && <span className="nav-lock-seal" aria-hidden="true">封</span>}
             </div>
             <span className="nav-label">{label}</span>
             {!unlocked && <LockTooltip desc={desc} hint={hint} position="above" />}

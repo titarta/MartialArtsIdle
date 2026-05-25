@@ -25453,3 +25453,280 @@ img.pp-emblem-locked { font-size: 0; }
   .offline-footer-note { animation-name: offline-stage-fade; }
   .offline-embers span { animation: none; opacity: 0; }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   HOME, "THE SANCTUM" (final design pass)
+   Reframes the Home screen as one unified meditation space:
+     . unified warm-bronze ring frame on every TopBar action icon
+     . currency inscribed on the bar (no pill chassis)
+     . meditation mandala beneath the cultivator (soft radial pulse)
+     . identity strip pattern on the realm-name + qi readout
+     . tier progress scroll with calligraphy 道 brass caps
+     . BottomNav: brass-rail underline at TOP of active tab; 封 wax-seal
+       corner stamp on locked tabs (replacing the 🔒 emoji)
+   See _design/home-pass/home-mockup.html + notes.md for the full pass.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+/* TopBar action icons: one ring vocabulary for Reinc / Codex / Settings.
+   Sizes them identically, swaps inner content (emoji or future PNG) but
+   keeps the chassis consistent so the bar has a visual rhythm. */
+.home-hud-reinc,
+.home-hud-progress,
+.home-hud-settings {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(220, 175, 110, 0.18) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(75, 60, 40, 0.55) 0%, rgba(40, 28, 18, 0.55) 100%);
+  border: 1px solid rgba(220, 175, 110, 0.32);
+  color: var(--ui-purple-cream, #f5e6c8);
+  font-size: 15px;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(245, 230, 200, 0.10),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+.home-hud-reinc:hover,
+.home-hud-progress:hover,
+.home-hud-settings:hover {
+  border-color: rgba(220, 175, 110, 0.62);
+  background:
+    radial-gradient(circle at 35% 30%, rgba(220, 175, 110, 0.28) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(95, 75, 50, 0.62) 0%, rgba(50, 36, 22, 0.62) 100%);
+}
+.home-hud-reinc:active,
+.home-hud-progress:active,
+.home-hud-settings:active {
+  transform: translateY(1px);
+}
+
+/* Currency inscription: the row IS the container. Drop any old pill
+   background and let the cream-coloured Cinzel value sit on the lacquer
+   bar with just its tiny icon + dot beside it. */
+.topbar-currencies {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+  min-width: 0;
+}
+.topbar-currency-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-purple-cream, #f5e6c8);
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+.topbar-currency-icon {
+  width: 14px;
+  height: 14px;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+/* Meditation mandala beneath the cultivator. Two soft radial rings + a
+   centred glow halo, pulsing on a slow 3.6s sine cadence so the sprite
+   reads as seated in a sacred composition rather than pasted onto the
+   wallpaper. Sits inside the fighter-stage as a z-indexed sibling
+   underneath the cultivator sprite. */
+.fighter-stage.home-fighter-stage {
+  position: relative;
+}
+.home-mandala {
+  position: absolute;
+  left: 50%;
+  bottom: -8%;
+  width: 132%;
+  height: 56%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at center,
+      rgba(255, 207, 131, 0.18) 0%,
+      rgba(220, 175, 110, 0.10) 24%,
+      rgba(220, 175, 110, 0.04) 48%,
+      transparent 70%);
+  filter: blur(0.5px);
+  animation: home-mandala-pulse 3.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.home-mandala::before {
+  content: '';
+  position: absolute;
+  inset: 18% 22%;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 207, 131, 0.10),
+    inset 0 0 14px rgba(255, 207, 131, 0.14);
+}
+.home-mandala::after {
+  content: '';
+  position: absolute;
+  inset: 32% 36%;
+  border-radius: 50%;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+}
+@keyframes home-mandala-pulse {
+  0%, 100% { opacity: 0.75; transform: translateX(-50%) scale(1);    }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.06); }
+}
+/* Ensure the cultivator sprites + aura sit above the mandala layer. */
+.home-fighter-stage > .home-cultivator-sprite,
+.home-fighter-stage > .home-cultivator-aura,
+.home-fighter-stage > .home-cultivator-qi-flow-layer {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-mandala { animation: none; opacity: 0.85; }
+}
+
+/* Identity strip: realm name + stage + qi numbers read as ONE unit beneath
+   the cultivator. Adds a thin gold hairline rule between the realm header
+   and the qi row so they group visually. The realm-name typography is
+   already Cinzel hero (set earlier in the file); this pass adds the
+   grouping rule + tightens the spacing. */
+.home-scene-bottom {
+  position: relative;
+}
+.home-scene-bottom .home-scene-overlay-row {
+  margin-top: 4px;
+}
+.home-scene-bottom .home-scene-realm-header {
+  position: relative;
+  padding-bottom: 6px;
+}
+.home-scene-bottom .home-scene-realm-header::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 64px;
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(220, 175, 110, 0.42) 50%,
+    transparent 100%);
+}
+
+/* Tier progress scroll: brass calligraphy 道 caps at each end of the
+   progress bar, reframing the flat bar as a temple progress scroll. The
+   caps overlay the existing dragon-cap zones on the qi-frame PNG so the
+   underlying <RealmProgressBar> needs no JSX change. Sized + positioned
+   to fully cover those baked-in ornaments, so the player sees 道, not a
+   dragon head fighting with brass calligraphy. */
+.home-bar-wrap {
+  position: relative;
+}
+.home-bar-wrap::before,
+.home-bar-wrap::after {
+  content: '道';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  color: var(--ui-purple-gold, #dcaf6e);
+  background:
+    radial-gradient(circle at 35% 30%, rgba(220, 175, 110, 0.42) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(40, 28, 18, 0.95) 0%, rgba(20, 14, 8, 0.98) 70%);
+  border: 1.5px solid rgba(220, 175, 110, 0.70);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 rgba(245, 230, 200, 0.22),
+    inset 0 0 8px rgba(255, 207, 131, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  z-index: 5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+.home-bar-wrap::before { left: 12px;  }
+.home-bar-wrap::after  { right: 12px; }
+
+/* BottomNav: active state moves the gold underline to the TOP edge of the
+   tab (the side closest to the scene above), matching the brass-rail
+   pattern used by the Bazaar/Cultivation sub-tabs. The underline grows
+   in from the tab centre on hover, locks at full width when active. */
+.navbar .nav-btn {
+  position: relative;
+}
+.navbar .nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--ui-purple-gold, #dcaf6e) 18%,
+    #ffcf83 50%,
+    var(--ui-purple-gold, #dcaf6e) 82%,
+    transparent 100%);
+  border-radius: 0 0 2px 2px;
+  transition: width 220ms ease-out, opacity 220ms ease-out;
+  opacity: 0;
+  pointer-events: none;
+}
+.navbar .nav-btn.active::before {
+  width: 58%;
+  opacity: 1;
+}
+
+/* 封 wax-seal corner stamp on locked tabs. Replaces the old 🔒 emoji
+   with a vermillion-on-cream stamp that matches the Sealed Pavilion
+   vocabulary used elsewhere (producer locks, sealed crystal slots).
+   Sits in the top-right corner of the icon wrap. */
+.nav-lock-seal {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 11px;
+  line-height: 1;
+  color: #ffe5cc;
+  background: linear-gradient(180deg, #c83838 0%, #962020 100%);
+  border: 1px solid rgba(255, 91, 91, 0.65);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.30),
+    0 1px 2px rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 1px rgba(80, 0, 0, 0.65);
+  transform: rotate(6deg);
+  pointer-events: none;
+  z-index: 2;
+}
+.nav-btn-locked .nav-icon-img,
+.nav-btn-locked .nav-icon-emoji {
+  filter: grayscale(1) brightness(0.55);
+}
+
+/* End of HOME "The Sanctum" design pass. */
