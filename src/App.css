@@ -26630,17 +26630,66 @@ img.pp-emblem-locked { font-size: 0; }
   opacity: 0.85 !important;
 }
 
-/* Reduce the v6 vignette darkness — was so heavy the temple bg was
-   nearly invisible. Bring it back to mockup-level subtle vignette. */
+/* Vignette + bg darken: match the mockup's sacred-dim feel. The mockup
+   looks much darker overall because the temple bg is muted to about
+   0.55 brightness with a strong centred vignette. */
 .home-cultivation-zone::before {
   background:
-    radial-gradient(120% 80% at 50% 38%,
+    radial-gradient(110% 75% at 50% 42%,
       transparent 0%,
-      rgba(8, 6, 4, 0.35) 65%,
-      rgba(8, 6, 4, 0.65) 100%) !important;
+      rgba(8, 6, 4, 0.50) 60%,
+      rgba(8, 6, 4, 0.85) 100%) !important;
 }
 .home-bg {
-  filter: brightness(0.72) saturate(0.82) !important;
+  filter: brightness(0.58) saturate(0.72) !important;
+}
+
+/* Petition Tablet: boost presence. The mockup's plaque is 78×152 with
+   a visible cord + cap + sway animation. The live home-hq-tablet shrunk
+   too narrow against the edge; force the mockup proportions. */
+.home-hq-tablet,
+.home-hq-tablet.hq-ready,
+.home-hq-tablet.hq-active,
+.home-hq-tablet.hq-cd {
+  width: 88px !important;
+  min-width: 88px !important;
+}
+.home-hq-tablet .hq-plaque {
+  min-height: 156px !important;
+  padding: 10px 5px 8px !important;
+}
+.home-hq-tablet .hq-glyph {
+  font-size: 46px !important;
+  text-shadow:
+    0 0 14px rgba(220, 175, 110, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.6) !important;
+  margin: -2px 0 4px !important;
+}
+.home-hq-tablet .hq-kicker {
+  font-size: 7px !important;
+  letter-spacing: 0.18em !important;
+}
+.home-hq-tablet .hq-cta {
+  font-size: 7px !important;
+  letter-spacing: 0.18em !important;
+}
+.home-hq-tablet .hq-offer-rate {
+  font-size: 9px !important;
+  letter-spacing: 0.10em !important;
+}
+.home-hq-tablet .hq-offer-dur {
+  font-size: 7px !important;
+  letter-spacing: 0.20em !important;
+}
+
+/* Identity strip: bump the realm name slightly for the hero feel the
+   mockup conveys; tighten the gold rule + qi row spacing. */
+.home-scene-realm-name {
+  font-size: 19px !important;
+}
+.home-scene-overlay-row {
+  margin-top: 6px !important;
+  gap: 16px !important;
 }
 
 /* End of SANCTUM v7 mockup-spec alignment. */
