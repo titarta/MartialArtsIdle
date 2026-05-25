@@ -14,7 +14,10 @@ const SCREENS = [
   { id: 'journey',      tKey: 'nav.journey',     emoji: '📜'         },
   { id: 'worlds',       tKey: 'nav.worlds'                            },
   { id: 'character',    tKey: 'nav.character'                         },
-  { id: 'collection',   tKey: 'nav.collection', sprite: 'inventory'  },
+  // Collection was a 4th tab in the original layout (locked, 封 wax-seal).
+  // Removed from the nav per the v25 home design pass - the item economy
+  // is surfaced elsewhere now (Codex, Spirit Bazaar). Re-add the entry
+  // here if/when Collection becomes a player-facing primary surface again.
   { id: 'production',   tKey: 'nav.craft'                             },
   // Settings and Reincarnation moved to the HomeScreen HUD bar.
 ];

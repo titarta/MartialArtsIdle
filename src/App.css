@@ -346,8 +346,11 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 .navbar {
   display: flex;
   gap: 2px;
-  padding: 6px 8px;
-  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  /* No top padding: the active-tab brass-rail (.nav-btn::before, top:0)
+     must sit flush with the navbar's actual top edge. Previously 6px
+     of top padding pushed the rail down and broke the indicator. */
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom);
   background: rgba(var(--ui-bg-deep-rgb), 0.92);
   border-top: 1px solid rgba(var(--ui-border-rgb), 0.85);
   justify-content: space-around;
