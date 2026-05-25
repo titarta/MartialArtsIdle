@@ -18539,39 +18539,42 @@ body.sheet-open {
    mutually-exclusive ×1/×10/×100 chip set. Pulsing dot signals "active"
    so the player can spot from a glance that qi is being spent in the
    background. */
+/* Auto-buy chip — jade vocabulary per the Estate Pavilions mockup.
+   Previously a generic white/grey pill that didn't fit the lacquer
+   theme. The "on" state still pulses the dot. */
 .cs-autobuy-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 5px 12px 5px 10px;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(126, 195, 143, 0.08);
+  border: 1px solid rgba(126, 195, 143, 0.25);
   border-radius: 999px;
-  color: rgba(230, 235, 240, 0.75);
+  color: #7ec38f;
   cursor: pointer;
-  font-family: inherit;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
-  margin-left: 6px;
 }
 .cs-autobuy-chip:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(126, 195, 143, 0.14);
+  border-color: rgba(126, 195, 143, 0.40);
 }
 .cs-autobuy-chip-on {
-  background: rgba(120, 230, 160, 0.14);
-  border-color: rgba(120, 230, 160, 0.5);
-  color: rgba(180, 250, 200, 1);
+  background: rgba(126, 195, 143, 0.20);
+  border-color: rgba(126, 195, 143, 0.65);
+  color: #aedfb8;
 }
 .cs-autobuy-dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(180, 250, 200, 0.55);
+  background: rgba(126, 195, 143, 0.55);
 }
 .cs-autobuy-chip-on .cs-autobuy-dot {
   background: rgba(120, 230, 160, 0.95);
@@ -23747,7 +23750,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 4px 12px;
+  /* Horizontal padding bumped from 4px to 14px to match the mockup's
+     uniform body gutter (mockup .body has padding: 14px 14px 28px).
+     The previous 4px was too tight against the screen edge. */
+  padding: 14px 14px 12px;
   flex-shrink: 0;
 }
 .cs-buy-mode-label {
@@ -23792,7 +23798,9 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 0 4px 96px;
+  /* Horizontal padding bumped from 4px to 14px to match the mockup's
+     uniform body gutter. Bottom padding 96px clears the bottom nav. */
+  padding: 0 14px 96px;
   overflow-y: auto;
   flex: 1;
   touch-action: pan-y;

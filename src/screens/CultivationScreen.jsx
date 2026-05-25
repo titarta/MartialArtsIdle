@@ -310,7 +310,7 @@ export default function CultivationScreen({
               Auto chip (Disciple's Diligence QoL). Lacquer chip
               treatment to match the Bazaar's category vocabulary. */}
           <div className="cs-buy-mode-row">
-            <span className="cs-buy-mode-label">Buy</span>
+            <span className="cs-buy-mode-label">Buy Mode</span>
             <button
               className={`cs-buy-chip${buyMode === 1 ? ' cs-buy-chip-on' : ''}`}
               onClick={() => setBuyMode(1)}
