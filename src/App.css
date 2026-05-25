@@ -22241,14 +22241,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   content: "\5E02";                          /* 市 — market */
   font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
   position: absolute;
-  right: -4px;
-  top: -10px;
-  font-size: 88px;
-  /* Bumped from rgba(255,104,100,0.07) which was invisible against the
-     dark-red header. Warm cream/bronze (matching every other watermark
-     in the game — About 道, Cultivation 炁, Settings 道) reads as
-     intentional decoration without competing with the vermillion CTAs. */
-  color: rgba(220, 175, 110, 0.18);
+  /* Matches the mockup spec (_design/screens-design-pass/bazaar-mockup.html):
+     110px gives the bundled Ma Shan Zheng enough room to render the
+     brush calligraphy detail. At the smaller 88px size the brush strokes
+     simplified and the glyph stopped reading as calligraphy. Color stays
+     vermillion (the bazaar's identity color); opacity bumped from the
+     mockup's 0.06 to 0.10 so the watermark is visible enough against
+     the dark-red header without competing with the Buy CTAs. */
+  right: -8px;
+  top: -28px;
+  font-size: 110px;
+  color: rgba(255, 104, 100, 0.10);
   line-height: 1;
   pointer-events: none;
   user-select: none;
