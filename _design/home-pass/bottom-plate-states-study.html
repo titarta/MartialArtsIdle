@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bottom plate — all states study (stable layout)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────────────────────
+   BOTTOM PLATE — design study covering all states.
+   Hard rule: NO element pushes/pulls another when content changes.
+   Achieved via:
+     . three-column grid for the qi-info row (qi-now / spacer-or-rate
+       / multipliers); right column has fixed reserved width that
+       hosts 0..N multiplier chips without ever shifting the qi-now
+       or the rate column.
+     . progress bar zone has TWO mutually-exclusive layouts that
+       occupy the SAME absolute footprint: regular bar (with 道 caps)
+       OR breakthrough gate (full-width CTA). Switching between them
+       does not change the plate height.
+     . major-realm gate is a separate inline pill that REPLACES the
+       rate text in place, same column - no extra row added.
+   ────────────────────────────────────────────────────────────── */
+:root{
+  --cream:          #f5e6c8;
+  --cream-warm:     #fff5e0;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --gold-deep:      #a87a3a;
+  --bronze-rim:     rgba(220, 175, 110, 0.55);
+
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+
+  --jade:           #7ec38f;
+  --violet:         #a78bfa;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(1400px 900px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 80px;
+  gap: 32px;
+}
+.lead{
+  max-width: 1100px;
+  text-align: center;
+  color: rgba(245,230,200,.65);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--cream-warm);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.lead .rule{
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(220,175,110,.32);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--gold-hot);
+  font-family: 'Cinzel', serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.grid{
+  display: grid;
+  grid-template-columns: repeat(3, 360px);
+  gap: 28px 24px;
+}
+@media (max-width: 1200px){ .grid{ grid-template-columns: repeat(2, 360px); } }
+@media (max-width: 820px){  .grid{ grid-template-columns: 360px; } }
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card-label{
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--gold-hot);
+}
+.card-sub{
+  font-size: 10.5px;
+  color: rgba(245,230,200,.55);
+  line-height: 1.55;
+  max-width: 360px;
+}
+
+/* ── Bottom plate (shared chassis) ────────────────────── */
+.plate{
+  position: relative;
+  width: 360px;
+  background:
+    linear-gradient(180deg, rgba(255, 225, 170, 0.08) 0%, transparent 12%),
+    linear-gradient(180deg, #2c1f12 0%, #1a120a 100%);
+  border: 1px solid rgba(220, 175, 110, 0.55);
+  border-top: 2px solid rgba(255, 207, 131, 0.62);
+  border-radius: 6px;
+  padding: 12px 16px 14px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.7);
+}
+/* Seal corners */
+.plate::before,
+.plate::after{
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 22px; height: 22px;
+  background: linear-gradient(180deg, #c83838 0%, #962020 100%);
+  border: 1px solid rgba(255, 120, 120, 0.65);
+  border-radius: 3px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 13px;
+  color: #ffe5cc;
+  display: flex; align-items: center; justify-content: center;
+  text-shadow: 0 1px 1px rgba(80, 0, 0, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.30),
+    0 1px 2px rgba(0, 0, 0, 0.55);
+  z-index: 3;
+}
+.plate::before{ left: 12px;  content: '道'; transform: rotate(-4deg); }
+.plate::after { right: 12px; content: '印'; transform: rotate(4deg); }
+
+/* Realm header */
+.plate-realm{
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--cream-warm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 0 12px rgba(220, 175, 110, 0.30), 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+.plate-stage{
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Qi info row: THREE-COLUMN GRID
+   Left  = qi-now / qi-cap (FIXED position, never moves)
+   Mid   = rate readout    (FIXED position)
+   Right = multiplier slot (FIXED width, hosts 0..N chips)
+   The right column's width is RESERVED so adding multipliers
+   never shifts the left or middle columns.
+   ═════════════════════════════════════════════════════════════ */
+.plate-info{
+  display: grid;
+  grid-template-columns: 1fr auto 84px;       /* fixed 84px slot on right */
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 10px;
+  padding: 0 4px;
+}
+.plate-qi-balance{
+  font-family: 'Cinzel', serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--cream-warm);
+  letter-spacing: .02em;
+  white-space: nowrap;
+  text-align: left;
+}
+.plate-qi-balance .cap{
+  color: var(--cream-dim);
+  font-weight: 600;
+  margin-left: 2px;
+}
+.plate-rate{
+  font-family: 'Cinzel', serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-hot);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  text-shadow: 0 0 6px rgba(255, 207, 131, 0.35);
+  justify-self: end;
+}
+.plate-mults{
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  width: 84px;            /* fixed slot - never grows */
+  overflow: hidden;
+}
+.mult{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  padding: 2px 6px 3px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  line-height: 1;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid rgba(255, 225, 170, 0.70);
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.30) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(220, 175, 110, 0.95) 0%, rgba(155, 125, 80, 0.95) 100%);
+  color: #1a0f06;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 0 5px rgba(255, 207, 131, 0.45);
+}
+.mult.mult-ad{
+  background:
+    linear-gradient(180deg, rgba(255, 130, 130, 0.30) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(200, 56, 56, 0.95) 0%, rgba(140, 30, 30, 0.95) 100%);
+  border-color: rgba(255, 130, 130, 0.70);
+  color: #fff5e0;
+  text-shadow: 0 1px 0 rgba(80, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.30),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.40),
+    0 0 6px rgba(255, 91, 91, 0.45);
+}
+.mult.mult-focus{
+  background:
+    linear-gradient(180deg, rgba(200, 180, 255, 0.30) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(167, 139, 250, 0.95) 0%, rgba(100, 80, 180, 0.95) 100%);
+  border-color: rgba(200, 180, 255, 0.70);
+  color: #fff5e0;
+  text-shadow: 0 1px 0 rgba(40, 20, 80, 0.5);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Bar zone: TWO mutually-exclusive layouts in the SAME footprint.
+     (a) regular progress bar + 道 caps
+     (b) breakthrough gate CTA (replaces the bar)
+   Same height so swapping doesn't change plate dimensions.
+   ═════════════════════════════════════════════════════════════ */
+.plate-bar-zone{
+  position: relative;
+  height: 28px;       /* fixed footprint */
+  margin-top: 4px;
+}
+
+/* ── (a) regular bar ───────────────────────── */
+.bar{
+  position: absolute;
+  inset: 7px 24px;
+  background: linear-gradient(180deg, rgba(10, 7, 4, 0.90) 0%, rgba(20, 14, 8, 0.90) 100%);
+  border: 1px solid rgba(120, 85, 50, 0.55);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.55);
+}
+.bar-fill{
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  background: linear-gradient(180deg, #ffcf83 0%, #dcaf6e 50%, #a87a3a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.55),
+    0 0 8px rgba(255, 207, 131, 0.55);
+  border-radius: 999px;
+}
+.bar-cap{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px; height: 20px;
+  background: radial-gradient(circle at 30% 30%, #ffd66b 0%, #9b7d50 100%);
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 12px;
+  color: rgba(0,0,0,.78);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,225,170,.30),
+    0 1px 2px rgba(0,0,0,.6);
+}
+.bar-cap-l{ left: 4px;  }
+.bar-cap-r{ right: 4px; }
+
+/* ── (b) breakthrough gate ─────────────────── */
+.gate{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 215, 130, 0.18) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(125, 80, 35, 0.96) 0%, rgba(60, 36, 14, 0.96) 100%);
+  border: 1.5px solid rgba(255, 220, 150, 0.85);
+  border-radius: 14px;
+  color: #fff4d4;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 0 18px rgba(255, 207, 131, 0.55);
+  animation: bt-pulse 2s ease-in-out infinite;
+}
+@keyframes bt-pulse{
+  0%, 100% { box-shadow: inset 0 1px 0 rgba(255,240,200,.32), inset 0 -1px 0 rgba(0,0,0,.45), 0 0 14px rgba(255,207,131,.45); }
+  50%      { box-shadow: inset 0 1px 0 rgba(255,240,200,.42), inset 0 -1px 0 rgba(0,0,0,.45), 0 0 26px rgba(255,207,131,.85); }
+}
+.gate-glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--gold-hot);
+  opacity: 0.78;
+  text-shadow: 0 0 10px rgba(255,207,131,.65);
+}
+.gate-cta{
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #fff4d4;
+  text-shadow: 0 0 10px rgba(255,207,131,.65), 0 1px 0 rgba(0,0,0,.5);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Major-realm GATE state: the qi line shows
+   "qi/s actual / qi/s required" instead of qi balance.
+   Uses the SAME columns so no layout shift.
+   ═════════════════════════════════════════════════════════════ */
+.gate-tag{
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--vermillion-hot);
+  margin-right: 6px;
+  text-shadow: 0 0 6px rgba(255,91,91,.5);
+}
+</style>
+</head>
+<body>
+
+  <div class="lead">
+    <h1>Bottom plate — states study</h1>
+    Same plate chassis across all states. Right column reserves a fixed 84px slot
+    for 0..N multiplier chips so the qi balance and rate columns NEVER shift when
+    boosts appear. The bar zone has a fixed 28px footprint that either hosts the
+    progress bar OR the breakthrough gate CTA (same height) so the plate's overall
+    dimensions stay constant.
+    <div class="rule">Layout rule: nothing pushes or pulls anything</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- A: IDLE (no boost) -->
+    <div class="card">
+      <div class="card-label">A · Idle</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">1st Stage</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">3.5M<span class="cap"> / 21.5M</span></span>
+          <span class="plate-rate">+990 Qi/s</span>
+          <span class="plate-mults"></span>
+        </div>
+        <div class="plate-bar-zone">
+          <span class="bar-cap bar-cap-l">道</span>
+          <div class="bar"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-cap bar-cap-r">道</span>
+        </div>
+      </div>
+      <div class="card-sub">Baseline. Multiplier slot empty (right column reserved 84px).</div>
+    </div>
+
+    <!-- B: WITH AD BOOST (×2) -->
+    <div class="card">
+      <div class="card-label">B · Heavenly Qi ×2</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">1st Stage</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">3.5M<span class="cap"> / 21.5M</span></span>
+          <span class="plate-rate">+1.98K Qi/s</span>
+          <span class="plate-mults"><span class="mult mult-ad">×2</span></span>
+        </div>
+        <div class="plate-bar-zone">
+          <span class="bar-cap bar-cap-l">道</span>
+          <div class="bar"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-cap bar-cap-r">道</span>
+        </div>
+      </div>
+      <div class="card-sub">Ad boost active. Vermillion chip in right slot; qi balance + rate positions unchanged from A.</div>
+    </div>
+
+    <!-- C: FOCUS BOOST (×3) -->
+    <div class="card">
+      <div class="card-label">C · Focus ×3</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">1st Stage</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">3.5M<span class="cap"> / 21.5M</span></span>
+          <span class="plate-rate">+2.97K Qi/s</span>
+          <span class="plate-mults"><span class="mult mult-focus">×3</span></span>
+        </div>
+        <div class="plate-bar-zone">
+          <span class="bar-cap bar-cap-l">道</span>
+          <div class="bar"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-cap bar-cap-r">道</span>
+        </div>
+      </div>
+      <div class="card-sub">Hold-to-focus active. Violet chip distinguishes from ad-boost.</div>
+    </div>
+
+    <!-- D: BOTH BOOSTS -->
+    <div class="card">
+      <div class="card-label">D · Focus ×3 · Ad ×2</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">1st Stage</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">3.5M<span class="cap"> / 21.5M</span></span>
+          <span class="plate-rate">+5.94K Qi/s</span>
+          <span class="plate-mults">
+            <span class="mult mult-focus">×3</span>
+            <span class="mult mult-ad">×2</span>
+          </span>
+        </div>
+        <div class="plate-bar-zone">
+          <span class="bar-cap bar-cap-l">道</span>
+          <div class="bar"><div class="bar-fill" style="width:18%;"></div></div>
+          <span class="bar-cap bar-cap-r">道</span>
+        </div>
+      </div>
+      <div class="card-sub">Both boosts. Slot still fits without pushing qi/rate. Combined rate folds 3·2=6 into the number.</div>
+    </div>
+
+    <!-- E: BREAKTHROUGH READY -->
+    <div class="card">
+      <div class="card-label">E · Breakthrough ready</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">Layer 9 · Peak</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">21.5M<span class="cap"> / 21.5M</span></span>
+          <span class="plate-rate" style="color: var(--cream-warm);">Ready</span>
+          <span class="plate-mults"></span>
+        </div>
+        <div class="plate-bar-zone">
+          <button class="gate" type="button">
+            <span class="gate-glyph">進</span>
+            <span class="gate-cta">Breakthrough</span>
+            <span class="gate-glyph">進</span>
+          </button>
+        </div>
+      </div>
+      <div class="card-sub">Bar replaced by golden gate CTA in the same 28px footprint. Plate height unchanged.</div>
+    </div>
+
+    <!-- F: MAJOR-REALM GATE (qi/s sustained check) -->
+    <div class="card">
+      <div class="card-label">F · Major-realm gate</div>
+      <div class="plate">
+        <div class="plate-realm">Separation &amp; Reunion</div>
+        <div class="plate-stage">Layer 9 · Gate</div>
+        <div class="plate-info">
+          <span class="plate-qi-balance">
+            <span class="gate-tag">Gate</span>1.2K<span class="cap"> / 1.5K Qi/s</span>
+          </span>
+          <span class="plate-rate" style="color: var(--vermillion-hot);">Sustained</span>
+          <span class="plate-mults">
+            <span class="mult mult-focus">×3</span>
+          </span>
+        </div>
+        <div class="plate-bar-zone">
+          <span class="bar-cap bar-cap-l">道</span>
+          <div class="bar"><div class="bar-fill" style="width:80%; background: linear-gradient(180deg, #ff8c5a 0%, #c83838 100%); box-shadow: inset 0 1px 0 rgba(255,200,180,.55), 0 0 8px rgba(200,56,56,.55);"></div></div>
+          <span class="bar-cap bar-cap-r">道</span>
+        </div>
+      </div>
+      <div class="card-sub">When the player is gated between major realms (needs sustained qi/s). Qi-balance column shows qi/s actual vs required, rate column shows status (Sustained / Falling / Ready). Bar fill switches to vermillion to mark the gate. Same plate, same columns.</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
