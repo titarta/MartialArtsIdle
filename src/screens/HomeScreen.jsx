@@ -132,9 +132,11 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
         // mult — same shape as the rate calc, so the badge matches reality.
         const cfBonus = sparkConsecutiveCurrentBonusRef?.current ?? 0;
         const mult = baseMult * (1 + sparkBonus) * (1 + cfBonus);
-        // Show 2 decimals when CF is contributing fractional gains so the
-        // step-ups (×3.00 → ×3.15 → ×3.36 …) feel readable.
-        const decimals = cfBonus > 0 ? 2 : (mult % 1 === 0 ? 0 : 1);
+        // Always 2 decimals on a fractional mult so the badge tells the
+        // truth: e.g. focusMultRef=297 -> mult=2.97 must show '×2.97',
+        // NOT '×3.0' which would mislead the player into expecting their
+        // rate to triple exactly. Integer mults stay clean ('×2', '×3').
+        const decimals = (mult % 1 === 0) ? 0 : 2;
         boostRef.current.textContent = `×${mult.toFixed(decimals)}`;
       }
       raf = requestAnimationFrame(update);
