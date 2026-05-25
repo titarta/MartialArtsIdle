@@ -28810,4 +28810,50 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v22. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v23: unified notification-badge design.
+   Two existing badges (nav-badge-dot purple + trophy-badge vermillion)
+   were inconsistent. Unify both as a vermillion brass-rim dot with a
+   subtle outer glow + slow pulse so unread content is unmistakable
+   without being noisy.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.nav-badge-dot,
+.home-hud-trophy-badge {
+  position: absolute;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 35% 30%, #ff8a8a 0%, #c83838 70%) !important;
+  border: 1.5px solid #0c0906 !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 91, 91, 0.42),
+    0 0 8px rgba(255, 91, 91, 0.65) !important;
+  pointer-events: none;
+  animation: notify-pulse 2.2s ease-in-out infinite;
+}
+.nav-badge-dot {
+  top: -3px !important;
+  right: -4px !important;
+}
+.home-hud-trophy-badge {
+  top: -3px !important;
+  right: -3px !important;
+}
+@keyframes notify-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 91, 91, 0.42),
+      0 0 8px rgba(255, 91, 91, 0.55);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1.5px rgba(255, 91, 91, 0.72),
+      0 0 14px rgba(255, 91, 91, 0.95);
+  }
+}
+
+/* End of SANCTUM v23. */
+
 /* End of HOME "The Sanctum" design pass. */
