@@ -26694,4 +26694,114 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v7 mockup-spec alignment. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v8.5: vertical rhythm fixes per direct user feedback.
+   . TopBar was only 31px tall (collapsed to children height); force
+     58px explicit height so the bar actually has chassis presence.
+   . Cultivator was floating high (y=401 in a scene ending at 786); push
+     the crystal-char-stack down so the cultivator sits closer to the
+     identity strip / progress bar at the bottom.
+   . Progress bar was glued to the nav (3px gap); add proper bottom
+     padding so it breathes.
+   . Identity strip + progress scroll get more vertical room so the
+     player can actually read them without crowding the nav.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* TopBar chassis: force a real height so the bar is a visible plate. */
+.top-bar {
+  height: 58px !important;
+  min-height: 58px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Currency strip + action icons centered vertically in the taller bar. */
+.topbar-currencies,
+.home-hud-blood-lotus,
+.home-hud-lotus-shop,
+.home-hud-reinc,
+.home-hud-progress,
+.home-hud-settings {
+  align-self: center;
+}
+
+/* Push the cultivator stack DOWN so the cultivator sits in the lower
+   middle of the scene (mockup composition), not floating in the upper
+   middle. The stack is absolute + translateX(-50%) for centering;
+   preserve that, only override the vertical anchor. */
+.home-crystal-char-stack {
+  top: auto !important;
+  bottom: 8px !important;
+  height: auto !important;
+  gap: 14px !important;
+  padding-bottom: 0 !important;
+}
+
+/* Scene-bottom: give the identity strip + progress bar real vertical
+   room. Was 105px tall (too compressed); push to 140px and add a
+   16px bottom padding so the bar is NOT glued to the nav. */
+.home-scene-bottom {
+  padding-bottom: 18px !important;
+  padding-top: 4px !important;
+  min-height: 140px !important;
+  background: linear-gradient(180deg,
+    rgba(8, 6, 4, 0) 0%,
+    rgba(8, 6, 4, 0.55) 35%,
+    rgba(8, 6, 4, 0.78) 100%);
+}
+
+/* Progress bar wrap: bottom margin so it lifts off the navbar. */
+.home-bar-wrap {
+  margin-bottom: 14px !important;
+  margin-top: 6px !important;
+}
+
+/* Top-left chips (active buffs, idle, pills): give them a cohesive
+   compact stack so they look intentional, not afterthought stickers. */
+.home-chips-tl {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  align-items: flex-start !important;
+  max-width: 180px;
+}
+.home-chips-tl > * {
+  font-family: 'Cinzel', serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 4px 9px 4px 7px !important;
+  border-radius: 999px !important;
+  background:
+    linear-gradient(180deg, rgba(126, 195, 143, 0.18) 0%, rgba(126, 195, 143, 0.08) 100%),
+    rgba(8, 6, 4, 0.88) !important;
+  border: 1px solid rgba(126, 195, 143, 0.45) !important;
+  color: #aedfb8 !important;
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(4px);
+  box-shadow:
+    inset 0 1px 0 rgba(245, 230, 200, 0.10),
+    0 2px 5px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Idle assignment + pill chips share the same jade vocabulary so the
+   stack reads as one cohesive system, not a junk drawer of buttons. */
+.home-chips-tl .home-idle-chip,
+.home-chips-tl .home-pill-chip,
+.home-chips-tl .home-sel-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+.home-chips-tl .home-idle-chip-icon,
+.home-chips-tl .home-pill-chip-icon,
+.home-chips-tl .home-sel-btn-icon {
+  font-size: 12px !important;
+  line-height: 1 !important;
+  filter: drop-shadow(0 0 4px rgba(126, 195, 143, 0.55));
+}
+
+/* End of SANCTUM v8.5 vertical rhythm. */
+
 /* End of HOME "The Sanctum" design pass. */
