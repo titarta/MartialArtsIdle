@@ -25906,4 +25906,289 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v2 amplification. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v3: aggressive replacement so the live screen reads as the
+   mockup, not as the old screen with bronze accents bolted on.
+   v1 + v2 added the new elements but the existing ones (qi-frame PNG,
+   vertical currency stack, flat realm header) stayed in place and
+   dominated. v3 hides what doesn't fit and rebuilds the rest.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* ─── THE THRESHOLD: TopBar rebuilt as a single lacquer plate ─────── */
+.top-bar {
+  background:
+    linear-gradient(180deg, rgba(220, 175, 110, 0.04) 0%, rgba(220, 175, 110, 0) 60%),
+    linear-gradient(180deg, #100c08 0%, #0c0906 100%) !important;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.32) !important;
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(255, 207, 131, 0.08) !important;
+  padding: 0 10px 0 10px !important;
+  gap: 6px !important;
+}
+
+/* Currency strip: force INLINE (qi + karma side by side, centered),
+   inscribed not pilled. Override the vertical column from upstream. */
+.topbar-currencies {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+  min-width: 0 !important;
+}
+.topbar-currency-row {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+  font-family: 'Cinzel', serif !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--ui-purple-cream, #f5e6c8) !important;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.85) !important;
+}
+.topbar-currency-icon {
+  width: 15px !important;
+  height: 15px !important;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+/* Lotus pill: keep red identity but tighten to the mockup proportions. */
+.home-hud-blood-lotus {
+  padding: 3px 9px 3px 3px !important;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(200, 56, 56, 0.30) 0%, transparent 60%),
+    rgba(40, 14, 14, 0.85) !important;
+  border: 1px solid rgba(220, 80, 80, 0.55) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 0 8px rgba(200, 56, 56, 0.25) !important;
+  font-family: 'Cinzel', serif;
+  font-size: 12px !important;
+  font-weight: 700;
+  color: var(--ui-purple-cream, #f5e6c8);
+}
+.home-hud-blood-lotus-icon {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* Shop entry next to the lotus pill: vermillion ring. */
+.home-hud-lotus-shop {
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(200, 56, 56, 0.18) 0%, transparent 60%),
+    rgba(28, 14, 10, 0.85) !important;
+  border: 1px solid rgba(220, 80, 80, 0.42) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.home-hud-lotus-shop-icon {
+  width: 20px !important;
+  height: 20px !important;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.45));
+}
+
+/* Right action icons (Reinc, Codex, Settings): unified bronze ring. */
+.home-hud-reinc,
+.home-hud-progress,
+.home-hud-settings {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 14px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(120% 100% at 50% 0%, rgba(220, 175, 110, 0.20) 0%, transparent 60%),
+    rgba(20, 16, 12, 0.88) !important;
+  border: 1px solid rgba(220, 175, 110, 0.42) !important;
+  color: var(--ui-purple-gold, #dcaf6e) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(245, 230, 200, 0.10),
+    0 1px 2px rgba(0, 0, 0, 0.55) !important;
+}
+.home-hud-reinc:hover,
+.home-hud-progress:hover,
+.home-hud-settings:hover {
+  border-color: rgba(255, 207, 131, 0.72) !important;
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+}
+.home-hud-trophy-badge {
+  background: var(--vermillion-hot, #ff5b5b) !important;
+  border-color: #100c08 !important;
+  box-shadow: 0 0 5px rgba(255, 91, 91, 0.7);
+}
+
+/* ─── THE SANCTUM scene: hide the dragon-bar PNG, build a scroll ──── */
+
+/* HIDE the original qi-frame dragon ornament. The 道 caps + new scroll
+   background replace the entire chassis. */
+.home-bar-wrap .qi-frame {
+  display: none !important;
+}
+
+/* Build the scroll background on .realm-track. Parchment-dark plate with
+   inner brass channel where the fill renders. */
+.home-bar-wrap .realm-track {
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      rgba(50, 35, 22, 0.95) 0%,
+      rgba(30, 22, 14, 0.95) 50%,
+      rgba(50, 35, 22, 0.95) 100%) !important;
+  border: 1px solid rgba(220, 175, 110, 0.55) !important;
+  border-radius: 10px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 180, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 18px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.6) !important;
+  height: 24px !important;
+  margin: 0 28px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+.home-bar-wrap .realm-channel {
+  position: relative !important;
+  flex: 1 !important;
+  height: 12px !important;
+  margin: 0 8px !important;
+  background:
+    linear-gradient(180deg, rgba(10, 7, 4, 0.85) 0%, rgba(20, 14, 8, 0.85) 100%) !important;
+  border: 1px solid rgba(120, 85, 50, 0.55) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.home-bar-wrap .realm-fill {
+  height: 100% !important;
+  background:
+    linear-gradient(180deg,
+      #ffcf83 0%,
+      #dcaf6e 45%,
+      #a87a3a 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 0 6px rgba(255, 207, 131, 0.45) !important;
+  border-radius: 4px !important;
+}
+.home-bar-wrap .realm-fill-inner {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 100%) !important;
+  animation: home-scroll-sheen 4.2s linear infinite;
+}
+@keyframes home-scroll-sheen {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Re-anchor 道 caps over the new scroll endpoints. */
+.home-bar-wrap::before { left: 6px !important;  }
+.home-bar-wrap::after  { right: 6px !important; }
+
+/* ─── Identity strip: realm name + stage + qi numbers as ONE unit ── */
+.home-scene-realm-header {
+  padding: 6px 0 8px !important;
+}
+.home-scene-realm-header::after {
+  width: 88px !important;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 207, 131, 0.65) 50%,
+    transparent 100%) !important;
+  bottom: 2px !important;
+}
+.home-scene-realm-name {
+  font-family: 'Cinzel', serif !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.10em !important;
+  text-transform: uppercase !important;
+  color: var(--ui-purple-cream-warm, #fff5e0) !important;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.92),
+    0 0 12px rgba(255, 207, 131, 0.18) !important;
+}
+.home-scene-realm-stage {
+  font-family: 'Cinzel', serif !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.26em !important;
+  text-transform: uppercase !important;
+  color: var(--ui-purple-gold, #dcaf6e) !important;
+  margin-top: 3px !important;
+}
+
+/* Qi numbers row: read as one inline line, not two split halves. */
+.home-scene-overlay-row {
+  justify-content: center !important;
+  gap: 18px !important;
+  padding: 0 16px !important;
+  margin-top: 2px !important;
+}
+.home-scene-overlay-row .home-overlay-half {
+  flex: none !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+.home-scene-overlay-row .qi-rate {
+  font-family: 'Cinzel', serif !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em !important;
+  color: var(--ui-purple-cream, #f5e6c8) !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+.home-scene-overlay-row .qi-rate-value,
+.home-scene-overlay-row .qi-rate > span:first-child {
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+}
+
+/* Mandala: push brightness one more notch so it's an unmistakable aura
+   under the seated cultivator. */
+.home-mandala {
+  background:
+    radial-gradient(ellipse at center,
+      rgba(255, 207, 131, 0.62) 0%,
+      rgba(255, 180, 90, 0.32) 18%,
+      rgba(220, 175, 110, 0.14) 42%,
+      rgba(220, 175, 110, 0.04) 62%,
+      transparent 78%);
+  opacity: 1;
+}
+.home-mandala::before {
+  border-color: rgba(255, 207, 131, 0.75) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 180, 0.22),
+    inset 0 0 28px rgba(255, 207, 131, 0.42),
+    0 0 32px rgba(255, 180, 90, 0.32) !important;
+}
+
+/* End of SANCTUM v3 rebuild. */
+
 /* End of HOME "The Sanctum" design pass. */
