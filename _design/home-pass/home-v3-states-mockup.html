@@ -132,6 +132,7 @@ img{ -webkit-user-drag: none; user-drag: none; }
 }
 @keyframes scrim-in { from { opacity: 0; } to { opacity: 1; } }
 .buffs-modal{
+  position: relative;
   width: 320px;
   max-height: 560px;
   background:
@@ -150,6 +151,30 @@ img{ -webkit-user-drag: none; user-drag: none; }
     0 0 28px -6px rgba(220,175,110,.42);
   animation: modal-in 0.24s cubic-bezier(.2,.7,.2,1);
 }
+/* Unified .modal-close pattern (matches the existing codebase rule).
+   Top-right X button. Used by every modal in the game so the close
+   action is in the same place every time. */
+.modal-close{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background: none;
+  border: none;
+  color: rgba(245, 230, 200, 0.55);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px 9px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.modal-close:hover{
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.06);
+}
 @keyframes modal-in {
   from { opacity: 0; transform: translateY(8px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0)   scale(1);    }
@@ -158,6 +183,7 @@ img{ -webkit-user-drag: none; user-drag: none; }
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  padding-right: 32px;        /* leave room for the .modal-close X */
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(220,175,110,.22);
 }
@@ -271,31 +297,9 @@ img{ -webkit-user-drag: none; user-drag: none; }
   box-shadow: 0 0 6px var(--accent, var(--gold-hot));
   border-radius: 999px;
 }
-.buffs-modal-footer{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 6px;
-  border-top: 1px solid rgba(220,175,110,.18);
-  font-family: 'Cinzel', serif;
-  font-size: 9.5px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-}
-.buffs-modal-hint{
-  color: rgba(245,230,200,.55);
-}
-.buffs-modal-close{
-  color: var(--gold-hot);
-  background: none;
-  border: none;
-  font-family: inherit;
-  font-size: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  cursor: pointer;
-  font-weight: 700;
-}
+/* No footer: close via the unified .modal-close X (top-right) or by
+   tapping the scrim outside the modal. Same convention as every other
+   modal in the game. */
 .phone{
   width: 390px;
   height: 844px;
@@ -1686,6 +1690,7 @@ img{ -webkit-user-drag: none; user-drag: none; }
           <!-- ACTIVE BUFFS MODAL — opens when player taps the jade charm -->
           <div class="buffs-modal-scrim">
             <div class="buffs-modal">
+              <button class="modal-close" type="button" aria-label="Close">×</button>
               <div class="buffs-modal-header">
                 <span class="buffs-modal-title">Active Buffs</span>
                 <span class="buffs-modal-count">3 active</span>
@@ -1728,10 +1733,6 @@ img{ -webkit-user-drag: none; user-drag: none; }
                   </span>
                 </div>
 
-              </div>
-              <div class="buffs-modal-footer">
-                <span class="buffs-modal-hint">Tap charm again to close</span>
-                <button class="buffs-modal-close">Close</button>
               </div>
             </div>
           </div>
