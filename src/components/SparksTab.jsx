@@ -12,31 +12,36 @@ import { fmtRate } from '../utils/format';
 const BASE = import.meta.env.BASE_URL;
 
 /**
- * SparksTab — canonical "your active sparks" view inside the Cultivation
- * screen. Replaces the modal that used to live behind the home chip; the
- * chip now ONLY surfaces TIMED buffs (time-pressure UI) and routes here
- * for the full view.
+ * SparksTab — "Karmic Charms" presentation of the player's spirit inventory.
  *
- * Layout: grid of compact BLOCK cards (similar visual language to
- * UpgradeCard / .cs-up-grid). Each block shows icon + name + rarity +
- * one-line contribution; tap to open a detail panel with the full
- * effect / example / lore + live contribution math.
+ * Two surfaces live here:
+ *   1. The TAB — 2-up grid of charm tokens (Charm component). Each token is a
+ *      jewel-like talisman: dark recessed mount + icon, Cinzel name in rarity
+ *      color, top-right gem dot, optional ✦ for trinity pieces, ember motes
+ *      on legendaries, stack badge on stacked permanents.
+ *   2. The DETAIL MODAL (CharmDetail component, opens on tap) — hero-led
+ *      inspect view: 92px mount with rarity halo, faint calligraphy character
+ *      behind the icon (heroGlyph from SPARK_COPY, falls back to 神), Cinzel
+ *      name + horizontal-rule rarity banner. Body sections: Effect / Currently
+ *      / Example / Lore, each with a Cinzel uppercase eyebrow + gold rule.
+ *      Lore is italic between hairline rules. Footer 印 stamp.
  *
- * Sections (top to bottom):
- *   1. Trinity Convergence banner (if all 3 beasts active)
- *   2. Timed buffs (countdown bar — time-pressure)
- *   3. Legendary (the chase tier)
- *   4. Permanent (uncommon stack buffs)
- *   5. Mechanics (Crystal Click / Divine Qi / Pattern / Consecutive Focus)
+ * Out of scope here (intentionally untouched):
+ *   - Timed sparks — they live exclusively on the HomeScreen ActiveBuffsChip
+ *     popover. Filtered out below.
+ *   - The choice reveal (QiSparkChoiceModal.jsx) — separate component,
+ *     separate redesign pass.
  */
 
+const DEFAULT_HERO_GLYPH = '神';
+
 /** Sprite-or-emoji icon. */
-function Icon({ icon, fallback = '✦', className = 'st-icon-img' }) {
+function Icon({ icon, fallback = '✦', className }) {
   const ic = icon ?? fallback;
   if (typeof ic === 'string' && ic.startsWith('/')) {
-    return <img className={className} src={`${BASE}${ic.replace(/^\//, '')}`} alt="" draggable={false} />;
+    return <img className={`${className}-img`} src={`${BASE}${ic.replace(/^\//, '')}`} alt="" draggable={false} />;
   }
-  return <span className={className.replace('-img', '-emoji')} aria-hidden="true">{ic}</span>;
+  return <span className={`${className}-emoji`} aria-hidden="true">{ic}</span>;
 }
 
 /**
@@ -58,6 +63,12 @@ function iconFor(sparkId) {
   return '✦';
 }
 
+/** Resolve the calligraphy character drawn behind the icon in the modal hero. */
+function heroGlyphFor(sparkId) {
+  const copy = SPARK_COPY[sparkId];
+  return copy?.heroGlyph || DEFAULT_HERO_GLYPH;
+}
+
 /** Tiny markdown-ish bold parser for **strong** → <strong>. */
 function renderRich(text) {
   if (!text) return null;
@@ -72,6 +83,10 @@ function renderRich(text) {
 /**
  * Compute a one-line "Currently: …" string describing the live contribution
  * of a spark. Returns null if there's nothing meaningful to show.
+ *
+ * The tab card has tight horizontal room (~30 chars before truncation), so
+ * the strings here are tuned to read on one line. The detail modal renders
+ * the same value but can wrap freely.
  */
 function describeContribution(spark, card, ctx) {
   const eff = card?.effect;
@@ -95,29 +110,29 @@ function describeContribution(spark, card, ctx) {
     case 'qi_mult_per_stack':
       return `+${Math.round(eff.value * stacks * 100)}% qi/s${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
     case 'focus_mult_bonus_per_stack':
-      return `+${Math.round(eff.value * stacks * 100)}% Focus multiplier${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return `+${Math.round(eff.value * stacks * 100)}% Focus mult${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
     case 'gate_reduction_per_stack':
       return `−${Math.round(eff.value * stacks * 100)}% major-realm gate cost${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
     case 'offline_qi_mult_per_stack':
-      return `+${Math.round(eff.value * stacks * 100)}% offline qi accrual${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return `+${Math.round(eff.value * stacks * 100)}% offline qi${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
     case 'qi_mult_per_breakthrough_per_stack': {
       const accrued = spark.breakthroughsAccrued ?? 0;
       const totalPct = Math.round(eff.value * stacks * accrued * 100);
-      return `+${totalPct}% qi/s (${stacks}× × ${accrued} breakthroughs)`;
+      return `+${totalPct}% qi/s (${stacks}× × ${accrued} BT)`;
     }
     // ── Legendary producer-synergy ──────────────────────────────────
     case 'producer_self_mult':
-      return `${pname(eff.target)} producing ×${eff.mult}`;
+      return `${pname(eff.target)} ×${eff.mult}`;
     case 'producer_count_mult': {
       const src = ownedMap[eff.source] ?? 0;
       const mult = 1 + src * eff.perEach;
-      return `${src} × ${pname(eff.source)} → ${pname(eff.target)} ×${mult.toFixed(2)}`;
+      return `${src} × ${pname(eff.source)} → ×${mult.toFixed(2)}`;
     }
     case 'producer_count_threshold_mult': {
       const src = ownedMap[eff.source] ?? 0;
       return src >= eff.threshold
         ? `Active → ${pname(eff.target)} ×${eff.mult}`
-        : `Dormant — need ${eff.threshold} × ${pname(eff.source)} (you have ${src})`;
+        : `Dormant — need ${eff.threshold} ${pname(eff.source)}`;
     }
     case 'producer_pair_synergy': {
       const a = ownedMap[eff.producerA] ?? 0;
@@ -145,10 +160,8 @@ function describeContribution(spark, card, ctx) {
     }
     // ── Dial-9 additions ────────────────────────────────────────────
     case 'producer_flat_per_unit':
-      return `+${eff.value} per-unit qi/s on every producer (timed)`;
+      return `+${eff.value} per-unit qi/s on every producer`;
     case 'qi_mult_per_focus_second_per_stack': {
-      // Read the run-level focus-seconds counter mirrored to localStorage
-      // by useQiSparks (same key). Falls back to 0 cleanly.
       let focusSeconds = 0;
       try {
         const v = Number(JSON.parse(localStorage.getItem('mai_qi_sparks_focus_seconds_run')));
@@ -162,7 +175,7 @@ function describeContribution(spark, card, ctx) {
       const charges = spark.chargesRemaining ?? 0;
       const pct = Math.round((eff.fraction ?? 0) * 100);
       return charges > 0
-        ? `−${pct}% producer cost · ${charges} purchase${charges > 1 ? 's' : ''} left`
+        ? `−${pct}% producer cost · ${charges} buy${charges > 1 ? 's' : ''} left`
         : `Bargain spent`;
     }
     default:
@@ -170,156 +183,160 @@ function describeContribution(spark, card, ctx) {
   }
 }
 
-// ── Compact block (grid item) ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CHARM — the small token card (tab grid item)
+// ─────────────────────────────────────────────────────────────────────────────
 
-function SparkBlock({ spark, ctx, isTrinityActive, onOpen }) {
+function Charm({ spark, ctx, isTrinityActive, onOpen }) {
   const card = QI_SPARK_BY_ID[spark.sparkId];
   if (!card) return null;
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
-  const icon   = iconFor(spark.sparkId);
+  const icon = iconFor(spark.sparkId);
+  const isMechanic = card.kind === 'mechanic';
+  const isLegendary = card.rarity === 'legendary';
   const isTrinityPiece = card.trinityPiece === true;
 
-  // Timer for timed sparks
-  const now = ctx.now;
-  const isTimed     = !!spark.expiresAt;
-  const remainingMs = isTimed ? Math.max(0, spark.expiresAt - now) : null;
-  const totalMs     = card.duration ?? 1;
-  const progress    = isTimed ? Math.max(0, Math.min(1, remainingMs / totalMs)) : null;
-  const secsLeft    = isTimed ? Math.max(0, Math.ceil(remainingMs / 1000)) : null;
-
   const contribution = describeContribution(spark, card, ctx);
-
-  // Show stack count badge on stacked permanents (>1)
   const stacks = spark.stacks ?? 1;
   const showStackBadge = card.kind === 'permanent' && stacks > 1;
 
-  // Estate Pavilions vocabulary: mechanic-kind sparks read as a fourth
-  // "rarity" with a jade ribbon so the player can tell mechanic unlocks
-  // apart from rolled rarities. Visual only; the underlying card.kind
-  // already carries the semantic.
-  const ribbonClass = card.kind === 'mechanic' ? 'mechanic' : card.rarity;
-  const ribbonLabel = card.kind === 'mechanic' ? 'Mechanic' : rarity.label;
+  // Mechanic-kind sparks extend the rarity ramp with a soft cyan tint so the
+  // player can tell mechanic unlocks apart from rolled rarities. The CSS uses
+  // var(--r) as the unifying knob — set per-instance, no rarity-specific
+  // classes required.
+  const rarityToken = isMechanic ? 'var(--r-mechanic)' : rarity.color;
+  const rarityClass = isMechanic ? 'charm-r-mechanic' : `charm-r-${card.rarity}`;
+
+  // Trinity pieces glow brighter once the full convergence is active.
+  const trinityActive = isTrinityPiece && isTrinityActive;
 
   return (
     <button
       type="button"
-      className={`st-block st-block-${card.rarity} st-block-pp st-block-pp-${ribbonClass}${isTrinityPiece ? ' st-block-trinity-piece' : ''}${isTrinityPiece && isTrinityActive ? ' st-block-trinity-active' : ''}`}
-      style={{ '--rarity-color': rarity.color }}
+      className={`charm ${rarityClass}${isLegendary ? ' charm-legendary' : ''}${trinityActive ? ' charm-trinity-active' : ''}`}
+      style={{ '--r': rarityToken }}
       onClick={() => onOpen(spark)}
       aria-label={`${card.name} — tap for details`}
     >
-      <span className="st-block-ribbon" aria-hidden="true">{ribbonLabel}</span>
-      <div className="st-block-icon-wrap st-block-frame">
-        <Icon icon={icon} className="st-block-icon-img" />
-        {isTrinityPiece && <span className="st-block-trinity-badge">✦</span>}
-        {showStackBadge && <span className="st-block-stack-badge">×{stacks}</span>}
+      <span className="charm-rarity-mark" aria-hidden="true" />
+      {isTrinityPiece && <span className="charm-trinity" aria-hidden="true">✦</span>}
+      {showStackBadge && <span className="charm-stack">×{stacks}</span>}
+      <div className="charm-mount">
+        <Icon icon={icon} className="charm-icon" />
       </div>
-      <div className="st-block-name">{card.name}</div>
-      {contribution && <div className="st-block-line">{contribution}</div>}
-      {isTimed && (
-        <div className="st-block-timer">
-          <div className="st-block-timer-bar">
-            <div className="st-block-timer-fill" style={{ '--p': progress }} />
-          </div>
-          <span className="st-block-timer-text">{secsLeft}s</span>
-        </div>
-      )}
+      <div className="charm-name">{card.name}</div>
+      {contribution && <div className="charm-line">{contribution}</div>}
     </button>
   );
 }
 
-// ── Detail panel (opens on block tap) ─────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CHARM DETAIL — hero-led inspect modal
+// ─────────────────────────────────────────────────────────────────────────────
 
-function SparkDetailPanel({ spark, ctx, isTrinityActive, onClose }) {
+function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
   const card = QI_SPARK_BY_ID[spark?.sparkId];
   if (!card) return null;
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
-  const copy   = SPARK_COPY[spark.sparkId];
-  const icon   = iconFor(spark.sparkId);
-  const effectText  = copy?.effectText  ?? card.description ?? '';
+  const copy = SPARK_COPY[spark.sparkId];
+  const icon = iconFor(spark.sparkId);
+  const glyph = heroGlyphFor(spark.sparkId);
+  const effectText = copy?.effectText ?? card.description ?? '';
   const exampleHtml = copy?.exampleText ?? null;
-  const loreHtml    = copy?.loreText    ?? null;
+  const loreHtml = copy?.loreText ?? null;
   const contribution = describeContribution(spark, card, ctx);
 
-  // Timer for timed sparks (live)
-  const now = ctx.now;
-  const isTimed     = !!spark.expiresAt;
-  const remainingMs = isTimed ? Math.max(0, spark.expiresAt - now) : null;
-  const totalMs     = card.duration ?? 1;
-  const progress    = isTimed ? Math.max(0, Math.min(1, remainingMs / totalMs)) : null;
-  const secsLeft    = isTimed ? Math.max(0, Math.ceil(remainingMs / 1000)) : null;
+  const isMechanic = card.kind === 'mechanic';
+  const rarityToken = isMechanic ? 'var(--r-mechanic)' : rarity.color;
+  const rarityLabel = isMechanic ? 'Mechanic' : rarity.label;
+  const rarityClass = isMechanic ? 'charm-detail-r-mechanic' : `charm-detail-r-${card.rarity}`;
 
   return (
     <div
-      className="st-detail-overlay"
+      className="charm-detail-overlay"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className={`st-detail-panel st-detail-r-${card.rarity}`} style={{ '--rarity-color': rarity.color }}>
+      <div
+        className={`charm-detail-panel ${rarityClass}`}
+        style={{ '--r': rarityToken }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={card.name}
+      >
         <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
-        <div className="st-detail-hero">
-          <Icon icon={icon} className="st-detail-hero-img" />
-          <div className={`st-detail-rarity-banner st-rt-${card.rarity}`}>{rarity.label}</div>
-        </div>
-        <div className="st-detail-body">
-          <div className="st-detail-name">{card.name}</div>
-          {isTimed && (
-            <div className="st-detail-timer">
-              <div className="st-detail-timer-bar">
-                <div className="st-detail-timer-fill" style={{ '--p': progress }} />
-              </div>
-              <span className="st-detail-timer-text">{secsLeft}s remaining</span>
-            </div>
-          )}
-          <div className="st-detail-section">
-            <div className="st-detail-section-label">Effect</div>
-            <div className="st-detail-effect-text">{renderRich(effectText)}</div>
+
+        <header className="charm-detail-hero" data-glyph={glyph}>
+          <div className="charm-detail-hero-mount">
+            <Icon icon={icon} className="charm-detail-hero-icon" />
           </div>
+          <h2 className="charm-detail-hero-name">{card.name}</h2>
+          <div className="charm-detail-hero-rarity">{rarityLabel}</div>
+        </header>
+
+        <div className="charm-detail-body">
+          <section className="charm-detail-section">
+            <div className="charm-detail-label">Effect</div>
+            <div className="charm-detail-text">{renderRich(effectText)}</div>
+          </section>
+
           {contribution && (
-            <div className="st-detail-section">
-              <div className="st-detail-section-label">Currently</div>
-              <div className="st-detail-contribution"><strong>{contribution}</strong></div>
-            </div>
+            <section className="charm-detail-section">
+              <div className="charm-detail-label">Currently</div>
+              <div className="charm-detail-currently">{contribution}</div>
+            </section>
           )}
+
           {exampleHtml && (
-            <div className="st-detail-section">
-              <div className="st-detail-section-label">Example</div>
-              <div className="st-detail-example" dangerouslySetInnerHTML={{ __html: exampleHtml }} />
-            </div>
+            <section className="charm-detail-section">
+              <div className="charm-detail-label">Example</div>
+              <div className="charm-detail-text" dangerouslySetInnerHTML={{ __html: exampleHtml }} />
+            </section>
           )}
+
           {loreHtml && (
-            <div className="st-detail-section">
-              <div className="st-detail-section-label">Lore</div>
-              <div className="st-detail-lore">{loreHtml}</div>
-            </div>
+            <section className="charm-detail-section">
+              <div className="charm-detail-label">Lore</div>
+              <div className="charm-detail-lore">{loreHtml}</div>
+            </section>
           )}
+
           {isTrinityActive && card.trinityPiece && (
-            <div className="st-detail-trinity-note">
-              ✦ Trinity Convergence active — +{Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100)}% global qi/s
+            <div className="charm-detail-trinity-note">
+              ✦ Trinity Convergence active · +{Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100)}% global qi/s
             </div>
           )}
+
+          <footer className="charm-detail-footer">
+            <span className="charm-detail-stamp">印</span>
+            <span>{rarityLabel} Charm</span>
+          </footer>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Section wrapper ────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION wrapper — rarity-themed header with lantern bar
+// ─────────────────────────────────────────────────────────────────────────────
 
-function Section({ label, count, tone, sublabel, children }) {
+function CharmSection({ label, sublabel, count, sectionColor, children }) {
   if (!count) return null;
   return (
-    <section className={`st-section st-section-${tone}`}>
-      <header className="st-section-header">
-        <span className="st-section-label">{label}</span>
-        {sublabel && <span className="st-section-sublabel">{sublabel}</span>}
-        <span className="st-section-count">{count}</span>
+    <section className="charm-section" style={{ '--section-color': sectionColor }}>
+      <header className="charm-section-header">
+        <span className="charm-section-label">{label}</span>
+        {sublabel && <span className="charm-section-sub">{sublabel}</span>}
+        <span className="charm-section-count">{count}</span>
       </header>
-      <div className="st-grid">{children}</div>
+      <div className="charm-grid">{children}</div>
     </section>
   );
 }
 
-// ── Tab root ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB ROOT
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function SparksTab({ qiSparks, producers, cultivation }) {
   const [now, setNow] = useState(Date.now());
@@ -334,7 +351,7 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     return () => clearInterval(id);
   }, [cultivation?.rateRef]);
 
-  // Close detail panel on Escape
+  // Close detail on Escape
   useEffect(() => {
     if (!openSpark) return undefined;
     const onKey = (e) => { if (e.key === 'Escape') setOpenSpark(null); };
@@ -342,15 +359,13 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [openSpark]);
 
-  // 2026-05-25: timed sparks (entries with expiresAt) live exclusively
-  // on the HomeScreen ActiveBuffsChip popover now. This tab is the
-  // canonical view for PERSISTENT build state only: legendary
-  // producer-synergies, uncommon stacks, mechanic unlocks. Filtering
-  // timed entries out here avoids duplicating them in two places.
+  // Timed sparks (expiresAt) live on the HomeScreen ActiveBuffsChip popover
+  // exclusively. Filtering them out here avoids duplicating the same buff in
+  // two places. This tab is the canonical view for PERSISTENT build state.
   const activeSparks = qiSparks?.activeSparks ?? [];
   const live = activeSparks.filter(s => !s.expiresAt);
 
-  // Group by rarity / kind
+  // Group by rarity / kind for sectioning
   const groups = { legendary: [], uncommon: [], mechanic: [] };
   for (const s of live) {
     const card = QI_SPARK_BY_ID[s.sparkId];
@@ -359,6 +374,8 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     else if (card.kind === 'mechanic') groups.mechanic.push(s);
     else groups.uncommon.push(s);
   }
+  // Pin trinity pieces to the front of the legendary list so the set chase
+  // reads visually from left to right when partially complete.
   groups.legendary.sort((a, b) => {
     const ai = TRINITY_SPARK_IDS.indexOf(a.sparkId);
     const bi = TRINITY_SPARK_IDS.indexOf(b.sparkId);
@@ -372,11 +389,6 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
   const ctx = { now, rate, ownedMap: producers?.owned ?? {}, qiSparks };
 
   if (live.length === 0) {
-    // 2026-05-21 — normalised to match the Upgrades tab's empty state
-    // (plain centred text, no icon, no dashed border) so the two tabs
-    // share the same visual language. CSS class kept as `st-empty` for
-    // backward compatibility; the CSS itself was rewritten to mirror
-    // .cs-upgrades-empty.
     return (
       <div className="st-empty">
         <div className="st-empty-title">No persistent sparks yet</div>
@@ -387,14 +399,14 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
     );
   }
 
-  // Currently-open spark — re-resolve from `live` so timer/contribution
-  // stay synced as the parent re-renders.
+  // Re-resolve the open spark from `live` each render so the modal's
+  // contribution math stays in sync with parent updates.
   const openSparkLive = openSpark
     ? live.find(s => s.instanceId === openSpark.instanceId) ?? null
     : null;
 
   return (
-    <div className="st-root">
+    <div className="charm-root">
       {isTrinityActive && (
         <div className="st-trinity-banner">
           <span className="stb-mark">✦</span>
@@ -404,45 +416,41 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
         </div>
       )}
 
-      {/* Active buffs (timed) section removed 2026-05-25. Timed
-          entries live on the HomeScreen ActiveBuffsChip popover
-          exclusively now, so this tab doesn't duplicate them. */}
-
-      <Section
+      <CharmSection
         label="Legendary"
         sublabel="producer synergies"
         count={groups.legendary.length}
-        tone="legendary"
+        sectionColor="var(--r-legendary)"
       >
         {groups.legendary.map(s => (
-          <SparkBlock key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
+          <Charm key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
         ))}
-      </Section>
+      </CharmSection>
 
-      <Section
+      <CharmSection
         label="Permanent"
         sublabel="lasts this run"
         count={groups.uncommon.length}
-        tone="uncommon"
+        sectionColor="var(--r-uncommon)"
       >
         {groups.uncommon.map(s => (
-          <SparkBlock key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
+          <Charm key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
         ))}
-      </Section>
+      </CharmSection>
 
-      <Section
+      <CharmSection
         label="Mechanics"
         sublabel="from crystal evolution"
         count={groups.mechanic.length}
-        tone="mechanic"
+        sectionColor="var(--r-mechanic)"
       >
         {groups.mechanic.map(s => (
-          <SparkBlock key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
+          <Charm key={s.instanceId} spark={s} ctx={ctx} isTrinityActive={isTrinityActive} onOpen={setOpenSpark} />
         ))}
-      </Section>
+      </CharmSection>
 
       {openSparkLive && (
-        <SparkDetailPanel
+        <CharmDetail
           spark={openSparkLive}
           ctx={ctx}
           isTrinityActive={isTrinityActive}

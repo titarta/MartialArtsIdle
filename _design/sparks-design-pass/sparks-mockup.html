@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sparks — Karmic Charms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Sparks — "Karmic Charms"
+   Each spark is a small jewel-like talisman with a rarity-colored
+   bezel. The whole grid reads as a SPIRIT INVENTORY of collected
+   charms. Rarity color drives the visual identity of every surface
+   (tab card, detail modal, choice reveal); icon + name are framed
+   like a mounted relic.
+   Surfaces in this mockup (top toggle row switches between):
+     1. SPARKS TAB         — 2-up grid of charms grouped by rarity
+     2. DETAIL MODAL       — inspect a single charm
+     3. CHOICE REVEAL      — ceremonial "pick one" moment
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        #0e0c08;
+  --bg-panel:       #1a1510;
+  --bg-recess:      #07050a;
+
+  --cream:          #f5e6c8;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+  --cream-faint:    rgba(245, 230, 200, 0.32);
+
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --bronze:         rgba(75, 60, 40, 0.55);
+
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+
+  /* Canonical rarity colors — match src/data/qiSparks.js SPARK_RARITY */
+  --r-common:       #9ca3af;
+  --r-uncommon:     #4ade80;
+  --r-rare:         #a78bfa;
+  --r-legendary:    #ffd66b;
+  --r-mechanic:     #7ec3c8;   /* extends the rarity ramp with a soft cyan */
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(900px 700px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    radial-gradient(700px 500px at 50% 110%, rgba(255, 214, 107, 0.04) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 80px;
+  gap: 24px;
+}
+.lead{
+  max-width: 480px;
+  text-align: center;
+  color: rgba(245,230,200,.55);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* ── Top toggle to switch surface ────────────────────────── */
+.toggle-row{ display: flex; gap: 6px; }
+.toggle-row button{
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  background: rgba(220,175,110,.08);
+  border: 1px solid rgba(220,175,110,.20);
+  color: var(--cream-dim);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle-row button.on{
+  background: rgba(220,175,110,.22);
+  border-color: var(--gold);
+  color: var(--cream);
+}
+
+/* ── Phone shell ─────────────────────────────────────────── */
+.phone{
+  width: 390px;
+  height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 30px 80px -20px rgba(0,0,0,.9);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.phone::before{
+  content:'';
+  display: block;
+  height: 52px;
+  background: rgba(8,6,4,.95);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   SURFACE 1 — SPARKS TAB
+   ═════════════════════════════════════════════════════════════ */
+.surface{ display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.surface.on{ display: flex; }
+
+/* Qi reservoir strip (excerpt for context) */
+.qi-strip{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    rgba(8, 6, 4, .96);
+  border-bottom: 1px solid rgba(220, 175, 110, .12);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.qi-strip::before{
+  content: '炁';
+  position: absolute;
+  right: -10px; top: -22px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 110px;
+  line-height: 1;
+  color: rgba(220, 175, 110, .055);
+  pointer-events: none;
+}
+.qi-strip-l, .qi-strip-r{ position: relative; z-index: 1; }
+.qi-strip-r{ text-align: right; }
+.qi-strip-eyebrow, .qi-strip-rate-label{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.qi-strip-rate-label{ color: rgba(245, 230, 200, 0.32); letter-spacing: .18em; }
+.qi-strip-amount{
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.qi-strip-rate{
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: var(--gold-hot);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sub-tab nav (Producers/Upgrades/Sparks) */
+.tab-rail{
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 18px 0;
+  background: #100c08;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.20);
+  flex-shrink: 0;
+  position: relative;
+}
+.tab-rail .tab{
+  background: none; border: none;
+  padding: 8px 2px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.28);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  cursor: pointer;
+}
+.tab-rail .tab.active{ color: var(--cream); }
+.tab-rail .tab .count{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(245, 230, 200, 0.35);
+  font-variant-numeric: tabular-nums;
+}
+.tab-rail .tab.active .count{ color: var(--gold-hot); }
+.tab-rail-indicator{
+  position: absolute;
+  bottom: 0;
+  left: 234px;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-hot) 20%,
+    var(--gold-hot) 80%,
+    transparent 100%);
+  box-shadow: 0 0 6px rgba(255, 207, 131, 0.40);
+}
+
+/* Body */
+.body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 28px;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   CHARM SECTION
+   ═════════════════════════════════════════════════════════════ */
+.charm-section{ margin-bottom: 20px; }
+.charm-section-header{
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-left: 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+/* Rarity-colored lantern bar */
+.charm-section-header::before{
+  content: '';
+  position: absolute;
+  left: 0; top: 4px;
+  width: 3px;
+  height: calc(100% - 4px);
+  background: var(--section-color);
+  border-radius: 1px;
+  box-shadow: 0 0 8px var(--section-color);
+}
+.charm-section-label{
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--section-color);
+}
+.charm-section-sub{
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.32);
+  flex: 1;
+}
+.charm-section-count{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(245, 230, 200, .08);
+  color: rgba(245, 230, 200, .65);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   CHARM — the small token card
+   ═════════════════════════════════════════════════════════════ */
+.charm-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.charm{
+  /* Local custom prop set per instance via inline style */
+  --r: var(--r-common);
+
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(245,230,200,.04) 0%, transparent 70%),
+    linear-gradient(180deg, #1f1a14 0%, #14110c 100%);
+  border: 1px solid color-mix(in srgb, var(--r) 50%, transparent);
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+  /* Soft rarity halo — tasteful, not loud */
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.06) inset,
+    0 0 16px -4px color-mix(in srgb, var(--r) 35%, transparent),
+    0 8px 14px -10px rgba(0,0,0,.7);
+}
+.charm:hover{
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--r) 75%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.10) inset,
+    0 0 22px -2px color-mix(in srgb, var(--r) 55%, transparent),
+    0 10px 18px -10px rgba(0,0,0,.8);
+}
+
+/* Top-right rarity glyph — a tiny gem mark, color = rarity */
+.charm-rarity-mark{
+  position: absolute;
+  top: 8px; right: 9px;
+  width: 7px; height: 7px;
+  background: var(--r);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--r), 0 0 0 1px rgba(0,0,0,.5);
+}
+
+/* Stack badge — top-left when stacked permanent */
+.charm-stack{
+  position: absolute;
+  top: 6px; left: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  padding: 2px 7px;
+  background: var(--bg-recess);
+  border: 1px solid color-mix(in srgb, var(--r) 45%, transparent);
+  color: var(--r);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  z-index: 2;
+}
+
+/* Mount: dark recessed frame for the icon */
+.charm-mount{
+  width: 56px;
+  height: 56px;
+  background:
+    radial-gradient(100% 80% at 50% 30%, color-mix(in srgb, var(--r) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(circle, #1a160f 0%, #07050a 100%);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--r) 35%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5) inset,
+    0 1px 0 rgba(255,225,170,.10) inset;
+}
+.charm-icon{
+  font-size: 28px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+.charm-icon-img{
+  width: 36px; height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--r) 50%, transparent));
+}
+
+.charm-name{
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--r);
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6);
+}
+.charm-line{
+  font-size: 9.5px;
+  line-height: 1.35;
+  color: rgba(245, 230, 200, .55);
+  text-align: center;
+  letter-spacing: .01em;
+}
+
+/* Trinity piece — a small ✦ above the rarity dot */
+.charm-trinity{
+  position: absolute;
+  top: 8px; right: 22px;
+  font-size: 9px;
+  color: var(--r-legendary);
+  text-shadow: 0 0 6px var(--r-legendary);
+}
+
+/* Legendary embers float upward */
+.charm-legendary{
+  overflow: hidden;
+}
+.charm-legendary::after{
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 18px;
+  width: 4px; height: 4px;
+  background: var(--r-legendary);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--r-legendary);
+  animation: ember-rise 3.2s ease-out infinite;
+  animation-delay: 0.4s;
+  opacity: 0;
+}
+@keyframes ember-rise{
+  0%   { opacity: 0; transform: translate(-50%, 0); }
+  20%  { opacity: 1; }
+  80%  { opacity: .6; }
+  100% { opacity: 0; transform: translate(-50%, -56px); }
+}
+
+/* ═════════════════════════════════════════════════════════════
+   SURFACE 2 — DETAIL MODAL
+   ═════════════════════════════════════════════════════════════ */
+.detail-overlay{
+  position: absolute;
+  inset: 52px 0 0 0;   /* below the faux top-bar */
+  background:
+    radial-gradient(140% 80% at 50% 0%, rgba(0,0,0,.5), rgba(0,0,0,.85)),
+    rgba(0,0,0,.6);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 18px;
+  z-index: 10;
+}
+.detail-overlay.on{ display: flex; }
+.detail-panel{
+  --r: var(--r-legendary);
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  background:
+    radial-gradient(140% 70% at 50% 0%, color-mix(in srgb, var(--r) 12%, transparent) 0%, transparent 65%),
+    linear-gradient(180deg, #221c14 0%, #14110c 100%);
+  border: 1px solid color-mix(in srgb, var(--r) 60%, transparent);
+  border-radius: 16px;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.10) inset,
+    0 0 40px -8px color-mix(in srgb, var(--r) 50%, transparent),
+    0 20px 40px -20px rgba(0,0,0,.9);
+}
+.detail-close{
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 28px; height: 28px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(245,230,200,.18);
+  color: rgba(245,230,200,.7);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+/* Hero — large icon + halo + rarity banner */
+.detail-hero{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--r) 25%, transparent);
+  overflow: hidden;
+}
+.detail-hero::before{
+  /* faint background calligraphy character */
+  content: attr(data-glyph);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 180px;
+  color: color-mix(in srgb, var(--r) 7%, transparent);
+  pointer-events: none;
+  line-height: 1;
+}
+.detail-hero-mount{
+  position: relative;
+  width: 92px;
+  height: 92px;
+  background:
+    radial-gradient(100% 80% at 50% 30%, color-mix(in srgb, var(--r) 22%, transparent) 0%, transparent 65%),
+    radial-gradient(circle, #1a160f 0%, #07050a 100%);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--r) 55%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5) inset,
+    0 1px 0 rgba(255,225,170,.12) inset,
+    0 0 32px -4px color-mix(in srgb, var(--r) 55%, transparent);
+}
+.detail-hero-icon{
+  font-size: 48px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+.detail-hero-name{
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-align: center;
+  color: var(--r);
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--r) 40%, transparent),
+    0 1px 0 rgba(0,0,0,.6);
+  position: relative;
+}
+.detail-hero-rarity{
+  margin-top: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--r);
+  position: relative;
+}
+.detail-hero-rarity::before,
+.detail-hero-rarity::after{
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 1px;
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--r) 60%, transparent);
+  margin: 0 8px;
+}
+.detail-body{
+  padding: 18px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.detail-section{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.detail-section-label{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  position: relative;
+  padding-bottom: 4px;
+}
+.detail-section-label::after{
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+}
+.detail-text{
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--cream);
+}
+.detail-text strong{ color: var(--gold-hot); font-weight: 700; }
+.detail-currently{
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--r) 8%, rgba(0,0,0,.4));
+  border-left: 2px solid var(--r);
+  border-radius: 0 6px 6px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--r) 80%, var(--cream));
+  letter-spacing: .02em;
+  font-variant-numeric: tabular-nums;
+}
+.detail-lore{
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(245, 230, 200, .55);
+  font-style: italic;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(245,230,200,.08);
+  border-bottom: 1px solid rgba(245,230,200,.08);
+}
+/* Footer 印 stamp (acquired-from breadcrumb) */
+.detail-footer{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, .42);
+}
+.detail-footer-stamp{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  color: var(--vermillion);
+  background: rgba(200, 56, 56, .12);
+  border: 1px solid rgba(200, 56, 56, .35);
+  padding: 2px 5px;
+  border-radius: 3px;
+  letter-spacing: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   SURFACE 3 — CHOICE REVEAL (the ceremonial moment)
+   ═════════════════════════════════════════════════════════════ */
+.choice-overlay{
+  position: absolute;
+  inset: 52px 0 0 0;
+  background:
+    radial-gradient(140% 80% at 50% 20%, rgba(220, 175, 110, .08), transparent 60%),
+    radial-gradient(140% 100% at 50% 100%, rgba(0,0,0,.4) 0%, rgba(0,0,0,.9) 100%);
+  backdrop-filter: blur(10px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 36px 18px 32px;
+  z-index: 10;
+}
+.choice-overlay.on{ display: flex; }
+
+/* Eyebrow + title */
+.choice-eyebrow{
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 4px;
+  position: relative;
+}
+.choice-title{
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cream);
+  text-align: center;
+  text-shadow:
+    0 0 16px rgba(220, 175, 110, .35),
+    0 1px 0 rgba(0,0,0,.6);
+  position: relative;
+}
+.choice-title-rule{
+  width: 70px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold) 50%,
+    transparent 100%);
+  margin: 10px auto 0;
+}
+.choice-sub{
+  text-align: center;
+  font-size: 12px;
+  color: var(--cream-faint);
+  margin: 12px 0 26px;
+  letter-spacing: .03em;
+  max-width: 280px;
+}
+
+/* The cards */
+.choice-cards{
+  display: flex;
+  gap: 14px;
+  flex: 1;
+  align-items: center;
+}
+.choice-card{
+  --r: var(--r-uncommon);
+  flex: 1;
+  position: relative;
+  background:
+    radial-gradient(140% 70% at 50% 0%, color-mix(in srgb, var(--r) 15%, transparent) 0%, transparent 65%),
+    linear-gradient(180deg, #22180f 0%, #100c08 100%);
+  border: 1px solid color-mix(in srgb, var(--r) 55%, transparent);
+  border-radius: 14px;
+  padding: 18px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, box-shadow 0.25s ease;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.08) inset,
+    0 0 22px -4px color-mix(in srgb, var(--r) 45%, transparent),
+    0 14px 24px -12px rgba(0,0,0,.8);
+  animation: card-rise 0.6s ease-out backwards;
+}
+.choice-card:nth-child(1){ animation-delay: 0.1s; }
+.choice-card:nth-child(2){ animation-delay: 0.25s; }
+@keyframes card-rise{
+  from { opacity: 0; transform: translateY(20px) scale(.95); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+.choice-card:hover{
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset,
+    0 0 36px -2px color-mix(in srgb, var(--r) 60%, transparent),
+    0 18px 28px -12px rgba(0,0,0,.85);
+}
+.choice-card-rarity-line{
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .32em;
+  text-transform: uppercase;
+  color: var(--r);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--r) 50%, transparent);
+}
+.choice-card-mount{
+  width: 76px; height: 76px;
+  margin: 6px 0 2px;
+  background:
+    radial-gradient(100% 80% at 50% 30%, color-mix(in srgb, var(--r) 25%, transparent) 0%, transparent 65%),
+    radial-gradient(circle, #1a160f 0%, #07050a 100%);
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--r) 50%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5) inset,
+    0 1px 0 rgba(255,225,170,.12) inset,
+    0 0 24px -4px color-mix(in srgb, var(--r) 55%, transparent);
+}
+.choice-card-icon{ font-size: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.choice-card-name{
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--r);
+  text-align: center;
+  line-height: 1.2;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--r) 40%, transparent), 0 1px 0 rgba(0,0,0,.6);
+  margin-top: 4px;
+}
+.choice-card-effect{
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--cream-dim);
+  text-align: center;
+  letter-spacing: .01em;
+  padding: 0 4px;
+  flex: 1;
+}
+.choice-card-effect strong{ color: var(--gold-hot); font-weight: 700; }
+
+/* Reroll */
+.choice-reroll{
+  margin-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: rgba(126, 195, 143, 0.08);
+  border: 1px solid rgba(126, 195, 143, 0.30);
+  color: #aedfb8;
+  border-radius: 999px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.choice-reroll-dot{
+  width: 6px; height: 6px;
+  background: #7ec38f;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #7ec38f;
+}
+
+.choice-meta{
+  margin-top: 14px;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  color: var(--cream-faint);
+  text-align: center;
+}
+
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>Sparks — Karmic Charms</h1>
+  Each spark is a small jewel-like talisman in your Spirit Inventory. Rarity color drives the
+  identity across every surface. Toggle to flip between tab, detail, and the choice reveal.
+</div>
+
+<div class="toggle-row" role="tablist">
+  <button class="on" data-surface="tab">Sparks Tab</button>
+  <button data-surface="detail">Detail Modal</button>
+  <button data-surface="choice">Choice Reveal</button>
+</div>
+
+<div class="phone">
+
+  <!-- ═══════════════════════════════════════════════════
+       SURFACE 1 — Sparks tab
+       ═══════════════════════════════════════════════════ -->
+  <div class="surface on" data-surface="tab">
+
+    <!-- Qi reservoir strip for context -->
+    <header class="qi-strip">
+      <div class="qi-strip-l">
+        <div class="qi-strip-eyebrow">Reservoir</div>
+        <div class="qi-strip-amount">52.5K Qi</div>
+      </div>
+      <div class="qi-strip-r">
+        <div class="qi-strip-rate-label">Flowing</div>
+        <div class="qi-strip-rate">+1.0 / sec</div>
+      </div>
+    </header>
+
+    <!-- Sub-tab nav (Sparks active) -->
+    <nav class="tab-rail">
+      <button class="tab" type="button">Producers <span class="count">6</span></button>
+      <button class="tab" type="button">Upgrades <span class="count">6</span></button>
+      <button class="tab active" type="button">Sparks <span class="count">5</span></button>
+      <div class="tab-rail-indicator"></div>
+    </nav>
+
+    <!-- Body — charms grouped by rarity -->
+    <div class="body">
+
+      <!-- ── Legendary ── -->
+      <section class="charm-section" style="--section-color: var(--r-legendary);">
+        <header class="charm-section-header">
+          <span class="charm-section-label">Legendary</span>
+          <span class="charm-section-sub">producer synergies</span>
+          <span class="charm-section-count">2</span>
+        </header>
+        <div class="charm-grid">
+          <button class="charm charm-legendary" type="button" style="--r: var(--r-legendary);">
+            <span class="charm-rarity-mark"></span>
+            <span class="charm-trinity">✦</span>
+            <div class="charm-mount">
+              <span class="charm-icon">🜨</span>
+            </div>
+            <div class="charm-name">Phoenix Reborn</div>
+            <div class="charm-line">Waiting on next major realm</div>
+          </button>
+          <button class="charm charm-legendary" type="button" style="--r: var(--r-legendary);">
+            <span class="charm-rarity-mark"></span>
+            <div class="charm-mount">
+              <span class="charm-icon">⚯</span>
+            </div>
+            <div class="charm-name">Heaven's Bond</div>
+            <div class="charm-line">2 pairs → both ×2.40</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- ── Permanent (Uncommon) ── -->
+      <section class="charm-section" style="--section-color: var(--r-uncommon);">
+        <header class="charm-section-header">
+          <span class="charm-section-label">Permanent</span>
+          <span class="charm-section-sub">lasts this run</span>
+          <span class="charm-section-count">2</span>
+        </header>
+        <div class="charm-grid">
+          <button class="charm" type="button" style="--r: var(--r-uncommon);">
+            <span class="charm-rarity-mark"></span>
+            <span class="charm-stack">×3</span>
+            <div class="charm-mount">
+              <span class="charm-icon">🕰</span>
+            </div>
+            <div class="charm-name">Master's Patience</div>
+            <div class="charm-line">120s held → +36% qi/s</div>
+          </button>
+          <button class="charm" type="button" style="--r: var(--r-uncommon);">
+            <span class="charm-rarity-mark"></span>
+            <span class="charm-stack">×2</span>
+            <div class="charm-mount">
+              <span class="charm-icon">🔍</span>
+            </div>
+            <div class="charm-name">Sharper Focus</div>
+            <div class="charm-line">+4% Focus multiplier</div>
+          </button>
+        </div>
+      </section>
+
+      <!-- ── Mechanics ── -->
+      <section class="charm-section" style="--section-color: var(--r-mechanic);">
+        <header class="charm-section-header">
+          <span class="charm-section-label">Mechanics</span>
+          <span class="charm-section-sub">from crystal evolution</span>
+          <span class="charm-section-count">1</span>
+        </header>
+        <div class="charm-grid">
+          <button class="charm" type="button" style="--r: var(--r-mechanic);">
+            <span class="charm-rarity-mark"></span>
+            <div class="charm-mount">
+              <span class="charm-icon">◈</span>
+            </div>
+            <div class="charm-name">Crystal Reservoir II</div>
+            <div class="charm-line">Reservoir fills 50% qi/s</div>
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SURFACE 2 — Detail modal (Phoenix Reborn — legendary)
+       ═══════════════════════════════════════════════════ -->
+  <div class="detail-overlay" data-surface="detail">
+    <div class="detail-panel" style="--r: var(--r-legendary);" data-glyph="鳳">
+      <button class="detail-close" type="button">✕</button>
+      <div class="detail-hero" data-glyph="鳳">
+        <div class="detail-hero-mount">
+          <span class="detail-hero-icon">🜨</span>
+        </div>
+        <div class="detail-hero-name">Phoenix Reborn</div>
+        <div class="detail-hero-rarity">Legendary</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <div class="detail-section-label">Effect</div>
+          <div class="detail-text">
+            On every major realm breakthrough, all <strong>other producers</strong> double their output.
+            Stacks indefinitely across breakthroughs.
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-label">Currently</div>
+          <div class="detail-currently">Waiting on next major realm</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-label">Example</div>
+          <div class="detail-text">
+            After <strong>3 breakthroughs</strong> with this active, your other producers produce
+            <strong>×8</strong> their base output. Reincarnation resets the multiplier.
+          </div>
+        </div>
+        <div class="detail-lore">
+          "What perishes in fire returns wearing flame. The phoenix does not remember dying;
+          it only remembers rising."
+        </div>
+        <div class="detail-footer">
+          <span class="detail-footer-stamp">印</span>
+          <span>Earned · Realm 18 Breakthrough</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       SURFACE 3 — Choice reveal modal
+       ═══════════════════════════════════════════════════ -->
+  <div class="choice-overlay" data-surface="choice">
+    <div class="choice-eyebrow">A Spark Arrives</div>
+    <div class="choice-title">Choose your Path</div>
+    <div class="choice-title-rule"></div>
+    <div class="choice-sub">
+      The Heavens offer you a Charm of this life. One only — choose carefully.
+    </div>
+    <div class="choice-cards">
+      <button class="choice-card" type="button" style="--r: var(--r-uncommon);">
+        <div class="choice-card-rarity-line">Uncommon</div>
+        <div class="choice-card-mount">
+          <span class="choice-card-icon">🕰</span>
+        </div>
+        <div class="choice-card-name">Master's Patience</div>
+        <div class="choice-card-effect">
+          <strong>+0.1% qi/s</strong> per second of Focus held.
+          Caps at <strong>+12%</strong> per stack.
+        </div>
+      </button>
+      <button class="choice-card" type="button" style="--r: var(--r-uncommon);">
+        <div class="choice-card-rarity-line">Uncommon</div>
+        <div class="choice-card-mount">
+          <span class="choice-card-icon">🪙</span>
+        </div>
+        <div class="choice-card-name">Tinker's Bargain</div>
+        <div class="choice-card-effect">
+          <strong>-30% qi</strong> on your next
+          <strong>5 producer purchases</strong>.
+        </div>
+      </button>
+    </div>
+    <button class="choice-reroll" type="button">
+      <span class="choice-reroll-dot"></span>
+      Reroll — Free
+    </button>
+    <div class="choice-meta">Inactivity in 0:47 picks the leftmost</div>
+  </div>
+
+</div>
+
+<script>
+  const toggles = document.querySelectorAll('.toggle-row button');
+  const surfaces = document.querySelectorAll('.surface, .detail-overlay, .choice-overlay');
+  toggles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.surface;
+      toggles.forEach(b => b.classList.toggle('on', b === btn));
+      surfaces.forEach(s => s.classList.toggle('on', s.dataset.surface === name));
+      // when not on tab, also turn off the tab surface so it doesn't show behind
+      const tab = document.querySelector('.surface[data-surface="tab"]');
+      if (tab) tab.classList.toggle('on', name === 'tab');
+    });
+  });
+</script>
+
+</body>
+</html>

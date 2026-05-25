@@ -24573,3 +24573,512 @@ img.pp-emblem-locked { font-size: 0; }
   color: #dcaf6e;
   font-weight: 600;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   KARMIC CHARMS — Sparks tab + detail modal (2026-05-25)
+   The SparksTab now renders charm tokens (.charm) in a 2-up grid and
+   opens a hero-led inspect panel (.charm-detail-*) on tap. The legacy
+   .st-* rules above are kept for any other surface that may still reach
+   into them, but SparksTab.jsx no longer emits those class names. Class
+   prefix `charm` mirrors the mockup at _design/sparks-design-pass/.
+
+   Rarity-tinted surfaces use color-mix(in srgb, var(--r) N%, transparent)
+   throughout so a single per-instance --r CSS var drives border, halo,
+   mount glow and name color. The Charm component sets --r inline from
+   SPARK_RARITY[*].color (mechanic-kind sparks fall back to --r-mechanic).
+   color-mix() is supported in Chrome 111+, Safari 16.2+, Firefox 113+ —
+   well above the Capacitor target.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Rarity tokens (extends the canonical SPARK_RARITY colors with a soft
+   cyan for the mechanic kind). */
+.charm-root {
+  --r-common:    #9ca3af;
+  --r-uncommon:  #4ade80;
+  --r-rare:      #a78bfa;
+  --r-legendary: #ffd66b;
+  --r-mechanic:  #7ec3c8;
+
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 14px 14px 80px;
+  overflow-y: auto;
+}
+
+/* ── Section header (lantern bar + label + count) ─────────────────────── */
+.charm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.charm-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-left: 12px;
+  position: relative;
+}
+.charm-section-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 3px;
+  height: calc(100% - 4px);
+  background: var(--section-color, var(--r-common));
+  border-radius: 1px;
+  box-shadow: 0 0 8px var(--section-color, var(--r-common));
+}
+.charm-section-label {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--section-color, var(--r-common));
+}
+.charm-section-sub {
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.32);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.charm-section-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(245, 230, 200, 0.08);
+  color: rgba(245, 230, 200, 0.65);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 2-up grid + the charm token ──────────────────────────────────────── */
+.charm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.charm {
+  --r: var(--r-common);
+
+  position: relative;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(245, 230, 200, 0.04) 0%, transparent 70%),
+    linear-gradient(180deg, #1f1a14 0%, #14110c 100%);
+  border: 1px solid color-mix(in srgb, var(--r) 50%, transparent);
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 1px 0 rgba(255, 225, 170, 0.06) inset,
+    0 0 16px -4px color-mix(in srgb, var(--r) 35%, transparent),
+    0 8px 14px -10px rgba(0, 0, 0, 0.7);
+}
+.charm:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--r) 75%, transparent);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 1px 0 rgba(255, 225, 170, 0.10) inset,
+    0 0 22px -2px color-mix(in srgb, var(--r) 55%, transparent),
+    0 10px 18px -10px rgba(0, 0, 0, 0.8);
+}
+.charm:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Top-right gem dot — tiny rarity glyph */
+.charm-rarity-mark {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 7px;
+  height: 7px;
+  background: var(--r);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--r), 0 0 0 1px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+/* Trinity ✦ marker, slotted just to the left of the gem dot */
+.charm-trinity {
+  position: absolute;
+  top: 7px;
+  right: 22px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--r-legendary);
+  text-shadow: 0 0 6px var(--r-legendary);
+  pointer-events: none;
+}
+.charm-trinity-active .charm-trinity {
+  animation: charm-trinity-pulse 1.8s ease-in-out infinite;
+}
+@keyframes charm-trinity-pulse {
+  0%, 100% { opacity: 0.85; text-shadow: 0 0 6px var(--r-legendary); }
+  50%      { opacity: 1;    text-shadow: 0 0 12px var(--r-legendary); }
+}
+
+/* Stack badge (top-left) — Cinzel pill in rarity color */
+.charm-stack {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  background: #07050a;
+  border: 1px solid color-mix(in srgb, var(--r) 45%, transparent);
+  color: var(--r);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  z-index: 2;
+}
+
+/* Dark recessed mount holding the icon */
+.charm-mount {
+  width: 56px;
+  height: 56px;
+  background:
+    radial-gradient(100% 80% at 50% 30%, color-mix(in srgb, var(--r) 18%, transparent) 0%, transparent 65%),
+    radial-gradient(circle, #1a160f 0%, #07050a 100%);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--r) 35%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5) inset,
+    0 1px 0 rgba(255, 225, 170, 0.10) inset;
+  flex-shrink: 0;
+}
+.charm-icon-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--r) 50%, transparent));
+}
+.charm-icon-emoji {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.charm-name {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--r);
+  line-height: 1.2;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+  /* Allow two lines for longer names like "Pearl-Dream Dragon". */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.charm-line {
+  font-size: 9.5px;
+  line-height: 1.35;
+  color: rgba(245, 230, 200, 0.55);
+  letter-spacing: 0.01em;
+  /* The mockup caps at ~30 chars; truncate gracefully past that. */
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Legendary tokens emit a slow ember mote rising from the mount. Marks them
+   as the chase tier without screaming it. `overflow: hidden` already on .charm
+   above clips the ember at the edge. */
+.charm-legendary {
+  overflow: hidden;
+}
+.charm-legendary::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  width: 4px;
+  height: 4px;
+  background: var(--r-legendary);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--r-legendary);
+  animation: charm-ember-rise 3.2s ease-out infinite;
+  animation-delay: 0.4s;
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes charm-ember-rise {
+  0%   { opacity: 0; transform: translate(-50%, 0); }
+  20%  { opacity: 1; }
+  80%  { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(-50%, -56px); }
+}
+
+/* ── Charm detail modal — hero-led inspect panel ───────────────────────── */
+.charm-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(140% 80% at 50% 0%, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.88)),
+    rgba(2, 4, 8, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--top-bar-h, 52px) + env(safe-area-inset-top) + 16px) 16px calc(var(--nav-h, 56px) + env(safe-area-inset-bottom) + 16px);
+  z-index: 230;
+  animation: charm-detail-fade 0.22s ease-out;
+}
+@keyframes charm-detail-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.charm-detail-panel {
+  --r: var(--r-legendary, #ffd66b);
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  max-height: 100%;
+  overflow-y: auto;
+  background:
+    radial-gradient(140% 70% at 50% 0%, color-mix(in srgb, var(--r) 12%, transparent) 0%, transparent 65%),
+    linear-gradient(180deg, #221c14 0%, #14110c 100%);
+  border: 1px solid color-mix(in srgb, var(--r) 60%, transparent);
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 1px 0 rgba(255, 225, 170, 0.10) inset,
+    0 0 40px -8px color-mix(in srgb, var(--r) 50%, transparent),
+    0 20px 40px -20px rgba(0, 0, 0, 0.9);
+  animation: charm-detail-pop 0.24s ease-out;
+}
+@keyframes charm-detail-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* Hero — 92px mount + faint calligraphy character + name + rarity rule */
+.charm-detail-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 16px 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--r) 25%, transparent);
+  overflow: hidden;
+}
+.charm-detail-hero::before {
+  /* The big calligraphy character drawn behind the icon. data-glyph is set
+     on the hero element so different sparks render different characters. */
+  content: attr(data-glyph);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 180px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--r) 8%, transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+.charm-detail-hero > * {
+  position: relative;
+  z-index: 1;
+}
+.charm-detail-hero-mount {
+  width: 92px;
+  height: 92px;
+  background:
+    radial-gradient(100% 80% at 50% 30%, color-mix(in srgb, var(--r) 22%, transparent) 0%, transparent 65%),
+    radial-gradient(circle, #1a160f 0%, #07050a 100%);
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--r) 55%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5) inset,
+    0 1px 0 rgba(255, 225, 170, 0.12) inset,
+    0 0 32px -4px color-mix(in srgb, var(--r) 55%, transparent);
+}
+.charm-detail-hero-icon-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+.charm-detail-hero-icon-emoji {
+  font-size: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+.charm-detail-hero-name {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--r);
+  margin: 0;
+  text-shadow:
+    0 0 12px color-mix(in srgb, var(--r) 40%, transparent),
+    0 1px 0 rgba(0, 0, 0, 0.6);
+}
+.charm-detail-hero-rarity {
+  margin-top: 8px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.charm-detail-hero-rarity::before,
+.charm-detail-hero-rarity::after {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: color-mix(in srgb, var(--r) 60%, transparent);
+}
+
+/* Body — sections share Cinzel eyebrow + gold under-rule */
+.charm-detail-body {
+  padding: 18px 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.charm-detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.charm-detail-label {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #dcaf6e;
+  position: relative;
+  padding-bottom: 4px;
+}
+.charm-detail-label::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, #dcaf6e 0%, transparent 100%);
+}
+.charm-detail-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #f5e6c8;
+}
+.charm-detail-text strong {
+  color: #ffcf83;
+  font-weight: 700;
+}
+.charm-detail-currently {
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--r) 8%, rgba(0, 0, 0, 0.4));
+  border-left: 2px solid var(--r);
+  border-radius: 0 6px 6px 0;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--r) 80%, #f5e6c8);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.charm-detail-lore {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(245, 230, 200, 0.55);
+  font-style: italic;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(245, 230, 200, 0.08);
+  border-bottom: 1px solid rgba(245, 230, 200, 0.08);
+}
+.charm-detail-trinity-note {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffd66b;
+  padding: 10px 12px;
+  background: rgba(120, 80, 20, 0.25);
+  border: 1px solid rgba(255, 215, 100, 0.4);
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Footer 印 stamp — acquired-from breadcrumb */
+.charm-detail-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 6px;
+  margin-top: 2px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.42);
+  border-top: 1px solid rgba(245, 230, 200, 0.06);
+}
+.charm-detail-stamp {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 16px;
+  line-height: 1;
+  color: #c83838;
+  background: rgba(200, 56, 56, 0.12);
+  border: 1px solid rgba(200, 56, 56, 0.35);
+  padding: 3px 6px;
+  border-radius: 3px;
+  letter-spacing: 0;
+}
+
