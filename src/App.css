@@ -26285,4 +26285,79 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v4. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v5: FIX THE REAL BUG.
+   The crystal was overlapping the cultivator's upper body because the
+   two cultivator sprites (normal + focused, stacked for crossfade) were
+   position:relative and flex-stacking sequentially in the fighter-stage,
+   pushing sprite[0] way ABOVE the stage. v5 makes both sprites absolute
+   so they overlap properly inside the stage, then re-anchors the mandala
+   to the cultivator's actual seated position. Also undoes v4's broken
+   scale (it wasn't applying anyway) and fixes the TopBar left-side
+   crowding.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* The two sprites must OVERLAP, not stack. Both absolute, both fill the
+   stage. Crossfade still works via opacity toggling. */
+.home-fighter-stage .home-cultivator-sprite {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  object-fit: contain;
+}
+
+/* Undo v4's transform: it never applied and was causing a redundant
+   layout shift. The cultivator now sits cleanly inside its stage. */
+.home-fighter-stage {
+  transform: none;
+  margin-top: 0;
+}
+
+/* Mandala v5: anchor to the cultivator's seated bottom edge (the lotus
+   pose touches the floor at the bottom of the stage). Sized to match
+   a proper meditation circle around the sprite, not a vague floor glow. */
+.home-mandala {
+  bottom: 4%;
+  width: 160%;
+  height: 55%;
+  background:
+    radial-gradient(ellipse at center,
+      rgba(255, 220, 150, 0.80) 0%,
+      rgba(255, 180, 90, 0.50) 12%,
+      rgba(220, 140, 60, 0.28) 30%,
+      rgba(220, 140, 60, 0.12) 55%,
+      transparent 78%);
+  z-index: 0;
+}
+.home-mandala::before {
+  inset: 8% 14%;
+}
+.home-mandala::after {
+  inset: 24% 32%;
+}
+
+/* Dark vignette must also drop to the cultivator's seat zone, not the
+   middle of the empty stage. */
+.home-fighter-stage::after {
+  top: auto;
+  bottom: -10%;
+  height: 90%;
+  width: 200%;
+}
+
+/* TopBar left-side crowding: more breathing room between the lotus
+   pill, the shop ring, and the currency strip on small mobile widths. */
+.top-bar {
+  gap: 8px !important;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.home-hud-lotus-shop {
+  margin-right: 6px;
+}
+
+/* End of SANCTUM v5. */
+
 /* End of HOME "The Sanctum" design pass. */
