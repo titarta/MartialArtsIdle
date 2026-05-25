@@ -28477,4 +28477,42 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v18. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v19: enforce the no-unexpected-movement rule for CF meter.
+   v18 made CF position:relative which pushed crystal+REFINE up when
+   focus-hold engaged. That breaks the UX rule (nothing should move
+   when state changes). v19 reserves a fixed-height CF slot that's
+   ALWAYS present between REFINE and the cultivator. When focus is
+   inactive the slot is empty (44px of breathing room); when active
+   CF absolutely fills the slot. No layout shifts.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Reserved CF slot: fixed 44px height, never grows/shrinks. */
+.home-char-hint-slot {
+  position: relative !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  flex: 0 0 44px !important;
+  width: 100% !important;
+  pointer-events: none !important;
+}
+
+/* CF meter: back to absolute positioning inside the reserved slot.
+   With the slot having fixed 44px height, CF fills it without
+   pushing anything. */
+.home-cf-meter {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  width: 240px !important;
+  padding: 5px 12px 6px !important;
+  border-radius: 6px !important;
+  pointer-events: auto !important;
+}
+
+/* End of SANCTUM v19. */
+
 /* End of HOME "The Sanctum" design pass. */
