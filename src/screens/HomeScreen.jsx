@@ -941,11 +941,17 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
     ? Math.max(0, crystal.requiredForNext - crystal.refinedQi)
     : 0;
   const [canAffordRefine, setCanAffordRefine] = useState(false);
+  // 0..1 ratio of current qi vs refine cost. Drives the amber
+  // 'saving-up' fill behind the REFINE button so the player can SEE
+  // themselves approaching the next refine.
+  const [refineProgress, setRefineProgress] = useState(0);
   useEffect(() => {
     if (!isUnlocked || !onRefine) return;
-    const tick = () => setCanAffordRefine(
-      refineCost > 0 && ((qiRef?.current ?? 0) >= refineCost)
-    );
+    const tick = () => {
+      const qi = qiRef?.current ?? 0;
+      setCanAffordRefine(refineCost > 0 && qi >= refineCost);
+      setRefineProgress(refineCost > 0 ? Math.min(1, qi / refineCost) : 0);
+    };
     tick();
     const id = setInterval(tick, 200);
     return () => clearInterval(id);
@@ -1093,11 +1099,16 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
           onClick={handleRefineClick}
           disabled={!canAffordRefine}
           aria-label={`Refine Qi Crystal to level ${level + 1} for ${fmtNum(refineCost)} qi`}
+          style={{ '--refine-p': `${Math.round(refineProgress * 100)}%` }}
         >
-          <span className="home-crystal-refine-icon">▲</span>
+          {/* Brass icon-square: signals 'this is an UPGRADE action'
+              at first glance, distinct from a generic action pill. */}
+          <span className="home-crystal-refine-icon" aria-hidden="true">▲</span>
           <span className="home-crystal-refine-label">
-            <span className="home-crystal-refine-verb">Refine</span>
-            <span className="home-crystal-refine-sep">·</span>
+            <span className="home-crystal-refine-verb">
+              Refine
+              <span className="home-crystal-refine-next">{` → Lv ${level + 1}`}</span>
+            </span>
             <span className="home-crystal-refine-cost">{fmtNum(refineCost)} Qi</span>
           </span>
         </button>

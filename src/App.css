@@ -28245,4 +28245,170 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v16. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v17: REFINE button redesign (V3+V4 hybrid from study).
+   Replaces the v11 horizontal pill. New look:
+   . Brass icon-square on the left (▲) - distinctive 'UPGRADE' silhouette
+   . Body on the right: 'Refine → Lv N' on top, '30.0K Qi' below
+   . Amber qi-progress fill BEHIND the body (--refine-p) so the player
+     watches the button fill up as they save toward the next refine
+   . Affordable: full brass gradient, gold-hot cost
+   . Unaffordable: dimmer, cost flips to vermillion 'can't afford'
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Wipe the v11 horizontal-pill rules and the v10.5 watermark. */
+.home-crystal-refine-btn::before { content: none !important; }
+.home-crystal-refine-btn .home-crystal-refine-label::after { content: none !important; }
+.home-crystal-refine-btn .home-crystal-refine-sep { display: none !important; }
+
+/* New chassis: two-section button (icon-square + body). */
+.home-crystal-refine-btn,
+.home-crystal-anchor .home-crystal-refine-btn {
+  position: relative !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: auto !important;
+  padding: 0 !important;
+  margin: 8px auto 0 !important;
+  border: 1px solid rgba(255, 225, 170, 0.72) !important;
+  border-radius: 6px !important;
+  background: none !important;
+  color: var(--ui-purple-cream-warm, #fff5e0) !important;
+  overflow: hidden !important;
+  box-shadow:
+    0 0 14px -2px rgba(255, 207, 131, 0.55),
+    0 3px 6px -2px rgba(0, 0, 0, 0.65) !important;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  cursor: pointer;
+  /* --refine-p comes from inline style, 0..100%. */
+}
+
+/* Left section: brass icon-square with the ▲ glyph. */
+.home-crystal-refine-btn .home-crystal-refine-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.22) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(220, 175, 110, 0.98) 0%, rgba(155, 125, 80, 0.98) 100%) !important;
+  border-right: 1px solid rgba(20, 14, 8, 0.45) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #1a0f06 !important;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.60);
+  margin: 0 !important;
+  z-index: 2;
+}
+
+/* Right section: body. Hosts the action line + cost on a dark brass
+   panel with the amber qi-progress fill behind. */
+.home-crystal-refine-btn .home-crystal-refine-label {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 1px !important;
+  padding: 6px 14px 7px 12px !important;
+  min-width: 130px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.10) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.22) 100%),
+    linear-gradient(180deg, rgba(155, 110, 60, 0.96) 0%, rgba(105, 70, 32, 0.96) 100%) !important;
+  overflow: hidden !important;
+  z-index: 1;
+}
+
+/* AMBER PROGRESS FILL behind the body: shows qi/cost ratio. */
+.home-crystal-refine-btn .home-crystal-refine-label::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: var(--refine-p, 0%);
+  background:
+    linear-gradient(180deg, rgba(255, 230, 150, 0.45) 0%, rgba(255, 200, 100, 0.32) 100%);
+  pointer-events: none;
+  transition: width 0.4s ease-out;
+  z-index: 0;
+}
+
+/* Top line: 'Refine → Lv 10'. Action verb in cream, target lvl gold-hot. */
+.home-crystal-refine-btn .home-crystal-refine-verb {
+  position: relative !important;
+  z-index: 1;
+  font-family: 'Cinzel', serif !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--ui-purple-cream-warm, #fff5e0) !important;
+  line-height: 1.1 !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+.home-crystal-refine-btn .home-crystal-refine-next {
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  margin-left: 2px;
+  text-shadow: 0 0 4px rgba(255, 207, 131, 0.45), 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Cost line: tabular-nums gold-hot. */
+.home-crystal-refine-btn .home-crystal-refine-cost {
+  position: relative !important;
+  z-index: 1;
+  font-family: 'Cinzel', serif !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+  text-shadow: 0 0 4px rgba(255, 207, 131, 0.4), 0 1px 0 rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+/* Unaffordable state: dim + vermillion cost. */
+.home-crystal-refine-btn.home-crystal-refine-btn-disabled {
+  opacity: 0.78;
+  cursor: not-allowed;
+  filter: grayscale(0.42);
+  box-shadow:
+    0 2px 4px -1px rgba(0, 0, 0, 0.55),
+    0 0 0 rgba(0, 0, 0, 0) !important;
+}
+.home-crystal-refine-btn.home-crystal-refine-btn-disabled .home-crystal-refine-cost {
+  color: var(--vermillion-hot, #ff5b5b) !important;
+  text-shadow: 0 0 4px rgba(255, 91, 91, 0.45), 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+.home-crystal-refine-btn.home-crystal-refine-btn-disabled .home-crystal-refine-next {
+  color: rgba(245, 230, 200, 0.55) !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Pressed state. */
+.home-crystal-refine-btn:not(.home-crystal-refine-btn-disabled):active {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 10px -2px rgba(255, 207, 131, 0.42),
+    0 1px 3px -1px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Affordable accent: when can-afford, the button gets a subtle
+   ready pulse on the border so the player knows 'tap me now'. */
+.home-crystal-refine-btn:not(.home-crystal-refine-btn-disabled) {
+  animation: refine-ready 2.4s ease-in-out infinite;
+}
+@keyframes refine-ready {
+  0%, 100% { box-shadow: 0 0 14px -2px rgba(255, 207, 131, 0.45), 0 3px 6px -2px rgba(0, 0, 0, 0.6); }
+  50%      { box-shadow: 0 0 22px -2px rgba(255, 207, 131, 0.75), 0 3px 6px -2px rgba(0, 0, 0, 0.6); }
+}
+
+/* End of SANCTUM v17. */
+
 /* End of HOME "The Sanctum" design pass. */
