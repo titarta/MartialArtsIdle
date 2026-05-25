@@ -18457,6 +18457,12 @@ body.sheet-open {
      gradient here was a legacy pre-lacquer tint that competed with
      the Estate Pavilions warm palette. */
   background: transparent;
+  /* The screen-container's default padding is stripped for this screen
+     (see the EOF :has() override). The screen owns its own TopBar +
+     BottomNav clearance here so the qi-strip, tab-rail, and the rest
+     of the page chrome extend edge-to-edge against the screen sides. */
+  padding-top: calc(var(--top-bar-h) + env(safe-area-inset-top));
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
 }
 
 .cs-sticky-header {
@@ -22801,6 +22807,16 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* Bazaar has overflow:hidden on its outer; the screen-container shouldn't
    double-pad it. Strip container padding. */
 .screen-container:has(.spirit-bazaar-screen) {
+  padding: 0;
+}
+
+/* Same treatment for Cultivation — the screen owns its own TopBar +
+   BottomNav clearance, the qi-strip and tab-rail extend edge-to-edge,
+   and the buy-mode-row + pavilions list provide their own 14px gutter
+   for card content. The screen-container's default `padding: 20px 16px`
+   (computed ~64/14/72) was insetting the whole page from the screen
+   edges and the user called it out. */
+.screen-container:has(.cultivation-screen) {
   padding: 0;
 }
 
