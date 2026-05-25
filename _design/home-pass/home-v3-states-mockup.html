@@ -784,84 +784,57 @@ img{ -webkit-user-drag: none; user-drag: none; }
   text-shadow: 0 1px 2px rgba(0,0,0,.9);
 }
 
-/* REFINE slip: vertical brass cartouche. English "REFINE" is the HERO
-   label (players need to know what this does); 提 calligraphy is a
-   faint watermark behind the chassis so the slip still reads as a
-   temple-stamped action, not a generic button. */
+/* REFINE pill: compact HORIZONTAL brass action. English label on
+   the left, cost on the right with a thin gold divider between them.
+   Sits in the same horizontal-pill lane as the CF marquee so the two
+   read as related siblings instead of competing surfaces. */
 .refine-slip{
   position: relative;
   margin-top: 10px;
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
   align-items: center;
-  padding: 6px 8px 6px;
-  width: 78px;
+  gap: 10px;
+  padding: 7px 14px 8px;
   background:
-    linear-gradient(180deg, rgba(255, 230, 180, 0.12) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.25) 100%),
-    linear-gradient(180deg, rgba(165, 110, 55, 0.95) 0%, rgba(120, 80, 38, 0.95) 100%);
-  border: 1px solid rgba(255, 225, 170, 0.55);
-  border-radius: 4px 4px 14px 14px;
-  color: #20140a;
+    linear-gradient(180deg, rgba(255, 230, 180, 0.18) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.22) 100%),
+    linear-gradient(180deg, rgba(180, 130, 70, 0.96) 0%, rgba(125, 85, 38, 0.96) 100%);
+  border: 1px solid rgba(255, 225, 170, 0.72);
+  border-radius: 999px;
+  color: #1a0f06;
   cursor: pointer;
-  overflow: hidden;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.30),
-    inset 0 -2px 0 rgba(0,0,0,.30),
-    0 0 14px -2px rgba(255, 207, 131, .50),
-    0 6px 10px -6px rgba(0,0,0,.7);
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 14px -2px rgba(255, 207, 131, .55),
+    0 4px 8px -4px rgba(0,0,0,.6);
   font-variant-numeric: tabular-nums;
 }
-/* 提 calligraphy as a faint watermark behind the English label.
-   Decorative only — visible enough to read as "stamped temple action"
-   but small enough that the English READS first. */
-.refine-slip::before{
-  content: '提';
-  position: absolute;
-  inset: 0;
-  font-family: 'Ma Shan Zheng', serif;
-  font-size: 44px;
-  line-height: 1;
-  color: rgba(20, 14, 8, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
 .refine-slip-tri{
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1;
   color: #1a0f06;
-  margin-bottom: 2px;
-  position: relative;
-  z-index: 1;
 }
 .refine-slip-label{
   font-family: 'Cinzel', serif;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: .18em;
   text-transform: uppercase;
   color: #1a0f06;
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
 }
 .refine-slip-rule{
-  width: 70%;
-  height: 1px;
-  background: rgba(20, 14, 8, 0.35);
-  margin: 4px 0 4px;
-  position: relative;
-  z-index: 1;
+  width: 1px;
+  height: 14px;
+  background: rgba(20, 14, 8, 0.42);
+  opacity: 0.85;
 }
 .refine-slip-cost{
   font-family: 'Cinzel', serif;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   color: #1a0f06;
-  position: relative;
-  z-index: 1;
 }
 
 /* ═════════════════════════════════════════════════════════════
@@ -873,7 +846,11 @@ img{ -webkit-user-drag: none; user-drag: none; }
    ═════════════════════════════════════════════════════════════ */
 .cf-marquee{
   position: absolute;
-  top: 320px;       /* BELOW crystal+REFINE block (crystal at 130-216, REFINE ends ~272), ABOVE cultivator head (~358) */
+  /* New horizontal REFINE pill is now ~32px tall, so the crystal+REFINE
+     block ends at ~y=270. CF marquee sits at y=282 (12px below REFINE)
+     so the two read as siblings in the same horizontal lane, with
+     comfortable room above the cultivator's head at ~y=358. */
+  top: 282px;
   left: 50%;
   transform: translateX(-50%);
   width: 240px;
