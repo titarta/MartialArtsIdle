@@ -26191,4 +26191,98 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v3 rebuild. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v4: make the cultivator the unmistakable hero of the scene.
+   The crystal + refine stack was visually dominating the centre; the
+   cultivator was small + dark + lost in the temple platform. v4:
+   . scales the cultivator sprite ~30% bigger
+   . adds a dark radial scrim behind the cultivator that lets the
+     mandala bloom actually read against the busy temple bg
+   . brightens the mandala to clear visible aura status
+   . thickens + brightens the crystal chain
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Push the cultivator stage up in scale so the sprite reads as the
+   centrepiece of the scene rather than a small figure on a cushion. */
+.home-fighter-stage {
+  transform: scale(1.30);
+  transform-origin: center bottom;
+  margin-top: 8px;
+}
+@media (max-height: 760px) {
+  .home-fighter-stage { transform: scale(1.18); }
+}
+
+/* Dark vignette behind the cultivator: a soft radial shadow that gives
+   the mandala glow something to bloom against, so the temple's busy
+   tile pattern stops drowning the sacred composition. */
+.home-fighter-stage::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220%;
+  height: 220%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse at center,
+    rgba(8, 6, 4, 0.55) 0%,
+    rgba(8, 6, 4, 0.32) 28%,
+    rgba(8, 6, 4, 0.12) 55%,
+    transparent 80%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Mandala v4: explicitly visible aura. Larger, brighter, second ring
+   strengthened so the cultivator reads as seated inside a sacred
+   geometric frame. */
+.home-mandala {
+  bottom: -6%;
+  width: 190%;
+  height: 90%;
+  background:
+    radial-gradient(ellipse at center,
+      rgba(255, 220, 150, 0.78) 0%,
+      rgba(255, 180, 90, 0.45) 14%,
+      rgba(220, 140, 60, 0.22) 32%,
+      rgba(220, 140, 60, 0.10) 55%,
+      transparent 78%);
+  filter: blur(0.4px) saturate(1.15);
+  opacity: 1;
+  z-index: 0;
+}
+.home-mandala::before {
+  inset: 10% 12%;
+  border-width: 2px;
+  border-color: rgba(255, 220, 150, 0.85) !important;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(255, 230, 180, 0.32),
+    inset 0 0 36px rgba(255, 207, 131, 0.55),
+    0 0 42px rgba(255, 180, 90, 0.45) !important;
+}
+.home-mandala::after {
+  inset: 28% 32%;
+  border-width: 1.5px;
+  border-color: rgba(255, 220, 150, 0.65);
+  box-shadow: inset 0 0 14px rgba(255, 207, 131, 0.40);
+}
+
+/* Chain v4: thicker + brighter gold dashes so the crystal genuinely
+   reads as hung from above rather than floating. */
+.home-crystal-anchor::before {
+  width: 2px !important;
+  height: 56px !important;
+  top: -50px !important;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    #ffcf83 2px,
+    #ffcf83 5px,
+    rgba(255, 207, 131, 0.25) 5px,
+    rgba(255, 207, 131, 0.25) 7px) !important;
+  filter: drop-shadow(0 0 4px rgba(255, 207, 131, 0.65)) !important;
+}
+
+/* End of SANCTUM v4. */
+
 /* End of HOME "The Sanctum" design pass. */
