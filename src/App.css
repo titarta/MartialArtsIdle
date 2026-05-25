@@ -26360,4 +26360,96 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v5. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v6: scene cleanup so the live screen reads as CLEAN as the
+   mockup. The mockup was clean because it had a strong radial vignette
+   tone-down on the background, leaving UI elements high-contrast on a
+   dim sacred backdrop. The live had the full-brightness temple bg
+   fighting every UI element. v6 fixes that.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Tone the temple background DOWN. The home.png is gorgeous art but at
+   full brightness it competes with every overlay. Drop brightness +
+   saturation so it reads as the AMBIENCE of a dim temple, not the
+   focal subject. UI elements pop against it. */
+.home-bg {
+  filter: brightness(0.62) saturate(0.78) !important;
+}
+
+/* Strong radial vignette over the whole scene: darkens the edges so
+   the centre composition (crystal, cultivator, mandala) reads as
+   bathed in centred light from above. Mockup-style sacred dim space. */
+.home-scene {
+  position: relative;
+}
+.home-scene > .home-cultivation-zone::before {
+  content: '';
+  position: absolute;
+  inset: -8% -8% -4% -8%;
+  background:
+    radial-gradient(120% 80% at 50% 38%, transparent 0%, rgba(8, 6, 4, 0.55) 65%, rgba(8, 6, 4, 0.85) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ensure scene chrome (chips, tablet, crystal, cultivator) sits ABOVE
+   the new vignette. */
+.home-cultivation-zone > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Lift the existing top + bottom gradients so they layer above the bg
+   without compounding into murky muddiness. */
+.home-scene::before {
+  height: 18% !important;
+  background: linear-gradient(to bottom,
+    rgba(8, 6, 4, 0.85) 0%,
+    rgba(8, 6, 4, 0.35) 60%,
+    rgba(8, 6, 4, 0) 100%) !important;
+}
+.home-scene::after {
+  height: 22% !important;
+  background: linear-gradient(to top,
+    rgba(8, 6, 4, 0.90) 0%,
+    rgba(8, 6, 4, 0.40) 55%,
+    rgba(8, 6, 4, 0) 100%) !important;
+}
+
+/* Petition Tablet (top right): make it more prominent — was reading as
+   a tiny sticker pressed against the edge. Pull it slightly off the
+   edge and give it presence. */
+.home-chips-tr {
+  top: 8px !important;
+  right: 12px !important;
+}
+
+/* Active buffs chip (top left): tighten and re-pin per mockup. */
+.home-chips-tl {
+  top: 10px !important;
+  left: 12px !important;
+  gap: 6px !important;
+}
+
+/* Identity strip: more vertical breathing room below the cultivator so
+   it doesn't crowd the progress scroll. */
+.home-scene-bottom {
+  padding-bottom: 8px;
+}
+.home-scene-realm-header {
+  padding-top: 4px !important;
+}
+
+/* Progress scroll: tighten the gutters so the 道 medallions sit
+   flush with the scene edge rather than floating in a wide margin. */
+.home-bar-wrap {
+  padding-left: 22px !important;
+  padding-right: 22px !important;
+}
+.home-bar-wrap .realm-track {
+  margin: 0 24px !important;
+}
+
+/* End of SANCTUM v6 scene cleanup. */
+
 /* End of HOME "The Sanctum" design pass. */
