@@ -166,8 +166,15 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
                 const progress = Math.max(0, Math.min(1, remainingMs / b.total));
                 const secsLeft = Math.max(0, Math.ceil(remainingMs / 1000));
                 const rowUrgent = secsLeft < 10;
+                // Source prefix on the key drives the v10 coloured-stripe
+                // on the left edge of the row (spark / shop / ad / etc.).
+                const source = String(b.key).split(':')[0];
                 return (
-                  <li key={b.key} className={`abp-row${rowUrgent ? ' abp-row-urgent' : ''}`}>
+                  <li
+                    key={b.key}
+                    data-source={source}
+                    className={`abp-row${rowUrgent ? ' abp-row-urgent' : ''}`}
+                  >
                     <div className="abp-row-icon">
                       <BuffIcon icon={b.icon} />
                     </div>
