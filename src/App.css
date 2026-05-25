@@ -23733,7 +23733,12 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   overflow: hidden;
 }
 .cs-qi-strip::before {
-  content: '炁';
+  /* Was '炁' (Taoist literary qi) but Ma Shan Zheng doesn't include
+     U+7081 — it was silently falling back to system serif. Swapped to
+     '气' (modern simplified qi, same meaning, U+6C14) which IS in the
+     font and matches the realm icon for Qi Transformation, keeping the
+     calligraphy consistent. */
+  content: '气';
   position: absolute;
   right: -10px;
   top: -22px;
