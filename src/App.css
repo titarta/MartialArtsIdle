@@ -6327,6 +6327,59 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   flex-shrink: 0;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
+/* Silhouette treatment for the next-evolution sprite. Renders the PNG
+   as a pure black/dark shape so the player isn't spoiled on the next
+   tier's appearance. A faint inner glow + ? watermark turn it into a
+   'mystery form ahead' affordance. */
+.cdm-next-sprite-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 55%,
+      rgba(110, 200, 180, 0.18) 0%,
+      rgba(110, 200, 180, 0.06) 45%,
+      transparent 75%);
+  border-radius: 50%;
+}
+.cdm-next-sprite-silhouette {
+  width: 52px;
+  height: 52px;
+  /* brightness(0) collapses every pixel to pure black; opacity tones it
+     to a dark grey silhouette so it reads as a shadow shape rather than
+     a hard black blob. */
+  filter: brightness(0) opacity(0.62) drop-shadow(0 0 8px rgba(110, 200, 180, 0.30));
+  animation: cdm-silhouette-breathe 3.6s ease-in-out infinite;
+}
+@keyframes cdm-silhouette-breathe {
+  0%, 100% { opacity: 0.62; }
+  50%      { opacity: 0.78; }
+}
+.cdm-next-sprite-mystery {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display, 'Cinzel', serif);
+  font-size: 28px;
+  font-weight: 700;
+  color: rgba(245, 240, 220, 0.85);
+  text-shadow:
+    0 0 6px rgba(110, 200, 180, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+  /* Sit ABOVE the silhouette via stacking order in the parent. */
+}
+.cdm-next-name-mystery .cdm-next-mystery-text {
+  color: rgba(245, 240, 220, 0.55);
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
 .cdm-next-body {
   flex: 1;
   min-width: 0;

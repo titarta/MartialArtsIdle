@@ -115,21 +115,27 @@ export default function CrystalDetailModal({ level, onClose }) {
           </div>
         </div>
 
-        {/* Next evolution preview — full reveal, no silhouette. The player
-            has earned a look at where they're heading. */}
+        {/* Next evolution preview — sprite + name are SILHOUETTED so the
+            player isn't spoiled on the next tier's appearance. Only the
+            level threshold and the projected bonus are revealed (useful
+            gameplay numbers, not visual spoilers). The silhouette + name
+            unveil naturally when the player reaches that tier in-game. */}
         {nextInfo ? (
           <div className="cdm-next">
             <div className="cdm-next-header">Next Evolution</div>
             <div className="cdm-next-row">
-              <img
-                src={nextSprite}
-                alt=""
-                className="cdm-next-sprite"
-                draggable={false}
-              />
+              <div className="cdm-next-sprite-wrap">
+                <img
+                  src={nextSprite}
+                  alt=""
+                  className="cdm-next-sprite cdm-next-sprite-silhouette"
+                  draggable={false}
+                />
+                <span className="cdm-next-sprite-mystery" aria-hidden="true">?</span>
+              </div>
               <div className="cdm-next-body">
-                <div className="cdm-next-name">
-                  T{nextInfo.tier} · {nextName}
+                <div className="cdm-next-name cdm-next-name-mystery">
+                  T{nextInfo.tier} · <span className="cdm-next-mystery-text">???</span>
                 </div>
                 <div className="cdm-next-meta">
                   Reaches at level {nextInfo.level}
