@@ -11190,12 +11190,15 @@ body.sheet-open {
 
   /* ── Nav: bigger tap targets ──────────────────────────────────────────── */
   .navbar {
-    padding: 4px 4px calc(6px + env(safe-area-inset-bottom));
+    /* No top/side padding so the active-tab brass-rail (top:0 of .nav-btn)
+       sits flush with the navbar's actual top edge. */
+    padding: 0 0 env(safe-area-inset-bottom);
   }
 
   .nav-btn {
     min-height: 52px;
-    padding: 6px 4px;
+    /* No top padding either - the rail must sit at the navbar's top border. */
+    padding: 4px 4px 6px;
     gap: 3px;
   }
 
