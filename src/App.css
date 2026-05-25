@@ -26452,4 +26452,197 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v6 scene cleanup. */
 
+/* ──────────────────────────────────────────────────────────────────────
+   SANCTUM v7: align live to mockup specs EXACTLY.
+   v3 inverted some sizes from the mockup (my 道 caps were 34x34 vs
+   mockup 22x22; my qi numbers were too small; the stage tracking was
+   wrong; the gold rule was the wrong width). v7 reads the mockup spec
+   values verbatim and overrides the live styles to match.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Identity strip: realm name 18/.10em; stage 9px/.32em; rule 80x1;
+   qi-now 16px cream-warm; qi-cap 11px cream-dim; rate 11px gold-hot. */
+.home-scene-realm-name {
+  font-size: 18px !important;
+  letter-spacing: 0.10em !important;
+  text-shadow:
+    0 0 14px rgba(220, 175, 110, 0.30),
+    0 2px 4px rgba(0, 0, 0, 0.85) !important;
+}
+.home-scene-realm-stage {
+  font-size: 9px !important;
+  letter-spacing: 0.32em !important;
+  margin-top: 2px !important;
+}
+.home-scene-realm-header::after {
+  width: 80px !important;
+  margin: 8px auto 0 !important;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--ui-purple-gold, #dcaf6e) 50%,
+    transparent 100%) !important;
+}
+
+/* Qi row: numbers + rate at mockup proportions. The current text node
+   is just plain text inside .qi-rate; we cannot style sub-parts without
+   JSX edits, so we style the whole row uniformly at the mockup's "qi-now"
+   size (16px) and tint the rate-readout (qi-rate-value class) gold-hot. */
+.home-scene-overlay-row .qi-rate {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+}
+.home-scene-overlay-row .qi-rate-value {
+  color: var(--ui-purple-gold-hot, #ffcf83) !important;
+  font-size: 13px !important;
+  text-shadow:
+    0 0 6px rgba(255, 207, 131, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* 道 brass caps: shrink to the mockup's 22x22 simple brass medallion.
+   v3 sized them at 34x34 which felt bulky and out-of-proportion with the
+   12px-tall progress bar. */
+.home-bar-wrap::before,
+.home-bar-wrap::after {
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 13px !important;
+  border-width: 1px !important;
+  background: radial-gradient(circle at 30% 30%, #ffd66b 0%, #9b7d50 100%) !important;
+  border-color: rgba(0, 0, 0, 0.4) !important;
+  color: rgba(0, 0, 0, 0.78) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 225, 170, 0.30),
+    0 1px 2px rgba(0, 0, 0, 0.6) !important;
+  text-shadow: none !important;
+}
+.home-bar-wrap::before { left: 10px !important; }
+.home-bar-wrap::after  { right: 10px !important; }
+
+/* Progress scroll: bar tighter (12px tall mockup-spec), pill rounded
+   completely (border-radius 999px), softer dark inner. */
+.home-bar-wrap .realm-track {
+  height: 12px !important;
+  margin: 0 36px !important;
+  background: rgba(8, 6, 4, 0.85) !important;
+  border: 1px solid rgba(75, 60, 40, 0.55) !important;
+  border-radius: 999px !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.55) !important;
+  padding: 0 !important;
+}
+.home-bar-wrap .realm-channel {
+  height: 100% !important;
+  margin: 0 !important;
+  background: none !important;
+  border: none !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+}
+.home-bar-wrap .realm-fill {
+  height: 100% !important;
+  background: linear-gradient(180deg,
+    rgba(255, 207, 131, 1) 0%,
+    rgba(220, 175, 110, 1) 50%,
+    rgba(155, 125, 80, 1) 100%) !important;
+  box-shadow: 0 0 8px rgba(255, 207, 131, 0.55) !important;
+  border-radius: 999px !important;
+}
+
+/* Mandala: footing ellipse under the cultivator's seat. Mockup spec is
+   subtle (220x28) but the live temple bg eats it; bump opacity + glow
+   so it actually reads against the temple platform tile pattern. */
+.home-mandala {
+  bottom: 0%;
+  width: 240px;
+  height: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 120px 20px at 50% 60%,
+    rgba(255, 207, 131, 0.62) 0%,
+    rgba(220, 175, 110, 0.32) 35%,
+    rgba(220, 175, 110, 0) 75%) !important;
+  border-radius: 50%;
+  filter: none;
+  opacity: 1;
+}
+.home-mandala::before {
+  inset: auto !important;
+  left: 50% !important;
+  bottom: 8px !important;
+  width: 150px !important;
+  height: 22px !important;
+  transform: translateX(-50%) !important;
+  border: 1.5px solid rgba(255, 207, 131, 0.65) !important;
+  border-radius: 50% !important;
+  background: radial-gradient(ellipse 75px 11px at 50% 50%,
+    rgba(255, 207, 131, 0.45) 0%,
+    transparent 80%) !important;
+  box-shadow:
+    0 0 12px rgba(255, 207, 131, 0.50),
+    inset 0 0 8px rgba(255, 207, 131, 0.28) !important;
+}
+.home-mandala::after { display: none !important; }
+@keyframes home-mandala-pulse {
+  0%, 100% { opacity: 0.78; transform: translateX(-50%) scale(1);    }
+  50%      { opacity: 1;    transform: translateX(-50%) scale(1.05); }
+}
+
+/* Crystal mount halo: cyan glow around the crystal sprite to match
+   mockup's hung-ornament look. The existing crystal-img-wrap is the
+   anchor for the sprite. */
+.home-crystal-img-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: radial-gradient(circle,
+    rgba(180, 220, 255, 0.30) 0%,
+    transparent 65%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: home-crystal-mount-glow 3.2s ease-in-out infinite;
+  z-index: -1;
+}
+@keyframes home-crystal-mount-glow {
+  0%, 100% { opacity: 0.7; transform: scale(1);    }
+  50%      { opacity: 1;   transform: scale(1.08); }
+}
+
+/* REFINE button: tighter pill, brass gradient, with the triangle prefix
+   sized down per mockup. */
+.home-crystal-refine-btn {
+  padding: 6px 13px 5px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.12em !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg,
+    rgba(220, 175, 110, 0.92) 0%,
+    rgba(155, 125, 80, 0.92) 100%) !important;
+  border: 1px solid rgba(255, 225, 170, 0.55) !important;
+  color: #1a120a !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    0 0 14px -2px rgba(255, 207, 131, 0.50),
+    0 4px 8px -4px rgba(0, 0, 0, 0.5) !important;
+}
+.home-crystal-refine-btn .home-crystal-refine-icon {
+  font-size: 8px !important;
+  opacity: 0.85 !important;
+}
+
+/* Reduce the v6 vignette darkness — was so heavy the temple bg was
+   nearly invisible. Bring it back to mockup-level subtle vignette. */
+.home-cultivation-zone::before {
+  background:
+    radial-gradient(120% 80% at 50% 38%,
+      transparent 0%,
+      rgba(8, 6, 4, 0.35) 65%,
+      rgba(8, 6, 4, 0.65) 100%) !important;
+}
+.home-bg {
+  filter: brightness(0.72) saturate(0.82) !important;
+}
+
+/* End of SANCTUM v7 mockup-spec alignment. */
+
 /* End of HOME "The Sanctum" design pass. */
