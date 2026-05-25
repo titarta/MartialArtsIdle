@@ -860,10 +860,14 @@ function spawnCrystalSpark(layer, intensity) {
 const QI_FLOW_ORB_POOL    = ['orb_small', 'orb_medium', 'orb_bright', 'orb_faint'];
 const QI_FLOW_RING_MIN_PX = 110;
 const QI_FLOW_RING_MAX_PX = 180;
-const QI_FLOW_BASE_RATE   = 1.5;  // particles/sec at effective ×1
-const QI_FLOW_RATE_K      = 3.0;  // sqrt(eff-1) coefficient — sub-linear ramp
-const QI_FLOW_BASE_SPEED  = 60;   // px/s baseline inflow
-const QI_FLOW_SPEED_K     = 24;   // sqrt(eff) coefficient on speed
+// Bumped baseline + multiplier coefficient so the stream is clearly
+// VISIBLE at idle and dramatically denser when boosted. Heavenly Qi
+// (×2) and Focus (×3) combined should make the cultivator visibly
+// drinking in qi from all directions.
+const QI_FLOW_BASE_RATE   = 3.0;  // particles/sec at effective ×1
+const QI_FLOW_RATE_K      = 5.5;  // sqrt(eff-1) coefficient
+const QI_FLOW_BASE_SPEED  = 80;   // px/s baseline inflow
+const QI_FLOW_SPEED_K     = 36;   // sqrt(eff) coefficient on speed
 
 function spawnQiFlowOrb(layer, eff) {
   const w = layer.clientWidth;

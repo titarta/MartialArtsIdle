@@ -25604,7 +25604,14 @@ img.pp-emblem-locked { font-size: 0; }
 .home-fighter-stage > .home-cultivator-sprite,
 .home-fighter-stage > .home-cultivator-aura,
 .home-fighter-stage > .home-cultivator-qi-flow-layer {
-  position: relative;
+  /* MUST stay absolute + inset:0 so the layer fills the fighter-stage
+     and gives the spawner non-zero clientWidth/Height to spawn into.
+     v5 had this as position:relative which collapsed the layer to 0x0
+     and silently killed the qi-flow particle stream. Keep z-index 1
+     so particles render BETWEEN the mandala (z:0) and the cultivator
+     sprite (z:1+). */
+  position: absolute;
+  inset: 0;
   z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
