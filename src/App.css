@@ -28714,4 +28714,100 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v20. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v22: REFINE button contrast pass.
+   The ▲ icon was barely visible (dark on brass) and the label suffered
+   from warm-on-warm contrast issues. v22 pushes each piece:
+   . Icon-square: brighter brass top + darker brass bottom; bigger
+     triangle in deep oxblood for crisp contrast against the gold
+   . Body: darker brass panel so cream/gold text pops
+   . REFINE label: pure cream-warm with stronger dark text-shadow
+   . Cost: brighter gold-hot with a stronger glow + bold weight
+   . Inner divider line between icon-square and body so the upgrade
+     affordance (left = action, right = info) reads at a glance
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-crystal-refine-btn,
+.home-crystal-anchor .home-crystal-refine-btn {
+  /* Lift the chassis - clearer border, deeper drop-shadow for the
+     'tap me' affordance. */
+  border: 1px solid rgba(255, 230, 180, 0.85) !important;
+  box-shadow:
+    0 0 16px -2px rgba(255, 207, 131, 0.62),
+    0 4px 8px -2px rgba(0, 0, 0, 0.75) !important;
+}
+
+/* Icon-square: HIGHER contrast brass gradient + bigger triangle in
+   deep oxblood. The triangle is the upgrade affordance - it MUST read. */
+.home-crystal-refine-btn .home-crystal-refine-icon {
+  width: 36px !important;
+  min-width: 36px !important;
+  font-size: 20px !important;
+  font-weight: 900 !important;
+  background:
+    linear-gradient(180deg, #ffe5a0 0%, #ffcf83 40%, #b58850 100%) !important;
+  border-right: 1px solid rgba(20, 14, 8, 0.65) !important;
+  color: #3a1a0a !important;     /* deep oxblood - high contrast on brass */
+  text-shadow:
+    0 1px 0 rgba(255, 240, 200, 0.55),
+    0 -1px 0 rgba(0, 0, 0, 0.35);
+  line-height: 1;
+}
+
+/* Body: darker brass so cream/gold text reads clearly. */
+.home-crystal-refine-btn .home-crystal-refine-label {
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.10) 0%, transparent 28%, transparent 72%, rgba(0, 0, 0, 0.30) 100%),
+    linear-gradient(180deg, rgba(95, 60, 26, 0.98) 0%, rgba(60, 38, 16, 0.98) 100%) !important;
+}
+
+/* Amber progress fill: tone it down slightly so it doesn't wash out
+   the label text when at high %. */
+.home-crystal-refine-btn .home-crystal-refine-label::before {
+  background:
+    linear-gradient(180deg, rgba(255, 220, 130, 0.35) 0%, rgba(255, 190, 90, 0.22) 100%) !important;
+}
+
+/* REFINE label: pure cream-warm with strong shadow for readability. */
+.home-crystal-refine-btn .home-crystal-refine-verb {
+  color: #fff8e0 !important;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.90),
+    0 0 6px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Target level: gold-hot with strong glow. */
+.home-crystal-refine-btn .home-crystal-refine-next {
+  color: #ffe2a0 !important;
+  text-shadow:
+    0 0 6px rgba(255, 207, 131, 0.85),
+    0 1px 2px rgba(0, 0, 0, 0.90) !important;
+}
+
+/* Cost: brighter gold-hot, bolder, with glow. */
+.home-crystal-refine-btn .home-crystal-refine-cost {
+  font-weight: 800 !important;
+  color: #ffe2a0 !important;
+  text-shadow:
+    0 0 6px rgba(255, 207, 131, 0.85),
+    0 1px 2px rgba(0, 0, 0, 0.90) !important;
+}
+
+/* Unaffordable: cost in vermillion with appropriate glow. */
+.home-crystal-refine-btn.home-crystal-refine-btn-disabled .home-crystal-refine-cost {
+  color: #ff8888 !important;
+  text-shadow:
+    0 0 6px rgba(255, 91, 91, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.90) !important;
+}
+.home-crystal-refine-btn.home-crystal-refine-btn-disabled .home-crystal-refine-icon {
+  /* Dim the icon-square too when unaffordable so the whole button
+     reads as 'not now'. */
+  background:
+    linear-gradient(180deg, #a08858 0%, #8a7048 40%, #5a4528 100%) !important;
+  color: rgba(58, 26, 10, 0.62) !important;
+}
+
+/* End of SANCTUM v22. */
+
 /* End of HOME "The Sanctum" design pass. */
