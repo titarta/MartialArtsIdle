@@ -27449,4 +27449,111 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v10 pass 2. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v10.5: ship-fidelity fixes per direct comparison with the
+   home-v3-states-mockup. Live deviated in 5 specific ways; this block
+   closes each gap.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. REFINE button — was absolute (didn't take flow), causing it to
+      overlap the cultivator's upper body. Make it relative so flex
+      naturally pushes the cultivator down below it. */
+.home-crystal-anchor .home-crystal-refine-btn {
+  position: relative !important;
+  top: auto !important;
+  transform: none !important;
+  margin-top: 8px !important;
+}
+
+/* 2. REFINE watermark — was way too prominent (46px / 0.18 alpha).
+      The mockup's 提 is BARELY visible. Drop to 0.10 alpha and shrink
+      to 30px so the English 'REFINE' label is unambiguously the hero. */
+.home-crystal-refine-btn::before {
+  font-size: 30px !important;
+  color: rgba(20, 14, 8, 0.10) !important;
+}
+
+/* 3. Cloud frieze — solid brass band at the top of the cultivation
+      zone. Bumped to unambiguously visible against the dim temple bg. */
+.home-cultivation-zone::after {
+  height: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 220, 150, 0.78) 0%, rgba(220, 175, 110, 0.55) 45%, rgba(120, 80, 38, 0.42) 90%, transparent 100%),
+    radial-gradient(ellipse 12px 5px at 18px 8px, rgba(255, 240, 200, 0.72) 0%, transparent 60%),
+    radial-gradient(ellipse 9px 4px at 38px 11px, rgba(255, 240, 200, 0.55) 0%, transparent 60%) !important;
+  background-size: auto, 48px 18px, 48px 18px !important;
+  background-repeat: no-repeat, repeat-x, repeat-x !important;
+  border-bottom: 1.5px solid rgba(255, 207, 131, 0.85) !important;
+  box-shadow: 0 2px 14px rgba(255, 207, 131, 0.45), 0 3px 0 rgba(0, 0, 0, 0.45) !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+}
+
+/* 4. Bamboo pillars — pseudos on .home-bg were behind the temple bg
+      art. Move them to .home-cultivation-zone so they sit on top.
+      Bump opacity to actually read. */
+.home-bg::before,
+.home-bg::after { display: none !important; }
+
+.home-cultivation-zone {
+  position: relative;
+}
+.home-cultivation-zone > .home-chips-tl ~ *::before,
+.home-cultivation-zone > .home-chips-tl ~ *::after { /* dummy chain */ }
+
+/* Pillars implemented as ::before/::after on the home-pc-center which
+   sits inside home-cultivation-zone but BELOW the scene chrome. */
+.home-pc-center {
+  position: relative;
+}
+.home-pc-center::before,
+.home-pc-center::after {
+  content: '';
+  position: absolute;
+  top: 22px; bottom: 100px;
+  width: 2.5px;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(220, 175, 110, 0.55) 10%,
+    rgba(255, 207, 131, 0.85) 50%,
+    rgba(220, 175, 110, 0.55) 90%,
+    transparent 100%);
+  filter: drop-shadow(0 0 6px rgba(255, 207, 131, 0.55));
+  z-index: 9;
+}
+.home-pc-center::before { left: 14px; }
+.home-pc-center::after  { right: 14px; }
+
+/* 5. Cushion shadow — was at the BOTTOM of the fighter-stage but the
+      sprite's actual seated position depends on the PNG. Bump opacity
+      and reposition so it's clearly the cultivator's ground footprint. */
+.home-fighter-stage::before {
+  width: 190px !important;
+  height: 22px !important;
+  bottom: -8px !important;
+  background:
+    radial-gradient(ellipse 95px 11px at 50% 50%,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.45) 50%,
+      transparent 80%) !important;
+  filter: blur(1px) !important;
+}
+
+/* 6. Petition Tablet — give it the mockup-spec presence. The chips-tr
+      container constrains width; bump the plaque inside. */
+.home-chips-tr .home-hq-tablet {
+  width: 88px !important;
+}
+.home-chips-tr .hq-plaque {
+  width: 78px !important;
+  min-height: 156px !important;
+}
+.home-chips-tr .hq-glyph {
+  font-size: 46px !important;
+  text-shadow: 0 0 14px rgba(220, 175, 110, 0.55), 0 1px 0 rgba(0, 0, 0, 0.6) !important;
+}
+
+/* End of SANCTUM v10.5 fidelity fixes. */
+
 /* End of HOME "The Sanctum" design pass. */
