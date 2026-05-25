@@ -69,7 +69,7 @@ html, body{
 }
 img{ -webkit-user-drag: none; user-drag: none; }
 .lead{
-  max-width: 1280px;
+  max-width: 1740px;
   text-align: center;
   color: rgba(245,230,200,.55);
   font-size: 12.5px;
@@ -111,6 +111,190 @@ img{ -webkit-user-drag: none; user-drag: none; }
   max-width: 280px;
   text-align: center;
   line-height: 1.55;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   ACTIVE BUFFS MODAL (state D)
+   Opens when the player taps the jade charm. Lists every active
+   temporary buff with name + effect + countdown bar. Sorted by
+   soonest-ending so the player can prioritise extending.
+   ═════════════════════════════════════════════════════════════ */
+.buffs-modal-scrim{
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 6, 4, 0.78);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: scrim-in 0.18s ease-out;
+}
+@keyframes scrim-in { from { opacity: 0; } to { opacity: 1; } }
+.buffs-modal{
+  width: 320px;
+  max-height: 560px;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.06) 0%, transparent 18%, transparent 82%, rgba(220,175,110,.06) 100%),
+    linear-gradient(180deg, #2a1d10 0%, #1f160c 100%);
+  border: 1px solid var(--bronze-rim);
+  border-radius: 10px;
+  padding: 16px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,225,170,.20),
+    inset 0 -1px 0 rgba(0,0,0,.55),
+    0 18px 40px rgba(0,0,0,.75),
+    0 0 28px -6px rgba(220,175,110,.42);
+  animation: modal-in 0.24s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+.buffs-modal-header{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(220,175,110,.22);
+}
+.buffs-modal-title{
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cream-warm);
+  text-shadow: 0 1px 2px rgba(0,0,0,.7);
+}
+.buffs-modal-count{
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  color: var(--jade);
+}
+.buffs-modal-list{
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.buff-row{
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 9px;
+  background: linear-gradient(180deg, rgba(50, 35, 22, 0.85) 0%, rgba(30, 22, 14, 0.85) 100%);
+  border: 1px solid rgba(220,175,110,.30);
+  border-radius: 6px;
+  overflow: hidden;
+}
+/* Buff-type accent stripe on the left edge */
+.buff-row::before{
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent, var(--jade));
+}
+.buff-row.type-shop   { --accent: #ff9966; }
+.buff-row.type-ad     { --accent: var(--gold-hot); }
+.buff-row.type-spark  { --accent: var(--violet); }
+.buff-row.type-pill   { --accent: var(--jade); }
+.buff-row-icon{
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: rgba(8,6,4,.55);
+  border: 1px solid rgba(220,175,110,.25);
+  border-radius: 6px;
+  color: var(--accent, var(--cream));
+}
+.buff-row-body{
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.buff-row-name{
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--cream-warm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.buff-row-effect{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .10em;
+  color: var(--gold-hot);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+.buff-row-time{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 56px;
+}
+.buff-row-time-value{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cream-warm);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+}
+.buff-row-progress{
+  width: 56px;
+  height: 3px;
+  background: rgba(8,6,4,.65);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.buff-row-progress > span{
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent, var(--gold-hot)), var(--gold-hot));
+  box-shadow: 0 0 6px var(--accent, var(--gold-hot));
+  border-radius: 999px;
+}
+.buffs-modal-footer{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid rgba(220,175,110,.18);
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.buffs-modal-hint{
+  color: rgba(245,230,200,.55);
+}
+.buffs-modal-close{
+  color: var(--gold-hot);
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  font-weight: 700;
 }
 .phone{
   width: 390px;
@@ -320,9 +504,14 @@ img{ -webkit-user-drag: none; user-drag: none; }
   width: 1.5px; height: 24px;
   background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
 }
+/* Charm: entry point indicator for the Active Buffs modal. Hidden when
+   no buffs are active. When active: shows a sparkle icon + count of
+   buffs + soonest-ending countdown, with a pulsing jade glow. Tap to
+   open the Active Buffs modal (real detail lives there). */
 .charm-stone{
-  width: 52px;
-  padding: 8px 8px 7px;
+  position: relative;
+  width: 56px;
+  padding: 7px 6px 6px;
   background:
     linear-gradient(180deg, rgba(126, 195, 143, 0.22) 0%, rgba(126, 195, 143, 0.10) 100%),
     rgba(10, 18, 12, 0.88);
@@ -331,33 +520,61 @@ img{ -webkit-user-drag: none; user-drag: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   box-shadow:
     0 1px 0 rgba(180,255,200,.14) inset,
     0 -1px 0 rgba(0,0,0,.45) inset,
     0 0 14px -4px rgba(126, 195, 143, 0.50),
     0 6px 10px -6px rgba(0,0,0,.85);
+  animation: charm-pulse 2.4s ease-in-out infinite;
 }
-.charm-kicker{
-  font-family: 'Cinzel', serif;
-  font-size: 6.5px;
-  font-weight: 700;
-  letter-spacing: .18em;
-  color: rgba(174, 223, 184, 0.78);
-  text-transform: uppercase;
+@keyframes charm-pulse{
+  0%, 100% { box-shadow:
+    0 1px 0 rgba(180,255,200,.14) inset,
+    0 -1px 0 rgba(0,0,0,.45) inset,
+    0 0 14px -4px rgba(126, 195, 143, 0.50),
+    0 6px 10px -6px rgba(0,0,0,.85); }
+  50%      { box-shadow:
+    0 1px 0 rgba(180,255,200,.18) inset,
+    0 -1px 0 rgba(0,0,0,.45) inset,
+    0 0 22px -4px rgba(126, 195, 143, 0.85),
+    0 6px 10px -6px rgba(0,0,0,.85); }
 }
-.charm-glyph{
-  font-family: 'Ma Shan Zheng', serif;
-  font-size: 28px;
+.charm-icon{
+  font-size: 14px;
   line-height: 1;
   color: var(--jade);
-  text-shadow: 0 0 8px rgba(126,195,143,.45);
+  text-shadow: 0 0 6px rgba(126,195,143,.55);
 }
-.charm-value{
+.charm-count{
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #d0ffd9;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  text-shadow: 0 1px 1px rgba(0,0,0,.65);
+}
+.charm-count-label{
+  font-family: 'Cinzel', serif;
+  font-size: 6px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(174, 223, 184, 0.72);
+}
+.charm-rule{
+  width: 60%;
+  height: 1px;
+  background: rgba(126, 195, 143, 0.30);
+  margin: 3px 0 2px;
+}
+.charm-countdown{
   font-family: 'Cinzel', serif;
   font-size: 7.5px;
   font-weight: 700;
-  letter-spacing: .12em;
+  letter-spacing: .08em;
   color: #aedfb8;
   font-variant-numeric: tabular-nums;
 }
@@ -1088,9 +1305,11 @@ img{ -webkit-user-drag: none; user-drag: none; }
           <div class="charm">
             <span class="charm-cord"></span>
             <div class="charm-stone">
-              <span class="charm-kicker">AURA</span>
-              <span class="charm-glyph">气</span>
-              <span class="charm-value">26m</span>
+              <span class="charm-icon">✦</span>
+              <span class="charm-count">3</span>
+              <span class="charm-count-label">Buffs</span>
+              <span class="charm-rule"></span>
+              <span class="charm-countdown">12m</span>
             </div>
           </div>
 
@@ -1187,9 +1406,11 @@ img{ -webkit-user-drag: none; user-drag: none; }
           <div class="charm">
             <span class="charm-cord"></span>
             <div class="charm-stone">
-              <span class="charm-kicker">AURA</span>
-              <span class="charm-glyph">气</span>
-              <span class="charm-value">26m</span>
+              <span class="charm-icon">✦</span>
+              <span class="charm-count">3</span>
+              <span class="charm-count-label">Buffs</span>
+              <span class="charm-rule"></span>
+              <span class="charm-countdown">12m</span>
             </div>
           </div>
 
@@ -1300,9 +1521,11 @@ img{ -webkit-user-drag: none; user-drag: none; }
           <div class="charm">
             <span class="charm-cord"></span>
             <div class="charm-stone">
-              <span class="charm-kicker">AURA</span>
-              <span class="charm-glyph">气</span>
-              <span class="charm-value">26m</span>
+              <span class="charm-icon">✦</span>
+              <span class="charm-count">3</span>
+              <span class="charm-count-label">Buffs</span>
+              <span class="charm-rule"></span>
+              <span class="charm-countdown">12m</span>
             </div>
           </div>
 
@@ -1369,6 +1592,159 @@ img{ -webkit-user-drag: none; user-drag: none; }
         </div>
       </div>
       <div class="frame-sub">When the realm bar fills. The 進 gate cartouche replaces the progress scroll with a calling-card golden pulse. Tap to ascend to next realm.</div>
+    </div>
+
+    <!-- ═══════════════════ STATE D: ACTIVE BUFFS MODAL ═══════════════════ -->
+    <div class="frame idle">
+      <div class="frame-label">D · Buffs Modal</div>
+      <div class="phone">
+
+        <div class="threshold">
+          <button class="threshold-lotus"><img src="../../public/sprites/items/blood_lotus.png"><span>4,950</span></button>
+          <button class="threshold-bazaar"><img src="../../public/ui/shop_nav.png"></button>
+          <div class="threshold-currency">
+            <span class="curr-pair"><img src="../../public/ui/qi.png"><span class="curr-value">73.4K</span></span>
+            <span class="curr-divider"></span>
+            <span class="curr-pair"><img src="../../public/ui/karma.png"><span class="curr-value">61</span></span>
+          </div>
+          <div class="threshold-actions">
+            <button class="threshold-icon">☸</button>
+            <button class="threshold-icon has-unread">📊</button>
+            <button class="threshold-icon">⚙</button>
+          </div>
+        </div>
+
+        <div class="sanctum">
+          <div class="plane-atmosphere"></div>
+          <div class="plane-bloom"></div>
+
+          <div class="frieze"></div>
+          <span class="pillar pillar-left"></span>
+          <span class="pillar pillar-right"></span>
+
+          <div class="charm">
+            <span class="charm-cord"></span>
+            <div class="charm-stone">
+              <span class="charm-icon">✦</span>
+              <span class="charm-count">3</span>
+              <span class="charm-count-label">Buffs</span>
+              <span class="charm-rule"></span>
+              <span class="charm-countdown">12m</span>
+            </div>
+          </div>
+
+          <div class="petition">
+            <span class="petition-cord"></span>
+            <span class="petition-cap"></span>
+            <div class="petition-plaque">
+              <span class="petition-kicker">Heavenly Qi</span>
+              <span class="petition-glyph">天</span>
+              <div class="petition-offer">
+                <span class="petition-rate">×2 QI/S</span>
+                <span class="petition-dur">30 MIN</span>
+              </div>
+              <span class="petition-cta">Tap to petition</span>
+            </div>
+          </div>
+
+          <div class="crystal-axis">
+            <span class="crystal-chain"></span>
+            <div class="crystal-mount">
+              <img class="crystal-sprite" src="../../public/crystals/crystal_1.png" alt="" />
+              <span class="crystal-lv">Lv 0</span>
+            </div>
+            <button class="refine-slip">
+              <span class="refine-slip-tri">▲</span>
+              <span class="refine-slip-label">Refine</span>
+              <span class="refine-slip-rule"></span>
+              <span class="refine-slip-cost">10 Qi</span>
+            </button>
+          </div>
+
+          <div class="cultivator-stage">
+            <span class="cultivator-cushion"></span>
+            <img class="cultivator-sprite" src="../../public/sprites/cultivator/t0_novice_normal.png" alt="" />
+          </div>
+
+          <div class="identity-plaque">
+            <div class="id-realm">Tempered Body</div>
+            <div class="id-stage">Layer 9</div>
+            <div class="id-rule"></div>
+            <div class="id-qi-row">
+              <span class="id-qi-now">73,400</span>
+              <span class="id-qi-cap">/ 87,000</span>
+              <span class="id-rate">+1,024 / SEC</span>
+            </div>
+          </div>
+
+          <div class="progress-scroll">
+            <span class="progress-cap">道</span>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+            <span class="progress-cap">道</span>
+          </div>
+
+          <!-- ACTIVE BUFFS MODAL — opens when player taps the jade charm -->
+          <div class="buffs-modal-scrim">
+            <div class="buffs-modal">
+              <div class="buffs-modal-header">
+                <span class="buffs-modal-title">Active Buffs</span>
+                <span class="buffs-modal-count">3 active</span>
+              </div>
+              <div class="buffs-modal-list">
+
+                <div class="buff-row type-ad">
+                  <span class="buff-row-icon">☸</span>
+                  <span class="buff-row-body">
+                    <span class="buff-row-name">Heavenly Qi</span>
+                    <span class="buff-row-effect">×2 Qi/s</span>
+                  </span>
+                  <span class="buff-row-time">
+                    <span class="buff-row-time-value">12:08</span>
+                    <span class="buff-row-progress"><span style="width: 40%"></span></span>
+                  </span>
+                </div>
+
+                <div class="buff-row type-shop">
+                  <span class="buff-row-icon">⚜</span>
+                  <span class="buff-row-body">
+                    <span class="buff-row-name">Crimson Aura</span>
+                    <span class="buff-row-effect">+30% Focus</span>
+                  </span>
+                  <span class="buff-row-time">
+                    <span class="buff-row-time-value">25:42</span>
+                    <span class="buff-row-progress"><span style="width: 86%"></span></span>
+                  </span>
+                </div>
+
+                <div class="buff-row type-spark">
+                  <span class="buff-row-icon">✦</span>
+                  <span class="buff-row-body">
+                    <span class="buff-row-name">Focus Surge</span>
+                    <span class="buff-row-effect">×1.25 Crystal Tap</span>
+                  </span>
+                  <span class="buff-row-time">
+                    <span class="buff-row-time-value">04:17</span>
+                    <span class="buff-row-progress"><span style="width: 14%"></span></span>
+                  </span>
+                </div>
+
+              </div>
+              <div class="buffs-modal-footer">
+                <span class="buffs-modal-hint">Tap charm again to close</span>
+                <button class="buffs-modal-close">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gates">
+          <div class="gate-tab active"><span class="gate-icon"><img src="../../public/sprites/nav/home.png"></span><span class="gate-label">Home</span></div>
+          <div class="gate-tab"><span class="gate-icon"><img src="../../public/sprites/nav/training.png"></span><span class="gate-label">Cultivation</span></div>
+          <div class="gate-tab"><span class="gate-icon" style="font-size: 22px;">📜</span><span class="gate-label">Journey</span></div>
+          <div class="gate-tab"><span class="gate-icon locked"><img src="../../public/sprites/nav/inventory.png"></span><span class="gate-label">Collection</span><span class="gate-seal">封</span></div>
+        </div>
+      </div>
+      <div class="frame-sub">Tap the jade charm to open this modal. Lists every active temporary buff (ad, shop, spark, pill etc.) with name, effect, and time remaining. Coloured stripe + icon distinguishes the source. Sorted by soonest-ending so you can prioritise.</div>
     </div>
 
   </div>
