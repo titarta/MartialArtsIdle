@@ -780,14 +780,14 @@ export const SPARK_COPY = {
   },
   sharper_focus: {
     icon: '🔍',
-    heroGlyph: '銳',
+    heroGlyph: '锐',
     effectText: '**+2% Focus multiplier** this run. Stacks.',
     exampleText: 'Three stacks make your Focus <strong>+6% stronger</strong>. Especially useful if you Focus often.',
     loreText: 'The blade is sharpened on the same stone, every morning.',
   },
   enduring_stream: {
     icon: '🏞️',
-    heroGlyph: '恆',
+    heroGlyph: '恒',
     effectText: '**+1% qi/s** this run. Stacks.',
     exampleText: 'Five stacks compound to roughly <strong>+5% total qi/s</strong>. Small but reliable, never expires.',
     loreText: 'The river that never stops becomes the sea.',
@@ -808,7 +808,7 @@ export const SPARK_COPY = {
   },
   heavens_bond: {
     icon: '☁️',
-    heroGlyph: '緣',
+    heroGlyph: '缘',
     effectText: '**+3% offline qi rate** this run. Stacks.',
     exampleText: 'Base offline rate is 20%. Three stacks lift it to <strong>29% offline rate</strong>, so your sect cultivates a little harder while you sleep.',
     loreText: 'The heavens do not require your attention. Only your alignment.',
@@ -834,7 +834,7 @@ export const SPARK_COPY = {
   },
   legendary_a2_hall_ten_thousand: {
     icon: PROD_SPRITE('p_sect_followers'),
-    heroGlyph: '萬',
+    heroGlyph: '万',
     effectText: 'Each **Tempering Disciple + Sect Follower** pair: both produce **×1.75**.',
     exampleText: 'Own <strong>10 disciples + 4 sect followers</strong>, so 4 pairs, each producer\'s qi/s is multiplied by <strong>×4</strong> (1 + 4 × 0.75).',
     loreText: 'A single disciple becomes a focal point; ten thousand pilgrims bow toward them. The pilgrim sees the disciple; the disciple feels the weight.',
@@ -855,7 +855,7 @@ export const SPARK_COPY = {
   },
   legendary_a5_void_garden: {
     icon: PROD_SPRITE('p_void'),
-    heroGlyph: '虛',
+    heroGlyph: '虚',
     effectText: 'Each **Void Conduit + Herb Garden** pair: both produce **×2.5**.',
     exampleText: 'Own <strong>3 void conduits + 10 gardens</strong>, so 3 pairs, each producer\'s qi/s is multiplied by <strong>×5.5</strong> (1 + 3 × 1.5).',
     loreText: 'The void\'s bleed carries seeds from another world; the garden devours them, blooms in colors no eye has named.',
@@ -873,35 +873,35 @@ export const SPARK_COPY = {
   // late-game compounding. Examples updated to match the new values.
   legendary_b1_dragon_hoard: {
     icon: PROD_SPRITE('p_dragon'),
-    heroGlyph: '寶',
+    heroGlyph: '宝',
     effectText: '**Spirit Dragon** gains **+25% qi/s** per Ancestral Treasure owned.',
     exampleText: 'Own <strong>1 dragon + 10 treasures</strong>, dragon\'s qi/s is <strong>×3.5</strong> (1 + 10 × 0.25). At 20 treasures, ×6.',
     loreText: 'The dragon\'s pearl is whatever you offered it. Every relic you\'ve kept, it has folded into itself.',
   },
   legendary_b3_beast_tribute: {
     icon: PROD_SPRITE('p_beast_pact'),
-    heroGlyph: '貢',
+    heroGlyph: '贡',
     effectText: '**Spirit Beast Pact** gains **+12% qi/s** per Spirit Herb Garden.',
     exampleText: 'Own <strong>10 beast pacts + 15 gardens</strong>, each beast pact\'s qi/s is <strong>×2.8</strong> (1 + 15 × 0.12).',
     loreText: 'Tigers eat the spirit herbs you grow. They return larger, faster, sharper.',
   },
   legendary_b4_furnace_sect: {
     icon: PROD_SPRITE('p_meridian_furnace'),
-    heroGlyph: '爐',
+    heroGlyph: '炉',
     effectText: '**Meridian Furnace** gains **+4% qi/s** per Tempering Disciple.',
     exampleText: 'Own <strong>5 furnaces + 50 disciples</strong>, each furnace\'s qi/s is <strong>×3</strong> (1 + 50 × 0.04).',
     loreText: 'Every apprentice\'s breath stokes the bronze legs a little brighter. The furnace was always a sect\'s effort.',
   },
   legendary_b5_heavens_bend: {
     icon: PROD_SPRITE('p_pillar'),
-    heroGlyph: '彎',
+    heroGlyph: '弯',
     effectText: '**Heavenly Pillar** produces **double qi/s** while you own ≥1 Void Conduit.',
     exampleText: 'Own <strong>10 pillars + 1 void</strong>, each pillar\'s qi/s is <strong>×2</strong>. Owning more voids doesn\'t increase the bonus further.',
     loreText: 'When reality is already torn, heaven stops resisting.',
   },
   legendary_b6_phoenix_garden: {
     icon: PROD_SPRITE('p_phoenix'),
-    heroGlyph: '園',
+    heroGlyph: '园',
     effectText: '**Sovereign Phoenix** gains **+5% qi/s** per Spirit Herb Garden.',
     exampleText: 'Own <strong>1 phoenix + 40 gardens</strong>, phoenix\'s qi/s is <strong>×3</strong> (1 + 40 × 0.05).',
     loreText: 'Fenghuang nests only where the soil is medicine. A hundred gardens, a hundred reasons to stay.',
@@ -911,7 +911,7 @@ export const SPARK_COPY = {
   // 2026-05-21 Dial-4.1: ×2 exponential to +50% additive per major BT.
   legendary_e2_phoenix_reborn: {
     icon: PROD_SPRITE('p_phoenix'),
-    heroGlyph: '鳳',
+    heroGlyph: '凤',
     effectText: 'Each major realm: **Phoenix → 0**, all other producers **+50% qi/s** permanently.',
     exampleText: 'Cross <strong>5 major realms</strong> with this active and every non-phoenix producer ends at <strong>×3.5 their normal output</strong> (1 + 5 × 0.5). You lose all phoenixes, but the rest of your sect grows steadily.',
     loreText: 'Fenghuang is reborn from its own ashes, to bless the sect of its hearth.',
@@ -928,14 +928,14 @@ export const SPARK_COPY = {
   },
   legendary_f2_pearl_dragon: {
     icon: PROD_SPRITE('p_dragon'),
-    heroGlyph: '龍',
+    heroGlyph: '龙',
     effectText: '**Spirit Dragon: double qi/s**. Trinity Beast: collect all 3 for **+100% global**.',
     exampleText: 'Own <strong>1 dragon</strong>, its qi/s is <strong>doubled</strong>. With the Tiger and Phoenix sparks also active, Trinity Convergence adds <strong>+100% global qi/s</strong> on top of every producer.',
     loreText: 'The pearl warms when the dragon hears two distant sounds, a tiger pacing, a phoenix folding its rainbow wings. Only then does the dream finish.',
   },
   legendary_f3_rainbow_phoenix: {
     icon: PROD_SPRITE('p_phoenix'),
-    heroGlyph: '鳳',
+    heroGlyph: '凤',
     effectText: '**Sovereign Phoenix: double qi/s**. Trinity Beast: collect all 3 for **+100% global**.',
     exampleText: 'Own <strong>1 phoenix</strong>, its qi/s is <strong>doubled</strong>. With the Tiger and Dragon sparks also active, Trinity Convergence adds <strong>+100% global qi/s</strong> on top of every producer.',
     loreText: 'The Fenghuang\'s cry has three notes. Alone it sings one. Somewhere a tiger paces, somewhere a dragon dreams. When all three sound, the heavens bend down.',
