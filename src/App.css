@@ -27862,4 +27862,176 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v13. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v14: measured fixes for THREE concrete failures.
+   1. Cultivator at y=556 while cultivation-zone ends at y=640 - 84px
+      of empty space wasted. The crystal-char-stack bottom:0 wasn't
+      winning because top was being set elsewhere. Force top:auto.
+   2. Bar caps and bar visibly disconnected by 16px gap on each side
+      because the track has margin:0 44 while caps sit at left/right 8
+      of the wrap. Align them at the bar's actual endpoints.
+   3. scene-bottom.bottom=780 vs navbar.top=781 = 1px gap. Margin in
+      flex flow wasn't doing anything. Position the scene-bottom
+      absolutely so it floats above the nav with proper breathing room.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Crystal-char-stack actually anchors to the bottom of the zone. */
+.home-crystal-char-stack {
+  top: auto !important;
+  bottom: 0 !important;
+  height: auto !important;
+  padding-bottom: 0 !important;
+}
+
+/* Push the cultivator-stage further down inside its char-group so
+   the cultivator's feet sit closer to the scene-bottom plate. */
+.home-char-group {
+  justify-content: flex-end !important;
+  padding-bottom: 0 !important;
+}
+
+/* 2. Bar caps + bar alignment. Remove the visible gap by tightening
+      the track margin to match the cap inset, and re-anchoring caps
+      at the actual bar endpoints (not the wrap edges). */
+.home-scene-bottom .home-bar-wrap .realm-track {
+  margin: 0 28px !important;
+}
+.home-scene-bottom .home-bar-wrap::before { left: 6px !important;  }
+.home-scene-bottom .home-bar-wrap::after  { right: 6px !important; }
+
+/* 3. scene-bottom floats above the navbar with a real 16px gap. */
+.home-scene-bottom {
+  position: absolute !important;
+  left: 14px !important;
+  right: 14px !important;
+  bottom: 16px !important;
+  margin: 0 !important;
+}
+
+/* Ensure home-pc-center is a positioned parent for the absolute
+   scene-bottom and the cultivation zone fills the remaining space
+   ABOVE the plate (not behind it). */
+.home-pc-center {
+  position: relative;
+}
+.home-cultivation-zone {
+  /* Reserve space at the bottom equal to the plate's footprint so
+     the cultivator doesn't render BEHIND the plate. */
+  padding-bottom: 152px !important;
+}
+
+/* End of SANCTUM v14 spatial fixes. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v14.5: cultivator STILL at y=379 after v14. The flex
+   bottom-anchor wasn't winning against the existing layout. Bypass
+   the flex entirely and absolutely position the cultivator stage at
+   the bottom of the cultivation zone.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Take char-group out of the flex flow and pin it to the bottom. */
+.home-char-group {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+}
+
+/* Crystal-char-stack is no longer a flex container for char-group
+   (char-group is now absolute). Keep crystal-anchor at the TOP. */
+.home-crystal-char-stack {
+  top: 0 !important;
+  bottom: auto !important;
+  height: auto !important;
+}
+
+/* End of SANCTUM v14.5. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v14.6: revert the v14.5 hack and position both crystal and
+   char-group as absolute siblings of the cultivation zone instead.
+   Crystal at top, cultivator at bottom; no flex stack flow to fight.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-crystal-char-stack {
+  /* No longer flex; not even a container - both children pin
+     independently to the zone. */
+  position: static !important;
+  height: 100% !important;
+  width: 100% !important;
+  display: block !important;
+}
+.home-crystal-anchor {
+  position: absolute !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+.home-char-group {
+  position: absolute !important;
+  bottom: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+}
+
+/* End of SANCTUM v14.6. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v14.7: REVERT v14.5+v14.6 absolute-positioning hacks (they
+   broke centering). Go back to flex flow but simply push the cultivator
+   down by giving the stack itself a translate that aligns the char-group
+   bottom with the plate top.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Restore the original flex stack. */
+.home-crystal-char-stack {
+  position: absolute !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  height: auto !important;
+  width: auto !important;
+  top: auto !important;
+  bottom: 8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+.home-crystal-anchor {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+.home-char-group {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+/* The stack-bottom of 8px puts char-group's bottom edge at y=~624.
+   That's 6px above the scene-bottom plate at y=630. Good. */
+
+/* End of SANCTUM v14.7 revert + simple bottom-anchor. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v14.8: math: zone ends y=786, plate top y=630. Stack bottom
+   needs to sit at y=624 (6px above plate). 786-624 = 162px from zone
+   bottom. Remove the now-redundant cultivation-zone padding-bottom
+   that was conflating with the stack's bottom positioning.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-cultivation-zone {
+  padding-bottom: 0 !important;
+}
+.home-crystal-char-stack {
+  bottom: 162px !important;
+}
+
+/* End of SANCTUM v14.8. */
+
 /* End of HOME "The Sanctum" design pass. */
