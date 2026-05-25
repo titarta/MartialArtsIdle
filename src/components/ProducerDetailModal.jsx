@@ -1,5 +1,5 @@
 import { fmt, fmtRate } from '../utils/format';
-import Sheet from './Sheet';
+import DetailModal from './DetailModal';
 import { getSpriteTier, SPRITE_TIERS } from '../data/producers';
 
 const BASE = import.meta.env.BASE_URL;
@@ -65,9 +65,8 @@ export default function ProducerDetailModal({
     : null;
 
   return (
-    <Sheet open onClose={onClose} className="pdm-sheet" ariaLabel={unlocked ? `${producer.name} details` : 'Locked producer'}>
-      <div className="sheet-body">
-        <button className="modal-close pdm-sheet-close" onClick={onClose} aria-label="Close">✕</button>
+    <DetailModal open onClose={onClose} className="pdm-modal" ariaLabel={unlocked ? `${producer.name} details` : 'Locked producer'}>
+      <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         <div className="pdm-hero">
           <HeroSprite sprite={sprite} silhouette={!unlocked} />
@@ -133,7 +132,6 @@ export default function ProducerDetailModal({
             </div>
           </>
         )}
-      </div>
-    </Sheet>
+    </DetailModal>
   );
 }
