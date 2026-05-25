@@ -1999,6 +1999,7 @@ function HomeScreen({
     adBoostActive,
     adBoostEndsAt,
     offlineEarnings,
+    offlineAwayMs,
     collectOfflineEarnings,
     majorBreakthrough,
     clearMajorBreakthrough,
@@ -2464,6 +2465,7 @@ function HomeScreen({
       {currentEvent?.kind === 'offline-earnings' && offlineEarnings > 0 && (
         <OfflineEarningsModal
           amount={offlineEarnings}
+          durationMs={offlineAwayMs}
           onCollect={() => {
             collectOfflineEarnings(1);
             dismiss(currentEvent.id);

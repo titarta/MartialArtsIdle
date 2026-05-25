@@ -50,10 +50,16 @@
     "breakthroughKicker": "Breakthrough"
   },
   "offlineModal": {
-    "title": "Welcome Back",
+    "eyebrow": "Returned from Seclusion",
+    "title": "Welcome Back, Cultivator",
     "message": "While you were away, the heavens continued to nourish your foundation.",
+    "durationSuffix": "of Quiet Practice",
+    "qiLabel": "Qi Gathered",
+    "qiUnit": "Qi",
     "collect": "Collect",
-    "collectDouble": "✦ Watch Ad — Collect ×2"
+    "watch": "Watch",
+    "collectDouble": "Watch Ad — Collect ×2",
+    "footerNote": "Your sect cultivated in silence while you rested."
   },
   "settings": {
     "title": "Settings",

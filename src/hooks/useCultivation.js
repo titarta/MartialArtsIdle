@@ -137,6 +137,36 @@ export default function useCultivation() {
     return rarity;
   }, [activeLawId]);
 
+  // Snapshot of the away duration in ms — captured at the same time as the
+  // offline-earnings calc so the modal can render "Xh Ym of Quiet Practice"
+  // alongside the qi number. Same eligibility window as the earnings calc
+  // (0 when no earnings were granted). Capped at the offline-window cap so
+  // a week-long absence still reads as the player's effective practice
+  // window, not the literal calendar gap.
+  const [offlineAwayMs, setOfflineAwayMs] = useState(() => {
+    if (!saved?.lastSeen || saved?.realmIndex === undefined) return 0;
+    const rawAwaySeconds = (Date.now() - saved.lastSeen) / 1000;
+    if (rawAwaySeconds < MIN_OFFLINE_SEC) return 0;
+    let capHoursBonus = 0;
+    try {
+      const raw = localStorage.getItem('mai_upgrades');
+      if (raw) {
+        const owned = new Set(JSON.parse(raw));
+        capHoursBonus = ['u_offline_cap_1','u_offline_cap_2','u_offline_cap_3','u_offline_cap_4']
+          .reduce((acc, id) => acc + (owned.has(id) ? 4 : 0), 0);
+      }
+    } catch {}
+    try {
+      const rawInv = localStorage.getItem('mai_shop_inventory');
+      if (rawInv) {
+        const stacks = JSON.parse(rawInv)?.stacks ?? {};
+        capHoursBonus += (Math.max(0, parseInt(stacks.qol_offline_cap_2h ?? 0, 10) || 0)) * 2;
+      }
+    } catch {}
+    const capSeconds = (MAX_OFFLINE_HOURS + capHoursBonus) * 3600;
+    return Math.min(rawAwaySeconds, capSeconds) * 1000;
+  });
+
   const [offlineEarnings, setOfflineEarnings] = useState(() => {
     // Calculate qi earned while the app was closed
     if (!saved?.lastSeen || saved?.realmIndex === undefined) return 0;
@@ -1066,6 +1096,7 @@ export default function useCultivation() {
       }
     } catch {}
     setOfflineEarnings(0);
+    setOfflineAwayMs(0);
   }, [offlineEarnings]);
 
   /**
@@ -1270,6 +1301,7 @@ export default function useCultivation() {
     adBoostEndsAt,
     // Offline earnings
     offlineEarnings,
+    offlineAwayMs,
     collectOfflineEarnings,
   };
 }

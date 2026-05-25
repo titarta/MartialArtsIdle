@@ -25094,3 +25094,362 @@ img.pp-emblem-locked { font-size: 0; }
   letter-spacing: 0;
 }
 
+/* ═════════════════════════════════════════════════════════════════════════
+   OFFLINE EARNINGS — "Emergence from Seclusion"
+   Spec: _design/offline-earnings-pass/offline-mockup.html + notes.md
+   The cultivator just emerged from 闭关. The screen stages a quiet
+   ceremony: dark veil → lacquer scroll with 修 calligraphy watermark →
+   hero qi number with rising ember motes → ranked CTAs (gold Collect
+   dominant, jade Watch ×2 secondary). Legacy .offline-overlay/.offline-card
+   rules above are kept as a safety-net fallback but are no longer used.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.offline-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    calc(var(--top-bar-h, 0px) + env(safe-area-inset-top) + 24px)
+    22px
+    calc(var(--nav-h, 0px) + env(safe-area-inset-bottom) + 24px);
+  background:
+    radial-gradient(120% 80% at 50% 30%, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.92) 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: offline-stage-fade 380ms ease-out backwards;
+}
+@keyframes offline-stage-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.offline-scroll {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 36px 26px 24px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(220, 175, 110, 0.07) 0%, transparent 65%),
+    linear-gradient(180deg, #221a12 0%, #1a1510 100%);
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4) inset,
+    0 1px 0 rgba(255, 225, 170, 0.10) inset,
+    0 0 60px -10px rgba(220, 175, 110, 0.25),
+    0 24px 48px -20px rgba(0, 0, 0, 0.9);
+  animation: offline-scroll-rise 500ms cubic-bezier(.2, .9, .3, 1.15) backwards 150ms;
+}
+@keyframes offline-scroll-rise {
+  from { opacity: 0; transform: translateY(28px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+/* 修 calligraphy watermark — large, faint, sits behind everything. Bundled
+   Ma Shan Zheng subset includes 修 (verified — see typography-audit). */
+.offline-scroll::before {
+  content: '修';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 280px;
+  line-height: 1;
+  color: rgba(220, 175, 110, 0.065);
+  pointer-events: none;
+  user-select: none;
+  animation: offline-glyph-ink 800ms ease-out backwards 250ms;
+}
+@keyframes offline-glyph-ink {
+  from { opacity: 0; filter: blur(8px); }
+  to   { opacity: 1; filter: blur(0);   }
+}
+/* Inner gold-filigree hairline border — temple plaque feel. */
+.offline-scroll::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(220, 175, 110, 0.14);
+  border-radius: 9px;
+  pointer-events: none;
+}
+.offline-scroll > * { position: relative; z-index: 1; }
+
+.offline-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #dcaf6e;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.offline-welcome {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #fff5e0;
+  text-align: center;
+  text-shadow:
+    0 0 14px rgba(220, 175, 110, 0.25),
+    0 1px 0 rgba(0, 0, 0, 0.5);
+}
+.offline-rule {
+  width: 56px;
+  height: 1px;
+  margin: 14px auto 16px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    #dcaf6e 50%,
+    transparent 100%);
+}
+
+/* Duration chip (hidden when durationMs < 15 min — see component) */
+.offline-duration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.offline-duration-mark {
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 12px;
+  color: #dcaf6e;
+  background: rgba(8, 6, 4, 0.6);
+}
+.offline-duration-text {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.62);
+}
+.offline-duration-text strong {
+  color: #fff5e0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hero qi number */
+.offline-hero {
+  position: relative;
+  text-align: center;
+  padding: 18px 0 24px;
+}
+.offline-hero-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.32);
+  margin-bottom: 8px;
+}
+.offline-hero-number {
+  font-family: 'Cinzel', serif;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff5e0;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-shadow:
+    0 0 28px rgba(255, 207, 131, 0.45),
+    0 0 8px  rgba(255, 207, 131, 0.35),
+    0 2px 0  rgba(0, 0, 0, 0.6);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  animation: offline-hero-rise 700ms cubic-bezier(.2, .9, .3, 1.15) backwards 400ms;
+}
+@keyframes offline-hero-rise {
+  from { opacity: 0; transform: translateY(14px) scale(.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+.offline-hero-plus {
+  font-size: 30px;
+  font-weight: 600;
+  color: #ffcf83;
+  margin-right: 2px;
+}
+.offline-hero-unit {
+  display: block;
+  margin-top: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #dcaf6e;
+}
+
+/* Ember motes rising behind the hero number */
+.offline-embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.offline-embers span {
+  position: absolute;
+  bottom: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffcf83;
+  box-shadow: 0 0 6px #ffcf83;
+  opacity: 0;
+  animation: offline-ember-rise 4.2s ease-out infinite;
+}
+.offline-embers span:nth-child(1) { left: 38%; animation-delay: 1.0s; }
+.offline-embers span:nth-child(2) { left: 52%; animation-delay: 2.2s; }
+.offline-embers span:nth-child(3) { left: 65%; animation-delay: 0.4s; }
+.offline-embers span:nth-child(4) { left: 30%; animation-delay: 3.0s; }
+.offline-embers span:nth-child(5) { left: 58%; animation-delay: 3.8s; }
+@keyframes offline-ember-rise {
+  0%   { opacity: 0;  transform: translateY(0); }
+  20%  { opacity: 0.9; }
+  100% { opacity: 0;  transform: translateY(-110px); }
+}
+
+/* CTAs — Collect dominant, Watch ×2 secondary */
+.offline-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: offline-actions-rise 500ms ease-out backwards 700ms;
+}
+@keyframes offline-actions-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.offline-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(180deg,
+    rgba(220, 175, 110, 0.95) 0%,
+    rgba(155, 125, 80, 0.95) 100%);
+  border: 1px solid rgba(255, 225, 170, 0.55);
+  border-radius: 10px;
+  color: #1a120a;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3) inset,
+    0 1px 0 rgba(255, 255, 255, 0.30) inset,
+    0 0 22px -2px rgba(255, 207, 131, 0.50),
+    0 8px 16px -8px rgba(0, 0, 0, 0.6);
+  transition: filter 150ms ease, transform 80ms ease;
+}
+.offline-btn-primary:hover { filter: brightness(1.06); }
+.offline-btn-primary:active { transform: scale(0.98); }
+.offline-btn-glyph {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 18px;
+  color: rgba(26, 18, 10, 0.85);
+}
+
+.offline-btn-secondary {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px 9px 14px;
+  background: rgba(126, 195, 143, 0.10);
+  border: 1px solid rgba(126, 195, 143, 0.45);
+  border-radius: 999px;
+  color: #7ec38f;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.offline-btn-secondary:hover {
+  background: rgba(126, 195, 143, 0.18);
+  border-color: rgba(126, 195, 143, 0.65);
+  color: #aedfb8;
+}
+.offline-ad-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background: #7ec38f;
+  color: #0e0c08;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.offline-mult-dot {
+  opacity: 0.5;
+  margin: 0 -2px;
+}
+.offline-mult {
+  color: #fff5e0;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.offline-footer-note {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: rgba(245, 230, 200, 0.32);
+  font-style: italic;
+  line-height: 1.5;
+  animation: offline-actions-rise 500ms ease-out backwards 900ms;
+}
+
+/* Respect reduced-motion: keep the fade-in but skip the rise/scale and
+   pause the ember loop. */
+@media (prefers-reduced-motion: reduce) {
+  .offline-stage,
+  .offline-scroll,
+  .offline-scroll::before,
+  .offline-hero-number,
+  .offline-actions,
+  .offline-footer-note {
+    animation-duration: 200ms;
+    animation-delay: 0ms;
+    animation-timing-function: ease-out;
+    transform: none !important;
+  }
+  .offline-scroll { animation-name: offline-stage-fade; }
+  .offline-scroll::before { animation-name: offline-stage-fade; }
+  .offline-hero-number { animation-name: offline-stage-fade; }
+  .offline-actions { animation-name: offline-stage-fade; }
+  .offline-footer-note { animation-name: offline-stage-fade; }
+  .offline-embers span { animation: none; opacity: 0; }
+}
