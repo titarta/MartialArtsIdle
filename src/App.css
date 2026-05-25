@@ -22507,7 +22507,11 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
-  padding: 8px 4px 0;
+  /* Horizontal padding bumped 4px → 18px so first/last tabs breathe
+     from the screen edges instead of sitting flush against them.
+     Applies to both the Cultivation and the Spirit Bazaar sub-tab
+     navs since they share this primitive. */
+  padding: 8px 18px 0;
   margin: 0;
   background: #100c08;
   border-bottom: 1px solid rgba(220, 175, 110, 0.20);
@@ -23845,12 +23849,15 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .pp {
   position: relative;
   display: grid;
-  /* Narrowed frame col (84 → 76) + tighter rail spacing + min cart col
-     gives the lintel ~6-8px more horizontal room to fit producer
-     names without ellipsis truncation. min-height ensures the row
-     accommodates name + tier + rate without clipping under
-     overflow:hidden. */
-  grid-template-columns: 4px 76px 1fr minmax(86px, auto);
+  /* Cart column is now a FIXED 104px so the Tribute button doesn't
+     expand/contract when the player switches buy mode (×1/×10/×100
+     cost text varies from "15 Qi" → "12.0K Qi"; the previous
+     minmax(86px, auto) made the column flex with content and the
+     button visibly jumped on each mode switch). 104px fits worst
+     case "999.9M Qi" at Cinzel 12.5px tabular-nums with the chip
+     padding intact. Frame col 76px (icon 64 + padding) and rail 4px
+     leave the lintel ~206px on a 390 viewport. */
+  grid-template-columns: 4px 76px 1fr 104px;
   align-items: stretch;
   min-height: 96px;
   background:
@@ -24028,10 +24035,12 @@ img.pp-emblem { font-size: 0; }
   box-shadow:
     0 1px 0 rgba(255,255,255,.18) inset,
     0 0 10px rgba(200, 56, 56, .35);
-  /* Narrowed from 86 to 78 so the lintel column gets a few more pixels
-     for the producer name. The cost text "1.4M Qi" fits at 78px with
-     padding 10px L+R. */
-  min-width: 78px;
+  /* Width is now governed by the fixed cart grid column (104px); the
+     button fills it via width:100% so the button surface stays the
+     SAME size regardless of buy-mode cost text length. Previously
+     min-width was 78 and the column was auto, letting the button
+     visibly grow/shrink on each ×1/×10/×100 switch. */
+  width: 100%;
   white-space: nowrap;
   transition: filter 150ms ease, transform 0.08s ease-out;
 }
