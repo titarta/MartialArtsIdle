@@ -28034,4 +28034,58 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v14.8. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v15: bring multipliers back (clean brass), align bar+caps.
+   1. .qi-rate-badge was hidden in v13. Players need to see WHICH boost
+      is active. Reinstate but ensure it uses the v12 brass design.
+   2. Bar caps (h=20) sat at top:4 = cap center 7px below bar center.
+      Pull to top:-3 so the cap is vertically centred on the bar.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Un-hide the rate badges. The v12 brass styling already applies. */
+.home-scene-overlay-row .qi-rate-badge,
+.qi-rate .qi-rate-badge {
+  display: inline-flex !important;
+}
+
+/* Tighten badge layout so it sits cleanly next to the rate number. */
+.home-scene-overlay-row .qi-rate {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+.qi-rate-badge {
+  min-width: 28px !important;
+  padding: 2px 7px 3px !important;
+  font-size: 9.5px !important;
+  letter-spacing: 0.06em !important;
+  margin-left: 0 !important;
+}
+
+/* 2. Cap vertical alignment: pull up so cap centre lines up with bar
+      centre. Bar wrap is 14 tall, cap is 20 tall, so cap-top needs
+      to be -3 to centre. */
+.home-scene-bottom .home-bar-wrap::before,
+.home-scene-bottom .home-bar-wrap::after {
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+/* End of SANCTUM v15. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v15.5: cap right-edge sits at the bar's start edge (no gap).
+   Math: cap left:4 + width 20 = right edge at x=24. Bar margin:0 24px
+   = bar starts at x=24. Edges touch perfectly. Cap reads as the bar's
+   physical end-piece, not a separate floating circle.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-scene-bottom .home-bar-wrap .realm-track {
+  margin: 0 24px !important;
+}
+.home-scene-bottom .home-bar-wrap::before { left: 4px !important;  }
+.home-scene-bottom .home-bar-wrap::after  { right: 4px !important; }
+
+/* End of SANCTUM v15.5. */
+
 /* End of HOME "The Sanctum" design pass. */
