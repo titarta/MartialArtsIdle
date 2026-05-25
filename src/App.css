@@ -27804,4 +27804,62 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v12 precision fixes. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v13: the bottom plate STILL looked bad. Direct screenshot
+   critique called out:
+   . realm name 'SEPARATION & REUNION' wrapping to 2 lines
+   . inline qi-rate ×2 / ×2.6 badges pasted-on, ugly
+   . 道 progress caps overlapping the BottomNav
+   . bottom plate background reads muddy
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Realm name: shrink + tighten letter-spacing so even long names
+      ('SEPARATION & REUNION', 'IMMORTAL ASCENSION') fit on one line. */
+.home-scene-realm-name {
+  font-size: 15.5px !important;
+  letter-spacing: 0.08em !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 2. Drop the inline ×2 / ×N qi-rate badges entirely. The rate
+      number itself already reflects the boosts; the visible Petition
+      Tablet 'CHANNELING' state shows the ad-boost; the CF marquee
+      shows focus state. The inline badges were duplicative AND ugly. */
+.home-scene-overlay-row .qi-rate-badge,
+.qi-rate .qi-rate-badge {
+  display: none !important;
+}
+
+/* 3. Progress 道 caps: move them UP so they sit inside the plate
+      rather than poking down past it into the navbar. */
+.home-scene-bottom .home-bar-wrap::before,
+.home-scene-bottom .home-bar-wrap::after {
+  top: 4px !important;
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 12px !important;
+}
+
+/* 4. Bottom plate: cleaner gradient + thicker top edge so it reads as
+      a carved brass band, not a muddy translucent box. */
+.home-scene-bottom {
+  background:
+    linear-gradient(180deg, rgba(255, 225, 170, 0.08) 0%, transparent 12%),
+    linear-gradient(180deg, #2c1f12 0%, #1a120a 100%) !important;
+  border-top-width: 2px !important;
+  border-top-color: rgba(255, 207, 131, 0.62) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 6px !important;
+}
+
+/* Stage subtitle (LAYER 9 / 1ST STAGE) tighter under the name. */
+.home-scene-realm-stage {
+  margin-top: 1px !important;
+  font-size: 8.5px !important;
+}
+
+/* End of SANCTUM v13. */
+
 /* End of HOME "The Sanctum" design pass. */
