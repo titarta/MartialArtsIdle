@@ -23812,8 +23812,14 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .pp {
   position: relative;
   display: grid;
-  grid-template-columns: 4px 84px 1fr auto;
+  /* Narrowed frame col (84 → 76) + tighter rail spacing + min cart col
+     gives the lintel ~6-8px more horizontal room to fit producer
+     names without ellipsis truncation. min-height ensures the row
+     accommodates name + tier + rate without clipping under
+     overflow:hidden. */
+  grid-template-columns: 4px 76px 1fr minmax(86px, auto);
   align-items: stretch;
+  min-height: 96px;
   background:
     linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 24%, rgba(220,175,110,0) 76%, rgba(220,175,110,.05) 100%),
     linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
@@ -23830,7 +23836,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .pp-rail {
   width: 4px;
   align-self: stretch;
-  margin: 8px 12px 8px 8px;
+  /* Margin tightened: previous 8px vertical margin was creating row-height
+     pressure that the grid resolved against the centered frame, and the
+     8px+12px+8px horizontal spec was confusing for a 4px column. */
+  margin: 10px 10px 10px 0;
   border-radius: 2px;
   background: linear-gradient(180deg,
     #ffcf83 0%,
@@ -23909,11 +23918,18 @@ img.pp-emblem { font-size: 0; }
   font-size: 13.5px;
   font-weight: 700;
   letter-spacing: .03em;
+  line-height: 1.2;
   color: #f5e6c8;
   text-shadow: 0 1px 0 rgba(0,0,0,.5);
-  white-space: nowrap;
+  /* Wrap to two lines instead of forced single-line ellipsis. Producer
+     names like "BODY TEMPERING DISCIPLE" and "MORTAL SECT FOLLOWER"
+     are too long for the lintel column at 390x844 and were truncating
+     mid-word. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 .pp-tier-row {
   display: flex;
@@ -23968,7 +23984,7 @@ img.pp-emblem { font-size: 0; }
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  padding: 8px 14px 7px;
+  padding: 7px 10px 6px;
   border-radius: 8px;
   border: 1px solid rgba(255, 200, 200, .32);
   background: linear-gradient(180deg, #ff5b5b 0%, #c83838 100%);
@@ -23979,7 +23995,11 @@ img.pp-emblem { font-size: 0; }
   box-shadow:
     0 1px 0 rgba(255,255,255,.18) inset,
     0 0 10px rgba(200, 56, 56, .35);
-  min-width: 86px;
+  /* Narrowed from 86 to 78 so the lintel column gets a few more pixels
+     for the producer name. The cost text "1.4M Qi" fits at 78px with
+     padding 10px L+R. */
+  min-width: 78px;
+  white-space: nowrap;
   transition: filter 150ms ease, transform 0.08s ease-out;
 }
 .pp-cart-btn:hover { filter: brightness(1.08); }
