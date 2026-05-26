@@ -29351,4 +29351,150 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v32. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v33: actually deliver the hung-jade-charm.
+   v31 shipped the CSS but a critical bug hid it - the chip itself
+   stayed position:static, so the ::before cord positioned relative to
+   .home-chips-tl (which sits at top:18) and the cord top landed at
+   y=-4, clipped behind the TopBar. User saw only a bare plate with no
+   cord = no personality. v33 fixes the anchor AND amplifies:
+
+   . position:relative on the chip - cord now hangs from the plate
+   . Vermillion silk cord (was dim brown) - reads as a spirit-charm
+     not a hardware-store keychain, and ties to the right plaque's
+     vermillion seal accents (counter-balance)
+   . Brass cap/grommet where cord meets plate top (gold knob)
+   . Wax-seal stamp dot on the plate corner via ::after - tiny but
+     adds the ritual-object feel and matches the Petition Tablet's
+     stamp vocabulary
+   . Plate gradient deepened + brass inner highlight along top edge
+   . Sway transform-origin moved to the cord-cap (y=-22) so the swing
+     pivot is the rope, not the plate centre
+   ═════════════════════════════════════════════════════════════════════ */
+
+.tb-buffs-chip {
+  /* CRITICAL: makes the ::before cord position relative to the chip
+     instead of the .home-chips-tl container. Without this, the cord
+     anchored 22px above .home-chips-tl (which sits at top:18) and
+     was clipped behind the TopBar - the bug that hid all v31 polish. */
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Cord + brass-trim wood cap, matching the right Petition Tablet's
+   hanging vocabulary EXACTLY (.hq-cord + .hq-cap on lines 21135-21162).
+   Same brown cord (#2b2014 -> #4a3520) + same dark-wood cap. The two
+   pieces of furniture should feel like they came from the same temple
+   workshop. Personality comes from the wax-seal stamp (::after) and
+   the jade body, not from a divergent cord. */
+.tb-buffs-chip::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -22px !important;
+  left: 50% !important;
+  width: 18px !important;
+  height: 22px !important;
+  transform: translateX(-50%) !important;
+  background:
+    /* cap: dark wood with brass-trim, sits flush on the plate top */
+    linear-gradient(180deg, #3a2a18 0%, #1a120a 100%) center bottom / 16px 6px no-repeat,
+    /* cord: 3-stop brown gradient, vertical strip above the cap */
+    linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%) center top / 2px 18px no-repeat !important;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Wax-seal stamp dot on the upper-right corner of the plate - a tiny
+   vermillion ritual mark that ties to the Petition Tablet's stamps. */
+.tb-buffs-chip::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 5px !important;
+  right: 5px !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 35% 35%,
+      #ff7878 0%, #c83838 55%, #6a1414 100%) !important;
+  box-shadow:
+    0 0 4px rgba(220, 60, 60, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Plate refinements: deeper jade + brass top-edge highlight to read as
+   carved jade tile rather than a flat panel. The grid layout from v31
+   stays as-is - this just amplifies the surface. */
+.tb-buffs-chip {
+  background:
+    /* top brass-leaf highlight strip */
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.22) 0%,
+      rgba(220, 175, 110, 0.06) 18%,
+      transparent 22%) ,
+    /* deeper jade gradient */
+    linear-gradient(180deg,
+      rgba(126, 195, 143, 0.32) 0%,
+      rgba(60, 110, 80, 0.18) 60%,
+      rgba(40, 80, 60, 0.22) 100%),
+    rgba(8, 14, 10, 0.94) !important;
+  border: 1px solid rgba(180, 220, 195, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(220, 255, 230, 0.32),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 14px -4px rgba(0, 0, 0, 0.65),
+    0 0 16px -4px rgba(126, 195, 143, 0.55),
+    0 8px 12px -6px rgba(0, 0, 0, 0.90) !important;
+}
+
+/* Sway pivot at cord-anchor (top of cord, where it 'attaches to the
+   ceiling'), not plate centre - the rope swings the plate, not the
+   other way around. -22px matches the ::before's top:-22 anchor. */
+.tb-buffs-chip {
+  transform-origin: 50% -22px !important;
+}
+
+/* Urgent variant: vermillion plate + the cord turns gold-and-ember as
+   if the talisman is burning down. */
+.tb-buffs-chip.tb-buffs-chip-urgent {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 200, 120, 0.22) 0%,
+      rgba(220, 100, 60, 0.10) 18%,
+      transparent 22%),
+    linear-gradient(180deg,
+      rgba(220, 70, 50, 0.38) 0%,
+      rgba(120, 30, 20, 0.22) 60%,
+      rgba(80, 15, 10, 0.30) 100%),
+    rgba(20, 6, 6, 0.94) !important;
+  border-color: rgba(255, 160, 130, 0.85) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 200, 0.32),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+    inset 0 0 14px -4px rgba(0, 0, 0, 0.55),
+    0 0 18px -2px rgba(255, 91, 91, 0.85),
+    0 8px 12px -6px rgba(0, 0, 0, 0.90) !important;
+}
+.tb-buffs-chip-urgent::before {
+  /* Same shape/dimensions as base cord but the cap warms to scorched
+     brass and the cord catches an ember tint - 'the talisman is
+     burning down'. Plate pulse carries the rest of the urgency. */
+  background:
+    linear-gradient(180deg, #5a2818 0%, #2a1208 100%) center bottom / 16px 6px no-repeat,
+    linear-gradient(180deg, #6a2818 0%, #c84818 50%, #6a2818 100%) center top / 2px 18px no-repeat !important;
+}
+.tb-buffs-chip-urgent::after {
+  background:
+    radial-gradient(circle at 35% 35%,
+      #ffd28a 0%, #ff7838 55%, #6a2810 100%) !important;
+  box-shadow:
+    0 0 6px rgba(255, 130, 70, 0.85),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35) !important;
+}
+
+/* End of SANCTUM v33. */
+
 /* End of HOME "The Sanctum" design pass. */
