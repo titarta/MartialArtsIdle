@@ -29168,4 +29168,37 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v29. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v30: page layout cleanup.
+   1. Remove the v10.5 'gold cloud frieze' at the top of the cultivation
+      zone - user said it's 'eating' things below. The bamboo pillars
+      provide enough architectural framing; the frieze was extra noise.
+   2. Pull the bottom plate down a bit so the gap to navbar matches the
+      breathing room at the top of the scene (recentre vertically).
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Remove the frieze entirely. */
+.home-cultivation-zone::after {
+  display: none !important;
+}
+
+/* Plate gap to navbar: 16px → 8px so it visually matches the small
+   gap at the top of the scene (chip stack sits right under TopBar).
+   Scene is vertically balanced now. */
+.home-scene-bottom {
+  bottom: 8px !important;
+}
+
+/* Push the top chips down ~10px so they don't sit flush against the
+   TopBar's bottom border. Gives a little breathing room that matches
+   the new plate-to-navbar gap. */
+.home-chips-tl {
+  top: 18px !important;
+}
+.home-chips-tr {
+  top: 18px !important;
+}
+
+/* End of SANCTUM v30. */
+
 /* End of HOME "The Sanctum" design pass. */
