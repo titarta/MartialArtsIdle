@@ -2190,27 +2190,30 @@ function HomeScreen({
 
   // ── Qi tick floaters — "+N Qi" flies up off the cultivator on a steady
   // cadence so passive ticking reads as visible progress. Reuses the existing
-  // vfx-float-up effect; gated off while qi is capped at a major-realm gate
-  // or the run is finished without ascension.
+  // vfx-float-up effect; only suppressed once the run is finished without
+  // ascension (truly nothing to read out).
+  //
   // Reads from `passiveQiAccruedRef` (monotone passive-only counter) instead
   // of `qiRef`. Otherwise one-shot grants (crystal collect, divine-qi
   // reward, pattern click) would inflate the next floater by their full
   // payout, making the cultivator briefly show a value much larger than
   // the actual passive tick rate.
+  //
+  // (2026-05-27) Removed the old `if (gateRef?.current) return` early-exit.
+  // That was correct under the pre-pivot design where qi balance was
+  // capped at the gate — there was literally no qi being earned, so a
+  // floater would be lying. After the Cookie-Clicker pivot only the
+  // realm meter caps at a gate; qi balance keeps growing from producers,
+  // and `passiveQiAccruedRef` keeps incrementing right alongside it.
+  // Suppressing floaters at the gate left the cultivator looking dead
+  // for the entire gate hold (the worst possible moment to feel dead -
+  // the player is actively trying to grow their qi/s).
   const passiveRef = passiveQiAccruedRef ?? qiRef;
   const lastFloaterQiRef = useRef(passiveRef.current);
   useEffect(() => {
     lastFloaterQiRef.current = passiveRef.current;
     const id = setInterval(() => {
-      // (Note - previous version added an !isActiveRef guard here to
-      // pause floaters while Home was hidden. That broke the floaters
-      // entirely on a realm-gate state and was over-engineered for the
-      // ~1.1s floater lifetime - by the time the player navigates
-      // away and back, existing floaters have already removed
-      // themselves via their setTimeout. Reverted to the pre-existing
-      // gate behaviour.)
-      if (maxed && !ascended)   return;
-      if (gateRef?.current)    { lastFloaterQiRef.current = passiveRef.current; return; }
+      if (maxed && !ascended) return;
       const now   = passiveRef.current;
       const delta = now - lastFloaterQiRef.current;
       // Breakthrough drained qi to a leftover — reseed the tracker and
@@ -2232,7 +2235,7 @@ function HomeScreen({
       });
     }, 500);
     return () => clearInterval(id);
-  }, [passiveRef, gateRef, maxed, ascended, spawnVFX, spriteScale]);
+  }, [passiveRef, maxed, ascended, spawnVFX, spriteScale]);
 
   // ── Qi flow VFX — orbs drift in from a ring around the cultivator ─────
   // Density + inflow speed scale with the effective transient multiplier
