@@ -838,8 +838,11 @@ function spawnCrystalSpark(layer, intensity) {
   // glints" rather than uniform pops.
   img.style.setProperty('--srot', `${(Math.random() - 0.5) * 40}deg`);
   const sizeVar = 0.65 + Math.random() * 0.35; // 0.65 → 1.00 multiplier
-  img.style.setProperty('--sscale-start', ((0.30 + intensity * 0.25) * sizeVar).toFixed(2));
-  img.style.setProperty('--sscale-end',   ((0.40 + intensity * 0.30) * sizeVar).toFixed(2));
+  // Scales reduced ~30% from (0.30+int*0.25) / (0.40+int*0.30) so the
+  // sparks read as small bright glints rather than chunky orbs against
+  // the crystal silhouette.
+  img.style.setProperty('--sscale-start', ((0.21 + intensity * 0.175) * sizeVar).toFixed(2));
+  img.style.setProperty('--sscale-end',   ((0.28 + intensity * 0.21) * sizeVar).toFixed(2));
   img.addEventListener('animationend', () => img.remove(), { once: true });
   layer.appendChild(img);
 }
@@ -915,8 +918,12 @@ function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
   // Per-orb size variation so the inflow reads as a mix of small glints
   // and larger orbs rather than uniform pops.
   const sizeVar = 0.65 + Math.random() * 0.35;
-  img.style.setProperty('--qf-scale-start', (0.40 * sizeVar).toFixed(2));
-  img.style.setProperty('--qf-scale-end',   (0.78 * sizeVar).toFixed(2));
+  // Scales reduced ~30% from 0.40 / 0.78 so the inflow reads as a
+  // delicate spirit stream rather than chunky orbs swarming the
+  // cultivator. Sizes still grow over the flight (start small at the
+  // ring, larger near the centre = "drawn in stronger").
+  img.style.setProperty('--qf-scale-start', (0.28 * sizeVar).toFixed(2));
+  img.style.setProperty('--qf-scale-end',   (0.55 * sizeVar).toFixed(2));
   // Optional negative animation-delay so the orb renders mid-flight.
   // Used by the qi-flow spawner's warm-up on return-to-tab so the
   // scene shows orbs already moving instead of all starting at the
@@ -963,11 +970,13 @@ function spawnClickBurst({ parent, x, y, xUnit = 'px', yUnit = 'px', count = 4, 
     img.style.setProperty('--bx-end',  `${bx.toFixed(1)}px`);
     img.style.setProperty('--by-peak', `${byPeak.toFixed(1)}px`);
     img.style.setProperty('--by-land', `${byLand.toFixed(1)}px`);
-    // Scales tuned down ~15% from the first cut so the splash reads as
-    // small bright orbs rather than chunky ones (was 0.45 / 0.85 / 0.65).
-    img.style.setProperty('--bscale-0', (0.38 * sizeVar).toFixed(2));
-    img.style.setProperty('--bscale-1', (0.72 * sizeVar).toFixed(2));
-    img.style.setProperty('--bscale-2', (0.55 * sizeVar).toFixed(2));
+    // Scales reduced another ~30% (now 0.27 / 0.50 / 0.39) so the
+    // crystal-tap and divine-qi splash reads as a confetti puff of
+    // small glints rather than chunky orbs hopping around the screen.
+    // Earlier passes: 0.45/0.85/0.65 -> 0.38/0.72/0.55 -> 0.27/0.50/0.39.
+    img.style.setProperty('--bscale-0', (0.27 * sizeVar).toFixed(2));
+    img.style.setProperty('--bscale-1', (0.50 * sizeVar).toFixed(2));
+    img.style.setProperty('--bscale-2', (0.39 * sizeVar).toFixed(2));
     img.addEventListener('animationend', () => img.remove(), { once: true });
     parent.appendChild(img);
   }
