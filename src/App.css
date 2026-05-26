@@ -29951,4 +29951,25 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* End of SANCTUM v38. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v39: remove the bamboo pillars on the home screen.
+
+   User: 'remove the side bars from the home screen. I don't think
+   they fit well. They are ::before and ::after I believe'.
+
+   The pillars were drawn by .home-pc-center::before / ::after
+   (lines 27588-27605) as 2.5px vertical brass-gradient strips with
+   drop-shadow, pinned 14px from each side of the centre column.
+   They were intended to give the scene a 'columned temple interior'
+   read, but the temple background art already carries that vocabulary
+   and the pillars ended up reading as visual noise. Hide them.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-pc-center::before,
+.home-pc-center::after {
+  display: none !important;
+}
+
+/* End of SANCTUM v39. */
+
 /* End of HOME "The Sanctum" design pass. */
