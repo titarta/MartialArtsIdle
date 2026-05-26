@@ -179,9 +179,22 @@
   box-sizing: border-box;
 }
 
-html {
-  /* Prevent pull-to-refresh on mobile */
+html, body {
+  /* Prevent pull-to-refresh AND rubber-band scroll past the page edges.
+     Both html and body need this on iOS standalone PWA - without
+     body the chain still bounces. Combined with overscroll-behavior:
+     contain on every .screen-container, the player can't drag past
+     either end to reveal empty viewport. */
   overscroll-behavior: none;
+  /* Lock the document itself to viewport height - all scrolling
+     happens INSIDE .screen-container / .home-screen, never the body.
+     Without this, body grows past 100vh on iPhone PWA when a screen's
+     content briefly exceeds its container, creating a scrollable
+     'empty space' below the actual UI. */
+  height: 100%;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 /* Landscape rotation prompt — browser fallback for phones in a tab.
@@ -225,12 +238,15 @@ html {
 }
 
 body {
+  /* Lock to viewport; html+body { position:fixed } above pins to 0,0. */
   min-height: 100vh;
   min-height: 100dvh;
   /* Prevent iOS tap zoom */
   -webkit-text-size-adjust: 100%;
-  /* Safe area padding for notched phones */
-  padding: env(safe-area-inset-top) 0 0 0;
+  /* No body padding: every screen (.top-bar, .home-screen,
+     .screen-container) handles its own env(safe-area-inset-top)
+     internally. Adding it here too caused a double offset. */
+  padding: 0;
 }
 
 /* Universal: kill iOS long-press loupe + callout menu everywhere.
