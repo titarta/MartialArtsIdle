@@ -1847,12 +1847,22 @@ function AppInner() {
       )}
       {/* Qi Sparks pick-1-of-2 modal — fires on every layer breakthrough.
           Suppressed while higher-priority overlays are showing so it doesn't
-          stack with breakthrough banners or law offers. */}
+          stack with breakthrough banners or law offers.
+
+          ALSO suppressed while a tutorial card is showing. The FIRST_SPARK_
+          OFFER tutorial enqueues at the SAME moment pendingOffer becomes
+          truthy (via the useEffect at line ~757). Previously the tutorial
+          was the one suppressed-by-spark-modal, which meant the "Choose
+          wisely" explainer appeared AFTER the player had already chosen.
+          Now the spark modal yields to the tutorial: explainer first,
+          then the picker. Generalises to any future tutorial that wants
+          to fire alongside a spark offer. */}
       {qiSparks.pendingOffer
         && !cultivation.majorBreakthrough
         && currentEvent?.kind !== 'breakthrough'
         && currentEvent?.kind !== 'crystal-evolution'
         && currentEvent?.kind !== 'offline-earnings'
+        && currentEvent?.kind !== 'tutorial'
         && !(selectionModalOpen && selections.pending[0]?.kind === 'law')
         && (
         <QiSparkChoiceModal
@@ -1871,11 +1881,12 @@ function AppInner() {
       {/* Tutorial cards (Tier A onboarding + crystal-tier mechanic unlocks).
           Rendered at App.jsx level so they fire regardless of active screen
           — e.g. first_producer triggers while still on Cultivation, not
-          after navigating Home. Suppressed while the spark choice modal or
-          a major-realm breakthrough cinematic is showing so we don't stack
-          modals on top of each other. */}
+          after navigating Home. Suppressed only while a major-realm
+          breakthrough cinematic is showing (those own the full screen).
+          The spark choice modal now yields to tutorials instead of the
+          other way around, so FIRST_SPARK_OFFER ('Choose wisely') shows
+          BEFORE the picker, not after. */}
       {currentEvent?.kind === 'tutorial'
-        && !qiSparks.pendingOffer
         && !cultivation.majorBreakthrough
         && (
         <TutorialModal
