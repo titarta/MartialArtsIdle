@@ -2077,16 +2077,6 @@ function QiParticles({ colors, rung = 0 }) {
 
 // ── Main screen ──────────────────────────────────────────────────────────────
 function HomeScreen({
-  // True only when the player is currently looking at the Home tab.
-  // HomeScreen is always mounted (kept alive via display:none on the
-  // wrapper) so in-flight orbs / pattern prompts survive cross-tab
-  // navigation. But the cosmetic VFX spawners (qi-flow particles,
-  // crystal sparks, +N qi tick floaters) should PAUSE while hidden
-  // and resume in a settled state when the player returns — otherwise
-  // floaters accumulate in React VFX state and dump out as a stack
-  // of '+N' numbers on return, and particle spawn timers reset to
-  // first-frame state which reads as "the scene rolled back".
-  isActive = true,
   cultivation, inventory,
   selections, onOpenSelections,
   onNavigate,
@@ -2110,10 +2100,6 @@ function HomeScreen({
   bypassTokenCount = 0,
   onUseBypassToken,
 }) {
-  // Keep isActive readable from imperative tick callbacks without
-  // re-binding them every navigation toggle.
-  const isActiveRef = useRef(isActive);
-  useEffect(() => { isActiveRef.current = isActive; }, [isActive]);
   const { t } = useTranslation('ui');
   const {
     realmName,
@@ -2195,14 +2181,13 @@ function HomeScreen({
   useEffect(() => {
     lastFloaterQiRef.current = passiveRef.current;
     const id = setInterval(() => {
-      // PAUSE while Home is hidden. Without this guard the interval
-      // kept calling spawnVFX every 500ms while the player was on
-      // another tab; the floaters lived in React VFX state and were
-      // all still alive (each has a 1.1s removal timer) when the
-      // player came back, dumping as a 'stack of +N numbers'.
-      // Reseeding lastFloaterQiRef means the first floater after
-      // return reflects only post-return accrual, not the offline gap.
-      if (!isActiveRef.current) { lastFloaterQiRef.current = passiveRef.current; return; }
+      // (Note - previous version added an !isActiveRef guard here to
+      // pause floaters while Home was hidden. That broke the floaters
+      // entirely on a realm-gate state and was over-engineered for the
+      // ~1.1s floater lifetime - by the time the player navigates
+      // away and back, existing floaters have already removed
+      // themselves via their setTimeout. Reverted to the pre-existing
+      // gate behaviour.)
       if (maxed && !ascended)   return;
       if (gateRef?.current)    { lastFloaterQiRef.current = passiveRef.current; return; }
       const now   = passiveRef.current;
@@ -2244,38 +2229,23 @@ function HomeScreen({
     // Seed at mount-time, NOT 0, so the first rAF frame doesn't trip
     // the spawn-throttle. Same reason as the crystal-spark rAF above.
     let lastSpawn = performance.now();
-    // Track active-tab transitions so we can WARM-UP a few orbs at
-    // staggered animation offsets the moment the player returns - that
-    // way the scene reads as "already in flight" instead of "fresh
-    // empty stage that's now starting to spawn things".
-    let wasActive = isActiveRef.current;
+    // Track visibility transitions via the layer's clientWidth (drops
+    // to 0 when HomeScreen wrapper is display:none on another tab,
+    // when .vfx-disabled hides it, etc.). When visibility returns
+    // false -> true we WARM UP a few orbs at staggered animation
+    // offsets so the scene reads as "already in flight" instead of
+    // "fresh empty stage that's now starting to spawn things".
+    let wasVisible = false;
     const tick = (now) => {
       const layer = qiFlowLayerRef.current;
       const kind = currentEventKindRef.current;
-      const active = isActiveRef.current;
-
-      // PAUSE while Home is hidden behind another tab. spawnQiFlowOrb
-      // appends DOM <img> nodes that would otherwise pile up out of
-      // view (each lives ~1s and self-removes, but they're invisible
-      // work either way - skip them entirely).
-      if (!active) {
-        lastSpawn = now;
-        wasActive = false;
-        raf = requestAnimationFrame(tick);
-        return;
-      }
-
       // Halt spawning while the cultivator is being taken over by an
       // overlay — breakthrough banner shows the realm-up text-blast, and
       // character-evolution lifts the sprite out for the tier-up reveal.
-      // Letting particles keep spawning during these would dump them into
-      // an empty area (sprite gone) and pop a backlog on the way back.
       const haltedForEvent = kind === 'breakthrough' || kind === 'character-evolution';
+      const visible = !haltedForEvent && layer && layer.clientWidth > 0 && layer.clientHeight > 0;
 
-      // Skip when the layer has zero dimensions — happens when .vfx-disabled
-      // body class hides it via display:none, or briefly during initial
-      // layout.
-      if (!haltedForEvent && layer && layer.clientWidth > 0 && layer.clientHeight > 0) {
+      if (visible) {
         const baseRate = cultivation.baseRateRef?.current ?? 0;
         const rate     = cultivation.rateRef?.current     ?? 0;
         const eff = baseRate > 0 ? Math.max(1, rate / baseRate) : 1;
@@ -2285,17 +2255,16 @@ function HomeScreen({
 
         // WARM-UP: just transitioned from hidden to visible. Pre-spawn
         // a small batch at staggered negative animation-delays so the
-        // orbs render at different points along their flight path -
-        // looks like they've been moving the whole time.
-        if (!wasActive) {
+        // orbs render at different points along their flight path.
+        if (!wasVisible) {
           for (let i = 0; i < QI_FLOW_WARMUP_COUNT; i++) {
             // Spread delays across the full orb life; spawnQiFlowOrb
             // uses 700-1500ms life depending on dist + speed, so a
-            // 200/500/800ms offset reads as a clean staggered stream.
+            // 200/450/700ms offset reads as a clean staggered stream.
             const delayMs = 200 + Math.round((i / QI_FLOW_WARMUP_COUNT) * 700);
             spawnQiFlowOrb(layer, eff, delayMs);
           }
-          wasActive = true;
+          wasVisible = true;
         }
 
         if (now - lastSpawn > interval) {
@@ -2303,8 +2272,10 @@ function HomeScreen({
           lastSpawn = now;
         }
       } else {
-        // Hidden / not yet laid out — reset spawn timer.
+        // Hidden / not yet laid out — reset spawn timer so we don't
+        // dump a backlog on return.
         lastSpawn = now;
+        wasVisible = false;
       }
       raf = requestAnimationFrame(tick);
     };
