@@ -1459,6 +1459,40 @@ function PatternClickPrompt({ prompt, onAccept, onDismiss }) {
  *
  * Returns { activePrompt, openPrompt, dismissPrompt, activePattern, completePattern }.
  */
+
+// ─── Sanctum spawn safe-zones for spark prompts + divine orbs ────────────
+// Percentages within the .home-cultivation-zone container. The post-Sanctum
+// home layout puts permanent UI in the centre (crystal stack, REFINE
+// button, cultivator) and top-right (Petition Tablet), so the old 12-88%
+// x / 22-67% y rectangle covered those obstructions and the spawns landed
+// behind them (untappable).
+//
+// Solution: two side-channel bands flanking the cultivator's silhouette.
+// Thematically reads like qi rising up the left/right meridians, which is
+// on-brand for the cultivation fantasy. Bottom-rear band (BR) sits just
+// above the bottom plate for occasional variation.
+//
+// Used by BOTH useDivineQi orb spawns AND usePatternClick prompt spawns
+// so the player's eye learns one set of "hot spots" to scan.
+const SPARK_SAFE_ZONES = [
+  // LEFT meridian — full vertical strip down the left side of the
+  // cultivator, between the chips-tl chip stack and the bottom plate.
+  { id: 'L', x:  4, y: 28, w: 22, h: 50 },
+  // RIGHT meridian — mirror of LEFT, but stops higher to avoid the
+  // Petition Tablet which extends ~y:3-32% on the right edge.
+  { id: 'R', x: 74, y: 36, w: 22, h: 42 },
+];
+
+function pickSparkSafeZone(forcedIndex = null) {
+  const zone = forcedIndex != null
+    ? SPARK_SAFE_ZONES[forcedIndex % SPARK_SAFE_ZONES.length]
+    : SPARK_SAFE_ZONES[Math.floor(Math.random() * SPARK_SAFE_ZONES.length)];
+  return {
+    x: zone.x + Math.random() * zone.w,
+    y: zone.y + Math.random() * zone.h,
+  };
+}
+
 function usePatternClick({ activeSparks, rateRef, qiRef }) {
   const [activePrompt,  setActivePrompt]  = useState(null);
   const [activePattern, setActivePattern] = useState(null);
@@ -1488,12 +1522,15 @@ function usePatternClick({ activeSparks, rateRef, qiRef }) {
     if (!cfg) return;
     if (!tryClaimSparkAttention('pattern')) return; // divine_qi has the floor
     activeRef.current = true;
-    // Place the prompt anywhere within the safe scene zone — same bounds as
-    // a single divine_qi orb so the eye-line is consistent.
+    // Place the prompt in one of the SPARK_SAFE_ZONES (left/right meridian
+    // bands) so it never lands behind the Petition Tablet, crystal stack,
+    // REFINE button, or cultivator. Same logic as divine_qi orbs - the
+    // player learns one consistent set of "spark hot spots".
+    const pos = pickSparkSafeZone();
     setActivePrompt({
       id:             Date.now(),
-      x:              12 + Math.random() * 76,
-      y:              22 + Math.random() * 45,
+      x:              pos.x,
+      y:              pos.y,
       promptWindowMs: cfg.promptWindowMs ?? 6_000,
     });
   }, []);
@@ -1728,15 +1765,23 @@ function useDivineQi({ activeSparks, rateRef, qiRef, spawnVFX }) {
     const waveId = ++nextIdRef.current;
     pendingWaveRef.current = { waveId, total: count, collected: 0 };
     const now = performance.now();
-    const newOrbs = Array.from({ length: count }, (_, i) => ({
-      id:           `dqi-${waveId}-${i}`,
-      waveId,
-      burstSeconds: cfg.burstSeconds,
-      // Scatter positions: safe zone within scene (avoid UI edges)
-      x: 12 + Math.random() * 68 + (i === 1 ? 20 : 0), // second orb offset right
-      y: 22 + Math.random() * 45,
-      expiresAt: now + cfg.windowMs,
-    }));
+    // Spawn each orb in one of the SPARK_SAFE_ZONES (left/right meridian
+    // bands). For a doubleOrb wave, force one in each zone so they never
+    // stack on top of each other - the player gets a clear left-and-right
+    // pair to tap.
+    const newOrbs = Array.from({ length: count }, (_, i) => {
+      const pos = count === 2
+        ? pickSparkSafeZone(i)   // i=0 -> LEFT zone, i=1 -> RIGHT zone
+        : pickSparkSafeZone();   // single orb -> random zone
+      return {
+        id:           `dqi-${waveId}-${i}`,
+        waveId,
+        burstSeconds: cfg.burstSeconds,
+        x: pos.x,
+        y: pos.y,
+        expiresAt: now + cfg.windowMs,
+      };
+    });
     setOrbs(prev => [...prev, ...newOrbs]);
     return true;
   }, []);
