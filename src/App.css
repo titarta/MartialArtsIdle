@@ -28861,4 +28861,30 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v23. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v24: clean up the major-realm gate qi-rate styling.
+   The base .qi-rate-gated added a dark-red pill bg + red box-shadow
+   glow + 1.4s pulse animation. That 'weird outline / shine' the user
+   reported was that legacy chrome bleeding through the Sanctum v16
+   gate vermillion-text override. Drop all the off-theme chrome and
+   let the qi-numbers simply turn vermillion within the existing
+   brass plate.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-scene-bottom .qi-rate.qi-rate-gated,
+.home-scene-bottom .home-overlay-half .qi-rate.qi-rate-gated {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  animation: none !important;
+}
+.home-scene-bottom .qi-rate.qi-rate-gated > span,
+.home-scene-bottom .qi-rate.qi-rate-gated .qi-rate-value {
+  color: var(--vermillion-hot, #ff5b5b) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85) !important;
+}
+
+/* End of SANCTUM v24. */
+
 /* End of HOME "The Sanctum" design pass. */
