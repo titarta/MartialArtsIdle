@@ -29108,4 +29108,64 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v28. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v29: STOP MICROMANAGING. When breakthrough is ready, the
+   ENTIRE plate IS the button. Hide everything else (visibility hidden
+   so the plate height stays the same), button fills the plate inset
+   by 8px. One calling-card surface, no dead space.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Hide every direct child of the plate while BT is active. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-scene-realm-header,
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-scene-overlay-row,
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-bar-wrap {
+  visibility: hidden !important;
+}
+
+/* Drop the bar-wrap's position:relative so its absolute child (the BT
+   button) positions relative to the PLATE instead of the wrap. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-bar-wrap {
+  position: static !important;
+}
+
+/* But unhide the button (since it lives INSIDE bar-wrap which we just
+   hid) and position it to fill the WHOLE plate inset by 8px. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-bar-wrap .home-major-breakthrough-btn {
+  visibility: visible !important;
+  position: absolute !important;
+  /* Anchor to the PLATE (scene-bottom), not the bar-wrap. The wrap is
+     hidden but the button escapes its bounds via the explicit inset
+     coords on the plate. */
+  inset: 8px !important;
+  top: 8px !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  left: 8px !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+}
+
+/* Also hide the seal corners on the plate while BT is showing - the
+   button is the entire visual now, the corners would clutter. */
+.home-scene-bottom:has(.home-major-breakthrough-btn)::before,
+.home-scene-bottom:has(.home-major-breakthrough-btn)::after {
+  display: none !important;
+}
+
+/* Bigger CTA + glyphs now that we have the full plate. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) .home-mb-icon {
+  font-size: 36px !important;
+}
+.home-scene-bottom:has(.home-major-breakthrough-btn) .home-mb-cta {
+  font-size: 20px !important;
+  letter-spacing: 0.28em !important;
+}
+.home-scene-bottom:has(.home-major-breakthrough-btn) .home-mb-next {
+  font-size: 11px !important;
+  letter-spacing: 0.14em !important;
+}
+
+/* End of SANCTUM v29. */
+
 /* End of HOME "The Sanctum" design pass. */
