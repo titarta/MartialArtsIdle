@@ -86,12 +86,105 @@ const GROUPS = groupRealms(REALMS);
 function JourneyBody({ realmIndex }) {
   const currentRef = useRef(null);
 
-  // Scroll the current realm group into view on mount so returning players
-  // land on their place in the chronicle, not at chapter I.
+  // Scroll behavior on mount:
+  // . FIRST EVER open: start at the top (Chapter I) and cinematically
+  //   scroll down to the player's current realm group over ~2.6s with
+  //   ease-out. Sells the "journey so far" feel - the player sees
+  //   their whole climb from the beginning before landing on Now.
+  // . Every open after: instant snap to current (returning players
+  //   want to be where they are, not re-watch the intro).
+  // Gate: localStorage flag mai_journey_intro_seen. Stored once,
+  // never re-fired even across reincarnations or app reinstalls
+  // unless the player clears site data.
   useEffect(() => {
-    if (currentRef.current) {
-      currentRef.current.scrollIntoView({ block: 'center', behavior: 'instant' });
+    if (!currentRef.current) return;
+    const target = currentRef.current;
+
+    let alreadySeen = false;
+    try { alreadySeen = !!localStorage.getItem('mai_journey_intro_seen'); } catch {}
+
+    if (alreadySeen) {
+      target.scrollIntoView({ block: 'center', behavior: 'instant' });
+      return;
     }
+
+    // First-open intro animation. Walk up from the target to find the
+    // nearest scrollable ancestor, then animate its scrollTop from 0
+    // to the position that centres the current realm group.
+    const findScrollContainer = (el) => {
+      let p = el.parentElement;
+      while (p) {
+        const style = getComputedStyle(p);
+        if (/(auto|scroll)/.test(style.overflowY) && p.scrollHeight > p.clientHeight) return p;
+        p = p.parentElement;
+      }
+      return document.scrollingElement || document.documentElement;
+    };
+    const container = findScrollContainer(target);
+    if (!container) return;
+
+    // Compute target scrollTop: place the realm group near the centre
+    // of the visible viewport.
+    const containerRect = container.getBoundingClientRect();
+    const targetRect    = target.getBoundingClientRect();
+    const offsetWithin  = (targetRect.top - containerRect.top) + container.scrollTop;
+    const centred       = offsetWithin - (container.clientHeight - target.clientHeight) / 2;
+    const targetY       = Math.max(0, Math.min(container.scrollHeight - container.clientHeight, centred));
+
+    // Start at the top (Chapter I) so the player visibly sees where the
+    // journey began before the scroll carries them to Now.
+    container.scrollTop = 0;
+
+    // Respect the prefers-reduced-motion media query - skip the
+    // cinematic and snap directly to current.
+    const reduceMotion = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      container.scrollTop = targetY;
+      try { localStorage.setItem('mai_journey_intro_seen', '1'); } catch {}
+      return;
+    }
+
+    // Short hold at Chapter I so the player registers the start,
+    // THEN the scroll begins. Total: 400ms hold + 2200ms scroll = 2.6s.
+    const HOLD_MS = 400;
+    const SCROLL_MS = 2200;
+    let raf;
+    let cancelled = false;
+    const startTimer = setTimeout(() => {
+      if (cancelled) return;
+      const startY = container.scrollTop;     // 0 (we set it above)
+      const delta  = targetY - startY;
+      const t0 = performance.now();
+      // Ease-out cubic: fast start, gentle landing. Reads as "the
+      // chronicle is unrolling toward your place".
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+      const tick = (now) => {
+        if (cancelled) return;
+        const elapsed = now - t0;
+        const p = Math.min(1, elapsed / SCROLL_MS);
+        container.scrollTop = startY + delta * easeOutCubic(p);
+        if (p < 1) {
+          raf = requestAnimationFrame(tick);
+        } else {
+          // Final snap to exact target so the centring is precise,
+          // THEN mark seen. Deferring the localStorage write until
+          // the animation actually completes avoids the React
+          // StrictMode dev pitfall where the double-mount would see
+          // the flag set by the first mount's cleanup-cancelled
+          // animation and snap on the second mount.
+          target.scrollIntoView({ block: 'center', behavior: 'instant' });
+          try { localStorage.setItem('mai_journey_intro_seen', '1'); } catch {}
+        }
+      };
+      raf = requestAnimationFrame(tick);
+    }, HOLD_MS);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(startTimer);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
