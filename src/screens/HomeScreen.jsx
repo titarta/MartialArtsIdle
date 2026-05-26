@@ -1020,7 +1020,16 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
   useEffect(() => {
     if (!mechanicOn) return;
     let raf;
-    let lastSpark = 0;
+    // Seed at mount-time, NOT 0. With lastSpark=0 the very first rAF
+    // frame would always pass the 'now - lastSpark > interval' check
+    // and spawn a spark - on every Home-screen mount, even if the
+    // player just navigated back from another tab. That mount-spawn
+    // (plus the crystal-overcharged class re-applying instantly when
+    // the reservoir was already full off-screen) made it look like a
+    // crystal-click animation replayed itself. Seeding to performance.
+    // now() means the first-frame delta is ~16ms which is < interval,
+    // so no spurious spawn. Normal cadence resumes naturally.
+    let lastSpark = performance.now();
     let lastOver  = null; // last applied overcharged state — avoids redundant DOM writes
     const tick = (now) => {
       const rate   = rateRef?.current   ?? 0;
@@ -2190,7 +2199,13 @@ function HomeScreen({
   const currentEventKindRef = useRef(null);
   useEffect(() => {
     let raf;
-    let lastSpawn = 0;
+    // Seed at mount-time, NOT 0. Same reason as the crystal-spark rAF
+    // above: with lastSpawn=0 the first frame would always spawn an
+    // orb on every Home-screen mount, contributing to the "looks like
+    // the screen is replaying recent activity" feel when the player
+    // navigates back. Seeding to performance.now() makes the first
+    // frame silent; normal cadence picks up on the next interval.
+    let lastSpawn = performance.now();
     const tick = (now) => {
       const layer = qiFlowLayerRef.current;
       const kind = currentEventKindRef.current;
