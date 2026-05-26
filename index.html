@@ -13,53 +13,18 @@
     <title>The Long Road to Heaven</title>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2334336722369393"
      crossorigin="anonymous"></script>
-  <script>
-    /* Block iOS double-tap-and-hold magnifier loupe.
-       CSS user-select:none kills the long-press loupe but iOS treats
-       double-tap-then-hold as a separate gesture that ignores it.
-       Fix: preventDefault the second touchstart ONLY when it lands
-       near the previous touchend position (i.e. a real double-tap on
-       the same spot). Without the distance check, every fast
-       successive swipe (scroll up, then scroll down within 300ms)
-       was being blocked at the touchstart, making the game feel
-       unresponsive on iOS while scrolling lists.
-       Position threshold: 24px. iOS treats touches within ~10-15px
-       of each other as the same point; 24px gives a small safety
-       margin without catching real swipes (which travel 100px+). */
-    (function () {
-      var DOUBLE_TAP_MS  = 300;
-      var DOUBLE_TAP_PX  = 24;
-      var lastEnd        = 0;
-      var lastEndX       = 0;
-      var lastEndY       = 0;
-
-      document.addEventListener('touchend', function (e) {
-        if (e.touches.length !== 0) return;
-        lastEnd = Date.now();
-        var t = (e.changedTouches && e.changedTouches[0]) || null;
-        if (t) { lastEndX = t.clientX; lastEndY = t.clientY; }
-      }, { passive: true, capture: true });
-
-      document.addEventListener('touchstart', function (e) {
-        if (Date.now() - lastEnd > DOUBLE_TAP_MS) return;
-        var tg = e.target;
-        if (tg && tg.matches && tg.matches('input, textarea, [contenteditable]')) return;
-        var t = e.touches[0];
-        if (!t) return;
-        // Distance from the previous touchend - only block if it's
-        // close enough to be a real double-tap (not a fast re-scroll).
-        var dx = t.clientX - lastEndX;
-        var dy = t.clientY - lastEndY;
-        if (dx * dx + dy * dy > DOUBLE_TAP_PX * DOUBLE_TAP_PX) return;
-        e.preventDefault();
-        var hit = document.elementFromPoint(t.clientX, t.clientY);
-        if (hit) hit.dispatchEvent(new MouseEvent('click', {
-          bubbles: true, cancelable: true,
-          clientX: t.clientX, clientY: t.clientY, view: window
-        }));
-      }, { passive: false, capture: true });
-    })();
-  </script>
+  <!--
+    Magnifier-loupe suppression: handled by CSS user-select:none +
+    -webkit-touch-callout:none in src/index.css (applied globally to *).
+    Modern iOS Safari (16+) respects those for the long-press loupe.
+    For the iOS App Store build (Capacitor / WKWebView) we suppress
+    the loupe natively in the iOS shell instead of via JS, which is
+    cleaner and zero touch-handler overhead.
+    Browser/PWA is internal-dev only, so if the loupe appears there in
+    some edge case it doesn't matter. The previous JS workaround
+    interfered with fast successive swipes (every touchstart within
+    300ms of a touchend was preventDefault'd) so it's gone.
+  -->
   </head>
   <body>
     <div id="rotate-overlay" role="alert">
