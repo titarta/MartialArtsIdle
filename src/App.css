@@ -29644,4 +29644,311 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* End of SANCTUM v37. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v38: toast notification redesign.
+
+   The old toast was a navy-purple pill from the pre-Sanctum palette -
+   #0e0e22/#13132e gradient, purple border, purple 'View →' button -
+   completely off-brand for the temple aesthetic. v38 rebuilds them as
+   'temple notice' plaques:
+
+   . brass-bordered dark lacquer body matching the Petition Tablet
+   . 3px vermillion banner ribbon along the top edge (ceremonial)
+   . vermillion wax-seal stamp on the left with a Ma Shan Zheng
+     calligraphic glyph (defaults to 印, but per-toast 山/符/賞/etc.)
+   . small-caps brass kicker line + cream Cinzel message body
+   . brass 'View →' pill matching the REFINE button vocabulary
+   . unified modal-close X (matches every other surface)
+   . drop-from-above arrival animation with subtle bounce
+   . peek cards behind show brass-trim slivers (queue communicated)
+
+   Per-type tinting via [data-toast-type]:
+     unlock     - jade stamp tint (new content)
+     achievement- gold stamp tint (commendation)
+     info       - vermillion stamp tint (default ritual mark)
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* ── Stack container: pin to top centre under the TopBar ──────────── */
+.toast-stack {
+  position: fixed;
+  top: calc(var(--top-bar-h) + env(safe-area-inset-top) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  width: min(340px, calc(100vw - 24px));
+  pointer-events: none;
+}
+
+.toast-stage {
+  position: relative;
+  padding-bottom: 16px;
+}
+
+/* ── Plaque body: brass border on dark lacquer, mini Petition Tablet ─ */
+.toast-card {
+  display: grid !important;
+  grid-template-columns: 44px 1fr auto !important;
+  grid-template-rows: auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 60px !important;
+  height: auto !important;
+  padding: 10px 12px !important;
+  position: relative;
+  /* Stacked backgrounds: top brass-leaf highlight + body gradient. */
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.16) 0%,
+      rgba(220, 175, 110, 0.04) 8%,
+      transparent 14%),
+    linear-gradient(180deg,
+      #2a1d10 0%,
+      #1f160c 60%,
+      #150e07 100%) !important;
+  border: 1px solid rgba(220, 175, 110, 0.55) !important;
+  border-radius: 4px 4px 8px 8px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 12px 28px rgba(0, 0, 0, 0.72),
+    0 0 18px -6px rgba(220, 175, 110, 0.45) !important;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Vermillion banner ribbon: 3px stripe along the top inside the border. */
+.toast-ribbon {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    rgba(140, 30, 30, 0.40) 0%,
+    #c83838 50%,
+    rgba(140, 30, 30, 0.40) 100%);
+  box-shadow: 0 1px 4px rgba(200, 56, 56, 0.45);
+  pointer-events: none;
+}
+
+/* ── Top card: arrival animation + interactive ─────────────────────── */
+.toast-card-top {
+  pointer-events: auto;
+  animation: toast-drop-in 0.32s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+  transform-origin: 50% -10px;
+}
+@keyframes toast-drop-in {
+  0%   { opacity: 0; transform: translateY(-14px) scale(0.94); }
+  60%  { opacity: 1; transform: translateY(2px)   scale(1.02); }
+  100% { opacity: 1; transform: translateY(0)     scale(1);    }
+}
+
+/* ── Peek cards: dimmer slivers behind the top ─────────────────────── */
+.toast-peek {
+  filter: saturate(0.85);
+}
+/* Peek hides its kicker/message + actions; only the brass-trim plate
+   strip shows behind the top. Keeps the queue communicated without
+   competing visually. */
+.toast-peek .toast-body,
+.toast-peek .toast-stamp-glyph {
+  visibility: hidden;
+}
+
+/* ── Stamp: vermillion wax seal with calligraphic glyph ────────────── */
+.toast-stamp {
+  grid-column: 1;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  background:
+    /* subtle inner highlight at top */
+    linear-gradient(180deg,
+      rgba(255, 200, 180, 0.30) 0%,
+      transparent 30%),
+    /* main vermillion body */
+    radial-gradient(circle at 35% 30%,
+      #e25656 0%, #c83838 55%, #7a1818 100%);
+  border: 1px solid rgba(255, 150, 130, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 200, 0.32),
+    inset 0 -2px 4px rgba(60, 0, 0, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.55),
+    0 0 10px -2px rgba(200, 56, 56, 0.55);
+  /* The stamp 'punches' onto the plate on arrival - tiny scale pulse. */
+  animation: toast-stamp-punch 0.42s cubic-bezier(0.34, 1.6, 0.5, 1) both;
+}
+@keyframes toast-stamp-punch {
+  0%   { transform: scale(0.6) rotate(-8deg); opacity: 0; }
+  60%  { transform: scale(1.10) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1)    rotate(0);    opacity: 1; }
+}
+
+.toast-stamp-glyph {
+  font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #fff4d4;
+  line-height: 1;
+  text-shadow:
+    0 1px 0 rgba(60, 0, 0, 0.55),
+    0 0 6px rgba(255, 200, 130, 0.45);
+  /* slight optical centring - the glyph baseline isn't dead-centre */
+  transform: translateY(-1px);
+}
+
+/* Per-type stamp tints: keep vermillion as the default ritual mark,
+   shift to jade for unlocks (new content) and gold for achievements. */
+.toast-card[data-toast-type="unlock"] .toast-stamp {
+  background:
+    linear-gradient(180deg,
+      rgba(200, 255, 220, 0.30) 0%,
+      transparent 30%),
+    radial-gradient(circle at 35% 30%,
+      #9fe2b3 0%, #4ea872 55%, #1d5236 100%);
+  border-color: rgba(180, 240, 200, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(220, 255, 230, 0.32),
+    inset 0 -2px 4px rgba(0, 40, 20, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.55),
+    0 0 10px -2px rgba(126, 195, 143, 0.55);
+}
+.toast-card[data-toast-type="achievement"] .toast-stamp {
+  background:
+    linear-gradient(180deg,
+      rgba(255, 240, 200, 0.32) 0%,
+      transparent 30%),
+    radial-gradient(circle at 35% 30%,
+      #ffe19a 0%, #d4a04a 55%, #6a4a18 100%);
+  border-color: rgba(255, 220, 150, 0.75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.40),
+    inset 0 -2px 4px rgba(60, 30, 0, 0.55),
+    0 1px 4px rgba(0, 0, 0, 0.55),
+    0 0 12px -2px rgba(220, 175, 110, 0.65);
+}
+
+/* ── Body: kicker + message stacked ────────────────────────────────── */
+.toast-body {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.toast-kicker {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.92);
+  line-height: 1;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+}
+
+.toast-message {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #f5e6c8;
+  line-height: 1.3;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+/* ── Actions: brass View pill + unified close X ────────────────────── */
+.toast-actions {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.toast-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #fff4d4;
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.34) 0%,
+      rgba(120, 80, 40, 0.22) 100%),
+    rgba(20, 14, 8, 0.85);
+  border: 1px solid rgba(220, 175, 110, 0.65);
+  border-radius: 6px;
+  padding: 6px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.55);
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.15s, transform 0.08s, background 0.15s;
+}
+.toast-go:hover {
+  filter: brightness(1.14);
+}
+.toast-go:active {
+  transform: translateY(1px);
+}
+.toast-go-arrow {
+  font-size: 11px;
+  color: #ffd28a;
+}
+
+/* Toast's dismiss X: reuse .modal-close base + shrink for the chip
+   context. .modal-close already brings the unified colour/hover. */
+.toast-card .toast-dismiss.modal-close {
+  position: static !important;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 13px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 1px solid rgba(220, 175, 110, 0.25) !important;
+  color: rgba(220, 175, 110, 0.65) !important;
+}
+.toast-card .toast-dismiss.modal-close:hover {
+  color: #ffe4a0 !important;
+  border-color: rgba(220, 175, 110, 0.55) !important;
+  background: rgba(220, 175, 110, 0.08) !important;
+}
+
+/* ── '+N more' overflow indicator: brass-trim chip ─────────────────── */
+.toast-overflow {
+  position: absolute;
+  bottom: 0;
+  right: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.85);
+  background: rgba(20, 14, 8, 0.92);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  border-radius: 20px;
+  padding: 3px 9px;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* End of SANCTUM v38. */
+
 /* End of HOME "The Sanctum" design pass. */

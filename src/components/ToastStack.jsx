@@ -3,6 +3,79 @@ import { useEffect } from 'react';
 const MAX_VISIBLE      = 3;
 const DEFAULT_DURATION = 4000;
 
+/**
+ * ToastStack — Sanctum "temple notice" toasts.
+ *
+ * Each toast is a brass-bordered dark-lacquer plaque with:
+ *   . a vermillion wax-seal stamp on the left (Ma Shan Zheng glyph)
+ *   . a small-caps brass kicker line and a cream message body
+ *   . optional brass 'View' CTA and the unified modal-close X
+ *   . peek cards stacked behind the top one, dimmer, slightly inset
+ *
+ * Data fields on each toast:
+ *   - id            unique string
+ *   - type          'unlock' | 'achievement' | 'info' (drives stamp tint)
+ *   - kicker        small-caps label above the message (optional)
+ *   - glyph         single CJK character for the stamp (defaults '印')
+ *   - message       main body text
+ *   - targetScreen  if set, renders the View CTA
+ *   - targetParam   forwarded to onNavigate
+ *   - duration      ms before auto-dismiss (default 4000)
+ */
+function ToastCard({ toast, isPeek, depth = 0, onDismiss, onNavigate }) {
+  const glyph  = toast.glyph  ?? '印';
+  const kicker = toast.kicker ?? null;
+  const type   = toast.type   ?? 'info';
+
+  function handleNavigate() {
+    if (toast.targetScreen) onNavigate(toast.targetScreen, toast.targetParam ?? null);
+    onDismiss(toast.id);
+  }
+
+  return (
+    <div
+      className={`toast-card${isPeek ? ' toast-peek' : ' toast-card-top'}`}
+      data-toast-type={type}
+      style={isPeek ? {
+        position: 'absolute',
+        top:     `${depth * 5}px`,
+        left:    `${depth * 4}px`,
+        right:   `${depth * 4}px`,
+        zIndex:  MAX_VISIBLE - depth,
+        opacity: 1 - depth * 0.25,
+      } : undefined}
+    >
+      {/* Vermillion banner ribbon along the top edge - ceremonial accent. */}
+      <span className="toast-ribbon" aria-hidden="true" />
+
+      <div className="toast-stamp" aria-hidden="true">
+        <span className="toast-stamp-glyph">{glyph}</span>
+      </div>
+
+      <div className="toast-body">
+        {kicker && <div className="toast-kicker">{kicker}</div>}
+        <div className="toast-message">{toast.message}</div>
+      </div>
+
+      {!isPeek && (
+        <div className="toast-actions">
+          {toast.targetScreen && (
+            <button className="toast-go" onClick={handleNavigate}>
+              <span className="toast-go-label">View</span>
+              <span className="toast-go-arrow" aria-hidden="true">→</span>
+            </button>
+          )}
+          <button
+            className="modal-close toast-dismiss"
+            onClick={() => onDismiss(toast.id)}
+            aria-label="Dismiss"
+          >✕</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ToastStack({ toasts, onDismiss, onNavigate }) {
   if (!toasts.length) return null;
 
@@ -18,54 +91,29 @@ function ToastStack({ toasts, onDismiss, onNavigate }) {
     return () => clearTimeout(timer);
   }, [top.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleNavigate() {
-    if (top.targetScreen) onNavigate(top.targetScreen, top.targetParam ?? null);
-    onDismiss(top.id);
-  }
-
   return (
     <div className="toast-stack">
       <div className="toast-stage">
 
-        {/* Peek cards — absolute, rendered before top so z-index wins */}
-        {visible.slice(1).map((toast, i) => {
-          const depth = i + 1;
-          return (
-            <div
-              key={toast.id}
-              className="toast-card toast-peek"
-              style={{
-                position: 'absolute',
-                top:     `${depth * 6}px`,
-                left:    `${depth * 5}px`,
-                right:   `${depth * 5}px`,
-                zIndex:  MAX_VISIBLE - depth,
-                opacity: 1 - depth * 0.2,
-              }}
-            >
-              <span className="toast-message">{toast.message}</span>
-            </div>
-          );
-        })}
+        {/* Peek cards — absolute behind the top, slivers of brass-trim
+            visible to communicate the queue. */}
+        {visible.slice(1).map((toast, i) => (
+          <ToastCard
+            key={toast.id}
+            toast={toast}
+            isPeek
+            depth={i + 1}
+            onDismiss={onDismiss}
+            onNavigate={onNavigate}
+          />
+        ))}
 
-        {/* Top card — in flow, defines stage height, highest z-index */}
-        <div className="toast-card toast-card-top">
-          <span className="toast-message">{top.message}</span>
-          <div className="toast-actions">
-            {top.targetScreen && (
-              <button className="toast-go" onClick={handleNavigate}>
-                View →
-              </button>
-            )}
-            <button
-              className="toast-dismiss"
-              onClick={() => onDismiss(top.id)}
-              aria-label="Dismiss"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+        {/* Top card — in flow, defines stage height. */}
+        <ToastCard
+          toast={top}
+          onDismiss={onDismiss}
+          onNavigate={onNavigate}
+        />
 
         {overflow > 0 && (
           <div className="toast-overflow">+{overflow} more</div>

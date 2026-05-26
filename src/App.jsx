@@ -1110,7 +1110,10 @@ function AppInner() {
         if (ok) {
           const card = QI_SPARK_BY_ID[sparkId];
           notifications.addToast({
-            message: `New mechanic unlocked: ${card?.name ?? sparkId}`,
+            type: 'unlock',
+            kicker: 'New Spark',
+            glyph: '符', // talisman / mechanism spark
+            message: card?.name ?? sparkId,
             duration: 6000,
           });
         }
@@ -1128,7 +1131,10 @@ function AppInner() {
       const { sparkId } = e.detail ?? {};
       const card = QI_SPARK_BY_ID[sparkId];
       notifications.addToast({
-        message: `⌛ Auto-selected: ${card?.name ?? 'spark'} (modal timed out)`,
+        type: 'info',
+        kicker: 'Auto-Picked',
+        glyph: '時', // time / timed out
+        message: `${card?.name ?? 'Spark'} (modal timed out)`,
         duration: 7000,
       });
     };
@@ -1192,7 +1198,10 @@ function AppInner() {
     } catch {}
     if (hadCombatData) {
       notifications.addToast({
-        message: 'Combat returns in a future update — your inventory and laws are preserved.',
+        type: 'info',
+        kicker: 'Tidings',
+        glyph: '告', // announcement / proclamation
+        message: 'Combat returns in a future update. Your inventory and laws are preserved.',
         duration: 8000,
       });
     }
@@ -1202,7 +1211,12 @@ function AppInner() {
 
   const achievements = useAchievements({
     onUnlock: (a) => {
-      notifications.addToast({ message: `🏆 Achievement: ${a.title}` });
+      notifications.addToast({
+        type: 'achievement',
+        kicker: 'Achievement',
+        glyph: '賞', // reward / commendation
+        message: a.title,
+      });
       try { trackAchievementUnlocked(a.id); } catch {}
     },
   });
@@ -1548,7 +1562,14 @@ function AppInner() {
       };
       const targetScreen = SCREEN[featureId] ?? null;
       const targetParam  = featureId === 'qi_crystal' ? { openCrystal: true } : null;
-      notifications.addToast({ message: msg, targetScreen, targetParam });
+      notifications.addToast({
+        type: 'unlock',
+        kicker: 'New Feature',
+        glyph: '解', // unlock / open
+        message: msg,
+        targetScreen,
+        targetParam,
+      });
     },
   });
   featureFlagsRef.current = featureFlags;

@@ -63,7 +63,14 @@ export default function useNotifications({ cultivation, inventory }) {
       ...q,
       ...newlyUnlocked.map(w => ({
         id: `world-${w.id}-${++toastCounter}`,
-        message: `New World Unlocked: ${w.name}`,
+        // Sanctum v38: structured toast = stamp glyph + kicker + message.
+        // kicker is a small-caps brass label above the message body; glyph
+        // is the Ma Shan Zheng calligraphic character that rides in the
+        // vermillion seal stamp on the left. Type drives the stamp tint.
+        type: 'unlock',
+        kicker: 'New World',
+        glyph: '山', // mountain - reads as 'realm beyond'
+        message: w.name,
         targetScreen: 'worlds',
         targetParam: { expandWorldId: w.id },
         duration: 6000,
@@ -106,7 +113,16 @@ export default function useNotifications({ cultivation, inventory }) {
   }, []);
 
   const addToast = useCallback((toast) => {
-    setToastQueue(q => [...q, { id: `ext-${++toastCounter}`, ...toast }]);
+    // Sanctum v38: backfill defaults for legacy callers that don't pass
+    // kicker / glyph / type. Component still renders cleanly with a
+    // generic 'TIDINGS' stamp if none of these are set.
+    setToastQueue(q => [...q, {
+      id: `ext-${++toastCounter}`,
+      type:   toast.type   ?? 'info',
+      kicker: toast.kicker ?? null,
+      glyph:  toast.glyph  ?? '印', // wax seal default
+      ...toast,
+    }]);
     try { AudioManager.playSfx('ui_notify'); } catch {}
   }, []);
 
