@@ -29332,4 +29332,23 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v31. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v32: restore position:absolute on chips-tl + chips-tr.
+   The v6 vignette CSS '.home-cultivation-zone > * { position: relative }'
+   was a sledgehammer that converted every direct child to relative -
+   including the chips containers, which broke their corner-pinning.
+   That's why the right plaque dropped down (it became a flex-flow item
+   instead of an absolute-positioned corner overlay).
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-chips-tl,
+.home-chips-tr {
+  position: absolute !important;
+  top: 18px !important;
+}
+.home-chips-tl { left: 12px !important; right: auto !important; }
+.home-chips-tr { right: 12px !important; left: auto !important; }
+
+/* End of SANCTUM v32. */
+
 /* End of HOME "The Sanctum" design pass. */
