@@ -30204,6 +30204,35 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* End of SANCTUM v40. */
 
 /* ────────────────────────────────────────────────────────────────────────
+   Bottom-plate overlay row layout hardening: keep the right half
+   (rate + multiplier badges) pinned to the right and the left half
+   (qi balance / GATE rate ratio) clipped if the text gets long, so a
+   wider GATE state never shoves the focus-mult badges off-position.
+   Was: flex with both halves at flex:0 0 auto, so a wide left half
+   grew and pushed everything right.
+   Now: 1fr-auto grid; left half gets `1fr` (can shrink + truncate),
+   right half gets `auto` (intrinsic width, always anchored right).
+   ──────────────────────────────────────────────────────────────────── */
+.home-scene-bottom .home-scene-overlay-row {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child {
+  min-width: 0 !important;       /* allow shrink-to-fit */
+  margin-right: 0 !important;    /* drop the flex hack */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child .qi-rate {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ────────────────────────────────────────────────────────────────────────
    .home-host — wrapper around HomeScreen that lets it run continuously
    in the background while another screen overlays. Keep layout stable
    when hidden so the qi-flow particle layer's clientWidth stays > 0 and

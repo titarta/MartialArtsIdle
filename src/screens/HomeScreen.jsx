@@ -206,8 +206,13 @@ function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, 
           const r = rateRef ? rateRef.current : 0;
           textRef.current.textContent = `${fmt(qiRef.current)} Qi  ·  ${fmtRate(r)}/s`;
         } else if (gate) {
+          // Dropped the trailing " Qi/s" suffix — the GATE prefix added
+          // by .qi-rate-gated::before already implies it's a rate, and
+          // the "X / Y" format reads as a ratio. Together the suffix
+          // expanded the left half past what fits on iPhone 13 and
+          // shoved the focus-mult badges out of place.
           const r = rateRef ? rateRef.current : gate.current;
-          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}  Qi/s`;
+          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}`;
         } else {
           // Cookie-Clicker pivot: realm-progress numerator is cumulative
           // qi earned this realm, NOT the spendable balance. Spending on
@@ -1234,8 +1239,10 @@ function PCQiProgressText({ qiRef, progressRef, costRef, gateRef, rateRef, maxed
           const r = rateRef ? rateRef.current : 0;
           textRef.current.textContent = `${fmt(qiRef.current)} Qi  ·  ${fmtRate(r)}/s`;
         } else if (gate) {
+          // Dropped the trailing " Qi/s" suffix - same reason as the
+          // QiProgressChip above. GATE prefix + X/Y ratio is enough.
           const r = rateRef ? rateRef.current : gate.current;
-          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}  Qi/s`;
+          textRef.current.textContent = `${fmtRate(r)} / ${fmtRate(gate.required)}`;
         } else {
           // Cookie-Clicker pivot: numerator is realm-progress meter.
           const progress = (progressRef?.current ?? qiRef.current);
