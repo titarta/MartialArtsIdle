@@ -29007,4 +29007,72 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v26. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v27: breakthrough button COVERS more without growing the
+   plate. v26 violated the no-expansion rule by bumping the bar zone
+   28→52px when BT was active. v27 instead positions the BT button
+   absolutely on the scene-bottom so it OVERLAYS both the qi-row AND
+   the bar zone in one larger footprint - same plate height in both
+   states, but the button reads as a big calling-card moment.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Revert v26 height expansion. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) {
+  height: 28px !important;
+}
+
+/* Move the BT button OUT of the bar wrap's interior - position it
+   absolutely on the scene-bottom, covering the qi-row + bar combined.
+   Approximate footprint: bar bottom is at scene-bottom bottom-14ish;
+   the qi-row sits ~24px above. So cover from y=qi-row-top down to
+   bar-bottom = ~60-70px tall. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) {
+  position: absolute;
+}
+.home-scene-bottom .home-major-breakthrough-btn {
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 8px !important;
+  top: auto !important;
+  width: auto !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding: 0 18px !important;
+  gap: 14px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 6;
+}
+
+/* When BT is active, the qi-row and bar are hidden visually
+   (opacity:0) - DOM keeps them so the card height stays the same. */
+.home-scene-bottom:has(.home-major-breakthrough-btn) .home-scene-overlay-row,
+.home-scene-bottom:has(.home-major-breakthrough-btn) .home-bar-wrap > .realm-bar {
+  visibility: hidden !important;
+}
+
+/* Realm header stays visible at top of the card (context: current
+   realm), so the player sees what they're breaking through FROM. */
+
+/* Bigger glyphs + bigger CTA now that we have 64px height. */
+.home-scene-bottom .home-major-breakthrough-btn .home-mb-icon {
+  font-size: 32px !important;
+}
+.home-scene-bottom .home-major-breakthrough-btn .home-mb-cta {
+  font-size: 17px !important;
+}
+.home-scene-bottom .home-major-breakthrough-btn .home-mb-next {
+  font-size: 10px !important;
+  letter-spacing: 0.10em !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+/* End of SANCTUM v27. */
+
 /* End of HOME "The Sanctum" design pass. */
