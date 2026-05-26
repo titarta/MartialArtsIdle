@@ -30215,24 +30215,37 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* End of SANCTUM v40. */
 
 /* ────────────────────────────────────────────────────────────────────────
-   Bottom-plate overlay row layout hardening: keep the right half
-   (rate + multiplier badges) pinned to the right and the left half
-   (qi balance / GATE rate ratio) clipped if the text gets long, so a
-   wider GATE state never shoves the focus-mult badges off-position.
-   Was: flex with both halves at flex:0 0 auto, so a wide left half
-   grew and pushed everything right.
-   Now: 1fr-auto grid; left half gets `1fr` (can shrink + truncate),
-   right half gets `auto` (intrinsic width, always anchored right).
+   Bottom-plate overlay row — NO-SHIFT-ON-INTERACTION layout.
+
+   Iron rule: nothing on this row may visually move when the player
+   holds (focus boost) or otherwise interacts. The badges, the rate
+   numbers, the GATE label - all fixed screen positions.
+
+   How:
+   . Row is a 3-track grid: left-content (1fr) | rate (FIXED 92px) |
+     badge slots (FIXED 82px = 32 ad + 6 gap + 44 cf).
+   . Left half takes the remaining 1fr, clips with ellipsis if a long
+     GATE goal pushes against its bound.
+   . Right half is a sub-grid that aligns to the parent's last two
+     fixed columns. Rate text right-justifies in its 92px box; badges
+     sit in their 32/44px columns.
+   . Result: every element's left/right edge is anchored to the same
+     absolute X regardless of (a) rate-text width change from focus
+     boost, (b) badge appearance/disappearance, (c) GATE state.
    ──────────────────────────────────────────────────────────────────── */
 .home-scene-bottom .home-scene-overlay-row {
   display: grid !important;
-  grid-template-columns: 1fr auto !important;
+  /* left content | rate slot | badge slot
+     Rate slot wide enough for '+999.9K Qi/s' or '+999.9B Qi/s' at
+     12px tabular-nums Cinzel without wrapping. */
+  grid-template-columns: 1fr 92px 82px !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 0 6px !important;
 }
 .home-scene-bottom .home-scene-overlay-row .home-overlay-half:first-child {
-  min-width: 0 !important;       /* allow shrink-to-fit */
-  margin-right: 0 !important;    /* drop the flex hack */
+  grid-column: 1 !important;
+  min-width: 0 !important;
+  margin-right: 0 !important;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -30241,6 +30254,27 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Right half spans the two fixed tracks. Internal sub-grid:
+   rate (1fr inside 92px) | ad (32px) | cf (44px). Both badges have
+   fixed grid-columns set further down (v37) so they always sit in
+   the same slot regardless of which badges are visible. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child {
+  grid-column: 2 / span 2 !important;
+  display: grid !important;
+  grid-template-columns: 1fr 32px 44px !important;
+  grid-auto-flow: dense !important;
+  align-items: center !important;
+  gap: 0 6px !important;
+}
+/* Re-anchor the qi-rate-value (rate text) to column 1 of the inner
+   grid, right-justified. This is the slot whose width is fixed - the
+   rate number can change from '+1.4K' to '+33.2K' without budging
+   the badges to its right. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child .qi-rate-value {
+  grid-column: 1 !important;
+  justify-self: end !important;
+  text-align: right;
 }
 
 /* ────────────────────────────────────────────────────────────────────────
