@@ -145,10 +145,12 @@ function JourneyBody({ realmIndex }) {
       return;
     }
 
-    // Short hold at Chapter I so the player registers the start,
-    // THEN the scroll begins. Total: 400ms hold + 2200ms scroll = 2.6s.
-    const HOLD_MS = 400;
-    const SCROLL_MS = 2200;
+    // Brief hold at Chapter I so the player registers the start,
+    // THEN a snappy ease-out scroll to current. Total ~1.1s - quick
+    // enough that the player isn't waiting, long enough to read as
+    // "the chronicle just unrolled" rather than "the screen jumped".
+    const HOLD_MS = 200;
+    const SCROLL_MS = 900;
     let raf;
     let cancelled = false;
     const startTimer = setTimeout(() => {
