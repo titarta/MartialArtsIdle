@@ -23,6 +23,30 @@ document.addEventListener('contextmenu', e => {
   if (e.target.tagName === 'IMG') e.preventDefault();
 });
 
+/* ─── PWA auto-reload when service worker updates ────────────────────────
+   iOS standalone PWA (added to home screen) caches aggressively. With
+   vite-plugin-pwa configured as { registerType: 'autoUpdate',
+   skipWaiting: true, clientsClaim: true }, a new SW activates as soon
+   as it downloads - BUT the currently-rendered page is still showing
+   the OLD HTML/CSS/JS from before the update. Without an explicit
+   page reload, the user sees stale assets until they manually quit
+   the PWA and relaunch.
+
+   This listener detects when a new SW takes control of the page
+   ('controllerchange' event) and triggers a soft reload so the new
+   assets load. Safe for an idle game: all state lives in localStorage,
+   so a reload loses zero progress. The `reloading` guard prevents
+   reload loops on browsers where multiple controllerchange events
+   fire during the SW activation handshake. */
+if ('serviceWorker' in navigator) {
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloading) return;
+    reloading = true;
+    window.location.reload();
+  });
+}
+
 const rootEl = document.getElementById('root')
 
 class ErrorBoundary extends Component {
