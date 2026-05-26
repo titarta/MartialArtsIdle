@@ -2,7 +2,12 @@
  * tutorialCards.js — Tier-A jade tutorial card content (2026-05-21).
  *
  * Each entry is keyed by a stable id and matches the `TutorialModal`
- * payload shape: { kicker, title, body, iconSrc?, ctaText? }.
+ * payload shape: { kicker, title, body, glyph?, iconSrc?, ctaText? }.
+ *
+ * `glyph` is the single Ma Shan Zheng character that sits as the
+ * calligraphic watermark behind the modal copy — provides identity
+ * even for cards without an iconSrc. Falls back to 道 (Way / Dao) if
+ * omitted.
  *
  * These cards fire at key first-run moments and never re-fire on the
  * same account (see src/systems/tutorialSeen.js). Trigger sites:
@@ -66,66 +71,77 @@ const CARDS = {
     kicker:  'Welcome, cultivator',
     title:   'The Path Begins',
     body:    'Qi flows in with every breath. Fill the bar at the bottom of the screen to break through a layer of your realm. Layers stack into realms, realms stack into the heavens. The path is long.',
+    glyph:   '道',  // Dao / Way
     ctaText: 'Begin',
   },
   [TUTORIAL_IDS.HOLD_TO_FOCUS]: {
     kicker:  'Focus',
     title:   'Hold to Focus',
     body:    'Press and hold the cultivator. Your qi/s climbs sharply while you hold, and drops back when you release. The early layers go by much faster with your thumb on the screen.',
+    glyph:   '念',  // intent / focus
     ctaText: 'Try it',
   },
   [TUTORIAL_IDS.PRODUCERS_TAB]: {
     kicker:  'Your sect',
     title:   'Producers',
     body:    'Producers gather qi for you in the background, even when you\'re not tapping. Each one raises your qi/s permanently for the rest of this life. Their price creeps up after every purchase, but each new tier outclasses the last. Spend your qi the moment you can afford one.',
+    glyph:   '宗',  // sect
     ctaText: 'Got it',
   },
   [TUTORIAL_IDS.PRODUCERS_HINT]: {
     kicker:  'A whisper from the path',
     title:   'You do not climb alone',
     body:    'Your breath alone fills the meridians slowly. Other hands can draw the heavens down with you. Visit the Cultivation hall to gather disciples, raise gardens, and shape the sources that gather qi while you sit still.',
+    glyph:   '宗',
     ctaText: 'Show me',
   },
   [TUTORIAL_IDS.FIRST_PRODUCER]: {
     kicker:  'First disciple',
     title:   'The Disciple Bows',
     body:    'A disciple kneels in your courtyard. Every disciple you train lifts your idle qi/s a little, and the next one costs slightly more than the last. The same shape holds for every producer you\'ll unlock.',
+    glyph:   '弟',  // disciple
     ctaText: 'Onward',
   },
   [TUTORIAL_IDS.FIRST_LAYER_BT]: {
     kicker:  'Breakthrough',
     title:   'First Breakthrough',
     body:    'Your meridians widen. Each layer you cross brings new producers, sparks, and upgrades within reach. Keep cultivating; the next layer is already in sight.',
+    glyph:   '突',  // sudden / break
     ctaText: 'Continue',
   },
   [TUTORIAL_IDS.FIRST_MAJOR_GATE]: {
     kicker:  'Major realm',
     title:   'The Heavens Test You',
     body:    'A major realm asks for two things at once. You need qi in the bank, and a sustained qi/s rate to push through the gate. Build more producers, level your crystal, hold Focus. Tap BREAKTHROUGH when the heavens stop pushing back.',
+    glyph:   '关',  // gate (simplified)
     ctaText: 'Got it',
   },
   [TUTORIAL_IDS.FIRST_SPARK_OFFER]: {
     kicker:  'Sparks',
     title:   'Qi Sparks',
     body:    'Every layer breakthrough offers a Spark. Two cards appear and you pick one. Some give a short boost, some stack permanently for this run, and the rare ones unlock new mechanics. If neither card tempts you, your first reroll on every offer is free.',
+    glyph:   '符',  // talisman / spark
     ctaText: 'Choose wisely',
   },
   [TUTORIAL_IDS.FIRST_SAINT]: {
     kicker:  'Reincarnation',
     title:   'A Second Life',
     body:    'You can reincarnate from here on. The progress of this life turns into karma, and karma buys permanent boosts on the Eternal Tree. Every life makes the next one start a little stronger. Keep grinding this run if it\'s still moving, or rebirth whenever the climb starts to drag.',
+    glyph:   '圣',  // saint (simplified)
     ctaText: 'Got it',
   },
   [TUTORIAL_IDS.PROGRESS_HUB_MIGRATION]: {
     kicker:  'Layout update',
     title:   'Journey, Achievements & Stats',
     body:    'Your Cultivation Journey and Achievements panels now live behind the 📊 Progress button at the top of the screen, alongside the new Statistics panel. One button, three tabs. Tap it whenever you want to see how far you\'ve climbed.',
+    glyph:   '图',  // chart / map
     ctaText: 'Got it',
   },
   [TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION]: {
     kicker:  'Layout update',
     title:   'Annals is now the Codex',
     body:    'The 📊 button at the top is now your Codex. Your Achievements and Stats are still here, plus a new Wardrobe tab where every cosmetic you own lives. Tap any owned skin to equip it.',
+    glyph:   '典',  // canon / codex
     ctaText: 'Got it',
   },
 };
