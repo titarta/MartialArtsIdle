@@ -16,6 +16,11 @@ name: Deploy to GitHub Pages (Dev)
 on:
   push:
     branches: [main]
+  # Allow manual triggering from the GitHub Actions UI or via
+  # `gh workflow run deploy.yml --ref main`. Useful when a push
+  # didn't fire the workflow (rare GitHub Actions hiccup) and you
+  # need to retrigger without making another commit.
+  workflow_dispatch:
 
 permissions:
   contents: read
