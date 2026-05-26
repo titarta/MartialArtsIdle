@@ -348,9 +348,19 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   gap: 2px;
   /* No top padding: the active-tab brass-rail (.nav-btn::before, top:0)
      must sit flush with the navbar's actual top edge. Previously 6px
-     of top padding pushed the rail down and broke the indicator. */
+     of top padding pushed the rail down and broke the indicator.
+
+     v41 NOTE: padding-bottom intentionally OMITS env(safe-area-inset-
+     bottom). The TopBar respects env(safe-area-inset-top) because the
+     Dynamic Island physically obscures content - mandatory clearance.
+     The bottom home-indicator is a semi-transparent line drawn OVER
+     whatever the app paints; reserving 34px above it just to keep the
+     nav buttons clear made the nav read as 'floating' with empty brown
+     space below. User explicitly wanted the nav flush with the bottom
+     edge. Buttons sit slightly under the home-indicator line on iPhone
+     - iOS gesture system handles the swipe-vs-tap disambiguation
+     fine for these tap targets. */
   padding: 0;
-  padding-bottom: env(safe-area-inset-bottom);
   background: rgba(var(--ui-bg-deep-rgb), 0.92);
   border-top: 1px solid rgba(var(--ui-border-rgb), 0.85);
   justify-content: space-around;
@@ -11251,9 +11261,12 @@ body.sheet-open {
 
   /* ── Nav: bigger tap targets ──────────────────────────────────────────── */
   .navbar {
-    /* No top/side padding so the active-tab brass-rail (top:0 of .nav-btn)
-       sits flush with the navbar's actual top edge. */
-    padding: 0 0 env(safe-area-inset-bottom);
+    /* No top/side/bottom padding. The active-tab brass-rail (top:0 of
+       .nav-btn) sits flush with the navbar's actual top edge, and the
+       nav itself sits flush with the bottom screen edge. v41 dropped
+       env(safe-area-inset-bottom) here - see the base .navbar rule
+       comment for why. */
+    padding: 0;
   }
 
   .nav-btn {
