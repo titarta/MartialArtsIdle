@@ -30203,4 +30203,30 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* End of SANCTUM v40. */
 
+/* ────────────────────────────────────────────────────────────────────────
+   .home-host — wrapper around HomeScreen that lets it run continuously
+   in the background while another screen overlays. Keep layout stable
+   when hidden so the qi-flow particle layer's clientWidth stays > 0 and
+   the spawners don't stall.
+
+   Previously this wrapper used `display: contents/none`. display:none
+   destroyed layout (particle spawn stopped, return to Home felt like the
+   scene reset). display:contents/visibility-hidden don't combine well.
+
+   New approach: real wrapper at position:absolute inset:0 with
+   visibility/pointer-events toggled inline by App.jsx. Visibility:hidden
+   on the wrapper cascades to HomeScreen children (so the player sees the
+   overlaying screen instead), but layout is preserved so the rAF loops
+   inside HomeScreen keep spawning particles at correct coordinates.
+   When the player returns, in-flight particles + floaters are already
+   mid-animation - no "pause and rewind" feel.
+   ──────────────────────────────────────────────────────────────────── */
+.home-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* visibility + pointer-events set inline by App.jsx based on
+     currentScreen === 'home'. Don't set them here. */
+}
+
 /* End of HOME "The Sanctum" design pass. */

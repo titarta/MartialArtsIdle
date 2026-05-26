@@ -1780,15 +1780,30 @@ function AppInner() {
         getDesc={featureFlags.getDesc}
       />
       <main className={`screen-container${(currentScreen === 'home' || currentScreen === 'reincarnation') ? ' sc-fullbleed' : ''}`}>
-        {/* HomeScreen is ALWAYS mounted — the divine-qi orb and pattern-click
-            minigame both live as local state inside HomeScreen (see
-            usePatternClick / divine-qi spawn controllers). Unmounting on tab
-            switch would destroy any active spawn, so a player who pops into
-            another tab the moment an orb appears loses it on return. Hiding
-            via display:none keeps the spawn timers + state alive while still
-            removing the visuals from layout. `display: contents` when active
-            so HomeScreen renders as if it were the direct child of <main>. */}
-        <div style={{ display: currentScreen === 'home' ? 'contents' : 'none' }}>
+        {/* HomeScreen is ALWAYS mounted AND always laid out. Previously
+            switched to display:none on tab change, which destroyed
+            layout - qi-flow particle layer's clientWidth dropped to 0,
+            spawners halted, every return-to-home felt like the scene
+            had been "paused and rewound". To make Home feel like it's
+            running continuously in the background:
+            . Wrapper uses visibility:hidden + pointer-events:none
+              instead of display:none. Layout is preserved, so the
+              qi-flow + crystal-spark rAF loops keep spawning into a
+              real-dimensions layer.
+            . Particles + floaters animate invisibly while another
+              screen overlays Home; when the player returns, in-flight
+              items are already mid-animation at their true positions.
+            . The non-home screen renders on top with an opaque
+              background, so the invisible Home underneath isn't seen.
+            Cost: ~5-6 DOM elements animating invisibly when off-tab.
+            Negligible vs the perceptual win. */}
+        <div
+          className="home-host"
+          style={{
+            visibility:    currentScreen === 'home' ? 'visible' : 'hidden',
+            pointerEvents: currentScreen === 'home' ? 'auto'    : 'none',
+          }}
+        >
           {screens.home}
         </div>
         {currentScreen !== 'home' && (screens[currentScreen] ?? null)}
