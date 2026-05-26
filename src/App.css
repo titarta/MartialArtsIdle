@@ -24393,7 +24393,12 @@ img.pp-emblem-locked { font-size: 0; }
   overflow: hidden;
 }
 .it-cost {
-  margin-top: 2px;
+  /* margin-top: auto so the cost button is ALWAYS anchored at the
+     bottom of the card regardless of how long the description text
+     is. Combined with the .cs-up-grid's default align-items:stretch
+     (which makes all cards in a row equal-height), this puts every
+     buy button at the same y position across the row. */
+  margin-top: auto;
   align-self: stretch;
   text-align: center;
   font-family: var(--font-display);
