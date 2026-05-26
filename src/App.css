@@ -29584,4 +29584,64 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v35. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v36: kill the Crimson Aura halo blob behind the cultivator.
+
+   User flagged it as 'the shadow from last task is still there, and i
+   found out it's associated with the buff from the bazaar'. The
+   shadow is the radial red/orange halo painted by
+   body.body-crimson-aura-active .home-fighter-stage::before (line
+   19989). It uses inset:-20% + opacity 0.55 + mix-blend-mode:screen,
+   which paints a large bright blob extending well past the sprite
+   silhouette. Looks like a weird shadow.
+
+   The sprite already gets its own red-gold drop-shadow filter (line
+   19981) which reads as a clean magical imbuement around the
+   character's outline. That alone is enough to communicate the buff.
+
+   Hide the halo, keep the sprite glow.
+   ═════════════════════════════════════════════════════════════════════ */
+
+body.body-crimson-aura-active .home-fighter-stage::before {
+  display: none !important;
+}
+
+/* End of SANCTUM v36. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v37: actually make the side-by-side multipliers WORK.
+
+   v35 set grid-template-columns: auto 32px 44px and gave each badge
+   an explicit grid-column. That works on paper, but CSS Grid's
+   default 'grid-auto-flow: row' moves the placement cursor forward
+   only:
+
+     1. qi-rate-value (col 1) -> row 1 col 1, cursor at col 2
+     2. cf badge      (col 3) -> row 1 col 3, cursor at col 4
+     3. ad badge      (col 2) -> WANTS col 2. Cursor is past col 2.
+        Algorithm gives up on row 1 and places ad at row 2 col 2.
+
+   Result: cf and value share row 1, ad falls to row 2 = the
+   stacking the user keeps seeing. (Source order in QiRateReadout
+   is cf-then-ad, so this trips every time both are active.)
+
+   Fix: 'grid-auto-flow: dense' tells the algorithm to back-fill
+   empty cells. ad lands in row 1 col 2 as intended. As a belt-and-
+   suspenders, also pin both badges to row 1 explicitly - even if
+   future JSX reorders source, the row stays locked.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child {
+  grid-auto-flow: dense !important;
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate-value {
+  grid-row: 1 !important;
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge-ad,
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge-cf {
+  grid-row: 1 !important;
+}
+
+/* End of SANCTUM v37. */
+
 /* End of HOME "The Sanctum" design pass. */
