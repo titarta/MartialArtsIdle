@@ -29497,4 +29497,91 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v33. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v34: buff chip timer becomes a HH:MM:SS clock readout.
+   User: 'present this as HH:MM:SS please' (raw seconds e.g. '2290s'
+   was unreadable - 38 minutes is hard to parse as a number).
+
+   The chip plate widens slightly (52 -> 64px) to fit 'H:MM:SS' /
+   'HH:MM:SS' comfortably, and the timer row shrinks its font +
+   tightens letter-spacing so 8 digit/colon glyphs fit cleanly. Plate
+   stays smaller than the right Petition Tablet (86px) so the
+   counter-balance silhouette holds.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.tb-buffs-chip {
+  /* Was 52px in v31. Now sized for 'HH:MM:SS' (max display) in
+     tabular-nums Cinzel at 7.5px font + 0.02em letter-spacing. */
+  width: 64px !important;
+}
+
+.tb-buffs-chip-timer {
+  /* Was 8.5px / 0.08em - too loose for 8-char clock. Tabular nums
+     keeps digit columns stable so colons line up across ticks. */
+  font-size: 7.5px !important;
+  letter-spacing: 0.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* End of SANCTUM v34. */
+
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v35: kill the weird dark blob behind the cultivator + put
+   the two qi multipliers side-by-side in fixed slots.
+
+   ── Blob ──
+   .home-fighter-stage::after used to paint a 220% x 220% dark radial
+   gradient behind the cultivator to give the mandala glow something
+   to bloom against. With the dim temple bg (filter brightness 0.58)
+   already doing that job, the extra blob just reads as a 'weird
+   shadow in the middle of the screen' (user's words). Remove it -
+   the mandala stands on its own against the dim bg.
+
+   ── Multipliers ──
+   Old layout: '.qi-rate' was display:contents inside a 2-column grid
+   (auto | 84px badge slot). BOTH badges went to grid-column:2 with
+   justify-self:start, so when AD AND focus were active they stacked
+   into auto rows = the violation the user flagged. The 'no shrink/
+   expand' rule means the badges need RESERVED slots, not a shared
+   slot that wraps.
+
+   Fix: split the badge area into two fixed slots inside the same
+   total width (no grow/shrink of the row). Heavenly Qi (AD) lands
+   in the LEFT slot, focus mult lands in the RIGHT slot. Either can
+   be empty without affecting the other's position. Order matches
+   the user's pick: 'heavenly qi first then our multiplier'.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Kill the dark vignette behind the cultivator. */
+.home-fighter-stage::after {
+  display: none !important;
+}
+
+/* 2. Multiplier slot split: 32px AD + 44px focus + 6px gap = 82px,
+      basically the same total reserved as the old 84px solo slot. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child {
+  grid-template-columns: auto 32px 44px !important;
+  gap: 6px !important;
+}
+/* Force each badge into its assigned column. Both override the
+   v17's blanket grid-column:2 above. */
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge-ad {
+  grid-column: 2 !important;
+  justify-self: stretch !important;
+}
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge-cf {
+  grid-column: 3 !important;
+  justify-self: stretch !important;
+}
+/* Centre the digit text inside each fixed-width slot so the chip
+   doesn't slide around as content changes (e.g., '×3' vs '×3.1'). */
+.home-scene-bottom .home-scene-overlay-row .qi-rate-badge {
+  text-align: center !important;
+  padding: 0 4px !important;
+  /* min-width drops since the grid column already reserves width. */
+  min-width: 0 !important;
+}
+
+/* End of SANCTUM v35. */
+
 /* End of HOME "The Sanctum" design pass. */

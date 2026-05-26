@@ -6,6 +6,21 @@ const BASE = import.meta.env.BASE_URL;
 const MODAL_ID = 'active-buffs';
 
 /**
+ * Format a buff countdown as a clock string.
+ *
+ * Always returns H:MM:SS (or HH:MM:SS for 10h+) so the chip cadence
+ * stays consistent: every tick the seconds digit changes, every 60
+ * ticks the minutes change, etc. Avoiding the "Ns vs M:SS vs H:MM:SS"
+ * format-switch keeps the chip width stable too (no-movement rule).
+ */
+function fmtBuffClock(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+/**
  * ActiveBuffsChip
  *
  * TopBar surface for ALL currently-active temporary buffs, regardless
@@ -137,7 +152,7 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
         <span className="tb-buffs-chip-icon" aria-hidden="true">✦</span>
         <span className="tb-buffs-chip-count">{count}</span>
         <span className="tb-buffs-chip-sep" aria-hidden="true">·</span>
-        <span className="tb-buffs-chip-timer">{chipTimer}s</span>
+        <span className="tb-buffs-chip-timer">{fmtBuffClock(chipTimer)}</span>
       </button>
 
       {open && createPortal(
@@ -184,7 +199,7 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
                         <div className="abp-row-bar-fill" style={{ '--p': progress }} />
                       </div>
                     </div>
-                    <div className="abp-row-timer">{secsLeft}s</div>
+                    <div className="abp-row-timer">{fmtBuffClock(secsLeft)}</div>
                   </li>
                 );
               })}
