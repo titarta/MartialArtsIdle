@@ -255,7 +255,10 @@ body.crystal-tier-10 {
 body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   content: '';
   position: absolute;
-  inset: -28%;
+  /* Same asymmetric inset as the steady-hold aura above - top edge
+     pinned to the stage so the rung-pop ring doesn't flash up into
+     the crystal area on each CF rung crossing. */
+  inset: 0 -28% -28% -28%;
   border-radius: 50%;
   background: radial-gradient(
     circle,
@@ -8026,11 +8029,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* ── Hold-state aura ─────────────────────────────────────────────────────
    Pulsing radial glow behind the cultivator while the player is holding.
-   Fades in on .stage-boosted and breathes on a 1.2s loop. */
+   Fades in on .stage-boosted and breathes on a 1.2s loop.
+   Inset is asymmetric: 0% on top so the aura's upper edge never
+   intrudes into the crystal area above. The user reported the prior
+   uniform -35% inset cast what read as a 'shadow below the crystal'
+   during hold - that was the aura's outer fringe gradient fading
+   out right under the LV chip. Sides + bottom keep -35% so the
+   aura still feels expansive around the body. */
 .home-fighter-stage::before {
   content: '';
   position: absolute;
-  inset: -35%;
+  inset: 0 -35% -35% -35%;
   border-radius: 50%;
   /* Colour cascades from body.crystal-tier-{N} (see top of file). */
   background: radial-gradient(
