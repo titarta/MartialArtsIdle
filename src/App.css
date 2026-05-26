@@ -29075,4 +29075,37 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v27. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v28: BT button properly spaced in the plate + drop the
+   heavy refine-button shadow.
+   v27 anchored the button to the bar-wrap which itself sits at the
+   plate's content-bottom, leaving 33px of dead space BELOW the
+   button. v28 positions on the plate directly with even top/bottom
+   margins so the button looks centred between the realm header and
+   the plate edge.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Position BT button on the plate (not the bar wrap). Use top + bottom
+   so it stretches between header and plate-edge with proper breathing
+   room on both sides. */
+.home-scene-bottom .home-major-breakthrough-btn {
+  position: absolute !important;
+  top: 50px !important;       /* just below the ~38px realm header + 12px gap */
+  bottom: 14px !important;    /* breathing room above the plate's edge */
+  left: 12px !important;
+  right: 12px !important;
+  height: auto !important;     /* derived from top + bottom */
+  width: auto !important;
+  margin: 0 !important;
+}
+
+/* ── Drop the heavy refine-button drop shadow. */
+.home-crystal-refine-btn,
+.home-crystal-anchor .home-crystal-refine-btn {
+  box-shadow:
+    0 0 14px -2px rgba(255, 207, 131, 0.55) !important;
+}
+
+/* End of SANCTUM v28. */
+
 /* End of HOME "The Sanctum" design pass. */
