@@ -874,7 +874,12 @@ const QI_FLOW_SPEED_K     = 36;   // sqrt(eff) coefficient on speed
 // Home from another tab. Each is dropped in with a negative
 // animation-delay so it appears mid-flight instead of fresh from
 // the ring - sells the illusion that qi never stopped flowing.
-const QI_FLOW_WARMUP_COUNT = 3;
+// Bumped from 3 to 6 so the orbs visibly populate the trajectory
+// from ring to centre at varied progress (~100ms / 200ms / 300ms /
+// 400ms / 500ms / 600ms in-flight). Combined with the natural ~333ms
+// cadence picking up immediately after, the player sees a continuous
+// stream on return instead of a 1/3-second empty gap.
+const QI_FLOW_WARMUP_COUNT = 6;
 
 function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
   const w = layer.clientWidth;
@@ -2254,14 +2259,16 @@ function HomeScreen({
         const interval = 1000 / Math.max(0.1, spawnRate);
 
         // WARM-UP: just transitioned from hidden to visible. Pre-spawn
-        // a small batch at staggered negative animation-delays so the
-        // orbs render at different points along their flight path.
+        // a batch at staggered negative animation-delays so the orbs
+        // populate the entire trajectory from ring to centre at varied
+        // in-flight progress. Linear stagger over ~600ms (~100ms apart
+        // for 6 orbs) so they read as a continuous stream by the time
+        // the natural cadence kicks in on the next interval.
         if (!wasVisible) {
           for (let i = 0; i < QI_FLOW_WARMUP_COUNT; i++) {
-            // Spread delays across the full orb life; spawnQiFlowOrb
-            // uses 700-1500ms life depending on dist + speed, so a
-            // 200/450/700ms offset reads as a clean staggered stream.
-            const delayMs = 200 + Math.round((i / QI_FLOW_WARMUP_COUNT) * 700);
+            // i=0 -> 100ms in flight (just departed the ring)
+            // i=5 -> 600ms in flight (almost at the centre)
+            const delayMs = 100 + Math.round((i / (QI_FLOW_WARMUP_COUNT - 1)) * 500);
             spawnQiFlowOrb(layer, eff, delayMs);
           }
           wasVisible = true;
