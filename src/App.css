@@ -4610,7 +4610,15 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   /* Fixed at top like the navbar is fixed at bottom.
      padding-top absorbs the safe area (Dynamic Island / notch).
      On phones with no notch: safe area = 0 → bar is ~48px total.
-     On iPhone 15 Pro (safe area 59px): bar is ~107px total. */
+     On iPhone 15 Pro (safe area 59px): bar is ~107px total.
+
+     ⚠️ IRON RULE (SANCTUM v40): Every .top-bar override in this
+     file MUST preserve padding-top: env(safe-area-inset-top) (or use
+     `calc(env(safe-area-inset-top) + N)`). Writing 'padding-top: 0
+     !important' or 'padding: 0 X 0 X !important' breaks iOS PWA
+     standalone mode - content hides behind the Dynamic Island.
+     This regressed TWICE already (v3 and v8.5). See v40 block at
+     App.css EOF for the full pattern and rule. */
   padding: calc(env(safe-area-inset-top) + 8px) 14px 8px;
   background: rgba(var(--ui-bg-deep-rgb), 0.92);
   border-bottom: 1px solid rgba(var(--ui-border-rgb), 0.85);
@@ -25994,6 +26002,12 @@ img.pp-emblem-locked { font-size: 0; }
    ──────────────────────────────────────────────────────────────────── */
 
 /* ─── THE THRESHOLD: TopBar rebuilt as a single lacquer plate ─────── */
+/* NOTE (v40): padding-top MUST stay env(safe-area-inset-top) so the
+   TopBar content sits below the iPhone Dynamic Island in standalone
+   PWA mode. Earlier this rule wrote 'padding: 0 10px 0 10px !important'
+   which stripped the safe-area inset and caused content to hide
+   behind the Dynamic Island. If you tweak this padding, KEEP the
+   env() on padding-top. See SANCTUM v40 rule comment at App.css EOF. */
 .top-bar {
   background:
     linear-gradient(180deg, rgba(220, 175, 110, 0.04) 0%, rgba(220, 175, 110, 0) 60%),
@@ -26002,7 +26016,7 @@ img.pp-emblem-locked { font-size: 0; }
   box-shadow:
     0 1px 0 rgba(0, 0, 0, 0.6),
     inset 0 -1px 0 rgba(255, 207, 131, 0.08) !important;
-  padding: 0 10px 0 10px !important;
+  padding: env(safe-area-inset-top) 10px 0 10px !important;
   gap: 6px !important;
 }
 
@@ -26786,11 +26800,18 @@ img.pp-emblem-locked { font-size: 0; }
      player can actually read them without crowding the nav.
    ──────────────────────────────────────────────────────────────────── */
 
-/* TopBar chassis: force a real height so the bar is a visible plate. */
+/* TopBar chassis: force a real content row so the bar is a visible
+   plate. min-height grows the bar to include the iPhone safe area
+   inset; padding-top reserves that inset for the Dynamic Island
+   clearance. height:auto so the padding can expand the bar.
+   v40 NOTE: the old version of this rule was 'height:58px;
+   padding-top:0 !important', which removed the safe-area inset and
+   caused the TopBar to hide behind the Dynamic Island in standalone
+   PWA mode. KEEP padding-top: env(safe-area-inset-top) here. */
 .top-bar {
-  height: 58px !important;
-  min-height: 58px !important;
-  padding-top: 0 !important;
+  height: auto !important;
+  min-height: calc(58px + env(safe-area-inset-top)) !important;
+  padding-top: env(safe-area-inset-top) !important;
   padding-bottom: 0 !important;
 }
 
