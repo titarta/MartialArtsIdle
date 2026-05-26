@@ -67,7 +67,7 @@ export const STATS_KEYS = [
   { key: 'offlineQiEarned',        label: 'Qi earned offline',    category: 'cultivation', format: 'qi', hidden: true },
   { key: 'producerCountPeak',      label: 'Peak owned of one producer', category: 'economy', format: 'int', peak: true, hidden: true },
   { key: 'speedGatesCleared',      label: 'Speed gates cleared',  category: 'cultivation', format: 'int', hidden: true },
-  { key: 'allInPurchases',         label: 'All-in purchases',     category: 'economy', format: 'int',     hidden: true },
+  { key: 'allInPurchases',         label: 'Trillion-qi purchases', category: 'economy', format: 'int',    hidden: true },
   { key: 'consecutiveDays',        label: 'Consecutive days played', category: 'meta', format: 'int',   peak: true, hidden: true, lifetimeOnly: true },
 ];
 

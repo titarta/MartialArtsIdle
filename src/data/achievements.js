@@ -326,7 +326,7 @@ export const ACHIEVEMENTS = [
   {
     id: 'all_in', icon: '💸', hidden: true,
     title: 'All In',
-    desc: 'Spend at least 95% of your current qi pool in a single producer or upgrade purchase.',
+    desc: 'Make a single producer or upgrade purchase that costs at least 1 trillion qi.',
     condition: s => s.allInPurchases >= 1,
   },
 

@@ -114,16 +114,15 @@ export default function CultivationScreen({
       ? Math.max(1, Math.ceil(rawCost * (1 - producerCostDiscountFrac)))
       : rawCost;
     // ── Achievement: All In ──
-    // Capture the pre-spend qi pool so we can detect a ≥95% drain on a
-    // successful purchase. We measure against the discounted cost (the
-    // amount actually leaving the pool).
-    const poolBefore = cultivation.qiRef?.current ?? 0;
-    // Atomic: spendQi succeeds only if the player can afford it. Producer
-    // count is incremented only on a successful spend.
+    // Increments allInPurchases when a single producer buy costs at
+    // least 1 trillion qi. Old threshold was '≥95% of current pool'
+    // which players hit on their first purchase (initial pool is
+    // tiny). The trillion-qi gate is a real milestone (mid-late game)
+    // that matches the 'All In' fantasy of betting big on one buy.
     if (cultivation.spendQi(cost)) {
       producers.buy(id, count);
       try {
-        if (poolBefore > 0 && cost / poolBefore >= 0.95) {
+        if (cost >= 1e12) {
           // Use lazy import so this hook does not have to add the
           // statsRecorder import — done dynamically to keep the diff
           // minimal. The recorder is a global singleton so this is fine.
@@ -157,11 +156,13 @@ export default function CultivationScreen({
     // Cost lives on the upgrade definition itself.
     const def = upgrades.getVisible(upgradeCtx).find(u => u.id === id);
     if (!def) return;
-    const poolBefore = cultivation.qiRef?.current ?? 0;
     if (cultivation.spendQi(def.cost)) {
       upgrades.buy(id);
       try {
-        if (poolBefore > 0 && def.cost / poolBefore >= 0.95) {
+        // ── Achievement: All In ── trigger on any single upgrade buy
+        // that costs ≥ 1 trillion qi. See producer-buy callback for
+        // rationale (old 95%-of-pool threshold was trivially easy).
+        if (def.cost >= 1e12) {
           import('../systems/statsRecorder').then(m => m.recordStat('allInPurchases', 1));
         }
       } catch {}

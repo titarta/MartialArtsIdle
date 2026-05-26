@@ -1175,39 +1175,12 @@ function AppInner() {
     backfillRanRef.current = true;
   }, [qiSparks, crystal?.level]);
 
-  // One-time "Combat returns later" toast. Fires on first launch under
-  // FEATURES.combat=false IF the player has combat-era data on disk that
-  // would otherwise vanish without explanation. Fresh players don't see
-  // it — they have nothing to reassure. Gated via mai_v1_combat_hidden_seen
-  // so it only ever fires once per device.
-  const combatHiddenToastRanRef = useRef(false);
-  useEffect(() => {
-    if (combatHiddenToastRanRef.current) return;
-    if (FEATURES.combat) return;
-    let seen = null;
-    try { seen = localStorage.getItem('mai_v1_combat_hidden_seen'); } catch {}
-    if (seen) { combatHiddenToastRanRef.current = true; return; }
-    let hadCombatData = false;
-    try {
-      hadCombatData = !!(
-        localStorage.getItem('mai_inventory') ||
-        localStorage.getItem('mai_owned_laws') ||
-        localStorage.getItem('mai_artefacts') ||
-        localStorage.getItem('mai_pills')
-      );
-    } catch {}
-    if (hadCombatData) {
-      notifications.addToast({
-        type: 'info',
-        kicker: 'Tidings',
-        glyph: '告', // announcement / proclamation
-        message: 'Combat returns in a future update. Your inventory and laws are preserved.',
-        duration: 8000,
-      });
-    }
-    try { localStorage.setItem('mai_v1_combat_hidden_seen', '1'); } catch {}
-    combatHiddenToastRanRef.current = true;
-  }, [notifications]);
+  // (Removed) "Combat returns later" one-time toast. Combat may or may
+  // not return; we're not committing to it in copy. If we later ship a
+  // re-introduction, re-add the toast then with concrete language about
+  // what actually changed. The mai_v1_combat_hidden_seen localStorage
+  // key is left untouched so existing players who already saw the toast
+  // don't have it resurface if we re-add it later.
 
   const achievements = useAchievements({
     onUnlock: (a) => {
