@@ -29972,4 +29972,79 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* End of SANCTUM v39. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v40: iOS safe-area fix for the TopBar.
+
+   User report (iPhone 13, real device - cannot reproduce in browser):
+   . Top: TopBar sits BEHIND the Dynamic Island, half-hidden by it.
+   . Bottom: nav floats fine above the home-indicator but the safe
+     area below the nav is BLACK (no bg fill).
+
+   Root cause: two later TopBar overrides nuked the safe-area padding
+   the base .top-bar rule (line 4609) had set up correctly:
+
+     line 26005 (Sanctum v3):  'padding: 0 10px 0 10px !important'
+     line 26790 (Sanctum v8.5): 'height: 58px !important; padding-top: 0 !important'
+
+   Both used !important so they win over the base. Result: content
+   starts at y=0 (Dynamic Island zone), not y=safe-area-inset-top.
+
+   Also: --top-bar-h was declared 48px but v8.5 bumped the actual
+   content height to 58px. Every modal / overlay / chip that does
+   'calc(var(--top-bar-h) + env(safe-area-inset-top) + N)' was using
+   stale 48 for the bar height = 10px gap of expected reserved space
+   that wasn't actually there. Bumping the var to 58 fixes the math
+   everywhere at once.
+
+   The base .navbar rule is already correct - 'padding-bottom:
+   env(safe-area-inset-bottom)' lifts the buttons above the home
+   indicator AND the bar background extends to the bottom edge. No
+   fix needed there.
+
+   ═══════════════════════════════════════════════════════════════════
+   RULE FOR FUTURE DEVS - read before touching .top-bar or .navbar:
+   ═══════════════════════════════════════════════════════════════════
+   Any fixed-position bar that sits at the edge of the viewport on
+   mobile MUST preserve safe-area-inset:
+
+     .top-bar  -> padding-top:    env(safe-area-inset-top)
+     .navbar   -> padding-bottom: env(safe-area-inset-bottom)
+
+   . Use min-height (not height) so padding can expand the bar.
+   . Use min-height: calc(<content-h> + env(safe-area-inset-top))
+     so the bar still gets a guaranteed content row on devices with
+     no notch (env returns 0px on Android + desktop = safe).
+   . Background extends through padding by default - no extra rule
+     needed to fill the safe-area zone.
+   . NEVER write 'padding-top: 0 !important' or 'height: <px>
+     !important' on a fixed top bar - that's how this bug shipped.
+   . If you bump <content-h>, update --top-bar-h / --nav-h to match.
+     Lots of code does calc(var(--top-bar-h) + env(...)) for spacing.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Bump --top-bar-h to match v8.5's 58px content height. Every
+      'calc(var(--top-bar-h) + env(safe-area-inset-top) + N)' across
+      the codebase picks this up - no per-site edit needed. */
+:root {
+  --top-bar-h: 58px;
+}
+
+/* 2. Restore safe-area-inset-top on the TopBar. Overrides both v3 and
+      v8.5 (which come earlier in the cascade). min-height grows the
+      bar so its content row stays 58px on every device.
+
+      On iPhone 13 (safe-area-inset-top ~47px): bar = 105px total.
+      On Android / desktop (env returns 0):     bar =  58px total. */
+.top-bar {
+  height: auto !important;
+  min-height: calc(58px + env(safe-area-inset-top)) !important;
+  padding-top: env(safe-area-inset-top) !important;
+  padding-bottom: 0 !important;
+  /* Preserve the horizontal padding the earlier overrides set. */
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+/* End of SANCTUM v40. */
+
 /* End of HOME "The Sanctum" design pass. */
