@@ -28459,15 +28459,26 @@ img.pp-emblem-locked { font-size: 0; }
   text-shadow: 0 0 6px rgba(255, 91, 91, 0.5);
 }
 .home-scene-bottom .home-overlay-half:first-child .qi-rate.qi-rate-gated::before {
-  content: 'Gate';
+  /* Two-glyph label: 'GATE' word + a chevron pointing at the rate.
+     Reads as "aim at this rate" — the rate to the right of the
+     chevron is the goal. Compact (saves horizontal space vs the old
+     'current/required' ratio that got cropped at high realms). */
+  content: 'Gate \203A';
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 8.5px;
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--vermillion-hot, #ff5b5b);
-  margin-right: 6px;
+  margin-right: 5px;
   text-shadow: 0 0 6px rgba(255, 91, 91, 0.5);
+}
+/* The goal-rate text itself reads as a headline when gated - slightly
+   bolder + a touch larger - so it's the visual anchor of the row. */
+.home-scene-bottom .home-overlay-half:first-child .qi-rate.qi-rate-gated > span {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
 }
 /* And the bar fill turns vermillion when gated. */
 .home-scene-bottom .home-bar-wrap .realm-bar.realm-bar-gated .realm-fill,
