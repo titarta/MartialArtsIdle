@@ -28958,4 +28958,53 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v25. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v26: breakthrough button GROWS the bar zone when active.
+   The 28px bar zone was too cramped for proper breakthrough display.
+   When the button is present, the wrap expands to 52px and the button
+   gets the full height + width to read as the calling-card moment.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Grow the bar wrap when breakthrough is showing. The wrap was 28px
+   for the bar+caps; bumped to 52px gives the button real presence.
+   This IS a state-change height shift, but breakthrough-ready is a
+   ceremonial moment and the transformation is intentional. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) {
+  height: 52px !important;
+}
+
+/* Hide the bar visual underneath - the button covers it anyway. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) .realm-bar {
+  display: none !important;
+}
+
+/* Button: use the full 52px height. Tighter padding, bigger CTA. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) .home-major-breakthrough-btn {
+  padding: 0 18px !important;
+  gap: 14px !important;
+  border-radius: 12px !important;
+}
+
+/* Flanking glyphs even bigger now that we have height. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) .home-mb-icon {
+  font-size: 32px !important;
+}
+
+/* CTA bigger - this is the calling-card moment. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) .home-mb-cta {
+  font-size: 17px !important;
+}
+
+/* Subtitle: keep it on ONE LINE. Force nowrap; tighten if needed. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn) .home-mb-next {
+  font-size: 10px !important;
+  letter-spacing: 0.10em !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+/* End of SANCTUM v26. */
+
 /* End of HOME "The Sanctum" design pass. */
