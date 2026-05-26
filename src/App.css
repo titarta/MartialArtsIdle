@@ -255,16 +255,16 @@ body.crystal-tier-10 {
 body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   content: '';
   position: absolute;
-  /* Same asymmetric inset as the steady-hold aura above - top edge
-     pinned to the stage so the rung-pop ring doesn't flash up into
-     the crystal area on each CF rung crossing. */
-  inset: 0 -28% -28% -28%;
+  /* Match the steady-hold aura's ellipse + shifted-centre geometry so
+     the rung-pop flash doesn't leave a visible top-edge band under
+     the CF marquee on each rung crossing. */
+  inset: -10% -28% -28% -28%;
   border-radius: 50%;
   background: radial-gradient(
-    circle,
+    ellipse 95% 75% at 50% 80%,
     var(--qi-aura-core)   0%,
-    var(--qi-aura-fringe) 40%,
-    transparent           70%
+    var(--qi-aura-fringe) 35%,
+    transparent           65%
   );
   pointer-events: none;
   z-index: -1;
@@ -8030,23 +8030,35 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 /* ── Hold-state aura ─────────────────────────────────────────────────────
    Pulsing radial glow behind the cultivator while the player is holding.
    Fades in on .stage-boosted and breathes on a 1.2s loop.
-   Inset is asymmetric: 0% on top so the aura's upper edge never
-   intrudes into the crystal area above. The user reported the prior
-   uniform -35% inset cast what read as a 'shadow below the crystal'
-   during hold - that was the aura's outer fringe gradient fading
-   out right under the LV chip. Sides + bottom keep -35% so the
-   aura still feels expansive around the body. */
+
+   Geometry: the aura is an ELLIPSE with its centre shifted DOWN to
+   80% of the stage box and the gradient going to transparent by
+   65%. Effect: the top of the ellipse fades fully transparent BEFORE
+   it reaches the cultivator's head/CF-marquee zone, while the body
+   and lower-aura around the seated silhouette get the full glow.
+
+   Earlier shapes had two distinct failure modes the user reported:
+   . inset:-35% uniform   -> circle reached up into the crystal area,
+                             leaving a "shadow below crystal" band.
+   . inset:0 -35% -35%    -> circle top-edge sat right under the
+                             CF marquee, leaving a hard "shadow
+                             below the CF chip" band.
+   Ellipse + shifted centre solves both - the gradient is fully
+   transparent by the time it gets to either zone. */
 .home-fighter-stage::before {
   content: '';
   position: absolute;
-  inset: 0 -35% -35% -35%;
+  inset: -10% -35% -35% -35%;
   border-radius: 50%;
-  /* Colour cascades from body.crystal-tier-{N} (see top of file). */
+  /* Colour cascades from body.crystal-tier-{N} (see top of file).
+     Ellipse 95% 75% at 50% 80%: wide-and-short, centred on the
+     seated silhouette's torso, fully transparent before the rim
+     reaches the chips above the stage. */
   background: radial-gradient(
-    circle,
+    ellipse 95% 75% at 50% 80%,
     var(--qi-aura-core)   0%,
-    var(--qi-aura-fringe) 35%,
-    transparent           72%
+    var(--qi-aura-fringe) 30%,
+    transparent           65%
   );
   opacity: 0;
   pointer-events: none;
