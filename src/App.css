@@ -21297,12 +21297,16 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .home-hq-tablet.hq-cd    { animation: hq-arrive 1.4s cubic-bezier(.34, 1.56, .64, 1) both; }
 
 /* ── Cord — the rope the plaque hangs from ─────────────────────────────── */
+/* Extended UP by the chips-tr container's top offset (18px) so the cord
+   reaches the TopBar's bottom edge instead of starting at the chips-tr
+   top - was floating in mid-air, user reported 'cords are floating from
+   nowhere'. Now reads as hung from the bar above. */
 .hq-cord {
   position: absolute;
-  top: 0;
+  top: -18px;
   left: 50%;
   width: 2px;
-  height: 22px;
+  height: 40px;
   transform: translateX(-50%);
   background: linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%);
   border-radius: 1px;
@@ -29578,16 +29582,24 @@ img.pp-emblem-locked { font-size: 0; }
 .tb-buffs-chip::before {
   content: '' !important;
   position: absolute !important;
-  top: -22px !important;
+  /* Extended UP so the cord reaches the TopBar's bottom edge instead
+     of floating in mid-air. Chip sits ~42px down from the TopBar
+     (chips-tl top:18 + chip margin-top:24); cord ::before is anchored
+     to the chip's top, so top:-42 makes the cord's upper end land
+     right at the TopBar. Same chip-to-cord junction (cap at bottom);
+     only the cord length grew. Reads as hung from the bar above. */
+  top: -42px !important;
   left: 50% !important;
   width: 18px !important;
-  height: 22px !important;
+  height: 42px !important;
   transform: translateX(-50%) !important;
   background:
     /* cap: dark wood with brass-trim, sits flush on the plate top */
     linear-gradient(180deg, #3a2a18 0%, #1a120a 100%) center bottom / 16px 6px no-repeat,
-    /* cord: 3-stop brown gradient, vertical strip above the cap */
-    linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%) center top / 2px 18px no-repeat !important;
+    /* cord: 3-stop brown gradient, vertical strip from top to cap.
+       38px long (height 42 minus the 6px cap below it, minus a tiny
+       overlap to hide the seam). */
+    linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%) center top / 2px 38px no-repeat !important;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
   pointer-events: none;
   z-index: 2;
@@ -29667,12 +29679,13 @@ img.pp-emblem-locked { font-size: 0; }
     0 8px 12px -6px rgba(0, 0, 0, 0.90) !important;
 }
 .tb-buffs-chip-urgent::before {
-  /* Same shape/dimensions as base cord but the cap warms to scorched
-     brass and the cord catches an ember tint - 'the talisman is
-     burning down'. Plate pulse carries the rest of the urgency. */
+  /* Same extended geometry as base cord (height 42, cord 2x38) but
+     the cap warms to scorched brass and the cord catches an ember
+     tint - 'the talisman is burning down'. Plate pulse carries the
+     rest of the urgency. */
   background:
     linear-gradient(180deg, #5a2818 0%, #2a1208 100%) center bottom / 16px 6px no-repeat,
-    linear-gradient(180deg, #6a2818 0%, #c84818 50%, #6a2818 100%) center top / 2px 18px no-repeat !important;
+    linear-gradient(180deg, #6a2818 0%, #c84818 50%, #6a2818 100%) center top / 2px 38px no-repeat !important;
 }
 .tb-buffs-chip-urgent::after {
   background:
