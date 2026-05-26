@@ -46,13 +46,16 @@ export const TUTORIAL_IDS = Object.freeze({
   FIRST_MAJOR_GATE:   'first_major_gate',
   FIRST_SPARK_OFFER:  'first_spark_offer',
   FIRST_SAINT:        'first_saint',
-  // One-shot card for players upgrading from the build that had separate
-  // Journey + Achievements TopBar icons. Fires once per existing save
-  // shortly after the upgrade so they know where their two old buttons
-  // moved (now both live behind the 📊 Progress hub icon alongside the
-  // new Stats panel). New players never see it (they don't have prior
-  // muscle memory to undo).
-  PROGRESS_HUB_MIGRATION: 'progress_hub_migration',
+  // (Removed) PROGRESS_HUB_MIGRATION — described an interim layout
+  // (Journey + Achievements behind the 📊 Progress hub) that was
+  // superseded by the Annals→Codex rename + Journey getting its own
+  // bottom-nav tab. The card and its trigger were leaving returning
+  // players with stale instructions. ANNALS_TO_CODEX_MIGRATION (below)
+  // is the current returning-player migration card. The id is kept
+  // declared here as a no-op so any older save with the
+  // mai_seen_tutorial_progress_hub_migration localStorage flag set
+  // doesn't error - hasSeenTutorial just returns true for it and the
+  // trigger has been removed from App.jsx.
   // One-shot card for players upgrading from the build where the 📊 modal
   // was called "Annals" and held only Achievements + Stats. The content-
   // audit renamed it to "Codex" and added a Wardrobe tab as the first
@@ -130,13 +133,10 @@ const CARDS = {
     glyph:   '圣',  // saint (simplified)
     ctaText: 'Got it',
   },
-  [TUTORIAL_IDS.PROGRESS_HUB_MIGRATION]: {
-    kicker:  'Layout update',
-    title:   'Journey, Achievements & Stats',
-    body:    'Your Cultivation Journey and Achievements panels now live behind the 📊 Progress button at the top of the screen, alongside the new Statistics panel. One button, three tabs. Tap it whenever you want to see how far you\'ve climbed.',
-    glyph:   '图',  // chart / map
-    ctaText: 'Got it',
-  },
+  // (Removed) PROGRESS_HUB_MIGRATION card body. Its trigger is gone
+  // (see App.jsx) and the id is no longer exported from TUTORIAL_IDS.
+  // Kept the removal note in TUTORIAL_IDS above so future devs can see
+  // why the id is absent.
   [TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION]: {
     kicker:  'Layout update',
     title:   'Annals is now the Codex',

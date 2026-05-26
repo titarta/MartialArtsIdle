@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import WORLDS from '../data/worlds';
 import { RECIPE_MAP } from '../data/pills';
+import { FEATURES } from '../data/featureFlags';
 import AudioManager from '../audio/AudioManager';
 
 const SEEN_WORLDS_KEY = 'mai_seen_worlds';
@@ -46,8 +47,12 @@ export default function useNotifications({ cultivation, inventory }) {
     saveSeenWorlds(seenWorlds);
   }, [seenWorlds]);
 
-  // Detect realm index jumps → fire toast for newly unlocked worlds
+  // Detect realm index jumps → fire toast for newly unlocked worlds.
+  // GATED on FEATURES.combat: when combat is off the Worlds tab isn't
+  // in the nav, so a "New World Unlocked" toast with targetScreen:
+  // 'worlds' would navigate to a hidden screen. Skip entirely.
   useEffect(() => {
+    if (!FEATURES.combat) return;
     const prev = prevRealmIndex.current;
     const curr = cultivation.realmIndex;
     if (curr === prev) return;
@@ -79,20 +84,23 @@ export default function useNotifications({ cultivation, inventory }) {
     try { AudioManager.playSfx('ui_notify'); } catch {}
   }, [cultivation.realmIndex]);
 
-  // Badge: Worlds tab — any unlocked world the player hasn't visited yet
-  const combatBadge = useMemo(() =>
-    WORLDS.some(w => cultivation.realmIndex >= w.minRealmIndex && !seenWorlds.has(w.id)),
+  // Badges for tabs that may not exist in this build. Both Worlds and
+  // Production are gated behind FEATURES.combat - when combat is off
+  // those tabs aren't in the nav, so any badge we'd compute would have
+  // no surface to render on. Skip the computation entirely (saves
+  // pointless inventory + WORLDS scans every render).
+  const worldsBadge = useMemo(() =>
+    FEATURES.combat
+      && WORLDS.some(w => cultivation.realmIndex >= w.minRealmIndex && !seenWorlds.has(w.id)),
     [cultivation.realmIndex, seenWorlds]
   );
-
-  // Badge: Production tab — any pill recipe brewable right now
   const productionBadge = useMemo(() =>
-    canBrewAnyPill(inventory.getQuantity),
+    FEATURES.combat && canBrewAnyPill(inventory.getQuantity),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [inventory.inventory]
   );
 
-  const badges = { worlds: combatBadge, production: productionBadge };
+  const badges = { worlds: worldsBadge, production: productionBadge };
 
   /** Call when the player navigates to a tab to clear its badge. */
   const clearBadge = useCallback((screen) => {

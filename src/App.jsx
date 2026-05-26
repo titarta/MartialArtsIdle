@@ -170,20 +170,14 @@ function AppInner() {
     });
   }, []);
 
-  // Progress hub migration card — fires once per existing player who
-  // remembers the old separate Journey + Achievements TopBar buttons.
-  // Gated on having seen WELCOME so brand-new players don't get an
-  // explanation for buttons they never had. Marks itself seen on fire so
-  // it never repeats. Runs once on mount; if the EventQueueContext is
-  // backed up, fireTutorialOnce enqueues normally and waits its turn.
-  useEffect(() => {
-    if (
-      hasSeenTutorial(TUTORIAL_IDS.WELCOME) &&
-      !hasSeenTutorial(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION)
-    ) {
-      fireTutorialOnce(TUTORIAL_IDS.PROGRESS_HUB_MIGRATION, enqueue);
-    }
-  }, [enqueue]);
+  // (Removed) PROGRESS_HUB_MIGRATION tutorial trigger. The card it
+  // fired described the old "Journey + Achievements behind the 📊
+  // Progress hub" layout. That layout has since been superseded -
+  // Journey was promoted out of the hub to its own bottom-nav tab,
+  // and the hub was renamed to Codex with a Wardrobe tab added
+  // (see ANNALS_TO_CODEX_MIGRATION below for the still-current
+  // migration card). The Progress-hub copy was misleading for
+  // returning players who hadn't seen it yet.
 
   // Annals → Codex migration card. Fires once per existing save (gated
   // on WELCOME so new players never see it). Same precedent as the
