@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Achievement Detail v2 . stacked vs drill-down . MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Ma+Shan+Zheng&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brass-edge:    #dcaf6e;
+  --brass-deep:    #8a5a28;
+  --lacquer-1:     #2a1d10;
+  --lacquer-2:     #1f160c;
+  --lacquer-3:     #150e07;
+  --cream:         #f5e6c8;
+  --cream-soft:    rgba(245, 230, 200, 0.86);
+  --vermillion:    #c83838;
+  --gold-check:    #b9d6a2;
+  --page-bg:       #181016;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(220, 175, 110, 0.06), transparent 60%),
+    var(--page-bg);
+  color: #e8d7c0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 36px 24px 80px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 0 0 6px;
+}
+h1 .sub {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 880px;
+  margin: 8px 0 24px;
+  color: rgba(232, 215, 192, 0.75);
+}
+.lede strong { color: var(--brass-edge); font-weight: 600; }
+.lede em { color: var(--vermillion); font-style: normal; font-weight: 600; }
+
+/* ── Precedent audit strip ─────────────────────────────────────────────── */
+.precedent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  max-width: 1100px;
+  margin: 0 0 36px;
+  padding: 16px 20px;
+  border: 1px solid rgba(220, 175, 110, 0.20);
+  border-left: 3px solid var(--brass-edge);
+  border-radius: 4px;
+  background: rgba(20, 14, 18, 0.6);
+}
+.precedent h3 {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+}
+.precedent .row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+.precedent .row b {
+  color: var(--cream);
+  font-weight: 600;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+}
+.precedent .row span {
+  color: rgba(232, 215, 192, 0.6);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+/* ── Comparison rail ─────────────────────────────────────────────────── */
+.rail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  max-width: 1100px;
+}
+
+.panel { display: flex; flex-direction: column; gap: 14px; }
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.panel-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  color: var(--brass-edge);
+  border-radius: 2px;
+}
+.panel-tag.win { color: #ffd28a; border-color: rgba(255, 210, 138, 0.65); background: rgba(220, 175, 110, 0.10); }
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--cream);
+}
+.panel-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.72);
+}
+.panel-note b { color: var(--cream); font-weight: 600; }
+.panel-note em { color: var(--brass-edge); font-style: normal; }
+.scorecard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 14px;
+  margin-top: 4px;
+  font-size: 11.5px;
+}
+.scorecard div {
+  display: flex; gap: 6px;
+  color: rgba(232, 215, 192, 0.75);
+}
+.scorecard .tick  { color: var(--gold-check); font-weight: 800; }
+.scorecard .meh   { color: #d9b67c; font-weight: 800; }
+.scorecard .cross { color: #ff8a8a; font-weight: 800; }
+
+/* ── Phone shell ─────────────────────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 720px;
+  border-radius: 36px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: #0d0810;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 6px #050306 inset,
+    0 0 0 7px rgba(220, 175, 110, 0.10) inset;
+  margin: 0 auto;
+}
+.phone-glass {
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a121c 0%, #0a070d 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.tb {
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #15101a 0%, #0d0810 100%);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.12);
+}
+.tb .pip {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffd76a 0%, #b07522 60%, #4a2f10 100%);
+  border: 1px solid #b07522;
+}
+.tb .pip.qi {
+  background: radial-gradient(circle at 35% 30%, #9ad0ff 0%, #3b6db5 60%, #1a3258 100%);
+  border-color: #3b6db5;
+}
+.tb .label {
+  font-size: 10px;
+  color: rgba(220, 175, 110, 0.7);
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-right: auto;
+}
+.tb .icon { width: 24px; height: 24px; border-radius: 6px; background: rgba(220, 175, 110, 0.10); border: 1px solid rgba(220, 175, 110, 0.22); }
+
+.modal-overlay {
+  position: absolute;
+  inset: 44px 0 0;
+  background: rgba(8, 4, 10, 0.78);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 20px 16px;
+}
+.codex-modal {
+  width: 100%;
+  max-width: 340px;
+  background: linear-gradient(180deg, #1d1620 0%, #110b14 100%);
+  border: 1px solid rgba(220, 175, 110, 0.28);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.75);
+  position: relative;
+}
+.codex-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 14px 8px;
+}
+.codex-tab {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: rgba(232, 215, 192, 0.55);
+  border: 1px solid rgba(220, 175, 110, 0.10);
+  background: rgba(255, 255, 255, 0.02);
+}
+.codex-tab.on {
+  color: #fff0d2;
+  border-color: rgba(220, 175, 110, 0.55);
+  background: rgba(220, 175, 110, 0.10);
+}
+.codex-close {
+  position: absolute;
+  top: 14px; right: 12px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  color: rgba(232, 215, 192, 0.7);
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+}
+.codex-prog {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(220, 175, 110, 0.85);
+  padding: 4px 14px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+.codex-bar {
+  margin: 6px 14px 0;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+.codex-bar > i {
+  display: block;
+  height: 100%;
+  width: 38%;
+  background: linear-gradient(90deg, #dcaf6e, #f5d28b);
+  box-shadow: 0 0 8px rgba(220, 175, 110, 0.6);
+}
+.codex-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 8px 0 12px;
+  position: relative;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 6px;
+  padding: 6px 14px 14px;
+}
+.ach {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: rgba(220, 175, 110, 0.05);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.ach.unlocked {
+  background: rgba(220, 175, 110, 0.10);
+  border-color: rgba(220, 175, 110, 0.32);
+  color: #fff0d2;
+}
+.ach.locked {
+  color: var(--vermillion);
+  font-weight: 800;
+  background: rgba(200, 56, 56, 0.06);
+  border-color: rgba(200, 56, 56, 0.20);
+}
+.ach.selected {
+  outline: 2px solid #ffd76a;
+  outline-offset: -2px;
+  box-shadow: 0 0 14px rgba(255, 215, 106, 0.45);
+}
+.ach .chk {
+  position: absolute;
+  bottom: 2px; right: 4px;
+  font-size: 9px;
+  color: var(--gold-check);
+  font-weight: 800;
+}
+
+/* ── Trophy Plaque (shared) ──────────────────────────────────────────── */
+.plaque {
+  position: relative;
+  padding: 18px 22px 18px;
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.14) 0%,
+      rgba(220, 175, 110, 0.04) 14%,
+      transparent 22%),
+    linear-gradient(180deg, var(--lacquer-1) 0%, var(--lacquer-2) 58%, var(--lacquer-3) 100%);
+  border: 1px solid rgba(220, 175, 110, 0.58);
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 18px 44px rgba(0, 0, 0, 0.85),
+    0 0 24px -4px rgba(220, 175, 110, 0.30);
+  overflow: hidden;
+}
+.plaque-ribbon {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    rgba(140, 30, 30, 0.40) 0%,
+    var(--vermillion) 50%,
+    rgba(140, 30, 30, 0.40) 100%);
+  box-shadow: 0 1px 6px rgba(200, 56, 56, 0.50);
+  pointer-events: none;
+}
+.plaque-glyph {
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Ma Shan Zheng', serif;
+  line-height: 1;
+  color: rgba(220, 175, 110, 0.10);
+  text-shadow: 0 0 50px rgba(220, 175, 110, 0.10);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.plaque-medal {
+  position: relative;
+  z-index: 1;
+  margin: 4px auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(255, 220, 150, 0.30) 0%,
+      rgba(120, 80, 40, 0.20) 55%,
+      transparent 78%),
+    rgba(8, 6, 4, 0.55);
+  border: 1.5px solid rgba(220, 175, 110, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.36),
+    inset 0 -1px 6px rgba(0, 0, 0, 0.55),
+    0 0 18px -4px rgba(220, 175, 110, 0.45);
+  line-height: 1;
+  color: #fff0d2;
+}
+.plaque-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 0;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.92);
+  line-height: 1;
+}
+.plaque-title {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 0;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--cream);
+  text-shadow:
+    0 0 12px rgba(220, 175, 110, 0.32),
+    0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.plaque-glyph-cn {
+  font-family: 'Ma Shan Zheng', serif;
+  color: rgba(220, 175, 110, 0.70);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+  position: relative; z-index: 1;
+}
+.plaque-divider {
+  height: 1px;
+  margin: 10px auto;
+  background: rgba(220, 175, 110, 0.35);
+  position: relative;
+  z-index: 1;
+}
+.plaque-body {
+  position: relative;
+  z-index: 1;
+  line-height: 1.50;
+  color: var(--cream-soft);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.65);
+}
+.plaque-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.55);
+}
+.plaque-meta .dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(220, 175, 110, 0.45);
+  align-self: center;
+}
+
+/* ── A1: STACKED (small, centered, over its own scrim) ────────────────── */
+.a1-scrim {
+  position: absolute;
+  inset: 44px 0 0;
+  background: rgba(4, 2, 6, 0.62);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  animation: scrimFade 0.22s ease-out;
+}
+@keyframes scrimFade { from { opacity: 0; } to { opacity: 1; } }
+.a1-plaque {
+  width: 100%;
+  max-width: 286px;
+  border-radius: 4px 4px 12px 12px;
+  animation: plaquePop 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.a1-plaque .plaque-glyph { font-size: 158px; }
+.a1-plaque .plaque-medal { width: 80px; height: 80px; font-size: 36px; }
+.a1-plaque .plaque-kicker { font-size: 10px; }
+.a1-plaque .plaque-title { font-size: 17px; }
+.a1-plaque .plaque-glyph-cn { font-size: 13px; }
+.a1-plaque .plaque-divider { width: 36px; }
+.a1-plaque .plaque-body { margin: 0 0 12px; font-size: 12px; }
+.a1-plaque .plaque-meta { font-size: 9px; }
+@keyframes plaquePop {
+  from { transform: scale(0.85) translateY(8px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+.plaque-close {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(220, 175, 110, 0.30);
+  color: rgba(232, 215, 192, 0.78);
+  font-size: 11px;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+}
+
+/* ── A2: DRILL-DOWN (replaces Codex body; ONE modal layer) ────────────── */
+.a2-body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 14px 18px;
+  position: relative;
+  overflow-y: auto;
+}
+.a2-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 10px 6px 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+  background: transparent;
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 6px;
+  margin: 4px 0 12px;
+}
+.a2-back .arrow {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--brass-edge);
+}
+.a2-plaque {
+  flex: 0 0 auto;
+  border-radius: 4px 4px 10px 10px;
+  animation: plaqueFade 0.26s ease-out;
+}
+.a2-plaque .plaque-glyph { font-size: 200px; }
+.a2-plaque .plaque-medal { width: 92px; height: 92px; font-size: 42px; }
+.a2-plaque .plaque-kicker { font-size: 11px; }
+.a2-plaque .plaque-title { font-size: 22px; margin-top: 8px; }
+.a2-plaque .plaque-glyph-cn { font-size: 15px; margin-top: 4px; }
+.a2-plaque .plaque-divider { width: 48px; margin: 14px auto; }
+.a2-plaque .plaque-body { font-size: 13px; margin: 0 0 18px; }
+.a2-plaque .plaque-meta { font-size: 10px; }
+@keyframes plaqueFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Verdict block ────────────────────────────────────────────────────── */
+.verdict {
+  max-width: 1100px;
+  margin: 56px 0 0;
+  padding: 22px 26px;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  border-left: 3px solid #ffd28a;
+  border-radius: 4px;
+  background: rgba(10, 6, 10, 0.55);
+}
+.verdict h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: var(--cream);
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+.verdict p { margin: 6px 0; }
+.verdict b { color: var(--cream); }
+.verdict em { color: #ffd28a; font-style: normal; }
+
+</style>
+</head>
+<body>
+
+<h1>Achievement Detail v2 . stacked vs drill-down
+  <span class="sub">addressing the "modal of a modal" concern . 2026-05-27</span>
+</h1>
+
+<p class="lede">
+  Both flavors keep the <strong>Trophy Plaque</strong> visual language (brass medallion, vermillion ribbon, MSZ glyph watermark, Cinzel + lacquer). The only thing that differs is <em>where the plaque lives</em>: a true second overlay (A1), or a body-swap inside the existing Codex modal (A2 . single-layer drill-down).
+</p>
+
+<!-- Precedent audit -->
+<div class="precedent">
+  <h3>Where the game already opens detail surfaces (precedent)</h3>
+  <div class="row"><b>Crystal detail</b><span>Tap crystal level chip on Home → centered DetailModal opens over Home. Detail = brass medallion + tier silhouette.</span></div>
+  <div class="row"><b>Producer detail</b><span>Tap a Pavilion Plaque in Cultivation → DetailModal opens over the Cultivation screen.</span></div>
+  <div class="row"><b>Karmic Charm detail</b><span>Tap a charm in Cultivation > Sparks tab → .charm-detail-overlay opens over the Sparks tab inside the screen.</span></div>
+  <div class="row"><b>Buffs modal</b><span>Tap the buff chip on Home → modal opens over Home with the active-buff list.</span></div>
+  <div class="row"><b>Tutorial card</b><span>Fires from any context (including over the Codex) → modal stacks above whatever's open.</span></div>
+  <div class="row"><b>Toasts</b><span>Already stack on top of every surface, including modals.</span></div>
+</div>
+
+<p class="lede" style="max-width: 880px;">
+  Three of those open detail modals over a parent <em>screen</em>; tutorials and toasts already stack over modals. Achievement is the only "tap to inspect" surface currently using an inline drawer. Switching to either flavor below brings it into the established <strong>"tap → detail surface"</strong> family.
+</p>
+
+<div class="rail">
+
+  <!-- ───────── A1: STACKED ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag">Option A1</span>
+      <span class="panel-title">Stacked plaque</span>
+    </div>
+    <div class="panel-note">
+      A small centered plaque opens over its own scrim, with the Codex dimmed behind it. <b>This is what we showed before.</b> Same shape as the Buffs/Crystal/Charm pattern, just rooted from a modal parent instead of a screen.
+    </div>
+    <div class="scorecard">
+      <div><span class="tick">✓</span> Ceremonial pop-in</div>
+      <div><span class="tick">✓</span> Same vocab as Tutorial card</div>
+      <div><span class="meh">~</span> 2 scrims stacked (Codex + plaque)</div>
+      <div><span class="tick">✓</span> Tap scrim or X dismisses</div>
+      <div><span class="tick">✓</span> Codex tab/scroll preserved</div>
+      <div><span class="meh">~</span> Slightly smaller plaque canvas</div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div>
+          <div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div>
+          <div class="icon"></div>
+        </div>
+        <!-- Dimmed Codex behind -->
+        <div class="modal-overlay" style="filter: blur(0.4px); opacity: 0.50;">
+          <div class="codex-modal">
+            <div class="codex-tabs">
+              <span class="codex-tab">Wardrobe</span>
+              <span class="codex-tab on">Achievements</span>
+              <span class="codex-tab">Stats</span>
+            </div>
+            <div class="codex-prog">18 / 75</div>
+            <div class="codex-bar"><i></i></div>
+            <div class="codex-body">
+              <div class="ach-grid">
+                <div class="ach unlocked">🜨</div>
+                <div class="ach unlocked">⚝<span class="chk">✓</span></div>
+                <div class="ach unlocked">☷<span class="chk">✓</span></div>
+                <div class="ach unlocked">𓂀<span class="chk">✓</span></div>
+                <div class="ach unlocked">☯<span class="chk">✓</span></div>
+                <div class="ach unlocked selected">✦<span class="chk">✓</span></div>
+                <div class="ach unlocked">🜂<span class="chk">✓</span></div>
+                <div class="ach unlocked">⛩<span class="chk">✓</span></div>
+                <div class="ach unlocked">🜎<span class="chk">✓</span></div>
+                <div class="ach locked">?</div>
+                <div class="ach locked">?</div>
+                <div class="ach locked">?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Second overlay: the plaque -->
+        <div class="a1-scrim">
+          <div class="plaque a1-plaque">
+            <div class="plaque-ribbon"></div>
+            <div class="plaque-glyph">符</div>
+            <button class="plaque-close">×</button>
+            <div class="plaque-medal">✦</div>
+            <div class="plaque-kicker">Achievement Earned</div>
+            <div class="plaque-title">First Spark</div>
+            <div class="plaque-glyph-cn">初符</div>
+            <div class="plaque-divider"></div>
+            <div class="plaque-body">Pick your first Qi Spark after breaking through a layer. The talisman writes itself.</div>
+            <div class="plaque-meta">
+              <span>Unlocked 12d ago</span>
+              <span class="dot"></span>
+              <span>Tier 1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── A2: DRILL-DOWN ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag win">Option A2 . pick</span>
+      <span class="panel-title">Drill-down (single layer)</span>
+    </div>
+    <div class="panel-note">
+      One modal layer. Tap a badge → the Codex body fades from "grid" to "plaque" with a brass <em>← Back</em> chip. No second scrim, no stacking. Plaque gets the <b>full Codex width</b> as canvas, reads even more like a trophy case. Codex X closes everything; Back returns to the grid (scroll position preserved).
+    </div>
+    <div class="scorecard">
+      <div><span class="tick">✓</span> Zero stacked overlays</div>
+      <div><span class="tick">✓</span> Bigger plaque canvas</div>
+      <div><span class="tick">✓</span> Same vocab as Tutorial card</div>
+      <div><span class="tick">✓</span> Explicit Back affordance</div>
+      <div><span class="tick">✓</span> Tabs stay visible (context)</div>
+      <div><span class="meh">~</span> No scrim-tap dismiss to grid</div>
+    </div>
+
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div>
+          <div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div>
+          <div class="icon"></div>
+        </div>
+        <!-- Just the Codex, no second overlay -->
+        <div class="modal-overlay">
+          <div class="codex-modal">
+            <button class="codex-close">×</button>
+            <div class="codex-tabs">
+              <span class="codex-tab">Wardrobe</span>
+              <span class="codex-tab on">Achievements</span>
+              <span class="codex-tab">Stats</span>
+            </div>
+            <!-- Codex body is now the plaque drill-down -->
+            <div class="a2-body">
+              <button class="a2-back"><span class="arrow">‹</span> Back to grid</button>
+              <div class="plaque a2-plaque">
+                <div class="plaque-ribbon"></div>
+                <div class="plaque-glyph">符</div>
+                <div class="plaque-medal">✦</div>
+                <div class="plaque-kicker">Achievement Earned</div>
+                <div class="plaque-title">First Spark</div>
+                <div class="plaque-glyph-cn">初符</div>
+                <div class="plaque-divider"></div>
+                <div class="plaque-body">Pick your first Qi Spark after breaking through a layer. The talisman writes itself.</div>
+                <div class="plaque-meta">
+                  <span>Unlocked 12d ago</span>
+                  <span class="dot"></span>
+                  <span>Tier 1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Verdict -->
+<div class="verdict">
+  <h2>Verdict . my recommendation</h2>
+  <p>
+    Both are valid and use the same Trophy Plaque vocabulary. The <em>"modal of a modal"</em> worry from A1 is genuinely answered by A2's drill-down, which keeps the player in one overlay the whole time. It also gives the plaque a bigger canvas which makes the trophy moment land harder.
+  </p>
+  <p>
+    <b>Go with A2 (Drill-down).</b> One overlay, explicit Back, big plaque. The Tutorial card and Buffs / Crystal modals stay as the precedent for "true overlay" (they all open from a non-modal Home screen, so no stacking). The Codex specifically gets a drill-down because its parent is already a modal . single layer is more honest UX.
+  </p>
+  <p style="margin-top: 14px;">
+    <b>Same component, different mount point.</b> The plaque visual is one file (<code>AchievementPlaque.jsx</code>); A2 renders it inline in the Codex body, A1 would have rendered it in a portal scrim. Switching between flavors later is a one-line change.
+  </p>
+</div>
+
+</body>
+</html>

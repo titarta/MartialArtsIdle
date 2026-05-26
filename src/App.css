@@ -3038,6 +3038,49 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   text-shadow: 0 0 6px rgba(255, 214, 107, 0.4);
 }
 
+/* ── Queue badge + snapshot context (2026-05-27 queue redesign) ──────────
+   When offline play stacks N breakthroughs, the picker shows a small
+   tail-count line so the player knows more offers wait behind this one.
+   The snapshot-context strip shows when (realm + relative time) the
+   current offer was rolled — pre-roll snapshot means a queued offer
+   shows its original realm and an age stamp, not the player's "now."
+   Visual is intentionally subtle: a small italic strip below the sub,
+   no chip / no border. The picker's drama belongs to the cards. */
+.spk-queue-badge {
+  margin-top: 8px;
+  font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--spk-gold-bright);
+  text-shadow: 0 0 6px rgba(255, 214, 107, 0.25);
+  font-style: italic;
+}
+.spk-queue-badge strong {
+  font-weight: 700;
+}
+.spk-snapshot-context {
+  margin-top: 6px;
+  font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--spk-cream-fade);
+  opacity: 0.65;
+  font-style: italic;
+}
+.spk-snapshot-sep {
+  opacity: 0.5;
+}
+
+/* Close button — leans on the shared .modal-close primitive but the
+   spk overlay is full-bleed with no panel inset, so we nudge the
+   position slightly inward and bump z-index above the calligraphy
+   watermark and ember layer. */
+.spk-close {
+  z-index: 3;
+  top: 18px;
+  right: 18px;
+}
+
 /* ── Pair layout ─────────────────────────────────────────────────── */
 .spk-pair {
   display: flex;
@@ -3947,6 +3990,21 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   color: #a7f3e8;
   box-shadow: 0 0 12px rgba(20, 150, 130, 0.35);
   animation: none;
+}
+
+/* Spark queue chip — warm gold variant matching the spark picker's
+   gold-bright palette. Shown when offline play has stacked spark
+   moments and the player hasn't reviewed them yet. Higher urgency
+   than the law chip (the player loses NOTHING by ignoring it, but
+   each queued offer represents a real choice to be made). */
+.home-sel-btn-spark {
+  background: linear-gradient(135deg,
+    rgba(120, 80,  20, 0.85),
+    rgba(160, 110, 35, 0.85)
+  );
+  border-color: rgba(255, 214, 107, 0.55);
+  color: #ffe9b5;
+  box-shadow: 0 0 12px rgba(255, 214, 107, 0.30);
 }
 
 @keyframes home-rewards-pulse {
@@ -25539,6 +25597,36 @@ img.pp-emblem-locked { font-size: 0; }
   color: #dcaf6e;
 }
 
+/* 2026-05-27 — Spark queue notice. Sits between hero number and actions
+   when offline play accumulated spark moments. Visual is restrained:
+   gold glyph + italic gold-cream text, no chip / no border. The actions
+   below remain the primary affordance; this is a subtle "by the way,
+   you have N choices waiting" promise that resolves after Collect. */
+.offline-spark-queue {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-family: 'Iowan Old Style', 'Palatino', 'Hoefler Text', Georgia, serif;
+  font-size: 13px;
+  font-style: italic;
+  color: #ffe9b5;
+  background: rgba(255, 214, 107, 0.08);
+  border: 1px solid rgba(255, 214, 107, 0.22);
+  border-radius: 999px;
+}
+.offline-spark-queue-glyph {
+  font-style: normal;
+  color: var(--spk-gold-bright, #ffd66b);
+  text-shadow: 0 0 8px rgba(255, 214, 107, 0.45);
+  font-size: 14px;
+}
+.offline-spark-queue-text strong {
+  font-weight: 700;
+  color: var(--spk-gold-bright, #ffd66b);
+}
+
 /* Ember motes rising behind the hero number */
 .offline-embers {
   position: absolute;
@@ -30338,3 +30426,272 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 
 /* End of HOME "The Sanctum" design pass. */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   ACHIEVEMENT TROPHY PLAQUE (Sanctum vocabulary)
+   ════════════════════════════════════════════════════════════════════════
+   Replaces the older `.ach-detail` sticky drawer inside the Codex >
+   Achievements tab. That drawer used to cover neighbouring badges when
+   one near the bottom of the grid was tapped, and the design predated
+   the Sanctum brass/lacquer/vermillion pass.
+
+   The plaque is a portaled modal opened over the Codex's own scrim
+   (modal-over-modal, by author direction). Single shared component
+   (AchievementPlaque.jsx) renders three states by data:
+
+     ach-plaque-unlocked   brass medallion + real title + real body
+     ach-plaque-locked     vermillion seal + real title + real body
+                           (entries without `hidden` or `secretDesc`)
+     ach-plaque-secret     vermillion seal + real title + obscured body
+                           (entries with `secretDesc:true`)
+     (`hidden:true` entries also use `ach-plaque-locked` but the JSX
+      swaps the title to "???" and the body to the locked-default copy)
+
+   Visual family matches `.tutorial-card` exactly: dark lacquer body,
+   vermillion ribbon along the top edge, large Ma Shan Zheng glyph
+   watermark behind copy, brass-trim medallion holding the icon, Cinzel
+   display kicker + title, soft-cream body. See
+   `_design/achievement-detail-study/` for the study that drove this.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Overlay sits above the Codex's own .modal-overlay. Same class, lifted
+   z-index so it stacks above the Codex stacking context. z = 220 sits
+   above modals (default .modal-overlay is typically z:200) but below
+   the toast stack (z:1000) so a Patience tip can still surface. */
+.modal-overlay.ach-plaque-overlay {
+  z-index: 220;
+  background: rgba(4, 2, 6, 0.62);
+  /* Lighter scrim than the default modal-overlay - the Codex behind is
+     already dimmed by ITS scrim, so a second 0.78 alpha would crush
+     the parent into pure black. Letting some glow through reads as
+     "the Codex paused" rather than "everything vanished". */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  padding: 28px 22px;
+  /* Animate the scrim in slightly faster than the plaque pop so the
+     focus shift reads as immediate. */
+  animation: ach-plaque-scrim-fade 0.18s ease-out;
+}
+@keyframes ach-plaque-scrim-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ach-plaque {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  padding: 20px 22px 20px;
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.14) 0%,
+      rgba(220, 175, 110, 0.04) 14%,
+      transparent 22%),
+    linear-gradient(180deg,
+      #2a1d10 0%,
+      #1f160c 60%,
+      #150e07 100%);
+  border: 1px solid rgba(220, 175, 110, 0.58);
+  border-radius: 4px 4px 12px 12px;
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.24),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 18px 44px rgba(0, 0, 0, 0.82),
+    0 0 24px -4px rgba(220, 175, 110, 0.30);
+  overflow: hidden;
+  animation: ach-plaque-pop 0.30s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes ach-plaque-pop {
+  from { transform: scale(0.85) translateY(8px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+
+/* Vermillion banner along the top edge - matches .tutorial-ribbon */
+.ach-plaque-ribbon {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg,
+    rgba(140, 30, 30, 0.40) 0%,
+    #c83838 50%,
+    rgba(140, 30, 30, 0.40) 100%);
+  box-shadow: 0 1px 6px rgba(200, 56, 56, 0.50);
+  pointer-events: none;
+  z-index: 2;
+}
+.ach-plaque-locked .ach-plaque-ribbon {
+  background: linear-gradient(90deg,
+    rgba(140, 30, 30, 0.55) 0%,
+    rgba(200, 56, 56, 0.85) 50%,
+    rgba(140, 30, 30, 0.55) 100%);
+}
+
+/* Ma Shan Zheng watermark glyph behind the copy. Same approach as the
+   tutorial card - calligraphic, very faded, gives identity without
+   demanding attention. */
+.ach-plaque-glyph {
+  position: absolute;
+  top: 56%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+  font-size: 180px;
+  font-weight: 400;
+  line-height: 1;
+  color: rgba(220, 175, 110, 0.10);
+  text-shadow: 0 0 60px rgba(220, 175, 110, 0.10);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  animation: ach-plaque-glyph-rise 0.5s ease-out both;
+}
+.ach-plaque-glyph-locked {
+  color: rgba(200, 56, 56, 0.10);
+  text-shadow: 0 0 50px rgba(200, 56, 56, 0.16);
+}
+@keyframes ach-plaque-glyph-rise {
+  from { opacity: 0; transform: translate(-50%, -42%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1);    }
+}
+
+/* Close - overrides .modal-close defaults to sit inside the plaque,
+   matching the tutorial card's close position. */
+.ach-plaque-close.modal-close {
+  position: absolute !important;
+  top: 9px !important;
+  right: 9px !important;
+  z-index: 3;
+}
+
+/* Brass medallion holding the achievement icon. Same warm radial-glow
+   construction as the tutorial card's icon mount. */
+.ach-plaque-medal {
+  position: relative;
+  z-index: 1;
+  width: 84px;
+  height: 84px;
+  margin: 4px auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(255, 220, 150, 0.28) 0%,
+      rgba(120, 80, 40, 0.20) 55%,
+      transparent 78%),
+    rgba(8, 6, 4, 0.55);
+  border: 1.5px solid rgba(220, 175, 110, 0.60);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.32),
+    inset 0 -1px 6px rgba(0, 0, 0, 0.55),
+    0 0 18px -4px rgba(220, 175, 110, 0.42);
+}
+.ach-plaque-medal-icon {
+  font-size: 38px;
+  line-height: 1;
+  color: #fff0d2;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+
+/* Locked seal variant. Switches the medallion to vermillion. The seal
+   glyph 封 ("sealed") goes inside, rotated a few degrees so it reads
+   as an applied wax stamp. */
+.ach-plaque-medal-seal {
+  border-color: rgba(200, 56, 56, 0.60);
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(200, 56, 56, 0.22) 0%,
+      rgba(80, 20, 20, 0.20) 55%,
+      transparent 78%),
+    rgba(8, 6, 4, 0.65);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 180, 180, 0.22),
+    inset 0 -1px 6px rgba(0, 0, 0, 0.55),
+    0 0 18px -4px rgba(200, 56, 56, 0.40);
+}
+.ach-plaque-seal {
+  font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+  font-size: 38px;
+  font-weight: 400;
+  color: #c83838;
+  text-shadow:
+    0 0 10px rgba(200, 56, 56, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.65);
+  transform: rotate(-6deg);
+  line-height: 1;
+}
+
+/* Kicker - small brass caps above the title. Three colour variants
+   depending on state. */
+.ach-plaque-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 10px 0 0;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.92);
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+.ach-plaque-kicker-locked { color: rgba(255, 180, 180, 0.78); }
+.ach-plaque-kicker-secret { color: rgba(220, 175, 110, 0.65); }
+
+/* Title - large Cinzel cream. Same family as the tutorial card title. */
+.ach-plaque-title {
+  position: relative;
+  z-index: 1;
+  margin: 6px 0 0;
+  font-family: 'Cinzel', serif;
+  font-size: 1.30rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #f5e6c8;
+  line-height: 1.2;
+  text-shadow:
+    0 0 12px rgba(220, 175, 110, 0.30),
+    0 2px 4px rgba(0, 0, 0, 0.85);
+}
+.ach-plaque-title-locked {
+  color: rgba(255, 210, 210, 0.85);
+  text-shadow:
+    0 0 12px rgba(200, 56, 56, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.85);
+}
+
+/* Thin brass divider between the title block and the body copy. */
+.ach-plaque-divider {
+  width: 36px;
+  height: 1px;
+  margin: 12px auto;
+  background: rgba(220, 175, 110, 0.35);
+  position: relative;
+  z-index: 1;
+}
+.ach-plaque-locked .ach-plaque-divider {
+  background: rgba(200, 56, 56, 0.40);
+}
+
+/* Body copy. Cream + soft drop shadow for readability over the watermark. */
+.ach-plaque-body {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.50;
+  color: rgba(245, 230, 200, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.70);
+}
+/* Obscured body (hidden / secretDesc) - italic + lower opacity reads as
+   "this is a hint, not the real story". */
+.ach-plaque-body-obscured {
+  font-style: italic;
+  color: rgba(255, 220, 220, 0.62);
+}
+
+/* End of Achievement Trophy Plaque block. */

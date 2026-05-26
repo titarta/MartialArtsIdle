@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { recordStat } from '../systems/statsRecorder';
+import AchievementPlaque from './AchievementPlaque';
 
 const LOCKED_ICON = '?';
-const LOCKED_TITLE = '???';
-const LOCKED_DESC  = 'Keep cultivating to reveal this achievement.';
 
 /**
  * Single achievement square. Cookie-Clicker-style badge: just the icon
  * (or a red "?" when locked) so many entries fit in a small grid. Tap
- * to surface the title and description in the sticky drawer.
+ * to surface the title and description in the trophy plaque modal.
  *
- * Locked rendering respects two hide modes:
+ * Locked rendering respects two hide modes (the plaque itself handles
+ * the obscured-text variants):
  *   hidden:true     title and desc both hidden as "???"
- *   secretDesc:true title visible, desc hidden as "???"
+ *   secretDesc:true title visible, desc hidden
  */
 function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
   const isHidden = !unlocked && (achievement.hidden === true);
@@ -23,7 +23,7 @@ function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
   ].filter(Boolean).join(' ');
   const tooltip = unlocked
     ? achievement.title
-    : (isHidden ? LOCKED_TITLE : achievement.title);
+    : (isHidden ? '???' : achievement.title);
   const iconChar = unlocked ? achievement.icon : LOCKED_ICON;
   return (
     <button
@@ -40,12 +40,19 @@ function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
 }
 
 /**
- * Achievements tab body for the Progress Hub modal. Grid of badges
- * with a sticky detail drawer below.
+ * Achievements tab body for the Codex modal. Grid of badges with the
+ * trophy plaque popping over the Codex when one is tapped.
  *
- * The legacy category tab strip is gone because the new flat list has
- * no categories. If a future category dimension comes back (e.g.
- * filter by "cultivation vs meta") we can reintroduce a chip row here.
+ * History: the old layout rendered a `.ach-detail` panel inline after the
+ * grid as `position: sticky; bottom: 0`. That covered neighbouring badges
+ * when one near the bottom was tapped, and the design was the older
+ * flat-purple style from before the Sanctum pass. Replaced with the
+ * AchievementPlaque overlay (matching the tutorial card / Petition Tablet
+ * brass + lacquer + vermillion vocabulary). See
+ * `_design/achievement-detail-study/` for the comparison study.
+ *
+ * (The legacy category tab strip was already gone before this change —
+ * achievements are a flat list now.)
  */
 function AchievementsBody({ achievements }) {
   const [selectedId, setSelectedId] = useState(null);
@@ -60,28 +67,6 @@ function AchievementsBody({ achievements }) {
 
   const selected = selectedId ? visible.find(a => a.id === selectedId) : null;
   const selectedUnlocked = selected ? achievements.isUnlocked(selected.id) : false;
-
-  // Detail-drawer rendering: respect hidden / secretDesc on locked
-  // entries. Unlocked entries always show full content.
-  let detailTitle = '';
-  let detailDesc  = '';
-  let detailIcon  = LOCKED_ICON;
-  if (selected) {
-    if (selectedUnlocked) {
-      detailTitle = selected.title;
-      detailDesc  = selected.desc;
-      detailIcon  = selected.icon;
-    } else if (selected.hidden) {
-      detailTitle = LOCKED_TITLE;
-      detailDesc  = LOCKED_DESC;
-    } else if (selected.secretDesc) {
-      detailTitle = selected.title;
-      detailDesc  = LOCKED_TITLE;
-    } else {
-      detailTitle = selected.title;
-      detailDesc  = selected.desc;
-    }
-  }
 
   return (
     <>
@@ -111,19 +96,11 @@ function AchievementsBody({ achievements }) {
       </div>
 
       {selected && (
-        <div className={`ach-detail${selectedUnlocked ? ' ach-detail-unlocked' : ' ach-detail-locked'}`}>
-          <button
-            type="button"
-            className="ach-detail-close"
-            onClick={() => setSelectedId(null)}
-            aria-label="Close achievement detail"
-          >✕</button>
-          <div className="ach-detail-icon">{detailIcon}</div>
-          <div className="ach-detail-body">
-            <div className="ach-detail-title">{detailTitle}</div>
-            <div className="ach-detail-desc">{detailDesc}</div>
-          </div>
-        </div>
+        <AchievementPlaque
+          achievement={selected}
+          unlocked={selectedUnlocked}
+          onClose={() => setSelectedId(null)}
+        />
       )}
     </>
   );
