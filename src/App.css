@@ -29201,4 +29201,135 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v30. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v31: revive the hung-jade-charm for the top-left buff entry.
+   v10 reskinned .tb-buffs-chip as a flat pill - losing the personality
+   that counter-balanced the Petition Tablet on the right. v31 brings
+   back the full hung-from-cord vocabulary:
+   . Brown cord + dark cap drawn via ::before, descending from above
+   . Jade plate with rounded-bottom corners (mini cousin of the Tablet)
+   . Stacked layout: ✦ icon / count / hairline / countdown
+   . Slow sway animation matching the Tablet's 5.4s rhythm
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Hide the cord on the urgent variant since the urgent pulse alone
+   carries the 'about to expire' signal - keep the cord on normal. */
+
+.tb-buffs-chip {
+  /* Override v10 pill rules AND the base .tb-buffs-chip height:24px
+     (which would clip our taller vertical layout). Become a vertical
+     hung-charm plate. */
+  display: grid !important;
+  grid-template-rows: 18px 16px 1px 12px !important;
+  place-items: center !important;
+  gap: 1px !important;
+  width: 52px !important;
+  height: auto !important;
+  min-height: 60px !important;
+  padding: 6px 6px 7px !important;
+  margin-top: 24px !important; /* room above for the cord */
+  border-radius: 7px 7px 14px 14px !important;
+  background:
+    linear-gradient(180deg, rgba(126, 195, 143, 0.22) 0%, rgba(126, 195, 143, 0.08) 100%),
+    rgba(8, 14, 10, 0.92) !important;
+  border: 1px solid rgba(126, 195, 143, 0.55) !important;
+  color: #aedfb8 !important;
+  font-family: 'Cinzel', serif !important;
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    inset 0 1px 0 rgba(180, 255, 200, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 0 14px -4px rgba(126, 195, 143, 0.55),
+    0 6px 10px -6px rgba(0, 0, 0, 0.85) !important;
+  animation: tb-buffs-charm-sway 5.4s ease-in-out infinite !important;
+  transform-origin: 50% -22px !important;
+  cursor: pointer;
+}
+@keyframes tb-buffs-charm-sway {
+  0%, 100% { transform: rotate(-1.0deg); }
+  50%      { transform: rotate( 1.0deg); }
+}
+
+/* Cord + cap drawn via ::before, descending from above the plate. */
+.tb-buffs-chip::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -22px !important;
+  left: 50% !important;
+  width: 18px !important;
+  height: 22px !important;
+  transform: translateX(-50%) !important;
+  /* Two layered gradients: cord (vertical strip) and cap (small bar
+     at the bottom of the cord, just above the plate). */
+  background:
+    /* cap */
+    linear-gradient(180deg, #3a2a18 0%, #1a120a 100%) center bottom / 16px 5px no-repeat,
+    /* cord */
+    linear-gradient(180deg, #2b2014 0%, #4a3520 50%, #2b2014 100%) center top / 2px 19px no-repeat !important;
+  pointer-events: none;
+}
+
+/* Override grid-row for each existing chip child so the layout is
+   icon (row 1) / count (row 2) / sep-becomes-rule (row 3) / timer (row 4). */
+.tb-buffs-chip-icon {
+  grid-row: 1 !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+  color: var(--jade, #7ec38f) !important;
+  filter: drop-shadow(0 0 6px rgba(126, 195, 143, 0.55));
+}
+.tb-buffs-chip-count {
+  grid-row: 2 !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #d0ffd9 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.02em !important;
+}
+/* The sep becomes a thin gold hairline between count and timer. */
+.tb-buffs-chip-sep {
+  grid-row: 3 !important;
+  width: 70% !important;
+  height: 1px !important;
+  background: rgba(126, 195, 143, 0.30) !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  margin: 0 !important;
+  align-self: center;
+}
+.tb-buffs-chip-timer {
+  grid-row: 4 !important;
+  font-size: 8.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: #aedfb8 !important;
+  line-height: 1 !important;
+}
+
+/* Urgent variant: vermillion plate + faster pulse, kill the sway. */
+.tb-buffs-chip.tb-buffs-chip-urgent {
+  animation: tb-buffs-charm-urgent 0.85s ease-in-out infinite alternate !important;
+  background:
+    linear-gradient(180deg, rgba(200, 56, 56, 0.32) 0%, rgba(200, 56, 56, 0.12) 100%),
+    rgba(20, 6, 6, 0.92) !important;
+  border-color: rgba(255, 130, 130, 0.85) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 200, 0.22),
+    0 0 14px -2px rgba(255, 91, 91, 0.85),
+    0 6px 10px -6px rgba(0, 0, 0, 0.85) !important;
+}
+.tb-buffs-chip-urgent .tb-buffs-chip-icon { color: #ffd5d5 !important; }
+.tb-buffs-chip-urgent .tb-buffs-chip-count,
+.tb-buffs-chip-urgent .tb-buffs-chip-timer { color: #ffe2e2 !important; }
+@keyframes tb-buffs-charm-urgent {
+  0%   { box-shadow: 0 0 10px -2px rgba(255, 91, 91, 0.65), 0 6px 10px -6px rgba(0,0,0,.85); }
+  100% { box-shadow: 0 0 22px -2px rgba(255, 91, 91, 0.95), 0 6px 10px -6px rgba(0,0,0,.85); }
+}
+
+/* Ensure the chip-tl container doesn't clip the cord that extends
+   above its child. */
+.home-chips-tl { overflow: visible !important; }
+
+/* End of SANCTUM v31. */
+
 /* End of HOME "The Sanctum" design pass. */
