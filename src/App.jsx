@@ -170,27 +170,14 @@ function AppInner() {
     });
   }, []);
 
-  // (Removed) PROGRESS_HUB_MIGRATION tutorial trigger. The card it
-  // fired described the old "Journey + Achievements behind the 📊
-  // Progress hub" layout. That layout has since been superseded -
-  // Journey was promoted out of the hub to its own bottom-nav tab,
-  // and the hub was renamed to Codex with a Wardrobe tab added
-  // (see ANNALS_TO_CODEX_MIGRATION below for the still-current
-  // migration card). The Progress-hub copy was misleading for
-  // returning players who hadn't seen it yet.
-
-  // Annals → Codex migration card. Fires once per existing save (gated
-  // on WELCOME so new players never see it). Same precedent as the
-  // PROGRESS_HUB_MIGRATION fire above; the rename added a Wardrobe tab
-  // and we want returning players to know nothing was deleted.
-  useEffect(() => {
-    if (
-      hasSeenTutorial(TUTORIAL_IDS.WELCOME) &&
-      !hasSeenTutorial(TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION)
-    ) {
-      fireTutorialOnce(TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION, enqueue);
-    }
-  }, [enqueue]);
+  // (Removed) Returning-player migration card triggers — both the
+  // PROGRESS_HUB_MIGRATION (Journey/Achievements layout shuffle) and
+  // ANNALS_TO_CODEX_MIGRATION (Annals → Codex rename + Wardrobe tab).
+  // Migration cards are temporary scaffolding to soften UI churn for
+  // players returning across an update; once the player base has rolled
+  // past the change, the card just becomes noise on first launch every
+  // time someone opens the app. Both card bodies + their TUTORIAL_IDS
+  // entries have been removed too (see src/data/tutorialCards.js).
 
   // Save schema version stamp. Set on first launch (and after any future
   // migrations). On v1 (Cookie-Clicker pivot) no data migration is needed —

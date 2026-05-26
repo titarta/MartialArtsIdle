@@ -46,22 +46,16 @@ export const TUTORIAL_IDS = Object.freeze({
   FIRST_MAJOR_GATE:   'first_major_gate',
   FIRST_SPARK_OFFER:  'first_spark_offer',
   FIRST_SAINT:        'first_saint',
-  // (Removed) PROGRESS_HUB_MIGRATION — described an interim layout
-  // (Journey + Achievements behind the 📊 Progress hub) that was
-  // superseded by the Annals→Codex rename + Journey getting its own
-  // bottom-nav tab. The card and its trigger were leaving returning
-  // players with stale instructions. ANNALS_TO_CODEX_MIGRATION (below)
-  // is the current returning-player migration card. The id is kept
-  // declared here as a no-op so any older save with the
-  // mai_seen_tutorial_progress_hub_migration localStorage flag set
-  // doesn't error - hasSeenTutorial just returns true for it and the
-  // trigger has been removed from App.jsx.
-  // One-shot card for players upgrading from the build where the 📊 modal
-  // was called "Annals" and held only Achievements + Stats. The content-
-  // audit renamed it to "Codex" and added a Wardrobe tab as the first
-  // entry. Fires once per existing save so returning players know their
-  // Achievements and Stats are still there, just behind a new front door.
-  ANNALS_TO_CODEX_MIGRATION: 'annals_to_codex_migration',
+  // (Removed) Migration cards — both PROGRESS_HUB_MIGRATION (Journey
+  // + Achievements layout shuffle) and ANNALS_TO_CODEX_MIGRATION
+  // (Annals → Codex rename + Wardrobe tab). The player base has
+  // rolled past both UI changes; migration cards are temporary
+  // scaffolding for returning players and become noise once the
+  // churn is no longer fresh. Triggers removed from App.jsx; card
+  // bodies removed below. Older saves with
+  // mai_seen_tutorial_progress_hub_migration or
+  // mai_seen_tutorial_annals_to_codex_migration localStorage flags
+  // are harmless - the flags just sit unread.
 });
 
 /**
@@ -133,17 +127,10 @@ const CARDS = {
     glyph:   '圣',  // saint (simplified)
     ctaText: 'Got it',
   },
-  // (Removed) PROGRESS_HUB_MIGRATION card body. Its trigger is gone
-  // (see App.jsx) and the id is no longer exported from TUTORIAL_IDS.
-  // Kept the removal note in TUTORIAL_IDS above so future devs can see
-  // why the id is absent.
-  [TUTORIAL_IDS.ANNALS_TO_CODEX_MIGRATION]: {
-    kicker:  'Layout update',
-    title:   'Annals is now the Codex',
-    body:    'The 📊 button at the top is now your Codex. Your Achievements and Stats are still here, plus a new Wardrobe tab where every cosmetic you own lives. Tap any owned skin to equip it.',
-    glyph:   '典',  // canon / codex
-    ctaText: 'Got it',
-  },
+  // (Removed) PROGRESS_HUB_MIGRATION + ANNALS_TO_CODEX_MIGRATION card
+  // bodies. Their triggers are gone (see App.jsx) and the ids are no
+  // longer exported from TUTORIAL_IDS. See the note at the top of the
+  // TUTORIAL_IDS block for the full rationale.
 };
 
 /** Fetch the payload for a tutorial id, or undefined if none. */

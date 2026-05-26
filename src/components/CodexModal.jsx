@@ -15,8 +15,9 @@ import WardrobeTab       from './WardrobeTab';
  * a cosmetic purchase), Achievements second (badge dot lives on the
  * TopBar button), Stats third. Default tab is Wardrobe.
  *
- * A one-shot migration tutorial fires once per existing save to explain
- * the rename (see ANNALS_TO_CODEX_MIGRATION in tutorialCards.js).
+ * (Earlier builds fired an ANNALS_TO_CODEX_MIGRATION returning-player
+ * tutorial card to explain the rename. That card has been removed -
+ * see the comment in src/data/tutorialCards.js TUTORIAL_IDS block.)
  */
 const TABS = [
   { id: 'wardrobe',     label: 'Wardrobe'     },
