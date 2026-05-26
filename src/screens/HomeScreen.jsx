@@ -870,16 +870,14 @@ const QI_FLOW_BASE_RATE   = 3.0;  // particles/sec at effective ×1
 const QI_FLOW_RATE_K      = 5.5;  // sqrt(eff-1) coefficient
 const QI_FLOW_BASE_SPEED  = 80;   // px/s baseline inflow
 const QI_FLOW_SPEED_K     = 36;   // sqrt(eff) coefficient on speed
-// Number of pre-staggered orbs spawned when the player returns to
-// Home from another tab. Each is dropped in with a negative
-// animation-delay so it appears mid-flight instead of fresh from
-// the ring - sells the illusion that qi never stopped flowing.
-// Bumped from 3 to 6 so the orbs visibly populate the trajectory
-// from ring to centre at varied progress (~100ms / 200ms / 300ms /
-// 400ms / 500ms / 600ms in-flight). Combined with the natural ~333ms
-// cadence picking up immediately after, the player sees a continuous
-// stream on return instead of a 1/3-second empty gap.
-const QI_FLOW_WARMUP_COUNT = 6;
+// (Removed) Warm-up orb pre-spawning on tab-return. Earlier versions
+// pre-spawned 3-6 orbs with negative animation-delays to make the
+// scene look "already in flight" on return. Side effect: every
+// rapid tab-cycle fired another batch, and players reported
+// "now it seems to be spawning even more particles". Replaced
+// with no warm-up at all - the natural ~333ms cadence resumes on
+// return and the brief ~300ms empty-trajectory window is barely
+// perceptible, much less jarring than a stacking burst.
 
 function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
   const w = layer.clientWidth;
@@ -2234,13 +2232,6 @@ function HomeScreen({
     // Seed at mount-time, NOT 0, so the first rAF frame doesn't trip
     // the spawn-throttle. Same reason as the crystal-spark rAF above.
     let lastSpawn = performance.now();
-    // Track visibility transitions via the layer's clientWidth (drops
-    // to 0 when HomeScreen wrapper is display:none on another tab,
-    // when .vfx-disabled hides it, etc.). When visibility returns
-    // false -> true we WARM UP a few orbs at staggered animation
-    // offsets so the scene reads as "already in flight" instead of
-    // "fresh empty stage that's now starting to spawn things".
-    let wasVisible = false;
     const tick = (now) => {
       const layer = qiFlowLayerRef.current;
       const kind = currentEventKindRef.current;
@@ -2257,23 +2248,6 @@ function HomeScreen({
         const spawnRate = QI_FLOW_BASE_RATE
           + Math.sqrt(Math.max(0, eff - 1)) * QI_FLOW_RATE_K;
         const interval = 1000 / Math.max(0.1, spawnRate);
-
-        // WARM-UP: just transitioned from hidden to visible. Pre-spawn
-        // a batch at staggered negative animation-delays so the orbs
-        // populate the entire trajectory from ring to centre at varied
-        // in-flight progress. Linear stagger over ~600ms (~100ms apart
-        // for 6 orbs) so they read as a continuous stream by the time
-        // the natural cadence kicks in on the next interval.
-        if (!wasVisible) {
-          for (let i = 0; i < QI_FLOW_WARMUP_COUNT; i++) {
-            // i=0 -> 100ms in flight (just departed the ring)
-            // i=5 -> 600ms in flight (almost at the centre)
-            const delayMs = 100 + Math.round((i / (QI_FLOW_WARMUP_COUNT - 1)) * 500);
-            spawnQiFlowOrb(layer, eff, delayMs);
-          }
-          wasVisible = true;
-        }
-
         if (now - lastSpawn > interval) {
           spawnQiFlowOrb(layer, eff);
           lastSpawn = now;
@@ -2282,7 +2256,6 @@ function HomeScreen({
         // Hidden / not yet laid out — reset spawn timer so we don't
         // dump a backlog on return.
         lastSpawn = now;
-        wasVisible = false;
       }
       raf = requestAnimationFrame(tick);
     };
