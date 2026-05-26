@@ -28887,4 +28887,75 @@ img.pp-emblem-locked { font-size: 0; }
 
 /* End of SANCTUM v24. */
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v25: breakthrough gate cleanup (readable, wider, cleaner).
+   The button was cramped inside the bar zone with the 道 caps poking
+   into its edges; typography was small; flanking ▲ icons were tiny.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* 1. Hide the 道 caps while the breakthrough button is showing - they
+      were peeking over the button's edges and cluttering the surface. */
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn)::before,
+.home-scene-bottom .home-bar-wrap:has(.home-major-breakthrough-btn)::after {
+  display: none !important;
+}
+
+/* 2. Pull the button OUT of the bar wrap's interior margins so it can
+      fill the full plate width. Drop the inset 24px gutters. */
+.home-scene-bottom .home-major-breakthrough-btn {
+  padding: 8px 18px 9px !important;
+  gap: 16px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(255, 220, 150, 0.92) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(255, 207, 131, 0.62) !important;
+}
+
+/* 3. Bigger flanking glyphs - more ceremonial presence. */
+.home-scene-bottom .home-mb-icon {
+  font-family: 'Ma Shan Zheng', serif !important;
+  font-size: 28px !important;
+  color: #ffe2a0 !important;
+  opacity: 1 !important;
+  text-shadow:
+    0 0 12px rgba(255, 207, 131, 0.75),
+    0 1px 0 rgba(0, 0, 0, 0.55) !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+}
+
+/* 4. CTA text bigger + cleaner spacing. */
+.home-scene-bottom .home-mb-cta {
+  font-size: 16px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.24em !important;
+  color: #fff8e0 !important;
+  text-shadow:
+    0 0 12px rgba(255, 207, 131, 0.75),
+    0 1px 2px rgba(0, 0, 0, 0.92) !important;
+  line-height: 1.05 !important;
+}
+
+/* 5. Next-realm subtitle bigger and using middle-dot separator via
+      pseudo-class trick (we replace any " - " in the text via CSS
+      can't do that, so just style it cleanly). */
+.home-scene-bottom .home-mb-next {
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 230, 180, 0.92) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85) !important;
+  margin-top: 2px;
+  line-height: 1.1 !important;
+}
+.home-scene-bottom .home-mb-label {
+  gap: 1px !important;
+}
+
+/* End of SANCTUM v25. */
+
 /* End of HOME "The Sanctum" design pass. */

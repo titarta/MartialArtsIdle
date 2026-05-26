@@ -2809,7 +2809,12 @@ function HomeScreen({
                 <span className="home-mb-icon">▲</span>
                 <span className="home-mb-label">
                   <span className="home-mb-cta">BREAKTHROUGH</span>
-                  <span className="home-mb-next">{cultivation.nextRealmName}</span>
+                  <span className="home-mb-next">
+                    {/* Data uses ' - ' as a realm/stage separator
+                        (e.g. 'Immortal Ascension - 1st Stage');
+                        replace with ' · ' so it reads cleaner here. */}
+                    {String(cultivation.nextRealmName ?? '').replace(/\s+-\s+/g, ' · ')}
+                  </span>
                 </span>
                 <span className="home-mb-icon">▲</span>
               </button>
