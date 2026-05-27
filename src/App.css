@@ -7994,55 +7994,73 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   line-height: 1;
 }
 
-/* Gated — qi bar tones pushed into an alarm state. Deep navy edges
-   compress the electric-blue centre, and the near-white pressure point
-   reads as qi building up against a wall it can't break through yet.
-   Faster pulse (0.9 s) adds urgency without leaving the bar's identity. */
+/* Gated — qi bar in an alarm state. Vermillion/cinnabar palette: deep
+   oxblood edges compress a bright flame-orange centre, and the hot core
+   reads as qi pressing against a Heaven-gate that refuses to open yet.
+   2026-05-27: was electric-blue ("pressure cooker"); swapped to red so
+   the gate state telegraphs URGENCY rather than just resistance.
+   Faster pulse (0.7 s) and deeper opacity swing carry the alarm. */
 .realm-track-gated .realm-fill {
-  box-shadow: 0 0 14px rgba(70, 150, 255, 0.80);
-  animation: realmGateFillPulse 0.9s ease-in-out infinite;
+  box-shadow:
+    0 0 14px rgba(255,  80,  60, 0.80),
+    0 0 28px rgba(220,  50,  30, 0.45);
+  animation: realmGateFillPulse 0.7s ease-in-out infinite;
 }
 
 .realm-track-gated .realm-fill-inner {
-  background: linear-gradient(to right, #0a1e36, #3a8fff, #cceeff, #3a8fff, #0a1e36);
+  background: linear-gradient(to right,
+    #2a0606,
+    #c5331b,
+    #ffb672,
+    #c5331b,
+    #2a0606);
 }
 
-/* Gated + holding — "surging through the gate". The white-hot core
-   signals the qi is about to burst the threshold; even faster pulse. */
+/* Gated + holding — "surging against the gate". The white-hot core
+   signals qi about to burst the threshold; even faster pulse + bigger
+   brightness swing for active push feedback. */
 .realm-track-gated .realm-fill.realm-fill-boosted {
   box-shadow:
-    0 0 16px rgba( 80, 170, 255, 0.95),
-    0 0 32px rgba( 40, 120, 255, 0.65);
-  animation: realmGateBoostedPulse 0.55s ease-in-out infinite alternate;
+    0 0 18px rgba(255, 110,  70, 0.95),
+    0 0 36px rgba(220,  60,  30, 0.70);
+  animation: realmGateBoostedPulse 0.45s ease-in-out infinite alternate;
 }
 
 .realm-track-gated .realm-fill-boosted .realm-fill-inner {
-  background: linear-gradient(to right, #0a1e36, #60b0ff, #ffffff, #60b0ff, #0a1e36);
+  background: linear-gradient(to right,
+    #2a0606,
+    #ff5536,
+    #ffffff,
+    #ff5536,
+    #2a0606);
 }
 
 @keyframes realmGateBoostedPulse {
   0%   {
     box-shadow:
-      0 0 12px rgba( 80, 160, 255, 0.80),
-      0 0 24px rgba( 40, 120, 255, 0.50);
+      0 0 14px rgba(255,  90,  50, 0.80),
+      0 0 28px rgba(220,  60,  30, 0.55);
     filter: brightness(1.0);
   }
   100% {
     box-shadow:
-      0 0 24px rgba(100, 180, 255, 1.00),
-      0 0 48px rgba( 60, 140, 255, 0.85);
-    filter: brightness(1.35);
+      0 0 26px rgba(255, 130,  90, 1.00),
+      0 0 52px rgba(255,  80,  40, 0.90);
+    filter: brightness(1.40);
   }
 }
 
 @keyframes realmGatePulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(60, 130, 255, 0.40); }
-  50%      { box-shadow: 0 0 16px rgba(80, 160, 255, 0.75); }
+  0%, 100% { box-shadow: 0 0 8px  rgba(220,  60,  30, 0.45); }
+  50%      { box-shadow: 0 0 18px rgba(255,  90,  50, 0.80); }
 }
 
+/* Opacity dip drives the heartbeat-style alarm — deeper than the old
+   blue gate (was 1 → 0.75) so the urgency reads even when the player
+   is mid-focus and not looking directly at the bar. */
 @keyframes realmGateFillPulse {
   0%, 100% { opacity: 1; }
-  50%      { opacity: 0.75; }
+  50%      { opacity: 0.65; }
 }
 
 
@@ -29466,10 +29484,18 @@ img.pp-emblem-locked { font-size: 0; }
    by 8px. One calling-card surface, no dead space.
    ═════════════════════════════════════════════════════════════════════ */
 
-/* Hide every direct child of the plate while BT is active. */
+/* Hide the realm header + qi/rate row while BT is active.
+   NOTE (2026-05-27): the bar-wrap was previously in this list with a
+   matching `visibility: visible !important` override on the BT button
+   below. That override leaked - the !important re-promoted the button
+   to visible even when an ancestor (.home-host) was hidden, so the
+   gold BT button bled through every other screen in the continuous-
+   background architecture. Bar-wrap removed from the hidden list now;
+   its only visual child (.realm-bar) is already display:none in v26
+   so nothing inside needs hiding. Caps (::before/::after on bar-wrap)
+   are also display:none in v25. */
 .home-scene-bottom:has(.home-major-breakthrough-btn) > .home-scene-realm-header,
-.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-scene-overlay-row,
-.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-bar-wrap {
+.home-scene-bottom:has(.home-major-breakthrough-btn) > .home-scene-overlay-row {
   visibility: hidden !important;
 }
 
@@ -29479,14 +29505,13 @@ img.pp-emblem-locked { font-size: 0; }
   position: static !important;
 }
 
-/* But unhide the button (since it lives INSIDE bar-wrap which we just
-   hid) and position it to fill the WHOLE plate inset by 8px. */
+/* Position the button to fill the WHOLE plate inset by 8px. No
+   visibility override - bar-wrap is no longer hidden, so the button
+   stays visible by inheritance (and disappears cleanly when
+   .home-host is hidden by a different screen overlaying Home). */
 .home-scene-bottom:has(.home-major-breakthrough-btn) > .home-bar-wrap .home-major-breakthrough-btn {
-  visibility: visible !important;
   position: absolute !important;
-  /* Anchor to the PLATE (scene-bottom), not the bar-wrap. The wrap is
-     hidden but the button escapes its bounds via the explicit inset
-     coords on the plate. */
+  /* Anchor to the PLATE (scene-bottom). */
   inset: 8px !important;
   top: 8px !important;
   right: 8px !important;
