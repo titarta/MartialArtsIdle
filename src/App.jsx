@@ -1873,7 +1873,7 @@ function AppInner() {
           onDone={() => dismiss(currentEvent.id)}
         />
       )}
-      {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} />}
+      {activeModal === 'shop'         && <BloodLotusShopModal  onClose={() => setActiveModal(null)} onBalanceChange={null} addToast={notifications.addToast} />}
       {activeModal === 'codex'        && (
         <CodexModal
           achievements={achievements}

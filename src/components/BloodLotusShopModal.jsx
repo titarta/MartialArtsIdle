@@ -61,10 +61,8 @@ function ratePerDollar(pkg) {
   return Math.round(pkg.amount / parseUsd(pkg.price));
 }
 
-export default function BloodLotusShopModal({ onClose, onBalanceChange }) {
+export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast }) {
   const [pending, setPending] = useState(null);
-  const [error,   setError]   = useState(null);
-  const [success, setSuccess] = useState(null);
   const [balance, setBalance] = useState(() => getBloodLotusBalance());
 
   // Live-sync the balance pip in the header. Balance changes (purchases,
@@ -75,28 +73,56 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange }) {
     return () => window.removeEventListener('blood-lotus-changed', refresh);
   }, []);
 
+  // Success / error routed through the global toast stack, NOT an inline
+  // bar inside the modal. The earlier inline bar pushed the pack grid
+  // down (broke the no-shift rule) and - more critically - sat at the
+  // TOP of the modal, so a player buying the bottom pack (Heaven's
+  // Fortune, T6) couldn't see the confirmation at all.
+  const fire = useCallback((toast) => {
+    if (typeof addToast === 'function') addToast(toast);
+  }, [addToast]);
+
   const buy = useCallback(async (pkg) => {
-    setError(null);
-    setSuccess(null);
     setPending(pkg.id);
     const result = await purchaseBloodLotus(pkg.id);
     setPending(null);
     if (result.ok) {
-      setSuccess(`+${pkg.amount.toLocaleString()} Blood Lotus added!`);
+      fire({
+        type:    'success',
+        kicker:  'Blood Lotus',
+        glyph:   '蓮',  // lotus
+        message: `+${pkg.amount.toLocaleString()} added`,
+        duration: 4500,
+      });
       setBalance(getBloodLotusBalance());
       onBalanceChange?.(getBloodLotusBalance());
     } else if (!result.cancelled) {
-      setError(result.error ?? 'Something went wrong.');
+      fire({
+        type:    'error',
+        kicker:  'Purchase failed',
+        glyph:   '失',  // loss / fail
+        message: result.error ?? 'Something went wrong.',
+        duration: 5500,
+      });
     }
-  }, [onBalanceChange]);
+  }, [onBalanceChange, fire]);
 
   const restore = useCallback(async () => {
-    setError(null);
     setPending('restore');
-    try { await restorePurchases(); }
-    catch (e) { setError(e?.message ?? 'Restore failed'); }
-    finally { setPending(null); }
-  }, []);
+    try {
+      await restorePurchases();
+    } catch (e) {
+      fire({
+        type:    'error',
+        kicker:  'Restore failed',
+        glyph:   '失',
+        message: e?.message ?? 'Restore failed',
+        duration: 5500,
+      });
+    } finally {
+      setPending(null);
+    }
+  }, [fire]);
 
   const basePkg = BLOOD_LOTUS_PACKAGES[0];
 
@@ -124,8 +150,12 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange }) {
           </div>
         </header>
 
-        {success && <div className="blshop-toast blshop-toast--success">{success}</div>}
-        {error   && <div className="blshop-toast blshop-toast--error">{error}</div>}
+        {/* (Inline success/error bar removed 2026-05-27. Was a fixed-
+            position div at the top of the modal that shifted the pack
+            grid down on appear/dismiss - broke the no-shift rule, and
+            was invisible when the player bought the bottom Heaven's
+            Fortune pack. Both outcomes now route through the global
+            toast stack via the `addToast` prop.) */}
 
         <div className="blshop-grid">
           {BLOOD_LOTUS_PACKAGES.map((pkg) => {
