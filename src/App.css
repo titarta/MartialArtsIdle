@@ -31407,7 +31407,9 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   transform: translateY(1px);
 }
 
-/* Inner parchment-cream panel - aged paper feel. */
+/* Inner parchment-cream panel - aged paper feel. Wider gap between
+   CTA + subtitle so the production button (which fills the full plate
+   inset:8px - taller than the design mockup) breathes properly. */
 .home-mb-edict .home-mb-inner {
   position: relative;
   width: 100%;
@@ -31417,7 +31419,7 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 8px;
   background:
     radial-gradient(ellipse at 50% 50%, rgba(255, 240, 200, 0.06), transparent 60%),
     linear-gradient(180deg, #ede0c2 0%, #d8c69e 100%);
@@ -31430,16 +31432,18 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 
 /* Calligraphic 突 watermark - deep brass, very faint, off-centre to
-   the left so the seal in the top-right doesn't fight it visually. */
+   the left so the seal in the top-right doesn't fight it visually.
+   Larger now that the production button has more vertical room than
+   the mockup; sits behind the text without clipping. */
 .home-mb-edict .home-mb-watermark {
   position: absolute;
-  top: 50%;
-  left: 26%;
-  transform: translate(-50%, -50%) scale(1.3);
+  top: 52%;
+  left: 28%;
+  transform: translate(-50%, -50%);
   font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
-  font-size: 90px;
+  font-size: 96px;
   font-weight: 400;
-  color: rgba(125, 80, 35, 0.12);
+  color: rgba(125, 80, 35, 0.13);
   pointer-events: none;
   user-select: none;
   z-index: 0;
@@ -31465,37 +31469,55 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .home-mb-edict .home-mb-dots::before { top: 4px;    left: 6px; }
 .home-mb-edict .home-mb-dots::after  { bottom: 4px; left: 6px; }
 
-/* BREAKTHROUGH copy - dark on cream. Need !important because v25 +
-   v27 + v29 all set color on .home-mb-cta to cream/cream-hot. */
-.home-mb-edict .home-mb-cta {
+/* BREAKTHROUGH copy - dark on cream. Selectors scoped through
+   .home-scene-bottom .home-bar-wrap to MATCH the specificity of the
+   v26/v27/v29 rules (which use .home-scene-bottom .home-bar-wrap:has
+   (...) chains, specificity ~0,4,0). With matching specificity +
+   !important + later source order, ours wins.
+   Bumped up from the mockup's 19px because the production button
+   fills the whole plate (~121px tall on 375w iPhone 13) - the
+   mockup was at ~84px so this needs more headline weight to fill. */
+.home-scene-bottom .home-bar-wrap .home-mb-edict .home-mb-cta {
   position: relative;
   z-index: 1;
   font-family: 'Cinzel', serif !important;
-  font-size: 19px !important;
+  font-size: 22px !important;
   font-weight: 800 !important;
   letter-spacing: 0.26em !important;
   text-transform: uppercase;
   color: #4a2810 !important;
   text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55) !important;
   line-height: 1.05 !important;
+  /* Pad right slightly so a fat letter doesn't crash into the seal at
+     narrow viewports. The seal sits ~44px from the right edge of the
+     panel; this keeps a 6px breathing margin. */
+  padding: 0 16px !important;
+  text-align: center;
 }
-.home-mb-edict .home-mb-next {
+.home-scene-bottom .home-bar-wrap .home-mb-edict .home-mb-next {
   position: relative;
   z-index: 1;
   font-family: 'Cinzel', serif !important;
-  font-size: 10.5px !important;
+  font-size: 11px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.16em !important;
+  /* Tighter tracking than CTA (0.10em vs 0.26em) so the full realm
+     name like 'QI TRANSFORMATION · EARLY STAGE' fits inside the
+     panel without ellipsis (the seal occupies ~44px of the right
+     edge, so usable text width is ~215px on 375w iPhone 13). */
+  letter-spacing: 0.10em !important;
   text-transform: uppercase !important;
   color: rgba(74, 40, 16, 0.78) !important;
   text-shadow: none !important;
-  margin-top: 2px !important;
-  /* Tighten if a long realm name would wrap on a narrow viewport. */
-  max-width: 92%;
+  margin-top: 0 !important;
+  /* Pull the text inward from the seal zone on the right and the
+     left dots zone. */
+  padding: 0 14px !important;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.1 !important;
+  text-align: center;
 }
 
 /* Vermillion imperial seal stamp - sits in the upper-right corner,

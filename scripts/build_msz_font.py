@@ -43,12 +43,15 @@ from fontTools.ttLib import TTFont
 #   玉 道                          : spark seal fallbacks (QiSparkChoiceModal.jsx)
 #   灵 神                          : reserved for future plaque variants
 #   凰 龍 玄                       : legendary spark per-card seal glyphs
+#   突 印                          : breakthrough button Ceremonial Edict
+#                                    (HomeScreen.jsx - watermark + seal stamp)
 CHARS = sorted(set(
     "命元圣归虚道天"             # chapter glyphs
     + "体气分仙王源帝半"           # realm glyphs not already covered
     + "玉"                          # uncommon seal fallback
     + "灵神"                        # future plaques
     + "凰龍玄"                      # legendary seal per-spark variants
+    + "突印"                        # BT button: 突 watermark + 印 seal stamp
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.
