@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breakthrough button . redesign study . MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Ma+Shan+Zheng&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brass-edge:    #dcaf6e;
+  --brass-deep:    #8a5a28;
+  --brass-glow:    #ffcf83;
+  --brass-bright:  #ffe2a0;
+  --lacquer-1:     #1f1208;
+  --lacquer-2:     #150e07;
+  --lacquer-3:     #0c0805;
+  --cream:         #f5e6c8;
+  --cream-hot:     #fff8e0;
+  --vermillion:    #c83838;
+  --vermillion-hot:#ff5b5b;
+  --vermillion-deep:#8c1e1e;
+  --jade:          #4ea372;
+  --page-bg:       #181016;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(220, 175, 110, 0.06), transparent 60%),
+    var(--page-bg);
+  color: #e8d7c0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 36px 24px 80px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 0 0 6px;
+}
+h1 .sub {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 900px;
+  margin: 8px 0 36px;
+  color: rgba(232, 215, 192, 0.78);
+}
+.lede strong { color: var(--brass-edge); font-weight: 600; }
+.lede em { color: var(--vermillion-hot); font-style: normal; font-weight: 600; }
+
+/* ── Phone rail ──────────────────────────────────────────────────────── */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(4, 380px);
+  gap: 26px;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  scrollbar-color: #553c20 transparent;
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel-head { display: flex; align-items: baseline; gap: 10px; }
+.panel-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  color: var(--brass-edge);
+  border-radius: 2px;
+}
+.panel-tag.today { color: rgba(232, 215, 192, 0.55); }
+.panel-tag.A { color: #ffd28a; border-color: rgba(255, 210, 138, 0.6); background: rgba(220, 175, 110, 0.10); }
+.panel-tag.B { color: #ffb098; border-color: rgba(255, 140, 110, 0.55); background: rgba(200, 56, 56, 0.10); }
+.panel-tag.C { color: #b9d6a2; border-color: rgba(140, 220, 160, 0.55); background: rgba(74, 151, 120, 0.10); }
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--cream);
+}
+.panel-note {
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.72);
+  min-height: 100px;
+}
+.panel-note b { color: var(--cream); font-weight: 600; }
+
+/* ── Phone shell ─────────────────────────────────────────────────────── */
+.phone {
+  width: 380px;
+  height: 720px;
+  border-radius: 36px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: #0d0810;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 6px #050306 inset,
+    0 0 0 7px rgba(220, 175, 110, 0.10) inset;
+}
+.phone-glass {
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0e0a14 0%, #050307 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* TopBar stub */
+.tb {
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, #15101a 0%, #0d0810 100%);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.10);
+}
+.tb .pip { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffd76a 0%, #b07522 60%, #4a2f10 100%); border: 1px solid #b07522; }
+.tb .pip.qi { background: radial-gradient(circle at 35% 30%, #9ad0ff 0%, #3b6db5 60%, #1a3258 100%); border-color: #3b6db5; }
+.tb .label { font-size: 10px; color: rgba(220, 175, 110, 0.7); letter-spacing: 0.06em; font-weight: 600; margin-right: auto; }
+.tb .icon { width: 22px; height: 22px; border-radius: 6px; background: rgba(220, 175, 110, 0.10); border: 1px solid rgba(220, 175, 110, 0.20); }
+
+/* Faux cultivator scene — radial wash to imply the temple bg without
+   needing the real asset for the mockup. */
+.scene {
+  flex: 1 1 auto;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(120, 80, 50, 0.25), transparent 60%),
+    radial-gradient(ellipse at 50% 90%, rgba(50, 30, 20, 0.55), transparent 70%),
+    linear-gradient(180deg, #1b1218 0%, #100a0c 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 24px;
+}
+.cultivator {
+  /* Cultivator silhouette - just a placeholder */
+  width: 130px; height: 200px;
+  background: radial-gradient(circle at 50% 30%,
+    rgba(245, 230, 200, 0.32) 0 14%,
+    rgba(110, 160, 110, 0.55) 14% 56%,
+    rgba(60, 90, 60, 0.55) 56% 78%,
+    rgba(30, 40, 30, 0) 78%);
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+  margin-bottom: 6px;
+}
+.crystal {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px; height: 70px;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(120, 200, 255, 0.85) 0 30%,
+    rgba(60, 140, 230, 0.55) 30% 70%,
+    transparent 70%);
+  border-radius: 50% 50% 30% 30%;
+  filter: blur(0.5px) drop-shadow(0 0 12px rgba(120, 200, 255, 0.45));
+}
+
+/* Bottom plate — fixed-height area containing the BT button */
+.plate {
+  flex: 0 0 100px;
+  position: relative;
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.06) 0%,
+      transparent 14%),
+    linear-gradient(180deg, rgba(40, 22, 14, 0.95), rgba(18, 10, 8, 0.98));
+  border-top: 1px solid rgba(220, 175, 110, 0.20);
+  padding: 8px;
+}
+/* Inner button area — the BT button fills this with inset:8px */
+.btn-host { position: relative; width: 100%; height: 100%; }
+
+/* ───────────────────────── TODAY ─────────────────────────────────────── */
+.bt-today {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 220, 150, 0.92);
+  background:
+    linear-gradient(180deg, rgba(255, 215, 130, 0.18) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(125, 80, 35, 0.96) 0%, rgba(60, 36, 14, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(255, 207, 131, 0.62);
+}
+.bt-today .glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 36px;
+  color: var(--brass-bright);
+  text-shadow: 0 0 12px rgba(255, 207, 131, 0.75), 0 1px 0 rgba(0,0,0,0.55);
+  line-height: 1;
+}
+.bt-today .label {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  text-align: center;
+}
+.bt-today .label .cta {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: var(--cream-hot);
+  text-shadow: 0 0 12px rgba(255, 207, 131, 0.75), 0 1px 2px rgba(0,0,0,0.92);
+  line-height: 1;
+}
+.bt-today .label .next {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 230, 180, 0.92);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  white-space: nowrap;
+}
+.bt-today .label .next .glyph-cn {
+  font-family: 'Ma Shan Zheng', serif;
+  color: var(--brass-bright);
+  font-size: 13px;
+  margin-right: 4px;
+}
+
+/* Triangle (▲) glyph used today */
+.bt-today .glyph.tri { font-family: 'Cinzel', serif; font-size: 22px; }
+
+/* ──────────────── A) HEAVENS PARTING ──────────────────────────────────
+   Calligraphic 突 watermark fills the back of the button, vermillion
+   underglow always pulsing slow (heartbeat), brass border + brass text
+   sits on top. Reads as "the heavens are calligraphing your name". */
+.bt-A {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--brass-edge);
+  background:
+    linear-gradient(180deg, rgba(255, 215, 130, 0.16) 0%, transparent 30%),
+    linear-gradient(180deg, rgba(125, 80, 35, 0.96) 0%, rgba(60, 36, 14, 0.96) 100%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(255, 207, 131, 0.55);
+  animation: bt-a-heartbeat 3.4s ease-in-out infinite;
+}
+.bt-A::before {
+  /* Calligraphic 突 watermark */
+  content: '突';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(1.4);
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 110px;
+  color: rgba(255, 240, 200, 0.10);
+  text-shadow:
+    0 0 18px rgba(255, 207, 131, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.40);
+  pointer-events: none;
+  line-height: 1;
+  z-index: 0;
+  animation: bt-a-watermark 6s ease-in-out infinite;
+}
+.bt-A::after {
+  /* Vermillion underglow that pulses behind */
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 14px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(200, 56, 56, 0.45) 0%, transparent 60%);
+  filter: blur(8px);
+  opacity: 0.65;
+  z-index: -1;
+  animation: bt-a-glow 3.4s ease-in-out infinite;
+}
+.bt-A > * { position: relative; z-index: 1; }
+.bt-A .ringL, .bt-A .ringR {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.2px solid var(--brass-bright);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  color: var(--brass-bright);
+  text-shadow: 0 0 6px rgba(255, 207, 131, 0.85);
+  background: radial-gradient(circle at 50% 40%, rgba(255, 215, 130, 0.22), transparent 70%);
+}
+.bt-A .label {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-align: center;
+}
+.bt-A .label .cta {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: var(--cream-hot);
+  text-shadow:
+    0 0 14px rgba(255, 207, 131, 0.85),
+    0 1px 2px rgba(0,0,0,0.92);
+  line-height: 1;
+}
+.bt-A .label .next {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass-bright);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  white-space: nowrap;
+}
+@keyframes bt-a-heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.015); }
+}
+@keyframes bt-a-glow {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 0.92; }
+}
+@keyframes bt-a-watermark {
+  0%, 100% { color: rgba(255, 240, 200, 0.10); }
+  50%      { color: rgba(255, 240, 200, 0.18); }
+}
+
+/* ──────────────── B) CEREMONIAL EDICT ─────────────────────────────────
+   Imperial sealed-scroll vibe. Parchment-cream center panel inside a
+   brass border, dark Cinzel BREAKTHROUGH + next realm in the center,
+   a vermillion seal 印 stamps onto the upper-right corner on arrival
+   (and stays). Fine mandala etching along the inner edge. Reads as
+   "the heavens have approved your ascension - here is the edict". */
+.bt-B {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 12px;
+  background:
+    /* Outer brass frame */
+    linear-gradient(180deg,
+      #d4a866 0%,
+      #b88a48 30%,
+      #8a5a28 70%,
+      #5a3a1a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.65),
+    0 0 22px rgba(255, 207, 131, 0.45);
+}
+.bt-B-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3px;
+  /* Aged parchment cream */
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 240, 200, 0.06), transparent 60%),
+    linear-gradient(180deg, #ede0c2 0%, #d8c69e 100%);
+  /* Fine etched border line just inside */
+  box-shadow:
+    inset 0 0 0 1px rgba(125, 80, 35, 0.45),
+    inset 0 0 0 2px transparent,
+    inset 0 0 0 3px rgba(125, 80, 35, 0.20);
+  overflow: hidden;
+}
+.bt-B-inner::before {
+  /* Subtle 突 watermark in deep brass */
+  content: '突';
+  position: absolute;
+  top: 50%; left: 26%;
+  transform: translate(-50%, -50%) scale(1.3);
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 90px;
+  color: rgba(125, 80, 35, 0.12);
+  pointer-events: none;
+  z-index: 0;
+  line-height: 1;
+}
+.bt-B .cta {
+  position: relative;
+  z-index: 1;
+  font-family: 'Cinzel', serif;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  color: #4a2810;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55);
+  line-height: 1;
+}
+.bt-B .next {
+  position: relative;
+  z-index: 1;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(74, 40, 16, 0.78);
+}
+/* The vermillion seal stamp - rotated chop in the upper-right corner. */
+.bt-B-seal {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #c83838 0%, #8c1e1e 100%);
+  border: 1.5px solid #a02020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-8deg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 180, 0.45),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+  z-index: 2;
+  animation: bt-b-stamp 0.7s cubic-bezier(0.34, 1.6, 0.64, 1) 1 backwards;
+}
+.bt-B-seal-glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff5d0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+  line-height: 1;
+}
+@keyframes bt-b-stamp {
+  0%   { transform: rotate(-8deg) scale(3); opacity: 0; }
+  60%  { transform: rotate(-8deg) scale(1.18); opacity: 1; }
+  100% { transform: rotate(-8deg) scale(1); opacity: 1; }
+}
+/* Mandala dots in the inner panel corners — fine etched detail */
+.bt-B-dots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.bt-B-dots::before, .bt-B-dots::after {
+  content: '◆';
+  position: absolute;
+  font-size: 7px;
+  color: rgba(125, 80, 35, 0.50);
+}
+.bt-B-dots::before { top: 4px; left: 6px; }
+.bt-B-dots::after  { bottom: 4px; left: 6px; }
+
+/* ──────────────── C) CRYSTAL GATE ─────────────────────────────────────
+   Closest to today + atmospheric polish: diagonal vermillion shimmer
+   sweeps every 4s, soft always-on underglow pulses with the beat,
+   subtle inhale/exhale breathing. Restrained - sells "the gate is
+   humming, ready to crack open" without redoing the whole shape. */
+.bt-C {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--brass-bright);
+  background:
+    linear-gradient(180deg, rgba(255, 215, 130, 0.18) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(125, 80, 35, 0.96) 0%, rgba(60, 36, 14, 0.96) 100%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(255, 207, 131, 0.62);
+  animation: bt-c-breathe 4.2s ease-in-out infinite;
+}
+.bt-C::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 170, 120, 0.18) 47%,
+    rgba(255, 180, 120, 0.50) 50%,
+    rgba(255, 170, 120, 0.18) 53%,
+    transparent 70%);
+  background-size: 220% 100%;
+  background-position: 200% 0;
+  mix-blend-mode: screen;
+  animation: bt-c-shimmer 4.2s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.bt-C::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 100%,
+    rgba(200, 56, 56, 0.40) 0%,
+    transparent 60%);
+  filter: blur(6px);
+  opacity: 0.6;
+  z-index: -1;
+  animation: bt-c-underglow 4.2s ease-in-out infinite;
+}
+.bt-C > * { position: relative; z-index: 1; }
+.bt-C .glyph {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 32px;
+  color: var(--brass-bright);
+  text-shadow: 0 0 12px rgba(255, 207, 131, 0.85), 0 1px 0 rgba(0,0,0,0.55);
+  line-height: 1;
+}
+.bt-C .label {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  text-align: center;
+}
+.bt-C .label .cta {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: var(--cream-hot);
+  text-shadow: 0 0 14px rgba(255, 207, 131, 0.85), 0 1px 2px rgba(0,0,0,0.92);
+  line-height: 1;
+}
+.bt-C .label .next {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 230, 180, 0.92);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  white-space: nowrap;
+}
+@keyframes bt-c-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -120% 0; }
+}
+@keyframes bt-c-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.012); }
+}
+@keyframes bt-c-underglow {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
+}
+
+/* ── Summary ─────────────────────────────────────────────────────────── */
+.summary {
+  margin-top: 56px;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  border-left: 3px solid #ffd28a;
+  border-radius: 4px;
+  background: rgba(10, 6, 10, 0.55);
+  padding: 22px 26px;
+  max-width: 1200px;
+}
+.summary h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: var(--cream);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.summary p { margin: 6px 0; }
+.summary p b { color: var(--cream); }
+.summary p em { color: #ffd28a; font-style: normal; }
+.summary table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.summary th, .summary td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.10);
+  vertical-align: top;
+}
+.summary th {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(220, 175, 110, 0.80);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.summary td:first-child { font-weight: 600; color: var(--cream); width: 180px; }
+.summary tr.win { background: rgba(220, 175, 110, 0.05); }
+.summary tr.win td:first-child { color: #ffd28a; }
+.tick  { color: #b9d6a2; font-weight: 800; }
+.meh   { color: #d9b67c; font-weight: 800; }
+</style>
+</head>
+<body>
+
+<h1>Breakthrough button . design study
+  <span class="sub">make the gate moment land harder . 2026-05-27</span>
+</h1>
+
+<p class="lede">
+  Today's button works but feels like a <strong>solid brass cartouche</strong> at a moment that should feel like <em>the heavens are letting you cross over</em>. Three directions below, all keeping the existing fixed-shape full-plate footprint so we don't break the no-shift bottom-plate rule. Pick one as a base and we can polish further.
+</p>
+
+<div class="rail">
+
+  <!-- ─────────── TODAY ─────────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag today">Today</span>
+      <span class="panel-title">Brass cartouche</span>
+    </div>
+    <div class="panel-note">
+      Solid warm-brass plate with two flanking <b>▲</b> glyphs, Cinzel BREAKTHROUGH, next-realm subtitle. Static. Functional, but reads as "a button" rather than "a ceremonial moment in your cultivation".
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div><div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div><div class="icon"></div>
+        </div>
+        <div class="scene">
+          <div class="crystal"></div>
+          <div class="cultivator"></div>
+        </div>
+        <div class="plate">
+          <div class="btn-host">
+            <button class="bt-today">
+              <span class="glyph tri">▲</span>
+              <span class="label">
+                <span class="cta">BREAKTHROUGH</span>
+                <span class="next">Immortal Ascension · 1st Stage</span>
+              </span>
+              <span class="glyph tri">▲</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────── A) HEAVENS PARTING ─────────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag A">Option A</span>
+      <span class="panel-title">Heavens Parting</span>
+    </div>
+    <div class="panel-note">
+      Large <b>突</b> (sudden / breakthrough) calligraphic watermark behind the text + always-on vermillion underglow pulsing on a 3.4s heartbeat. Flanking ▲ become small brass medallions. Same brass + lacquer body, just <em>alive</em>. Reads: "the gate is breathing".
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div><div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div><div class="icon"></div>
+        </div>
+        <div class="scene">
+          <div class="crystal"></div>
+          <div class="cultivator"></div>
+        </div>
+        <div class="plate">
+          <div class="btn-host">
+            <button class="bt-A">
+              <span class="ringL">突</span>
+              <span class="label">
+                <span class="cta">BREAKTHROUGH</span>
+                <span class="next">Immortal Ascension · 1st Stage</span>
+              </span>
+              <span class="ringR">突</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────── B) CEREMONIAL EDICT ─────────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag B">Option B</span>
+      <span class="panel-title">Ceremonial Edict</span>
+    </div>
+    <div class="panel-note">
+      Imperial sealed-scroll vibe. Parchment-cream inner panel inside a thick brass frame, dark Cinzel text, fine 突 watermark, mandala dots in the corners, and a vermillion <b>seal stamp 印</b> that <em>stamps</em> down rotated when the button arrives (scale 3 → 1 with rotation, 0.7s ease-back). Most dramatic. Most ceremonial.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div><div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div><div class="icon"></div>
+        </div>
+        <div class="scene">
+          <div class="crystal"></div>
+          <div class="cultivator"></div>
+        </div>
+        <div class="plate">
+          <div class="btn-host">
+            <button class="bt-B">
+              <div class="bt-B-inner">
+                <div class="bt-B-dots"></div>
+                <span class="cta">BREAKTHROUGH</span>
+                <span class="next">Immortal Ascension · 1st Stage</span>
+              </div>
+              <span class="bt-B-seal"><span class="bt-B-seal-glyph">印</span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────── C) CRYSTAL GATE ─────────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag C">Option C</span>
+      <span class="panel-title">Crystal Gate (subtle)</span>
+    </div>
+    <div class="panel-note">
+      Closest to today + atmospheric polish: <b>warm shimmer pass</b> sweeps diagonally every 4.2s, always-on vermillion underglow, gentle <b>inhale/exhale breathing</b> (1.012× scale). Identical silhouette, more "alive". Lowest-risk option - same shape, just better feel.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <div class="pip"></div><div class="pip qi"></div>
+          <div class="label">SEPARATION & REUNION</div>
+          <div class="icon"></div><div class="icon"></div>
+        </div>
+        <div class="scene">
+          <div class="crystal"></div>
+          <div class="cultivator"></div>
+        </div>
+        <div class="plate">
+          <div class="btn-host">
+            <button class="bt-C">
+              <span class="glyph">突</span>
+              <span class="label">
+                <span class="cta">BREAKTHROUGH</span>
+                <span class="next">Immortal Ascension · 1st Stage</span>
+              </span>
+              <span class="glyph">突</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <h2>Verdict matrix</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Direction</th>
+        <th>Ceremony</th>
+        <th>Boldness</th>
+        <th>Implementation</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Today</td>
+        <td><span class="meh">~</span></td>
+        <td><span class="meh">~</span></td>
+        <td><span class="tick">✓</span> Already there</td>
+        <td>Reads as "a button"</td>
+      </tr>
+      <tr>
+        <td>A . Heavens Parting</td>
+        <td><span class="tick">✓✓</span></td>
+        <td><span class="tick">✓</span></td>
+        <td>~10 lines CSS + 突 char</td>
+        <td>Restrained vermillion underglow + watermark sells the cultivation theme without redrawing the button shape. <b>Best balance of impact + safety.</b></td>
+      </tr>
+      <tr>
+        <td>B . Ceremonial Edict</td>
+        <td><span class="tick">✓✓✓</span></td>
+        <td><span class="tick">✓✓✓</span></td>
+        <td>~40 lines CSS + JSX restructure</td>
+        <td>Most striking. Reads as "imperial proclamation". The seal stamp on arrival is the memorable beat. Bigger commit.</td>
+      </tr>
+      <tr>
+        <td>C . Crystal Gate</td>
+        <td><span class="tick">✓</span></td>
+        <td><span class="meh">~</span></td>
+        <td>~6 lines CSS, no JSX change</td>
+        <td>Shimmer + breathing on the existing shape. Lowest risk, most polish-per-line.</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top:14px;">
+    <b>My recommendation: <em>Option A (Heavens Parting)</em></b>. Restrained but distinctly Sanctum - the 突 watermark + vermillion heartbeat say "this is a moment your cultivator crossed over", not "you tapped a button". Doesn't require any JSX restructure (just CSS + swap the ▲ glyph for 突). Worth pushing to <em>B</em> if we want a real "calling card" moment, but only after we've seen A in motion.
+  </p>
+</div>
+
+</body>
+</html>
