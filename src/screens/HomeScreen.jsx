@@ -1168,7 +1168,17 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
         </button>
         <div
           className="home-crystal-img-wrap"
-          style={{ '--spark-hue': `${vfxHue}deg`, '--spark-sat': vfxSat }}
+          style={{
+            '--spark-hue': `${vfxHue}deg`,
+            '--spark-sat': vfxSat,
+            // Crystal sprite URL exposed as a CSS var so the overcharge
+            // red-tint pseudo-element (defined in App.css) can render
+            // the SAME crystal silhouette on top of the actual img -
+            // producing a red-tinted overlay that pulses in/out via
+            // opacity. The CSS overlay is keyed off the
+            // `.home-crystal-overcharged` class on the img below.
+            '--crystal-src': `url(${BASE}crystals/crystal_${tier}.png)`,
+          }}
         >
           <img
             ref={crystalImgRef}

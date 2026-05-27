@@ -6655,46 +6655,86 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
    Asymmetric "heartbeat" curve - quick bloom (0 -> ~25% of cycle) then
    slow recovery so each beat reads as discrete, not a smooth sine.
    Cycle 2.6s.
-   2026-05-28: dropped the hue-rotate(50deg) gold pulse in favour of a
-   vermillion-red drop-shadow halo. Hue-rotate looked inconsistent
-   across crystal tiers (each tier has its own native hue, so a fixed
-   50deg rotation landed on a different colour per tier). The red halo
-   leaves the crystal's native colour intact and just radiates
-   vermillion "ready" light around it - consistent across every tier
-   AND on-brand with the rest of the game's vermillion accent
-   vocabulary (price chips, BT seal, gate-rate text). Crystal still
-   inhales (+6% scale) and gets a small brightness lift; the colour
-   signal is purely the surrounding halo. */
+
+   2026-05-28 v3: user wants a red FILTER applied on top of the
+   crystal (not a hue shift, not a back halo). The crystal IMG itself
+   keeps a tiny inhale scale + brightness lift. The red tint is
+   delivered by a pseudo-element overlay on the .home-crystal-img-wrap
+   (defined below) - it renders the same crystal sprite (via the
+   --crystal-src CSS var set in HomeScreen.jsx) with a red filter,
+   pulsing in via opacity. Clipped to the crystal silhouette because
+   the overlay IS a tinted copy of the same sprite, so transparent
+   areas stay transparent.
+
+   v3 rationale:
+     . hue-rotate(50deg) [v1]: inconsistent across tiers (each tier
+       has its own native hue, so a fixed rotation landed on a
+       different colour per tier)
+     . drop-shadow halo [v2]: was "red light radiating from behind"
+       not "red filter on the crystal"
+     . tinted-sprite overlay [v3, this]: the crystal itself visibly
+       reddens in pulse, the silhouette stays crisp, works across
+       every tier
+*/
 @keyframes home-crystal-overcharge-pulse {
-  0% {
-    filter:
-      brightness(1.05) saturate(1.05)
-      drop-shadow(0 0 6px rgba(255, 91, 91, 0.30));
-    transform: scale(1);
-  }
-  25% {
-    filter:
-      brightness(1.16) saturate(1.10)
-      drop-shadow(0 0 14px rgba(255, 91, 91, 0.95))
-      drop-shadow(0 0 28px rgba(200, 56, 56, 0.55));
-    transform: scale(1.06);
-  }
-  70% {
-    filter:
-      brightness(1.06) saturate(1.06)
-      drop-shadow(0 0 8px rgba(255, 91, 91, 0.40));
-    transform: scale(1.005);
-  }
-  100% {
-    filter:
-      brightness(1.05) saturate(1.05)
-      drop-shadow(0 0 6px rgba(255, 91, 91, 0.30));
-    transform: scale(1);
-  }
+  0%   { filter: brightness(1.05); transform: scale(1);     }
+  25%  { filter: brightness(1.15); transform: scale(1.05);  }
+  70%  { filter: brightness(1.06); transform: scale(1.005); }
+  100% { filter: brightness(1.05); transform: scale(1);     }
 }
 .home-crystal-img.home-crystal-overcharged {
   animation: home-crystal-overcharge-pulse 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
   transform-origin: center;
+}
+
+/* Red-tint overlay pseudo. Renders the same crystal sprite (URL from
+   the --crystal-src CSS var set inline on the wrap in HomeScreen.jsx)
+   filter-tinted to red. Opacity pulses 0 -> 0.78 -> 0 over the same
+   2.6s cycle as the img, with the peak landing at 25% to match the
+   heartbeat curve. Since the overlay IS the crystal sprite, alpha
+   matches the silhouette exactly - no red bleed into transparent
+   corners. */
+.home-crystal-img-wrap {
+  position: relative;
+}
+.home-crystal-img-wrap:has(.home-crystal-overcharged)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--crystal-src);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* sepia -> hue-rotate -> saturate -> brightness chain converts ANY
+     crystal tier (blue, violet, gold, etc.) into a consistent deep
+     red. sepia removes original hue first, hue-rotate aims the
+     resulting tan at red, saturate cranks vermillion intensity. */
+  filter:
+    sepia(1)
+    hue-rotate(-30deg)
+    saturate(7)
+    brightness(0.85);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  animation: home-crystal-overcharge-tint 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  /* Match the img's transform-origin so a future scale on the
+     overlay (if added) lines up with the img's inhale. */
+  transform-origin: center;
+}
+@keyframes home-crystal-overcharge-tint {
+  0%   { opacity: 0;    }
+  25%  { opacity: 0.78; }
+  70%  { opacity: 0.12; }
+  100% { opacity: 0;    }
+}
+
+/* Reduced-motion users: skip both pulses. */
+@media (prefers-reduced-motion: reduce) {
+  .home-crystal-img.home-crystal-overcharged,
+  .home-crystal-img-wrap:has(.home-crystal-overcharged)::after {
+    animation: none !important;
+  }
 }
 
 /* ── Divine Qi — golden orb ─────────────────────────────────────────────── */
