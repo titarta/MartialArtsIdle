@@ -103,28 +103,26 @@ function SkinCard({ item, balance, onBuy, busy }) {
         <span className="bls-skin-card-slot">{slotLabel(item.cosmeticSlot)}</span>
       </div>
 
-      <div className="bls-skin-proc">
-        <div className="bls-skin-proc-row" style={{ '--stage-count': totalCount }}>
-          {sprites.map((src, i) => (
-            <div
-              key={i}
-              className={`bls-skin-stage${i >= revealed ? ' bls-skin-stage-shadow' : ''}`}
-              style={{ '--stage-index': i }}
-            >
-              {/* Two layered images: colored one (shown for first 3),
-                  silhouette one (shown for the rest via the .shadow
-                  class). CSS picks the right layer per stage. */}
-              <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
-              <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
-            </div>
-          ))}
-        </div>
-        {/* Veil line marks where the surprise begins (between stage 3 and 4) */}
-        <span
-          className="bls-skin-proc-veil-line"
-          style={{ left: `calc(${(revealed / totalCount) * 100}%)` }}
-          aria-hidden="true"
-        />
+      {/* Procession — two layered images per stage (colour + silhouette).
+          CSS ramps the silhouette opacity by --stage-index so stage 1 is
+          full colour, stage 2 ~33% silhouette, stage 3 ~67% silhouette,
+          stage 4+ fully silhouetted. data-slot picks the right breathing
+          animation (character bob vs crystal glow). */}
+      <div
+        className="bls-skin-proc"
+        data-slot={item.cosmeticSlot}
+        style={{ '--stage-count': totalCount }}
+      >
+        {sprites.map((src, i) => (
+          <div
+            key={i}
+            className="bls-skin-stage"
+            style={{ '--stage-index': i }}
+          >
+            <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+            <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
+          </div>
+        ))}
       </div>
 
       <div className="bls-skin-card-foot">
@@ -172,15 +170,19 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
           const sprites = getSkinSprites(c).slice(0, 6);
           return (
             <div className="bls-bundle-piece" key={c.id}>
-              <div className="bls-bundle-piece-mini">
+              <div
+                className="bls-skin-proc bls-skin-proc-mini"
+                data-slot={c.cosmeticSlot}
+                style={{ '--stage-count': sprites.length }}
+              >
                 {sprites.map((src, i) => (
                   <div
                     key={i}
-                    className={`bls-skin-stage bls-skin-stage-mini${i >= 3 ? ' bls-skin-stage-shadow' : ''}`}
+                    className="bls-skin-stage"
                     style={{ '--stage-index': i }}
                   >
                     <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
-                    <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
                   </div>
                 ))}
               </div>
@@ -341,15 +343,19 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
           (() => {
             const sprites = getSkinSprites(item).slice(0, 5);
             return (
-              <div className="sbz-featured-preview-procession">
+              <div
+                className="bls-skin-proc bls-skin-proc-mini"
+                data-slot={item.cosmeticSlot}
+                style={{ '--stage-count': sprites.length }}
+              >
                 {sprites.map((src, i) => (
                   <div
                     key={i}
-                    className={`bls-skin-stage bls-skin-stage-feat${i >= 3 ? ' bls-skin-stage-shadow' : ''}`}
+                    className="bls-skin-stage"
                     style={{ '--stage-index': i }}
                   >
                     <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
-                    <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
                   </div>
                 ))}
               </div>

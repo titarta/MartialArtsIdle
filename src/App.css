@@ -30887,102 +30887,149 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   white-space: nowrap;
 }
 
-/* Procession (13 stages for cultivator, 10 for crystal, 6 for the
-   particle/backdrop placeholder). First 3 = colour, rest = silhouette
-   behind a soft mist veil. */
+/* Procession — ported from the legacy .bls-procession block (which the
+   first v2 rewrite accidentally regressed into a binary color/silhouette
+   toggle). The old version had three nuances worth preserving:
+     . Stage 1 is full colour; stages 2 + 3 ramp linearly toward full
+       silhouette (smooth fade, not a hard cutoff at stage 4).
+     . Subtle scale growth per stage (1.00 → 1.06 at last) so deeper
+       stages "loom" slightly larger - reads as evolution, not just
+       "more of the same".
+     . Long-cycle breathing: character bob (10s, movement in first
+       ~25%, then HOLD ~7.5s) staggered per stage; crystal glow (12s,
+       pulse in first ~25%, then HOLD). Long rests so the shop never
+       feels relentless. */
 .bls-skin-proc {
   position: relative;
-  height: 92px;
+  width: 100%;
+  height: 100px;
+  padding: 8px 0 6px;
   margin: 4px 0 10px;
-  padding: 6px 0;
+  background: linear-gradient(180deg, rgba(34, 26, 44, 0.65), rgba(22, 16, 32, 0.65));
   border-radius: 8px;
-  background:
-    radial-gradient(ellipse at 50% 60%,
-      rgba(220, 175, 110, 0.06),
-      transparent 60%),
-    rgba(8, 4, 8, 0.55);
-  border: 1px solid rgba(220, 175, 110, 0.14);
   overflow: hidden;
+  /* Per-stage sprite dimensions. Tuned so 13 stages fit a ~340px
+     content area without horizontal scroll, with visible overlap. */
+  --proc-w: 42px;
+  --proc-h: 52px;
+  --proc-pad: 12px;
 }
-/* Mist veil — fades the silhouette stages further into the dark so the
-   "mystery deepens" reading is unmistakable. */
-.bls-skin-proc::before {
-  content: '';
+/* Crystal slot — crystals are visually more compact than humanoid
+   silhouettes, so bump the slot a touch larger to read cleanly. */
+.bls-skin-proc[data-slot="crystal"] {
+  --proc-w: 50px;
+  --proc-h: 58px;
+}
+
+/* Mini variant (bundle pieces) - smaller box, smaller sprites. */
+.bls-skin-proc-mini {
+  height: 60px;
+  padding: 6px 0 4px;
+  margin: 0;
+  --proc-w: 22px;
+  --proc-h: 32px;
+  --proc-pad: 6px;
+}
+.bls-skin-proc-mini[data-slot="crystal"] {
+  --proc-w: 26px;
+  --proc-h: 36px;
+}
+
+/* Per-stage wrapper — owns positioning + scale. Holds two image layers
+   (colour underneath, silhouette on top); the silhouette's opacity is
+   the ramp, NOT a display toggle. */
+.bls-skin-stage {
   position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 72%;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(8, 4, 12, 0.30) 30%,
-    rgba(8, 4, 12, 0.50) 100%);
+  bottom: 6px;
+  /* Distribute LEFT edges evenly across the available width so the
+     first stage starts at left=PAD and the last stage's RIGHT edge
+     sits at right=PAD. */
+  left: calc(
+    var(--proc-pad) +
+    var(--stage-index, 0) *
+    ((100% - 2 * var(--proc-pad) - var(--proc-w)) / max(1, calc(var(--stage-count, 1) - 1)))
+  );
+  width: var(--proc-w);
+  height: var(--proc-h);
+  transform-origin: bottom center;
+  /* Subtle growth with depth: stage 0 = 1.00, last stage = 1.06. */
+  transform: scale(calc(
+    1 + (var(--stage-index, 0) * (0.06 / max(1, calc(var(--stage-count, 1) - 1))))
+  ));
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7));
+}
+
+/* Both layers stack on top of each other inside the wrapper, with
+   the same fit + bottom anchor so they line up pixel-perfect. */
+.bls-skin-stage-color,
+.bls-skin-stage-silhouette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
   pointer-events: none;
-  z-index: 1;
 }
-.bls-skin-proc-row {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  height: 100%;
-  padding: 0 10px;
-  position: relative;
+.bls-skin-stage-color { z-index: 1; }
+.bls-skin-stage-silhouette {
   z-index: 2;
-}
-
-.bls-skin-stage {
-  position: relative;
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: flex-end;
-  justify-content: center;
-  height: 100%;
-}
-/* The sprite scales with --stage-index so the procession grows
-   left-to-right - small at t1, large at the final stage. We cap at
-   a sensible max so 13 stages still fit at 320px viewport width. */
-.bls-skin-stage {
-  width: calc(20px + var(--stage-index, 0) * 0.6px);
-  max-width: 28px;
-}
-.bls-skin-stage img {
-  width: auto;
-  height: calc(34px + var(--stage-index, 0) * 3.5px);
-  max-height: 82px;
-  display: block;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
-}
-.bls-skin-stage-color    { display: block; }
-.bls-skin-stage-shadow-img { display: none; }
-/* Silhouette stages: hide the colored layer, show a black silhouette
-   (achieved with brightness 0 + a faint rim drop-shadow). */
-.bls-skin-stage-shadow .bls-skin-stage-color    { display: none; }
-.bls-skin-stage-shadow .bls-skin-stage-shadow-img {
-  display: block;
+  /* Use the project-wide SVG silhouette filter defined in App.jsx
+     (#mai-silhouette) - it crushes everything to a single dark tone
+     while preserving the alpha shape, much cleaner than brightness(0)
+     which can leave coloured fringes on partially transparent edges. */
   filter:
-    brightness(0)
-    drop-shadow(0 0 3px rgba(0, 0, 0, 0.85));
-  opacity: 0.92;
+    url(#mai-silhouette)
+    drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+  /* Linear opacity ramp clamped at 1:
+       i=0 (stage 1): 0    → only colour visible
+       i=1 (stage 2): 0.33 → mostly colour, hint of silhouette creeping in
+       i=2 (stage 3): 0.67 → mostly silhouette, hint of colour bleeding
+       i=3 (stage 4): 1.00 → fully silhouetted, no colour
+       i=4+: 1.00          → clamped, stays fully silhouetted */
+  opacity: min(1, calc(var(--stage-index, 0) / 3));
 }
 
-/* Mini procession (used in bundle cards). Smaller scale. */
-.bls-skin-stage-mini { width: 12px; max-width: 14px; }
-.bls-skin-stage-mini img { height: calc(20px + var(--stage-index, 0) * 2px); max-height: 38px; }
+/* ── Subtle breathing animations — character bob + crystal glow ──────
+   Long-cycle (10-12s) with movement only in the first ~25% of each
+   cycle; the rest is a HOLD so the shop reads as alive but never
+   relentless. Forward propagation per stage so the wave starts at the
+   front (most-revealed) sprite and travels back into the silhouettes. */
+@keyframes bls-skin-char-bob {
+  0%   { translate: 0 0;    }
+  12%  { translate: 0 -3px; }  /* peak */
+  25%  { translate: 0 0;    }  /* settled */
+  100% { translate: 0 0;    }  /* HOLD ~7.5s before restart */
+}
+.bls-skin-proc[data-slot="character"] .bls-skin-stage {
+  /* `translate` composes cleanly with the existing transform: scale(). */
+  animation: bls-skin-char-bob 10s ease-in-out infinite;
+  animation-delay: calc(var(--stage-index, 0) * 0.6s);
+}
 
-/* Featured-hero procession (slightly larger for the hero card). */
-.bls-skin-stage-feat { width: 18px; max-width: 24px; }
-.bls-skin-stage-feat img { height: calc(32px + var(--stage-index, 0) * 4px); max-height: 64px; }
+@keyframes bls-skin-crystal-glow {
+  0%, 25%, 100% {
+    filter:
+      drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7))
+      drop-shadow(0 0 3px  rgba(180, 130, 255, 0.28));
+  }
+  12% {
+    filter:
+      drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7))
+      drop-shadow(0 0 12px rgba(180, 130, 255, 0.70));
+  }
+}
+.bls-skin-proc[data-slot="crystal"] .bls-skin-stage {
+  animation: bls-skin-crystal-glow 12s ease-in-out infinite;
+  animation-delay: calc(var(--stage-index, 0) * 0.5s);
+}
 
-/* Veil line marks the boundary between revealed-3 and silhouetted rest.
-   left-coord is set inline (calc % of revealed/total). */
-.bls-skin-proc-veil-line {
-  position: absolute;
-  top: 8px; bottom: 8px;
-  width: 1px;
-  background: linear-gradient(180deg,
-    transparent 0%,
-    rgba(220, 175, 110, 0.45) 30%,
-    rgba(220, 175, 110, 0.45) 70%,
-    transparent 100%);
-  z-index: 3;
+/* Reduced-motion users: kill the alive animations entirely. */
+@media (prefers-reduced-motion: reduce) {
+  .bls-skin-proc[data-slot="character"] .bls-skin-stage,
+  .bls-skin-proc[data-slot="crystal"]   .bls-skin-stage {
+    animation: none !important;
+  }
 }
 
 .bls-skin-card-foot {
