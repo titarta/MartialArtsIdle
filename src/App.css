@@ -6651,35 +6651,44 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   animation: home-crystal-spark-pop 560ms ease-out forwards;
 }
 
-/* Overcharged hue pulse on the crystal sprite.
-   Asymmetric "heartbeat" curve — quick bloom (0 → ~25% of cycle) then slow
-   recovery (rest of the cycle) so the eye reads each beat as a discrete
-   pulse rather than a smooth sine. Cycle 2.6s. Hue 50°, gold halo blooms
-   6 → 24px, +6% scale inhale, brightness +24%, saturate +50%.
-   Overrides the base .home-crystal-img glow animation while active. */
+/* Overcharged pulse on the crystal sprite.
+   Asymmetric "heartbeat" curve - quick bloom (0 -> ~25% of cycle) then
+   slow recovery so each beat reads as discrete, not a smooth sine.
+   Cycle 2.6s.
+   2026-05-28: dropped the hue-rotate(50deg) gold pulse in favour of a
+   vermillion-red drop-shadow halo. Hue-rotate looked inconsistent
+   across crystal tiers (each tier has its own native hue, so a fixed
+   50deg rotation landed on a different colour per tier). The red halo
+   leaves the crystal's native colour intact and just radiates
+   vermillion "ready" light around it - consistent across every tier
+   AND on-brand with the rest of the game's vermillion accent
+   vocabulary (price chips, BT seal, gate-rate text). Crystal still
+   inhales (+6% scale) and gets a small brightness lift; the colour
+   signal is purely the surrounding halo. */
 @keyframes home-crystal-overcharge-pulse {
   0% {
     filter:
-      brightness(1.05) saturate(1.05) hue-rotate(0deg)
-      drop-shadow(0 0 6px rgba(122, 220, 196, 0.45));
+      brightness(1.05) saturate(1.05)
+      drop-shadow(0 0 6px rgba(255, 91, 91, 0.30));
     transform: scale(1);
   }
   25% {
     filter:
-      brightness(1.24) saturate(1.50) hue-rotate(50deg)
-      drop-shadow(0 0 24px rgba(245, 175, 20, 1));
+      brightness(1.16) saturate(1.10)
+      drop-shadow(0 0 14px rgba(255, 91, 91, 0.95))
+      drop-shadow(0 0 28px rgba(200, 56, 56, 0.55));
     transform: scale(1.06);
   }
   70% {
     filter:
-      brightness(1.06) saturate(1.08) hue-rotate(2deg)
-      drop-shadow(0 0 8px rgba(160, 200, 180, 0.55));
+      brightness(1.06) saturate(1.06)
+      drop-shadow(0 0 8px rgba(255, 91, 91, 0.40));
     transform: scale(1.005);
   }
   100% {
     filter:
-      brightness(1.05) saturate(1.05) hue-rotate(0deg)
-      drop-shadow(0 0 6px rgba(122, 220, 196, 0.45));
+      brightness(1.05) saturate(1.05)
+      drop-shadow(0 0 6px rgba(255, 91, 91, 0.30));
     transform: scale(1);
   }
 }
