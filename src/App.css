@@ -6712,28 +6712,41 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* Red silhouette overlay pseudo. Paints a solid vermillion rectangle
    then masks it down to the crystal's silhouette - so the overlay is
-   the SHAPE of the crystal, filled flat red, with NO internal sprite
-   detail. Fades in/out via opacity to read as "a red stamp pulsing
-   on top of the crystal".
+   the SHAPE of the crystal, filled flat red. Combined with
+   mix-blend-mode: multiply, the deep vermillion DARKENS-AND-SHIFTS the
+   crystal's colours toward red instead of stamping a flat layer over
+   them, so internal detail (facets, highlights) reads through but the
+   crystal visibly pulses red.
 
    2026-05-28 v4: previous attempt (v3) used background-image + sepia
    /hue-rotate filter chain which produced an orange-yellow tint, not
    pure red, and rendered as another fully-detailed crystal copy
    layered on top - reading as "two crystals slightly offset" rather
-   than a tint. The mask approach below paints a flat solid colour
-   clipped to the silhouette; the crystal's own detail underneath
-   remains visible because the overlay opacity caps at 0.55 (NEVER
-   fully opaque). */
+   than a tint. The mask approach paints a flat solid colour clipped to
+   the silhouette.
+   2026-05-28 v5: v4's flat-blend + 0.55 opacity was too subtle on cool
+   crystals (blue + 0.55 flat red = muddy purple, barely visible).
+   Bumped peak opacity to 0.85 and switched to mix-blend-mode: multiply
+   with a deeper #d40808 vermillion so the red actually saturates the
+   crystal's colours during the heartbeat. */
 .home-crystal-img-wrap {
   position: relative;
 }
 .home-crystal-img-wrap:has(.home-crystal-overcharged)::after {
   content: '';
   position: absolute;
-  inset: 0;
-  /* Flat vermillion fill - clipped to the crystal shape by the mask
-     below. Matches the game's vermillion accent vocabulary. */
-  background: #ff3a3a;
+  /* The wrap is inline-flex sized to its content, but .home-crystal-img
+     carries margin-top: 10px - so the wrap is 10px taller than the img
+     and the img sits at y=10 inside it. inset: 0 would size the pseudo
+     to the full wrap (82×72), causing mask-size: contain to scale the
+     silhouette into the taller box and offset it ~5px upward vs the
+     actual crystal. Top-inset of 10px aligns the pseudo's box with
+     the img's box exactly so the mask renders pixel-aligned. */
+  inset: 10px 0 0 0;
+  /* Deep vermillion - paints flat then multiplies into the crystal
+     beneath so cool colours shift red while detail bleeds through. */
+  background: #d40808;
+  mix-blend-mode: multiply;
   -webkit-mask-image: var(--crystal-src);
           mask-image: var(--crystal-src);
   -webkit-mask-size: contain;
@@ -6748,17 +6761,17 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   animation: home-crystal-overcharge-tint 2.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
   transform-origin: center;
 }
-/* Opacity pulse - capped at 0.55 (NEVER fully opaque) so the crystal
-   underneath always reads through the red stamp. Heartbeat curve:
-   quick bloom to peak, gentle echo at 70%, slow recovery.
+/* Opacity pulse - capped at 0.85 so detail still bleeds through under
+   the multiply blend. Heartbeat curve: quick bloom to peak, gentle
+   echo at 70%, slow recovery.
    Transform mirrors the img's home-crystal-overcharge-pulse scale
    curve EXACTLY (1 -> 1.05 -> 1.005 -> 1) so the silhouette grows
    with the crystal during the inhale - otherwise the red stamp lags
    the crystal's expansion and shows a misaligned edge halo. */
 @keyframes home-crystal-overcharge-tint {
   0%   { opacity: 0;    transform: scale(1);     }
-  25%  { opacity: 0.55; transform: scale(1.05);  }
-  70%  { opacity: 0.10; transform: scale(1.005); }
+  25%  { opacity: 0.85; transform: scale(1.05);  }
+  70%  { opacity: 0.20; transform: scale(1.005); }
   100% { opacity: 0;    transform: scale(1);     }
 }
 
@@ -31544,6 +31557,7 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   left: 2px !important;
   width: auto !important;
   transform: none !important;
+  padding: 4px !important;
 }
 /* Restore press-down on active — needs !important to beat the transform:none above. */
 .home-scene-bottom:has(.home-mb-edict) > .home-bar-wrap .home-major-breakthrough-btn.home-mb-edict:active {
