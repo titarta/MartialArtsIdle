@@ -88,45 +88,97 @@ function slotLabel(slot) {
  * No equip / unequip here. Once bought the card disappears from the
  * Bazaar and lives in Codex > Wardrobe for equipping.
  */
+/**
+ * ParticleShowcase — preview for the PARTICLES cosmetic slot. Instead
+ * of the cultivator/crystal evolution procession (which makes no sense
+ * for a particle skin), shows 5 drifting qi orbs using the game's
+ * actual qi_orb_*.png assets. Mixed sizes + staggered float animations
+ * sell the "this is what your qi orbs will look like" pitch without
+ * pretending the product has 13 evolution forms.
+ */
+function ParticleShowcase() {
+  const orbs = [
+    { src: 'qi_orb_bright.png', size: 22, x: 12,  delay: 0.0 },
+    { src: 'qi_orb_medium.png', size: 16, x: 32,  delay: 1.4 },
+    { src: 'qi_orb_small.png',  size: 12, x: 50,  delay: 0.7 },
+    { src: 'qi_orb_bright.png', size: 20, x: 68,  delay: 2.1 },
+    { src: 'qi_spark_star.png', size: 14, x: 86,  delay: 0.4 },
+  ];
+  return (
+    <div className="bls-skin-proc bls-skin-proc-particles" aria-hidden="true">
+      {orbs.map((o, i) => (
+        <span
+          key={i}
+          className="bls-particle-orb"
+          style={{
+            left:           `${o.x}%`,
+            width:          `${o.size}px`,
+            height:         `${o.size}px`,
+            animationDelay: `${o.delay}s`,
+          }}
+        >
+          <img
+            src={`${BASE}sprites/vfx/qi_particles/${o.src}`}
+            alt=""
+            draggable="false"
+          />
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function SkinCard({ item, balance, onBuy, busy }) {
   const sprites    = getSkinSprites(item);
   const revealed   = 3;
   const totalCount = sprites.length;
   const disabled   = balance < item.cost || busy;
+  const isParticles = item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES;
   return (
     <div className="bls-skin-card" data-slot={item.cosmeticSlot}>
       <div className="bls-skin-card-head">
         <div className="bls-skin-card-titles">
           <div className="bls-skin-card-name">{item.name}</div>
-          <div className="bls-skin-card-kicker">Evolves through {totalCount} {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'forms'}</div>
+          <div className="bls-skin-card-kicker">
+            {isParticles
+              ? 'Replaces your qi orb flow'
+              : `Evolves through ${totalCount} ${item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'forms'}`}
+          </div>
         </div>
         <span className="bls-skin-card-slot">{slotLabel(item.cosmeticSlot)}</span>
       </div>
 
-      {/* Procession — two layered images per stage (colour + silhouette).
-          CSS ramps the silhouette opacity by --stage-index so stage 1 is
-          full colour, stage 2 ~33% silhouette, stage 3 ~67% silhouette,
-          stage 4+ fully silhouetted. data-slot picks the right breathing
-          animation (character bob vs crystal glow). */}
-      <div
-        className="bls-skin-proc"
-        data-slot={item.cosmeticSlot}
-        style={{ '--stage-count': totalCount }}
-      >
-        {sprites.map((src, i) => (
-          <div
-            key={i}
-            className="bls-skin-stage"
-            style={{ '--stage-index': i }}
-          >
-            <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
-            <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
-          </div>
-        ))}
-      </div>
+      {/* Particles slot: drifting qi-orb showcase. Other slots: the
+          procession (first 3 colour, rest silhouetted). data-slot on
+          the procession picks the breathing animation (character bob
+          vs crystal glow). */}
+      {isParticles ? (
+        <ParticleShowcase />
+      ) : (
+        <div
+          className="bls-skin-proc"
+          data-slot={item.cosmeticSlot}
+          style={{ '--stage-count': totalCount }}
+        >
+          {sprites.map((src, i) => (
+            <div
+              key={i}
+              className="bls-skin-stage"
+              style={{ '--stage-index': i }}
+            >
+              <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+              <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="bls-skin-card-foot">
-        <span className="bls-skin-foot-label"><b>{revealed} of {totalCount}</b> {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'stances'} revealed</span>
+        <span className="bls-skin-foot-label">
+          {isParticles
+            ? <>Live preview of the new <b>qi flow</b></>
+            : <><b>{revealed} of {totalCount}</b> {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'stances'} revealed</>}
+        </span>
         <button
           type="button"
           className="bls-skin-buy"
@@ -167,25 +219,40 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
 
       <div className="bls-bundle-pieces">
         {components.map(c => {
+          const isParticles = c.cosmeticSlot === COSMETIC_SLOTS.PARTICLES;
           const sprites = getSkinSprites(c).slice(0, 6);
           return (
             <div className="bls-bundle-piece" key={c.id}>
-              <div
-                className="bls-skin-proc bls-skin-proc-mini"
-                data-slot={c.cosmeticSlot}
-                style={{ '--stage-count': sprites.length }}
-              >
-                {sprites.map((src, i) => (
-                  <div
-                    key={i}
-                    className="bls-skin-stage"
-                    style={{ '--stage-index': i }}
-                  >
-                    <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
-                    <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
-                  </div>
-                ))}
-              </div>
+              {isParticles ? (
+                <div className="bls-skin-proc bls-skin-proc-mini bls-skin-proc-particles bls-skin-proc-particles-mini" aria-hidden="true">
+                  <span className="bls-particle-orb" style={{ left: '18%', width: '12px', height: '12px', animationDelay: '0s'   }}>
+                    <img src={`${BASE}sprites/vfx/qi_particles/qi_orb_bright.png`} alt="" draggable="false" />
+                  </span>
+                  <span className="bls-particle-orb" style={{ left: '50%', width: '9px',  height: '9px',  animationDelay: '1.4s' }}>
+                    <img src={`${BASE}sprites/vfx/qi_particles/qi_orb_small.png`} alt="" draggable="false" />
+                  </span>
+                  <span className="bls-particle-orb" style={{ left: '78%', width: '10px', height: '10px', animationDelay: '0.6s' }}>
+                    <img src={`${BASE}sprites/vfx/qi_particles/qi_spark_star.png`} alt="" draggable="false" />
+                  </span>
+                </div>
+              ) : (
+                <div
+                  className="bls-skin-proc bls-skin-proc-mini"
+                  data-slot={c.cosmeticSlot}
+                  style={{ '--stage-count': sprites.length }}
+                >
+                  {sprites.map((src, i) => (
+                    <div
+                      key={i}
+                      className="bls-skin-stage"
+                      style={{ '--stage-index': i }}
+                    >
+                      <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+                      <img src={src} alt="" draggable="false" className="bls-skin-stage-silhouette" />
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="bls-bundle-piece-meta">
                 <div className="bls-bundle-piece-name">{c.name}</div>
                 <div className="bls-bundle-piece-type">{slotLabel(c.cosmeticSlot)}</div>

@@ -30905,8 +30905,18 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   height: 100px;
   padding: 8px 0 6px;
   margin: 4px 0 10px;
-  background: linear-gradient(180deg, rgba(34, 26, 44, 0.65), rgba(22, 16, 32, 0.65));
+  /* Background tuned to sit inside the bazaar's dark-lacquer cards
+     (the legacy purple-grey clashed with the brass/vermillion shop
+     vocabulary). Slight warmth + a soft brass top edge so the
+     procession reads as inset glass against the card behind it. */
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.04) 0%,
+      transparent 14%),
+    linear-gradient(180deg, rgba(20, 12, 14, 0.85), rgba(10, 6, 10, 0.92));
   border-radius: 8px;
+  border: 1px solid rgba(220, 175, 110, 0.10);
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.06);
   overflow: hidden;
   /* Per-stage sprite dimensions. Tuned so 13 stages fit a ~340px
      content area without horizontal scroll, with visible overlap. */
@@ -31027,9 +31037,57 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* Reduced-motion users: kill the alive animations entirely. */
 @media (prefers-reduced-motion: reduce) {
   .bls-skin-proc[data-slot="character"] .bls-skin-stage,
-  .bls-skin-proc[data-slot="crystal"]   .bls-skin-stage {
+  .bls-skin-proc[data-slot="crystal"]   .bls-skin-stage,
+  .bls-particle-orb {
     animation: none !important;
   }
+}
+
+/* ── Particles slot — qi-orb showcase ─────────────────────────────────
+   Particle skins don't have a 13-stage evolution; they replace the
+   qi-flow orb pool. Showcase the actual in-game qi_orb_*.png assets
+   floating with staggered drift so the player sees what they'll get
+   in-flight rather than a sprite that doesn't represent the SKU. */
+.bls-skin-proc-particles {
+  /* Inherits the procession box (lacquer bg + brass border + 100px
+     height) so it sits visually identical to the other slot cards. */
+  display: block;
+}
+.bls-skin-proc-particles-mini {
+  /* In bundle pieces - use the mini procession height (60px) but
+     keep the same drift behaviour. */
+}
+
+.bls-particle-orb {
+  position: absolute;
+  bottom: 14px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  /* Soft drop-shadow halo so the orb reads against any background. */
+  filter: drop-shadow(0 0 6px rgba(255, 230, 180, 0.45));
+  animation: bls-particle-drift 4.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.bls-particle-orb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.bls-skin-proc-particles-mini .bls-particle-orb {
+  bottom: 8px;
+  filter: drop-shadow(0 0 4px rgba(255, 230, 180, 0.45));
+}
+
+/* Drift cycle - rise, sway, fade out at the top, then warp back to
+   the start invisibly. The staggered animation-delay per orb (set
+   inline in JSX) means they're never in sync, giving the showcase a
+   natural "qi flowing in" feeling. */
+@keyframes bls-particle-drift {
+  0%   { transform: translate(-50%, 0)    scale(0.85); opacity: 0;   }
+  18%  { transform: translate(-50%, -8px) scale(1);    opacity: 1;   }
+  72%  { transform: translate(-50%, -34px) scale(1);   opacity: 0.85;}
+  100% { transform: translate(-50%, -46px) scale(0.9); opacity: 0;   }
 }
 
 .bls-skin-card-foot {
