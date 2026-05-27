@@ -72,12 +72,17 @@ function RealmProgressBar({ qiRef, progressRef, costRef, gateRef, boosting, maxe
       const pk     = !bt && (isGated || inPeak);
       const bst    = !bt && !!boostingRef.current && !(inPeak && !isGated);
 
-      if (bt !== btPrev || pk !== pkPrev || bst !== bstPrev) {
+      if (bt !== btPrev || pk !== pkPrev || bst !== bstPrev || isGated !== gatedPrev) {
         btPrev = bt; pkPrev = pk; bstPrev = bst;
         if (fillRef.current) {
           fillRef.current.classList.toggle('realm-fill-breakthrough', bt);
           fillRef.current.classList.toggle('realm-fill-peak-stage',   pk);
           fillRef.current.classList.toggle('realm-fill-boosted',      bst);
+          // 2026-05-27 — also mirror gated state onto the fill itself so the
+          // SANCTUM v16 vermillion-gated style + new red pulse animation can
+          // engage. Without this the v16 CSS was dead code (it expected
+          // .realm-fill-gated, but only .realm-track-gated was being set).
+          fillRef.current.classList.toggle('realm-fill-gated', isGated);
         }
       }
 
