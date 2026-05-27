@@ -6750,12 +6750,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 }
 /* Opacity pulse - capped at 0.55 (NEVER fully opaque) so the crystal
    underneath always reads through the red stamp. Heartbeat curve:
-   quick bloom to peak, gentle echo at 70%, slow recovery. */
+   quick bloom to peak, gentle echo at 70%, slow recovery.
+   Transform mirrors the img's home-crystal-overcharge-pulse scale
+   curve EXACTLY (1 -> 1.05 -> 1.005 -> 1) so the silhouette grows
+   with the crystal during the inhale - otherwise the red stamp lags
+   the crystal's expansion and shows a misaligned edge halo. */
 @keyframes home-crystal-overcharge-tint {
-  0%   { opacity: 0;    }
-  25%  { opacity: 0.55; }
-  70%  { opacity: 0.10; }
-  100% { opacity: 0;    }
+  0%   { opacity: 0;    transform: scale(1);     }
+  25%  { opacity: 0.55; transform: scale(1.05);  }
+  70%  { opacity: 0.10; transform: scale(1.005); }
+  100% { opacity: 0;    transform: scale(1);     }
 }
 
 /* Reduced-motion users: skip both pulses. */
@@ -31538,6 +31542,12 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   right: 2px !important;
   bottom: 2px !important;
   left: 2px !important;
+  width: auto !important;
+  transform: none !important;
+}
+/* Restore press-down on active — needs !important to beat the transform:none above. */
+.home-scene-bottom:has(.home-mb-edict) > .home-bar-wrap .home-major-breakthrough-btn.home-mb-edict:active {
+  transform: translateY(1px) !important;
 }
 .home-mb-edict.home-major-breakthrough-btn:hover {
   filter: brightness(1.05);
