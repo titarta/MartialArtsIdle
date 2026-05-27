@@ -14711,11 +14711,17 @@ body.sheet-open {
   text-shadow: 0 0 4px rgba(255, 220, 140, 0.9);
 }
 
-/* ── Bonus chip — top-right corner ─────────────────────────────────── */
+/* ── Bonus chip — sits inside the buy section's perks row ─────────────
+   2026-05-27 — Previously absolute at top:10/right:10. That position
+   horizontally collided with the marketing badge on the small T2/T4
+   cards (badge spans ~80px centered, chip ~48px right-anchored — they
+   overlap by ~30px on any mobile width) and competed visually with
+   the price column on the banner / hero layouts.
+   Now it lives in `.blshop-pack-perks` beside the strike+price row, so
+   the chip reinforces the price story instead of fighting the badge. */
 .blshop-pack-bonus {
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  display: inline-flex;
+  align-items: center;
   padding: 3px 8px;
   border-radius: 8px;
   font-size: 11px;
@@ -14727,13 +14733,25 @@ body.sheet-open {
   border: 1px solid rgba(180, 255, 210, 0.35);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5),
               inset 0 1px 0 rgba(220, 255, 230, 0.32);
-  z-index: 2;
+  white-space: nowrap;
+  line-height: 1;
 }
 .blshop-pack--radiant .blshop-pack-bonus {
   padding: 4px 10px;
   font-size: 13px;
   background: linear-gradient(180deg, #6dd9a4 0%, #1a6a4a 100%);
   border-color: rgba(220, 255, 235, 0.45);
+}
+
+/* Perks row — holds the bonus + save chips together inside the buy
+   section. flex-wrap so it collapses onto two lines on the very
+   narrowest viewports rather than overflowing. */
+.blshop-pack-perks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 /* ── Body content (label, amount, rate) ────────────────────────────── */
@@ -14907,8 +14925,13 @@ body.sheet-open {
   cursor: default;
 }
 
-/* Mobile tightening — modal is full-width-ish on narrow screens. */
-@media (max-width: 420px) {
+/* Mobile tightening — modal is full-width-ish on narrow screens.
+   Breakpoint raised from 420 → 480 (2026-05-27) after the bonus chip
+   moved into the buy section's perks row. The added perks width pushed
+   the desktop auto/1fr/auto grid past the card edge on iPhone Plus /
+   14 Pro Max (414-430). 480 covers every phone-class viewport without
+   triggering on small tablets (~600+). */
+@media (max-width: 480px) {
   .blood-lotus-shop-card { padding: 14px 12px; gap: 12px; }
   .blshop-header       { padding-right: 32px; gap: 8px; }
   .blshop-title        { font-size: 17px; }
@@ -14921,42 +14944,58 @@ body.sheet-open {
   .blshop-footer { flex-direction: column; align-items: stretch; gap: 8px; }
   .blshop-restore { align-self: center; }
 
-  /* Hero card on narrow viewports: the auto/1fr/auto grid runs out of
-     room because the buy column needs ~150px (strike + bold price +
-     SAVE chip). Restack the buy section onto its OWN row below the
-     icon + body, full width, with a divider. The banner (T5) doesn't
-     have this problem because its strikethrough is shorter ($69.99). */
-  .blshop-pack--hero {
+  /* Banner (T5) + Hero (T6) cards on narrow viewports: the auto/1fr/auto
+     grid runs out of room because the buy column needs ~150px to fit
+     strike + bold price (+ Save chip + Bonus chip). Restack the buy
+     section onto its OWN row below the icon + body, full width, with a
+     divider. Before (2026-05-27) the banner kept the horizontal layout
+     and its "$49.99" price overflowed the right edge at every width
+     below 414px - confirmed at 320 (48px overflow) and 360 (8px
+     overflow). Now both wide variants share the same restack rule. */
+  .blshop-pack--hero,
+  .blshop-pack--banner {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
     column-gap: 12px;
     row-gap: 10px;
   }
-  .blshop-pack--hero .blshop-pack-icon { grid-row: 1; grid-column: 1; }
-  .blshop-pack--hero .blshop-pack-body {
+  .blshop-pack--hero .blshop-pack-icon,
+  .blshop-pack--banner .blshop-pack-icon { grid-row: 1; grid-column: 1; }
+  .blshop-pack--hero .blshop-pack-body,
+  .blshop-pack--banner .blshop-pack-body {
     grid-row: 1;
     grid-column: 2;
     min-width: 0;
-    /* The +50% bonus chip is absolutely positioned at top-right of the
-       card. On desktop it overlaps the (empty) buy column, but with the
-       mobile restack the body now occupies that area, so the label
-       runs UNDER the chip. Pad the body to clear the chip footprint
-       (~56px wide + 10px gap). */
-    padding-right: 70px;
+    /* The bonus chip no longer lives at the top-right corner (it moved
+       into the buy section's perks row in the 2026-05-27 fix), so the
+       body can now use the full width without clearing chip footprint. */
   }
-  .blshop-pack--hero .blshop-pack-buy {
+  .blshop-pack--hero .blshop-pack-buy,
+  .blshop-pack--banner .blshop-pack-buy {
     grid-row: 2;
     grid-column: 1 / -1;
     min-width: 0;
     width: 100%;
     flex-direction: row;
+    /* space-between pushes strike+price to the left and the perks
+       (bonus + save chips) to the right. flex-wrap allows the perks to
+       drop to a second line on the very narrowest viewports rather
+       than overflowing the card. */
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 8px 12px;
     padding-top: 12px;
     border-top: 1px solid rgba(212, 168, 102, 0.22);
   }
-  .blshop-pack--hero .blshop-pack-save { flex-shrink: 0; }
+  .blshop-pack--hero .blshop-pack-save,
+  .blshop-pack--banner .blshop-pack-save { flex-shrink: 0; }
+  /* Perks row stays right-anchored inside the restacked buy row so the
+     bonus + save chips read as a single "what you get" group. */
+  .blshop-pack--hero .blshop-pack-perks,
+  .blshop-pack--banner .blshop-pack-perks {
+    justify-content: flex-end;
+  }
 }
 
 /* ─── Progress hub HUD button ───────────────────────────────────────────
@@ -26300,6 +26339,34 @@ img.pp-emblem-locked { font-size: 0; }
   width: 15px !important;
   height: 15px !important;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+/* 2026-05-27 — Anchored qi/karma layout. Each currency slot has a
+   min-width so the brass divider sits at a stable screen position
+   regardless of how wide the qi readout grows (K → M → B → T → Qa).
+   Qi pulls its icon-value pair toward the divider (right-aligned),
+   karma pulls toward the divider (left-aligned), so both currencies
+   "grow away" from the divider — qi extends LEFT into its slot,
+   karma extends RIGHT into its slot. Per home-pass/home-v2-mockup. */
+.topbar-currency-qi {
+  min-width: 84px;
+  justify-content: flex-end;
+}
+.topbar-currency-karma {
+  min-width: 60px;
+  justify-content: flex-start;
+}
+.topbar-currency-sep {
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(212, 184, 136, 0.55) 50%,
+    transparent 100%
+  );
+  flex-shrink: 0;
 }
 
 /* Lotus pill: keep red identity but tighten to the mockup proportions. */

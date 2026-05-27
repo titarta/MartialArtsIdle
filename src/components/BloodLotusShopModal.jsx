@@ -202,12 +202,10 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) 
         </span>
       )}
 
-      {/* Top-right bonus chip — only when there's a real bonus over baseline */}
-      {bonus > 0 && (
-        <span className="blshop-pack-bonus" aria-label={`Bonus ${bonus}% over baseline`}>
-          +{bonus}%
-        </span>
-      )}
+      {/* (Bonus chip moved into the buy section below — see the
+          .blshop-pack-perks row. Previously this was absolutely positioned
+          at top:10/right:10 and conflicted with the marketing badge on
+          small cards / with the price column on the banner.) */}
 
       <div className="blshop-pack-icon" aria-hidden="true">
         <img
@@ -237,8 +235,20 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) 
               )}
               <span className="blshop-pack-price">{pkg.price}</span>
             </div>
-            {(isHero || (isBanner && savedDollars > 0)) && savedDollars > 0 && (
-              <span className="blshop-pack-save">Save ${savedDollars}</span>
+            {(bonus > 0 || ((isHero || isBanner) && savedDollars > 0)) && (
+              <div className="blshop-pack-perks">
+                {bonus > 0 && (
+                  <span
+                    className="blshop-pack-bonus"
+                    aria-label={`Bonus ${bonus}% over baseline`}
+                  >
+                    +{bonus}%
+                  </span>
+                )}
+                {(isHero || isBanner) && savedDollars > 0 && (
+                  <span className="blshop-pack-save">Save ${savedDollars}</span>
+                )}
+              </div>
             )}
           </>
         )}
