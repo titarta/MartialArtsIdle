@@ -28489,19 +28489,23 @@ img.pp-emblem-locked { font-size: 0; }
 /* End of SANCTUM v15. */
 
 /* ═════════════════════════════════════════════════════════════════════
-   SANCTUM v15.5: cap right-edge sits at the bar's start edge (no gap).
-   Math: cap left:4 + width 20 = right edge at x=24. Bar margin:0 24px
-   = bar starts at x=24. Edges touch perfectly. Cap reads as the bar's
-   physical end-piece, not a separate floating circle.
+   SANCTUM v15.5 (revised 2026-05-27): slight gap between caps and bar.
+   v15.5 originally pinned the cap's right edge to the bar's start edge
+   so they read as one piece. In practice that made the brass cap feel
+   pressed INTO the bar fill, especially when the fill reached the end
+   and visually merged with the cap colour.
+   Math: cap left:4 + width 20 = right edge at x=24. Bar margin:0 30px
+   = bar starts at x=30. 6px clear air on each side reads as deliberate
+   inset — the cap still bookends the bar, just no longer touches it.
    ═════════════════════════════════════════════════════════════════════ */
 
 .home-scene-bottom .home-bar-wrap .realm-track {
-  margin: 0 24px !important;
+  margin: 0 30px !important;
 }
 .home-scene-bottom .home-bar-wrap::before { left: 4px !important;  }
 .home-scene-bottom .home-bar-wrap::after  { right: 4px !important; }
 
-/* End of SANCTUM v15.5. */
+/* End of SANCTUM v15.5 (revised). */
 
 /* ═════════════════════════════════════════════════════════════════════
    SANCTUM v16: ship the bottom-plate states study to live.
