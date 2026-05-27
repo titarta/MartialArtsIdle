@@ -69,8 +69,15 @@ export default function TopBar({
           draggable="false"
         />
       </button>
+      {/* Currency pair: qi + karma flank a fixed brass divider.
+          Each slot has a min-width and pulls its icon-value pair toward
+          the divider (qi right-aligned, karma left-aligned). Qi values
+          grow into the unused space on the LEFT of the qi slot and
+          karma values grow into the unused space on the RIGHT of the
+          karma slot, so the divider's screen position never shifts as
+          the qi readout changes scale. Per home-pass/home-v2-mockup. */}
       <div className="topbar-currencies">
-        <div className="topbar-currency-row" aria-label="Current Qi">
+        <div className="topbar-currency-row topbar-currency-qi" aria-label="Current Qi">
           <img
             src={`${BASE}ui/qi.png`}
             className="topbar-currency-icon"
@@ -79,7 +86,8 @@ export default function TopBar({
           />
           <QiLiveText qiRef={qiRef} />
         </div>
-        <div className="topbar-currency-row" aria-label="Current Karma">
+        <span className="topbar-currency-sep" aria-hidden="true" />
+        <div className="topbar-currency-row topbar-currency-karma" aria-label="Current Karma">
           <img
             src={`${BASE}ui/karma.png`}
             className="topbar-currency-icon"
