@@ -2929,12 +2929,17 @@ function HomeScreen({
           <div className="home-bar-wrap">
             {cultivation.pendingMajorBreakthrough && (
               <button
-                className="home-major-breakthrough-btn"
+                className="home-major-breakthrough-btn home-mb-edict"
                 onClick={cultivation.confirmMajorBreakthrough}
                 aria-label={`Breakthrough to ${cultivation.nextRealmName ?? 'next realm'}`}
               >
-                <span className="home-mb-icon">▲</span>
-                <span className="home-mb-label">
+                {/* Inner parchment-cream panel inside the brass frame.
+                    Holds the calligraphic 突 watermark, mandala corner
+                    dots, BREAKTHROUGH copy + next-realm subtitle.
+                    See "Ceremonial Edict" in _design/bt-button-study/. */}
+                <span className="home-mb-inner">
+                  <span className="home-mb-watermark" aria-hidden="true">突</span>
+                  <span className="home-mb-dots" aria-hidden="true" />
                   <span className="home-mb-cta">BREAKTHROUGH</span>
                   <span className="home-mb-next">
                     {/* Data uses ' - ' as a realm/stage separator
@@ -2943,7 +2948,13 @@ function HomeScreen({
                     {String(cultivation.nextRealmName ?? '').replace(/\s+-\s+/g, ' · ')}
                   </span>
                 </span>
-                <span className="home-mb-icon">▲</span>
+                {/* Vermillion imperial seal stamp - lands rotated in the
+                    top-right corner on mount via the stamp keyframe.
+                    aria-hidden because it's pure ornament; the seal
+                    glyph (印) is decorative. */}
+                <span className="home-mb-seal" aria-hidden="true">
+                  <span className="home-mb-seal-glyph">印</span>
+                </span>
               </button>
             )}
             <GateBypassButton
