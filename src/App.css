@@ -31395,6 +31395,24 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     0 4px 12px rgba(0, 0, 0, 0.65),
     0 0 22px rgba(255, 207, 131, 0.55) !important;
 }
+
+/* Reclaim the plate's horizontal real estate. v29 positions the BT
+   button at inset:8px from the plate's padding-box edges, but the
+   plate itself has 16px L/R padding - so the button sits with a
+   visible dark gap on each side. The Ceremonial Edict is meant to
+   fill the plate as a calling-card moment; bring the inset in to
+   2px so the brass frame hugs the plate edge with only a hairline
+   gap (kept non-zero so the plate's 1px brass border stays visible
+   as a subtle outer ring).
+   Specificity: 0,5,1 (3 classes in the parent chain + 2 classes on
+   the button + 1 :has) - beats v29's 0,4,1. */
+.home-scene-bottom:has(.home-mb-edict) > .home-bar-wrap .home-major-breakthrough-btn.home-mb-edict {
+  inset: 2px !important;
+  top: 2px !important;
+  right: 2px !important;
+  bottom: 2px !important;
+  left: 2px !important;
+}
 .home-mb-edict.home-major-breakthrough-btn:hover {
   filter: brightness(1.05);
   box-shadow:
