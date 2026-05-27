@@ -164,18 +164,50 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     const loaded = loadJSON(ACTIVE_KEY, []);
     return loaded.map(s => ({ ...s, instanceId: ++instanceCounter }));
   });
-  const [pendingOffer, setPendingOffer] = useState(() => {
-    // Filter pending-offer cards through QI_SPARK_BY_ID so a save migration
-    // that retires a card (Dial-9 dropped inner_calm / focus_surge / etc.)
-    // doesn't leave the modal staring at undefined card ids. Drops the offer
-    // entirely if both cards have been retired.
+  // ── Spark offer queue (2026-05-27 redesign) ─────────────────────────────────
+  // pendingOffer used to be a single offer object. It's now an array of
+  // queued offers — every breakthrough that rolls sparks appends to the tail,
+  // and the player picks through them at their own pace. The "head" is the
+  // entry currently displayed by QiSparkChoiceModal. Why:
+  //   - Offline play used to auto-resolve to the leftmost card on every
+  //     subsequent breakthrough, robbing the player of N-1 of their N
+  //     potential choices. The queue preserves every roll.
+  //   - The roll for each entry is fixed at breakthrough time (snapshot of
+  //     `cards`), so balance patches that change the pool / weights can't
+  //     retroactively buff queued offers. Players can't sit on the queue
+  //     waiting for a legendary-odds patch.
+  //   - Rerolls still use the CURRENT pool (rerolls cost BL, so anyone
+  //     gaming this is paying for the privilege; not a free exploit).
+  const [pendingOffers, setPendingOffers] = useState(() => {
     const raw = loadJSON(PENDING_KEY, null);
-    if (!raw || !Array.isArray(raw.cards)) return raw;
-    const filtered = raw.cards.filter(id => !!QI_SPARK_BY_ID[id]);
-    if (filtered.length === 0) return null;
-    if (filtered.length === raw.cards.length) return raw;
-    return { ...raw, cards: filtered };
+    // Migrate: old format was a single object (or null). Wrap as
+    // single-element array. New format is an array of offers.
+    let list;
+    if (raw == null) list = [];
+    else if (Array.isArray(raw)) list = raw;
+    else list = [raw];
+    // Filter each entry's cards through QI_SPARK_BY_ID so retired ids don't
+    // leave the modal staring at undefined. Drop entries that have no
+    // surviving cards.
+    return list
+      .map(entry => {
+        if (!entry || !Array.isArray(entry.cards)) return null;
+        const filtered = entry.cards.filter(id => !!QI_SPARK_BY_ID[id]);
+        if (filtered.length === 0) return null;
+        if (filtered.length === entry.cards.length) return entry;
+        return { ...entry, cards: filtered };
+      })
+      .filter(Boolean);
   });
+  // Head accessor — every existing caller (App.jsx, QiSparkChoiceModal,
+  // nextRerollCost, the preview ref below) reads via `pendingOffer` and
+  // doesn't need to know about the queue shape.
+  const pendingOffer = pendingOffers[0] ?? null;
+  // Modal visibility, distinct from "is there anything to pick." Default
+  // open whenever there's something in the queue at mount time (player
+  // returning to a non-empty queue gets prompted to review). Player can
+  // dismiss to close it; new breakthroughs auto-reopen.
+  const [isOfferModalOpen, setOfferModalOpen] = useState(() => pendingOffers.length > 0);
   const [pityCounter,  setPityCounter]  = useState(() => loadJSON(PITY_KEY, 0));
   const [bloodLotusBalance, setBloodLotusBalance] = useState(() => {
     try { return getBloodLotusBalance(); } catch { return 0; }
@@ -233,7 +265,7 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
 
   // Persist
   useEffect(() => { saveJSON(ACTIVE_KEY,  activeSparks); }, [activeSparks]);
-  useEffect(() => { saveJSON(PENDING_KEY, pendingOffer); }, [pendingOffer]);
+  useEffect(() => { saveJSON(PENDING_KEY, pendingOffers); }, [pendingOffers]);
   useEffect(() => { saveJSON(PITY_KEY,    pityCounter);  }, [pityCounter]);
   // Ref mirror for pity — setState updaters need fresh value (the breakthrough
   // effect calls drawOffer() with forceLegendary based on the current pity).
@@ -511,33 +543,24 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     const shouldDrawSpark = stageHasSpark(curr);
     if (!shouldDrawSpark) return;  // skip the draw entirely this BT
 
-    // Roll a new offer if none is pending. If one is pending (player took too
-    // long on the previous breakthrough), auto-resolve it to the leftmost so
-    // it doesn't pile up.
-    setPendingOffer(prev => {
-      if (prev) {
-        // Auto-resolve previous offer to leftmost; this is rare in practice
-        // because the modal is blocking, but covers the gd debug edge case.
-        // We fall through and roll a new one below.
-        const leftmostId = prev.cards?.[0];
-        if (leftmostId) {
-          // Apply leftmost in a deferred microtask to avoid double-setState in render
-          queueMicrotask(() => applySparkChoice(leftmostId));
-        }
-      }
+    // Roll a new offer and APPEND it to the queue. We never overwrite the
+    // head, so offline players who breakthrough multiple times don't lose
+    // any choices — every roll is preserved as its own queue entry, with
+    // its cards snapshotted at the moment they were rolled.
+    setPendingOffers(prev => {
       // Pity: if the counter has reached the threshold, force the FIRST
       // card slot to be a legendary on this draw. Counter resets below.
       const pityNow = pityCounterRef.current ?? 0;
       const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
       const ctxBase = drawOfferCtx();
       const cards = drawOffer(2, { ...ctxBase, forceLegendary }, getWeightOverrides());
-      if (cards.length === 0) return null;
+      if (cards.length === 0) return prev;
       // After draw: reset pity if a legendary appeared (forced or natural),
       // else increment by 1. We do this here (not in a separate setPity call)
       // to make pity advancement deterministic with respect to the draw.
       const sawLegendary = containsLegendary(cards);
       setPityCounter(c => sawLegendary ? 0 : (c + 1));
-      return {
+      const newOffer = {
         id:                   `qs-offer-${++instanceCounter}-${curr}`,
         cards,
         // 2026-05-21: offer-level reroll state (tier-locked redesign). The
@@ -550,13 +573,24 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
         cardFreeRerollsLeft:  [0, 0],
         cardPaidRerollsUsed:  [0, 0],
         rolledAtRealm:        curr,
+        // 2026-05-27 — timestamp + pity snapshot so the queue review UI can
+        // show "Sparked at X, 14h ago" and so any future audit can confirm
+        // the roll context. Snapshot only; not used in pick-time logic.
+        rolledAt:             Date.now(),
+        rolledAtPity:         pityNow,
       };
+      return [...prev, newOffer];
     });
+    // A fresh breakthrough should always present its offer: if the player
+    // had previously dismissed the modal to review later, the new draw
+    // re-opens it. Same reason a new notification surfaces an icon that
+    // was previously cleared — the world produced a new thing to react to.
+    setOfferModalOpen(true);
   }, [cultivation.realmIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stash the most-recently-rolled cards so the pity-counter effect above can
   // peek at them without depending on pendingOffer (which would race with the
-  // setPendingOffer call earlier in the same effect).
+  // setPendingOffers call earlier in the same effect).
   const pendingRollPreviewRef = useRef(null);
   useEffect(() => { pendingRollPreviewRef.current = pendingOffer?.cards ?? null; }, [pendingOffer]);
 
@@ -690,12 +724,17 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
   // ── Player actions ──────────────────────────────────────────────────────
 
   const choose = useCallback((sparkId) => {
-    setPendingOffer(prev => {
-      if (!prev || !prev.cards.includes(sparkId)) return prev;
-      try { trackSparkPicked(sparkId, prev.cards.length); } catch {}
+    setPendingOffers(prev => {
+      const head = prev[0];
+      if (!head || !head.cards.includes(sparkId)) return prev;
+      try { trackSparkPicked(sparkId, head.cards.length); } catch {}
       try { recordStat('qiSparksCaught', 1); } catch {}
       applySparkChoice(sparkId);
-      return null;
+      const next = prev.slice(1);
+      // If the queue is now empty, close the modal — otherwise the next
+      // queued offer auto-becomes the head and the modal re-renders.
+      if (next.length === 0) setOfferModalOpen(false);
+      return next;
     });
   }, [applySparkChoice]);
 
@@ -710,10 +749,11 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
    */
   const rerollOffer = useCallback(() => {
     let result = false;
-    setPendingOffer(prev => {
-      if (!prev) return prev;
-      const freeLeft = prev.offerFreeRerollsLeft ?? 1;
-      const paidUsed = prev.offerPaidRerollsUsed ?? 0;
+    setPendingOffers(prev => {
+      const head = prev[0];
+      if (!head) return prev;
+      const freeLeft = head.offerFreeRerollsLeft ?? 1;
+      const paidUsed = head.offerPaidRerollsUsed ?? 0;
       const isFree = freeLeft > 0;
 
       if (!isFree) {
@@ -726,7 +766,10 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
         try { trackSparkRerolled(true, 0); } catch {}
       }
 
-      // Pity-driven force-legendary still applies on the reroll.
+      // Pity-driven force-legendary still applies on the reroll. Note that
+      // reroll always reads the CURRENT pool / weights / pity, not the
+      // snapshot from when this offer was originally rolled — see the
+      // pendingOffers comment above for the design rationale.
       const pityNow = pityCounterRef.current ?? 0;
       const forceLegendary = pityNow >= LEGENDARY_PITY_THRESHOLD;
       const newCards = drawOffer(2, { ...drawOfferCtx(), forceLegendary }, getWeightOverrides());
@@ -735,12 +778,13 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
       const sawLegendary = containsLegendary(newCards);
       if (sawLegendary) setPityCounter(0);
       result = true;
-      return {
-        ...prev,
+      const newHead = {
+        ...head,
         cards:                  newCards,
         offerFreeRerollsLeft:   isFree ? 0 : freeLeft,
         offerPaidRerollsUsed:   isFree ? paidUsed : paidUsed + 1,
       };
+      return [newHead, ...prev.slice(1)];
     });
     return result;
   }, []);
@@ -760,35 +804,36 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
   }, [pendingOffer]);
 
   /**
-   * Discard the current offer without picking. Used by the modal's auto-
-   * timeout when the player ignores the choice. Auto-resolves to the
-   * LEFTMOST card so the player isn't punished for ignoring.
+   * Dismiss the choice modal WITHOUT picking. The offer stays in the queue
+   * (head position) so the player can return to it later. Replaces the old
+   * `skip` behavior, which auto-resolved to the leftmost card on a 60s
+   * inactivity timeout — that path is gone now: the queue is the
+   * promise that no roll is ever resolved on the player's behalf.
    *
-   * 2026-05-21 bug-fix: fires a `mai:spark-auto-picked` window event so the
-   * UI can surface a toast — previously the modal would just disappear and
-   * the player wouldn't know which spark they got.
+   * Modal's inactivity timer was removed in the same change, so this is
+   * only invoked when the player explicitly closes the modal.
    */
-  const skip = useCallback(() => {
-    setPendingOffer(prev => {
-      if (!prev) return null;
-      const leftmostId = prev.cards?.[0];
-      if (leftmostId) {
-        applySparkChoice(leftmostId);
-        // Notify UI so a toast can confirm the auto-pick.
-        try {
-          window.dispatchEvent(new CustomEvent('mai:spark-auto-picked', {
-            detail: { sparkId: leftmostId },
-          }));
-        } catch {}
-      }
-      return null;
-    });
-  }, [applySparkChoice]);
+  const dismiss = useCallback(() => {
+    // Close the modal without removing the head offer. Reopening (via a
+    // chip/CTA in the UI, or a fresh breakthrough enqueueing another
+    // offer) sets isOfferModalOpen back to true.
+    setOfferModalOpen(false);
+  }, []);
+  // Legacy alias — old code paths called `skip` to mean "go away."
+  // Mapping it to dismiss (no auto-pick) is the safe modern behavior.
+  const skip = dismiss;
+  // Explicit open hook for "review queued sparks" CTAs (offline summary
+  // tap-through, chip on a screen, debug tools). Mounts the modal at the
+  // current head; no-op if the queue is empty.
+  const openOfferModal = useCallback(() => {
+    setOfferModalOpen(true);
+  }, []);
 
   /** Wipe everything — call on reincarnation reset. */
   const clearAll = useCallback(() => {
     setActiveSparks([]);
-    setPendingOffer(null);
+    setPendingOffers([]);
+    setOfferModalOpen(false);
     setPityCounter(0);
     // Reset the mirrored offline-qi multiplier so the next run starts at 1×
     // even if the page is reloaded before any new permanent draws.
@@ -858,6 +903,14 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
   return {
     activeSparks,
     pendingOffer,
+    // 2026-05-27 queue redesign — expose queue tail + modal visibility so
+    // the UI can show "N sparks await" affordances and explicitly open
+    // the modal from CTAs (offline summary, queue chip).
+    pendingOffers,
+    pendingOffersCount: pendingOffers.length,
+    isOfferModalOpen,
+    openOfferModal,
+    dismiss,
     bloodLotusBalance,
     qiMultRef,
     qiFlatRef,
@@ -950,10 +1003,11 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
     _debugSetOffer: (sparkIds) => {
       const cards = (sparkIds ?? []).filter(id => !!QI_SPARK_BY_ID[id]).slice(0, 2);
       if (cards.length === 0) {
-        setPendingOffer(null);
+        setPendingOffers([]);
+        setOfferModalOpen(false);
         return false;
       }
-      setPendingOffer({
+      setPendingOffers([{
         id:                   `gd-preview-${++instanceCounter}`,
         cards,
         offerFreeRerollsLeft: 1,
@@ -961,8 +1015,36 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
         cardFreeRerollsLeft:  [0, 0],
         cardPaidRerollsUsed:  [0, 0],
         rolledAtRealm:        cultivation.realmIndex ?? 0,
-      });
+        rolledAt:             Date.now(),
+        rolledAtPity:         pityCounterRef.current ?? 0,
+      }]);
+      setOfferModalOpen(true);
       return true;
+    },
+    /**
+     * Debug-only: append additional offers to the queue without spending
+     * a breakthrough. Useful for testing queue review UI with N entries.
+     * Pass an array of arrays — e.g. [['quick_burst','sacred_seal'], ...]
+     */
+    _debugEnqueueOffers: (offers) => {
+      const built = (offers ?? []).map(cardsRaw => {
+        const cards = (cardsRaw ?? []).filter(id => !!QI_SPARK_BY_ID[id]).slice(0, 2);
+        if (cards.length === 0) return null;
+        return {
+          id:                   `gd-preview-${++instanceCounter}`,
+          cards,
+          offerFreeRerollsLeft: 1,
+          offerPaidRerollsUsed: 0,
+          cardFreeRerollsLeft:  [0, 0],
+          cardPaidRerollsUsed:  [0, 0],
+          rolledAtRealm:        cultivation.realmIndex ?? 0,
+          rolledAt:             Date.now(),
+          rolledAtPity:         pityCounterRef.current ?? 0,
+        };
+      }).filter(Boolean);
+      setPendingOffers(prev => [...prev, ...built]);
+      if (built.length > 0) setOfferModalOpen(true);
+      return built.length;
     },
   };
 }

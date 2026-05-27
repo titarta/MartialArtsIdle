@@ -1,15 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
 import { QI_SPARK_BY_ID, SPARK_RARITY, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
 
 /**
- * Inactivity timeout: the modal auto-resolves (picks leftmost) if the
- * player does not interact. 60 seconds is calibrated against playtest
- * data; any tap, reroll, or hover counts as activity and resets the
- * timer, so an engaged player effectively never times out.
+ * Format a "how long ago this offer was rolled" stamp. Used in the
+ * snapshot-context line so the player can see at a glance whether the
+ * choice they're looking at is fresh (this session) or queued from an
+ * earlier offline run.
  */
-const CHOICE_TIMEOUT_MS = 60_000;
+function formatTimeAgo(ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return 'just now';
+  const sec = Math.floor(ms / 1000);
+  if (sec < 60)  return 'just now';
+  const min = Math.floor(sec / 60);
+  if (min < 60)  return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr  < 24)  return `${hr}h ago`;
+  const day = Math.floor(hr / 24);
+  return `${day}d ago`;
+}
 
 /** Bold-aware mini-renderer: `**foo**` becomes <strong>foo</strong>. */
 function renderEffect(text) {
@@ -142,47 +151,45 @@ function SparkCardSlot({ sparkId, onPick }) {
  * pair below the title. Reroll button + meta strip pin to the bottom.
  *
  * Props:
- *   offer:             { id, cards, offerFreeRerollsLeft, offerPaidRerollsUsed }
+ *   offer:             { id, cards, offerFreeRerollsLeft, offerPaidRerollsUsed,
+ *                        rolledAtRealm, rolledAt }
+ *   queueCount:        number of offers currently queued including this one
+ *                      (renders a "N await" badge when > 1)
  *   bloodLotusBalance: number (for paid reroll affordability check)
  *   nextRerollCostFor: (cardIndex) => number | () => number
  *   onChoose(sparkId)
  *   onRerollOffer()    | onRerollCard()   (legacy alias)
- *   onSkip()           (called on inactivity timeout, picks leftmost)
+ *   onDismiss()        — close without picking; head stays in queue
+ *   onSkip()           — legacy alias for dismiss (no auto-pick anymore)
  *   pityCounter, pityThreshold, legendaryChance, legendaryPoolInfo
+ *
+ * 2026-05-27 — Queue redesign: the modal no longer auto-resolves on
+ * inactivity. The player either picks, rerolls, or dismisses; nothing
+ * gets resolved on their behalf. Dismiss leaves the offer in the queue
+ * so the player can return to it from a CTA (offline summary / queue
+ * chip / next breakthrough's auto-reopen).
  */
 function QiSparkChoiceModal({
   offer,
+  queueCount = 1,
   bloodLotusBalance,
   nextRerollCostFor,
   onChoose,
   onRerollOffer,
   onRerollCard,         // legacy prop name; same shape
-  onSkip,
+  onDismiss,
+  onSkip,               // legacy — same behavior as onDismiss
   pityCounter = 0,
   pityThreshold = 17,
   legendaryChance = 0.06,
   legendaryPoolInfo = null,
 }) {
-  const rerollFn = onRerollOffer ?? onRerollCard;
+  const rerollFn  = onRerollOffer ?? onRerollCard;
+  const dismissFn = onDismiss ?? onSkip;
 
-  // Auto-skip after timeout. onSkip is captured via ref so the timer
-  // does not reset on every parent render.
-  const onSkipRef = useRef(onSkip);
-  onSkipRef.current = onSkip;
-
-  // Activity nonce bumps on user interaction so the timer resets.
-  const [activityNonce, setActivityNonce] = useState(0);
-  const bumpActivity = () => setActivityNonce(n => n + 1);
-
-  useEffect(() => {
-    if (!offer) return;
-    const id = setTimeout(() => onSkipRef.current?.(), CHOICE_TIMEOUT_MS);
-    return () => clearTimeout(id);
-  }, [offer?.id, activityNonce]);
-
-  // Wrap pick + reroll so they count as activity.
-  const handlePick = (sparkId) => { bumpActivity(); onChoose?.(sparkId); };
-  const handleReroll = () => { bumpActivity(); rerollFn?.(); };
+  const handlePick   = (sparkId) => { onChoose?.(sparkId); };
+  const handleReroll = () => { rerollFn?.(); };
+  const handleClose  = () => { dismissFn?.(); };
 
   if (!offer) return null;
 
@@ -253,15 +260,48 @@ function QiSparkChoiceModal({
     );
   };
 
+  // Snapshot context: realm + relative timestamp. Empty string if the
+  // offer lacks the field (older queued entries from pre-2026-05-27
+  // saves) — we just hide the line in that case.
+  const rolledAt    = offer.rolledAt ?? null;
+  const ageMs       = rolledAt ? Date.now() - rolledAt : 0;
+  const ageLabel    = rolledAt ? formatTimeAgo(ageMs) : '';
+  const realmLabel  = Number.isFinite(offer.rolledAtRealm) ? `Realm ${offer.rolledAtRealm}` : '';
+  const hasContext  = realmLabel || ageLabel;
+  // Queue depth — 1 means "this is the only one." > 1 means more are waiting.
+  const tailCount   = Math.max(0, (queueCount ?? 1) - 1);
+
   return (
-    <div className="modal-overlay spk-overlay" onMouseMove={bumpActivity}>
+    <div className="modal-overlay spk-overlay">
       <div className="spk-modal" onClick={e => e.stopPropagation()}>
+
+        <button
+          type="button"
+          className="modal-close spk-close"
+          onClick={handleClose}
+          aria-label="Review later"
+          title="Review later (offer stays in your queue)"
+        >
+          ✕
+        </button>
 
         <div className="spk-head">
           <h2 className="spk-title">Qi Spark</h2>
           <p className="spk-sub">
             a <span className={`spk-tier-pill spk-tier-${offerRarity}`}>{offerRarityLabel}</span> offer, choose one
           </p>
+          {tailCount > 0 && (
+            <div className="spk-queue-badge" aria-label={`${tailCount} more spark moments queued`}>
+              ✦ <strong>{tailCount}</strong> more {tailCount === 1 ? 'spark awaits' : 'sparks await'} after this
+            </div>
+          )}
+          {hasContext && (
+            <div className="spk-snapshot-context" aria-label="Roll context">
+              {realmLabel}
+              {realmLabel && ageLabel && <span className="spk-snapshot-sep"> · </span>}
+              {ageLabel}
+            </div>
+          )}
         </div>
 
         <div className="spk-pair">

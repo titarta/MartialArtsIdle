@@ -2120,6 +2120,13 @@ function HomeScreen({
   // App.jsx (couples consumable use + cultivation.bypassGate atomically).
   bypassTokenCount = 0,
   onUseBypassToken,
+  // 2026-05-27 queue redesign — surfaces a "✦ N sparks await" chip in
+  // home-chips-tl when offline breakthroughs have queued spark choices
+  // the player hasn't picked yet. Hidden when the queue is empty or the
+  // picker modal is currently mounted (no duplicate affordance).
+  pendingSparkOffers = 0,
+  sparkModalOpen     = false,
+  onReviewSparkQueue,
 }) {
   const { t } = useTranslation('ui');
   const {
@@ -2625,6 +2632,7 @@ function HomeScreen({
         <OfflineEarningsModal
           amount={offlineEarnings}
           durationMs={offlineAwayMs}
+          pendingSparkCount={pendingSparkOffers}
           onCollect={() => {
             collectOfflineEarnings(1);
             dismiss(currentEvent.id);
@@ -2687,6 +2695,23 @@ function HomeScreen({
               rewards, pills shortcut. */}
           <div className="home-chips-tl">
             <ActiveBuffsChip activeSparks={activeSparks} activeBuffs={activeBuffs} />
+            {/* Spark queue chip — appears when the player has dismissed
+                the picker (or returned from offline to a non-empty queue
+                and dismissed) and there are still unresolved spark
+                moments waiting. Tap to re-open the picker at the head
+                of the queue. Hidden while the picker itself is mounted. */}
+            {pendingSparkOffers > 0 && !sparkModalOpen && !majorBreakthrough && (
+              <button
+                className="home-sel-btn home-sel-btn-spark"
+                onClick={onReviewSparkQueue}
+                title="Review queued spark moments"
+              >
+                <span className="home-sel-btn-icon">✦</span>
+                <span className="home-sel-btn-label">
+                  {pendingSparkOffers} Spark{pendingSparkOffers !== 1 ? 's' : ''} await
+                </span>
+              </button>
+            )}
             {selections?.pendingCount > 0 && !majorBreakthrough && (
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>

@@ -1634,7 +1634,7 @@ function AppInner() {
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
     // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} />,
     // Combat-adjacent screens are mounted only when FEATURES.combat is true.
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
@@ -1827,6 +1827,7 @@ function AppInner() {
           then the picker. Generalises to any future tutorial that wants
           to fire alongside a spark offer. */}
       {qiSparks.pendingOffer
+        && qiSparks.isOfferModalOpen
         && !cultivation.majorBreakthrough
         && currentEvent?.kind !== 'breakthrough'
         && currentEvent?.kind !== 'crystal-evolution'
@@ -1836,10 +1837,12 @@ function AppInner() {
         && (
         <QiSparkChoiceModal
           offer={qiSparks.pendingOffer}
+          queueCount={qiSparks.pendingOffersCount}
           bloodLotusBalance={qiSparks.bloodLotusBalance}
           nextRerollCostFor={qiSparks.nextRerollCost}
           onChoose={qiSparks.choose}
           onRerollOffer={qiSparks.rerollOffer}
+          onDismiss={qiSparks.dismiss}
           onSkip={qiSparks.skip}
           pityCounter={qiSparks.pityCounter}
           pityThreshold={qiSparks.pityThreshold}

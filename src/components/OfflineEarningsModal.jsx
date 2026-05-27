@@ -32,11 +32,23 @@ function formatAwayDuration(ms) {
  * is the deliberately-secondary doubler. When onDoubleCollect is null the
  * Watch ×2 button is omitted entirely (no broken button).
  */
-function OfflineEarningsModal({ amount, durationMs = 0, onCollect, onDoubleCollect }) {
+function OfflineEarningsModal({
+  amount,
+  durationMs = 0,
+  onCollect,
+  onDoubleCollect,
+  // 2026-05-27 — Spark queue redesign. If breakthroughs fired while the
+  // player was away, the picker queues their rolls instead of forcing an
+  // immediate choice. Surface that here so the returning player sees the
+  // queue exists at the same moment they see their offline qi. After they
+  // collect, the picker auto-mounts to walk them through the queue.
+  pendingSparkCount = 0,
+}) {
   const { t } = useTranslation('ui');
 
   const showDuration = durationMs >= DURATION_VISIBILITY_THRESHOLD_MS;
   const durationText = showDuration ? formatAwayDuration(durationMs) : '';
+  const hasSparkQueue = pendingSparkCount > 0;
 
   return (
     <div className="offline-stage">
@@ -75,6 +87,21 @@ function OfflineEarningsModal({ amount, durationMs = 0, onCollect, onDoubleColle
             {t('offlineModal.qiUnit', { defaultValue: 'Qi' })}
           </div>
         </div>
+
+        {hasSparkQueue && (
+          <div className="offline-spark-queue" aria-label="Spark moments awaiting your discernment">
+            <span className="offline-spark-queue-glyph" aria-hidden="true">✦</span>
+            <span className="offline-spark-queue-text">
+              <strong>{pendingSparkCount}</strong>
+              {' '}
+              {t('offlineModal.sparkQueue', {
+                defaultValue: pendingSparkCount === 1
+                  ? 'spark moment awaits your discernment'
+                  : 'spark moments await your discernment',
+              })}
+            </span>
+          </div>
+        )}
 
         <div className="offline-actions">
           <button
