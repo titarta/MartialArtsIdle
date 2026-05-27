@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spirit Bazaar v2 . skin cards + bundles . MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Ma+Shan+Zheng&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brass-edge:    #dcaf6e;
+  --brass-deep:    #8a5a28;
+  --lacquer-1:     #2a1d10;
+  --lacquer-2:     #1f160c;
+  --lacquer-3:     #150e07;
+  --cream:         #f5e6c8;
+  --cream-soft:    rgba(245, 230, 200, 0.86);
+  --vermillion:    #c83838;
+  --jade:          #4ea372;
+  --gold-check:    #b9d6a2;
+  --page-bg:       #181016;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(220, 175, 110, 0.06), transparent 60%),
+    var(--page-bg);
+  color: #e8d7c0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 36px 24px 80px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 0 0 6px;
+}
+h1 .sub {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 920px;
+  margin: 8px 0 18px;
+  color: rgba(232, 215, 192, 0.78);
+}
+.lede strong { color: var(--brass-edge); font-weight: 600; }
+.lede em { color: var(--vermillion); font-style: normal; font-weight: 600; }
+
+/* ── Rule strip ──────────────────────────────────────────────────────── */
+.rules {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  max-width: 1280px;
+  margin: 0 0 36px;
+}
+.rule {
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: rgba(20, 14, 18, 0.6);
+  border-left: 3px solid var(--brass-edge);
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  border-left: 3px solid var(--brass-edge);
+}
+.rule-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+}
+.rule-body {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.85);
+}
+.rule-body b { color: var(--cream); font-weight: 600; }
+
+/* ── Phone rail ──────────────────────────────────────────────────────── */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(3, 390px);
+  gap: 28px;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  scrollbar-color: #553c20 transparent;
+}
+.panel { display: flex; flex-direction: column; gap: 14px; }
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.panel-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  color: var(--brass-edge);
+  border-radius: 2px;
+}
+.panel-tag.win    { color: #ffd28a; border-color: rgba(255, 210, 138, 0.70); background: rgba(220, 175, 110, 0.10); }
+.panel-tag.bundle { color: #d8a9ff; border-color: rgba(216, 169, 255, 0.55); background: rgba(140, 90, 200, 0.10); }
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--cream);
+}
+.panel-note {
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.72);
+  min-height: 56px;
+}
+.panel-note b { color: var(--cream); font-weight: 600; }
+
+/* ── Phone shell ─────────────────────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 820px;
+  border-radius: 36px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: #0d0810;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 6px #050306 inset,
+    0 0 0 7px rgba(220, 175, 110, 0.10) inset;
+}
+.phone-glass {
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a121c 0%, #0a070d 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.tb {
+  flex: 0 0 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, #15101a 0%, #0d0810 100%);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.12);
+}
+.tb .back {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(220, 175, 110, 0.85);
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.20);
+  border-radius: 999px;
+}
+.tb .title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+  margin-right: auto;
+}
+.tb .bal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd6b0;
+  padding: 4px 10px;
+  border: 1px solid rgba(200, 56, 56, 0.45);
+  border-radius: 999px;
+  background: rgba(40, 10, 14, 0.6);
+}
+.tb .bal::before {
+  content: '';
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #c83838 60%, #5a1010);
+  box-shadow: 0 0 4px rgba(200, 56, 56, 0.65);
+}
+
+.sub-rail {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.12);
+}
+.sub-rail .tab {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  color: rgba(232, 215, 192, 0.55);
+}
+.sub-rail .tab.on {
+  color: var(--cream);
+  border-bottom: 2px solid var(--brass-edge);
+  padding-bottom: 2px;
+}
+
+.body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 14px 24px;
+}
+
+.sec-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.sec-label .count {
+  font-size: 9.5px;
+  color: rgba(220, 175, 110, 0.50);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+}
+.sec-label.bundles { color: #d8a9ff; }
+
+/* ── Skin card (procession - 3 visible + 10 silhouettes) ─────────────── */
+.skin-card {
+  position: relative;
+  margin: 0 0 14px;
+  padding: 12px 14px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.06) 0%,
+      transparent 16%),
+    linear-gradient(180deg, rgba(40, 14, 18, 0.92), rgba(18, 10, 14, 0.97));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 180, 0.10),
+    0 4px 12px rgba(0, 0, 0, 0.55);
+}
+.skin-card-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.skin-card-titles { min-width: 0; }
+.skin-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  line-height: 1.15;
+}
+.skin-card-kicker {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.70);
+  margin-top: 3px;
+}
+.skin-card-slot {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.55);
+  padding: 3px 7px;
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ─── Procession - 13 stages, first 3 colored, rest silhouetted ─── */
+.proc {
+  position: relative;
+  height: 88px;
+  margin: 4px 0 10px;
+  padding: 6px 0;
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse at 50% 60%,
+      rgba(220, 175, 110, 0.06),
+      transparent 60%),
+    rgba(8, 4, 8, 0.55);
+  border: 1px solid rgba(220, 175, 110, 0.14);
+  overflow: hidden;
+}
+.proc::before {
+  /* "veil" overlay that fades from clear (left, revealed stages) to
+     misty (right, silhouetted stages) - sells the "mystery deepens"
+     narrative without spoiling the late forms */
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 72%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(8, 4, 12, 0.35) 30%,
+    rgba(8, 4, 12, 0.55) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+.proc-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 10px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Each silhouette = abstract cultivator. CSS placeholder for sprite. */
+.silh {
+  width: 22px;
+  position: relative;
+  flex: 0 0 auto;
+}
+.silh::before { /* body */
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 76%;
+  background: linear-gradient(180deg,
+    #a8b878 0%,
+    #6a8d6a 60%,
+    #455c43 100%);
+  border-radius: 30% 30% 16% 16% / 16% 16% 28% 28%;
+}
+.silh::after { /* head */
+  content: '';
+  position: absolute;
+  bottom: 56%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56%;
+  height: 24%;
+  background: radial-gradient(circle at 50% 50%,
+    #d9c89a 0 78%,
+    transparent 78%);
+  border-radius: 50%;
+}
+/* Stage growth */
+.silh.t1  { height: 40px; }
+.silh.t2  { height: 44px; }
+.silh.t3  { height: 48px; }
+.silh.t4  { height: 52px; }
+.silh.t5  { height: 56px; }
+.silh.t6  { height: 60px; }
+.silh.t7  { height: 64px; }
+.silh.t8  { height: 68px; }
+.silh.t9  { height: 70px; }
+.silh.t10 { height: 72px; }
+.silh.t11 { height: 74px; }
+.silh.t12 { height: 76px; }
+.silh.t13 { height: 78px; }
+
+/* Silhouette state (stages 4..13): true black silhouette, no detail */
+.silh.shadow::before {
+  background: linear-gradient(180deg,
+    #1a1010 0%,
+    #050204 75%,
+    #000 100%);
+}
+.silh.shadow::after {
+  background: radial-gradient(circle at 50% 50%,
+    #050204 0 78%,
+    transparent 78%);
+}
+.silh.shadow {
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.85));
+  opacity: 0.96;
+}
+.silh.t13.shadow::after {
+  /* Last stage gets a tiny rim-light to tease "something powerful" */
+  box-shadow: 0 0 6px rgba(220, 175, 110, 0.35);
+}
+
+/* Stage divider after t3 — the "veil" line where surprise begins */
+.proc-veil-line {
+  position: absolute;
+  top: 8px; bottom: 8px;
+  width: 1px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(220, 175, 110, 0.45) 30%,
+    rgba(220, 175, 110, 0.45) 70%,
+    transparent 100%);
+  z-index: 3;
+}
+
+/* Stage badge under the procession */
+.skin-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.skin-card-foot-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: rgba(232, 215, 192, 0.55);
+}
+.skin-card-foot-label b { color: var(--cream); font-weight: 600; }
+
+.skin-card-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff5d0;
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.32), rgba(120, 80, 40, 0.22));
+  border: 1px solid rgba(220, 175, 110, 0.65);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.skin-card-buy::before {
+  content: '';
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #c83838 60%, #5a1010);
+  box-shadow: 0 0 4px rgba(200, 56, 56, 0.65);
+}
+.skin-card-buy-amt {
+  font-variant-numeric: tabular-nums;
+}
+.skin-card-buy:disabled,
+.skin-card-buy.disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+/* ── Bundle pack card (3 mini-processions in one card) ───────────────── */
+.bundle {
+  position: relative;
+  margin: 0 0 16px;
+  padding: 14px 14px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(216, 169, 255, 0.55);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(140, 90, 200, 0.18), transparent 60%),
+    linear-gradient(180deg, rgba(36, 18, 48, 0.94), rgba(18, 10, 22, 0.97));
+  box-shadow:
+    inset 0 1px 0 rgba(220, 190, 255, 0.18),
+    0 0 24px rgba(140, 90, 200, 0.18),
+    0 8px 20px rgba(0, 0, 0, 0.55);
+}
+.bundle-ribbon {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: #f5e3ff;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8a52d8 0%, #5a3296 100%);
+  border: 1px solid rgba(220, 190, 255, 0.55);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 235, 250, 0.32);
+}
+.bundle-save-ribbon {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b9d6a2;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(40, 80, 50, 0.55);
+  border: 1px solid rgba(110, 217, 164, 0.55);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+.bundle-head {
+  margin-top: 4px;
+  margin-bottom: 10px;
+}
+.bundle-name {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f5e3ff;
+  text-shadow: 0 0 10px rgba(140, 90, 200, 0.45);
+  line-height: 1.1;
+}
+.bundle-tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  color: rgba(232, 215, 232, 0.66);
+  margin-top: 4px;
+}
+
+.bundle-pieces {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.piece {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(8, 4, 12, 0.55);
+  border: 1px solid rgba(220, 190, 255, 0.16);
+}
+.piece-mini {
+  position: relative;
+  height: 36px;
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  padding: 0 4px;
+}
+.piece-mini .silh { width: 8px; }
+.piece-mini .silh.t1  { height: 16px; }
+.piece-mini .silh.t2  { height: 20px; }
+.piece-mini .silh.t3  { height: 24px; }
+.piece-mini .silh.t4  { height: 28px; }
+.piece-mini .silh.t5  { height: 32px; }
+.piece-mini .silh.t6  { height: 36px; }
+
+.piece-meta { min-width: 0; }
+.piece-name {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+}
+.piece-type {
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(220, 190, 255, 0.50);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.piece-price-strike {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 200, 200, 0.45);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 120, 120, 0.55);
+}
+
+.bundle-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(220, 190, 255, 0.18);
+}
+.bundle-price-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.bundle-price-strike {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 200, 200, 0.55);
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 120, 120, 0.65);
+}
+.bundle-price {
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff5d0;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.bundle-price::before {
+  content: '';
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #c83838 60%, #5a1010);
+  box-shadow: 0 0 5px rgba(200, 56, 56, 0.7);
+}
+.bundle-buy {
+  padding: 10px 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #f5e3ff;
+  background: linear-gradient(180deg, #8a52d8 0%, #5a3296 100%);
+  border: 1px solid rgba(220, 190, 255, 0.55);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 250, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 3px 10px rgba(140, 90, 200, 0.30);
+  cursor: pointer;
+}
+
+/* ── Summary ─────────────────────────────────────────────────────────── */
+.summary {
+  margin-top: 56px;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  border-left: 3px solid #ffd28a;
+  border-radius: 4px;
+  background: rgba(10, 6, 10, 0.55);
+  padding: 22px 26px;
+  max-width: 1280px;
+}
+.summary h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: var(--cream);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.summary p { margin: 6px 0; }
+.summary p b { color: var(--cream); }
+.summary p em { color: #ffd28a; font-style: normal; }
+.summary ul { margin: 8px 0 0; padding-left: 22px; }
+.summary li { margin: 4px 0; color: rgba(232, 215, 192, 0.85); }
+.summary li code { font-family: 'Inter', monospace; background: rgba(220, 175, 110, 0.08); padding: 1px 6px; border-radius: 3px; color: var(--brass-edge); }
+</style>
+</head>
+<body>
+
+<h1>Spirit Bazaar v2 . skin cards + theme bundles
+  <span class="sub">procession-only, no tint, no equip-in-store, bundle packs added . 2026-05-27</span>
+</h1>
+
+<p class="lede">
+  Clearer brief: <em>(1)</em> tint cards are a <strong>bug</strong> - remove entirely; <em>(2)</em> every skin is the <strong>procession</strong> (first 3 stances readable, rest silhouetted to keep the surprise) - placeholder sprites today, real premium pixel art later; <em>(3)</em> <strong>no equip / unequip in the store</strong> - once bought, the card disappears and lives in Codex > Wardrobe; <em>(4)</em> add Fortnite-style <strong>theme bundles</strong> (cultivator + crystal + particles same theme, discounted).
+</p>
+
+<!-- Rule strip -->
+<div class="rules">
+  <div class="rule">
+    <div class="rule-tag">Rule 1 . no tints</div>
+    <div class="rule-body">Drop the entire <b>tint product line</b> (Crimson / Verdant / Amethyst Path etc.). It was a bug - there's no recolor SKU.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-tag">Rule 2 . one card shape</div>
+    <div class="rule-body">Every skin uses the <b>procession</b>: t1-t3 in colored detail, t4-t13 in pure silhouette behind a soft mist veil. Same shape across all slots.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-tag">Rule 3 . store sells only</div>
+    <div class="rule-body">No equip / unequip here. <b>Buy . disappear from store . equip in Codex > Wardrobe.</b> Store stays focused on conversion.</div>
+  </div>
+  <div class="rule">
+    <div class="rule-tag">Rule 4 . theme bundles</div>
+    <div class="rule-body">A <b>"Frost Sect" pack</b> = cultivator skin + crystal skin + particle pack at <b>20-25% off</b> the sum-of-parts. Violet/purple chrome distinguishes from singles.</div>
+  </div>
+</div>
+
+<div class="rail">
+
+  <!-- ───────── 1. Standalone skin cards ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag win">Singles</span>
+      <span class="panel-title">Cosmetics aisle . skin cards</span>
+    </div>
+    <div class="panel-note">
+      Each skin card is a <b>procession</b>. Header has name + slot tag (CULTIVATOR / CRYSTAL / etc.). Foot has stage counter + Buy CTA with explicit lotus-tagged price. <b>No equip flow</b> - the card vanishes the moment it's bought (goes to Codex). Already-owned skins never appear here.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label">Cultivator Skins <span class="count">2 available</span></div>
+
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Frost Ascetic</div>
+                <div class="skin-card-kicker">Evolves through 13 forms</div>
+              </div>
+              <span class="skin-card-slot">Cultivator</span>
+            </div>
+            <div class="proc">
+              <div class="proc-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4 shadow"></div><div class="silh t5 shadow"></div>
+                <div class="silh t6 shadow"></div><div class="silh t7 shadow"></div>
+                <div class="silh t8 shadow"></div><div class="silh t9 shadow"></div>
+                <div class="silh t10 shadow"></div><div class="silh t11 shadow"></div>
+                <div class="silh t12 shadow"></div><div class="silh t13 shadow"></div>
+              </div>
+              <span class="proc-veil-line" style="left: 22.5%;"></span>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>3 of 13</b> stances revealed</div>
+              <button class="skin-card-buy"><span class="skin-card-buy-amt">1,200</span></button>
+            </div>
+          </div>
+
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Bone Patriarch</div>
+                <div class="skin-card-kicker">Evolves through 13 forms</div>
+              </div>
+              <span class="skin-card-slot">Cultivator</span>
+            </div>
+            <div class="proc">
+              <div class="proc-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4 shadow"></div><div class="silh t5 shadow"></div>
+                <div class="silh t6 shadow"></div><div class="silh t7 shadow"></div>
+                <div class="silh t8 shadow"></div><div class="silh t9 shadow"></div>
+                <div class="silh t10 shadow"></div><div class="silh t11 shadow"></div>
+                <div class="silh t12 shadow"></div><div class="silh t13 shadow"></div>
+              </div>
+              <span class="proc-veil-line" style="left: 22.5%;"></span>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>3 of 13</b> stances revealed</div>
+              <button class="skin-card-buy"><span class="skin-card-buy-amt">1,500</span></button>
+            </div>
+          </div>
+
+          <div class="sec-label" style="margin-top:20px;">Crystal Skins <span class="count">1 available</span></div>
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Frost Crystal</div>
+                <div class="skin-card-kicker">Evolves through 10 tiers</div>
+              </div>
+              <span class="skin-card-slot">Crystal</span>
+            </div>
+            <div class="proc">
+              <div class="proc-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4 shadow"></div><div class="silh t5 shadow"></div>
+                <div class="silh t6 shadow"></div><div class="silh t7 shadow"></div>
+                <div class="silh t8 shadow"></div><div class="silh t9 shadow"></div>
+                <div class="silh t10 shadow"></div>
+              </div>
+              <span class="proc-veil-line" style="left: 28.5%;"></span>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>3 of 10</b> tiers revealed</div>
+              <button class="skin-card-buy"><span class="skin-card-buy-amt">800</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── 2. Theme bundle (Frost Sect) ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag bundle">Bundles</span>
+      <span class="panel-title">Theme pack . single CTA</span>
+    </div>
+    <div class="panel-note">
+      Bundles sit at the <b>top</b> of the Cosmetics aisle (highest conversion). Violet-purple chrome separates them visually from single-skin singles. Each piece shows a mini-procession (6 stages) + its strike-through individual price. Footer: stacked total strike + bundle price + single purple Buy CTA.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label bundles">Theme Packs <span class="count">2 available</span></div>
+
+          <div class="bundle">
+            <span class="bundle-ribbon">Theme Pack</span>
+            <span class="bundle-save-ribbon">Save 800</span>
+            <div class="bundle-head">
+              <div class="bundle-name">Frost Sect</div>
+              <div class="bundle-tag">Cultivator + crystal + particles, one theme</div>
+            </div>
+
+            <div class="bundle-pieces">
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Frost Ascetic</div>
+                  <div class="piece-type">Cultivator</div>
+                </div>
+                <span class="piece-price-strike">1,200</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Frost Crystal</div>
+                  <div class="piece-type">Crystal</div>
+                </div>
+                <span class="piece-price-strike">800</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Snowfall Motes</div>
+                  <div class="piece-type">Particles</div>
+                </div>
+                <span class="piece-price-strike">500</span>
+              </div>
+            </div>
+
+            <div class="bundle-foot">
+              <div class="bundle-price-stack">
+                <span class="bundle-price-strike">2,500 BL</span>
+                <span class="bundle-price">1,700</span>
+              </div>
+              <button class="bundle-buy">Claim Pack</button>
+            </div>
+          </div>
+
+          <div class="bundle">
+            <span class="bundle-ribbon">Theme Pack</span>
+            <span class="bundle-save-ribbon">Save 600</span>
+            <div class="bundle-head">
+              <div class="bundle-name">Bone Court</div>
+              <div class="bundle-tag">Cultivator + crystal + particles, one theme</div>
+            </div>
+
+            <div class="bundle-pieces">
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Bone Patriarch</div>
+                  <div class="piece-type">Cultivator</div>
+                </div>
+                <span class="piece-price-strike">1,500</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Ossuary Crystal</div>
+                  <div class="piece-type">Crystal</div>
+                </div>
+                <span class="piece-price-strike">800</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta">
+                  <div class="piece-name">Ashen Motes</div>
+                  <div class="piece-type">Particles</div>
+                </div>
+                <span class="piece-price-strike">500</span>
+              </div>
+            </div>
+
+            <div class="bundle-foot">
+              <div class="bundle-price-stack">
+                <span class="bundle-price-strike">2,800 BL</span>
+                <span class="bundle-price">2,200</span>
+              </div>
+              <button class="bundle-buy">Claim Pack</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── 3. Full aisle composition ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag win">Full aisle</span>
+      <span class="panel-title">Bundles on top, singles below</span>
+    </div>
+    <div class="panel-note">
+      Final composition: <b>Theme Packs first</b> (the deal-driver), then singles grouped by slot. Section header counts shrink as the player buys (sold items move to Codex > Wardrobe). Empty group = section header hidden entirely - no "Coming Soon" placeholders, no dead space.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label bundles">Theme Packs <span class="count">2</span></div>
+
+          <div class="bundle">
+            <span class="bundle-ribbon">Theme Pack</span>
+            <span class="bundle-save-ribbon">Save 800</span>
+            <div class="bundle-head">
+              <div class="bundle-name">Frost Sect</div>
+              <div class="bundle-tag">Cultivator + crystal + particles, one theme</div>
+            </div>
+            <div class="bundle-pieces">
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta"><div class="piece-name">Frost Ascetic</div><div class="piece-type">Cultivator</div></div>
+                <span class="piece-price-strike">1,200</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta"><div class="piece-name">Frost Crystal</div><div class="piece-type">Crystal</div></div>
+                <span class="piece-price-strike">800</span>
+              </div>
+              <div class="piece">
+                <div class="piece-mini"><div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div><div class="silh t4 shadow"></div><div class="silh t5 shadow"></div><div class="silh t6 shadow"></div></div>
+                <div class="piece-meta"><div class="piece-name">Snowfall Motes</div><div class="piece-type">Particles</div></div>
+                <span class="piece-price-strike">500</span>
+              </div>
+            </div>
+            <div class="bundle-foot">
+              <div class="bundle-price-stack">
+                <span class="bundle-price-strike">2,500 BL</span>
+                <span class="bundle-price">1,700</span>
+              </div>
+              <button class="bundle-buy">Claim Pack</button>
+            </div>
+          </div>
+
+          <div class="sec-label" style="margin-top:18px;">Cultivator Skins <span class="count">2</span></div>
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Frost Ascetic</div>
+                <div class="skin-card-kicker">Evolves through 13 forms</div>
+              </div>
+              <span class="skin-card-slot">Cultivator</span>
+            </div>
+            <div class="proc">
+              <div class="proc-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4 shadow"></div><div class="silh t5 shadow"></div>
+                <div class="silh t6 shadow"></div><div class="silh t7 shadow"></div>
+                <div class="silh t8 shadow"></div><div class="silh t9 shadow"></div>
+                <div class="silh t10 shadow"></div><div class="silh t11 shadow"></div>
+                <div class="silh t12 shadow"></div><div class="silh t13 shadow"></div>
+              </div>
+              <span class="proc-veil-line" style="left: 22.5%;"></span>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>3 of 13</b> stances revealed</div>
+              <button class="skin-card-buy"><span class="skin-card-buy-amt">1,200</span></button>
+            </div>
+          </div>
+          <div class="sec-label" style="margin-top:18px;">Crystal Skins <span class="count">1</span></div>
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Frost Crystal</div>
+                <div class="skin-card-kicker">Evolves through 10 tiers</div>
+              </div>
+              <span class="skin-card-slot">Crystal</span>
+            </div>
+            <div class="proc">
+              <div class="proc-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4 shadow"></div><div class="silh t5 shadow"></div>
+                <div class="silh t6 shadow"></div><div class="silh t7 shadow"></div>
+                <div class="silh t8 shadow"></div><div class="silh t9 shadow"></div>
+                <div class="silh t10 shadow"></div>
+              </div>
+              <span class="proc-veil-line" style="left: 28.5%;"></span>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>3 of 10</b> tiers revealed</div>
+              <button class="skin-card-buy"><span class="skin-card-buy-amt">800</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <h2>What changes in code</h2>
+  <p><b>Drop entirely:</b></p>
+  <ul>
+    <li>The <code>TINT_PREVIEW_FILTERS</code> map and the tint-card branch in <code>SpiritBazaarScreen.jsx</code>'s <code>getPreview()</code></li>
+    <li>The simple <code>CosmeticCard</code> component (all the hue-rotate variants)</li>
+    <li>The <code>cos_char_crimson</code>/<code>cos_char_verdant</code>/<code>cos_char_amethyst</code>/<code>cos_crystal_verdant</code>/<code>cos_crystal_amber</code>/<code>cos_particles_jade</code>/<code>cos_particles_violet</code>/<code>cos_bg_dawn</code>/<code>cos_bg_twilight</code> data entries</li>
+    <li>The <code>group.premium</code> "Coming Soon" subsection rendering</li>
+    <li>The <code>onEquip</code> / <code>onUnequip</code> wiring in <code>CosmeticCardProcession</code> - equipping happens in Codex > Wardrobe now</li>
+  </ul>
+  <p style="margin-top:12px;"><b>Add / keep:</b></p>
+  <ul>
+    <li><code>CosmeticCardProcession</code> stays as the <em>only</em> cosmetic card shape - sells full-skin SKUs only</li>
+    <li>New <code>BundleCard</code> component for theme packs (violet chrome, 3 mini-processions, save-ribbon, total strike + bundle price)</li>
+    <li>New data shape in <code>shopItems.js</code>: <code>{ id, kind: 'bundle', theme, components: [skinId, skinId, skinId], cost, saveAmount }</code> - the apply layer expands components on purchase and credits all three to inventory</li>
+    <li>After purchase: cosmetic disappears from the Bazaar list (filtered out by <code>!inventory.isCosmeticOwned(id)</code> at the section level) and surfaces in Codex > Wardrobe for equipping</li>
+  </ul>
+  <p style="margin-top:12px;"><b>Aisle order:</b> Theme Packs first (deal-driver), then singles by slot (Cultivator / Crystal / Particles / Backdrop). Empty group = hidden entirely. No "Coming Soon" placeholders.</p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spirit Bazaar . cosmetic card study . MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Ma+Shan+Zheng&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brass-edge:    #dcaf6e;
+  --brass-deep:    #8a5a28;
+  --lacquer-1:     #2a1d10;
+  --lacquer-2:     #1f160c;
+  --lacquer-3:     #150e07;
+  --cream:         #f5e6c8;
+  --cream-soft:    rgba(245, 230, 200, 0.86);
+  --vermillion:    #c83838;
+  --jade:          #4ea372;
+  --page-bg:       #181016;
+
+  /* Three tints we are previewing */
+  --tint-crimson:  hue-rotate(-95deg) saturate(1.35) brightness(0.95);
+  --tint-verdant:  hue-rotate(60deg)  saturate(1.20) brightness(0.95);
+  --tint-amethyst: hue-rotate(180deg) saturate(1.20) brightness(0.95);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(220, 175, 110, 0.06), transparent 60%),
+    var(--page-bg);
+  color: #e8d7c0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 36px 24px 80px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 0 0 6px;
+}
+h1 .sub {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 920px;
+  margin: 8px 0 32px;
+  color: rgba(232, 215, 192, 0.75);
+}
+.lede strong { color: var(--brass-edge); font-weight: 600; }
+.lede em { color: var(--vermillion); font-style: normal; font-weight: 600; }
+
+/* ── Issue strip ──────────────────────────────────────────────────────── */
+.issues {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 0 40px;
+}
+.issue {
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 140, 140, 0.30);
+  border-left: 3px solid #ff8a8a;
+  border-radius: 4px;
+  background: rgba(40, 12, 14, 0.45);
+}
+.issue-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ff8a8a;
+}
+.issue-body {
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.85);
+}
+.issue-body b { color: var(--cream); font-weight: 600; }
+
+/* ── Comparison rail ─────────────────────────────────────────────────── */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(3, 390px);
+  gap: 28px;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  scrollbar-color: #553c20 transparent;
+}
+.panel { display: flex; flex-direction: column; gap: 14px; }
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.panel-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  color: var(--brass-edge);
+  border-radius: 2px;
+}
+.panel-tag.broken { color: #ff8a8a; border-color: rgba(255, 140, 140, 0.50); }
+.panel-tag.win    { color: #ffd28a; border-color: rgba(255, 210, 138, 0.70); background: rgba(220, 175, 110, 0.10); }
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--cream);
+}
+.panel-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: rgba(232, 215, 192, 0.72);
+  min-height: 66px;
+}
+.panel-note b { color: var(--cream); font-weight: 600; }
+
+/* ── Phone shell ─────────────────────────────────────────────────────── */
+.phone {
+  width: 390px;
+  height: 780px;
+  border-radius: 36px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: #0d0810;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgba(0, 0, 0, 0.8),
+    0 0 0 6px #050306 inset,
+    0 0 0 7px rgba(220, 175, 110, 0.10) inset;
+}
+.phone-glass {
+  position: absolute;
+  inset: 12px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a121c 0%, #0a070d 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.tb {
+  flex: 0 0 38px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, #15101a 0%, #0d0810 100%);
+  border-bottom: 1px solid rgba(220, 175, 110, 0.12);
+}
+.tb .back {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(220, 175, 110, 0.85);
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.20);
+  border-radius: 999px;
+}
+.tb .title {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+  margin-right: auto;
+}
+.tb .bal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd6b0;
+  padding: 4px 10px;
+  border: 1px solid rgba(200, 56, 56, 0.45);
+  border-radius: 999px;
+  background: rgba(40, 10, 14, 0.6);
+}
+.tb .bal::before {
+  content: '';
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #c83838 60%, #5a1010);
+  box-shadow: 0 0 4px rgba(200, 56, 56, 0.65);
+}
+
+.sub-rail {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid rgba(220, 175, 110, 0.12);
+}
+.sub-rail .tab {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  color: rgba(232, 215, 192, 0.55);
+}
+.sub-rail .tab.on {
+  color: var(--cream);
+  border-bottom: 2px solid var(--brass-edge);
+  padding-bottom: 2px;
+}
+
+.body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 14px 24px;
+}
+
+.sec-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+  margin: 4px 0 10px;
+}
+.sec-label-soon {
+  color: rgba(255, 180, 180, 0.55);
+}
+
+/* ── BROKEN today's card ──────────────────────────────────────────────── */
+.bls-card-today {
+  position: relative;
+  margin: 0 0 12px;
+  padding: 10px 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  background: linear-gradient(180deg, rgba(40, 14, 18, 0.85), rgba(20, 10, 14, 0.95));
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+}
+.bls-card-today .prev {
+  width: 78px; height: 78px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1b0f15, #100a10);
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.bls-card-today .prev .silhouette {
+  /* placeholder for the t1 cultivator sprite */
+  width: 56px; height: 56px;
+  border-radius: 999px 999px 50% 50%;
+  background: radial-gradient(circle at 50% 30%,
+    #d9c89a 0 22%,
+    #6a8d6a 22% 70%,
+    transparent 70%);
+  filter: var(--cur-tint, none);
+}
+.bls-card-today .body {
+  padding: 0;
+  overflow: visible;
+}
+.bls-card-today .name {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.04em;
+}
+.bls-card-today .badge {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.70);
+  margin-top: 3px;
+}
+.bls-card-today .badge .dots { display: inline-flex; gap: 3px; margin-right: 6px; vertical-align: middle; }
+.bls-card-today .badge .dots span { width: 4px; height: 4px; border-radius: 50%; background: rgba(220, 175, 110, 0.55); }
+.bls-card-today .cta {
+  margin-top: 8px;
+  width: 100%;
+  padding: 9px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff5d0;
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.30), rgba(120, 80, 40, 0.20));
+  border: 1px solid rgba(220, 175, 110, 0.55);
+  border-radius: 8px;
+}
+
+/* The pseudo "Coming Soon" subsection in the broken version */
+.bls-coming-soon {
+  margin-top: 12px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  border: 1px dashed rgba(200, 56, 56, 0.30);
+  background: rgba(40, 12, 14, 0.30);
+}
+.bls-coming-soon .label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 180, 180, 0.62);
+  margin-bottom: 8px;
+}
+.bls-coming-soon .tease {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bls-coming-soon .tease .silhouette {
+  width: 46px; height: 46px;
+  border-radius: 999px 999px 50% 50%;
+  background: radial-gradient(circle at 50% 30%,
+    rgba(80, 60, 100, 0.85) 0 22%,
+    rgba(40, 30, 50, 0.85) 22% 70%,
+    transparent 70%);
+}
+.bls-coming-soon .tease .meta {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  color: rgba(255, 180, 180, 0.55);
+}
+.bls-coming-soon .tease .meta b { color: rgba(255, 200, 200, 0.85); font-weight: 600; }
+.bls-coming-soon .tease .ribbon {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vermillion);
+  padding: 3px 8px;
+  border: 1px solid rgba(200, 56, 56, 0.45);
+  border-radius: 4px;
+}
+
+/* ── PROPOSED — evolution-procession card ────────────────────────────── */
+.skin-card {
+  position: relative;
+  margin: 0 0 14px;
+  padding: 14px 14px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  background:
+    linear-gradient(180deg,
+      rgba(220, 175, 110, 0.08) 0%,
+      transparent 18%),
+    linear-gradient(180deg, rgba(40, 14, 18, 0.92), rgba(18, 10, 14, 0.97));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 180, 0.10),
+    0 4px 12px rgba(0, 0, 0, 0.55);
+}
+.skin-card.equipped {
+  border-color: rgba(110, 217, 164, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(180, 255, 210, 0.18),
+    0 0 0 1px rgba(110, 217, 164, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+.skin-card-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.skin-card-titles {
+  min-width: 0;
+}
+.skin-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  line-height: 1.15;
+}
+.skin-card-kicker {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 3px;
+}
+.skin-card.equipped .skin-card-kicker { color: #b9d6a2; }
+
+/* Price chip — the explicit price tag */
+.skin-card-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #ffd6b0;
+  background: rgba(40, 10, 14, 0.7);
+  border: 1px solid rgba(200, 56, 56, 0.45);
+  white-space: nowrap;
+}
+.skin-card-price::before {
+  content: '';
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff8a8a, #c83838 60%, #5a1010);
+  box-shadow: 0 0 4px rgba(200, 56, 56, 0.65);
+}
+.skin-card-price.muted {
+  color: rgba(255, 200, 200, 0.55);
+  border-color: rgba(200, 56, 56, 0.25);
+  background: rgba(40, 10, 14, 0.4);
+}
+.skin-card .ribbon-equipped {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b9d6a2;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(110, 217, 164, 0.45);
+  background: rgba(40, 80, 50, 0.30);
+  white-space: nowrap;
+}
+
+/* ─── Evolution procession — 13 silhouettes, all tinted ─── */
+.skin-card-procession {
+  position: relative;
+  height: 92px;
+  margin: 4px 0 10px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse at 50% 60%,
+      rgba(220, 175, 110, 0.08),
+      transparent 60%),
+    rgba(8, 4, 8, 0.55);
+  border: 1px solid rgba(220, 175, 110, 0.14);
+  overflow: hidden;
+}
+.skin-card-procession-fade-l,
+.skin-card-procession-fade-r {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 18px;
+  pointer-events: none;
+  z-index: 2;
+}
+.skin-card-procession-fade-l { left: 0;  background: linear-gradient(90deg, rgba(8,4,8,0.95), transparent); }
+.skin-card-procession-fade-r { right: 0; background: linear-gradient(-90deg, rgba(8,4,8,0.95), transparent); }
+
+.skin-card-procession-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 12px;
+}
+
+.silh {
+  /* abstract cultivator silhouette - head + body */
+  width: 26px;
+  height: 60px;
+  position: relative;
+  flex: 0 0 auto;
+  filter: var(--tint, none);
+  /* the silhouettes are pure shape; the tint applies via the CSS variable
+     set on the procession wrapper */
+}
+.silh::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 76%;
+  background: linear-gradient(180deg,
+    #a8b878 0%,
+    #6a8d6a 60%,
+    #455c43 100%);
+  border-radius: 30% 30% 16% 16% / 16% 16% 28% 28%;
+}
+.silh::after {
+  content: '';
+  position: absolute;
+  bottom: 56%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56%;
+  height: 24%;
+  background: radial-gradient(circle at 50% 50%,
+    #d9c89a 0 78%,
+    transparent 78%);
+  border-radius: 50%;
+}
+/* Tier-driven scale: each successive silhouette grows + gets more
+   ornament. We just bump height a touch to convey "evolves". */
+.silh.t1  { height: 42px; opacity: 0.92; }
+.silh.t2  { height: 46px; opacity: 0.92; }
+.silh.t3  { height: 50px; opacity: 0.94; }
+.silh.t4  { height: 54px; opacity: 0.94; }
+.silh.t5  { height: 58px; opacity: 0.96; }
+.silh.t6  { height: 62px; opacity: 0.96; }
+.silh.t7  { height: 66px; opacity: 0.98; }
+.silh.t8  { height: 70px; opacity: 0.98; }
+.silh.t9  { height: 74px; opacity: 1; }
+.silh.t10 { height: 76px; opacity: 1; }
+.silh.t11 { height: 78px; opacity: 1; }
+.silh.t12 { height: 80px; opacity: 1; }
+.silh.t13 { height: 82px; opacity: 1; }
+.silh.t13::after { box-shadow: 0 0 8px rgba(255, 220, 150, 0.45); }
+
+/* Tint variants — applied via filter on the wrapper procession row */
+.skin-card-procession.crimson  .skin-card-procession-row { --tint: var(--tint-crimson);  }
+.skin-card-procession.verdant  .skin-card-procession-row { --tint: var(--tint-verdant);  }
+.skin-card-procession.amethyst .skin-card-procession-row { --tint: var(--tint-amethyst); }
+
+/* Stage badge under the procession */
+.skin-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.skin-card-foot-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: rgba(232, 215, 192, 0.55);
+}
+.skin-card-foot-label b { color: var(--cream); font-weight: 600; }
+
+.skin-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff5d0;
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.32), rgba(120, 80, 40, 0.22));
+  border: 1px solid rgba(220, 175, 110, 0.65);
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.32),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+.skin-card-cta-disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+.skin-card-cta-equip {
+  background: linear-gradient(180deg, rgba(110, 217, 164, 0.32), rgba(60, 120, 90, 0.20));
+  border-color: rgba(110, 217, 164, 0.55);
+  color: #d8ffe8;
+}
+.skin-card-cta-unequip {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.2));
+  border-color: rgba(220, 175, 110, 0.45);
+  color: rgba(245, 230, 200, 0.85);
+}
+
+/* ── Summary block ────────────────────────────────────────────────────── */
+.summary {
+  margin-top: 56px;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  border-left: 3px solid #ffd28a;
+  border-radius: 4px;
+  background: rgba(10, 6, 10, 0.55);
+  padding: 22px 26px;
+  max-width: 1200px;
+}
+.summary h2 {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: var(--cream);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+.summary p { margin: 6px 0; }
+.summary p b { color: var(--cream); }
+.summary p em { color: #ffd28a; font-style: normal; }
+.summary ul { margin: 8px 0 0; padding-left: 22px; }
+.summary li { margin: 4px 0; color: rgba(232, 215, 192, 0.85); }
+.summary li code { font-family: 'Inter', monospace; background: rgba(220, 175, 110, 0.08); padding: 1px 6px; border-radius: 3px; color: var(--brass-edge); }
+</style>
+</head>
+<body>
+
+<h1>Spirit Bazaar . cosmetic card redesign
+  <span class="sub">silhouette evolution panel + explicit price + drop coming-soon . 2026-05-27</span>
+</h1>
+
+<p class="lede">
+  Three problems hit the Cosmetics aisle: <em>(1)</em> the preview is a single t1 sprite with a hue-rotate, but the in-game tint actually applies across <strong>all 13 cultivator evolutions</strong> - the card is selling something narrower than what the player gets; <em>(2)</em> the price lives <strong>inside the action button</strong> ("300 BL" doubles as the button label, then disappears the moment you own it) so prices are hard to compare side-by-side; <em>(3)</em> a <em>"Coming Soon"</em> subsection sits under each cosmetic group with silhouette teasers that the player can't act on.
+</p>
+
+<!-- Issue strip -->
+<div class="issues">
+  <div class="issue">
+    <div class="issue-tag">Issue 1 . inaccurate preview</div>
+    <div class="issue-body">A single t1 silhouette with <b>hue-rotate</b> sells the tint as if it only colors one form. The live render applies the tint across <b>all 13 forms</b>.</div>
+  </div>
+  <div class="issue">
+    <div class="issue-tag">Issue 2 . price-as-button</div>
+    <div class="issue-body">Price lives inside the CTA label (<b>"300 BL"</b>). It vanishes after purchase (<b>"Equip"</b> / <b>"Equipped"</b>). Hard to scan prices across a grid.</div>
+  </div>
+  <div class="issue">
+    <div class="issue-tag">Issue 3 . coming-soon clutter</div>
+    <div class="issue-body">Every cosmetic group has a "Coming Soon" subsection with silhouettes the player can't act on. Dead space; drop it.</div>
+  </div>
+</div>
+
+<div class="rail">
+
+  <!-- ───────── 1. CURRENT ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag broken">Today</span>
+      <span class="panel-title">Hue-rotate + price-in-CTA</span>
+    </div>
+    <div class="panel-note">
+      Single t1 silhouette with a <b>hue-rotate filter</b>. The "300 BL" line lives inside the button label - if owned, it would be replaced by "Equip" or "Equipped", so prices vanish from the grid. <b>Coming Soon</b> subsection below.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label">Cultivator Skins</div>
+
+          <div class="bls-card-today">
+            <div class="prev"><div class="silhouette" style="--cur-tint: var(--tint-crimson)"></div></div>
+            <div class="body">
+              <div class="name">Crimson Path</div>
+              <div class="badge">
+                <span class="dots"><span></span><span></span><span></span><span></span><span></span></span>
+                Evolves . 13 stages
+              </div>
+              <button class="cta">300 BL</button>
+            </div>
+          </div>
+          <div class="bls-card-today">
+            <div class="prev"><div class="silhouette" style="--cur-tint: var(--tint-verdant)"></div></div>
+            <div class="body">
+              <div class="name">Verdant Path</div>
+              <div class="badge">
+                <span class="dots"><span></span><span></span><span></span><span></span><span></span></span>
+                Evolves . 13 stages
+              </div>
+              <button class="cta">300 BL</button>
+            </div>
+          </div>
+
+          <div class="bls-coming-soon">
+            <div class="label">Cultivator Skins . Coming Soon</div>
+            <div class="tease">
+              <div class="silhouette"></div>
+              <div class="meta">Premium skin<br><b>Drops later</b></div>
+              <div class="ribbon">Coming Soon</div>
+            </div>
+            <div class="tease" style="margin-top:8px;">
+              <div class="silhouette"></div>
+              <div class="meta">Premium skin<br><b>Drops later</b></div>
+              <div class="ribbon">Coming Soon</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── 2. PROPOSED (pick) ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag win">Proposed</span>
+      <span class="panel-title">Evolution procession + price chip</span>
+    </div>
+    <div class="panel-note">
+      <b>13 silhouettes</b> in a single row, all tinted with the cosmetic's color - sells the truth: "this color follows you through every form". <b>Price chip</b> with lotus icon, top-right, separate from the buy CTA so it survives state changes. <b>No "Coming Soon"</b> subsection.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label">Cultivator Skins</div>
+
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Crimson Path</div>
+                <div class="skin-card-kicker">Tints all 13 forms</div>
+              </div>
+              <span class="skin-card-price">300</span>
+            </div>
+            <div class="skin-card-procession crimson">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta">Buy</button>
+            </div>
+          </div>
+
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Verdant Path</div>
+                <div class="skin-card-kicker">Tints all 13 forms</div>
+              </div>
+              <span class="skin-card-price">300</span>
+            </div>
+            <div class="skin-card-procession verdant">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta">Buy</button>
+            </div>
+          </div>
+
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Amethyst Path</div>
+                <div class="skin-card-kicker">Tints all 13 forms</div>
+              </div>
+              <span class="skin-card-price">300</span>
+            </div>
+            <div class="skin-card-procession amethyst">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta">Buy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── 3. STATE VARIANTS ───────── -->
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-tag win">State variants</span>
+      <span class="panel-title">Owned / Equipped / Insufficient</span>
+    </div>
+    <div class="panel-note">
+      Same shell, different CTAs. <b>Price chip stays visible always</b> - on owned cards it dims to muted so the player still knows "what this would cost". The CTA toggles between <b>Buy / Equip / Unequip</b>; equipped cards get a green ribbon + green border accent.
+    </div>
+    <div class="phone">
+      <div class="phone-glass">
+        <div class="tb">
+          <span class="back">‹ Back</span>
+          <span class="title">Bazaar</span>
+          <span class="bal">10,500</span>
+        </div>
+        <div class="sub-rail">
+          <span class="tab">Buffs</span>
+          <span class="tab">Consumables</span>
+          <span class="tab">QoL</span>
+          <span class="tab on">Cosmetics</span>
+        </div>
+        <div class="body">
+          <div class="sec-label">Cultivator Skins</div>
+
+          <!-- Owned + equipped (Crimson) -->
+          <div class="skin-card equipped">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Crimson Path</div>
+                <div class="skin-card-kicker">Equipped . tinting now</div>
+              </div>
+              <span class="ribbon-equipped">Equipped</span>
+            </div>
+            <div class="skin-card-procession crimson">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta skin-card-cta-unequip">Unequip</button>
+            </div>
+          </div>
+
+          <!-- Owned but not equipped (Verdant) -->
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Verdant Path</div>
+                <div class="skin-card-kicker">Owned . swap to wear</div>
+              </div>
+              <span class="skin-card-price muted">300</span>
+            </div>
+            <div class="skin-card-procession verdant">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta skin-card-cta-equip">Equip</button>
+            </div>
+          </div>
+
+          <!-- Insufficient BL (Amethyst) -->
+          <div class="skin-card">
+            <div class="skin-card-head">
+              <div class="skin-card-titles">
+                <div class="skin-card-name">Amethyst Path</div>
+                <div class="skin-card-kicker">Need 300 BL to claim</div>
+              </div>
+              <span class="skin-card-price">300</span>
+            </div>
+            <div class="skin-card-procession amethyst">
+              <div class="skin-card-procession-fade-l"></div>
+              <div class="skin-card-procession-fade-r"></div>
+              <div class="skin-card-procession-row">
+                <div class="silh t1"></div><div class="silh t2"></div><div class="silh t3"></div>
+                <div class="silh t4"></div><div class="silh t5"></div><div class="silh t6"></div>
+                <div class="silh t7"></div><div class="silh t8"></div><div class="silh t9"></div>
+                <div class="silh t10"></div><div class="silh t11"></div><div class="silh t12"></div>
+                <div class="silh t13"></div>
+              </div>
+            </div>
+            <div class="skin-card-foot">
+              <div class="skin-card-foot-label"><b>13 stages</b> . evolves with you</div>
+              <button class="skin-card-cta skin-card-cta-disabled">Buy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <h2>Recommendation</h2>
+  <p>Ship the <em>evolution-procession card</em> for every cosmetic, with the explicit <b>price chip</b> always visible. Drop the "Coming Soon" subsection entirely.</p>
+  <ul>
+    <li><b>One card shape across all cosmetic slots</b> (cultivator / crystal / particles / backdrop). Each renders its own silhouette set: cultivator = 13 forms, crystal = 10 tiers, particles + backdrop = 3 dots/swatches with the tint applied.</li>
+    <li><b>Price chip never disappears.</b> Buyable: bright vermillion-bordered. Owned-but-not-equipped: muted same chip. Equipped: chip replaced by jade "EQUIPPED" ribbon.</li>
+    <li><b>CTA simplifies to one verb:</b> <code>Buy</code> / <code>Equip</code> / <code>Unequip</code>. No price text inside the button.</li>
+    <li><b>Coming Soon section removed.</b> When the real Tier-2 skin assets land, they slot into the same card with their actual silhouettes - no placeholder needed in the meantime.</li>
+    <li>Card matches existing Sanctum vocabulary: lacquer body, brass border, Cinzel display, vermillion-bordered price chip mirroring the TopBar lotus balance.</li>
+  </ul>
+</div>
+
+</body>
+</html>

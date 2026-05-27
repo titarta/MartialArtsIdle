@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   SHOP_ITEMS,
+  SHOP_BUNDLES,
   SHOP_CATEGORIES,
   SHOP_ITEMS_BY_ID,
   COSMETIC_SLOTS,
@@ -9,11 +10,12 @@ import {
 
 const BASE = import.meta.env.BASE_URL;
 
-// ── Cosmetic preview asset resolution ───────────────────────────────────
-// Lifted verbatim from the legacy BloodLotusSpendShopModal. The card
-// internals (preview tiles, buy CTA state machines) are unchanged from
-// when this was a modal — only the outer chrome moved from .modal-overlay
-// to a screen route per the nav-audit.
+// ── Cosmetic procession asset resolution ───────────────────────────────
+// Each cosmetic slot evolves through a different number of stages. The
+// procession card reveals the first 3 in colour and silhouettes the rest
+// (sells the shape without spoiling late-game forms). All slot art is
+// placeholder for v1 - the player's current cultivator / crystal sprites
+// fill in until premium pixel art ships per skin.
 
 const CULTIVATOR_SPRITES = [
   '/sprites/cultivator/t0_novice_normal.png',
@@ -30,61 +32,6 @@ const CULTIVATOR_SPRITES = [
   '/sprites/cultivator/t11_emperor_realm_normal.png',
   '/sprites/cultivator/t12_open_heaven_normal.png',
 ];
-
-const TINT_PREVIEW_FILTERS = {
-  cos_char_crimson:    'hue-rotate(-95deg) saturate(1.35) brightness(0.95)',
-  cos_char_verdant:    'hue-rotate(60deg) saturate(1.2) brightness(0.95)',
-  cos_char_amethyst:   'hue-rotate(180deg) saturate(1.2) brightness(0.95)',
-  cos_crystal_verdant: 'hue-rotate(110deg) saturate(1.25) brightness(0.95)',
-  cos_crystal_amber:   'hue-rotate(-140deg) saturate(1.4) brightness(1.05)',
-  cos_particles_jade:  'hue-rotate(110deg) saturate(1.3)',
-  cos_particles_violet:'hue-rotate(180deg) saturate(1.3) brightness(1.1)',
-};
-
-function getPreview(item) {
-  if (item.comingSoon) {
-    if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
-      const idx = Math.min(CULTIVATOR_SPRITES.length - 1, Math.max(0, item.previewSprite ?? 5));
-      return { kind: 'sprite', src: `${BASE}${CULTIVATOR_SPRITES[idx].replace(/^\//, '')}`, silhouette: true };
-    }
-    if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
-      const tier = Math.min(10, Math.max(1, item.previewSprite ?? 5));
-      return { kind: 'sprite', src: `${BASE}crystals/crystal_${tier}.png`, silhouette: true };
-    }
-    if (item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES) {
-      return { kind: 'particle-icon', icon: item.icon };
-    }
-    if (item.cosmeticSlot === COSMETIC_SLOTS.BACKGROUND) {
-      return { kind: 'bg-icon', icon: item.icon };
-    }
-  }
-  if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
-    return {
-      kind: 'sprite',
-      src: `${BASE}${CULTIVATOR_SPRITES[1].replace(/^\//, '')}`,
-      filter: TINT_PREVIEW_FILTERS[item.id],
-    };
-  }
-  if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
-    return {
-      kind: 'sprite',
-      src: `${BASE}crystals/crystal_5.png`,
-      filter: TINT_PREVIEW_FILTERS[item.id],
-    };
-  }
-  if (item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES) {
-    return { kind: 'particle-icon', icon: item.icon, filter: TINT_PREVIEW_FILTERS[item.id] };
-  }
-  if (item.cosmeticSlot === COSMETIC_SLOTS.BACKGROUND) {
-    if (item.effect?.bodyClass === 'cosmetic-bg-dawn') {
-      return { kind: 'gradient', gradient: 'radial-gradient(ellipse at 50% 30%, rgba(255,180,80,.6), rgba(120,60,30,.85))' };
-    }
-    if (item.effect?.bodyClass === 'cosmetic-bg-twilight') {
-      return { kind: 'gradient', gradient: 'radial-gradient(ellipse at 50% 30%, rgba(120,140,255,.6), rgba(40,20,80,.9))' };
-    }
-  }
-  return { kind: 'icon', icon: item.icon };
-}
 
 function BuffCountdown({ expiresAtMs }) {
   const [now, setNow] = useState(Date.now());
@@ -104,169 +51,164 @@ function BuffCountdown({ expiresAtMs }) {
   return <span className="bls-buff-countdown">{label} left</span>;
 }
 
-function getEvolutionSprites(item) {
+function getSkinSprites(item) {
   if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
     return CULTIVATOR_SPRITES.map(s => `${BASE}${s.replace(/^\//, '')}`);
   }
   if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
     return Array.from({ length: 10 }, (_, i) => `${BASE}crystals/crystal_${i + 1}.png`);
   }
-  return [];
+  // Particles / backdrop slots: 6 abstract stages. We fall back to the
+  // cultivator sprite set sliced into 6 (the procession CSS treats them
+  // like everything else - first 3 colour, rest silhouette) for the v1
+  // placeholder phase. When real particle/backdrop assets ship this
+  // helper grows a per-slot branch.
+  return CULTIVATOR_SPRITES.slice(0, 6).map(s => `${BASE}${s.replace(/^\//, '')}`);
 }
 
-function CosmeticCardProcession({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
-  const sprites = getEvolutionSprites(item);
-  const revealedCount = 3;
-  const totalStages = sprites.length;
+/** Slot label used on the card header chip. */
+function slotLabel(slot) {
+  if (slot === COSMETIC_SLOTS.CHARACTER)  return 'Cultivator';
+  if (slot === COSMETIC_SLOTS.CRYSTAL)    return 'Crystal';
+  if (slot === COSMETIC_SLOTS.PARTICLES)  return 'Particles';
+  if (slot === COSMETIC_SLOTS.BACKGROUND) return 'Backdrop';
+  return 'Skin';
+}
 
-  let stateClass, label, disabled, onClick;
-  if (item.comingSoon) {
-    stateClass = 'coming-soon'; label = 'Coming Soon'; disabled = true; onClick = null;
-  } else {
-    const owned    = ownership.isCosmeticOwned(item.id);
-    const equipped = ownership.isCosmeticEquipped(item.id);
-    if (!owned)         { stateClass = 'buyable';  label = `${item.cost} BL`; disabled = balance < item.cost || busy; onClick = () => onBuy(item.id); }
-    else if (equipped)  { stateClass = 'equipped'; label = 'Equipped';        disabled = false; onClick = () => onUnequip(item.cosmeticSlot); }
-    else                { stateClass = 'owned';    label = 'Equip';           disabled = false; onClick = () => onEquip(item.id); }
-  }
-
+/**
+ * SkinCard — the canonical cosmetic card (Bazaar v2, 2026-05-27).
+ *
+ * One shape for every cosmetic slot. Renders a procession of the skin's
+ * sprite stages: the first 3 in colour, the remainder silhouetted behind
+ * a soft mist veil so the player sees the shape arc without spoiling
+ * late-game forms. The header has the skin name + slot chip; the foot
+ * has the stage-revealed count + a single Buy CTA with an explicit
+ * lotus-tagged price.
+ *
+ * No equip / unequip here. Once bought the card disappears from the
+ * Bazaar and lives in Codex > Wardrobe for equipping.
+ */
+function SkinCard({ item, balance, onBuy, busy }) {
+  const sprites    = getSkinSprites(item);
+  const revealed   = 3;
+  const totalCount = sprites.length;
+  const disabled   = balance < item.cost || busy;
   return (
-    <div className={`bls-card bls-card-strip-variant bls-card-${stateClass}`}>
-      {stateClass === 'equipped'    && <span className="bls-card-ribbon">EQUIPPED</span>}
-      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
+    <div className="bls-skin-card" data-slot={item.cosmeticSlot}>
+      <div className="bls-skin-card-head">
+        <div className="bls-skin-card-titles">
+          <div className="bls-skin-card-name">{item.name}</div>
+          <div className="bls-skin-card-kicker">Evolves through {totalCount} {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'forms'}</div>
+        </div>
+        <span className="bls-skin-card-slot">{slotLabel(item.cosmeticSlot)}</span>
+      </div>
 
-      <div className="bls-strip-header">
-        <div className="bls-strip-name">{item.name}</div>
+      <div className="bls-skin-proc">
+        <div className="bls-skin-proc-row" style={{ '--stage-count': totalCount }}>
+          {sprites.map((src, i) => (
+            <div
+              key={i}
+              className={`bls-skin-stage${i >= revealed ? ' bls-skin-stage-shadow' : ''}`}
+              style={{ '--stage-index': i }}
+            >
+              {/* Two layered images: colored one (shown for first 3),
+                  silhouette one (shown for the rest via the .shadow
+                  class). CSS picks the right layer per stage. */}
+              <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+              <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
+            </div>
+          ))}
+        </div>
+        {/* Veil line marks where the surprise begins (between stage 3 and 4) */}
+        <span
+          className="bls-skin-proc-veil-line"
+          style={{ left: `calc(${(revealed / totalCount) * 100}%)` }}
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="bls-skin-card-foot">
+        <span className="bls-skin-foot-label"><b>{revealed} of {totalCount}</b> {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'stances'} revealed</span>
         <button
           type="button"
-          className={`bls-card-cta bls-card-cta-${stateClass} bls-strip-cta`}
-          onClick={onClick ?? undefined}
+          className="bls-skin-buy"
+          onClick={() => onBuy(item.id)}
           disabled={disabled}
         >
-          {label}
+          <span className="bls-skin-buy-lotus" aria-hidden="true" />
+          <span className="bls-skin-buy-amt">{item.cost.toLocaleString()}</span>
         </button>
-      </div>
-
-      <div
-        className="bls-procession"
-        data-slot={item.cosmeticSlot}
-        style={{ '--stage-count': totalStages }}
-      >
-        {sprites.map((src, i) => (
-          <div
-            key={i}
-            className="bls-proc-stage"
-            style={{
-              '--stage-index': i,
-              zIndex: totalStages - i,
-            }}
-            aria-label={i === 0
-              ? `Stage ${i + 1}`
-              : `Stage ${i + 1}: partially revealed`}
-          >
-            <img src={src} alt="" draggable="false" className="bls-proc-sprite-color" />
-            <img src={src} alt="" draggable="false" className="bls-proc-sprite-silhouette" />
-          </div>
-        ))}
-      </div>
-
-      <div className="bls-strip-footer">
-        <span className="bls-strip-footer-label">
-          {revealedCount} of {totalStages} stages revealed · evolves with you
-        </span>
       </div>
     </div>
   );
 }
 
-function CosmeticCard({ item, ownership, balance, onBuy, onEquip, onUnequip, busy }) {
-  const preview = getPreview(item);
-
-  let stateClass, label, disabled, onClick;
-  if (item.comingSoon) {
-    stateClass = 'coming-soon';
-    label      = 'Coming Soon';
-    disabled   = true;
-    onClick    = null;
-  } else {
-    const owned    = ownership.isCosmeticOwned(item.id);
-    const equipped = ownership.isCosmeticEquipped(item.id);
-    if (!owned) {
-      stateClass = 'buyable';
-      label      = `${item.cost} BL`;
-      disabled   = balance < item.cost || busy;
-      onClick    = () => onBuy(item.id);
-    } else if (equipped) {
-      stateClass = 'equipped';
-      label      = 'Equipped';
-      disabled   = false;
-      onClick    = () => onUnequip(item.cosmeticSlot);
-    } else {
-      stateClass = 'owned';
-      label      = 'Equip';
-      disabled   = false;
-      onClick    = () => onEquip(item.id);
-    }
-  }
-
+/**
+ * BundleCard — a Fortnite-style theme pack (Bazaar v2).
+ *
+ * Violet-purple chrome distinguishes the bundle from single-skin cards.
+ * Header carries the bundle name + a short tagline. Body shows each
+ * component as a mini-row (small procession + name + slot type + its
+ * individual strike-through price). Footer has the total strike-through
+ * + bundle price + a single "Claim Pack" CTA.
+ */
+function BundleCard({ bundle, balance, onBuy, busy }) {
+  const disabled = balance < bundle.cost || busy;
+  const components = (bundle.components ?? [])
+    .map(id => SHOP_ITEMS_BY_ID[id])
+    .filter(Boolean);
   return (
-    <div className={`bls-card bls-card-${stateClass}`} data-slot={item.cosmeticSlot}>
-      {stateClass === 'equipped' && <span className="bls-card-ribbon">EQUIPPED</span>}
-      {stateClass === 'coming-soon' && <span className="bls-card-ribbon bls-card-ribbon-soon">COMING SOON</span>}
+    <div className="bls-bundle">
+      <span className="bls-bundle-ribbon">Theme Pack</span>
+      <span className="bls-bundle-save-ribbon">Save {bundle.saveAmount?.toLocaleString() ?? ''}</span>
 
-      <div className="bls-card-preview">
-        {preview.kind === 'sprite' && (
-          <img
-            src={preview.src}
-            alt=""
-            draggable="false"
-            className={`bls-card-preview-sprite${preview.silhouette ? ' bls-card-preview-silhouette' : ''}`}
-            style={preview.filter ? { filter: preview.filter } : undefined}
-          />
-        )}
-        {preview.kind === 'particle-icon' && (
-          <div className="bls-card-preview-particles" style={preview.filter ? { filter: preview.filter } : undefined}>
-            <span className="bls-card-preview-orb bls-card-preview-orb-1">{preview.icon}</span>
-            <span className="bls-card-preview-orb bls-card-preview-orb-2">{preview.icon}</span>
-            <span className="bls-card-preview-orb bls-card-preview-orb-3">{preview.icon}</span>
-          </div>
-        )}
-        {preview.kind === 'gradient' && (
-          <div className="bls-card-preview-bg" style={{ background: preview.gradient }} />
-        )}
-        {preview.kind === 'bg-icon' && (
-          <div className="bls-card-preview-bg-icon">{preview.icon}</div>
-        )}
-        {preview.kind === 'icon' && (
-          <div className="bls-card-preview-icon">{preview.icon}</div>
-        )}
+      <div className="bls-bundle-head">
+        <div className="bls-bundle-name">{bundle.name}</div>
+        <div className="bls-bundle-tag">{bundle.desc}</div>
       </div>
 
-      <div className="bls-card-body">
-        <div className="bls-card-name">{item.name}</div>
-        {(item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) && (
-          <div className="bls-card-evolution-badge">
-            <span className="bls-card-evolution-dots" aria-hidden="true">
-              <span /><span /><span /><span /><span />
-            </span>
-            <span className="bls-card-evolution-label">Evolves · 13 stages</span>
-          </div>
-        )}
-        {(item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) && (
-          <div className="bls-card-evolution-badge">
-            <span className="bls-card-evolution-dots" aria-hidden="true">
-              <span /><span /><span /><span /><span />
-            </span>
-            <span className="bls-card-evolution-label">Evolves · 10 tiers</span>
-          </div>
-        )}
+      <div className="bls-bundle-pieces">
+        {components.map(c => {
+          const sprites = getSkinSprites(c).slice(0, 6);
+          return (
+            <div className="bls-bundle-piece" key={c.id}>
+              <div className="bls-bundle-piece-mini">
+                {sprites.map((src, i) => (
+                  <div
+                    key={i}
+                    className={`bls-skin-stage bls-skin-stage-mini${i >= 3 ? ' bls-skin-stage-shadow' : ''}`}
+                    style={{ '--stage-index': i }}
+                  >
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
+                  </div>
+                ))}
+              </div>
+              <div className="bls-bundle-piece-meta">
+                <div className="bls-bundle-piece-name">{c.name}</div>
+                <div className="bls-bundle-piece-type">{slotLabel(c.cosmeticSlot)}</div>
+              </div>
+              <span className="bls-bundle-piece-strike">{c.cost?.toLocaleString() ?? ''}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="bls-bundle-foot">
+        <div className="bls-bundle-price-stack">
+          <span className="bls-bundle-price-strike">{bundle.originalCost?.toLocaleString()} BL</span>
+          <span className="bls-bundle-price">
+            <span className="bls-skin-buy-lotus" aria-hidden="true" />
+            {bundle.cost.toLocaleString()}
+          </span>
+        </div>
         <button
           type="button"
-          className={`bls-card-cta bls-card-cta-${stateClass}`}
-          onClick={onClick ?? undefined}
+          className="bls-bundle-buy"
+          onClick={() => onBuy(bundle.id)}
           disabled={disabled}
         >
-          {label}
+          Claim Pack
         </button>
       </div>
     </div>
@@ -387,39 +329,34 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
 function FeaturedHero({ featured, balance, busy, onBuy }) {
   if (!featured) return null;
   const { item, originalCost, discountedCost, endsAtMs } = featured;
-  const owned = false; // featured items are not flagged owned even if the
-                       // player has bought them before — the discount is
-                       // the offer, not the ownership state. Cosmetic-
-                       // ownership is enforced inside onBuy.
   const disabled = balance < discountedCost || busy;
-  const preview = getPreview(item);
-
+  const isSkin = item.ownership === 'cosmetic';
   return (
     <div className="sbz-featured" aria-label="Today's pick">
       <span className="sbz-featured-ribbon">Today's Pick</span>
 
       <div className="sbz-featured-preview">
         <span className="sbz-featured-halo" aria-hidden="true" />
-        {preview.kind === 'sprite' && (
-          <img
-            src={preview.src}
-            alt=""
-            draggable="false"
-            className="sbz-featured-preview-sprite"
-            style={preview.filter ? { filter: preview.filter } : undefined}
-          />
-        )}
-        {preview.kind === 'icon' && (
-          <span className="sbz-featured-preview-icon">{preview.icon}</span>
-        )}
-        {preview.kind === 'particle-icon' && (
-          <span className="sbz-featured-preview-icon">{preview.icon}</span>
-        )}
-        {preview.kind === 'gradient' && (
-          <div className="sbz-featured-preview-bg" style={{ background: preview.gradient }} />
-        )}
-        {preview.kind === 'bg-icon' && (
-          <span className="sbz-featured-preview-icon">{preview.icon}</span>
+        {isSkin ? (
+          (() => {
+            const sprites = getSkinSprites(item).slice(0, 5);
+            return (
+              <div className="sbz-featured-preview-procession">
+                {sprites.map((src, i) => (
+                  <div
+                    key={i}
+                    className={`bls-skin-stage bls-skin-stage-feat${i >= 3 ? ' bls-skin-stage-shadow' : ''}`}
+                    style={{ '--stage-index': i }}
+                  >
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-color" />
+                    <img src={src} alt="" draggable="false" className="bls-skin-stage-shadow-img" />
+                  </div>
+                ))}
+              </div>
+            );
+          })()
+        ) : (
+          <span className="sbz-featured-preview-icon">{item.icon}</span>
         )}
       </div>
 
@@ -433,7 +370,7 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
             type="button"
             className="sbz-featured-buy"
             onClick={() => onBuy(item.id)}
-            disabled={disabled || owned}
+            disabled={disabled}
           >
             <span className="sbz-featured-buy-lotus" aria-hidden="true" />
             {discountedCost} <span className="sbz-featured-buy-unit">BL</span>
@@ -463,18 +400,14 @@ function FeaturedCountdown({ endsAtMs }) {
 }
 
 /**
- * Spirit Bazaar — full screen (post nav-audit).
+ * Spirit Bazaar — full screen.
  *
- * Was BloodLotusSpendShopModal; the audit promoted it to a screen because a
- * 4-category shop with timed buffs, owned-state, equip flow, and cosmetic
- * previews wants the full viewport. TopBar 🏮 routes here via
- * navigate('spirit-bazaar'). The IAP "Top Up" flow remains a separate modal
- * (it is a real-money transaction with a discrete start/end).
- *
- * Layout: header (back chip + title + lotus balance card) on top, jump-rail
- * for the four categories, then a single scrollable storefront with one
- * section per category. The interior card / row components are unchanged
- * from the legacy modal — only the outer chrome moved.
+ * Layout: header (back · title · balance · Top Up) on top, jump-rail for
+ * the four categories, then a single scrollable storefront with one
+ * section per category. Cosmetics aisle (v2, 2026-05-27) renders theme
+ * BUNDLES first (the deal-driver), then SkinCards grouped by slot. No
+ * equip / unequip in the store - once bought, items vanish here and the
+ * player equips them in Codex > Wardrobe.
  */
 export default function SpiritBazaarScreen({
   inventory,
@@ -485,19 +418,10 @@ export default function SpiritBazaarScreen({
 }) {
   const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
-  // activeCat drives the .tab-rail-tab-active class. Set by jumpTo (on tap)
-  // and updated by the IntersectionObserver below so the rail tracks
-  // whichever aisle is on screen as the player scrolls.
   const [activeCat, setActiveCat] = useState('buff');
   const bodyRef = useRef(null);
   const railRef = useRef(null);
   const indicatorRef = useRef(null);
-  // After a tap-driven jumpTo, the smooth scroll passes through other
-  // sections. During that window we lock the active tab to whatever the
-  // tap chose, so the IntersectionObserver can't "steal" the indicator
-  // onto a neighbour section before the scroll settles. Cleared 600ms
-  // after the tap (enough for smooth scrolls under normal section
-  // distances at the default browser easing).
   const scrollLockUntilRef = useRef(0);
 
   const itemsByCategory = useMemo(() => {
@@ -507,21 +431,33 @@ export default function SpiritBazaarScreen({
     return out;
   }, []);
 
+  // Cosmetics grouped by slot. Hides items already owned (those live in
+  // Codex > Wardrobe now). Only renders a slot section if it has at
+  // least one available item.
   const cosmeticsBySlot = useMemo(() => {
     const groups = {
-      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins',   tier1: [], premium: [] },
-      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',      tier1: [], premium: [] },
-      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects',   tier1: [], premium: [] },
-      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',          tier1: [], premium: [] },
+      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins', items: [] },
+      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',    items: [] },
+      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects', items: [] },
+      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',        items: [] },
     };
     const cosmetics = itemsByCategory.get('cosmetic') ?? [];
     for (const it of cosmetics) {
       if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
-      if (it.comingSoon) groups[it.cosmeticSlot].premium.push(it);
-      else               groups[it.cosmeticSlot].tier1.push(it);
+      if (inventory.isCosmeticOwned(it.id)) continue;
+      groups[it.cosmeticSlot].items.push(it);
     }
     return groups;
-  }, [itemsByCategory]);
+  }, [itemsByCategory, inventory]);
+
+  // Bundles available to the player. A bundle hides the moment any of
+  // its components is owned (the discount stops making sense once the
+  // player has paid piecemeal). The remaining components stay buyable
+  // as singles.
+  const availableBundles = useMemo(
+    () => SHOP_BUNDLES.filter(b => inventory.isBundleAvailable?.(b.id) ?? true),
+    [inventory]
+  );
 
   useEffect(() => {
     if (!flash) return;
@@ -547,19 +483,11 @@ export default function SpiritBazaarScreen({
     if (!target) return;
     if (cat) {
       setActiveCat(cat);
-      // Lock the active state for 600ms so the IO can't steal it onto
-      // a short neighbour section while the smooth scroll is en route.
       scrollLockUntilRef.current = Date.now() + 600;
     }
-    // scrollIntoView respects scroll-margin-top on .bls-section (52px
-    // for the sticky rail clearance), landing the section header
-    // exactly below the rail rather than buried behind it.
     target.scrollIntoView({ block: 'start', behavior: 'smooth' });
   };
 
-  // Track which aisle is on screen so the rail's active chip follows the
-  // player's scroll position. IntersectionObserver fires when 35% of an
-  // aisle's header is visible; whichever fired most recently wins.
   useEffect(() => {
     const root = bodyRef.current;
     if (!root) return undefined;
@@ -574,12 +502,7 @@ export default function SpiritBazaarScreen({
       'sec-cosmetic':   'cosmetic',
     };
     const io = new IntersectionObserver((entries) => {
-      // While a tap-driven smooth scroll is in flight, respect the locked
-      // active state — don't let the scroll passing through neighbouring
-      // sections steal the indicator before it lands.
       if (Date.now() < scrollLockUntilRef.current) return;
-      // Pick the entry with the largest intersection ratio that's actually
-      // intersecting; ignore entries that just exited the viewport.
       const visible = entries.filter(e => e.isIntersecting);
       if (visible.length === 0) return;
       visible.sort((a, b) => b.intersectionRatio - a.intersectionRatio);
@@ -588,10 +511,6 @@ export default function SpiritBazaarScreen({
       if (cat) setActiveCat(cat);
     }, {
       root,
-      // Trigger band starts just below the sticky rail (52px) and ends
-      // at 60% from the bottom. Tight enough that short sections
-      // (Consumables, QoL with 1 tile each) can still win the band when
-      // the player has explicitly scrolled them into the upper viewport.
       rootMargin: '-52px 0px -60% 0px',
       threshold: [0, 0.25, 0.5, 0.75, 1],
     });
@@ -599,9 +518,6 @@ export default function SpiritBazaarScreen({
     return () => io.disconnect();
   }, []);
 
-  // Slide the gold underline indicator under the active tab. Re-measures
-  // on activeCat change and after fonts settle (Cinzel's woff2 metrics
-  // may differ from the system-serif fallback used during initial paint).
   useLayoutEffect(() => {
     const rail = railRef.current;
     const ind  = indicatorRef.current;
@@ -609,26 +525,17 @@ export default function SpiritBazaarScreen({
     const place = () => {
       const tab = rail.querySelector(`.tab-rail-tab[data-cat="${activeCat}"]`);
       if (!tab) return;
-      // Indicator width tracks the label, not the tap-target; nudge in 2px
-      // L+R so the underline lines up under the text rather than the padding.
       ind.style.width = `${tab.offsetWidth - 4}px`;
       ind.style.transform = `translateX(${tab.offsetLeft + 2}px)`;
     };
     place();
-    // Re-place once fonts settle (no-op if already metric-stable).
     if (document.fonts?.ready) document.fonts.ready.then(place).catch(() => {});
-    // Re-place on viewport resize (orientation change, etc).
     window.addEventListener('resize', place);
     return () => window.removeEventListener('resize', place);
   }, [activeCat]);
 
   const buffs       = itemsByCategory.get('buff')       ?? [];
   const consumables = itemsByCategory.get('consumable') ?? [];
-  // QoL filtering per content-audit rule: permanent QoL hides once
-  // owned (the perk surfaces in Settings → Active Perks now), and
-  // stackable QoL hides only when the stack is at its maxStack. The
-  // raw catalog still feeds the section header count so players see
-  // how the section shrinks as they buy.
   const qolAll      = itemsByCategory.get('qol') ?? [];
   const qol         = qolAll.filter(item => {
     if (item.ownership === 'permanent') return !inventory.hasQol(item.id);
@@ -636,27 +543,20 @@ export default function SpiritBazaarScreen({
       const cap = item.maxStack ?? Infinity;
       return inventory.getStack(item.id) < cap;
     }
-    return true; // unknown ownership shapes fall through
+    return true;
   });
-  const cosmeticsCount = (itemsByCategory.get('cosmetic') ?? []).length;
+  const cosmeticsCount =
+    availableBundles.length +
+    Object.values(cosmeticsBySlot).reduce((sum, g) => sum + g.items.length, 0);
 
-  // Featured "Today's Pick" — 7-day rotation keyed on local weekday.
-  // Memoised once per render; the inner countdown handles the per-minute
-  // tick so we don't churn this object every second.
   const featured = useMemo(() => getFeaturedItemForToday(), []);
 
   return (
     <div className="spirit-bazaar-screen">
 
-      {/* Compact header — back · title · balance pill · top-up. The
-          calligraphy "市" watermark is painted by .sbz-screen-head::before. */}
       <header className="sbz-screen-head sbz-screen-head-compact">
         <div className="sbz-head-row">
-          <button
-            className="sbz-back-chip"
-            onClick={onBack}
-            aria-label="Back"
-          >
+          <button className="sbz-back-chip" onClick={onBack} aria-label="Back">
             <span className="sbz-back-arrow">‹</span> Back
           </button>
 
@@ -686,7 +586,6 @@ export default function SpiritBazaarScreen({
 
       <div className="bls-body sbz-body" ref={bodyRef}>
 
-        {/* FEATURED HERO — "Today's Pick" */}
         <div className="sbz-featured-wrap">
           <FeaturedHero
             featured={featured}
@@ -696,14 +595,6 @@ export default function SpiritBazaarScreen({
           />
         </div>
 
-        {/* Category nav — plain text tabs with a sliding gold underline.
-            Pattern reference: iOS Music / Spotify / App Store. The nav's
-            only job is "here are the sections, here's the one you're
-            viewing." It's not a design statement; the shop content
-            (Featured Hero, buff tiles, Buy CTAs) gets to carry the
-            visual focus. Active state is driven by activeCat (set on
-            tap + by the IntersectionObserver above); the indicator is
-            measured against the active tab in the useLayoutEffect above. */}
         <nav className="tab-rail tab-rail-sticky" ref={railRef} aria-label="Bazaar sections">
           <button
             type="button"
@@ -739,7 +630,7 @@ export default function SpiritBazaarScreen({
           </button>
           <span className="tab-rail-indicator" ref={indicatorRef} aria-hidden="true" />
         </nav>
-        {/* Buffs aisle */}
+
         <section id="sec-buff" className="bls-section">
           <header className="bls-section-header">
             <h3 className="bls-section-title">Buffs</h3>
@@ -760,7 +651,6 @@ export default function SpiritBazaarScreen({
           </div>
         </section>
 
-        {/* Consumables aisle */}
         <section id="sec-consumable" className="bls-section">
           <header className="bls-section-header">
             <h3 className="bls-section-title">Consumables</h3>
@@ -783,7 +673,6 @@ export default function SpiritBazaarScreen({
           )}
         </section>
 
-        {/* QoL aisle */}
         <section id="sec-qol" className="bls-section">
           <header className="bls-section-header">
             <h3 className="bls-section-title">Quality of Life</h3>
@@ -806,113 +695,60 @@ export default function SpiritBazaarScreen({
           )}
         </section>
 
-        {/* Cosmetics aisle */}
+        {/* Cosmetics aisle (v2) — bundles first, then singles by slot.
+            Already-owned items hide; cards bought here disappear and
+            move to Codex > Wardrobe. */}
         <section id="sec-cosmetic" className="bls-section">
           <header className="bls-section-header">
             <h3 className="bls-section-title">Cosmetics</h3>
-            <span className="bls-section-tag">Recolours · skins · backdrops</span>
+            <span className="bls-section-tag">Skins · theme packs · evolves with you</span>
             <span className="bls-section-count">{cosmeticsCount}</span>
           </header>
-          <div className="bls-cosmetic-sections">
-            {Object.entries(cosmeticsBySlot).map(([slot, group]) => {
-              if (group.tier1.length === 0 && group.premium.length === 0) return null;
-              const isMultiTier = slot === COSMETIC_SLOTS.CHARACTER || slot === COSMETIC_SLOTS.CRYSTAL;
-              // Content-audit rule: hide a tier-1 cosmetic card the moment
-              // it's owned. The owned version moves to the Codex →
-              // Wardrobe tab; the Bazaar slot shows a "view in Codex"
-              // callout when ALL its tier-1 cards have been bought.
-              const tier1Available = group.tier1.filter(it => !inventory.isCosmeticOwned(it.id));
-              const tier1OwnedCount = group.tier1.length - tier1Available.length;
-              const tier1AllOwned   = group.tier1.length > 0 && tier1Available.length === 0;
-              return (
-                <div key={slot} className="bls-cosmetic-slot-group">
-                  {group.tier1.length > 0 && !tier1AllOwned && (
-                    <section className="bls-cosmetic-section">
-                      <div className="bls-cosmetic-section-label">
-                        {group.label}
-                        {tier1OwnedCount > 0 && (
-                          <button
-                            type="button"
-                            className="bls-cosmetic-section-owned-chip"
-                            onClick={onOpenCodex}
-                          >
-                            {tier1OwnedCount} owned · in Codex →
-                          </button>
-                        )}
-                      </div>
-                      <div className="bls-card-grid">
-                        {tier1Available.map(item => (
-                          <CosmeticCard
-                            key={item.id}
-                            item={item}
-                            ownership={inventory}
-                            balance={balance}
-                            onBuy={handleBuy}
-                            onEquip={(id)  => inventory.equip(id)}
-                            onUnequip={(s) => inventory.unequip(s)}
-                            busy={busy}
-                          />
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                  {tier1AllOwned && (
-                    <section className="bls-cosmetic-section">
-                      <div className="bls-cosmetic-section-label">{group.label}</div>
-                      <button
-                        type="button"
-                        className="bls-cosmetic-all-owned-callout"
-                        onClick={onOpenCodex}
-                      >
-                        <span className="bls-cosmetic-all-owned-text">
-                          Owned: <b>{tier1OwnedCount}</b> · view in Codex
-                        </span>
-                        <span className="bls-cosmetic-all-owned-link">→</span>
-                      </button>
-                    </section>
-                  )}
-                  {group.premium.length > 0 && isMultiTier && (
-                    <section className="bls-cosmetic-section">
-                      <div className="bls-cosmetic-section-label">{group.label} · Coming Soon</div>
-                      <div className="bls-strip-list">
-                        {group.premium.map(item => (
-                          <CosmeticCardProcession
-                            key={item.id}
-                            item={item}
-                            ownership={inventory}
-                            balance={balance}
-                            onBuy={handleBuy}
-                            onEquip={(id)  => inventory.equip(id)}
-                            onUnequip={(s) => inventory.unequip(s)}
-                            busy={busy}
-                          />
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                  {group.premium.length > 0 && !isMultiTier && (
-                    <section className="bls-cosmetic-section">
-                      <div className="bls-cosmetic-section-label">{group.label} · Coming Soon</div>
-                      <div className="bls-card-grid">
-                        {group.premium.map(item => (
-                          <CosmeticCard
-                            key={item.id}
-                            item={item}
-                            ownership={inventory}
-                            balance={balance}
-                            onBuy={handleBuy}
-                            onEquip={(id)  => inventory.equip(id)}
-                            onUnequip={(s) => inventory.unequip(s)}
-                            busy={busy}
-                          />
-                        ))}
-                      </div>
-                    </section>
-                  )}
+
+          {availableBundles.length > 0 && (
+            <div className="bls-cosmetic-section">
+              <div className="bls-cosmetic-section-label bls-cosmetic-section-label-bundles">
+                Theme Packs
+                <span className="bls-cosmetic-section-count">{availableBundles.length}</span>
+              </div>
+              {availableBundles.map(b => (
+                <BundleCard
+                  key={b.id}
+                  bundle={b}
+                  balance={balance}
+                  onBuy={handleBuy}
+                  busy={busy}
+                />
+              ))}
+            </div>
+          )}
+
+          {Object.entries(cosmeticsBySlot).map(([slot, group]) => {
+            if (group.items.length === 0) return null;
+            return (
+              <div key={slot} className="bls-cosmetic-section">
+                <div className="bls-cosmetic-section-label">
+                  {group.label}
+                  <span className="bls-cosmetic-section-count">{group.items.length}</span>
                 </div>
-              );
-            })}
-          </div>
+                {group.items.map(item => (
+                  <SkinCard
+                    key={item.id}
+                    item={item}
+                    balance={balance}
+                    onBuy={handleBuy}
+                    busy={busy}
+                  />
+                ))}
+              </div>
+            );
+          })}
+
+          {availableBundles.length === 0 && cosmeticsCount === 0 && (
+            <div className="bls-empty">
+              You own every skin available right now. Find them in <button type="button" className="bls-inline-link" onClick={onOpenCodex}>Codex › Wardrobe</button>.
+            </div>
+          )}
         </section>
       </div>
 

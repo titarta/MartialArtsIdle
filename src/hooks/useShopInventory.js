@@ -155,18 +155,40 @@ export default function useShopInventory() {
           [itemId]: { expiresAtMs: baseEnd + item.effect.durationMs },
         };
       } else if (item.ownership === 'cosmetic') {
-        // Cosmetics are permanent-owned and auto-equip on first purchase
-        // (the player just bought it — they want to see it). Subsequent
-        // equip/unequip flows live in the dedicated equip() method.
+        // Cosmetics are permanent-owned. Bazaar v2 (2026-05-27) removed
+        // the auto-equip-on-purchase behaviour: the player goes to
+        // Codex > Wardrobe to equip what they bought. This keeps the
+        // store focused on "buy" and the wardrobe focused on "wear".
         next.cosmetics = { ...next.cosmetics, [itemId]: true };
-        if (item.cosmeticSlot) {
-          next.equipped = { ...next.equipped, [item.cosmeticSlot]: itemId };
+      } else if (item.ownership === 'bundle') {
+        // Theme bundle: expand into the component cosmetics, credit each
+        // to the cosmetics map. BL already spent above, so no second
+        // affordability check; affordability for the bundle is for the
+        // bundle's discounted total, not the sum of components.
+        next.cosmetics = { ...next.cosmetics };
+        for (const componentId of (item.components ?? [])) {
+          next.cosmetics[componentId] = true;
         }
       }
       return next;
     });
 
     return { ok: true };
+  }, [inv]);
+
+  /**
+   * True if a bundle is still buyable - i.e. the player does NOT own any
+   * of its components yet. Once even one component is purchased
+   * individually, the bundle hides from the storefront (discount logic
+   * stops making sense once partial-ownership exists).
+   */
+  const isBundleAvailable = useCallback((bundleId) => {
+    const item = SHOP_ITEMS_BY_ID[bundleId];
+    if (!item || item.ownership !== 'bundle') return false;
+    for (const cid of (item.components ?? [])) {
+      if (inv.cosmetics[cid]) return false;
+    }
+    return true;
   }, [inv]);
 
   // ── Cosmetic equip / unequip ──────────────────────────────────────────
@@ -281,5 +303,6 @@ export default function useShopInventory() {
     isCosmeticOwned,
     isCosmeticEquipped,
     getEquippedInSlot,
+    isBundleAvailable,
   };
 }

@@ -164,154 +164,87 @@ export const SHOP_ITEMS = [
   //                          to the slot's target element(s).
   //   effect.bodyClass    — the class App.jsx toggles when equipped.
 
-  // Character tints
-  {
-    id: 'cos_char_crimson',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
-    name: 'Crimson Path',
-    desc: 'Tints your cultivator with the deep red of the crimson sect. CSS recolour — premium pixelart skins arrive later.',
-    icon: '🔴',
-    cost: 300,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-char-crimson' },
-  },
-  {
-    id: 'cos_char_verdant',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
-    name: 'Verdant Path',
-    desc: 'Tints your cultivator in jade-green serenity. CSS recolour.',
-    icon: '🟢',
-    cost: 300,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-char-verdant' },
-  },
-  {
-    id: 'cos_char_amethyst',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.CHARACTER,
-    name: 'Amethyst Path',
-    desc: 'Tints your cultivator in royal violet. CSS recolour.',
-    icon: '🟣',
-    cost: 300,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-char-amethyst' },
-  },
-
-  // Crystal tints — affect the crystal sprite on the home screen.
-  {
-    id: 'cos_crystal_verdant',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,
-    name: 'Verdant Crystal',
-    desc: 'Recolours your qi crystal jade-green through all tiers. CSS recolour.',
-    icon: '◆',
-    cost: 200,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-crystal-verdant' },
-  },
-  {
-    id: 'cos_crystal_amber',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,
-    name: 'Amber Crystal',
-    desc: 'Recolours your qi crystal in warm amber-gold. CSS recolour.',
-    icon: '◆',
-    cost: 200,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-crystal-amber' },
-  },
-
-  // Particle tints — affect the qi-flow VFX orbs around the cultivator.
-  {
-    id: 'cos_particles_jade',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.PARTICLES,
-    name: 'Jade Particles',
-    desc: 'Qi orbs flow as jade motes instead of the default white-gold.',
-    icon: '✨',
-    cost: 150,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-particles-jade' },
-  },
-  {
-    id: 'cos_particles_violet',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.PARTICLES,
-    name: 'Violet Particles',
-    desc: 'Qi orbs flow in deep violet, befitting a high-aspect cultivator.',
-    icon: '✨',
-    cost: 150,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-particles-violet' },
-  },
-
-  // Background tints — overlay a tinted gradient on the home backdrop.
-  {
-    id: 'cos_bg_dawn',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.BACKGROUND,
-    name: 'Dawn Sky',
-    desc: 'Bathes the home backdrop in warm sunrise light.',
-    icon: '🌅',
-    cost: 250,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-bg-dawn' },
-  },
-  {
-    id: 'cos_bg_twilight',
-    category: 'cosmetic',
-    cosmeticSlot: COSMETIC_SLOTS.BACKGROUND,
-    name: 'Twilight Veil',
-    desc: 'Cools the home backdrop with twilight blues and indigo shadows.',
-    icon: '🌌',
-    cost: 250,
-    ownership: 'cosmetic',
-    effect: { kind: 'tint', bodyClass: 'cosmetic-bg-twilight' },
-  },
-
-  // ── Cosmetics — Tier 2 placeholder slots ("Coming Soon") ────────────────
+  // ── Cosmetic SKINS (procession format) ─────────────────────────────────
+  // 2026-05-27 redesign. The earlier "tint" cards (Crimson Path / Verdant
+  // Path / Amethyst Path / etc.) were a bug — there is no recolour SKU.
+  // Every skin is now a full sprite-set product. The card shop renders
+  // them as a procession (first 3 stances revealed, remaining 10
+  // silhouetted) so the player sees the shape evolution without spoiling
+  // the late-game sprites.
   //
-  // These cards exist purely for the showcase. The visual is a
-  // silhouetted late-realm cultivator / crystal sprite so the player
-  // gets a tease of "what's coming" without spoiling specific shapes.
-  // `comingSoon: true` flips the shop UI to a locked card variant —
-  // no Buy button, no price, just a teaser. When the real Tier-2
-  // skin lands we drop `comingSoon`, add `effect.kind: 'skin'` and an
-  // `assetPath`, and reuse the same slot.
+  // Sprite assets aren't done yet for these skin SKUs, so for v1 each
+  // entry ships WITHOUT an `effect.bodyClass`. The skin lives in the
+  // player's inventory (Codex > Wardrobe surfaces it) but does not yet
+  // override the sprite. When the pixel-art assets land, just add
+  // `effect: { kind: 'skin', bodyClass: '...', assetPath: '...' }` and
+  // the equip flow lights up - save state preserved.
   //
-  // Character — silhouette previews use a MID-LATE tier so the card
-  // sells "this gets epic" while hiding the specific late-game shape
-  // (full silhouette filter strips colour, only outline reads).
-  // Pokémon-Pokedex-style tease, not LoL-style full reveal. Real
-  // Tier-2 skins (when they ship) will show a mid-tier (t4-5) at
-  // FULL colour as the hero shot + the "Evolves through 13 stages"
-  // caption — same data shape, just `comingSoon: false` + a real
-  // `assetPath` for the sprite override.
-  { id: 'cos_char_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Sword Saint',  desc: 'A blade-bound cultivator. Evolves through all 13 realms with you.',                          icon: '🗡️', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
-  { id: 'cos_char_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Demon Path',   desc: 'A heretical path stained in shadow and ember. Evolves through all 13 realms.',               icon: '👹', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
-  { id: 'cos_char_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller', desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',                  icon: '⚡', ownership: 'cosmetic', comingSoon: true, previewSprite: 7 },
-  { id: 'cos_char_premium_4', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',   desc: 'Petals bloom around an ascetic\'s frame. Evolves through all 13 realms.',                    icon: '🪷', ownership: 'cosmetic', comingSoon: true, previewSprite: 8 },
+  // Themes: skins are grouped by theme name (frost / bone / etc.) so a
+  // matching bundle pack can sell them together at a discount. See
+  // SHOP_BUNDLES below.
 
-  // Crystal — Tier-2 premium skins (different gem cuts / fantasy
-  // materials). 10-tier evolution like the base crystal; silhouette
-  // a mid-tier (T4-T6) so the card teases shape without revealing
-  // the specific late-tier signature look.
-  { id: 'cos_crystal_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Obsidian Heart', desc: 'A jet-black crystal carved by void cultivators. Evolves through all 10 tiers.', icon: '⬣', ownership: 'cosmetic', comingSoon: true, previewSprite: 5 },
-  { id: 'cos_crystal_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Phoenix Core',   desc: 'A molten ember bound in crystal lattice. Evolves through all 10 tiers.',         icon: '🔥', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
-  { id: 'cos_crystal_premium_3', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL, name: 'Dragon Tear',    desc: 'Wept by a slumbering ancient. Evolves through all 10 tiers.',                   icon: '🐉', ownership: 'cosmetic', comingSoon: true, previewSprite: 6 },
+  // Frost Sect — theme: 'frost'
+  { id: 'cos_char_frost_ascetic',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Frost Ascetic',  desc: 'A wind-bitten monk of the frozen peaks. Evolves through all 13 realms with you.', icon: '🏔️', cost: 1200, ownership: 'cosmetic', theme: 'frost', previewSprite: 5 },
+  { id: 'cos_crystal_frost',       category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Frost Crystal',  desc: 'A glacial shard carved by winter cultivators. Evolves through all 10 tiers.',     icon: '◇',  cost: 800,  ownership: 'cosmetic', theme: 'frost', previewSprite: 5 },
+  { id: 'cos_particles_snowfall',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Snowfall Motes', desc: 'Qi orbs replaced by drifting snow petals.',                                       icon: '❄️', cost: 500,  ownership: 'cosmetic', theme: 'frost' },
 
-  // Particles — Tier-2 (alt particle pools)
-  { id: 'cos_particles_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Cherry Blossom', desc: 'Petals drift inward instead of orbs. Premium skin — coming soon.',  icon: '🌸', ownership: 'cosmetic', comingSoon: true },
-  { id: 'cos_particles_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Sigil Runes',    desc: 'Glowing arcane glyphs spiral toward you. Premium skin — coming soon.',  icon: '🔮', ownership: 'cosmetic', comingSoon: true },
+  // Bone Court — theme: 'bone'
+  { id: 'cos_char_bone_patriarch', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Bone Patriarch', desc: 'A withered elder of the ossuary sect. Evolves through all 13 realms with you.',  icon: '💀', cost: 1500, ownership: 'cosmetic', theme: 'bone',  previewSprite: 6 },
+  { id: 'cos_crystal_ossuary',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Ossuary Crystal', desc: 'A crystal lattice grown through ancient bone. Evolves through all 10 tiers.',    icon: '⬣',  cost: 800,  ownership: 'cosmetic', theme: 'bone',  previewSprite: 6 },
+  { id: 'cos_particles_ashen',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Ashen Motes',     desc: 'Qi orbs replaced by drifting ash and ember sparks.',                              icon: '🪶', cost: 500,  ownership: 'cosmetic', theme: 'bone' },
 
-  // Backgrounds — Tier-2 (full scene swaps)
-  { id: 'cos_bg_premium_1', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.BACKGROUND, name: 'Frozen Peak',     desc: 'A snowbound summit at the edge of the heavens. Premium backdrop — coming soon.', icon: '🏔️', ownership: 'cosmetic', comingSoon: true },
-  { id: 'cos_bg_premium_2', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.BACKGROUND, name: 'Lotus Pavilion',  desc: 'A jade pavilion floating on a still lotus pond. Premium backdrop — coming soon.', icon: '🏯', ownership: 'cosmetic', comingSoon: true },
+  // Untethered skins — no bundle association yet
+  { id: 'cos_char_storm_caller',   category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller',  desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',       icon: '⚡', cost: 1300, ownership: 'cosmetic', previewSprite: 7 },
+  { id: 'cos_char_lotus_sage',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',    desc: 'Petals bloom around an ascetic\'s frame. Evolves through all 13 realms.',         icon: '🪷', cost: 1100, ownership: 'cosmetic', previewSprite: 8 },
+  { id: 'cos_crystal_phoenix',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Phoenix Core',  desc: 'A molten ember bound in crystal lattice. Evolves through all 10 tiers.',          icon: '🔥', cost: 900,  ownership: 'cosmetic', previewSprite: 6 },
 ];
 
-export const SHOP_ITEMS_BY_ID = Object.fromEntries(SHOP_ITEMS.map(i => [i.id, i]));
+// ── Theme bundle packs ─────────────────────────────────────────────────────
+// Fortnite-style bundle: a cultivator + crystal + particles from the same
+// theme, sold together at a discount over the sum of the individual prices.
+// Purchase expands into the components atomically; the apply layer in
+// `useShopInventory.purchase` handles `category: 'bundle'` by iterating
+// `components` and crediting each as a cosmetic.
+//
+// A bundle hides from the storefront once ANY of its components is already
+// owned (the discount logic stops making sense once the player has paid
+// piecemeal). The remaining components stay buyable as singles.
+
+export const SHOP_BUNDLES = [
+  {
+    id: 'bundle_frost_sect',
+    category: 'bundle',
+    name: 'Frost Sect',
+    theme: 'frost',
+    desc: 'Cultivator + crystal + particles, one frozen theme.',
+    icon: '❄️',
+    components: ['cos_char_frost_ascetic', 'cos_crystal_frost', 'cos_particles_snowfall'],
+    cost: 1700,          // discounted price
+    originalCost: 2500,  // sum of components (1200 + 800 + 500)
+    saveAmount: 800,
+    ownership: 'bundle',
+  },
+  {
+    id: 'bundle_bone_court',
+    category: 'bundle',
+    name: 'Bone Court',
+    theme: 'bone',
+    desc: 'Cultivator + crystal + particles, one ossuary theme.',
+    icon: '💀',
+    components: ['cos_char_bone_patriarch', 'cos_crystal_ossuary', 'cos_particles_ashen'],
+    cost: 2200,
+    originalCost: 2800,  // sum of components (1500 + 800 + 500)
+    saveAmount: 600,
+    ownership: 'bundle',
+  },
+];
+
+// Lookup table for ALL purchasable entries - includes singles AND bundles
+// so the purchase / featured / display layers can look anything up by id
+// without caring whether the source array was SHOP_ITEMS or SHOP_BUNDLES.
+export const SHOP_ITEMS_BY_ID = Object.fromEntries(
+  [...SHOP_ITEMS, ...SHOP_BUNDLES].map(i => [i.id, i])
+);
 
 /** True if an item is currently affordable. */
 export function canAfford(itemId, balance) {
@@ -331,13 +264,13 @@ export function canAfford(itemId, balance) {
 // catalogue; weekday buffs are the impulse-buy moments where a discount
 // can flip a "maybe later" into a purchase.
 export const FEATURED_BY_WEEKDAY = [
-  'cos_char_crimson',           // Sun
+  'cos_char_frost_ascetic',     // Sun  — cosmetic spotlight
   'buff_crimson_aura_4h',       // Mon
   'qol_skip_bt_confirm',        // Tue
   'buff_producer_surge_4h',     // Wed
   'consumable_major_bt_bypass', // Thu
   'buff_crimson_aura_12h',      // Fri
-  'cos_crystal_amber',          // Sat
+  'cos_crystal_phoenix',        // Sat  — cosmetic spotlight
 ];
 
 export const FEATURED_DISCOUNT = 0.20; // 20% off the daily pick
