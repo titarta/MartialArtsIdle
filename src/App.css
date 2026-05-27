@@ -22939,20 +22939,27 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   position: relative;
   padding-left: 4px;
 }
-.spirit-bazaar-screen .bls-section::before {
+/* Vermillion lantern bar - moved from .bls-section to .bls-section-header
+   so it auto-centers on the TITLE row instead of the whole section
+   (which has items below the header and was making the bar drift down).
+   Mirrors the working .cs-up-section-lantern pattern in Cultivation:
+   absolute, left:0, top:50% + translateY(-50%). */
+.spirit-bazaar-screen .bls-section .bls-section-header {
+  position: relative;
+  padding-left: 14px;
+}
+.spirit-bazaar-screen .bls-section .bls-section-header::before {
   content: "";
   position: absolute;
-  left: 12px;
-  top: 14px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 4px;
-  height: 28px;
+  height: 22px;
   border-radius: 2px;
   background: linear-gradient(180deg, #ff6864 0%, #b81e1e 100%);
   box-shadow: 0 0 12px rgba(255, 104, 100, 0.50);
   pointer-events: none;
-}
-.spirit-bazaar-screen .bls-section .bls-section-header {
-  padding-left: 14px;
 }
 .spirit-bazaar-screen .bls-section-title {
   font-family: var(--font-display);
@@ -23202,16 +23209,9 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   background: rgba(var(--ui-bg-panel-rgb), 0.94);
 }
 
-/* Aisle (.bls-section) header padding — the vermillion lantern bar sits
-   at top:14px / height:28px. Bring it down so it visually anchors to the
-   title (which is ~16px Cinzel + the .bls-section-tag uppercase row). */
-.spirit-bazaar-screen .bls-section::before {
-  top: 16px;
-  height: 26px;
-}
-
-/* Aisle section header — give it breathing room from the lantern bar and
-   make sure the title baseline aligns with the lantern center. */
+/* Aisle section header - lantern bar auto-centers on the title row
+   via top:50%/translateY above. Just give the row enough breathing
+   space + a min-height so the bar's 22px sits inside it cleanly. */
 .spirit-bazaar-screen .bls-section .bls-section-header {
   padding-top: 4px;
   padding-bottom: 4px;
@@ -30945,12 +30945,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   --proc-h: 36px;
 }
 
-/* Per-stage wrapper — owns positioning + scale. Holds two image layers
-   (colour underneath, silhouette on top); the silhouette's opacity is
-   the ramp, NOT a display toggle. */
+/* Per-stage wrapper — owns positioning + scale + stacking. Holds two
+   image layers (colour underneath, silhouette on top); the silhouette's
+   opacity is the ramp, NOT a display toggle.
+   z-index inverts the index so the FIRST stage (most revealed) sits
+   FRONTMOST and the late silhouettes recede behind - reads as the
+   evolution receding into mystery, not the mystery looming over the
+   reveal. */
 .bls-skin-stage {
   position: absolute;
   bottom: 6px;
+  z-index: calc(var(--stage-count, 1) - var(--stage-index, 0));
   /* Distribute LEFT edges evenly across the available width so the
      first stage starts at left=PAD and the last stage's RIGHT edge
      sits at right=PAD. */
