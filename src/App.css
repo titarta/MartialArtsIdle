@@ -6957,11 +6957,24 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   transform: translate(-50%, -50%) scale(0.88);
 }
 
-/* ── Pattern Clicking mechanic ──────────────────────────────────────────── */
+/* ── Tracing Meridians — minigame overlay ───────────────────────────────────
+   Redesign 2026-05-28: previously a generic dark scrim + osu-style purple
+   numbered dots + purple-blue gradient timer bar. Replaced with the Sanctum
+   design vocabulary - lacquer + brass + vermillion + Ma Shan Zheng brush -
+   so the mechanic feels like cultivation theatre rather than a tap-the-
+   circles drill.
 
-/* Fixed overlay — constrained to the playable area between TopBar (top) and
-   NavBar (bottom) so the timer + dots never spawn underneath either bar.
-   Z-index sits below the nav bar (z-100) and below the top bar (z-700). */
+   Visual layers (bottom → top):
+     1. Overlay scrim                  - vermillion-tinted ink wash + 气 watermark
+     2. Title strip                    - 气脉 brush + "Trace the Meridians" Cinzel
+     3. Incense timer (top)            - dark column, glowing brass tip recedes
+     4. Ink-meridian connections (svg) - curved paths between nodes (brass active)
+     5. Acupressure nodes              - lacquer-brass medallions with numerals
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Overlay backdrop — fixed-positioned playable rect between top bar and
+   nav bar. Vermillion-tinted ink wash + 气 watermark replace the flat
+   black scrim. z-index sits below NavBar (z:100) + TopBar (z:700). */
 .pc-overlay {
   position:       fixed;
   top:            calc(var(--top-bar-h) + env(safe-area-inset-top));
@@ -6970,62 +6983,174 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   right:          0;
   z-index:        90;
   pointer-events: auto;
-  background:     rgba(0, 0, 0, 0.38);
-  animation:      pc-overlay-in 0.3s ease-out;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(200, 60, 60, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0.62) 100%);
+  overflow:       hidden;
+  animation:      pc-overlay-in 0.32s ease-out;
 }
 @keyframes pc-overlay-in {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-/* Success: green flash then fade out */
+/* Bottom-corner 气 watermark — atmospheric, never interactive */
+.pc-overlay::after {
+  content: '气';
+  position: absolute;
+  bottom: 10px;
+  right: 18px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 96px;
+  line-height: 0.8;
+  color: rgba(220, 175, 110, 0.07);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Success: warm brass flash + fade. Replaces the green osu-style flash. */
 .pc-overlay-success {
   pointer-events: none;
   animation: pc-overlay-success 0.6s ease-out forwards;
 }
 @keyframes pc-overlay-success {
-  0%   { background: rgba(0, 0, 0, 0.28); }
-  25%  { background: rgba(74, 222, 128, 0.32); }
+  0%   {
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(200, 60, 60, 0.10) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0.62) 100%);
+  }
+  25%  {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(255, 200, 130, 0.32) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.25) 40%, rgba(0, 0, 0, 0.55) 100%);
+  }
   100% { background: rgba(0, 0, 0, 0); opacity: 0; }
 }
-/* Fail: red flash then fade out */
+/* Fail: vermillion flash + fade. */
 .pc-overlay-fail {
   pointer-events: none;
   animation: pc-overlay-fail 0.6s ease-out forwards;
 }
 @keyframes pc-overlay-fail {
-  0%   { background: rgba(0, 0, 0, 0.28); }
-  25%  { background: rgba(239, 68, 68, 0.28); }
+  0%   {
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(200, 60, 60, 0.10) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.35) 30%, rgba(0, 0, 0, 0.62) 100%);
+  }
+  25%  {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(255, 91, 91, 0.28) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0.25) 40%, rgba(0, 0, 0, 0.55) 100%);
+  }
   100% { background: rgba(0, 0, 0, 0); opacity: 0; }
 }
 
-/* Timer bar — spans the width at the top of the overlay */
+/* Title strip — brush 气脉 + Cinzel subtitle at the top of the overlay. */
+.pc-title-strip {
+  position:        absolute;
+  top:             6px;
+  left:            0;
+  right:           0;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             1px;
+  pointer-events:  none;
+  z-index:         5;
+}
+.pc-title-cn {
+  font-family:     'Ma Shan Zheng', serif;
+  font-size:       16px;
+  line-height:     1;
+  color:           rgba(220, 175, 110, 0.85);
+  letter-spacing:  0.18em;
+}
+.pc-title-en {
+  font-family:     'Cinzel', serif;
+  font-weight:     600;
+  font-size:       8.5px;
+  line-height:     1.2;
+  letter-spacing:  0.32em;
+  color:           rgba(232, 215, 192, 0.55);
+  text-transform:  uppercase;
+}
+
+/* Incense timer — slim lacquer column with a glowing brass-hot tip that
+   recedes leftward as time burns. Bar uses the rAF-driven scaleX shrink
+   from the JS so the actual position is data-correct; CSS only handles
+   the look. Sits 40px down from the overlay top so the title strip has
+   air above it. */
 .pc-timer-track {
   position:      absolute;
-  top:           8px;
-  left:          10%;
-  right:         10%;
-  height:        4px;
-  background:    rgba(255, 255, 255, 0.14);
-  border-radius: 2px;
-  overflow:      hidden;
+  top:           42px;
+  left:          32px;
+  right:         32px;
+  height:        6px;
+  background:    linear-gradient(180deg, #150e07, #0c0805);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 0 rgba(220, 175, 110, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  overflow:      visible;
 }
 .pc-timer-bar {
-  height:           100%;
+  position:         absolute;
+  top:              0; left: 0; bottom: 0;
   width:            100%;
-  background:       linear-gradient(90deg, #a78bfa, #60a5fa);
+  border-radius:    3px 0 0 3px;
+  background: linear-gradient(90deg,
+    rgba(255, 180, 110, 0.0)   0%,
+    rgba(255, 180, 110, 0.55) 25%,
+    rgba(255, 220, 150, 0.95) 88%,
+    #fff8e0                  100%);
+  box-shadow:
+    0 0 8px 2px rgba(255, 200, 130, 0.55),
+    inset 0 1px 0 rgba(255, 235, 180, 0.3);
   transform-origin: left center;
   transform:        scaleX(1);
 }
+/* Brass anchor cap at the BAR's burning tip — small glow knot. Pure CSS,
+   travels with the bar via scaleX (so the ::after sits at the bar's right
+   edge regardless of remaining time). */
+.pc-timer-bar::after {
+  content: '';
+  position: absolute;
+  right: -3px; top: -2px; bottom: -2px;
+  width: 6px;
+  background: radial-gradient(circle, #fff8e0 0%, rgba(255, 200, 130, 0.7) 50%, transparent 100%);
+  filter: blur(1px);
+}
+/* Right-edge "empty cap" tick so the player has a visual anchor for the
+   end of the burn. Sits on the track, NOT the bar. */
+.pc-timer-endcap {
+  position: absolute;
+  right: -1px; top: -2px; bottom: -2px;
+  width: 2px;
+  background: rgba(220, 175, 110, 0.35);
+  border-radius: 1px;
+  pointer-events: none;
+}
+/* Urgent (< 25%): swap brass-hot to vermillion-hot, brighter glow,
+   slight opacity pulse. */
 .pc-timer-bar.pc-timer-urgent {
-  background: linear-gradient(90deg, #f87171, #fb923c);
-  animation:  pc-timer-pulse 0.4s ease-in-out infinite alternate;
+  background: linear-gradient(90deg,
+    rgba(255, 91, 91, 0.0)    0%,
+    rgba(255, 91, 91, 0.6)   25%,
+    rgba(255, 140, 100, 0.95) 88%,
+    #fff8e0                 100%);
+  box-shadow:
+    0 0 10px 3px rgba(255, 91, 91, 0.6),
+    inset 0 1px 0 rgba(255, 235, 180, 0.3);
+  animation: pc-timer-pulse 0.42s ease-in-out infinite alternate;
 }
 @keyframes pc-timer-pulse {
   from { opacity: 0.75; }
   to   { opacity: 1; }
 }
 
-/* SVG follow-point connections — spans the full overlay */
+/* Ink-meridian connections — curved Bezier paths between nodes. The SVG
+   uses viewBox 0-100 non-uniform so percentages line up with dot CSS
+   percentages. `vector-effect: non-scaling-stroke` on the <path>s keeps
+   the stroke width visually constant despite the aspect skew. */
 .pc-connections {
   position:       absolute;
   inset:          0;
@@ -7034,74 +7159,204 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   pointer-events: none;
   overflow:       visible;
 }
-/* Dim dashed line to all upcoming dots */
 .pc-connection {
-  stroke:            rgba(200, 185, 255, 0.28);
-  stroke-width:      2px;
-  stroke-dasharray:  7 5;
+  fill:              none;
+  stroke:            rgba(220, 175, 110, 0.32);
+  stroke-width:      1.5;
+  stroke-dasharray:  3 5;
   stroke-linecap:    round;
 }
-/* Bright solid line from the current dot to the next one */
 .pc-connection-active {
-  stroke:            rgba(210, 195, 255, 0.72);
-  stroke-width:      2.5px;
+  stroke:            #ffcf83;
+  stroke-width:      2;
   stroke-dasharray:  none;
+  filter:            drop-shadow(0 0 4px rgba(255, 200, 130, 0.55));
 }
 
-/* Individual numbered dot */
+/* Acupressure node medallion — lacquer disc + brass rim + glyph centred.
+   Three pseudo layers stack so we can animate them independently:
+     ::before = the disc body (background + rim)
+     ::after  = outer state ring (waiting jade halo / current spinning rim)
+     > span   = the numeral / 印 glyph
+*/
 .pc-dot {
   position:        absolute;
   width:           54px;
   height:          54px;
   border-radius:   50%;
-  border:          2px solid rgba(167, 139, 250, 0.6);
-  background:      rgba(25, 15, 45, 0.88);
-  color:           #c4b5fd;
-  font-size:       18px;
-  font-weight:     700;
-  font-family:     var(--font-heading, sans-serif);
+  border:          none;
+  padding:         0;
+  background:      transparent;
   display:         flex;
   align-items:     center;
   justify-content: center;
   transform:       translate(-50%, -50%);
   cursor:          pointer;
   touch-action:    manipulation;
-  z-index:         1;
+  z-index:         2;
   transition:      transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
-/* Current dot — pulsing glow, player taps this one next */
-.pc-dot-current {
-  border-color: #c4b5fd;
-  background:   rgba(55, 35, 90, 0.95);
-  color:        #ede9fe;
-  animation:    pc-dot-current-pulse 0.8s ease-in-out infinite alternate;
+/* Disc body — dark lacquer gradient with a brass rim. The rim colour
+   varies by state via the modifier classes below. */
+.pc-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(45, 30, 18, 0.95) 0%,
+      rgba(28, 18, 11, 0.96) 60%,
+      rgba(20, 12, 8, 0.96) 100%);
+  border: 1.5px solid #8a5a28;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  transition: border-color 0.18s ease;
 }
-@keyframes pc-dot-current-pulse {
-  from { box-shadow: 0 0 10px 3px rgba(167, 139, 250, 0.45),
-                     0 0 22px 7px rgba(167, 139, 250, 0.18); }
-  to   { box-shadow: 0 0 18px 7px rgba(167, 139, 250, 0.78),
-                     0 0 38px 14px rgba(167, 139, 250, 0.35); }
+/* Outer state ring — empty by default, used by `current` / `tapped` */
+.pc-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  pointer-events: none;
+  transition: border-color 0.18s ease;
 }
-/* Waiting dots — dimmed */
+/* The glyph itself — Ma Shan Zheng brush for both numerals and 印 stamp */
+.pc-dot-glyph {
+  position:    relative;
+  z-index:     1;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size:   26px;
+  line-height: 1;
+  color:       inherit;
+  pointer-events: none;
+  user-select: none;
+  /* Slight downward optical nudge so the brush stroke sits centred on the
+     disc rather than appearing top-heavy (MSZ runs tall above baseline). */
+  transform:   translateY(2px);
+}
+
+/* WAITING — dim jade rim + dim numeral. Inert. */
 .pc-dot-waiting {
-  opacity: 0.38;
-  cursor:  default;
+  color: rgba(127, 198, 158, 0.5);
+  cursor: default;
 }
-/* Tapped dot — burst-expand then vanish */
+.pc-dot-waiting::before {
+  border-color: rgba(74, 151, 120, 0.40);
+}
+.pc-dot-waiting::after {
+  inset: -1px;
+  border: 1px solid rgba(127, 198, 158, 0.18);
+  box-shadow: 0 0 6px rgba(127, 198, 158, 0.10);
+}
+
+/* CURRENT — vermillion inner pulse + spinning brass rim. Hot. */
+.pc-dot-current {
+  color: #fff8e0;
+}
+.pc-dot-current::before {
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(80, 25, 25, 0.95) 0%,
+      rgba(50, 15, 12, 0.95) 60%,
+      rgba(28, 10, 8, 0.95) 100%);
+  border-color: #dcaf6e;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.30),
+    inset 0 0 8px rgba(255, 91, 91, 0.35),
+    0 0 0 0 rgba(255, 91, 91, 0.45);
+  animation: pc-dot-current-bloom 1.0s ease-in-out infinite alternate;
+}
+@keyframes pc-dot-current-bloom {
+  from {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 220, 150, 0.30),
+      inset 0 0 6px rgba(255, 91, 91, 0.30),
+      0 0 12px 3px rgba(255, 91, 91, 0.30),
+      0 0 24px 6px rgba(200, 56, 56, 0.14);
+  }
+  to {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 220, 150, 0.30),
+      inset 0 0 10px rgba(255, 91, 91, 0.55),
+      0 0 22px 6px rgba(255, 91, 91, 0.55),
+      0 0 40px 12px rgba(200, 56, 56, 0.28);
+  }
+}
+/* Spinning brass-vermillion rim outside the disc */
+.pc-dot-current::after {
+  inset: -7px;
+  border: 1.5px solid transparent;
+  border-top-color:    #ffcf83;
+  border-right-color:  #dcaf6e;
+  border-bottom-color: #ff5b5b;
+  border-left-color:   #8a5a28;
+  border-radius: 50%;
+  animation: pc-dot-spin 2.4s linear infinite;
+}
+@keyframes pc-dot-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* TAPPED — bursts into a vermillion 印 stamp, scales out, fades.
+   We tint the disc itself vermillion + scale up the glyph + fade to
+   zero opacity. The state lasts ~450ms then the dot stays mounted at
+   opacity 0 (React removes it on completePattern). */
 .pc-dot-tapped {
   pointer-events: none;
-  animation: pc-dot-tapped 0.42s ease-out forwards !important;
+  color: #ff5b5b;
+  animation: pc-dot-tapped-fade 0.46s ease-out 0.42s forwards;
 }
-@keyframes pc-dot-tapped {
-  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 1;
-         box-shadow: 0 0 14px 5px rgba(167, 139, 250, 0.65); }
-  40%  { transform: translate(-50%, -50%) scale(1.45); opacity: 0.9;
-         box-shadow: 0 0 28px 12px rgba(167, 139, 250, 0.45); }
-  100% { transform: translate(-50%, -50%) scale(0);    opacity: 0; }
+.pc-dot-tapped::before {
+  background: rgba(200, 56, 56, 0.20);
+  border-color: #c83838;
+  box-shadow:
+    0 0 22px 6px rgba(255, 91, 91, 0.55),
+    0 0 44px 14px rgba(200, 56, 56, 0.28);
+  animation: pc-dot-stamp-disc 0.46s ease-out forwards;
 }
+.pc-dot-tapped::after { display: none; }
+.pc-dot-tapped .pc-dot-glyph {
+  animation: pc-dot-stamp-glyph 0.46s ease-out forwards;
+}
+@keyframes pc-dot-stamp-disc {
+  0%   { transform: scale(1);    opacity: 1;    }
+  35%  { transform: scale(1.45); opacity: 0.95; }
+  100% { transform: scale(1.18); opacity: 0;    }
+}
+@keyframes pc-dot-stamp-glyph {
+  0%   { transform: translateY(2px) scale(1)    rotate(-6deg); opacity: 1; }
+  35%  { transform: translateY(2px) scale(1.35) rotate(-10deg); opacity: 1; }
+  100% { transform: translateY(2px) scale(1.55) rotate(-12deg); opacity: 0; }
+}
+/* Hold the dot itself at 0 opacity after the burst so we don't flicker
+   while React unmounts on success/fail. */
+@keyframes pc-dot-tapped-fade {
+  to { opacity: 0; }
+}
+
 /* Tap press feedback */
 .pc-dot:active:not(.pc-dot-waiting):not(.pc-dot-tapped) {
-  transform: translate(-50%, -50%) scale(0.86);
+  transform: translate(-50%, -50%) scale(0.88);
+}
+
+/* Reduced motion — kill the bloom + spin + stamp burst, keep state
+   colour swaps so the mechanic stays playable. */
+@media (prefers-reduced-motion: reduce) {
+  .pc-overlay,
+  .pc-dot-current::before,
+  .pc-dot-current::after,
+  .pc-dot-tapped,
+  .pc-dot-tapped::before,
+  .pc-dot-tapped .pc-dot-glyph,
+  .pc-timer-bar.pc-timer-urgent {
+    animation: none !important;
+  }
+  .pc-dot-tapped { opacity: 0; }
 }
 
 /* ── Crystal Feed Modal ─────────────────────────────────────────────────── */

@@ -45,6 +45,11 @@ from fontTools.ttLib import TTFont
 #   凰 龍 玄                       : legendary spark per-card seal glyphs
 #   突 印                          : breakthrough button Ceremonial Edict
 #                                    (HomeScreen.jsx - watermark + seal stamp)
+#   脉 一 二 三 四 五 六 七        : Tracing Meridians minigame
+#                                    (HomeScreen.jsx PatternClickOverlay -
+#                                     title "气脉" + numerals 1-7 on the
+#                                     acupressure nodes; 气 + 印 already
+#                                     covered by realm-glyphs + BT button)
 CHARS = sorted(set(
     "命元圣归虚道天"             # chapter glyphs
     + "体气分仙王源帝半"           # realm glyphs not already covered
@@ -52,6 +57,7 @@ CHARS = sorted(set(
     + "灵神"                        # future plaques
     + "凰龍玄"                      # legendary seal per-spark variants
     + "突印"                        # BT button: 突 watermark + 印 seal stamp
+    + "脉一二三四五六七"            # Tracing Meridians: title 脉 + numerals 1-7
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.
