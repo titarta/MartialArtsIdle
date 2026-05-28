@@ -636,6 +636,13 @@ ELEMENTS = {
     # cultivator tier. Must be radially symmetric so CSS rotation is seamless.
     "cultivator_halo": {
         "size": (256, 256),
+        "strip_dark_neutral": True,
+        "strip_dark_neutral_kwargs": {
+            "max_thresh": 90,   # max channel < 90 = dark pixel
+            "warmth_thresh": 20, # max-min < 20 = neutral (not warm gold)
+            "center_r": 45,      # wipe hollow centre (< 45 px from centre)
+            "exterior_r": 116,   # wipe exterior (> 116 px from centre)
+        },
         "desc": (
             "Divine cultivation formation circle, xianxia VFX overlay, pixel art, top-down. "
             "256x256 RGBA. Radially symmetric. "
@@ -993,6 +1000,43 @@ def run_finalize(element_id, cand_n):
     # Carve a transparent channel into a solid bar (when model filled in the interior)
     if cfg.get("carve_channel"):
         img = carve_bar_channel(img, **cfg.get("carve_channel_kwargs", {}))
+
+    # Strip dark-neutral fake-transparency artefacts for halo / VFX overlays.
+    # PixelLab sometimes renders the "transparent" background as a near-black
+    # checkerboard of opaque pixels instead of real alpha=0. For elements with
+    # strip_dark_neutral=True we remove any opaque pixel whose warmth (max-min
+    # channel spread) is below the threshold — preserving warm gold/amber content
+    # while erasing neutral dark background squares. Optionally, a circle mask
+    # (center_r / exterior_r in px from image centre) punches out the hollow
+    # centre and clips the exterior to a clean disc edge.
+    if cfg.get("strip_dark_neutral"):
+        import math as _math
+        opts       = cfg.get("strip_dark_neutral_kwargs", {})
+        max_thresh = opts.get("max_thresh", 90)
+        warmth_thresh = opts.get("warmth_thresh", 20)
+        center_r   = opts.get("center_r", None)
+        exterior_r = opts.get("exterior_r", None)
+        w2, h2 = img.size
+        px2 = img.load()
+        removed = 0
+        cxp, cyp = w2 // 2, h2 // 2
+        for yy in range(h2):
+            for xx in range(w2):
+                pr, pg, pb, pa = px2[xx, yy]
+                if pa == 0:
+                    continue
+                dist = _math.sqrt((xx - cxp) ** 2 + (yy - cyp) ** 2)
+                if (center_r   and dist < center_r)   or \
+                   (exterior_r and dist > exterior_r):
+                    px2[xx, yy] = (pr, pg, pb, 0)
+                    removed += 1
+                    continue
+                max_c   = max(pr, pg, pb)
+                warmth  = max_c - min(pr, pg, pb)
+                if max_c < max_thresh and warmth < warmth_thresh:
+                    px2[xx, yy] = (pr, pg, pb, 0)
+                    removed += 1
+        print(f"  Stripped {removed} dark-neutral bg pixels")
 
     # Optional per-config composite through the canonical badge frame.
     # Default off: with style_image-based generation the model already echoes
