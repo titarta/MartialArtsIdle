@@ -27828,24 +27828,15 @@ img.pp-emblem-locked { font-size: 0; }
 .home-bg::before { left: 14px; }
 .home-bg::after  { right: 14px; }
 
-/* Cushion shadow anchoring the cultivator to the ground.
-   Sits inside the fighter-stage as an ::before so no JSX edit. */
-.home-fighter-stage::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -4px;
-  width: 168px;
-  height: 18px;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(ellipse 84px 9px at 50% 50%,
-      rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.32) 55%, transparent 80%);
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(0.5px);
-  z-index: 0;
-}
+/* 2026-05-27 — REMOVED the "cushion shadow" that lived on
+   .home-fighter-stage::before. That pseudo-element is the HOLD-STATE AURA
+   (see line ~8474): its opacity is 0 when idle and 1 while boosting. Painting
+   a dark radial-gradient cushion shadow on the same pseudo meant the shadow
+   was invisible at rest and bloomed into a dark elliptical blob the moment
+   the player held focus — the "shadow in the middle of the screen" bug. It
+   also clobbered the aura's coloured glow background entirely. Do NOT re-add
+   a shadow here; if the cultivator needs a ground shadow, give it its own
+   element/pseudo that isn't opacity-driven by the boost state. */
 
 /* ── Identity plaque: carved brass with 道 / 印 seal-stamp corners ─── */
 .home-scene-realm-header {
@@ -28393,20 +28384,11 @@ img.pp-emblem-locked { font-size: 0; }
 .home-pc-center::before { left: 14px; }
 .home-pc-center::after  { right: 14px; }
 
-/* 5. Cushion shadow — was at the BOTTOM of the fighter-stage but the
-      sprite's actual seated position depends on the PNG. Bump opacity
-      and reposition so it's clearly the cultivator's ground footprint. */
-.home-fighter-stage::before {
-  width: 190px !important;
-  height: 22px !important;
-  bottom: -8px !important;
-  background:
-    radial-gradient(ellipse 95px 11px at 50% 50%,
-      rgba(0, 0, 0, 0.82) 0%,
-      rgba(0, 0, 0, 0.45) 50%,
-      transparent 80%) !important;
-  filter: blur(1px) !important;
-}
+/* 5. Cushion shadow — REMOVED (2026-05-27). This was the dark override
+      that turned the hold-state aura pseudo into a dark elliptical blob
+      on focus-hold. See the longer note at the first cushion-shadow site
+      above. The aura (.home-fighter-stage::before) now keeps its intended
+      coloured glow. */
 
 /* 6. Petition Tablet — give it the mockup-spec presence. The chips-tr
       container constrains width; bump the plaque inside. */
