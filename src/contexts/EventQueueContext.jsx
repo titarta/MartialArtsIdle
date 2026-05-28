@@ -9,9 +9,13 @@
  * "current event" — only one is presented at a time. When dismissed, the
  * next one slides in.
  *
- * Two extra knobs:
- *  - `priority: 'high'` jumps to the front of the queue (used for crystal
- *    evolution + offline earnings, which feel cheap to interrupt).
+ * Three priority levels:
+ *  - `priority: 'pinned'` jumps to the front AND cannot be displaced by
+ *    subsequent high events while it is the head. Use for offline-earnings
+ *    and any other modal the player MUST see and act on before anything else.
+ *  - `priority: 'high'` jumps to the front, but yields to a pinned head
+ *    (inserting at position 1 instead). Used for crystal/character evolution.
+ *  - `priority: 'normal'` (default) appends to the tail.
  *  - `dedupe: true` replaces a pending event of the same kind instead of
  *    stacking duplicates.
  *
@@ -39,7 +43,19 @@ export function EventQueueProvider({ children }) {
     setQueue(prev => {
       let next = prev;
       if (opts.dedupe) next = next.filter(e => e.kind !== kind);
-      return event.priority === 'high' ? [event, ...next] : [...next, event];
+      if (event.priority === 'pinned') {
+        // Pinned always goes to the very front, no exceptions.
+        return [event, ...next];
+      }
+      if (event.priority === 'high') {
+        // High jumps to the front, but yields to a pinned head so the pinned
+        // event is never displaced while the player is looking at it.
+        if (next.length > 0 && next[0].priority === 'pinned') {
+          return [next[0], event, ...next.slice(1)];
+        }
+        return [event, ...next];
+      }
+      return [...next, event];
     });
     return id;
   }, []);
