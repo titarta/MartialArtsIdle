@@ -27241,6 +27241,19 @@ img.pp-emblem-locked { font-size: 0; }
   z-index: 60 !important;
 }
 
+/* Pattern Click (Tracing Meridians) overlay: full-screen scrim that MUST
+   stay position:fixed pinned to the viewport playable area (top: top-bar,
+   bottom: nav). Without this restoration the sledgehammer rule above
+   converts it to position:relative, the top/bottom anchors stop meaning
+   anything, height collapses to 0, and the entire minigame becomes
+   invisible. Bug discovered 2026-05-28 when the Meridians redesign first
+   exposed the issue — the feature appeared "bugged" because dots were
+   rendering inside a zero-height parent. */
+.home-cultivation-zone > .pc-overlay {
+  position: fixed !important;
+  z-index: 90 !important;
+}
+
 /* Divine Qi pickup floaters: text bounce sits above the orb itself. */
 .home-cultivation-zone > .divine-qi-floater {
   position: absolute !important;
