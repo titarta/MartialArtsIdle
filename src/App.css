@@ -30432,6 +30432,21 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   display: none !important;
 }
 
+/* ═════════════════════════════════════════════════════════════════════
+   SANCTUM v37: kill the yellow circular glow when holding to focus.
+
+   The darkened temple bg (v6, brightness 0.62) and the new vignette
+   make the .home-fighter-stage::before aura (activated by .stage-boosted
+   on hold) pop as a large conspicuous yellow/gold circle. Before v6 it
+   was less visible against the bright bg. The cultivator already switches
+   to its _focused.png pose as hold feedback — the radial blob adds nothing
+   and reads as a bug. Hide it, same pattern as v35/v36.
+   ═════════════════════════════════════════════════════════════════════ */
+.home-fighter-stage.stage-boosted::before,
+.home-fighter-stage.stage-ad-boosted::before {
+  display: none !important;
+}
+
 /* End of SANCTUM v36. */
 
 /* ═════════════════════════════════════════════════════════════════════
