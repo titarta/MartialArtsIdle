@@ -463,6 +463,24 @@ export default function useCultivation() {
   // the main save is wiped on reincarnation. Used by useReincarnationKarma to
   // continuously award karma based on total Qi generated this life.
   const qiEarnedThisLifeRef  = useRef(saved?.qiEarnedThisLife  ?? 0);
+  // All-time qi counter — accumulates every qi tick and is NEVER reset (not
+  // on breakthrough, not on reincarnation). Single source of truth for the
+  // karma hook's cumulative cube-root formula (2026-05-27). Stored in its
+  // own key (mai_qi_alltime) rather than the main save blob, because the
+  // main save is wiped on reincarnation and all-time must survive that.
+  // Migration: legacy saves have no all-time key, so seed from the current
+  // life's qi; the karma hook clamps so this under-count can't flood/drought.
+  const qiEarnedAllTimeRef = useRef(undefined);
+  if (qiEarnedAllTimeRef.current === undefined) {
+    // Lazy one-time init (useRef has no lazy initializer): read the
+    // dedicated all-time key, else seed from the current life's qi.
+    let seed = saved?.qiEarnedThisLife ?? 0;
+    try {
+      const raw = localStorage.getItem('mai_qi_alltime');
+      if (raw != null) { const v = Number(raw); if (Number.isFinite(v)) seed = v; }
+    } catch {}
+    qiEarnedAllTimeRef.current = seed;
+  }
   const costRef    = useRef(REALMS[savedIndex].cost);
   const maxedRef   = useRef(!REALMS[savedIndex + 1]);
   const indexRef   = useRef(savedIndex);
@@ -643,6 +661,9 @@ export default function useCultivation() {
       // Lifetime qi — accumulates across the entire current life; used by
       // the karma hook to continuously award karma. Reset on reincarnation.
       qiEarnedThisLifeRef.current  += dQi;
+      // All-time qi — same accrual, but NEVER reset. Drives the cumulative
+      // cube-root karma formula. Persisted separately (mai_qi_alltime).
+      qiEarnedAllTimeRef.current   += dQi;
       // Stats — accumulate passive qi here; flushed to the stats recorder
       // once per second by the interval below so we don't hammer the
       // singleton at 60 Hz.
@@ -866,6 +887,11 @@ export default function useCultivation() {
       try {
         localStorage.setItem('mai_crystal_reservoir', String(crystalReservoirRef.current));
       } catch {}
+      // All-time qi persisted separately so it survives the reincarnation
+      // wipe of the main save blob.
+      try {
+        localStorage.setItem('mai_qi_alltime', String(qiEarnedAllTimeRef.current));
+      } catch {}
     }, 2000);
     return () => clearInterval(interval);
   }, []);
@@ -1068,6 +1094,7 @@ export default function useCultivation() {
     qiEarnedThisRealmRef.current += total;
     // Offline qi also counts toward this life's total for karma accrual.
     qiEarnedThisLifeRef.current  += total;
+    qiEarnedAllTimeRef.current   += total;
     try {
       const lastSeen = saved?.lastSeen ?? Date.now();
       trackOfflineQiCollected(Math.floor(total), Date.now() - lastSeen, multiplier);
@@ -1169,6 +1196,7 @@ export default function useCultivation() {
     // Cookie-Clicker pivot — tap qi counts toward realm progress too.
     qiEarnedThisRealmRef.current += granted;
     qiEarnedThisLifeRef.current  += granted;
+    qiEarnedAllTimeRef.current   += granted;
     return granted;
   }, []);
 
@@ -1194,6 +1222,9 @@ export default function useCultivation() {
     // Lifetime counter — used by the karma hook to award karma continuously.
     // Reset when the main save is wiped on reincarnation.
     qiEarnedThisLifeRef,
+    // All-time counter — never reset. Drives the cumulative cube-root karma
+    // formula. Survives reincarnation (stored in mai_qi_alltime).
+    qiEarnedAllTimeRef,
     costRef,
     indexRef,
     rateRef,

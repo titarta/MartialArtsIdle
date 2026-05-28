@@ -374,10 +374,12 @@ function AppInner() {
   useEffect(() => {
     if (!karma.noteQiEarned) return;
     const id = setInterval(() => {
-      karma.noteQiEarned(cultivation.qiEarnedThisLifeRef?.current ?? 0);
+      // Feed the ALL-TIME cumulative qi (never reset) — the karma hook uses
+      // the cumulative cube-root formula now, not per-life.
+      karma.noteQiEarned(cultivation.qiEarnedAllTimeRef?.current ?? 0);
     }, 1000);
     return () => clearInterval(id);
-  }, [karma.noteQiEarned, cultivation.qiEarnedThisLifeRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [karma.noteQiEarned, cultivation.qiEarnedAllTimeRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep pill qi multiplier in sync with cultivation game loop.
   const pillQiMult = pills.getQiMult();
@@ -1693,6 +1695,8 @@ function AppInner() {
     reincarnation: <EternalTreeScreen
                      karma={karma.karma}
                      karmaEarnedThisLife={karma.karmaEarnedThisLife}
+                     cumulativeQi={karma.cumulativeQi}
+                     qiForNextKarma={karma.qiForNextKarma}
                      tree={tree}
                      lives={karma.lives}
                      realmIndex={cultivation.realmIndex}

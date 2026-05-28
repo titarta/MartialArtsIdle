@@ -169,6 +169,8 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
 export default function EternalTreeScreen({
   karma,
   karmaEarnedThisLife,
+  cumulativeQi = 0,
+  qiForNextKarma = 0,
   tree,
   lives,
   realmIndex,
@@ -202,11 +204,9 @@ export default function EternalTreeScreen({
   const karmaSpentOnTree = purchased.size;
   const canReincarnate   = realmIndex >= 24;
 
-  // Next karma costs 1,000,000 + karmaEarnedThisLife × 10,000 Qi (0-indexed: k-th point).
-  const nextKarmaQiCost = useMemo(() => {
-    const k = Math.max(0, Math.floor(karmaEarnedThisLife ?? 0));
-    return 1_000_000 + k * 10_000;
-  }, [karmaEarnedThisLife]);
+  // Cumulative cube-root model: the next karma point unlocks once all-time
+  // Qi reaches qiForNextKarma. Show progress toward it.
+  const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
 
   return (
     <div style={{
@@ -257,8 +257,8 @@ export default function EternalTreeScreen({
           </span>
         </div>
         <div style={{ color: '#7c6a9a', fontSize: 11 }}>
-          Next karma: {fmt(nextKarmaQiCost)} Qi earned this life
-          (earned {karmaEarnedThisLife ?? 0} karma this life)
+          Next karma at {fmt(qiForNextKarma)} total Qi
+          {' '}({fmt(qiToNext)} to go · earned {karmaEarnedThisLife ?? 0} this life)
         </div>
       </div>
 
