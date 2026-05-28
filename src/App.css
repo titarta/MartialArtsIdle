@@ -27223,11 +27223,28 @@ img.pp-emblem-locked { font-size: 0; }
   z-index: 1;
 }
 
-/* Burst particles are appended directly to .home-cultivation-zone at absolute
-   coordinates. The rule above would override to position:relative and stack
-   them in normal flow (the "line" bug). Restore absolute here. */
+/* Several direct children of .home-cultivation-zone need position:absolute
+   and their own z-index. The .home-cultivation-zone > * rule above sets
+   position:relative; z-index:1 (same specificity 0,1,0, later = wins).
+   Restore each element explicitly with !important. */
+
+/* Burst particles (spawned imperatively, must sit at absolute coords) */
 .home-cultivation-zone > .home-click-burst-p {
   position: absolute !important;
+}
+
+/* Divine Qi orbs + Pattern Click prompts: float over the scene at absolute
+   percent coords; must sit above all static scene chrome (z:1). */
+.home-cultivation-zone > .divine-qi-orb,
+.home-cultivation-zone > .pc-prompt {
+  position: absolute !important;
+  z-index: 60 !important;
+}
+
+/* Divine Qi pickup floaters: text bounce sits above the orb itself. */
+.home-cultivation-zone > .divine-qi-floater {
+  position: absolute !important;
+  z-index: 80 !important;
 }
 
 /* Lift the existing top + bottom gradients so they layer above the bg
