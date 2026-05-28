@@ -186,12 +186,31 @@ export const SHOP_ITEMS = [
   // Frost Sect — theme: 'frost'
   { id: 'cos_char_frost_ascetic',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Frost Ascetic',  desc: 'A wind-bitten monk of the frozen peaks. Evolves through all 13 realms with you.', icon: '🏔️', cost: 1200, ownership: 'cosmetic', theme: 'frost', previewSprite: 5 },
   { id: 'cos_crystal_frost',       category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Frost Crystal',  desc: 'A glacial shard carved by winter cultivators. Evolves through all 10 tiers.',     icon: '◇',  cost: 800,  ownership: 'cosmetic', theme: 'frost', previewSprite: 5 },
-  { id: 'cos_particles_snowfall',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Snowfall Motes', desc: 'Qi orbs replaced by drifting snow petals.',                                       icon: '❄️', cost: 500,  ownership: 'cosmetic', theme: 'frost' },
 
   // Bone Court — theme: 'bone'
   { id: 'cos_char_bone_patriarch', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Bone Patriarch', desc: 'A withered elder of the ossuary sect. Evolves through all 13 realms with you.',  icon: '💀', cost: 1500, ownership: 'cosmetic', theme: 'bone',  previewSprite: 6 },
   { id: 'cos_crystal_ossuary',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Ossuary Crystal', desc: 'A crystal lattice grown through ancient bone. Evolves through all 10 tiers.',    icon: '⬣',  cost: 800,  ownership: 'cosmetic', theme: 'bone',  previewSprite: 6 },
-  { id: 'cos_particles_ashen',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Ashen Motes',     desc: 'Qi orbs replaced by drifting ash and ember sparks.',                              icon: '🪶', cost: 500,  ownership: 'cosmetic', theme: 'bone' },
+
+  // ── Qi Particle skins ─────────────────────────────────────────────────────
+  // Each variant is a different pixel-art orb shape generated via the
+  // qi_orb_c9 batch. C1 is the default (free, no item). C0 + C2-C15 are
+  // purchasable. ID pattern: cos_particles_c9_N — HomeScreen.jsx derives
+  // the maskBase path directly from the N suffix.
+  { id: 'cos_particles_c9_0',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Void Mote',       desc: 'Condensed-absence orbs. Understated and pure.',               icon: '⚫', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_2',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Wisp Mote',       desc: 'Trailing wisps of raw qi. Leave a faint luminous tail.',      icon: '🌫️', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_3',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Star Mote',       desc: 'Compact star-form orbs that flicker with celestial light.',   icon: '⭐', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_4',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Dense Core',      desc: 'Compressed qi, heavy with intent. Tight inner glow.',         icon: '🔵', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_5',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Mist Orb',        desc: 'Soft and diffuse. Dissolves into you like morning fog.',      icon: '🌊', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_6',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Primal Orb',      desc: 'An older form of qi manifestation. Raw and resonant.',        icon: '🔮', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_7',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Crystal Mote',    desc: 'Qi shaped around a crystalline lattice. Hard-edged inner glow.', icon: '💎', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_8',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Ethereal Orb',    desc: 'Barely material qi. More radiance than substance.',           icon: '🌟', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_9',  category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Celestial Mote',  desc: 'Heaven-grade orbs. Carry a distant, ancient echo.',           icon: '✨', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_10', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Arcane Orb',      desc: 'Intricate qi nodes with an ordered inner pattern.',           icon: '🔷', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_11', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Dragon Mote',     desc: 'Coiled qi. Carries the concentrated force of a dragon.',      icon: '🐲', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_12', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Phoenix Orb',     desc: 'Warm rising orbs. Bright inner core like flame reforming.',   icon: '🌅', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_13', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Storm Mote',      desc: 'Crackles with contained charge. Never quite still.',          icon: '⚡', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_14', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Thunder Orb',     desc: 'Carries the memory of a hundred thunderclaps.',              icon: '💥', cost: 400, ownership: 'cosmetic' },
+  { id: 'cos_particles_c9_15', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Supreme Mote',    desc: 'The pinnacle form. Dense, bright, perfectly balanced qi.',    icon: '👑', cost: 400, ownership: 'cosmetic' },
 
   // Untethered skins — no bundle association yet
   { id: 'cos_char_storm_caller',   category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller',  desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',       icon: '⚡', cost: 1300, ownership: 'cosmetic', previewSprite: 7 },
@@ -200,11 +219,8 @@ export const SHOP_ITEMS = [
 ];
 
 // ── Theme bundle packs ─────────────────────────────────────────────────────
-// Fortnite-style bundle: a cultivator + crystal + particles from the same
-// theme, sold together at a discount over the sum of the individual prices.
-// Purchase expands into the components atomically; the apply layer in
-// `useShopInventory.purchase` handles `category: 'bundle'` by iterating
-// `components` and crediting each as a cosmetic.
+// Fortnite-style bundle: a cultivator + crystal from the same theme, sold
+// together at a discount. Purchase expands into components atomically.
 //
 // A bundle hides from the storefront once ANY of its components is already
 // owned (the discount logic stops making sense once the player has paid
@@ -216,12 +232,12 @@ export const SHOP_BUNDLES = [
     category: 'bundle',
     name: 'Frost Sect',
     theme: 'frost',
-    desc: 'Cultivator + crystal + particles, one frozen theme.',
+    desc: 'Cultivator + crystal, one frozen theme.',
     icon: '❄️',
-    components: ['cos_char_frost_ascetic', 'cos_crystal_frost', 'cos_particles_snowfall'],
-    cost: 1700,          // discounted price
-    originalCost: 2500,  // sum of components (1200 + 800 + 500)
-    saveAmount: 800,
+    components: ['cos_char_frost_ascetic', 'cos_crystal_frost'],
+    cost: 1500,          // discounted price
+    originalCost: 2000,  // sum of components (1200 + 800)
+    saveAmount: 500,
     ownership: 'bundle',
   },
   {
@@ -229,11 +245,11 @@ export const SHOP_BUNDLES = [
     category: 'bundle',
     name: 'Bone Court',
     theme: 'bone',
-    desc: 'Cultivator + crystal + particles, one ossuary theme.',
+    desc: 'Cultivator + crystal, one ossuary theme.',
     icon: '💀',
-    components: ['cos_char_bone_patriarch', 'cos_crystal_ossuary', 'cos_particles_ashen'],
-    cost: 2200,
-    originalCost: 2800,  // sum of components (1500 + 800 + 500)
+    components: ['cos_char_bone_patriarch', 'cos_crystal_ossuary'],
+    cost: 1700,
+    originalCost: 2300,  // sum of components (1500 + 800)
     saveAmount: 600,
     ownership: 'bundle',
   },

@@ -89,40 +89,41 @@ function slotLabel(slot) {
  * Bazaar and lives in Codex > Wardrobe for equipping.
  */
 /**
- * ParticleShowcase — preview for the PARTICLES cosmetic slot. Instead
- * of the cultivator/crystal evolution procession (which makes no sense
- * for a particle skin), shows 5 drifting qi orbs using the game's
- * actual qi_orb_*.png assets. Mixed sizes + staggered float animations
- * sell the "this is what your qi orbs will look like" pitch without
- * pretending the product has 13 evolution forms.
+ * ParticleShowcase — preview for the PARTICLES cosmetic slot.
+ * Shows 5 animated orbs using the 3-layer mask pipeline with the actual
+ * qi_orb_c9_N variant for that item. Colors cascade from the active crystal
+ * tier on body so the preview always shows the player's live tint.
  */
-function ParticleShowcase() {
+function ParticleShowcase({ variant = '1' }) {
+  const maskBase = `${BASE}sprites/vfx/qi_particles/qi_orb_c9_${variant}`;
   const orbs = [
-    { src: 'qi_orb_bright.png', size: 22, x: 12,  delay: 0.0 },
-    { src: 'qi_orb_medium.png', size: 16, x: 32,  delay: 1.4 },
-    { src: 'qi_orb_small.png',  size: 12, x: 50,  delay: 0.7 },
-    { src: 'qi_orb_bright.png', size: 20, x: 68,  delay: 2.1 },
-    { src: 'qi_spark_star.png', size: 14, x: 86,  delay: 0.4 },
+    { x: 12, delay: 0.0 },
+    { x: 30, delay: 1.4 },
+    { x: 50, delay: 0.7 },
+    { x: 70, delay: 2.1 },
+    { x: 88, delay: 0.4 },
   ];
   return (
     <div className="bls-skin-proc bls-skin-proc-particles" aria-hidden="true">
       {orbs.map((o, i) => (
-        <span
+        <div
           key={i}
           className="bls-particle-orb"
           style={{
-            left:           `${o.x}%`,
-            width:          `${o.size}px`,
-            height:         `${o.size}px`,
-            animationDelay: `${o.delay}s`,
+            left:                    `${o.x}%`,
+            width:                   '44px',
+            height:                  '44px',
+            animationDelay:          `${o.delay}s`,
+            '--mask-primary':   `url(${maskBase}_mask_primary.png)`,
+            '--mask-secondary': `url(${maskBase}_mask_secondary.png)`,
+            '--mask-shine':     `url(${maskBase}_mask_shine.png)`,
+            '--orig-orb':       `url(${maskBase}.png)`,
           }}
         >
-          <img
-            src={`${BASE}sprites/vfx/qi_particles/${o.src}`}
-            alt=""
-            draggable="false"
-          />
-        </span>
+          <div className="layer-p" />
+          <div className="layer-s" />
+          <div className="layer-g" />
+        </div>
       ))}
     </div>
   );
@@ -133,7 +134,10 @@ function SkinCard({ item, balance, onBuy, busy }) {
   const revealed   = 3;
   const totalCount = sprites.length;
   const disabled   = balance < item.cost || busy;
-  const isParticles = item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES;
+  const isParticles     = item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES;
+  const particleVariant = isParticles
+    ? (item.id.match(/cos_particles_c9_(\d+)/)?.[1] ?? '1')
+    : null;
   return (
     <div className="bls-skin-card" data-slot={item.cosmeticSlot}>
       <div className="bls-skin-card-head">
@@ -153,7 +157,7 @@ function SkinCard({ item, balance, onBuy, busy }) {
           the procession picks the breathing animation (character bob
           vs crystal glow). */}
       {isParticles ? (
-        <ParticleShowcase />
+        <ParticleShowcase variant={particleVariant} />
       ) : (
         <div
           className="bls-skin-proc"

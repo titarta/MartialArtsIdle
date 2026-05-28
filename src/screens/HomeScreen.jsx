@@ -24,6 +24,12 @@ import { eventStat } from '../systems/statsRecorder';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
+// Active particle mask base path. Updated by HomeScreen via useEffect when
+// the equipped particle item changes. ID pattern: cos_particles_c9_N maps to
+// qi_orb_c9_N. Defaults to C1 (the standard variant, no store item needed).
+// Module-level so the plain spawn functions can read it without prop threading.
+let _particleMaskBase = `${BASE}sprites/vfx/qi_particles/qi_orb_c9_1`;
+
 // home.png natural dimensions — used to compute the cover-scale sprite size.
 const HOME_BG_W = 1376;
 const HOME_BG_H = 768;
@@ -786,23 +792,23 @@ function CharacterEvolutionOverlay({ event, onDone }) {
 // Crystal Reservoir VFX — particle pool + per-tier spark tint.
 //
 // Sparks live in /public/sprites/vfx/qi_particles/ and are blue/cyan by default.
-// CSS `hue-rotate` + `saturate` on the spark layer tints them per-tier so each
-// crystal evolution's sparks match its colour family. Values dialled against
-// the crystal sprites; tweak by tier if any tier feels off.
-//   [hueDeg, satMult]
+// Per-tier primary/secondary hex colors for the mask-pipeline particles
+// (click-burst and qi-flow orbs). Mirrors CRYSTAL_COLORS particles arrays:
+// darker shade → primary (outer body), brighter accent → secondary (inner ring).
+// The crystal surface sparks (.home-crystal-vfx-p) still use --spark-hue/sat.
 // ─────────────────────────────────────────────────────────────────────────────
 const CRYSTAL_VFX_SPARK_POOL = ['spark_cross', 'spark_diamond', 'spark_burst'];
 const CRYSTAL_VFX_TIER_TINT = {
-   1: [   0, 0.40],   // blue-grey
-   2: [   0, 0.90],   // blue
-   3: [ -15, 1.10],   // cyan (greenish push)
-   4: [  10, 1.10],   // deep blue
-   5: [  20, 1.15],   // dark blue
-   6: [  55, 1.20],   // violet
-   7: [  85, 1.25],   // purple
-   8: [ 100, 1.10],   // pale lilac
-   9: [-130, 1.35],   // gold (negative rotates blue→gold)
-  10: [-140, 1.40],   // orange-gold
+   1: ['#778899', '#aabbcc'],   // blue-grey
+   2: ['#3377aa', '#88bbdd'],   // blue
+   3: ['#00aaaa', '#aaffee'],   // cyan
+   4: ['#0044bb', '#66bbff'],   // deep blue
+   5: ['#0022aa', '#5588ff'],   // dark blue / navy
+   6: ['#4e17bb', '#e8d870'],   // deep violet outer + warm gold inner (crystal data)
+   7: ['#670eba', '#c8a8f4'],   // dark purple + lavender (crystal data)
+   8: ['#721da9', '#d080e0'],   // deep violet outer + pale lilac inner (crystal data)
+   9: ['#9c4492', '#f6dd84'],   // purple-magenta outer + golden-yellow inner (crystal data)
+  10: ['#ff9900', '#ffe566'],   // orange-gold
 };
 // Spark spawn-rate intensity model. Below 5% fill: no sparks. Between 5%-75%
 // (CAP_PCT): linear ramp from MAX_MS → MIN_MS interval. Above 75% (incl. 100%+
@@ -869,7 +875,7 @@ function spawnCrystalSpark(layer, intensity) {
 // fully invisible at the moment it hits the cultivator centre (= absorption).
 // No per-particle JS — a single rAF only handles spawn cadence.
 // ─────────────────────────────────────────────────────────────────────────────
-const QI_FLOW_ORB_POOL    = ['orb_small', 'orb_medium', 'orb_bright', 'orb_faint'];
+// QI_FLOW_ORB_POOL removed — flow orbs now use the mask pipeline via qi_orb_c9_0.
 const QI_FLOW_RING_MIN_PX = 110;
 const QI_FLOW_RING_MAX_PX = 180;
 // Bumped baseline + multiplier coefficient so the stream is clearly
@@ -909,39 +915,37 @@ function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
   const speed = QI_FLOW_BASE_SPEED + Math.sqrt(eff) * QI_FLOW_SPEED_K;
   const life  = Math.max(700, Math.round((dist / speed) * 1000));
 
-  const orbKey = QI_FLOW_ORB_POOL[
-    Math.floor(Math.random() * QI_FLOW_ORB_POOL.length)
-  ];
-  const img = document.createElement('img');
-  img.className = 'home-qi-flow-p';
-  img.src = `${BASE}sprites/vfx/qi_particles/qi_${orbKey}.png`;
-  img.alt = '';
-  img.draggable = false;
-  img.style.left = `${sx}px`;
-  img.style.top  = `${sy}px`;
-  img.style.setProperty('--qf-dx',   `${dx}px`);
-  img.style.setProperty('--qf-dy',   `${dy}px`);
-  img.style.setProperty('--qf-life', `${life}ms`);
+  // Three-layer mask-pipeline wrapper. Colors cascade from body.crystal-tier-N
+  // via --spark-pc/sc — no explicit color needed here.
+  const maskBase = _particleMaskBase;
+  const wrap = document.createElement('div');
+  wrap.className = 'home-qi-flow-p';
+  wrap.style.left = `${sx}px`;
+  wrap.style.top  = `${sy}px`;
+  wrap.style.setProperty('--mask-primary',   `url(${maskBase}_mask_primary.png)`);
+  wrap.style.setProperty('--mask-secondary', `url(${maskBase}_mask_secondary.png)`);
+  wrap.style.setProperty('--mask-shine',     `url(${maskBase}_mask_shine.png)`);
+  wrap.style.setProperty('--orig-orb',       `url(${maskBase}.png)`);
+  wrap.style.setProperty('--qf-dx',          `${dx}px`);
+  wrap.style.setProperty('--qf-dy',          `${dy}px`);
+  wrap.style.setProperty('--qf-life',        `${life}ms`);
   // Per-orb size variation so the inflow reads as a mix of small glints
   // and larger orbs rather than uniform pops.
   const sizeVar = 0.65 + Math.random() * 0.35;
-  // Scales reduced ~30% from 0.40 / 0.78 so the inflow reads as a
-  // delicate spirit stream rather than chunky orbs swarming the
-  // cultivator. Sizes still grow over the flight (start small at the
-  // ring, larger near the centre = "drawn in stronger").
-  img.style.setProperty('--qf-scale-start', (0.28 * sizeVar).toFixed(2));
-  img.style.setProperty('--qf-scale-end',   (0.55 * sizeVar).toFixed(2));
-  // Optional negative animation-delay so the orb renders mid-flight.
-  // Used by the qi-flow spawner's warm-up on return-to-tab so the
-  // scene shows orbs already moving instead of all starting at the
-  // ring. Clamped so we don't accidentally start past life-end.
+  wrap.style.setProperty('--qf-scale-start', (0.28 * sizeVar).toFixed(2));
+  wrap.style.setProperty('--qf-scale-end',   (0.55 * sizeVar).toFixed(2));
   if (animationOffsetMs > 0) {
-    const lifeMs = life;
-    const offset = Math.min(animationOffsetMs, Math.max(0, lifeMs - 50));
-    img.style.animationDelay = `-${offset}ms`;
+    const offset = Math.min(animationOffsetMs, Math.max(0, life - 50));
+    wrap.style.animationDelay = `-${offset}ms`;
   }
-  img.addEventListener('animationend', () => img.remove(), { once: true });
-  layer.appendChild(img);
+  const lp = document.createElement('div'); lp.className = 'layer-p';
+  const ls = document.createElement('div'); ls.className = 'layer-s';
+  const lg = document.createElement('div'); lg.className = 'layer-g';
+  wrap.appendChild(lp);
+  wrap.appendChild(ls);
+  wrap.appendChild(lg);
+  wrap.addEventListener('animationend', () => wrap.remove(), { once: true });
+  layer.appendChild(wrap);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -953,39 +957,47 @@ function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
 // animationend. Per-particle randomness (final dx, peak height, landing
 // depth, size) gives a varied splash without identical trails.
 //
-// Hue tint: by default cascades from body.crystal-tier-N (--spark-hue/sat).
-// Pass `tintFilter` to override (e.g. divine-qi uses gold regardless of tier).
+// Color: primary/secondary hex (pc/sc) cascade from body.crystal-tier-N via
+// --spark-pc/sc by default. Pass pc/sc explicitly to override (divine-qi uses
+// gold regardless of the active crystal tier).
 // ─────────────────────────────────────────────────────────────────────────────
-function spawnClickBurst({ parent, x, y, xUnit = 'px', yUnit = 'px', count = 4, src, tintFilter }) {
+function spawnClickBurst({ parent, x, y, xUnit = 'px', yUnit = 'px', count = 4, pc, sc }) {
   if (!parent) return;
   if (typeof document !== 'undefined' && document.body.classList.contains('vfx-disabled')) return;
+  const maskBase = _particleMaskBase;
   for (let i = 0; i < count; i++) {
-    const img = document.createElement('img');
-    img.className = 'home-click-burst-p';
-    img.src = src;
-    img.alt = '';
-    img.draggable = false;
-    img.style.left = `${x}${xUnit}`;
-    img.style.top  = `${y}${yUnit}`;
-    if (tintFilter) img.style.filter = tintFilter;
+    const wrap = document.createElement('div');
+    wrap.className = 'home-click-burst-p';
+    wrap.style.left = `${x}${xUnit}`;
+    wrap.style.top  = `${y}${yUnit}`;
+    // Explicit color override (e.g. divine-qi gold). Without it, --pc/sc
+    // fall back to --spark-pc/sc from the body.crystal-tier-N cascade.
+    if (pc) wrap.style.setProperty('--pc', pc);
+    if (sc) wrap.style.setProperty('--sc', sc);
+    wrap.style.setProperty('--mask-primary',   `url(${maskBase}_mask_primary.png)`);
+    wrap.style.setProperty('--mask-secondary', `url(${maskBase}_mask_secondary.png)`);
+    wrap.style.setProperty('--mask-shine',     `url(${maskBase}_mask_shine.png)`);
+    wrap.style.setProperty('--orig-orb',       `url(${maskBase}.png)`);
     // Per-particle motion vars — CSS keyframes interpolate between these.
     const bx = (Math.random() - 0.5) * 70;        // -35 → +35 px horizontal final
     const byPeak = -22 - Math.random() * 22;      // -22 → -44 px peak height
     const byLand = 28 + Math.random() * 24;       // +28 → +52 px landing depth
     const sizeVar = 0.8 + Math.random() * 0.35;
-    img.style.setProperty('--bx-mid',  `${(bx * 0.5).toFixed(1)}px`);
-    img.style.setProperty('--bx-end',  `${bx.toFixed(1)}px`);
-    img.style.setProperty('--by-peak', `${byPeak.toFixed(1)}px`);
-    img.style.setProperty('--by-land', `${byLand.toFixed(1)}px`);
-    // Scales reduced another ~30% (now 0.27 / 0.50 / 0.39) so the
-    // crystal-tap and divine-qi splash reads as a confetti puff of
-    // small glints rather than chunky orbs hopping around the screen.
-    // Earlier passes: 0.45/0.85/0.65 -> 0.38/0.72/0.55 -> 0.27/0.50/0.39.
-    img.style.setProperty('--bscale-0', (0.27 * sizeVar).toFixed(2));
-    img.style.setProperty('--bscale-1', (0.50 * sizeVar).toFixed(2));
-    img.style.setProperty('--bscale-2', (0.39 * sizeVar).toFixed(2));
-    img.addEventListener('animationend', () => img.remove(), { once: true });
-    parent.appendChild(img);
+    wrap.style.setProperty('--bx-mid',  `${(bx * 0.5).toFixed(1)}px`);
+    wrap.style.setProperty('--bx-end',  `${bx.toFixed(1)}px`);
+    wrap.style.setProperty('--by-peak', `${byPeak.toFixed(1)}px`);
+    wrap.style.setProperty('--by-land', `${byLand.toFixed(1)}px`);
+    wrap.style.setProperty('--bscale-0', (0.27 * sizeVar).toFixed(2));
+    wrap.style.setProperty('--bscale-1', (0.50 * sizeVar).toFixed(2));
+    wrap.style.setProperty('--bscale-2', (0.39 * sizeVar).toFixed(2));
+    const lp = document.createElement('div'); lp.className = 'layer-p';
+    const ls = document.createElement('div'); ls.className = 'layer-s';
+    const lg = document.createElement('div'); lg.className = 'layer-g';
+    wrap.appendChild(lp);
+    wrap.appendChild(ls);
+    wrap.appendChild(lg);
+    wrap.addEventListener('animationend', () => wrap.remove(), { once: true });
+    parent.appendChild(wrap);
   }
 }
 
@@ -1138,7 +1150,7 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
   const { level, crystalQiBonus } = crystal;
   const tier = getCrystalTier(level);
   const { glowA, glowB } = CRYSTAL_COLORS[tier];
-  const [vfxHue, vfxSat] = CRYSTAL_VFX_TIER_TINT[tier] ?? CRYSTAL_VFX_TIER_TINT[1];
+  const [vfxPc, vfxSc] = CRYSTAL_VFX_TIER_TINT[tier] ?? CRYSTAL_VFX_TIER_TINT[1];
   // SFX + VFX are fired by the parent's onCollect handler so cooldown-blocked
   // taps don't produce sound or floaters. Empty taps still grant a small qi
   // floor — the parent decides what feedback to play based on the granted amount.
@@ -1169,8 +1181,8 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
         <div
           className="home-crystal-img-wrap"
           style={{
-            '--spark-hue': `${vfxHue}deg`,
-            '--spark-sat': vfxSat,
+            '--spark-pc': vfxPc,
+            '--spark-sc': vfxSc,
             // Crystal sprite URL exposed as a CSS var so the overcharge
             // red-tint pseudo-element (defined in App.css) can render
             // the SAME crystal silhouette on top of the actual img -
@@ -1749,8 +1761,8 @@ function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
     }
     // Golden splash burst at the orb position — bigger than the crystal-tap
     // splash (10 orbs) since divine qi is a rarer, more rewarding moment.
-    // Forced gold tint via inline filter — divine bursts ignore the active
-    // crystal tier so they always feel "divine" regardless of progression.
+    // Explicit gold pc/sc — divine bursts ignore the active crystal tier
+    // so they always feel "divine" regardless of progression.
     try {
       const zone = document.querySelector('.home-cultivation-zone');
       if (zone) {
@@ -1759,8 +1771,8 @@ function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
           x: orb.x, y: orb.y,
           xUnit: '%', yUnit: '%',
           count: 10,
-          src: `${BASE}sprites/vfx/qi_particles/qi_orb_bright.png`,
-          tintFilter: 'hue-rotate(-130deg) saturate(1.5) brightness(1.1)',
+          pc: '#ffbb22',
+          sc: '#fffacc',
         });
       }
     } catch {}
@@ -2137,8 +2149,22 @@ function HomeScreen({
   pendingSparkOffers = 0,
   sparkModalOpen     = false,
   onReviewSparkQueue,
+  // Active particle cosmetic item ID (e.g. 'cos_particles_c9_7'). Null means
+  // use the default (C1). HomeScreen keeps _particleMaskBase in sync so the
+  // module-level spawn functions always use the right orb shape.
+  equippedParticle = null,
 }) {
   const { t } = useTranslation('ui');
+
+  // Keep the module-level spawn-path in sync with whatever particle the
+  // player has equipped. Pattern: cos_particles_c9_N → qi_orb_c9_N.
+  // Falls back to C1 when nothing is equipped or the ID doesn't match.
+  useEffect(() => {
+    const m = (equippedParticle ?? '').match(/cos_particles_c9_(\d+)/);
+    _particleMaskBase = m
+      ? `${BASE}sprites/vfx/qi_particles/qi_orb_c9_${m[1]}`
+      : `${BASE}sprites/vfx/qi_particles/qi_orb_c9_1`;
+  }, [equippedParticle]);
   const {
     realmName,
     realmStage,
@@ -2347,7 +2373,7 @@ function HomeScreen({
           x: crystalEl.clientWidth  / 2,
           y: crystalEl.clientHeight / 2,
           count,
-          src: `${BASE}sprites/vfx/qi_particles/qi_orb_small.png`,
+          // No pc/sc: cascades from --spark-pc/sc on .home-crystal-img-wrap
         });
       }
     } catch {}

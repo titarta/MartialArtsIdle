@@ -431,11 +431,13 @@ function AppInner() {
     }
   }, [selections.pendingCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-enqueue offline earnings when they appear. High priority so they
-  // jump ahead of less-impactful events like the daily bonus.
+  // Auto-enqueue offline earnings when they appear. Pinned priority so it
+  // stays at the head of the queue even if a crystal/character evolution fires
+  // simultaneously -- the player must collect (or watch the ad) before anything
+  // else pops over it.
   useEffect(() => {
     if (cultivation.offlineEarnings > 0) {
-      enqueue('offline-earnings', null, { priority: 'high', dedupe: true });
+      enqueue('offline-earnings', null, { priority: 'pinned', dedupe: true });
     }
   }, [cultivation.offlineEarnings]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1634,7 +1636,7 @@ function AppInner() {
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
     // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} />,
+    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
     // Combat-adjacent screens are mounted only when FEATURES.combat is true.
     // Otherwise they're null and `navigate` rewrites any attempt to land on
     // them to `home` (see the SCREEN_FLAGS guard above).
