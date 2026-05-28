@@ -26968,6 +26968,13 @@ img.pp-emblem-locked { font-size: 0; }
   z-index: 1;
 }
 
+/* Burst particles are appended directly to .home-cultivation-zone at absolute
+   coordinates. The rule above would override to position:relative and stack
+   them in normal flow (the "line" bug). Restore absolute here. */
+.home-cultivation-zone > .home-click-burst-p {
+  position: absolute !important;
+}
+
 /* Lift the existing top + bottom gradients so they layer above the bg
    without compounding into murky muddiness. */
 .home-scene::before {
