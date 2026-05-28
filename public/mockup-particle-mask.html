@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Particle Mask — 3-layer material (primary + secondary + shine)</title>
+<style>
+  :root {
+    /* qi_orb_bright (default / baseline) */
+    --orig-orb:       url("data:image/png;base64,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");
+    --mask-alpha:     url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAwUlEQVR4nO3azQqDMBRE4XOHvv8rTzdddGGtitrMTc9K/EnEDySIZZuT2jtQnTGpCO9x4JqzyD6Ns0tmKgFfeB9L82ySmELAN9zHYYnWAmaMvCbRUsCMmZckWgmYjPwuES8gwhPhifBEg7eQycwtBER4IjwRnghPhCfCE+GJ8ER4osFaqF7baWuiaiEgwhPhifBEo+9CFfI2qrYCo0vU0s6WAqNJ1NrB1gK/lqgtJ00hcLdE7Tl5KoFvT+j/twoHegJ4TRl4LTfAugAAAABJRU5ErkJggg==");
+    --mask-lum:       url("data:image/png;base64,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");
+    --mask-primary:   url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAFk0lEQVR4nM1aSS88QRTvHnO3O9gSEiLCQTjYvoLvgMtkXIiESNy4cXEgDiZ8CJ9AkLhIhIgtxHKQzDCWK6b+efX3Kq9fv+ruoYmXTLq7upbf219Vj+vERGVlZaqkpETfu66rr0op8x7u8fnj48N5fX393+mblHRiIgTNgUvPyGgcVLQUSktLFQWcSCQ0wFQq5RQKBY+0KVOUYEwmk/H1ged8Pu/+qAZgwcbGRn29vb3VoAEQmIVkMtCPAsVnvHctTEbGU4yNw2INDQ36ubm5WYNvbW31MMfNhRIwKvUrFArO9fW1vt/a2nLe39+dp6enSNj+zxiBUFpoJi0tLeadBBrbqPPSe+roSik9L/wAPDIaCVdYh/LycgULpNNpbSZA1NYlRiXGUACLi4vimlNTU3odHLe+vh4pWkXyAYgaAJpKEEFxu7dR0DvuMyiEKNHKDZI8XLu7u/XEXV1doo3bgPF2CgxMZGFhQVx7cnJSYWQD2tjY0Jp4eXkR+wcaG0gABlN7DYsa3OYpgRZhfJCNFz59ga4Z1N+HpqKiQkcbiOvgUGjvYaDr6+s9GrJpBjWRzWZNGwhqfn7elTSB4MEnAAvPEz4fQM4BPI8YHBi9D4sckubUp3RtUQxzDApGWsPMWllZ6ZlldHRUnBQnq6ur8wCbmJjwINzc3PShGhoa0n2WlpZULpfzmApcQRNzc3Oeeaanp3WNtba2Zvq9vb05z8/Prk8DCNAmFexDgQNJkkGwEgGzs7Oz2lQpYZi2kRSdfBoYGBjQz1KGhWttba0nooyPj3+rFtjY2NCMnJ+fm7ZkMmk0ARqA98fHx5rB/f19fX18fNTvjeiCIg11TPruu+Bt/mXThKRpqxNTp+GRBfrEAR6IJi8agmdmZlQUk01IDooDpMwbFseLpZGREXd4eNil62BlK5UsPkxVVVU63vb39xvVAUgo1miEaGpq0td0Oh2L5G2UyWR0TXRxceEx2dPTU2MV0La3t6dDvTYhAI7c2jJt3JIPImVJhoiNJtdEkMPywd/dfEQhxdbnJoNYgHSmljbgf4VUiBC1VdgG/4a0JbKV6xy4CSjSwL+iDRXBnJNSJ8msfssHgKQ9h5RgfSaEHbnj/AWNuCxjG0eWgEbdZf0EKSFp2Y5htAZ4xpWy72+B5ySZDGcwaSviTk5OdJxta2tzfpMUE97Z2ZmnxOe1WpJmYV4P8dO1KNvLuJhwhbBJn03lQPcD0NjX12cYQA3QMgLu4VQulUrFGpKWl5f1ond3dx5GwBJo3N/Z2dHvHh4evDsyevLGT81+I3x+fFagYevxd4YBfqiEbegL7e3tphK8urqKnYH7+3sRAwUutXt2ZPx0jOcF+n5lZUWtrq7GGppcwdYpFokJ81RTU6PwYBV+eCKHE+G1s7PT+ASYGxy1A42NjbnF7oUdx9F1PxCP94eHh2bzDmuB7VPwuVzO6wM4GM9AuS/wfEAj11f2CTh/gawDlM/njYCkNfmJifVkrqenx9OZagHaOzo6PNEJd2zSVpQKAPtcXl76pA50dHTkifnYjhpAyYdu6uliFAi/0m0eBUnHUA3xnOIyLXNBSULw4PW1EE1gXpDqcj4ZaoSney4c/B0cHPiERN/f3NyYz1gwH54DffkbWZTYTK9BGxFpTpeAB0LpQ34I+k4QGjlAEwCmt7fXJym6uFTD0/sowF0y7/b2dqDkkULDh+RoXBvFZk8OHokywaOTjSLHbqiVqNOCb+CiSJLt204UgBLESXd3dz39wiT/pe/EPAoF1es0e3KyRSs3YIyNiq7S4NuZFF4HBwc9/XhpzhlAiStS+cIvm83+7Jd6TDLSLo6HRJoDuNb4NjGRSHzpPxSx1cnV1dU6b1CQZhHCGJYqUW3cCaHY/q1CaxcKmJoS3sd5xvoPDVIyhi/b3D4AAAAASUVORK5CYII=");
+    --mask-secondary: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACEUlEQVR4nO2X3aoCIRDHnd1z1X3QB/Q2fRA9bh8E9TJRSxc9wUJ6GGmWyaPbSa0umh+E7ubqf3RmVKUEQRAEQRC+F8jV0XK5NLZDAGWMUYvFAnxtiqJQ8/k827iQq6PVamVQPKG1tsY0AwE0z1jOZrMsY0MO4U1nAGo0GtkVoGdeIsfj0f5P76bTaZKGn5SP1+u14WLIfXzCqV6WpW1Dv1SiDdhsNlY8+jSKGw6Hf0T7GAwGtqyqKosBReyHKBRnk3ybi6F6SCC2R8PLslT7/d7sdrtoS572v+12azMJBWm/3/cK9D2Tofg9UbGVwHI8HsNLV4DEkOuEZr5t9nkdbiv51hjAQXu9nq3/RygFNg9wHhMAYLPTWwzg+ZzjGkLP3F0eBfhHDeDu5EujvJ3bDyQYFp2FXMg9QmJCu3IqUQbQ4L4NqS23t4k2kXtCVBbirtKWMvm73K6TZSPj9ZC/+/4LzbaJWIVsMYC0nYEeGWwiXejpLOQO5G5mbW7BY4ejtb4rX24ACuHn/VAc+CCD3cA3kSsAKUdpqne7XdXpdBqBXKyvjhwOhzvRsfeC6Bjgmehyuai6roNnI/dYgatHpb79Ykk2gDifz3dnHt7OPeS5tzL9CQPw0o6Xc74D8wMZn2mqI6fTKZv/I9lOV3RP4KdOnzB6N5lMsoyddCd2cd0ldI+4Xq85hxUEQRAEQfhafgEI3Ebwxn6TTQAAAABJRU5ErkJggg==");
+    --mask-shine:     url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAVElEQVR4nO3UwQmAQAxFwST99xyPiiiILK4LMw3kw4NEAMyUXx/s7r4ckvlqS8XictbhUSUqFpfxE30q8rSEArNL1PAF7CXuPtWRAgAAAAAAQKxmA4IrGAe+D7iyAAAAAElFTkSuQmCC");
+
+    /* crystal9_orb -- referenced explicitly by c9 wrappers */
+    --c9-orig-orb:       url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAYAAAAehFoBAAAL+UlEQVR4nLVZW6xdVRUda629zy0P5RUeEh4qQi1SoFBMCkETGqOJH+oHGq1giAiV0qjYCyL8qTEkRQIoLZVHQCQmkmiiRvzwgyAEBRSpEsHb8LDIqzx80N6791pzmjHn2udcW1JyqR5azu09e+81H2OOOeY8AXv4OubA0zRFRQDsr6ry//5hsF/Yj6I9Os14+tW/8Ldv+dXsqcE0TrVBCMltnGckVKAqdk2Aok17ftyCvT1qv6WKIB5R6XHzut8gdEDSaMZ6rNUsV1WEoOZADLxG8cmbViD2dEIwV3q88NpzC7Jh4S7HYsZkLWinGqSuIEoALTInNCCESHug1ZQQaGCABIGWjGJpCGjSaMHHv6l3R+9zpjbMtmZo6PD96Z8hdkCjQFSBINIL0Nyg/rMGN14DI+zRZOQLBFIY/wiiI4SC1TeuQuw8Ex0KHn/53rBnEdYCRYJEoGn3QuoFkRANwczQKFARiAKZhSUdBNmiGYIgBUWDBq3uhRin7Ej6oDSciekCEBoIM1fkrUf4qLedpVEzc4zUJmy66E5MFYEy2jyDeA09li+/DIpsUIn8jNAgYKP9Ae/nPw3dQXDv3Tc7VOiwsUsxI7644RxIzCiFAeqx5eUHwoIiHEpGahqU0COoopHqfVJo4EMZ4TmLTCI+mupIZEHyGkCjItIopkQKggrySNBKhmhrRWheFoUIi5SOJshuIr2LF0fve5YyIkogNBEbL7odU70BFmFUsHzZNDIhkQiRiLWXLLF/xzjmNKiDpT6dxjK6ASrbsfH67UiieOr49UQ7nt3YQQILV4AkOO+GTwNtRu7nILIDf3v1sbD7CPO+JiGjt7MaswZAK5CwAyXMIaaAlBI09iiJrNVaoQ0GmsGB/Kz1gR6aGPdGDP9ACgJpM2JxpwILwBwikxDLzExC/wbm7Rrh/VZqig02rr0do65AWR2jjBUnrkWJAYXYjBGrp5daykftIkBIZX6/twwa7bAADSZI7IICZMGoAa791nbGAA8e93U0WjD7AzUMky2Yn/M2fhwZHZ7dtnn3ES5hO1LahzYixIRO/g3tZlHYAILfYFBrWCwNXu//WbudMa0ZxxOa0KCJrXVAYrjQU9Ids0e6SwUaMo44rINmwZMlIoaCEiKU9NgI4htAeWz9Ow84RUPssWntPRh1vX/YFLz/hIvR02tSVAxYfeVii2KK0Qps+pyfW4rZgo052NisO7OI4F2a6Q4BUSOuvvNTUFJYBtqUcf03n0TLPtORgQruf+Aay2Rk89GMVTedjpSBrS89E3aNcGqBngTJaLBYgJLUWMIoiqzF4lPiVxHZBXJGaCoEqpFjcIQab/4h09BoNCgssEh0kAKzOaCjgFRch6gQHn5mlKnanHaCBKnJOpDXt1Uwq7aXFikCF12x2DCW6EDqMb3ql0haIBZ963M1ZyS1ic1K32syCYUvn3uH/bz+trMt6hesOw6tKDZc97h1yoBk0GBAnK7jPHMrtzt255CiGOUQ+JpY3XPIiCjEIWlOG2sMkdcwsgNiqSVoNDER2Zq9Pav9mtHyk7wI2Ug80qxnRq8TvrOge/QjMgQhxsbHG71jjjG85O0rNKaCa9b8Cm3fIRIKjeK0ZZdDouD8y98FKRFtFLQx47LP/9QiWyoVGXQQ8Y4lR4KZ3nfpqe5ELcK5p//AaGDL5mcs8tYFvcNYcV214WPW2oMIppoduOXaGUhXcM+Dm8hu1tahPc696UyETFhpMs5jFzKVZb4aAduBUVrvQNS1maDxVspG4TxrpGV3peRw8JZMX6K1ZXKy8IcB0xUkpqA1umGRDX7KmCOyc0oto+hskWQvFBU01N1jDmXfNzlAUws08TQ647hmTj1AtQhDwuFLDrcHjBafbPgzKAzDRgCaI081GBybezNiy8y2MUE5mwxnhzHzGPApU/0Ke05CC01EQHKx4rRUxxvSlJHgUPkWJnuwIQHEYMWsqyDDol02jy11sNyKku1AJvd4/gwafJo7ECGFEEj1Opa+Q4/Z59/GK2MIyYSZGW3H56APJheZLjChHpAWn4JoEq5OG+ZYFT/gWWy5iubdp7sHM3cP9prYr4mrxrGlz2OZepb/wh2L1vNrmgc5MJYFVQTV2aca5NHwOPPhps3GNFbrbZJqDI3DC45woxE2mQwt24ycvKux0jhPY1q0KWUw2PwaQ8IdGFvPgqsFM7TGwXHLREXbgIOhJlC73nADOduzQyMcAhNb3CmDhRX/+MYaPD+9IbIiRXflTFNOg1eD4fXzeY5WaycFU6uyTvZDilCN9gsjq05q4Q7wsabq9MjHsAmxLY8ZczxqkXEswhPDLCH27kTtUeeHxJaf7qpryL5CtjxiZqb3LHNhNngzRDf4M/qZP6IBpSlb78Rzr1l30JvNcPqkntwuysREPeIcySjXMDuOaGEh3zrufKRhYVS8VaNLEJuCy8zD1v+dCyZdDQzA3/+EIDscWtXYoUDHxW0tnizEM5xrK6kZxxtLWH+0iZCCxsd3LxgXM0CLJkSUWDUDp2SJHqVaWNseed6cO+zkQxD++hD02OWIg2SDImx50KCw9Yl/VWqi3Sw6v4SddchEtmGWbD5pLw6vKqQIiywd+n5u3D1sRUI11kWPcCJb1lbLCNhAoPzIqciHXhuhLEJMjG9ZkOwBzudjErfZje8C6QUp9WhisRXAAfv+2aaNTAEUfQakjiC75JxRqNEHuBx68KFKIf3jLz2KWBhtICwqWHritPl74aUnILJdl4yoBVde8AtYI7QwMXIeF8c4wzfQXXBbbWSqTUaAq+5Y6awgdFpw4xXPQDvBQ5u/jdBM+XpBFatu/jDQ78DWF5+yB034gz09jDwZqUEgXkuCFjEcJxrCMd+KgmKW9MPbTMdZKi2WFQ4GK62wtV2KNxBGkJGKkY6rZadJCsz1ri0S9XItbkrMzFu5z9hZD3OZ4RmzRYkRPEVHq4ipww3rH7bJ4PyvvA+hjfjGrR817fy11XcbZGxEGu+mhs6IirTaGQFc9cOzfOLgNU2P766bQUMpIHyat3zrDYZBpzJj2p0NtonAZDuJkSsob4YsEGpjt4ViOgG5r8ouWBYoW33LOlkEDrQWrFjElRfnNk4XzGZVYVH6WmDR9a/1An8UxRClpzf+/2K6yeuIg4/XUQq4dc2vEYvYRAudw9IPTqOxJVRAGxVfWHsS0qhW2dAlB40wSNQwjElcplQxb5wuuP7SJ2wXQSdo7EObr0Ox6mWoCi7YdDZKnsWWbY/ufmpuyiJwNZBMkBrkEHVk85ZSpzIL2jiECrWxKyrTB/NaoHUnVMVXm9JA3kGKBcNypoqcGxuJuNkMKSKR/nJCTHvvbN6uET7moBW2+bEcp4RbLr4LoRRjBsRZnLTycl/mhGQ74QvXHI/Eoc9S7zJyLKRCnaSNIQq2vvIYfnL1CI30ECnGEL/d/B0UgtHWVorPbvwEGlEsivujxDnMPHf/7iNsIwwrnpHgioprVlKy2cHoJ4RGgM6XfIxIlh6v97OYy7PImiHoQKYOoVT8OieTDEjNKo3ht+TgQ2ovxhb0O1Hnh4icCoLB7U0iPI70/h9Q2+EybSnixjV3QstQ+7l+FSBYtvKrRnFe4d4w7KuC4UHKIvLOxrn2/vvWW0Qd19GKnTeet+EzthwkBCUJtr7wuwVuL5uRR6lWqvFrCrZZ5MbHNz0K9Mk42jh2iIBJyInojBypSoBkSkxiv9IXR66GOkYMdo6jiHYsDd/ALrzJ670HfUhHiyJenXscfTeLH637vX1r4Jt2b7ccHKsy8BXBIHzgzWPQFSxRYQgHvk4Bn7vhI5x3EdsDEZLiqefv27MNfEwje34hHMLIOppRVPXWNsXCpuMcwRY8nykwTw9TPBl9DxxNgpU5CPYz2KQ2/O+/RTrk4MNVs6s7yYq7LnnUqn2YcQdOHv7zl3/HQXyv+t4ZpqA4lRPrL7324v/3WyTjTZOjCVzLcv9qay2b1fwaz/gggrQuUFhkbPcdhEMrV2DNguO18Ajv/DrqkDO0IeHXecbNG0Z6sfciGRmzKLoDL7zy/B6ducdfTdpwHqkwhjmupt+XN/ai9GS3jGm+Knhrr/8AkGNnGWXByQEAAAAASUVORK5CYII=");
+    --c9-mask-primary:   url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAYAAAAehFoBAAAFhklEQVR4nK1ZyUprTRA+HePVF3AWX8VxLboQdCM4ofgGghMiiAvdCmrWggtdREQX4hP4DuIAEdSNG6ekL9V/vr51KnWG5PwFh5Pu011dU39V3TFBRurp6bG5XM63rbX+tzHGtyuVSlAul4OXlxeTZb18lskQkB4IzYXkRP35fOblgrq1bW9vt7Q4EQm2u7vrLAehuIBWWJtodXXVj//9/Q3e3t7qkqFulWlhesjFZLE4YQ3rA2E8UVNT0/9vYbIoMYa1dnZ23KLcylJg3jbM0vQmRbmw29vbXgn69vj4aDJZmLu1ubnZL4hvEAibitzMlTDGuPjGIwXnyqehyJGdnZ0WApHrNzY2XD/fXESzs7N1xeDR0ZHVQmhra8srQPT09KTy/YdHgsgC5DZt88hwqIdyzNJoA2loTbSjqEaLjo4Oi0lk2fX1de96UmBubi40Z3h42HuCW41vukql4jfq7e1taH6hULAcGsmTtM7Pz4+K2zUxzBfiWvONF9K4KigeHr+2+hsWjUIFvheISFCaw/dLpIW7urocKmxubroJCI2FhYXQ2P7+fofHf/78qVEyjipVOLy+vjZRsU08yNI0tlQqpbMw3tj9khDfn5+fNYICGZqqY6S1NaVoDXiRZ05JhluWGHNcJAYSBQYHB91qxJDGj4+P1wiBRTWcLhaL7g3PXV1dqZYGz7W1NfeGpUMWpkGEo3HulbCGDRW7s81/Y6Ek5mie48WShs9eYGwInqH4BFgW/WNjY6pQSel5dHTUvc/Pz903Qhlq39zcGG19Od8HiowbbTCPR24dDmsy9ozSjz7iIXnBCzwbhpJMd3e3w13sSjCfn593owYGBiygjZ6JiQk3UTJbXl6OzXgHBwehDIf3ycmJj3nyMnD6+PjY4TPgDfLlkRA0ZpI4LsrUmkQmhjcMwglK4MG8PFzAGccJIGNscXExVS2xtLTkxh0eHoZ2J9+skVAWLqL+xYwmKNcS7agNkYaMqEWi+GiZ0wktBa2r1GtAYCsESOIlPep9wBloRYx23GlE4BwLwbR8+PdcFHzx35rrkpJF3OJWzEsbYq425y7S8jz6s1iVkyyUomqLmoRRHedCIm0My1BphHIKEkijRK3tUIJDhpoKqwlD+9aI0DblJo8KU1dLSHDmCYIX0kiXvBAnXKX+JDwuFAr+PkNLQFHFkBQ6L+8VpNUQO8hG9JZj0t4vWIblqCE4/9bW1hpFZBXpe9va2iwx2Nvb8zUFnQymp6fdmKGhIVdzwDqTk5N+Ma3o0ZQngnBnZ2ehUhN1MdXDtC6UohqChFXrYV63gjn/xmtfWJy7mbuXZ0eQZlnpHWqDF18T5AWWhz6Jl6hXqS4mC5yenroxU1NTqoBRUHVWtSzal5eXkbEPz3G5VAsnwQssRMTvErQTs2E1gbRWlFL8/CdPzuqpmSxIZzuODvJsNzIy4mMtSlkjNg4X5uLiouZ+grfpJohi9/n5OTROree0G0lJEu7ihDXCqtJqxWLRQR76wVtDnxqJent73WSkTdKU4/TMzEyNpflxngtpRClZKpWCu7u70Hw6WfA5dNOEi0ei+/v7+HsJvgDOXNw6kkhYGvf19eWul3D5wvnZiFob33EnIb2mxrjKJQgCOuvhip+Y4UzFhacHZ7+0dFjNjLKcpZsm8KV23beXEJZnN15ZxVktiWw1jiXeyrs4jRJX7Ovrsy0tLcHHx0fw/f3tMqEsEWWC4WhgRUjJIz3d7JCwdEdH7YeHh2w38GRpxJlWzEuk0LIbSHoJ3uObPInq9inVHHAfKbG/v59YZloGeysrKyH3v7+/1yVDQ3+cYTF+Z6zFsxVHeI619K2R/+2ynXequC1jWlK5XPab7PX1NdOamf+a1E7AMp75XxBZ6S9ZBEIry+YoYAAAAABJRU5ErkJggg==");
+    --c9-mask-secondary: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAYAAAAehFoBAAACnElEQVR4nO1Yy86yMBCl6iu4U1fiyifQuPASbw8sETTe4kvIVlj5Bir9cxqG9Dcf2FL4vg0nIVVCZ05Pp9NpLatChQoVssAsQ+x2O845txhjVr1eF22tVhMtgFb+PRgMjHw2TDonRhoNQRYAWQKLyeOJouhvFHZdl8M5SIDoZDLRsnG5XDja0WjEfkVhTD/IkqK6YHF45IVyb8dxhDIACC8WCyPPh8NB2Gs2m+J/v99nhSpMyhahEgBbsKlKlMBUlIVhcrJcLs3ZStjv9xzh9Xq9hBDT6ZQZKUxqEumiwWL7cnYxIvx+v8UCW61WhSpLoCxzOp1E9vmGr8MqS9m8YFn5Fu18PldSdrvdCoW63e5/78MwFJvGeDxWsgOlEc9psZwaErqZADNBudm2bdHZ930ub82qyIrnzBhWcYRaAt91Op2EKMG2bXa73ThlAwxqNptlGqXtPBdhFcBBWpz7vs911wPCJ0soY8LtdvtHkrLanHOr1WopEf42q6na54k9kJXj18qZa7NgbuFDFSL9qTDTGHzukNBxQtONPrK6PH6vS7o0hYMgEE+v12NZgwjDUHxXKmGdXe54PIr0hj5yP8aY9Xg8lE8c33ymhoTqFNIOhvr2fr+LbCA7DoJAqQqT/WaRrmUVPTrnsM/BUZZhmnFrfPbzPI/jsUqG67p8s9lw40VHB86y8Xw+lWbj606HggaEUQugVa26VOE4TrJYVQj/eT0cRVEStyrxq6wW6lRSAkrnvVeQ62fYIpLr9VrJnnJwFq10FEWJTVWygLZK1+s1OUVD8eFwqGXD87xEWbS6Z0Xt5U9ZQ1ZItz+PNwfkel0Yr/jz+Zycdn+6EuAfO5fuXdwnjBOsfEKQyckka3EeL+oGs0KFChWsVPwDmfB0+Hb10LoAAAAASUVORK5CYII=");
+    --c9-mask-shine:     url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAYAAAAehFoBAAAAVUlEQVR4nO3VMQ7AIAwDQNL//5kuHRi6VEoGq3c7YKFEXguAX9qPr+eumTjkjwaQbA9ufnVe9hayqlrfGG26ag7b7vzhmDLYKUFP6nZC5CgAAABkuwHq2zPahLP0qQAAAABJRU5ErkJggg==");
+    --c9-mask-lum:       url("data:image/png;base64,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");
+    --c9-mask-alpha:     url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAsCAYAAAAehFoBAAAAsElEQVR4nN2Yuw4CMRADvRb//8umoQDpQAq5g52dKlLeExdJKok2WR2gdiazYNy+6LN7JNkxPtJwLl5DVoyPMpwfruNo3hprOOpBjkzjDFswLHCGo57kOcs4wxYMC5jhiEGQhi0YFgwLhgXDgmHBsGBYMCwYFvAuUY9y9ztFIQ1bMCzwm66aZrnQhi0Y1oC/tWqS5Rpr+N+m61PlKMPvdny28VppPNLw2cZrsf0LOMN3WYgWbF3OGK0AAAAASUVORK5CYII=");
+
+    --bg-page:   rgba(4, 10, 14, 0.97);
+    --bg-cell:   rgba(20, 28, 36, 0.80);
+    --bg-cell-d: rgba(10, 16, 22, 0.95);
+    --border-c:  rgba(110, 200, 180, 0.18);
+    --text-pri:  #d8eaff;
+    --text-mut:  rgba(220, 230, 240, 0.65);
+    --text-soft: rgba(180, 200, 220, 0.45);
+    --cyan:      #7adcc4;
+    --gold:      #f5af14;
+    --warn:      #f57a1a;
+    --ok:        #7adcc4;
+    --violet:    #cc88ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg-page); color:var(--text-pri);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; }
+
+  header { padding:16px 24px 12px; border-bottom:1px solid var(--border-c); }
+  header h1 { margin:0 0 4px; font-size:18px; font-weight:700; }
+  header p  { margin:0; font-size:13px; color:var(--text-mut); max-width:820px; line-height:1.55; }
+  header em { color:var(--cyan); font-style:normal; font-weight:700; }
+  header strong { color:var(--gold); }
+
+  section { padding:18px 24px 22px; border-bottom:1px solid var(--border-c); }
+  section h2 { margin:0 0 4px; font-size:14px; font-weight:700; color:var(--cyan); letter-spacing:.02em; }
+  section.c9-section h2 { color:var(--violet); }
+  section h2 .kbd { font-size:11px; color:var(--text-soft); font-weight:500; margin-left:8px; }
+  .pill { display:inline-block; margin-left:7px; padding:1px 8px; border-radius:10px;
+           font-size:10px; font-weight:700; }
+  .pill-warn   { background:rgba(245,122,26,.15); color:var(--warn); }
+  .pill-ok     { background:rgba(122,220,196,.15); color:var(--ok); }
+  .pill-violet { background:rgba(204,136,255,.12); color:var(--violet); }
+  section > p.lede { margin:0 0 14px; font-size:12.5px; color:var(--text-mut);
+                      max-width:820px; line-height:1.55; }
+  section > p.lede code { background:rgba(0,0,0,.35); padding:1px 6px; border-radius:3px;
+                            font-size:11.5px; color:var(--cyan); }
+  section > p.lede strong { color:var(--gold); }
+  .sub-h { margin:18px 0 8px; font-size:12px; font-weight:700; color:var(--text-mut);
+            text-transform:uppercase; letter-spacing:.05em; }
+
+  /* ── Assets row ──────────────────────────────────────────────────────────── */
+  .asset-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+               gap:12px; max-width:1050px; }
+  .asset-cell { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+                 padding:12px; display:flex; flex-direction:column; align-items:center; gap:7px; }
+  .asset-swatch {
+    width:96px; height:96px; display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%),
+                linear-gradient(45deg,rgba(255,255,255,.04) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.04) 75%),
+                var(--bg-cell-d);
+    background-size:14px 14px; background-position:0 0,7px 7px;
+    border-radius:4px; border:1px solid rgba(255,255,255,.05);
+  }
+  .asset-swatch .png { width:64px; height:64px; background-size:contain;
+                        background-repeat:no-repeat; background-position:center; }
+  .asset-label { font-size:11px; font-weight:700; color:var(--text-pri); }
+  .asset-desc  { font-size:10px; color:var(--text-soft); text-align:center; line-height:1.4; }
+
+  /* ── Tier grid ───────────────────────────────────────────────────────────── */
+  .tier-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(84px,1fr)); gap:9px; }
+  @media(min-width:1100px) { .tier-grid { grid-template-columns:repeat(10,minmax(0,1fr)); } }
+  .tier-cell { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+                padding:9px 5px 7px; display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .tier-cell .stage { width:100%; aspect-ratio:1/1; display:flex; align-items:center;
+                       justify-content:center; background:var(--bg-cell-d); border-radius:4px; }
+  .tier-cell .label { font-size:10.5px; font-weight:700; color:var(--text-pri); }
+  .tier-cell .hex   { font-size:9px; color:var(--text-soft);
+                       font-family:ui-monospace,"Cascadia Mono","Consolas",monospace; line-height:1.4; text-align:center; }
+
+  /* ── Compare row (before/after) ──────────────────────────────────────────── */
+  .compare-row { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start; margin-bottom:18px; }
+  .compare-cell { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+                   padding:14px 12px; display:flex; flex-direction:column; align-items:center; gap:8px;
+                   min-width:120px; }
+  .compare-stage { width:128px; height:128px; display:flex; align-items:center; justify-content:center;
+                    background:var(--bg-cell-d); border-radius:4px; }
+  .compare-label { font-size:11px; font-weight:700; color:var(--text-pri); }
+  .compare-note  { font-size:10px; color:var(--text-soft); text-align:center; line-height:1.4;
+                    font-family:ui-monospace,"Cascadia Mono","Consolas",monospace; }
+
+  /* ── Approach A: hue-rotate ──────────────────────────────────────────────── */
+  .hr-orb { width:64px; height:64px; background-image:var(--orig-orb); background-size:contain;
+             background-repeat:no-repeat; background-position:center; }
+
+  /* ── 3-sibling layer stack ───────────────────────────────────────────────── */
+  /* CRITICAL: siblings, NOT ::before/::after. Pseudo-elements inherit the
+     parent's mask and cannot render above it. Each sibling owns its own mask. */
+  .tri-wrap { position:relative; /* width/height set inline */ }
+  .tri-wrap .layer-p,
+  .tri-wrap .layer-s,
+  .tri-wrap .layer-g { position:absolute; inset:0;
+    -webkit-mask-size:contain; mask-size:contain;
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-position:center; mask-position:center; }
+
+  /* Layer 1: primary body -- L < 180, luminance mode */
+  .tri-wrap .layer-p {
+    background-color: var(--pc, #508cf0);
+    -webkit-mask-image:var(--mask-primary); mask-image:var(--mask-primary);
+    -webkit-mask-mode:luminance; mask-mode:luminance;
+  }
+  /* Layer 2: secondary accent -- L 180-219, luminance mode */
+  .tri-wrap .layer-s {
+    background-color: var(--sc, #88b4f8);
+    -webkit-mask-image:var(--mask-secondary); mask-image:var(--mask-secondary);
+    -webkit-mask-mode:luminance; mask-mode:luminance;
+  }
+  /* Layer 3: shine -- L >= 220, alpha mode on ORIGINAL PNG.
+     No color variable. Always shows the original baked pixel colours. */
+  .tri-wrap .layer-g {
+    background-image:var(--orig-orb);
+    background-size:contain; background-repeat:no-repeat; background-position:center;
+    -webkit-mask-image:var(--mask-shine); mask-image:var(--mask-shine);
+    /* alpha mode (default) -- white pixels in shine mask reveal the original image */
+  }
+
+  /* ── Duo grid ────────────────────────────────────────────────────────────── */
+  .duo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; max-width:1100px; }
+  .duo-cell { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+               padding:14px 10px 12px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .duo-stage { width:100%; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+                background:var(--bg-cell-d); border-radius:4px; }
+  .duo-label { font-size:11px; font-weight:700; color:var(--text-pri); text-align:center; }
+  .duo-hex   { font-size:10px; line-height:1.6; color:var(--text-soft);
+                font-family:ui-monospace,"Cascadia Mono","Consolas",monospace; text-align:center; }
+
+  /* ── Live picker ─────────────────────────────────────────────────────────── */
+  .picker-row { display:grid; grid-template-columns:1fr; gap:20px; align-items:center; max-width:960px; }
+  @media(min-width:700px) { .picker-row { grid-template-columns:240px 1fr; } }
+  .picker-controls { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+                      padding:16px; display:flex; flex-direction:column; gap:14px; }
+  .picker-controls .grp { display:flex; flex-direction:column; gap:5px; }
+  .picker-controls .grp-lbl { font-size:10px; color:var(--text-soft); text-transform:uppercase;
+                                letter-spacing:.06em; font-weight:700; }
+  .picker-controls input[type="color"] { width:100%; height:34px; background:transparent;
+    border:1px solid var(--border-c); border-radius:4px; cursor:pointer; }
+  .picker-controls input[type="text"] { width:100%; padding:6px 8px; background:var(--bg-cell-d);
+    color:var(--text-pri); border:1px solid var(--border-c); border-radius:4px;
+    font-family:ui-monospace,"Cascadia Mono","Consolas",monospace; font-size:11.5px; }
+  .picker-controls .shine-row { display:flex; align-items:center; gap:8px;
+    padding:8px 10px; background:var(--bg-cell-d); border:1px solid var(--border-c); border-radius:4px; }
+  .picker-controls .shine-dot { width:18px; height:18px; border-radius:50%;
+    background:linear-gradient(135deg,#fff 40%,#c8eeff 100%); flex-shrink:0; }
+  .picker-controls .shine-note { font-size:10.5px; color:var(--text-soft); line-height:1.4; }
+  .picker-stage { background:var(--bg-cell); border:1px solid var(--border-c); border-radius:6px;
+                   padding:20px; display:flex; align-items:center; justify-content:center; }
+
+  .footer { padding:18px 24px 30px; font-size:12px; color:var(--text-mut); max-width:900px; line-height:1.6; }
+  .footer strong { color:var(--gold); }
+  .footer code { background:rgba(0,0,0,.35); padding:1px 6px; border-radius:3px;
+                  font-size:11.5px; color:var(--cyan); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Particle Mask — 3-layer material</h1>
+  <p>
+    <em>primary</em> (body) + <em>secondary</em> (inner accent) + <em>shine</em> (original pixel colours, locked).
+    Three sibling divs -- not pseudo-elements -- so each layer's mask is truly independent.
+    Same particle, any colour combination, no new art required.
+    <strong>CSS var inheritance</strong> means any new particle only needs 4 vars overridden on the wrapper.
+  </p>
+</header>
+
+
+<!-- =====================================================================
+     SECTION: Crystal 9 orb -- new particle pipeline demo
+     ===================================================================== -->
+
+<section class="c9-section">
+  <h2>Crystal 9 orb <span class="pill pill-violet">new particle</span></h2>
+  <p class="lede">
+    Generated at 64x64 using <code>qi_orb_bright</code> as shape reference.
+    Palette zones: violet outer body (#a040c8), amber-gold inner ring (#ffcc44), white-yellow shine core.
+    The pipeline splits these automatically by luminance: primary (L&lt;180), secondary (L 180-219), shine (L&ge;220).
+  </p>
+
+  <div class="sub-h">Assets</div>
+  <div class="asset-row">
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--c9-orig-orb);"></div></div>
+      <div class="asset-label">Original</div>
+      <div class="asset-desc">Generated pixel art. As painted.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--c9-mask-primary);"></div></div>
+      <div class="asset-label">Primary (L&lt;180)</div>
+      <div class="asset-desc">Outer violet body. Tint with --pc.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--c9-mask-secondary);"></div></div>
+      <div class="asset-label">Secondary (L 180-219)</div>
+      <div class="asset-desc">Inner amber ring. Tint with --sc.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--c9-mask-shine);"></div></div>
+      <div class="asset-label">Shine (L&ge;220)</div>
+      <div class="asset-desc">Core pixels. Original colour, locked.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--c9-mask-lum);"></div></div>
+      <div class="asset-label">Lum (reference)</div>
+      <div class="asset-desc">Full grayscale -- not used in pipeline.</div>
+    </div>
+  </div>
+
+  <div class="sub-h">Before / after pipeline</div>
+  <div class="compare-row">
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div style="width:96px;height:96px;background-image:var(--c9-orig-orb);
+             background-size:contain;background-repeat:no-repeat;background-position:center;"></div>
+      </div>
+      <div class="compare-label">Original</div>
+      <div class="compare-note">Generated colours<br>as-is from PixelLab</div>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div class="tri-wrap" style="width:96px;height:96px;--pc:#a040c8;--sc:#ffcc44;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div>
+      </div>
+      <div class="compare-label">Crystal 9 natural</div>
+      <div class="compare-note" style="color:var(--violet)">--pc: #a040c8<br>
+        <span style="color:var(--gold)">--sc: #ffcc44</span></div>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div class="tri-wrap" style="width:96px;height:96px;--pc:#be123c;--sc:#fde68a;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div>
+      </div>
+      <div class="compare-label">Crimson + cream</div>
+      <div class="compare-note" style="color:#be123c">--pc: #be123c<br>
+        <span style="color:#fde68a">--sc: #fde68a</span></div>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div class="tri-wrap" style="width:96px;height:96px;--pc:#0c4a6e;--sc:#f59e0b;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div>
+      </div>
+      <div class="compare-label">Ocean + amber</div>
+      <div class="compare-note" style="color:#38bdf8">--pc: #0c4a6e<br>
+        <span style="color:#f59e0b">--sc: #f59e0b</span></div>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div class="tri-wrap" style="width:96px;height:96px;--pc:#166534;--sc:#ffd700;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div>
+      </div>
+      <div class="compare-label">Forest + gold</div>
+      <div class="compare-note" style="color:#4ade80">--pc: #166534<br>
+        <span style="color:#ffd700">--sc: #ffd700</span></div>
+    </div>
+    <div class="compare-cell">
+      <div class="compare-stage">
+        <div class="tri-wrap" style="width:96px;height:96px;--pc:#1e1b4b;--sc:#f43f5e;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div>
+      </div>
+      <div class="compare-label">Midnight + rose</div>
+      <div class="compare-note" style="color:#a5b4fc">--pc: #1e1b4b<br>
+        <span style="color:#f43f5e">--sc: #f43f5e</span></div>
+    </div>
+  </div>
+
+  <div class="sub-h">All 10 tiers on crystal9_orb</div>
+  <div class="tier-grid">
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#8899bb;--sc:#b0bfd8;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T1</div><div class="hex"><span style="color:#8899bb">#8899bb</span><br><span style="color:#b0bfd8;font-size:9px">#b0bfd8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#4488bb;--sc:#7ab2d8;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T2</div><div class="hex"><span style="color:#4488bb">#4488bb</span><br><span style="color:#7ab2d8;font-size:9px">#7ab2d8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#00bbcc;--sc:#55d8e8;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T3</div><div class="hex"><span style="color:#00bbcc">#00bbcc</span><br><span style="color:#55d8e8;font-size:9px">#55d8e8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#508cf0;--sc:#88b4f8;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T4</div><div class="hex"><span style="color:#508cf0">#508cf0</span><br><span style="color:#88b4f8;font-size:9px">#88b4f8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#505fdc;--sc:#8a96ee;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T5</div><div class="hex"><span style="color:#505fdc">#505fdc</span><br><span style="color:#8a96ee;font-size:9px">#8a96ee</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#8c3cdc;--sc:#c480f0;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T6</div><div class="hex"><span style="color:#8c3cdc">#8c3cdc</span><br><span style="color:#c480f0;font-size:9px">#c480f0</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#aa46e6;--sc:#d488ff;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T7</div><div class="hex"><span style="color:#aa46e6">#aa46e6</span><br><span style="color:#d488ff;font-size:9px">#d488ff</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#cc99ff;--sc:#e8ccff;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T8</div><div class="hex"><span style="color:#cc99ff">#cc99ff</span><br><span style="color:#e8ccff;font-size:9px">#e8ccff</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#ffcc44;--sc:#ffe899;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T9</div><div class="hex"><span style="color:#ffcc44">#ffcc44</span><br><span style="color:#ffe899;font-size:9px">#ffe899</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#ffaa22;--sc:#ffcc88;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T10</div><div class="hex"><span style="color:#ffaa22">#ffaa22</span><br><span style="color:#ffcc88;font-size:9px">#ffcc88</span></div></div>
+  </div>
+
+  <div class="sub-h" style="margin-top:22px">Live picker -- crystal9_orb</div>
+  <p class="lede" style="margin-bottom:12px;">
+    Dial in any combination. Shine core always shows original baked colour.
+  </p>
+  <div class="picker-row">
+    <div class="picker-controls">
+      <div class="grp">
+        <div class="grp-lbl">Primary -- outer body (L &lt; 180)</div>
+        <input type="color" id="c9-pc-picker" value="#a040c8">
+        <input type="text"  id="c9-pc-hex"    value="#a040c8" maxlength="9">
+      </div>
+      <div class="grp">
+        <div class="grp-lbl">Secondary -- inner ring (L 180-219)</div>
+        <input type="color" id="c9-sc-picker" value="#ffcc44">
+        <input type="text"  id="c9-sc-hex"    value="#ffcc44" maxlength="9">
+      </div>
+      <div class="shine-row">
+        <div class="shine-dot"></div>
+        <div class="shine-note">Shine (L &ge; 220) always shows<br>original pixel colour -- not configurable.</div>
+      </div>
+    </div>
+    <div class="picker-stage">
+      <div class="tri-wrap" id="live-orb-c9"
+           style="width:192px;height:192px;--pc:#a040c8;--sc:#ffcc44;--mask-primary:var(--c9-mask-primary);--mask-secondary:var(--c9-mask-secondary);--mask-shine:var(--c9-mask-shine);--orig-orb:var(--c9-orig-orb);">
+        <div class="layer-p"></div>
+        <div class="layer-s"></div>
+        <div class="layer-g"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =====================================================================
+     SECTION: Original qi_orb_bright assets (reference / baseline)
+     ===================================================================== -->
+
+<section>
+  <h2>qi_orb_bright assets <span class="pill pill-ok">baseline</span></h2>
+  <p class="lede">
+    Original cyan particle. Baseline for approach comparison below.
+    <code>primary</code> and <code>secondary</code> are luminance-mode masks.
+    <code>shine</code> is an alpha-mode mask paired with the <strong>original PNG</strong> as
+    background -- the shine pixels always render their baked colour.
+  </p>
+  <div class="asset-row">
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--orig-orb);"></div></div>
+      <div class="asset-label">Original</div>
+      <div class="asset-desc">Baked cyan colour. Untouched.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--mask-alpha);"></div></div>
+      <div class="asset-label">Alpha mask</div>
+      <div class="asset-desc">Full silhouette, hard fill.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--mask-lum);"></div></div>
+      <div class="asset-label">Lum mask</div>
+      <div class="asset-desc">Full grayscale (reference only).</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--mask-primary);"></div></div>
+      <div class="asset-label">Primary (L&lt;180)</div>
+      <div class="asset-desc">Dark outer body. Tint with --pc.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--mask-secondary);"></div></div>
+      <div class="asset-label">Secondary (L 180-219)</div>
+      <div class="asset-desc">Inner glow ring. Tint with --sc.</div>
+    </div>
+    <div class="asset-cell">
+      <div class="asset-swatch"><div class="png" style="background-image:var(--mask-shine);"></div></div>
+      <div class="asset-label">Shine (L&ge;220)</div>
+      <div class="asset-desc">Specular pixels. Original colour, locked.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Approach A -- hue-rotate <span class="pill pill-warn">current production</span></h2>
+  <p class="lede">Today's production approach.</p>
+  <div class="tier-grid">
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(0deg)    saturate(0.40);"></div></div><div class="label">T1</div><div class="hex">blue-grey</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(0deg)    saturate(0.90);"></div></div><div class="label">T2</div><div class="hex">blue</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(-15deg)  saturate(1.10);"></div></div><div class="label">T3</div><div class="hex">cyan</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(10deg)   saturate(1.10);"></div></div><div class="label">T4</div><div class="hex">deep blue</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(20deg)   saturate(1.15);"></div></div><div class="label">T5</div><div class="hex">indigo</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(55deg)   saturate(1.20);"></div></div><div class="label">T6</div><div class="hex">violet</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(85deg)   saturate(1.25);"></div></div><div class="label">T7</div><div class="hex">purple</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(100deg)  saturate(1.10);"></div></div><div class="label">T8</div><div class="hex">pale lilac</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(-130deg) saturate(1.35);"></div></div><div class="label">T9</div><div class="hex">gold</div></div>
+<div class="tier-cell"><div class="stage"><div class="hr-orb" style="filter:hue-rotate(-140deg) saturate(1.40);"></div></div><div class="label">T10</div><div class="hex">orange-gold</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Approach C -- 3 sibling layers on qi_orb_bright <span class="pill pill-ok">the fix</span></h2>
+  <p class="lede">
+    Three sibling <code>div</code>s inside a wrapper. Each has its own independent mask --
+    no parent mask interference. Shine layer uses the <strong>original PNG as
+    background-image</strong>, revealing its baked near-white pixels exactly as painted.
+    Primary + secondary are fully configurable CSS variables.
+  </p>
+  <div class="tier-grid">
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#8899bb;--sc:#b0bfd8;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T1</div><div class="hex"><span style="color:#8899bb">#8899bb</span><br><span style="color:#b0bfd8;font-size:9px">#b0bfd8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#4488bb;--sc:#7ab2d8;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T2</div><div class="hex"><span style="color:#4488bb">#4488bb</span><br><span style="color:#7ab2d8;font-size:9px">#7ab2d8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#00bbcc;--sc:#55d8e8;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T3</div><div class="hex"><span style="color:#00bbcc">#00bbcc</span><br><span style="color:#55d8e8;font-size:9px">#55d8e8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#508cf0;--sc:#88b4f8;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T4</div><div class="hex"><span style="color:#508cf0">#508cf0</span><br><span style="color:#88b4f8;font-size:9px">#88b4f8</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#505fdc;--sc:#8a96ee;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T5</div><div class="hex"><span style="color:#505fdc">#505fdc</span><br><span style="color:#8a96ee;font-size:9px">#8a96ee</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#8c3cdc;--sc:#c480f0;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T6</div><div class="hex"><span style="color:#8c3cdc">#8c3cdc</span><br><span style="color:#c480f0;font-size:9px">#c480f0</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#aa46e6;--sc:#d488ff;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T7</div><div class="hex"><span style="color:#aa46e6">#aa46e6</span><br><span style="color:#d488ff;font-size:9px">#d488ff</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#cc99ff;--sc:#e8ccff;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T8</div><div class="hex"><span style="color:#cc99ff">#cc99ff</span><br><span style="color:#e8ccff;font-size:9px">#e8ccff</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#ffcc44;--sc:#ffe899;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T9</div><div class="hex"><span style="color:#ffcc44">#ffcc44</span><br><span style="color:#ffe899;font-size:9px">#ffe899</span></div></div>
+<div class="tier-cell"><div class="stage"><div class="tri-wrap" style="width:64px;height:64px;--pc:#ffaa22;--sc:#ffcc88;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="label">T10</div><div class="hex"><span style="color:#ffaa22">#ffaa22</span><br><span style="color:#ffcc88;font-size:9px">#ffcc88</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Two-tone -- cross-family combos on qi_orb_bright <span class="pill pill-ok">secondary is any colour</span></h2>
+  <p class="lede">
+    The secondary zone is the inner glow ring (L 180-219). It can be a lighter shade of
+    primary (same family) or a completely different hue. Shine is still original in all cases.
+  </p>
+  <div class="duo-grid">
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#8c3cdc;--sc:#f5af14;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Violet + gold (crystal 8 feel)</div><div class="duo-hex"><span style="color:#8c3cdc">&#9632; #8c3cdc</span><br><span style="color:#f5af14">&#9632; #f5af14</span></div></div>
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#222a36;--sc:#7adcc4;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Onyx + jade</div><div class="duo-hex"><span style="color:#222a36">&#9632; #222a36</span><br><span style="color:#7adcc4">&#9632; #7adcc4</span></div></div>
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#be123c;--sc:#fde68a;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Crimson + cream</div><div class="duo-hex"><span style="color:#be123c">&#9632; #be123c</span><br><span style="color:#fde68a">&#9632; #fde68a</span></div></div>
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#0c4a6e;--sc:#f59e0b;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Ocean + amber</div><div class="duo-hex"><span style="color:#0c4a6e">&#9632; #0c4a6e</span><br><span style="color:#f59e0b">&#9632; #f59e0b</span></div></div>
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#166534;--sc:#ffd700;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Forest + gold</div><div class="duo-hex"><span style="color:#166534">&#9632; #166534</span><br><span style="color:#ffd700">&#9632; #ffd700</span></div></div>
+<div class="duo-cell"><div class="duo-stage"><div class="tri-wrap" style="width:96px;height:96px;--pc:#1e1b4b;--sc:#f43f5e;"><div class="layer-p"></div><div class="layer-s"></div><div class="layer-g"></div></div></div><div class="duo-label">Midnight + rose</div><div class="duo-hex"><span style="color:#1e1b4b">&#9632; #1e1b4b</span><br><span style="color:#f43f5e">&#9632; #f43f5e</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Live picker -- qi_orb_bright (primary + secondary)</h2>
+  <div class="picker-row">
+    <div class="picker-controls">
+      <div class="grp">
+        <div class="grp-lbl">Primary -- body (L &lt; 180)</div>
+        <input type="color" id="pc-picker" value="#8c3cdc">
+        <input type="text"  id="pc-hex"    value="#8c3cdc" maxlength="9">
+      </div>
+      <div class="grp">
+        <div class="grp-lbl">Secondary -- inner glow (L 180-219)</div>
+        <input type="color" id="sc-picker" value="#f5af14">
+        <input type="text"  id="sc-hex"    value="#f5af14" maxlength="9">
+      </div>
+      <div class="shine-row">
+        <div class="shine-dot"></div>
+        <div class="shine-note">Shine (L &ge; 220) always shows<br>original pixel colour -- not configurable.</div>
+      </div>
+    </div>
+    <div class="picker-stage">
+      <div class="tri-wrap" id="live-orb" style="width:192px;height:192px;--pc:#8c3cdc;--sc:#f5af14;">
+        <div class="layer-p"></div>
+        <div class="layer-s"></div>
+        <div class="layer-g"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <strong>Architecture note.</strong>
+  The three-sibling pattern is the web equivalent of layered material channels in Unreal.
+  Per-particle mask switching costs zero new CSS -- set 4 vars on the wrapper div and every
+  child layer resolves to that particle's masks automatically via CSS inheritance.
+  To add a new particle to the system: generate it, run <code>gen_particle_mask.py</code>,
+  add 4 CSS vars to <code>:root</code>, done.
+  <br><br>
+  <strong>Threshold tuning.</strong>
+  Run <code>gen_particle_mask.py &lt;name&gt; --mid N --shine N</code> to shift the zone boundaries.
+  The right values depend on the particle's luminance distribution -- check the buckets first.
+</div>
+
+<script>
+  function bindLivePicker(orbId, pcPickerId, pcHexId, scPickerId, scHexId) {
+    const orb      = document.getElementById(orbId);
+    const pcPicker = document.getElementById(pcPickerId);
+    const pcHex    = document.getElementById(pcHexId);
+    const scPicker = document.getElementById(scPickerId);
+    const scHex    = document.getElementById(scHexId);
+
+    function setPC(c) { orb.style.setProperty('--pc', c); }
+    function setSC(c) { orb.style.setProperty('--sc', c); }
+
+    function bindPair(picker, hex, setter) {
+      picker.addEventListener('input', e => { hex.value = e.target.value; setter(e.target.value); });
+      hex.addEventListener('input', e => {
+        const v = e.target.value.trim();
+        if (/^#?[0-9a-fA-F]{3,8}$/.test(v)) {
+          const c = v.startsWith('#') ? v : '#' + v;
+          if (c.length === 7) picker.value = c;
+          setter(c);
+        }
+      });
+    }
+    bindPair(pcPicker, pcHex, setPC);
+    bindPair(scPicker, scHex, setSC);
+  }
+
+  bindLivePicker('live-orb',    'pc-picker',    'pc-hex',    'sc-picker',    'sc-hex');
+  bindLivePicker('live-orb-c9', 'c9-pc-picker', 'c9-pc-hex', 'c9-sc-picker', 'c9-sc-hex');
+</script>
+
+</body>
+</html>

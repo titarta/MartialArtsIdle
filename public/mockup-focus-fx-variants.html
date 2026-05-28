@@ -1,0 +1,1323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Focus FX — Variant Tests</title>
+<style>
+  :root {
+    --bg-page:    rgba(4, 10, 14, 0.96);
+    --bg-cell:    rgba(20, 28, 36, 0.72);
+    --border-c:   rgba(110, 200, 180, 0.22);
+    --text-pri:   #d8eaff;
+    --text-mut:   rgba(220, 230, 240, 0.7);
+    --text-soft:  rgba(200, 210, 220, 0.5);
+    --cyan:       #7adcc4;
+    --violet:     #c4b5fd;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-page);
+    color: var(--text-pri);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    image-rendering: pixelated;
+  }
+  img { image-rendering: pixelated; }
+
+  header {
+    padding: 18px 24px 8px;
+    border-bottom: 1px solid var(--border-c);
+  }
+  header h1 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  header p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-mut);
+  }
+
+  /* ─── Section headers ──────────────────────────────────────────────────── */
+  .section-head {
+    padding: 22px 24px 6px;
+    border-bottom: 1px solid rgba(122, 220, 196, 0.10);
+  }
+  .section-head h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .section-head p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--text-soft);
+    max-width: 760px;
+  }
+
+  /* ─── Grid ─────────────────────────────────────────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    padding: 14px;
+  }
+  .cell {
+    background: var(--bg-cell);
+    border: 1px solid var(--border-c);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .cell h3 {
+    margin: 0;
+    padding: 10px 14px 2px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .cell .sub {
+    padding: 0 14px 6px;
+    font-size: 11px;
+    color: var(--text-soft);
+    line-height: 1.45;
+    min-height: 28px;
+  }
+  .cell .controls {
+    padding: 0 14px 8px;
+    display: flex;
+    gap: 6px;
+  }
+  .cell .controls button {
+    background: rgba(122, 220, 196, 0.10);
+    border: 1px solid rgba(122, 220, 196, 0.35);
+    color: var(--cyan);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .cell .controls button:hover { background: rgba(122, 220, 196, 0.20); }
+  .cell .controls button.on {
+    background: rgba(196, 181, 253, 0.18);
+    border-color: rgba(196, 181, 253, 0.55);
+    color: var(--violet);
+  }
+
+  /* ─── Stages ───────────────────────────────────────────────────────────── */
+  .stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background:
+      radial-gradient(ellipse at 50% 80%, rgba(20, 50, 70, 0.65), transparent 70%),
+      linear-gradient(160deg, #0a1820 0%, #07111a 100%);
+    overflow: hidden;
+    user-select: none;
+    cursor: crosshair;
+  }
+  .stage--btn { cursor: pointer; }
+  .stage .label {
+    position: absolute;
+    bottom: 6px; left: 8px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* Particle base */
+  .p {
+    position: absolute;
+    pointer-events: none;
+    will-change: transform, opacity;
+    image-rendering: pixelated;
+  }
+
+  /* Character silhouette (uses real cultivator sprite) */
+  .cult {
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .cult-large { width: 84px; height: 84px; bottom: 10%; }
+
+  /* Crystal sprite for section 3 */
+  .crystal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px; height: 72px;
+    z-index: 5;
+    cursor: pointer;
+    transition: transform 80ms ease-out;
+    filter: drop-shadow(0 0 8px rgba(122, 220, 196, 0.5));
+  }
+  .crystal.tapped { transform: translate(-50%, -50%) scale(0.92); }
+
+  /* ─── Tap rings (Section 1) — CSS-driven for crispness ─────────────────── */
+  .tap-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+  }
+  .tap-ring-classic {
+    border: 2px solid rgba(122, 220, 196, 0.9);
+    box-shadow: 0 0 12px rgba(122, 220, 196, 0.7), inset 0 0 8px rgba(122, 220, 196, 0.4);
+    animation: tap-ring-classic 600ms ease-out forwards;
+  }
+  @keyframes tap-ring-classic {
+    0%   { width: 20px; height: 20px; opacity: 1; border-width: 3px; }
+    100% { width: 160px; height: 160px; opacity: 0; border-width: 1px; }
+  }
+  .tap-ring-double-inner {
+    border: 2px solid rgba(196, 181, 253, 0.95);
+    box-shadow: 0 0 10px rgba(196, 181, 253, 0.7);
+    animation: tap-ring-double-inner 220ms ease-out forwards;
+  }
+  @keyframes tap-ring-double-inner {
+    0%   { width: 16px; height: 16px; opacity: 1; }
+    100% { width: 70px; height: 70px; opacity: 0; }
+  }
+  .tap-ring-double-outer {
+    border: 2px solid rgba(122, 220, 196, 0.7);
+    box-shadow: 0 0 14px rgba(122, 220, 196, 0.5);
+    animation: tap-ring-double-outer 800ms ease-out forwards;
+  }
+  @keyframes tap-ring-double-outer {
+    0%   { width: 30px; height: 30px; opacity: 0.9; border-width: 3px; }
+    100% { width: 220px; height: 220px; opacity: 0; border-width: 1px; }
+  }
+  .tap-ring-ripple {
+    border: 2px solid rgba(122, 220, 196, 0.85);
+    box-shadow: 0 0 8px rgba(122, 220, 196, 0.5);
+    animation: tap-ring-ripple 700ms ease-out forwards;
+  }
+  @keyframes tap-ring-ripple {
+    0%   { width: 20px; height: 20px; opacity: 1; }
+    100% { width: 140px; height: 140px; opacity: 0; }
+  }
+  .tap-solid-pulse {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(122,220,196,0.4) 40%, transparent 70%);
+    animation: tap-solid-pulse 550ms ease-out forwards;
+  }
+  @keyframes tap-solid-pulse {
+    0%   { width: 0; height: 0; opacity: 1; }
+    35%  { width: 80px; height: 80px; opacity: 0.85; }
+    100% { width: 180px; height: 180px; opacity: 0; }
+  }
+  .tap-sigil {
+    position: absolute;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: tap-sigil 900ms ease-out forwards;
+  }
+  @keyframes tap-sigil {
+    0%   { width: 20px; height: 20px; opacity: 0; transform: translate(-50%, -50%) rotate(0deg); }
+    20%  { opacity: 1; }
+    100% { width: 180px; height: 180px; opacity: 0; transform: translate(-50%, -50%) rotate(180deg); }
+  }
+  .tap-sigil svg { width: 100%; height: 100%; filter: drop-shadow(0 0 6px rgba(122,220,196,0.8)); }
+  .tap-bloom {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(122,220,196,0.7) 0%, rgba(60,180,230,0.4) 30%, transparent 70%);
+    filter: blur(2px);
+    animation: tap-bloom 750ms ease-out forwards;
+  }
+  @keyframes tap-bloom {
+    0%   { width: 30px; height: 30px; opacity: 0; }
+    25%  { opacity: 0.9; }
+    100% { width: 200px; height: 200px; opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Focus FX — Variant Tests</h1>
+  <p>Pick favourites for each effect. <strong>Section 1</strong>: tap anywhere in stage to fire a ring. <strong>Section 2</strong>: gathering loops auto-run — toggle Intense to compare densities. <strong>Section 3</strong>: tap the crystal.</p>
+</header>
+
+<!-- ════════════════════════ SECTION 1 — TAP CIRCLE FX ═══════════════════════ -->
+<div class="section-head">
+  <h2>1 · Tap Circle FX (one-shot per tap)</h2>
+  <p>Fires once per tap at the cursor location. Lives ~500-900ms. Designed to register the input instantly without obscuring the cultivator.</p>
+</div>
+
+<div class="grid">
+
+  <div class="cell">
+    <h3>A · Classic Ring</h3>
+    <div class="sub">Single cyan ring expands fast, fades. The current convention — tight, clear.</div>
+    <div class="stage stage--btn" id="tap-a">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>B · Double Ring</h3>
+    <div class="sub">Tight violet inner (200ms) + soft cyan outer (800ms). Two-stage punch.</div>
+    <div class="stage stage--btn" id="tap-b">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>C · Triple Ripple</h3>
+    <div class="sub">3 rings staggered 80ms apart. Reads as "deep" energy with each tap.</div>
+    <div class="stage stage--btn" id="tap-c">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>D · Solid Pulse</h3>
+    <div class="sub">Bright white core fading through cyan. Has more "weight" than rings — bigger feedback.</div>
+    <div class="stage stage--btn" id="tap-d">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>E · Sigil Ring</h3>
+    <div class="sub">Hexagonal cultivation rune rotating outward. Most stylised — feels intentional, ritualistic.</div>
+    <div class="stage stage--btn" id="tap-e">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>F · Soft Bloom</h3>
+    <div class="sub">No hard ring — pure radial glow. Subtle, never competes with character — but easy to miss.</div>
+    <div class="stage stage--btn" id="tap-f">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>G · Real Qi Ring (sprite)</h3>
+    <div class="sub">Actual <code>qi_ring.png</code> scales outward. Carries the qi-particle aesthetic, reads as cultivation energy not generic UI.</div>
+    <div class="stage stage--btn" id="tap-g">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>H · Ring + Inner Crescent</h3>
+    <div class="sub"><code>qi_ring</code> expanding + <code>qi_crescent</code> rotating inside. Layered, ritualistic.</div>
+    <div class="stage stage--btn" id="tap-h">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>I · Ring + Swirl Stack</h3>
+    <div class="sub">3 <code>qi_ring</code> staggered + a counter-rotating <code>qi_swirl</code>. Most ornate.</div>
+    <div class="stage stage--btn" id="tap-i">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>J · Twin Ring (fast + slow)</h3>
+    <div class="sub">Two <code>qi_ring</code> at different speeds/sizes. Reads as a quick "tick" plus follow-through ripple.</div>
+    <div class="stage stage--btn" id="tap-j">
+      <img class="cult" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">tap & hold anywhere</div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════ SECTION 2 — GATHERING FX ════════════════════════ -->
+<div class="section-head">
+  <h2>2 · Gathering FX (sustained, while focused)</h2>
+  <p>Loops while the player is in focused state. Compare how different <strong>size strategies</strong> read — uniform vs mixed vs depth-layered.</p>
+</div>
+
+<div class="grid">
+
+  <div class="cell">
+    <h3>A · All Small (uniform)</h3>
+    <div class="sub">Only <code>qi_orb_small</code>. Baseline — busy and consistent, but flat.</div>
+    <div class="controls">
+      <button data-gather="a" data-intensity="normal">Normal</button>
+      <button data-gather="a" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-a">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>B · All Bright (uniform)</h3>
+    <div class="sub">Only <code>qi_orb_bright</code>. Heavy, majestic, fewer overall — but lacks depth.</div>
+    <div class="controls">
+      <button data-gather="b" data-intensity="normal">Normal</button>
+      <button data-gather="b" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-b">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>C · Depth-Layered (small bg + bright fg)</h3>
+    <div class="sub">Small/faint orbs spawn far at low opacity, bright orbs spawn closer. Reads as 3D depth.</div>
+    <div class="controls">
+      <button data-gather="c" data-intensity="normal">Normal</button>
+      <button data-gather="c" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-c">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>D · Random Mix (small/med/bright)</h3>
+    <div class="sub">Random size per particle, uniform speed. Variety without depth structure.</div>
+    <div class="controls">
+      <button data-gather="d" data-intensity="normal">Normal</button>
+      <button data-gather="d" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-d">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>E · Crescendo (grow toward character)</h3>
+    <div class="sub">Particles spawn small, scale UP as they approach. Reads as "qi condensing" — powerful.</div>
+    <div class="controls">
+      <button data-gather="e" data-intensity="normal">Normal</button>
+      <button data-gather="e" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-e">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>F · Inverse (shrink into character)</h3>
+    <div class="sub">Particles spawn LARGE at the edges, shrink as they reach the cultivator. Suggests absorption.</div>
+    <div class="controls">
+      <button data-gather="f" data-intensity="normal">Normal</button>
+      <button data-gather="f" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-f">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>G · C + Sparkle Accents</h3>
+    <div class="sub">Depth-layered base (your favourite) plus occasional <code>spark_diamond</code> flecks. Adds twinkle without losing structure.</div>
+    <div class="controls">
+      <button data-gather="g" data-intensity="normal">Normal</button>
+      <button data-gather="g" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-g">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>H · E + Wisp Trails</h3>
+    <div class="sub">Crescendo base (your other favourite) plus <code>qi_wisp_diagonal</code> streaks for motion lines. Reads as "pulling in".</div>
+    <div class="controls">
+      <button data-gather="h" data-intensity="normal">Normal</button>
+      <button data-gather="h" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-h">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>I · Full Mix (orbs + sparks + droplets)</h3>
+    <div class="sub">Every gentle particle type at small scale, all converging. Densest, busiest — "saturated qi field".</div>
+    <div class="controls">
+      <button data-gather="i" data-intensity="normal">Normal</button>
+      <button data-gather="i" data-intensity="intense">Intense</button>
+    </div>
+    <div class="stage" id="gather-i">
+      <img class="cult cult-large" src="/sprites/cultivator/t1_qi_transformation_focused.png" alt="">
+      <div class="label">auto-loop</div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════ SECTION 3 — CRYSTAL CLICK ═══════════════════════ -->
+<div class="section-head">
+  <h2>3 · Crystal Click Burst (one-shot on tap)</h2>
+  <p>Tap the crystal to fire. The current production is <strong>A</strong> (loose spark burst). Compare alternatives — heavier impact, more sparkle variety, ringed shockwave.</p>
+</div>
+
+<div class="grid">
+
+  <div class="cell">
+    <h3>A · Outward Spark Burst</h3>
+    <div class="sub">8 sparks shoot radially outward, fast. Loose, lively — current style baseline.</div>
+    <div class="stage" id="crystal-a">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="a">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>B · Mix Sparkle (cross + star + diamond)</h3>
+    <div class="sub">Varied sparkle shapes radiate outward. Richer detail, less "single-effect" feeling.</div>
+    <div class="stage" id="crystal-b">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="b">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>C · Ring Shockwave + Center Burst</h3>
+    <div class="sub">Outward ring + central spark_burst. Reads as a focused, weighted impact.</div>
+    <div class="stage" id="crystal-c">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="c">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>D · Bright Flash</h3>
+    <div class="sub">Single large white→cyan flash. Heaviest visual weight per tap — most "powerful" feel.</div>
+    <div class="stage" id="crystal-d">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="d">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>E · Shatter (4 cardinal shards)</h3>
+    <div class="sub">Shards fly out N/S/E/W. Crisp, directional — feels like crystal "cracking" energy out.</div>
+    <div class="stage" id="crystal-e">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="e">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>F · Sustained Charge-Up</h3>
+    <div class="sub">Central pop + radiating sparkles for ~800ms. Reads as "channelled" — best when tapped rhythmically.</div>
+    <div class="stage" id="crystal-f">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="f">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>G · Pure Geometric (low random)</h3>
+    <div class="sub">8 identical sparks at exact 45° angles, identical speed. Crisp, ritualised, predictable.</div>
+    <div class="stage" id="crystal-g">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="g">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>H · Qi Orb Explosion</h3>
+    <div class="sub">Lots of small <code>qi_orb_*</code> bursting outward instead of sparks. Soft, organic, "qi released" feel.</div>
+    <div class="stage" id="crystal-h">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="h">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>I · Total Chaos (high random)</h3>
+    <div class="sub">Every particle type, random angles, random speeds, staggered timing. Most lively, most "noisy".</div>
+    <div class="stage" id="crystal-i">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="i">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>J · Wisp Shooter</h3>
+    <div class="sub"><code>qi_wisp_horizontal</code> + <code>qi_wisp_diagonal</code> radiate outward + center spark. Directional energy.</div>
+    <div class="stage" id="crystal-j">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="j">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+  <div class="cell">
+    <h3>K · Orb + Sparkle Hybrid</h3>
+    <div class="sub">Soft <code>qi_orb_small</code> outward + crisp <code>spark_diamond</code> overlay. Body + accent in one burst.</div>
+    <div class="stage" id="crystal-k">
+      <img class="crystal" src="/sprites/items/origin_crystal.png" alt="" data-crystal="k">
+      <div class="label">tap crystal</div>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared particle system
+// ─────────────────────────────────────────────────────────────────────────────
+const BASE = '/sprites/vfx/qi_particles/';
+const SRC = {
+  orb_small:        BASE + 'qi_orb_small.png',
+  orb_medium:       BASE + 'qi_orb_medium.png',
+  orb_bright:       BASE + 'qi_orb_bright.png',
+  orb_faint:        BASE + 'qi_orb_faint.png',
+  spark_diamond:    BASE + 'qi_spark_diamond.png',
+  spark_cross:      BASE + 'qi_spark_cross.png',
+  spark_star:       BASE + 'qi_spark_star.png',
+  spark_burst:      BASE + 'qi_spark_burst.png',
+  wisp_horizontal:  BASE + 'qi_wisp_horizontal.png',
+  wisp_diagonal:    BASE + 'qi_wisp_diagonal.png',
+  droplet_falling:  BASE + 'qi_droplet_falling.png',
+  droplet_rising:   BASE + 'qi_droplet_rising.png',
+  ring:             BASE + 'qi_ring.png',
+  swirl:            BASE + 'qi_swirl.png',
+  crescent:         BASE + 'qi_crescent.png',
+  shard:            BASE + 'qi_shard.png',
+};
+
+const stages = new Map();
+
+function getStage(el) {
+  if (!stages.has(el)) stages.set(el, { particles: [] });
+  return stages.get(el);
+}
+
+function spawn(stageEl, key, opts) {
+  const s = getStage(stageEl);
+  const img = document.createElement('img');
+  img.src = SRC[key];
+  img.className = 'p';
+  img.style.transformOrigin = 'center';
+  stageEl.appendChild(img);
+  const p = {
+    el: img,
+    x:   opts.x   ?? 0,
+    y:   opts.y   ?? 0,
+    vx:  opts.vx  ?? 0,
+    vy:  opts.vy  ?? 0,
+    ax:  opts.ax  ?? 0,
+    ay:  opts.ay  ?? 0,
+    targetX: opts.targetX,
+    targetY: opts.targetY,
+    arrival: opts.arrival ?? null,  // ms to reach target
+    life:    opts.life    ?? 1500,
+    age:     0,
+    scale:   opts.scale   ?? 1,
+    rot:     opts.rot     ?? 0,
+    rotV:    opts.rotV    ?? 0,
+    scaleEnd: opts.scaleEnd,
+    fadeIn:  opts.fadeIn  ?? 0.1,
+    fadeOut: opts.fadeOut ?? 0.4,
+    opacity: opts.opacity ?? 1,
+  };
+  s.particles.push(p);
+  return p;
+}
+
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(50, now - last);
+  last = now;
+  for (const [stage, s] of stages) {
+    const alive = [];
+    for (const p of s.particles) {
+      p.age += dt;
+      const tFrac = p.age / p.life;
+      if (tFrac >= 1) { p.el.remove(); continue; }
+      // Target-arrival mode — interpolate position toward target over `arrival` ms
+      if (p.targetX != null && p.arrival) {
+        const t = Math.min(1, p.age / p.arrival);
+        // ease in-out
+        const eased = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+        const startX = p.x;
+        const startY = p.y;
+        // store original start on first frame
+        if (p._sx == null) { p._sx = startX; p._sy = startY; }
+        const ax = p._sx + (p.targetX - p._sx) * eased;
+        const ay = p._sy + (p.targetY - p._sy) * eased;
+        p.x = ax; p.y = ay;
+      } else {
+        p.vx += p.ax * (dt / 1000);
+        p.vy += p.ay * (dt / 1000);
+        p.x  += p.vx * (dt / 1000);
+        p.y  += p.vy * (dt / 1000);
+      }
+      p.rot += p.rotV * (dt / 1000);
+      let alpha = p.opacity;
+      if (tFrac < p.fadeIn)             alpha *= tFrac / p.fadeIn;
+      else if (tFrac > 1 - p.fadeOut)   alpha *= (1 - tFrac) / p.fadeOut;
+      let scale = p.scale;
+      if (p.scaleEnd != null) scale = p.scale + (p.scaleEnd - p.scale) * tFrac;
+      p.el.style.transform =
+        `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) ` +
+        `translate(-50%, -50%) ` +
+        `scale(${scale.toFixed(2)}) rotate(${p.rot.toFixed(1)}deg)`;
+      p.el.style.opacity = alpha.toFixed(2);
+      alive.push(p);
+    }
+    s.particles = alive;
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 1 — TAP CIRCLE FX (CSS-driven)
+// ─────────────────────────────────────────────────────────────────────────────
+function spawnRing(stage, x, y, className) {
+  const r = document.createElement('div');
+  r.className = className;
+  r.style.left = x + 'px';
+  r.style.top  = y + 'px';
+  stage.appendChild(r);
+  setTimeout(() => r.remove(), 1100);
+}
+function spawnSigil(stage, x, y) {
+  const wrap = document.createElement('div');
+  wrap.className = 'tap-sigil';
+  wrap.style.left = x + 'px';
+  wrap.style.top  = y + 'px';
+  wrap.innerHTML = `
+    <svg viewBox="0 0 100 100">
+      <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" fill="none" stroke="rgba(122,220,196,0.95)" stroke-width="2"/>
+      <polygon points="50,20 78,35 78,65 50,80 22,65 22,35" fill="none" stroke="rgba(196,181,253,0.7)" stroke-width="1.2"/>
+      <circle cx="50" cy="50" r="6" fill="rgba(255,255,255,0.5)"/>
+    </svg>
+  `;
+  stage.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 950);
+}
+
+const tapHandlers = {
+  'tap-a': (e, s, x, y) => spawnRing(s, x, y, 'tap-ring tap-ring-classic'),
+  'tap-b': (e, s, x, y) => {
+    spawnRing(s, x, y, 'tap-ring tap-ring-double-inner');
+    spawnRing(s, x, y, 'tap-ring tap-ring-double-outer');
+  },
+  'tap-c': (e, s, x, y) => {
+    spawnRing(s, x, y, 'tap-ring tap-ring-ripple');
+    setTimeout(() => spawnRing(s, x, y, 'tap-ring tap-ring-ripple'), 80);
+    setTimeout(() => spawnRing(s, x, y, 'tap-ring tap-ring-ripple'), 160);
+  },
+  'tap-d': (e, s, x, y) => spawnRing(s, x, y, 'tap-solid-pulse'),
+  'tap-e': (e, s, x, y) => spawnSigil(s, x, y),
+  'tap-f': (e, s, x, y) => spawnRing(s, x, y, 'tap-bloom'),
+  // ── Real qi_ring sprite variants ─────────────────────────────────────────
+  'tap-g': (e, s, x, y) => {
+    spawn(s, 'ring', {
+      x, y,
+      scale: 0.4, scaleEnd: 2.2,
+      life: 700,
+      fadeIn: 0.05, fadeOut: 0.65,
+    });
+  },
+  'tap-h': (e, s, x, y) => {
+    spawn(s, 'ring', {
+      x, y,
+      scale: 0.4, scaleEnd: 2.4,
+      life: 800,
+      fadeIn: 0.05, fadeOut: 0.65,
+    });
+    spawn(s, 'crescent', {
+      x, y,
+      scale: 0.6, scaleEnd: 1.1,
+      life: 750,
+      rotV: 540,
+      fadeIn: 0.05, fadeOut: 0.55,
+    });
+  },
+  'tap-i': (e, s, x, y) => {
+    spawn(s, 'ring', { x, y, scale: 0.3, scaleEnd: 1.4, life: 650, fadeIn: 0.05, fadeOut: 0.6 });
+    setTimeout(() => spawn(s, 'ring', { x, y, scale: 0.3, scaleEnd: 1.8, life: 650, fadeIn: 0.05, fadeOut: 0.6 }), 80);
+    setTimeout(() => spawn(s, 'ring', { x, y, scale: 0.3, scaleEnd: 2.2, life: 650, fadeIn: 0.05, fadeOut: 0.6 }), 160);
+    spawn(s, 'swirl', {
+      x, y,
+      scale: 0.5, scaleEnd: 1.2,
+      life: 800,
+      rotV: -420,
+      fadeIn: 0.05, fadeOut: 0.55,
+    });
+  },
+  'tap-j': (e, s, x, y) => {
+    // Fast tick + slow follow-through
+    spawn(s, 'ring', {
+      x, y,
+      scale: 0.3, scaleEnd: 1.2,
+      life: 380,
+      fadeIn: 0.05, fadeOut: 0.55,
+    });
+    spawn(s, 'ring', {
+      x, y,
+      scale: 0.5, scaleEnd: 2.6,
+      life: 900,
+      fadeIn: 0.05, fadeOut: 0.7,
+    });
+  },
+};
+
+for (const id of Object.keys(tapHandlers)) {
+  const stageEl = document.getElementById(id);
+  stageEl.addEventListener('pointerdown', (e) => {
+    const r = stageEl.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    tapHandlers[id](e, stageEl, x, y);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 2 — GATHERING FX (sustained loops)
+// ─────────────────────────────────────────────────────────────────────────────
+const gatherIntensity = {
+  a: 'normal', b: 'normal', c: 'normal', d: 'normal', e: 'normal', f: 'normal',
+  g: 'normal', h: 'normal', i: 'normal',
+};
+
+// Per-variant spawner — called on a fixed interval based on intensity
+function spawnGather(variant, intensity) {
+  const stageEl = document.getElementById('gather-' + variant);
+  if (!stageEl) return;
+  const r = stageEl.getBoundingClientRect();
+  const cx = r.width / 2;
+  const cy = r.height * 0.78;  // matches .cult bottom position
+  const startAngle = rand(0, Math.PI * 2);
+  const startDist  = Math.max(r.width, r.height) * rand(0.5, 0.75);
+  const startX = cx + Math.cos(startAngle) * startDist;
+  const startY = cy + Math.sin(startAngle) * startDist * 0.8;
+
+  const mult = intensity === 'intense' ? 1 : 1;  // density via interval (see schedulers below)
+
+  // Common targets — slight scatter near the cultivator's chest height
+  const tx = cx + rand(-10, 10);
+  const ty = cy + rand(-22, -12);
+
+  switch (variant) {
+    case 'a': // All small (uniform, smaller)
+      spawn(stageEl, 'orb_small', {
+        x: startX, y: startY,
+        targetX: tx, targetY: ty,
+        arrival: rand(1400, 2000),
+        life: 2200,
+        scale: rand(0.30, 0.45),
+        opacity: 0.9,
+        fadeIn: 0.15, fadeOut: 0.35,
+      });
+      break;
+    case 'b': // All bright (uniform, smaller)
+      spawn(stageEl, 'orb_bright', {
+        x: startX, y: startY,
+        targetX: tx, targetY: ty,
+        arrival: rand(1800, 2400),
+        life: 2600,
+        scale: rand(0.28, 0.42),
+        opacity: 0.95,
+        fadeIn: 0.18, fadeOut: 0.30,
+      });
+      break;
+    case 'c': // Depth-layered — small faint far, bright closer
+      {
+        const isFar = Math.random() < 0.7;
+        spawn(stageEl, isFar ? pick(['orb_faint','orb_small']) : 'orb_bright', {
+          x: startX, y: startY,
+          targetX: tx, targetY: ty,
+          arrival: isFar ? rand(2200, 2800) : rand(1300, 1700),
+          life: isFar ? 2800 : 1900,
+          scale: isFar ? rand(0.18, 0.28) : rand(0.38, 0.50),
+          opacity: isFar ? 0.55 : 0.95,
+          fadeIn: 0.20, fadeOut: 0.30,
+        });
+      }
+      break;
+    case 'd': // Random mix, uniform speed
+      spawn(stageEl, pick(['orb_small','orb_medium','orb_bright']), {
+        x: startX, y: startY,
+        targetX: tx, targetY: ty,
+        arrival: rand(1700, 2100),
+        life: 2300,
+        scale: rand(0.25, 0.50),
+        opacity: 0.9,
+        fadeIn: 0.15, fadeOut: 0.32,
+      });
+      break;
+    case 'e': // Crescendo — grow toward character (capped)
+      spawn(stageEl, pick(['orb_small','orb_medium']), {
+        x: startX, y: startY,
+        targetX: tx, targetY: ty,
+        arrival: rand(1800, 2200),
+        life: 2300,
+        scale: 0.18,
+        scaleEnd: rand(0.48, 0.62),
+        opacity: 0.95,
+        fadeIn: 0.10, fadeOut: 0.20,
+      });
+      break;
+    case 'f': // Inverse — shrink into character
+      spawn(stageEl, pick(['orb_medium','orb_bright']), {
+        x: startX, y: startY,
+        targetX: tx, targetY: ty,
+        arrival: rand(1700, 2200),
+        life: 2300,
+        scale: rand(0.55, 0.70),
+        scaleEnd: 0.12,
+        opacity: 0.95,
+        fadeIn: 0.10, fadeOut: 0.30,
+      });
+      break;
+    case 'g': // C + sparkle accents (your fav + twinkle)
+      {
+        const isSpark = Math.random() < 0.18;
+        if (isSpark) {
+          spawn(stageEl, pick(['spark_diamond','spark_cross']), {
+            x: startX, y: startY,
+            targetX: tx, targetY: ty,
+            arrival: rand(1600, 2100),
+            life: 2300,
+            scale: rand(0.30, 0.45),
+            rotV: rand(-120, 120),
+            opacity: 0.95,
+            fadeIn: 0.12, fadeOut: 0.30,
+          });
+        } else {
+          const isFar = Math.random() < 0.7;
+          spawn(stageEl, isFar ? pick(['orb_faint','orb_small']) : 'orb_bright', {
+            x: startX, y: startY,
+            targetX: tx, targetY: ty,
+            arrival: isFar ? rand(2200, 2800) : rand(1300, 1700),
+            life: isFar ? 2800 : 1900,
+            scale: isFar ? rand(0.18, 0.28) : rand(0.38, 0.50),
+            opacity: isFar ? 0.55 : 0.95,
+            fadeIn: 0.20, fadeOut: 0.30,
+          });
+        }
+      }
+      break;
+    case 'h': // E + wisp trails (your fav + motion lines)
+      {
+        const isWisp = Math.random() < 0.20;
+        if (isWisp) {
+          spawn(stageEl, 'wisp_diagonal', {
+            x: startX, y: startY,
+            targetX: tx, targetY: ty,
+            arrival: rand(1100, 1500),
+            life: 1700,
+            scale: rand(0.30, 0.45),
+            rot: Math.atan2(ty - startY, tx - startX) * 180 / Math.PI,
+            opacity: 0.7,
+            fadeIn: 0.10, fadeOut: 0.40,
+          });
+        } else {
+          spawn(stageEl, pick(['orb_small','orb_medium']), {
+            x: startX, y: startY,
+            targetX: tx, targetY: ty,
+            arrival: rand(1800, 2200),
+            life: 2300,
+            scale: 0.18,
+            scaleEnd: rand(0.48, 0.62),
+            opacity: 0.95,
+            fadeIn: 0.10, fadeOut: 0.20,
+          });
+        }
+      }
+      break;
+    case 'i': // Full mix — orbs + sparks + droplets, all small
+      {
+        const roll = Math.random();
+        let key;
+        if      (roll < 0.45) key = pick(['orb_small','orb_faint']);
+        else if (roll < 0.65) key = 'orb_medium';
+        else if (roll < 0.78) key = 'orb_bright';
+        else if (roll < 0.90) key = pick(['spark_diamond','spark_cross']);
+        else                  key = 'droplet_rising';
+        spawn(stageEl, key, {
+          x: startX, y: startY,
+          targetX: tx, targetY: ty,
+          arrival: rand(1500, 2200),
+          life: 2300,
+          scale: rand(0.20, 0.42),
+          rotV: key.startsWith('spark_') ? rand(-180, 180) : 0,
+          opacity: rand(0.7, 1.0),
+          fadeIn: 0.15, fadeOut: 0.30,
+        });
+      }
+      break;
+  }
+}
+
+// Per-variant intervals — different for normal vs intense
+const gatherIntervals = {};
+function setGatherSchedule(variant) {
+  if (gatherIntervals[variant]) clearInterval(gatherIntervals[variant]);
+  const intensity = gatherIntensity[variant];
+  const intervals = {
+    a: { normal: 200, intense: 70 },
+    b: { normal: 380, intense: 140 },
+    c: { normal: 130, intense: 60 },
+    d: { normal: 200, intense: 80 },
+    e: { normal: 230, intense: 100 },
+    f: { normal: 230, intense: 100 },
+    g: { normal: 130, intense: 60 },
+    h: { normal: 200, intense: 90 },
+    i: { normal: 110, intense: 50 },
+  };
+  const ms = intervals[variant][intensity];
+  gatherIntervals[variant] = setInterval(() => spawnGather(variant, intensity), ms);
+}
+['a','b','c','d','e','f','g','h','i'].forEach(setGatherSchedule);
+
+// Wire intensity toggle buttons
+document.querySelectorAll('[data-gather]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const variant = btn.dataset.gather;
+    const intensity = btn.dataset.intensity;
+    gatherIntensity[variant] = intensity;
+    // toggle button visual
+    document.querySelectorAll(`[data-gather="${variant}"]`).forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    setGatherSchedule(variant);
+  });
+});
+// Default "Normal" buttons marked active
+document.querySelectorAll('[data-gather][data-intensity="normal"]').forEach(b => b.classList.add('on'));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTION 3 — CRYSTAL CLICK BURSTS
+// ─────────────────────────────────────────────────────────────────────────────
+const crystalBursts = {
+  a: (stage, cx, cy) => {
+    // Loose outward spark burst
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + rand(-0.2, 0.2);
+      const speed = rand(120, 180);
+      spawn(stage, 'spark_cross', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: 550,
+        scale: rand(0.5, 0.8),
+        rotV: rand(-300, 300),
+        fadeIn: 0.05, fadeOut: 0.6,
+      });
+    }
+  },
+  b: (stage, cx, cy) => {
+    // Mix sparkle — diamond + star + cross
+    const shapes = ['spark_diamond','spark_star','spark_cross'];
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + rand(-0.25, 0.25);
+      const speed = rand(100, 200);
+      spawn(stage, shapes[i % shapes.length], {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: rand(500, 720),
+        scale: rand(0.5, 0.9),
+        rotV: rand(-360, 360),
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }
+  },
+  c: (stage, cx, cy) => {
+    // Ring shockwave + center burst
+    spawn(stage, 'ring', {
+      x: cx, y: cy,
+      scale: 0.3, scaleEnd: 2.0,
+      life: 600,
+      fadeIn: 0.05, fadeOut: 0.65,
+    });
+    spawn(stage, 'spark_burst', {
+      x: cx, y: cy,
+      scale: 0.7, scaleEnd: 1.4,
+      life: 450,
+      fadeIn: 0.05, fadeOut: 0.6,
+    });
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2;
+      spawn(stage, 'spark_diamond', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * 90,
+        vy: Math.sin(a) * 90,
+        life: 500,
+        scale: 0.6,
+        rotV: rand(-200, 200),
+        fadeIn: 0.05, fadeOut: 0.5,
+      });
+    }
+  },
+  d: (stage, cx, cy) => {
+    // Big bright flash — pure visual weight
+    const flash = document.createElement('div');
+    flash.style.cssText = `
+      position: absolute;
+      left: ${cx}px; top: ${cy}px;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(122,220,196,0.6) 35%, transparent 70%);
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+      z-index: 50;
+      animation: crystal-d-flash 480ms ease-out forwards;
+    `;
+    stage.appendChild(flash);
+    setTimeout(() => flash.remove(), 520);
+    // sparse small sparkles for texture
+    for (let i = 0; i < 5; i++) {
+      const a = rand(0, Math.PI * 2);
+      const speed = rand(50, 100);
+      spawn(stage, 'spark_cross', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: 600,
+        scale: 0.5,
+        fadeIn: 0.05, fadeOut: 0.6,
+      });
+    }
+  },
+  e: (stage, cx, cy) => {
+    // 4 cardinal shards
+    const dirs = [[0,-1],[1,0],[0,1],[-1,0]];
+    for (const [dx, dy] of dirs) {
+      spawn(stage, 'shard', {
+        x: cx, y: cy,
+        vx: dx * 160,
+        vy: dy * 160,
+        life: 600,
+        scale: 0.85,
+        rot: Math.atan2(dy, dx) * 180 / Math.PI,
+        fadeIn: 0.05, fadeOut: 0.5,
+      });
+    }
+    // small center pop
+    spawn(stage, 'spark_burst', {
+      x: cx, y: cy,
+      scale: 0.5, scaleEnd: 1.0,
+      life: 350,
+      fadeIn: 0.05, fadeOut: 0.6,
+    });
+  },
+  f: (stage, cx, cy) => {
+    // Sustained 800ms — center pop + drift sparks
+    spawn(stage, 'spark_star', {
+      x: cx, y: cy,
+      scale: 0.6, scaleEnd: 1.4,
+      life: 700,
+      fadeIn: 0.05, fadeOut: 0.6,
+    });
+    const start = performance.now();
+    const id = setInterval(() => {
+      if (performance.now() - start > 800) { clearInterval(id); return; }
+      const a = rand(0, Math.PI * 2);
+      spawn(stage, pick(['spark_cross','spark_diamond']), {
+        x: cx, y: cy,
+        vx: Math.cos(a) * rand(40, 90),
+        vy: Math.sin(a) * rand(40, 90),
+        life: 500,
+        scale: rand(0.4, 0.65),
+        rotV: rand(-300, 300),
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }, 60);
+  },
+  // ── New combination variants (G–K) ────────────────────────────────────────
+  g: (stage, cx, cy) => {
+    // Pure geometric — 8 identical sparks, exact 45° intervals, identical speed
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      spawn(stage, 'spark_diamond', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * 150,
+        vy: Math.sin(a) * 150,
+        life: 550,
+        scale: 0.65,
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }
+  },
+  h: (stage, cx, cy) => {
+    // Qi orb explosion — many soft orbs bursting outward, varied speed
+    for (let i = 0; i < 14; i++) {
+      const a = rand(0, Math.PI * 2);
+      const speed = rand(80, 180);
+      spawn(stage, pick(['orb_small','orb_medium','orb_bright','orb_faint']), {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: rand(550, 800),
+        scale: rand(0.30, 0.55),
+        opacity: rand(0.75, 1.0),
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }
+  },
+  i: (stage, cx, cy) => {
+    // Total chaos — every type, random angles + speeds + delays
+    const allTypes = ['spark_diamond','spark_cross','spark_star','spark_burst',
+                      'orb_small','orb_medium','orb_bright',
+                      'droplet_rising','crescent','shard'];
+    for (let i = 0; i < 16; i++) {
+      const delay = rand(0, 250);
+      setTimeout(() => {
+        const a = rand(0, Math.PI * 2);
+        const speed = rand(60, 220);
+        const key = pick(allTypes);
+        spawn(stage, key, {
+          x: cx, y: cy,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed,
+          life: rand(450, 800),
+          scale: rand(0.30, 0.70),
+          rotV: rand(-360, 360),
+          opacity: rand(0.7, 1.0),
+          fadeIn: 0.05, fadeOut: 0.55,
+        });
+      }, delay);
+    }
+  },
+  j: (stage, cx, cy) => {
+    // Wisp shooter — horizontal + diagonal wisps blast outward, center spark
+    spawn(stage, 'spark_burst', {
+      x: cx, y: cy,
+      scale: 0.6, scaleEnd: 1.2,
+      life: 400,
+      fadeIn: 0.05, fadeOut: 0.6,
+    });
+    // 4 horizontal + 4 diagonal wisps in cardinal/inter-cardinal directions
+    const dirs = [
+      { a:  0,                key: 'wisp_horizontal' },
+      { a:  Math.PI,          key: 'wisp_horizontal' },
+      { a:  Math.PI / 2,      key: 'wisp_horizontal' },
+      { a: -Math.PI / 2,      key: 'wisp_horizontal' },
+      { a:  Math.PI / 4,      key: 'wisp_diagonal' },
+      { a: -Math.PI / 4,      key: 'wisp_diagonal' },
+      { a:  3 * Math.PI / 4,  key: 'wisp_diagonal' },
+      { a: -3 * Math.PI / 4,  key: 'wisp_diagonal' },
+    ];
+    for (const { a, key } of dirs) {
+      spawn(stage, key, {
+        x: cx, y: cy,
+        vx: Math.cos(a) * 170,
+        vy: Math.sin(a) * 170,
+        life: 600,
+        scale: 0.55,
+        rot: a * 180 / Math.PI,
+        fadeIn: 0.05, fadeOut: 0.5,
+      });
+    }
+  },
+  k: (stage, cx, cy) => {
+    // Orb body + spark accent — soft underlay + crisp accent
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + rand(-0.15, 0.15);
+      const speed = rand(80, 140);
+      // Orb at this angle
+      spawn(stage, 'orb_small', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: 650,
+        scale: rand(0.35, 0.50),
+        opacity: 0.9,
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }
+    // Spark diamond accent — 5 of them, offset angles
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 + Math.PI / 10;
+      const speed = rand(120, 170);
+      spawn(stage, 'spark_diamond', {
+        x: cx, y: cy,
+        vx: Math.cos(a) * speed,
+        vy: Math.sin(a) * speed,
+        life: 550,
+        scale: rand(0.45, 0.60),
+        rotV: rand(-260, 260),
+        fadeIn: 0.05, fadeOut: 0.55,
+      });
+    }
+  },
+};
+
+// Inject the flash keyframe (Section 3D)
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes crystal-d-flash {
+    0%   { width: 0;     height: 0;     opacity: 1;   }
+    35%  { width: 120px; height: 120px; opacity: 0.9; }
+    100% { width: 220px; height: 220px; opacity: 0;   }
+  }
+`;
+document.head.appendChild(style);
+
+// Wire crystal taps
+document.querySelectorAll('[data-crystal]').forEach(crystalEl => {
+  const variant = crystalEl.dataset.crystal;
+  const stage = document.getElementById('crystal-' + variant);
+  crystalEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const r = stage.getBoundingClientRect();
+    const cx = r.width / 2;
+    const cy = r.height / 2;
+    // press-down feedback
+    crystalEl.classList.add('tapped');
+    setTimeout(() => crystalEl.classList.remove('tapped'), 80);
+    crystalBursts[variant](stage, cx, cy);
+  });
+});
+
+</script>
+
+</body>
+</html>

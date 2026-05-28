@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1, viewport-fit=cover" />
+<title>Spirit Bazaar — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ──────────────────────────────────────────────────────────
+   SPIRIT BAZAAR — Temple Storefront Redesign
+   Central move: a real shop, not a category list.
+     - FEATURED HERO (today's pick) up top, big preview,
+       countdown ribbon, "best value" framing
+     - ACTIVE BUFFS rail right below — players see what's
+       running before they spend more
+     - CATEGORY CHIPS as horizontal aisle markers with item
+       counts
+     - SECTIONS read like temple bazaar aisles with hanging
+       lantern dividers (vermillion glow on left edge)
+   Vermillion + cream/gold lacquer.
+   ────────────────────────────────────────────────────────── */
+:root{
+  --ui-bg-deep-rgb:    14, 12, 8;
+  --ui-bg-panel-rgb:   32, 26, 18;
+  --ui-purple-rgb:     200, 170, 120;
+  --ui-purple-deep:    #9b7d50;
+  --ui-purple-strong:  #dcaf6e;
+  --ui-purple-soft:    #e8d5a8;
+  --ui-purple-light:   #f5e6c8;
+  --ui-purple-wash:    #f8edd4;
+  --ui-purple-darker:  #4a3520;
+  --ui-label-rgb:      210, 195, 170;
+  --ui-muted-rgb:      175, 160, 140;
+  --ui-border:         rgba(75, 60, 40, 0.6);
+  --ui-border-soft:    rgba(75, 60, 40, 0.35);
+
+  --bg-deep:           rgb(var(--ui-bg-deep-rgb));
+  --bg-panel:          rgba(var(--ui-bg-panel-rgb), 0.92);
+  --bg-nested:         rgba(14, 12, 8, 0.55);
+
+  /* Vermillion — Blood Lotus identity. accent-rgb from index.css */
+  --accent-rgb:        233, 69, 96;
+  --lotus-hot:         #ff6864;
+  --lotus-deep:        #6e1a1a;
+  --lotus-glow:        rgba(255, 104, 100, 0.22);
+
+  --font-display:      'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-cn:           'Ma Shan Zheng', 'Cinzel', serif;
+  --font-body:         -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background: #060504;
+  color: var(--ui-purple-light);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+body{
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 20px 0 40px;
+  min-height: 100vh;
+}
+.device{
+  width: 390px; height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+
+/* ── TopBar ── */
+.topbar{
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+  background: rgba(14, 12, 8, 0.85);
+  border-bottom: 1px solid var(--ui-border);
+  flex-shrink: 0; z-index: 5;
+}
+.tb-shop{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 14px;
+}
+.tb-curr{
+  flex: 1; display: flex; flex-direction: column; gap: 1px;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.tb-curr-row{ display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ui-purple-soft); }
+.tb-curr-row .dot{ width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%); }
+.tb-curr-row .dot.gold{ background: radial-gradient(circle, #ffd55a 30%, #6b4a10 70%); }
+.tb-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 16px;
+}
+
+/* ── BAZAAR HEADER (compact, sticky-feeling) ── */
+.bazaar-head{
+  padding: 12px 16px 10px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--lotus-glow), transparent 65%),
+    linear-gradient(180deg, rgba(30, 14, 10, 0.92), rgba(20, 14, 10, 0.95));
+  border-bottom: 1px solid rgba(120, 30, 30, 0.40);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.bazaar-head::before{
+  content: "市";
+  font-family: var(--font-cn);
+  position: absolute;
+  right: -8px; top: -28px;
+  font-size: 110px;
+  color: rgba(255, 104, 100, 0.06);
+  line-height: 1;
+}
+.bh-row{
+  display: flex; align-items: center;
+  gap: 10px;
+  position: relative; z-index: 2;
+}
+.back-chip{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 11px 5px 7px;
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  color: var(--ui-purple-soft);
+  font-size: 11px;
+}
+.back-chip .ar{ font-size: 14px; line-height: 1; }
+.bh-title{
+  flex: 1; display: flex; flex-direction: column; gap: 2px;
+  margin-left: 4px;
+}
+.bh-eyebrow{
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 180, 180, 0.55);
+}
+.bh-name{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+  line-height: 1.05;
+}
+.bh-balance{
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 104, 100, 0.10);
+  border: 1px solid rgba(255, 104, 100, 0.45);
+  border-radius: 14px;
+  box-shadow: 0 0 14px rgba(255, 104, 100, 0.15) inset;
+}
+.bh-balance .lotus{
+  width: 16px; height: 16px;
+  background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 104, 100, 0.55);
+}
+.bh-balance-num{
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #ffd3d3;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.bh-balance-add{
+  font-size: 11px;
+  color: var(--lotus-hot);
+  font-weight: 600;
+  padding-left: 6px;
+  border-left: 1px solid rgba(255, 104, 100, 0.45);
+}
+
+/* ── ACTIVE BUFF RAIL ── */
+.buff-rail{
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px;
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid var(--ui-border-soft);
+  border-radius: 10px;
+  position: relative; z-index: 2;
+}
+.buff-rail-label{
+  font-size: 9px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  padding-right: 6px;
+  border-right: 1px solid var(--ui-border-soft);
+}
+.buff-pill{
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 8px;
+  background: rgba(255, 104, 100, 0.10);
+  border: 1px solid rgba(255, 104, 100, 0.35);
+  border-radius: 12px;
+  font-size: 10px;
+  color: #ffd3d3;
+  font-variant-numeric: tabular-nums;
+}
+.buff-pill.green{
+  background: rgba(116, 255, 156, 0.08);
+  border-color: rgba(116, 255, 156, 0.30);
+  color: #d8ffe1;
+}
+.buff-pill b{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.buff-pill .timer{
+  color: rgba(255, 220, 220, 0.85);
+  font-weight: 500;
+  font-size: 9px;
+  margin-left: 2px;
+  padding-left: 5px;
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ── BODY ── */
+.body{
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 84px;
+  background:
+    radial-gradient(120% 50% at 50% 0%, rgba(80, 20, 20, 0.10), transparent 60%),
+    linear-gradient(180deg, rgba(20, 14, 8, 0) 0%, rgba(8, 6, 4, 0.95) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+}
+
+/* ── FEATURED HERO CARD ── */
+.featured-wrap{ padding: 14px 16px 0; }
+.featured{
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 14px;
+  padding: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 104, 100, 0.18) 0%, rgba(40, 14, 10, 0.0) 60%),
+    linear-gradient(160deg, rgba(46, 18, 14, 0.96), rgba(20, 12, 10, 0.96));
+  border: 1px solid rgba(255, 104, 100, 0.45);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 200, 180, 0.10),
+    0 12px 32px -18px rgba(255, 104, 100, 0.45);
+  overflow: hidden;
+}
+.featured::before{
+  /* glow halo behind preview */
+  content: "";
+  position: absolute;
+  left: -20px; top: -20px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(255, 104, 100, 0.35) 0%, transparent 60%);
+  pointer-events: none;
+}
+.featured-ribbon{
+  position: absolute;
+  top: 10px; right: -32px;
+  transform: rotate(28deg);
+  background: linear-gradient(180deg, #ff6864, #b81e1e);
+  color: #fff5e2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  padding: 3px 36px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.featured-preview{
+  width: 96px; height: 96px;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 200, 100, 0.18), rgba(60, 20, 16, 0.85));
+  border: 1px solid rgba(255, 104, 100, 0.30);
+  border-radius: 12px;
+  position: relative;
+  z-index: 1;
+}
+.featured-preview .halo{
+  position: absolute; inset: -6px;
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px rgba(255, 104, 100, 0.20), 0 0 24px rgba(255, 104, 100, 0.45);
+  pointer-events: none;
+}
+.featured-preview .figure{
+  width: 56px; height: 56px;
+  background: radial-gradient(circle at 50% 40%, #ffd3a0 0%, #b95e44 40%, #6b1f1a 80%);
+  border-radius: 4px;
+  position: relative;
+}
+.featured-preview .figure::after{
+  content: ""; position: absolute;
+  inset: -4px; border-radius: 8px;
+  box-shadow: 0 0 16px rgba(255, 104, 100, 0.65);
+}
+
+.featured-body{ position: relative; z-index: 2; display: flex; flex-direction: column; gap: 4px; }
+.featured-eyebrow{
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 180, 180, 0.65);
+}
+.featured-name{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--ui-purple-light);
+  line-height: 1.15;
+}
+.featured-desc{
+  font-size: 11px;
+  color: rgba(var(--ui-label-rgb), 0.75);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+.featured-meta{
+  margin-top: 6px;
+  display: flex; gap: 10px; align-items: center;
+  font-size: 10px; color: rgba(var(--ui-muted-rgb), 0.80);
+  letter-spacing: 0.10em; text-transform: uppercase;
+}
+.featured-meta b{
+  font-family: var(--font-display); font-weight: 700; color: var(--ui-purple-strong);
+  font-size: 11px; letter-spacing: 0.03em; text-transform: none;
+}
+.featured-cta{
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.featured-buy{
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 9px 12px;
+  background: linear-gradient(180deg, #ff8888 0%, #e63a3a 60%, #a82020 100%);
+  border: 1px solid rgba(255, 200, 200, 0.40);
+  border-radius: 10px;
+  color: #fff8ee;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 215, 0.30),
+    0 6px 18px -8px rgba(255, 104, 100, 0.55);
+}
+.featured-buy .lotus{
+  display: inline-block;
+  width: 12px; height: 12px;
+  background: radial-gradient(circle, #fff 30%, #ffd3d3 70%);
+  border-radius: 50%;
+}
+.featured-strike{
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  text-decoration: line-through;
+  font-variant-numeric: tabular-nums;
+}
+.featured-timer{
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px;
+  color: rgba(255, 220, 220, 0.85);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── CATEGORY RAIL ── */
+.cat-rail{
+  position: sticky; top: 0;
+  z-index: 4;
+  display: flex; gap: 6px;
+  padding: 14px 16px 10px;
+  background: linear-gradient(180deg, rgba(8, 6, 4, 0.92) 70%, transparent);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.cat-rail::-webkit-scrollbar{ display: none; }
+.cat-pill{
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px;
+  background: rgba(14, 12, 8, 0.65);
+  border: 1px solid var(--ui-border);
+  border-radius: 16px;
+  color: var(--ui-purple-soft);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.cat-pill .gl{ font-size: 13px; line-height: 1; }
+.cat-pill .count{
+  display: inline-block;
+  background: rgba(220, 175, 110, 0.18);
+  color: var(--ui-purple-strong);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.cat-pill.active{
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.18), rgba(150, 30, 30, 0.18));
+  border-color: rgba(255, 104, 100, 0.55);
+  color: #ffe3e3;
+}
+.cat-pill.active .count{
+  background: rgba(255, 104, 100, 0.20);
+  color: #ffd3d3;
+}
+
+/* ── AISLE (section header w/ vermillion lantern) ── */
+.aisle{
+  margin-top: 4px;
+  padding: 12px 16px 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.aisle-lantern{
+  width: 8px; height: 32px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #ff6864 0%, #b81e1e 100%);
+  box-shadow: 0 0 12px rgba(255, 104, 100, 0.55);
+}
+.aisle-title{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+}
+.aisle-tag{
+  flex: 1;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-muted-rgb), 0.70);
+  text-align: right;
+}
+.aisle-count{
+  display: inline-block;
+  background: rgba(220, 175, 110, 0.18);
+  color: var(--ui-purple-strong);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── BUFF GRID (cards) ── */
+.buff-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+}
+.buff-card{
+  position: relative;
+  padding: 12px 10px 10px;
+  background:
+    linear-gradient(180deg, rgba(255, 104, 100, 0.08), transparent 60%),
+    var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.buff-card .ribbon-active{
+  position: absolute;
+  top: 8px; left: 8px;
+  font-size: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 2px 6px;
+  background: rgba(116, 255, 156, 0.18);
+  color: #98ffb4;
+  border: 1px solid rgba(116, 255, 156, 0.40);
+  border-radius: 4px;
+}
+.buff-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255, 104, 100, 0.10);
+  border: 1px solid rgba(255, 104, 100, 0.30);
+  border-radius: 8px;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.buff-head{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--lotus-hot);
+  text-shadow: 0 0 8px rgba(255, 104, 100, 0.30);
+  line-height: 1;
+}
+.buff-name{
+  font-size: 11px;
+  color: var(--ui-purple-soft);
+  margin: 2px 0 6px;
+  letter-spacing: 0.02em;
+}
+.buff-meta{
+  display: flex; gap: 6px; align-items: center;
+  margin-bottom: 8px;
+  font-size: 10px; color: rgba(var(--ui-muted-rgb), 0.85);
+  font-variant-numeric: tabular-nums;
+}
+.buff-dur{
+  background: rgba(14, 12, 8, 0.60);
+  border: 1px solid var(--ui-border-soft);
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+.buff-time{
+  color: #98ffb4;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.buff-buy{
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.30), rgba(150, 30, 30, 0.25));
+  border: 1px solid rgba(255, 104, 100, 0.40);
+  color: #ffe3e3;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.buff-buy.dim{
+  background: rgba(40, 30, 18, 0.5);
+  border-color: var(--ui-border);
+  color: rgba(var(--ui-muted-rgb), 0.55);
+}
+
+/* ── COMPACT ROW (consumables / QoL) ── */
+.row-list{ padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+.r{
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+}
+.r-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(220, 175, 110, 0.10);
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 8px;
+  font-size: 16px;
+}
+.r-body{ flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.r-name{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 12px;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+}
+.r-tag{
+  display: inline-block;
+  font-size: 9px;
+  background: rgba(220, 175, 110, 0.20);
+  color: var(--ui-purple-strong);
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 6px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+.r-desc{
+  font-size: 10.5px;
+  color: rgba(var(--ui-muted-rgb), 0.75);
+  line-height: 1.35;
+}
+.r-buy{
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.28), rgba(150, 30, 30, 0.22));
+  border: 1px solid rgba(255, 104, 100, 0.40);
+  color: #ffe3e3;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.r-buy.owned{
+  background: rgba(116, 255, 156, 0.08);
+  border-color: rgba(116, 255, 156, 0.30);
+  color: #98ffb4;
+}
+
+/* ── COSMETIC HERO CARD ── */
+.cos-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 16px;
+}
+.cos-card{
+  position: relative;
+  background: var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex; flex-direction: column; align-items: center;
+  overflow: hidden;
+}
+.cos-card.equipped{
+  background:
+    linear-gradient(180deg, rgba(116, 255, 156, 0.08), transparent 60%),
+    var(--bg-panel);
+  border-color: rgba(116, 255, 156, 0.40);
+}
+.cos-ribbon{
+  position: absolute; top: 6px; right: 6px;
+  font-size: 8px;
+  font-family: var(--font-display); font-weight: 700; letter-spacing: 0.18em;
+  padding: 2px 6px;
+  background: rgba(116, 255, 156, 0.18);
+  color: #98ffb4;
+  border: 1px solid rgba(116, 255, 156, 0.40);
+  border-radius: 4px;
+}
+.cos-preview{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(220, 175, 110, 0.18), rgba(40, 30, 18, 0.85));
+  border-radius: 8px;
+  border: 1px solid rgba(220, 175, 110, 0.20);
+  margin-bottom: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cos-preview .swatch{
+  width: 56px; height: 56px;
+  background: radial-gradient(circle at 50% 40%, #f9c8c8 0%, #c44848 50%, #6e1a1a 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 16px rgba(255, 104, 100, 0.45);
+}
+.cos-preview.green .swatch{ background: radial-gradient(circle at 50% 40%, #c8f9d8 0%, #48c478 50%, #1a6e2c 100%); box-shadow: 0 0 16px rgba(100, 255, 156, 0.40); }
+.cos-preview.violet .swatch{ background: radial-gradient(circle at 50% 40%, #d8c8f9 0%, #7848c4 50%, #2a1a6e 100%); box-shadow: 0 0 16px rgba(180, 100, 255, 0.40); }
+.cos-name{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 12px;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.cos-evolve{
+  font-size: 9px;
+  color: rgba(var(--ui-muted-rgb), 0.70);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.cos-evolve-dots{ display: inline-flex; gap: 2px; }
+.cos-evolve-dots span{
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--ui-purple-strong);
+  opacity: 0.4;
+}
+.cos-evolve-dots span:nth-child(-n+3){ opacity: 1; }
+.cos-buy{
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 104, 100, 0.28), rgba(150, 30, 30, 0.22));
+  border: 1px solid rgba(255, 104, 100, 0.40);
+  color: #ffe3e3;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.cos-buy.equip{
+  background: rgba(116, 255, 156, 0.10);
+  border-color: rgba(116, 255, 156, 0.35);
+  color: #98ffb4;
+}
+
+/* ── Bottom nav ── */
+.botnav{
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60px;
+  display: flex;
+  background: rgba(14, 12, 8, 0.96);
+  border-top: 1px solid var(--ui-border);
+  padding: 8px 0 10px;
+  z-index: 6;
+}
+.bn-item{
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.bn-item .bni{ font-size: 18px; line-height: 1; }
+.bn-item.active{ color: var(--lotus-hot); }
+
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- TopBar -->
+  <div class="topbar">
+    <button class="tb-shop">⌗</button>
+    <div class="tb-curr">
+      <div class="tb-curr-row"><span class="dot"></span>Blood Lotus <b>420</b></div>
+      <div class="tb-curr-row"><span class="dot gold"></span>Karma <b>1,205</b></div>
+    </div>
+    <button class="tb-icon" title="Achievements">🏆</button>
+    <button class="tb-icon" title="Settings">⚙</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="bazaar-head">
+    <div class="bh-row">
+      <button class="back-chip"><span class="ar">‹</span> Back</button>
+      <div class="bh-title">
+        <span class="bh-eyebrow">The Spirit</span>
+        <span class="bh-name">Bazaar</span>
+      </div>
+      <div class="bh-balance">
+        <span class="lotus"></span>
+        <span class="bh-balance-num">420</span>
+        <button class="bh-balance-add">+ Top Up</button>
+      </div>
+    </div>
+
+    <!-- ACTIVE BUFFS RAIL -->
+    <div class="buff-rail">
+      <span class="buff-rail-label">Active</span>
+      <span class="buff-pill"><b>×2</b> Crimson Aura <span class="timer">42m left</span></span>
+      <span class="buff-pill green"><b>×1.5</b> Producer Surge <span class="timer">3h 14m</span></span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- FEATURED HERO -->
+    <div class="featured-wrap">
+      <div class="featured">
+        <span class="featured-ribbon">Today's Pick</span>
+        <div class="featured-preview">
+          <div class="halo"></div>
+          <div class="figure"></div>
+        </div>
+        <div class="featured-body">
+          <span class="featured-eyebrow">Limited Offering</span>
+          <span class="featured-name">Crimson Aura — 12h</span>
+          <span class="featured-desc">×2 qi/s for twelve hours. The "going to sleep" pack — wear a crimson halo until dawn.</span>
+          <div class="featured-meta">
+            <span><b>×2</b> Qi/s</span>
+            <span>·</span>
+            <span><b>12h</b> Duration</span>
+          </div>
+          <div class="featured-cta">
+            <button class="featured-buy">
+              <span class="lotus"></span> 280 <span style="opacity:0.8; font-weight:500; margin-left:2px;">BL</span>
+            </button>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px;">
+              <span class="featured-strike">350 BL</span>
+              <span class="featured-timer">⏳ 04h 22m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CATEGORY RAIL -->
+    <div class="cat-rail">
+      <button class="cat-pill active"><span class="gl">⚡</span>Buffs<span class="count">5</span></button>
+      <button class="cat-pill"><span class="gl">✦</span>Consumables<span class="count">1</span></button>
+      <button class="cat-pill"><span class="gl">⚙</span>QoL<span class="count">3</span></button>
+      <button class="cat-pill"><span class="gl">❀</span>Cosmetics<span class="count">17</span></button>
+    </div>
+
+    <!-- BUFFS AISLE -->
+    <div class="aisle">
+      <span class="aisle-lantern"></span>
+      <span class="aisle-title">Buffs</span>
+      <span class="aisle-tag">power-ups · stack with everything</span>
+      <span class="aisle-count">5</span>
+    </div>
+    <div class="buff-grid">
+      <div class="buff-card">
+        <span class="ribbon-active">ACTIVE</span>
+        <div class="buff-icon">🔴</div>
+        <div class="buff-head">×2 QI/S</div>
+        <div class="buff-name">Crimson Aura — 1h</div>
+        <div class="buff-meta">
+          <span class="buff-dur">1h</span>
+          <span class="buff-time">42m left</span>
+        </div>
+        <button class="buff-buy">50 BL</button>
+      </div>
+      <div class="buff-card">
+        <div class="buff-icon">🔴</div>
+        <div class="buff-head">×2 QI/S</div>
+        <div class="buff-name">Crimson Aura — 4h</div>
+        <div class="buff-meta">
+          <span class="buff-dur">4h</span>
+        </div>
+        <button class="buff-buy">150 BL</button>
+      </div>
+      <div class="buff-card">
+        <div class="buff-icon">◆</div>
+        <div class="buff-head">×2 TAP</div>
+        <div class="buff-name">Crystal Resonance</div>
+        <div class="buff-meta">
+          <span class="buff-dur">30m</span>
+        </div>
+        <button class="buff-buy">40 BL</button>
+      </div>
+      <div class="buff-card">
+        <div class="buff-icon">⚙</div>
+        <div class="buff-head">×1.5 RATE</div>
+        <div class="buff-name">Producer Surge</div>
+        <div class="buff-meta">
+          <span class="buff-dur">4h</span>
+          <span class="buff-time">3h 14m</span>
+        </div>
+        <button class="buff-buy">80 BL</button>
+      </div>
+    </div>
+
+    <!-- CONSUMABLES AISLE -->
+    <div class="aisle">
+      <span class="aisle-lantern"></span>
+      <span class="aisle-title">Consumables</span>
+      <span class="aisle-tag">one-shot talismans</span>
+      <span class="aisle-count">1</span>
+    </div>
+    <div class="row-list">
+      <div class="r">
+        <div class="r-icon">☁️</div>
+        <div class="r-body">
+          <div class="r-name">Heaven's Pardon<span class="r-tag">×2</span></div>
+          <div class="r-desc">Skip the qi/s gate on your next major breakthrough. You still pay the cost.</div>
+        </div>
+        <button class="r-buy">120 BL</button>
+      </div>
+    </div>
+
+    <!-- QOL AISLE -->
+    <div class="aisle">
+      <span class="aisle-lantern"></span>
+      <span class="aisle-title">Quality of Life</span>
+      <span class="aisle-tag">permanent unlocks</span>
+      <span class="aisle-count">3</span>
+    </div>
+    <div class="row-list">
+      <div class="r">
+        <div class="r-icon">🤖</div>
+        <div class="r-body">
+          <div class="r-name">Disciple's Diligence</div>
+          <div class="r-desc">Unlocks Auto-Buy on the Cultivation screen.</div>
+        </div>
+        <button class="r-buy owned">Owned</button>
+      </div>
+      <div class="r">
+        <div class="r-icon">⚡</div>
+        <div class="r-body">
+          <div class="r-name">Decisive Heart</div>
+          <div class="r-desc">Auto-confirms major breakthroughs the moment the gate clears.</div>
+        </div>
+        <button class="r-buy">180 BL</button>
+      </div>
+      <div class="r">
+        <div class="r-icon">⏳</div>
+        <div class="r-body">
+          <div class="r-name">Patient Mind +2h<span class="r-tag">1/3</span></div>
+          <div class="r-desc">Extends offline qi-accrual cap by 2 hours. Stack up to 3.</div>
+        </div>
+        <button class="r-buy">200 BL</button>
+      </div>
+    </div>
+
+    <!-- COSMETICS AISLE -->
+    <div class="aisle">
+      <span class="aisle-lantern"></span>
+      <span class="aisle-title">Cultivator Skins</span>
+      <span class="aisle-tag">recolours · evolves with you</span>
+      <span class="aisle-count">3</span>
+    </div>
+    <div class="cos-grid">
+      <div class="cos-card equipped">
+        <span class="cos-ribbon">EQUIPPED</span>
+        <div class="cos-preview"><div class="swatch"></div></div>
+        <div class="cos-name">Crimson Path</div>
+        <div class="cos-evolve">
+          <span class="cos-evolve-dots"><span></span><span></span><span></span><span></span><span></span></span>
+          Evolves · 13 stages
+        </div>
+        <button class="cos-buy equip">Equipped</button>
+      </div>
+      <div class="cos-card">
+        <div class="cos-preview green"><div class="swatch"></div></div>
+        <div class="cos-name">Verdant Path</div>
+        <div class="cos-evolve">
+          <span class="cos-evolve-dots"><span></span><span></span><span></span><span></span><span></span></span>
+          Evolves · 13 stages
+        </div>
+        <button class="cos-buy">300 BL</button>
+      </div>
+      <div class="cos-card">
+        <div class="cos-preview violet"><div class="swatch"></div></div>
+        <div class="cos-name">Amethyst Path</div>
+        <div class="cos-evolve">
+          <span class="cos-evolve-dots"><span></span><span></span><span></span><span></span><span></span></span>
+          Evolves · 13 stages
+        </div>
+        <button class="cos-buy">300 BL</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="botnav">
+    <div class="bn-item"><span class="bni">⛰</span>Cultivate</div>
+    <div class="bn-item"><span class="bni">📜</span>Journey</div>
+    <div class="bn-item active"><span class="bni">🏮</span>Bazaar</div>
+    <div class="bn-item"><span class="bni">⚙</span>Settings</div>
+  </div>
+
+</div>
+</body>
+</html>

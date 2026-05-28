@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mockup — Spark Cards (normalized to longest)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-page:        #0f1418;
+      --text:           #e6f0ee;
+      --text-dim:       #8aa39e;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg-page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
+    body { padding: 24px; max-width: 1300px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 6px; }
+    .intro {
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.55;
+      max-width: 760px;
+      margin: 0 0 28px;
+    }
+    .intro strong { color: var(--text); }
+    .intro code {
+      background: rgba(255,255,255,0.06);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .scene-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .scene-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin: 0 0 16px;
+      line-height: 1.5;
+    }
+
+    .device-frame {
+      width: 390px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #050708;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+    .device-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      padding: 6px 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ────────────────────────────────────────────────────────────────
+       Spark card system — normalized height locked by `.spark-card`
+       min-height so every card matches the longest-text card.
+       ──────────────────────────────────────────────────────────────── */
+
+    .spark-overlay {
+      min-height: 600px;
+      background:
+        radial-gradient(ellipse at center top, rgba(167, 139, 250, 0.06), transparent 60%),
+        linear-gradient(180deg, rgba(8, 12, 18, 0.95), rgba(4, 6, 10, 0.98));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 24px;
+      position: relative;
+    }
+    .spark-overlay-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(230, 240, 238, 0.95);
+      text-shadow: 0 0 12px rgba(167, 139, 250, 0.5);
+      margin-bottom: 4px;
+    }
+    .spark-overlay-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .spark-grid {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 360px;
+      justify-content: center;
+      align-items: stretch;       /* all cards in row stretch to tallest */
+    }
+
+    /* CARD — fixed min-height computed from the longest-text legendary
+       (Phoenix Reborn or A3 Pearl and Pendant — ~200 chars description).
+       Locked at 348 px so every card in any draw matches. */
+    .spark-card {
+      width: 170px;
+      flex-shrink: 0;
+      min-height: 348px;          /* ← NORMALIZATION HEIGHT */
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity);
+      box-shadow: 0 0 16px var(--card-glow), 0 4px 18px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .spark-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 24px var(--card-glow), 0 8px 24px rgba(0, 0, 0, 0.85);
+    }
+
+    .spark-card-common {
+      --card-rarity: rgba(156, 163, 175, 0.55);
+      --card-glow:   rgba(156, 163, 175, 0.18);
+      --card-strip-bg: linear-gradient(90deg, rgba(80, 86, 96, 0.6), rgba(120, 128, 140, 0.4));
+    }
+    .spark-card-uncommon {
+      --card-rarity: rgba(74, 222, 128, 0.65);
+      --card-glow:   rgba(74, 222, 128, 0.30);
+      --card-strip-bg: linear-gradient(90deg, rgba(40, 80, 60, 0.7), rgba(40, 130, 90, 0.5));
+    }
+    .spark-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.85);
+      --card-glow:   rgba(255, 215, 100, 0.45);
+      --card-strip-bg: linear-gradient(90deg, rgba(95, 60, 28, 0.95), rgba(140, 95, 40, 0.85));
+      animation: legendary-card-breathe 2.6s ease-in-out infinite;
+    }
+    @keyframes legendary-card-breathe {
+      0%, 100% { box-shadow: 0 0 14px var(--card-glow), 0 4px 18px rgba(0, 0, 0, 0.7); }
+      50%      { box-shadow: 0 0 26px rgba(255, 220, 130, 0.65), 0 4px 22px rgba(0, 0, 0, 0.85); }
+    }
+
+    /* IMAGE area — locked height (118 px) so it's predictable */
+    .spark-card-image {
+      width: 100%;
+      height: 118px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, rgba(30, 35, 45, 0.6), rgba(15, 20, 28, 0.8));
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--card-rarity);
+    }
+    .spark-card-image img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
+      transition: transform 0.3s ease;
+    }
+    .spark-card:hover .spark-card-image img { transform: scale(1.05); }
+    .spark-card-image .emoji {
+      font-size: 60px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+    }
+    .spark-card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 60%);
+      pointer-events: none;
+    }
+    .spark-card-legendary .spark-card-image::after {
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 215, 100, 0.30), transparent 65%);
+    }
+
+    /* RARITY STRIP — fixed height */
+    .spark-card-rarity-strip {
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--card-strip-bg);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* BODY area — flex:1 so it absorbs the variable space.
+       Short descriptions get padding-only whitespace; long ones fill.
+       Name pins to top, description below, button anchored to bottom via
+       margin-top:auto in the wrapper. */
+    .spark-card-body {
+      padding: 10px 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;                   /* fills the space between strip & button */
+      min-height: 0;             /* allow content to overflow gracefully */
+    }
+    .spark-card-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+    .spark-card-legendary .spark-card-name {
+      color: #fff4d4;
+      text-shadow: 0 0 8px rgba(255, 215, 100, 0.5);
+    }
+    .spark-card-desc {
+      font-size: 11px;
+      line-height: 1.42;
+      color: rgba(220, 230, 235, 0.7);
+    }
+
+    /* REROLL — pinned to the bottom (since body has flex:1) */
+    .spark-card-reroll {
+      width: 100%;
+      padding: 7px 10px;
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(167, 139, 250, 0.12);
+      color: rgba(230, 240, 238, 0.9);
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+    .spark-card-reroll-free {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+    }
+    .spark-card-reroll:hover { background: rgba(167, 139, 250, 0.25); }
+    .spark-card-reroll-free:hover { background: rgba(74, 222, 128, 0.28); }
+
+    .spark-footer-meta {
+      margin-top: 18px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.02em;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .spark-footer-meta strong { color: #ffd66b; }
+
+    .char-hint {
+      font-size: 10px;
+      color: rgba(255, 200, 100, 0.7);
+      margin-top: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Tiny measurement table for tracking which spark has the longest text */
+    .length-table {
+      margin: 12px auto 6px;
+      max-width: 720px;
+      font-size: 11px;
+      border-collapse: collapse;
+      background: rgba(20, 28, 36, 0.7);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .length-table th, .length-table td {
+      padding: 6px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .length-table th {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-dim);
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .length-table tr.longest td { background: rgba(80, 60, 20, 0.5); color: #ffd66b; font-weight: 700; }
+    .length-table .col-count { text-align: right; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <h1>Spark Cards — Normalized to Longest Text</h1>
+  <p class="intro">
+    Card <code>min-height: 348px</code> is locked to fit the longest
+    legendary description (Phoenix Reborn / Pearl and Pendant — ~200
+    chars). Short-text cards (Quick Burst, Heavens Bend Down) match the
+    same height with whitespace below the description. The reroll button
+    is always pinned to the bottom of the card.
+  </p>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <p class="scene-label">Character counts — finding the longest</p>
+  <p class="scene-note">Top 6 longest legendary descriptions. Phoenix Reborn is the cap — all other cards normalize to this size.</p>
+  <table class="length-table">
+    <tr><th>Card</th><th>Rarity</th><th class="col-count">chars</th></tr>
+    <tr class="longest"><td>Phoenix Reborn (E2)</td><td>Legendary</td><td class="col-count">218</td></tr>
+    <tr><td>The Pearl and the Pendant (A3)</td><td>Legendary</td><td class="col-count">211</td></tr>
+    <tr><td>Storm-Furred Tiger (F1)</td><td>Legendary</td><td class="col-count">191</td></tr>
+    <tr><td>Smoke and Petal (A1)</td><td>Legendary</td><td class="col-count">188</td></tr>
+    <tr><td>Lingering Focus</td><td>Common</td><td class="col-count">93</td></tr>
+    <tr><td>Quick Burst</td><td>Common</td><td class="col-count">56</td></tr>
+  </table>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <p class="scene-label">Scene 1 — Longest legendary alone (Phoenix Reborn)</p>
+  <p class="scene-note">This card defines the standard height. Description fills the body area without scrolling.</p>
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+      <div class="spark-grid">
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_phoenix_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Phoenix Reborn</div>
+            <div class="spark-card-desc">Every realm breakthrough resets your Phoenix count to 0 but permanently doubles every other producer's qi/s for this run. Fenghuang is reborn from its own ashes — to bless the sect of its hearth.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+      </div>
+      <div class="char-hint">Phoenix Reborn description = 218 chars — sets the floor.</div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <p class="scene-label">Scene 2 — Longest legendary + shortest common (both normalized)</p>
+  <p class="scene-note">Quick Burst (56 chars) has plenty of whitespace below its description; Phoenix Reborn (218 chars) fills the body. Same total height, same reroll-button position at the bottom of both cards.</p>
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+      <div class="spark-grid">
+        <div class="spark-card spark-card-common">
+          <div class="spark-card-image"><span class="emoji">⚡</span></div>
+          <div class="spark-card-rarity-strip">Common</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Quick Burst</div>
+            <div class="spark-card-desc">Instant qi gain worth 30 seconds of your current qi/s.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_phoenix_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Phoenix Reborn</div>
+            <div class="spark-card-desc">Every realm breakthrough resets your Phoenix count to 0 but permanently doubles every other producer's qi/s for this run. Fenghuang is reborn from its own ashes — to bless the sect of its hearth.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+      </div>
+      <div class="spark-footer-meta">
+        <span>✦ <strong>3%</strong> legendary chance per card</span>
+        <span style="opacity:0.4">·</span>
+        <span>Pity in <strong>9</strong> realms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <p class="scene-label">Scene 3 — Two legendaries (mixed text lengths)</p>
+  <p class="scene-note">Heavens Bend Down (105 chars) on the left next to Phoenix Reborn (218 chars). Both still match.</p>
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+      <div class="spark-grid">
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_pillar_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Heavens Bend Down</div>
+            <div class="spark-card-desc">Heavenly Pillar ×3 qi/s if you own at least 1 Void Conduit. When reality is already torn, heaven stops resisting.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_phoenix_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Phoenix Reborn</div>
+            <div class="spark-card-desc">Every realm breakthrough resets your Phoenix count to 0 but permanently doubles every other producer's qi/s for this run. Fenghuang is reborn from its own ashes — to bless the sect of its hearth.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+      </div>
+      <div class="spark-footer-meta">
+        <span>✦ <strong>3%</strong> legendary chance per card</span>
+        <span style="opacity:0.4">·</span>
+        <span>Pity in <strong>4</strong> realms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────────────── -->
+  <p class="scene-label">Scene 4 — Trinity pair (Storm-Furred Tiger + Pearl-Dream Dragon)</p>
+  <p class="scene-note">Both ~190 chars, fill the body neatly.</p>
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+      <div class="spark-grid">
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_beast_pact_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Storm-Furred Tiger</div>
+            <div class="spark-card-desc">Spirit Beast Pact ×3 qi/s. The tiger paces, ears flat. It will not roar until a dragon dreams its name and a phoenix sings it back. Until then, the storm in its fur only mutters.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+        <div class="spark-card spark-card-legendary">
+          <div class="spark-card-image">
+            <img src="/sprites/producers/p_dragon_mythic.png" alt="" />
+          </div>
+          <div class="spark-card-rarity-strip">Legendary</div>
+          <div class="spark-card-body">
+            <div class="spark-card-name">Pearl-Dream Dragon</div>
+            <div class="spark-card-desc">Slumbering Spirit Dragon ×3 qi/s. The pearl warms when the dragon hears two distant sounds — a tiger pacing, a phoenix folding its rainbow wings. Only then does the dream finish.</div>
+          </div>
+          <button class="spark-card-reroll spark-card-reroll-free">↺ Free reroll</button>
+        </div>
+      </div>
+      <div class="spark-footer-meta">
+        <span>✦ <strong>3%</strong> legendary chance per card</span>
+        <span style="opacity:0.4">·</span>
+        <span>Pity in <strong>14</strong> realms</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

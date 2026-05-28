@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1" />
+<title>Spirit Bazaar — Screen (proposed)</title>
+<style>
+  :root {
+    --ui-bg-deep:    rgb(14, 12, 8);
+    --ui-bg-panel:   rgba(32, 26, 18, 0.92);
+    --ui-bg-panel-2: rgba(48, 38, 26, 0.75);
+    --ui-border:     rgba(75, 60, 40, 0.6);
+    --ui-tan:        #c8aa78;
+    --ui-cream:      #f5e6c8;
+    --ui-cream-soft: #e8d5a8;
+    --ui-amber:      #dcaf6e;
+    --ui-label:      rgba(210, 195, 170, 0.85);
+    --ui-muted:      rgba(175, 160, 140, 0.7);
+    --rare-buff:     #74b3ff;
+    --rare-cons:     #74ff9c;
+    --rare-qol:      #ffd474;
+    --rare-cos:      #ff7cd6;
+    --lotus:         #ff6864;
+    --font-display:  'Cinzel', Georgia, 'Times New Roman', serif;
+    --font-body:     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #060504;
+    color: var(--ui-cream);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  body {
+    display: flex; justify-content: center;
+    padding: 24px 0;
+    min-height: 100vh;
+  }
+  .device {
+    width: 390px;
+    height: 844px;
+    background: var(--ui-bg-deep);
+    border-radius: 36px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TopBar */
+  .topbar {
+    height: 56px;
+    display: flex; align-items: center;
+    padding: 0 12px; gap: 8px;
+    background: rgba(14, 12, 8, 0.85);
+    border-bottom: 1px solid var(--ui-border);
+    flex-shrink: 0;
+    z-index: 5;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    background: rgba(80, 30, 30, 0.5);
+    border: 1px solid rgba(160, 80, 80, 0.5);
+    border-radius: 14px;
+    font-size: 13px;
+    color: #ffd3d3;
+  }
+  .pill-icon {
+    width: 14px; height: 14px;
+    background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+    border-radius: 50%;
+  }
+  .shop-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: rgba(220, 175, 110, 0.18);
+    border: 1px solid var(--ui-amber);
+    border-radius: 8px;
+    color: var(--ui-amber);
+  }
+  .currencies {
+    flex: 1; display: flex; flex-direction: column;
+    gap: 1px; margin-left: 8px;
+    font-size: 12px;
+    color: var(--ui-cream-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .topbar-icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-cream-soft);
+    font-size: 16px;
+  }
+
+  /* Screen body */
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    background:
+      radial-gradient(120% 40% at 50% 0%, rgba(255, 100, 100, 0.10), transparent 70%),
+      radial-gradient(60% 30% at 50% 100%, rgba(255, 220, 140, 0.06), transparent 70%),
+      linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .98));
+    padding: 18px 16px 100px 16px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 36px), transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 36px), transparent 100%);
+  }
+
+  .back-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: none;
+    color: var(--ui-cream-soft); font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 8px;
+  }
+  .back-arrow { color: var(--ui-amber); font-size: 16px; }
+
+  .screen-head {
+    padding: 0 4px 14px 4px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--ui-border);
+  }
+  .screen-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--ui-cream);
+    letter-spacing: 0.06em;
+  }
+  .screen-sub {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--ui-muted);
+    margin-top: 4px;
+  }
+  .lotus-balance {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(110, 26, 26, 0.45), rgba(60, 14, 14, 0.55));
+    border: 1px solid rgba(180, 80, 80, 0.4);
+    border-radius: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .lotus-icon {
+    width: 28px; height: 28px;
+    background: radial-gradient(circle, #ff6864 25%, #c92b2b 65%, #6e1a1a 95%);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+  }
+  .lotus-label { font-size: 11px; color: var(--ui-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .lotus-amt { font-size: 18px; color: var(--ui-cream); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .lotus-topup {
+    margin-left: auto;
+    padding: 6px 12px;
+    background: rgba(255, 104, 100, 0.18);
+    border: 1px solid rgba(255, 104, 100, 0.5);
+    border-radius: 16px;
+    color: #ffd3d3;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  /* Category chip rail */
+  .chip-rail {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chip-rail::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 18px;
+    font-size: 13px;
+    color: var(--ui-cream-soft);
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .chip.active {
+    background: linear-gradient(180deg, rgba(220,175,110,.25), rgba(155,125,80,.2));
+    border-color: var(--ui-amber);
+    color: var(--ui-cream);
+    font-weight: 600;
+  }
+  .chip-dot {
+    display: inline-block;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rare-cos);
+    box-shadow: 0 0 6px var(--rare-cos);
+  }
+
+  /* Active buffs strip */
+  .buffs-strip {
+    background: rgba(116, 179, 255, 0.08);
+    border: 1px solid rgba(116, 179, 255, 0.25);
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+  }
+  .buffs-head {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
+    color: var(--rare-buff); margin-bottom: 6px;
+  }
+  .buff-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px;
+  }
+  .buff-name { color: var(--ui-cream); font-weight: 500; flex: 1; }
+  .buff-time { color: var(--ui-cream-soft); font-variant-numeric: tabular-nums; font-size: 11px; }
+  .buff-icon {
+    width: 18px; height: 18px;
+    background: radial-gradient(circle, #74b3ff, #2c5aa8);
+    border-radius: 4px;
+  }
+
+  /* Card grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .card {
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex; flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .card.featured {
+    grid-column: 1 / -1;
+    background:
+      radial-gradient(80% 90% at 100% 100%, rgba(255, 124, 214, 0.15), transparent 70%),
+      linear-gradient(180deg, rgba(48, 30, 60, 0.85), rgba(28, 18, 36, 0.9));
+    border-color: rgba(255, 124, 214, 0.45);
+    padding: 14px;
+  }
+  .card .preview {
+    width: 100%;
+    aspect-ratio: 1;
+    background:
+      radial-gradient(circle at 50% 60%, rgba(220, 175, 110, 0.35) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(14, 12, 8, 0.55), rgba(48, 38, 26, 0.4));
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .card.featured .preview {
+    aspect-ratio: 16 / 10;
+    background:
+      radial-gradient(50% 70% at 30% 50%, rgba(255, 124, 214, 0.5), transparent 70%),
+      linear-gradient(135deg, rgba(70, 30, 80, 0.85), rgba(28, 18, 36, 0.9));
+  }
+  .card-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ui-cream);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    min-height: 32px;
+  }
+  .card.featured .card-name {
+    font-size: 18px;
+    min-height: auto;
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 11px;
+    color: var(--ui-muted);
+    margin-top: 2px;
+    flex: 1;
+    line-height: 1.3;
+  }
+  .card-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 8px;
+  }
+  .price {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px;
+    color: #ffd3d3;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .price-icon {
+    width: 12px; height: 12px;
+    background: radial-gradient(circle, #ff6864 30%, #6e1a1a 80%);
+    border-radius: 50%;
+  }
+  .buy {
+    background: rgba(220, 175, 110, 0.22);
+    border: 1px solid var(--ui-amber);
+    color: var(--ui-cream);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .card.featured .buy { padding: 6px 14px; font-size: 13px; }
+  .tag {
+    position: absolute;
+    top: 8px; left: 8px;
+    padding: 2px 6px;
+    background: rgba(14, 12, 8, 0.85);
+    border-radius: 10px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ui-amber);
+    z-index: 2;
+  }
+  .tag.new { color: var(--rare-cons); }
+  .tag.cosmetic { color: var(--rare-cos); }
+  .owned {
+    background: rgba(75, 60, 40, 0.5);
+    border-color: var(--ui-border);
+    color: var(--ui-muted);
+  }
+  .card.featured::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 90% at 110% 50%, rgba(255, 124, 214, 0.10), transparent 70%);
+    pointer-events: none;
+  }
+
+  .section-h {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--ui-amber);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin: 18px 4px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-h::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--ui-border), transparent);
+  }
+
+  /* BottomNav */
+  .navbar {
+    display: flex;
+    height: 68px;
+    background: rgba(14, 12, 8, 0.95);
+    border-top: 1px solid var(--ui-border);
+    position: absolute; bottom: 0; left: 0; right: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    background: transparent; border: none;
+    color: var(--ui-muted);
+    font-size: 11px;
+  }
+  .nav-btn.active { color: var(--ui-amber); }
+  .nav-ico { width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- TopBar (Bazaar accent — but it's a separate screen, not a top-bar modal anymore) -->
+  <div class="topbar">
+    <button class="pill"><span class="pill-icon"></span> 24</button>
+    <button class="shop-btn" aria-label="Spirit Bazaar (current)">🏮</button>
+    <div class="currencies">
+      <span>QI 50.8M</span>
+      <span>KARMA 42</span>
+    </div>
+    <button class="topbar-icon-btn" aria-label="Reincarnation">☸</button>
+    <button class="topbar-icon-btn" aria-label="Annals">📊</button>
+    <button class="topbar-icon-btn" aria-label="Settings">⚙</button>
+  </div>
+
+  <main class="screen">
+    <button class="back-chip"><span class="back-arrow">‹</span> Back</button>
+
+    <div class="screen-head">
+      <div class="screen-title">Spirit Bazaar</div>
+      <div class="screen-sub">Spend Blood Lotus on boons, relics, and refinements</div>
+
+      <div class="lotus-balance">
+        <span class="lotus-icon"></span>
+        <span>
+          <div class="lotus-label">Blood Lotus</div>
+          <div class="lotus-amt">24</div>
+        </span>
+        <button class="lotus-topup">+ Top Up</button>
+      </div>
+    </div>
+
+    <!-- Category chip rail -->
+    <div class="chip-rail">
+      <button class="chip active">Featured</button>
+      <button class="chip">Buffs</button>
+      <button class="chip">Consumables</button>
+      <button class="chip">Quality of Life</button>
+      <button class="chip">Cosmetics <span class="chip-dot"></span></button>
+    </div>
+
+    <!-- Active buffs strip -->
+    <div class="buffs-strip">
+      <div class="buffs-head">Active Boons</div>
+      <div class="buff-row">
+        <span class="buff-icon"></span>
+        <span class="buff-name">Qi Surge ×2</span>
+        <span class="buff-time">04:12</span>
+      </div>
+    </div>
+
+    <!-- Featured cosmetic card -->
+    <div class="grid">
+      <div class="card featured">
+        <span class="tag cosmetic">New · Cosmetic</span>
+        <div class="preview">✦</div>
+        <div class="card-name">Amethyst Cultivator</div>
+        <div class="card-desc">Re-tints your cultivator sprite with a deep amethyst hue. Cosmetic only.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 12</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+
+      <div class="section-h" style="grid-column: 1 / -1">Boons</div>
+
+      <div class="card">
+        <span class="tag">Buff · 30 min</span>
+        <div class="preview" style="color: var(--rare-buff)">⚡</div>
+        <div class="card-name">Qi Surge</div>
+        <div class="card-desc">+100% Qi gain for 30 minutes.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 5</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">Buff · 30 min</span>
+        <div class="preview" style="color: var(--rare-buff)">◆</div>
+        <div class="card-name">Producer Surge</div>
+        <div class="card-desc">+50% producer output for 30 minutes.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 4</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+
+      <div class="section-h" style="grid-column: 1 / -1">Consumables</div>
+
+      <div class="card">
+        <span class="tag new">Consumable</span>
+        <div class="preview" style="color: var(--rare-cons)">⌛</div>
+        <div class="card-name">Bypass Token</div>
+        <div class="card-desc">Skip the next major realm gate without burn.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 8</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag new">Consumable</span>
+        <div class="preview" style="color: var(--rare-cons)">⟳</div>
+        <div class="card-name">Spark Reroll</div>
+        <div class="card-desc">Reroll the current spark offer for free.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 3</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+
+      <div class="section-h" style="grid-column: 1 / -1">Quality of Life</div>
+
+      <div class="card owned">
+        <span class="tag">Owned</span>
+        <div class="preview" style="color: var(--rare-qol)">✓</div>
+        <div class="card-name">Disciple's Diligence</div>
+        <div class="card-desc">Auto-buys the cheapest producer once per second.</div>
+        <div class="card-foot">
+          <span class="price" style="color: var(--ui-muted)">—</span>
+          <button class="buy" disabled style="opacity: .5">Owned</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="tag">QoL · Permanent</span>
+        <div class="preview" style="color: var(--rare-qol)">⏵</div>
+        <div class="card-name">Decisive Heart</div>
+        <div class="card-desc">Skip the breakthrough confirmation pause.</div>
+        <div class="card-foot">
+          <span class="price"><span class="price-icon"></span> 25</span>
+          <button class="buy">Buy</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="navbar">
+    <button class="nav-btn">
+      <span class="nav-ico">🏯</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn">
+      <span class="nav-ico">🧘</span>
+      <span>Cultivation</span>
+    </button>
+    <button class="nav-btn">
+      <span class="nav-ico">📜</span>
+      <span>Journey</span>
+    </button>
+  </nav>
+
+</div>
+</body>
+</html>

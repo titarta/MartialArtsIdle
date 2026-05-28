@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>REFINE button — design study (upgrade affordance + readability)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ───────────────────────────────────────────────────────────────
+   REFINE BUTTON — design study
+   Goal: read as an UPGRADE (not a generic action), high-contrast
+   English label, sit under the crystal in the existing Sanctum
+   vocabulary (brass / lacquer / vermillion). Four candidates +
+   affordable/disabled states.
+   ────────────────────────────────────────────────────────────── */
+:root{
+  --cream:          #f5e6c8;
+  --cream-warm:     #fff5e0;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --gold-deep:      #a87a3a;
+  --bronze-rim:     rgba(220, 175, 110, 0.55);
+
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(1400px 900px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 24px 80px;
+  gap: 32px;
+}
+.lead{
+  max-width: 980px;
+  text-align: center;
+  color: rgba(245,230,200,.65);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--cream-warm);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.grid{
+  display: grid;
+  grid-template-columns: repeat(2, 460px);
+  gap: 32px;
+}
+@media (max-width: 1000px){ .grid{ grid-template-columns: 460px; } }
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  background: linear-gradient(180deg, rgba(30, 22, 14, 0.85) 0%, rgba(18, 14, 10, 0.85) 100%);
+  border: 1px solid rgba(220, 175, 110, 0.32);
+  border-radius: 10px;
+}
+.card-label{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--gold-hot);
+}
+.card-title{
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--cream-warm);
+}
+.card-sub{
+  font-size: 11.5px;
+  color: rgba(245,230,200,.55);
+  line-height: 1.6;
+}
+.card-state-row{
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 14px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+  /* Faux temple bg so we can judge contrast in context */
+  background:
+    radial-gradient(ellipse 240px 60px at 50% 80%, rgba(255, 207, 131, 0.20) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(40, 25, 15, 0.55) 0%, rgba(20, 14, 8, 0.65) 100%);
+  border-radius: 8px;
+  border: 1px dashed rgba(220, 175, 110, 0.18);
+}
+.state-label{
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.45);
+  text-align: center;
+  margin-top: 6px;
+}
+.state-block{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Variant 1: CURRENT (baseline pill) - the in-game design today
+   ═════════════════════════════════════════════════════════════ */
+.v1{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.18) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.22) 100%),
+    linear-gradient(180deg, rgba(180, 130, 70, 0.96) 0%, rgba(125, 85, 38, 0.96) 100%);
+  border: 1px solid rgba(255, 225, 170, 0.72);
+  border-radius: 999px;
+  color: #1a0f06;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 14px -2px rgba(255, 207, 131, .55);
+}
+.v1 .tri{ font-size: 10px; }
+.v1 .sep{ width: 1px; height: 13px; background: rgba(20, 14, 8, 0.42); }
+.v1.disabled{
+  opacity: 0.45;
+  filter: grayscale(0.5);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Variant 2: LEVEL TRANSITION pill - shows current -> next Lv
+   ═════════════════════════════════════════════════════════════ */
+.v2{
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.18) 0%, transparent 35%, transparent 65%, rgba(0,0,0,.22) 100%),
+    linear-gradient(180deg, rgba(180, 130, 70, 0.96) 0%, rgba(125, 85, 38, 0.96) 100%);
+  border: 1px solid rgba(255, 225, 170, 0.72);
+  border-radius: 999px;
+  color: #1a0f06;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 14px -2px rgba(255, 207, 131, .55);
+  overflow: hidden;
+}
+.v2-action{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.v2-action .arrow{ font-size: 11px; }
+.v2-levels{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 11px 8px;
+  background: rgba(20, 14, 8, 0.32);
+  border-left: 1px solid rgba(20, 14, 8, 0.42);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.v2-cost{
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px 8px;
+  background: rgba(20, 14, 8, 0.18);
+  border-left: 1px solid rgba(20, 14, 8, 0.42);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+.v2.disabled{
+  opacity: 0.45;
+  filter: grayscale(0.5);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Variant 3: BRASS BADGE with ▲ icon-square + caption
+   Shape says 'upgrade' at a glance. Compact, distinctive.
+   ═════════════════════════════════════════════════════════════ */
+.v3{
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid rgba(255, 225, 170, 0.72);
+  border-radius: 6px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Cinzel', serif;
+  box-shadow:
+    0 0 14px -2px rgba(255, 207, 131, .55),
+    0 3px 6px -2px rgba(0,0,0,.6);
+  overflow: hidden;
+}
+.v3-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  padding: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.22) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(220, 175, 110, 0.98) 0%, rgba(155, 125, 80, 0.98) 100%);
+  border-right: 1px solid rgba(20, 14, 8, 0.45);
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a0f06;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.6);
+}
+.v3-body{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  padding: 6px 14px 7px 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.10) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.20) 100%),
+    linear-gradient(180deg, rgba(155, 110, 60, 0.96) 0%, rgba(105, 70, 32, 0.96) 100%);
+  color: var(--cream-warm);
+  min-width: 120px;
+}
+.v3-action-line{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cream-warm);
+  text-shadow: 0 1px 0 rgba(0,0,0,.45);
+  line-height: 1.1;
+}
+.v3-action-line .next{
+  color: var(--gold-hot);
+  font-size: 9.5px;
+  letter-spacing: .04em;
+  text-transform: none;
+}
+.v3-cost{
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--gold-hot);
+  text-shadow: 0 0 4px rgba(255, 207, 131, 0.4), 0 1px 0 rgba(0,0,0,.5);
+}
+.v3.disabled{
+  opacity: 0.50;
+  filter: grayscale(0.6);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.v3.disabled .v3-cost{
+  color: var(--vermillion-hot);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   Variant 4: PLATE + EMBEDDED PROGRESS (always-on visual hint
+   of qi progress toward next refine cost). Reads as an upgrade
+   with built-in "fillingness" feedback.
+   ═════════════════════════════════════════════════════════════ */
+.v4{
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 7px 16px 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 230, 180, 0.18) 0%, transparent 30%, transparent 70%, rgba(0,0,0,.22) 100%),
+    linear-gradient(180deg, rgba(165, 115, 60, 0.96) 0%, rgba(115, 75, 38, 0.96) 100%);
+  border: 1px solid rgba(255, 225, 170, 0.72);
+  border-radius: 999px;
+  color: #1a0f06;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Cinzel', serif;
+  min-width: 168px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 14px -2px rgba(255, 207, 131, .55);
+}
+.v4-row{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.5);
+  position: relative;
+  z-index: 1;
+}
+.v4-tri{ font-size: 10px; }
+.v4-cost{
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: #1a0f06;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 0 rgba(255, 230, 180, 0.5);
+  margin-top: 1px;
+}
+/* qi progress hint: a thin amber fill behind the text showing
+   how close the player is to affording it */
+.v4::before{
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: var(--p, 0%);
+  background: linear-gradient(180deg, rgba(255, 230, 150, 0.42) 0%, rgba(255, 200, 100, 0.28) 100%);
+  pointer-events: none;
+  border-radius: 999px 0 0 999px;
+  transition: width 0.4s ease-out;
+  z-index: 0;
+}
+.v4.disabled{
+  opacity: 0.85;
+  cursor: not-allowed;
+  filter: grayscale(0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 0 rgba(0,0,0,0);
+}
+.v4.disabled .v4-row,
+.v4.disabled .v4-cost{
+  color: rgba(50, 30, 10, 0.62);
+  text-shadow: 0 1px 0 rgba(200, 170, 130, 0.30);
+}
+.v4.disabled .v4-cost::after{
+  content: ' ?';
+  color: var(--vermillion-hot);
+}
+
+/* Pressed/active visual */
+.v1:active, .v2:active, .v3:active, .v4:active{
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.30),
+    inset 0 -1px 0 rgba(0,0,0,.30),
+    0 0 10px -2px rgba(255, 207, 131, .42);
+}
+</style>
+</head>
+<body>
+
+  <div class="lead">
+    <h1>REFINE button — design study</h1>
+    Four variants. Goal: reads as an UPGRADE (not a generic action), English-first,
+    matches the Sanctum brass/lacquer vocabulary. Each variant shown in both
+    affordable (ready to spend) and unaffordable (insufficient qi) states.
+  </div>
+
+  <div class="grid">
+
+    <!-- VARIANT 1: current baseline -->
+    <div class="card">
+      <div class="card-label">V1 · Current (baseline)</div>
+      <div class="card-title">"▲ REFINE | 30.0K Qi"</div>
+      <div class="card-state-row">
+        <div class="state-block">
+          <button class="v1" type="button">
+            <span class="tri">▲</span>
+            <span>Refine</span>
+            <span class="sep"></span>
+            <span>30.0K Qi</span>
+          </button>
+          <div class="state-label">Affordable</div>
+        </div>
+        <div class="state-block">
+          <button class="v1 disabled" type="button" disabled>
+            <span class="tri">▲</span>
+            <span>Refine</span>
+            <span class="sep"></span>
+            <span>30.0K Qi</span>
+          </button>
+          <div class="state-label">Can't afford</div>
+        </div>
+      </div>
+      <div class="card-sub">What's in the game today. Reads as a generic action pill - the ▲ is small and could be confused with a sort/expand arrow. No explicit "upgrade" cue.</div>
+    </div>
+
+    <!-- VARIANT 2: level transition pill -->
+    <div class="card">
+      <div class="card-label">V2 · Level transition</div>
+      <div class="card-title">"REFINE  Lv 9 → 10  30.0K Qi"</div>
+      <div class="card-state-row">
+        <div class="state-block">
+          <button class="v2" type="button">
+            <span class="v2-action"><span class="arrow">▲</span>Refine</span>
+            <span class="v2-levels">Lv 9 → 10</span>
+            <span class="v2-cost">30.0K Qi</span>
+          </button>
+          <div class="state-label">Affordable</div>
+        </div>
+        <div class="state-block">
+          <button class="v2 disabled" type="button" disabled>
+            <span class="v2-action"><span class="arrow">▲</span>Refine</span>
+            <span class="v2-levels">Lv 9 → 10</span>
+            <span class="v2-cost">30.0K Qi</span>
+          </button>
+          <div class="state-label">Can't afford</div>
+        </div>
+      </div>
+      <div class="card-sub">Adds explicit Lv N → N+1 to remove all doubt that this is an upgrade. Three subtly-tinted compartments (action / levels / cost) help the eye parse it. Cost is wider; may overflow on small phones.</div>
+    </div>
+
+    <!-- VARIANT 3: brass badge with icon-square -->
+    <div class="card">
+      <div class="card-label">V3 · Iconic upgrade badge</div>
+      <div class="card-title">[▲] Refine to Lv 10 · 30.0K Qi</div>
+      <div class="card-state-row">
+        <div class="state-block">
+          <button class="v3" type="button">
+            <span class="v3-icon">▲</span>
+            <span class="v3-body">
+              <span class="v3-action-line">Refine<span class="next">→ Lv 10</span></span>
+              <span class="v3-cost">30.0K Qi</span>
+            </span>
+          </button>
+          <div class="state-label">Affordable</div>
+        </div>
+        <div class="state-block">
+          <button class="v3 disabled" type="button" disabled>
+            <span class="v3-icon">▲</span>
+            <span class="v3-body">
+              <span class="v3-action-line">Refine<span class="next">→ Lv 10</span></span>
+              <span class="v3-cost">30.0K Qi</span>
+            </span>
+          </button>
+          <div class="state-label">Can't afford</div>
+        </div>
+      </div>
+      <div class="card-sub">Large brass icon-square on the left says "ACTION" at a glance; the body has the verb + target level on top, cost gold-hot below. Distinctive silhouette - reads as upgrade from across the screen. Unaffordable: cost flips to vermillion.</div>
+    </div>
+
+    <!-- VARIANT 4: pill with embedded qi-progress fill -->
+    <div class="card">
+      <div class="card-label">V4 · Progress-fill pill</div>
+      <div class="card-title">"▲ REFINE / 30.0K Qi" with qi-progress aura</div>
+      <div class="card-state-row">
+        <div class="state-block">
+          <button class="v4" type="button" style="--p: 100%;">
+            <span class="v4-row"><span class="v4-tri">▲</span>Refine</span>
+            <span class="v4-cost">30.0K Qi</span>
+          </button>
+          <div class="state-label">Affordable · 100%</div>
+        </div>
+        <div class="state-block">
+          <button class="v4 disabled" type="button" disabled style="--p: 63%;">
+            <span class="v4-row"><span class="v4-tri">▲</span>Refine</span>
+            <span class="v4-cost">30.0K Qi</span>
+          </button>
+          <div class="state-label">Saving · 63%</div>
+        </div>
+      </div>
+      <div class="card-sub">An always-visible amber fill behind the text shows how close the player is to affording the next refine (qi/cost ratio). Reads as a "filling cup". The button stays semi-opaque when unaffordable so the player sees the progress filling up.</div>
+    </div>
+
+  </div>
+
+  <div class="lead" style="margin-top: 8px;">
+    My pick: <strong style="color: var(--gold-hot)">V3 + V4 combined</strong> - V3's iconic upgrade silhouette (left icon-square)
+    with V4's embedded qi-progress fill. Most clearly reads as "this is an upgrade you're
+    saving up to buy." Pick a variant and I'll ship it.
+  </div>
+
+</body>
+</html>

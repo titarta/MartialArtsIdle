@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=375, initial-scale=1">
+<title>Meridians live-CSS test</title>
+
+<!-- Pull the actual app CSS so we exercise the shipped .pc-* rules -->
+<link rel="stylesheet" href="/src/App.css">
+
+<style>
+  :root {
+    --top-bar-h: 58px;
+    --nav-h: 48px;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d0707;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+  /* Faux top bar + nav so the overlay's `top/bottom` lookups have correct offsets */
+  .fake-topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 58px;
+    background: linear-gradient(180deg, rgba(20,12,8,0.92), rgba(20,12,8,0.55));
+    border-bottom: 1px solid rgba(220, 175, 110, 0.18);
+    z-index: 700;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(220, 175, 110, 0.55);
+    font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.18em;
+  }
+  .fake-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 48px;
+    background: linear-gradient(0deg, rgba(20,12,8,0.95), rgba(20,12,8,0.7));
+    border-top: 1px solid rgba(220, 175, 110, 0.18);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-around;
+    color: rgba(232, 215, 192, 0.35);
+    font-size: 9.5px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  /* Soft cultivator silhouette so the overlay has something to layer over */
+  .fake-cultivator {
+    position: fixed;
+    left: 50%; bottom: 90px;
+    width: 220px; height: 300px;
+    transform: translateX(-50%);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(220,150,90,0.18), transparent 65%);
+    opacity: 0.6; filter: blur(1px);
+  }
+</style>
+</head>
+<body>
+
+<div class="fake-topbar">SANCTUM . MERIDIANS LIVE-CSS TEST</div>
+<div class="fake-cultivator"></div>
+<div class="fake-nav"><span>HOME</span><span>CULT</span><span>JOUR</span><span>SHOP</span></div>
+
+<!-- The overlay markup, exactly as it ships from PatternClickOverlay -->
+<div class="pc-overlay pc-overlay-active" aria-label="Tracing Meridians challenge">
+
+  <div class="pc-title-strip" aria-hidden="true">
+    <div class="pc-title-cn">气脉</div>
+    <div class="pc-title-en">Trace the Meridians</div>
+  </div>
+
+  <div class="pc-timer-track">
+    <div class="pc-timer-bar" style="transform: scaleX(0.62)"></div>
+    <div class="pc-timer-endcap"></div>
+  </div>
+
+  <svg class="pc-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <!-- Tapped dots' outgoing paths are excluded by the JS -->
+    <!-- 3→4 active (curving toward centre) -->
+    <path d="M 16,52 Q 35,66 16,82" class="pc-connection pc-connection-active" vector-effect="non-scaling-stroke" />
+    <!-- 4→5 dim -->
+    <path d="M 16,82 Q 50,76 85,82" class="pc-connection" vector-effect="non-scaling-stroke" />
+    <!-- 5→6 dim -->
+    <path d="M 85,82 Q 65,58 85,52" class="pc-connection" vector-effect="non-scaling-stroke" />
+    <!-- 6→7 dim -->
+    <path d="M 85,52 Q 60,40 85,22" class="pc-connection" vector-effect="non-scaling-stroke" />
+  </svg>
+
+  <!-- 1+2 tapped, 3 current, 4-7 waiting -->
+  <button class="pc-dot pc-dot-tapped" style="left: 16%; top: 22%;" data-num="1" aria-label="Acupressure node 1">
+    <span class="pc-dot-glyph">印</span>
+  </button>
+  <button class="pc-dot pc-dot-tapped" style="left: 85%; top: 22%;" data-num="2" aria-label="Acupressure node 2">
+    <span class="pc-dot-glyph">印</span>
+  </button>
+  <button class="pc-dot pc-dot-current" style="left: 16%; top: 52%;" data-num="3" aria-label="Acupressure node 3">
+    <span class="pc-dot-glyph">三</span>
+  </button>
+  <button class="pc-dot pc-dot-waiting" style="left: 16%; top: 82%;" data-num="4" aria-label="Acupressure node 4">
+    <span class="pc-dot-glyph">四</span>
+  </button>
+  <button class="pc-dot pc-dot-waiting" style="left: 85%; top: 82%;" data-num="5" aria-label="Acupressure node 5">
+    <span class="pc-dot-glyph">五</span>
+  </button>
+  <button class="pc-dot pc-dot-waiting" style="left: 85%; top: 52%;" data-num="6" aria-label="Acupressure node 6">
+    <span class="pc-dot-glyph">六</span>
+  </button>
+  <button class="pc-dot pc-dot-waiting" style="left: 85%; top: 22%;" data-num="7" aria-label="Acupressure node 7">
+    <span class="pc-dot-glyph">七</span>
+  </button>
+</div>
+
+</body>
+</html>

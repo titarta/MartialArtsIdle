@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Qi Flow — Particles flowing into the cultivator</title>
+<style>
+  :root {
+    --bg-page:    rgba(4, 10, 14, 0.96);
+    --bg-cell:    rgba(20, 28, 36, 0.78);
+    --bg-cell-d:  rgba(12, 18, 24, 0.94);
+    --border-c:   rgba(110, 200, 180, 0.22);
+    --text-pri:   #d8eaff;
+    --text-mut:   rgba(220, 230, 240, 0.7);
+    --text-soft:  rgba(200, 210, 220, 0.5);
+    --cyan:       #7adcc4;
+    --gold:       #f5af14;
+
+    /* Defaults — overridden by body.crystal-tier-{N} below */
+    --qi-aura-core:    rgba(120, 220, 255, 0.50);
+    --qi-aura-fringe:  rgba( 60, 180, 230, 0.26);
+    --qi-text-color:   #b3eeff;
+    --qi-text-glow:    rgba( 92, 216, 255, 0.95);
+    --qi-text-deep:    rgba( 30, 170, 230, 0.55);
+    --qi-bar-edge:     #205a85;
+    --qi-bar-mid:      #6ab8de;
+
+    /* Per-tier spark hue/sat (matches the live crystal VFX system) */
+    --spark-hue: 0deg;
+    --spark-sat: 1;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-page);
+    color: var(--text-pri);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    image-rendering: pixelated;
+  }
+  img { image-rendering: pixelated; }
+
+  /* Crystal-tier palette — mirrors the in-game definitions */
+  body.crystal-tier-1 { --qi-aura-core: rgba(136,153,187,0.55); --qi-aura-fringe: rgba(100,120,160,0.30); --spark-hue: 0deg;    --spark-sat: 0.40; }
+  body.crystal-tier-2 { --qi-aura-core: rgba( 68,136,187,0.60); --qi-aura-fringe: rgba( 30, 90,150,0.32); --spark-hue: 0deg;    --spark-sat: 0.90; }
+  body.crystal-tier-3 { --qi-aura-core: rgba(  0,187,204,0.62); --qi-aura-fringe: rgba(  0,130,150,0.34); --spark-hue: -15deg;  --spark-sat: 1.10; }
+  body.crystal-tier-4 { --qi-aura-core: rgba( 80,140,240,0.66); --qi-aura-fringe: rgba( 20, 70,200,0.38); --spark-hue: 10deg;   --spark-sat: 1.10; }
+  body.crystal-tier-5 { --qi-aura-core: rgba( 80, 95,220,0.68); --qi-aura-fringe: rgba( 30, 40,170,0.40); --spark-hue: 20deg;   --spark-sat: 1.15; }
+  body.crystal-tier-6 { --qi-aura-core: rgba(140, 60,220,0.70); --qi-aura-fringe: rgba( 80,  0,170,0.42); --spark-hue: 55deg;   --spark-sat: 1.20; }
+  body.crystal-tier-7 { --qi-aura-core: rgba(170, 70,230,0.72); --qi-aura-fringe: rgba(100,  0,180,0.44); --spark-hue: 85deg;   --spark-sat: 1.25; }
+  body.crystal-tier-8 { --qi-aura-core: rgba(204,153,255,0.70); --qi-aura-fringe: rgba(160,100,230,0.40); --spark-hue: 100deg;  --spark-sat: 1.10; }
+  body.crystal-tier-9 { --qi-aura-core: rgba(255,204, 68,0.78); --qi-aura-fringe: rgba(220,160, 40,0.46); --spark-hue: -130deg; --spark-sat: 1.35; }
+  body.crystal-tier-10 { --qi-aura-core: rgba(255,170, 34,0.80); --qi-aura-fringe: rgba(220,120,  0,0.48); --spark-hue: -140deg; --spark-sat: 1.40; }
+
+  header {
+    padding: 12px 24px 8px;
+    border-bottom: 1px solid var(--border-c);
+  }
+  header h1 { margin: 0 0 2px; font-size: 17px; font-weight: 700; }
+  header p  { margin: 0; font-size: 12px; color: var(--text-mut); }
+  header em { color: var(--cyan); font-style: normal; font-weight: 700; }
+
+  /* Controls — sticky */
+  .controls {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-cell-d);
+    border-bottom: 1px solid var(--border-c);
+    padding: 10px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .row > label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-mut);
+    min-width: 130px;
+  }
+  .row input[type=range] {
+    flex: 1;
+    max-width: 380px;
+    accent-color: var(--cyan);
+  }
+  .row .readout {
+    min-width: 88px;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--cyan);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .focus-btn {
+    padding: 6px 14px;
+    background: rgba(122, 220, 196, 0.10);
+    border: 1px solid rgba(122, 220, 196, 0.45);
+    border-radius: 6px;
+    color: var(--cyan);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    user-select: none;
+    transition: background 120ms, border-color 120ms;
+  }
+  .focus-btn.on {
+    background: rgba(245, 175, 20, 0.22);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+  .tier-pick {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 120ms, border-color 120ms;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-mut);
+  }
+  .tier-pick.on { border-color: var(--cyan); background: rgba(122, 220, 196, 0.14); color: var(--text-pri); }
+  .pick {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 5px 9px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 120ms, border-color 120ms;
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .pick:hover { background: rgba(122, 220, 196, 0.08); }
+  .pick.on    { border-color: var(--cyan); background: rgba(122, 220, 196, 0.14); }
+  .pick img { width: 24px; height: 24px; image-rendering: pixelated; pointer-events: none; opacity: 0.4; transition: opacity 120ms; filter: hue-rotate(var(--spark-hue, 0deg)) saturate(var(--spark-sat, 1)); }
+  .pick.on img { opacity: 1; }
+  .pick .nm { font-size: 9.5px; font-weight: 600; color: var(--text-mut); pointer-events: none; letter-spacing: 0.02em; }
+  .pick.on .nm { color: var(--text-pri); }
+
+  /* Stage */
+  .stage-wrap {
+    padding: 14px 24px 24px;
+  }
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    background:
+      radial-gradient(ellipse at 50% 70%, var(--qi-aura-fringe), transparent 50%),
+      linear-gradient(165deg, #0a1820 0%, #060e15 100%);
+    border-radius: 12px;
+    border: 1px solid var(--border-c);
+    overflow: hidden;
+    user-select: none;
+  }
+  .stage .ring-debug {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 360px; height: 360px;
+    border: 1px dashed rgba(122, 220, 196, 0.18);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 0.5;
+    transition: opacity 220ms;
+  }
+  .stage.hide-debug .ring-debug { opacity: 0; }
+  /* The "cultivator" — a stylised silhouette + breathing aura.
+     The aura colour cascades from the body's crystal-tier class. */
+  .cultivator {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 110px;
+    height: 110px;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .cultivator .aura {
+    position: absolute;
+    inset: -90%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--qi-aura-core) 0%, var(--qi-aura-fringe) 35%, transparent 72%);
+    animation: cultivator-aura-pulse 2.4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  @keyframes cultivator-aura-pulse {
+    0%, 100% { transform: scale(0.96); opacity: 0.85; }
+    50%      { transform: scale(1.10); opacity: 1.00; }
+  }
+  .cultivator .body {
+    position: absolute;
+    inset: 14% 20% 6%;
+    background:
+      radial-gradient(ellipse at 50% 28%, #d8c5a8 0%, #ad8f6a 60%, transparent 70%),
+      linear-gradient(180deg, #2e2632 0%, #2e2632 30%, #6e3636 30%, #6e3636 100%);
+    border-radius: 40% 40% 28% 28% / 32% 32% 30% 30%;
+    box-shadow: inset 0 -8px 10px rgba(0, 0, 0, 0.45);
+  }
+  .cultivator .glow {
+    position: absolute;
+    left: 50%; top: 35%;
+    width: 22px; height: 22px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(122, 220, 196, 0.55) 40%, transparent 75%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: cultivator-glow 1.6s ease-in-out infinite;
+  }
+  @keyframes cultivator-glow {
+    0%, 100% { opacity: 0.65; transform: translate(-50%, -50%) scale(0.95); }
+    50%      { opacity: 1.00; transform: translate(-50%, -50%) scale(1.10); }
+  }
+
+  /* Particle base — position set inline (left/top), the animation drives x/y.
+     z-index intentionally BELOW the cultivator (z:5) so orbs drift behind the
+     character and disappear into them, not in front. */
+  .p {
+    position: absolute;
+    pointer-events: none;
+    image-rendering: pixelated;
+    will-change: transform, opacity;
+    filter: hue-rotate(var(--spark-hue, 0deg)) saturate(var(--spark-sat, 1));
+    z-index: 3;
+  }
+
+  .stage .stats {
+    position: absolute;
+    top: 8px; left: 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  .stage .stats strong { color: var(--cyan); }
+  .stage .focus-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(245, 175, 20, 0.10) 55%, rgba(245, 175, 20, 0.18) 75%, transparent 100%);
+    opacity: 0;
+    transition: opacity 320ms ease-out;
+    z-index: 4;
+  }
+  .stage.focusing .focus-overlay { opacity: 1; }
+</style>
+</head>
+<body class="crystal-tier-3">
+
+<header>
+  <h1>Qi Flow — particles drift inward to the cultivator</h1>
+  <p>
+    Particles spawn on a ring around the cultivator and drift toward the centre. Density and
+    inflow speed scale with the <em>multiplier</em>. Toggle <em>Focus</em> for the in-game
+    boost (×3 on top). Tier picker switches the colour palette to test how it reads across
+    crystal evolutions.
+  </p>
+</header>
+
+<div class="controls">
+  <div class="row">
+    <label for="mult">Qi multiplier</label>
+    <input id="mult" type="range" min="1" max="15" step="0.5" value="3">
+    <div class="readout" id="mult-readout">×3.0</div>
+    <button class="focus-btn" id="focus-btn">Focus ×3 (off)</button>
+    <div class="readout" id="effective-readout">eff ×3.0</div>
+  </div>
+  <div class="row">
+    <label>Particle pool</label>
+    <div class="pick on" data-key="orb_small">
+      <img src="/sprites/vfx/qi_particles/qi_orb_small.png" alt=""><div class="nm">orb·small</div>
+    </div>
+    <div class="pick on" data-key="orb_medium">
+      <img src="/sprites/vfx/qi_particles/qi_orb_medium.png" alt=""><div class="nm">orb·med</div>
+    </div>
+    <div class="pick on" data-key="orb_bright">
+      <img src="/sprites/vfx/qi_particles/qi_orb_bright.png" alt=""><div class="nm">orb·bright</div>
+    </div>
+    <div class="pick on" data-key="orb_faint">
+      <img src="/sprites/vfx/qi_particles/qi_orb_faint.png" alt=""><div class="nm">orb·faint</div>
+    </div>
+  </div>
+  <div class="row">
+    <label>Crystal tier</label>
+    <div class="tier-pick" data-tier="1">T1</div>
+    <div class="tier-pick" data-tier="2">T2</div>
+    <div class="tier-pick on" data-tier="3">T3</div>
+    <div class="tier-pick" data-tier="4">T4</div>
+    <div class="tier-pick" data-tier="5">T5</div>
+    <div class="tier-pick" data-tier="6">T6</div>
+    <div class="tier-pick" data-tier="7">T7</div>
+    <div class="tier-pick" data-tier="8">T8</div>
+    <div class="tier-pick" data-tier="9">T9</div>
+    <div class="tier-pick" data-tier="10">T10</div>
+    <button class="focus-btn" id="debug-btn" style="margin-left:auto;">Show spawn ring</button>
+  </div>
+</div>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+    <div class="ring-debug"></div>
+    <div class="focus-overlay"></div>
+    <div class="cultivator">
+      <div class="aura"></div>
+      <div class="body"></div>
+      <div class="glow"></div>
+    </div>
+    <div class="stats" id="stats">
+      <div>mult <strong id="stat-eff">×3.0</strong></div>
+      <div>alive <strong id="stat-alive">0</strong></div>
+      <div>spawn/s <strong id="stat-rate">0</strong></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// Particle pool
+// ─────────────────────────────────────────────────────────────────────────────
+const BASE = '/sprites/vfx/qi_particles/';
+const SRC = {
+  orb_small:        BASE + 'qi_orb_small.png',
+  orb_medium:       BASE + 'qi_orb_medium.png',
+  orb_bright:       BASE + 'qi_orb_bright.png',
+  orb_faint:        BASE + 'qi_orb_faint.png',
+  spark_cross:      BASE + 'qi_spark_cross.png',
+  spark_diamond:    BASE + 'qi_spark_diamond.png',
+  droplet_falling:  BASE + 'qi_droplet_falling.png',
+  droplet_rising:   BASE + 'qi_droplet_rising.png',
+  swirl:            BASE + 'qi_swirl.png',
+};
+
+const rand  = (a, b) => a + Math.random() * (b - a);
+const pick  = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+const stage = document.getElementById('stage');
+const stats = {
+  eff:   document.getElementById('stat-eff'),
+  alive: document.getElementById('stat-alive'),
+  rate:  document.getElementById('stat-rate'),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Controls wiring
+// ─────────────────────────────────────────────────────────────────────────────
+const slider = document.getElementById('mult');
+const multRead = document.getElementById('mult-readout');
+const effRead  = document.getElementById('effective-readout');
+const focusBtn = document.getElementById('focus-btn');
+const debugBtn = document.getElementById('debug-btn');
+let focusing = false;
+
+function getBaseMult()      { return Number(slider.value); }
+function getEffectiveMult() { return getBaseMult() * (focusing ? 3 : 1); }
+
+function updateReadouts() {
+  const base = getBaseMult();
+  const eff  = getEffectiveMult();
+  multRead.textContent = `×${base.toFixed(1)}`;
+  effRead.textContent  = `eff ×${eff.toFixed(1)}`;
+  stats.eff.textContent = `×${eff.toFixed(1)}`;
+}
+slider.addEventListener('input', updateReadouts);
+
+focusBtn.addEventListener('click', () => {
+  focusing = !focusing;
+  focusBtn.classList.toggle('on', focusing);
+  focusBtn.textContent = `Focus ×3 (${focusing ? 'on' : 'off'})`;
+  stage.classList.toggle('focusing', focusing);
+  updateReadouts();
+});
+
+debugBtn.addEventListener('click', () => {
+  stage.classList.toggle('hide-debug');
+});
+
+document.querySelectorAll('.pick').forEach(el => {
+  el.addEventListener('click', () => el.classList.toggle('on'));
+});
+
+document.querySelectorAll('.tier-pick').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.tier-pick').forEach(other => other.classList.remove('on'));
+    el.classList.add('on');
+    const tier = el.dataset.tier;
+    document.body.className = `crystal-tier-${tier}`;
+  });
+});
+
+function SELECTED_KEYS() {
+  return [...document.querySelectorAll('.pick.on')].map(el => el.dataset.key);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Particle system — DOM-only, self-removes on animationend equivalent.
+//
+// Each particle:
+//   - spawns at a random angle on a ring (radius ~ 200px from centre)
+//   - has a velocity vector pointed at the cultivator centre
+//   - accelerates slightly toward the centre (mild gravity-toward-target)
+//   - fades in over 12% of life, fades out over 30% near end
+//   - scales 0.5 → 0.95 over life (slight grow as it approaches)
+//
+// Spawn rate scales sub-linearly with multiplier: rate = base + sqrt(mult-1) * k
+//   so the visual doesn't explode at high mults but still reads as "more qi".
+// Inflow speed: base 70 px/s + sqrt(mult) * 20 — caps the visual frenzy.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const particles = [];
+function spawnParticle() {
+  const keys = SELECTED_KEYS();
+  if (keys.length === 0) return;
+
+  const r = stage.getBoundingClientRect();
+  const cx = r.width / 2;
+  const cy = r.height / 2;
+
+  const angle = rand(0, Math.PI * 2);
+  const ringR = rand(160, 220);
+  const sx = cx + Math.cos(angle) * ringR;
+  const sy = cy + Math.sin(angle) * ringR;
+
+  // Aim toward cultivator centre (with small jitter so trajectories vary)
+  const tx = cx + rand(-12, 12);
+  const ty = cy + rand(-12, 12);
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const dist = Math.hypot(dx, dy);
+  const m = getEffectiveMult();
+  const baseSpeed = 60 + Math.sqrt(m) * 24; // px/s
+  const speed = baseSpeed * rand(0.85, 1.15);
+  const ux = dx / dist;
+  const uy = dy / dist;
+
+  const img = document.createElement('img');
+  img.className = 'p';
+  img.src = SRC[pick(keys)];
+  img.alt = '';
+  stage.appendChild(img);
+  const sizeVar = 0.65 + Math.random() * 0.35;
+  const p = {
+    el: img,
+    x: sx, y: sy,
+    vx: ux * speed, vy: uy * speed,
+    ax: ux * 80, ay: uy * 80, // mild inward acceleration toward cultivator
+    life: rand(1700, 2400),
+    age: 0,
+    scaleStart: 0.40 * sizeVar,
+    scaleEnd:   0.75 * sizeVar,
+    fadeIn:  0.12,
+    fadeOut: 0.30,
+  };
+  particles.push(p);
+}
+
+// rAF loop driving particle advances + spawn cadence
+let last = performance.now();
+let lastSpawn = 0;
+let spawnsThisSecond = 0;
+let secondMark = performance.now();
+
+function tick(now) {
+  const dt = Math.min(50, now - last);
+  last = now;
+  const dtSec = dt / 1000;
+
+  // Spawn cadence — base ~3/s, scales with sqrt(mult-1)
+  const m = getEffectiveMult();
+  // particles per second target
+  const spawnRate = 1.5 + Math.sqrt(Math.max(0, m - 1)) * 3.0;
+  const interval = 1000 / Math.max(0.1, spawnRate);
+  if (now - lastSpawn > interval) {
+    spawnParticle();
+    lastSpawn = now;
+    spawnsThisSecond++;
+  }
+
+  // Per-second readout
+  if (now - secondMark > 1000) {
+    stats.rate.textContent = spawnsThisSecond.toFixed(0);
+    spawnsThisSecond = 0;
+    secondMark = now;
+  }
+
+  // Tick particles
+  const r = stage.getBoundingClientRect();
+  const cx = r.width / 2;
+  const cy = r.height / 2;
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.age += dt;
+    const t = p.age / p.life;
+    if (t >= 1) {
+      p.el.remove();
+      particles.splice(i, 1);
+      continue;
+    }
+    p.vx += p.ax * dtSec;
+    p.vy += p.ay * dtSec;
+    p.x  += p.vx * dtSec;
+    p.y  += p.vy * dtSec;
+
+    // Absorption — once a particle reaches the cultivator silhouette, freeze
+    // it in place and fast-fade over a short window so it visually "lands"
+    // and dissolves instead of drifting through and out the other side.
+    if (!p.absorbed) {
+      const d = Math.hypot(p.x - cx, p.y - cy);
+      if (d < 22) {
+        p.absorbed     = true;
+        p.absorbedAt   = p.age;
+        p.absorbedFade = 140; // ms — short, snappy fade-on-contact
+        p.vx = p.vy = p.ax = p.ay = 0;
+      }
+    }
+
+    let alpha = 1;
+    if (p.absorbed) {
+      const fadeT = (p.age - p.absorbedAt) / p.absorbedFade;
+      alpha = Math.max(0, 1 - fadeT);
+      if (fadeT >= 1) {
+        p.el.remove();
+        particles.splice(i, 1);
+        continue;
+      }
+    } else if (t < p.fadeIn)        alpha = t / p.fadeIn;
+    else if (t > 1 - p.fadeOut)     alpha = (1 - t) / p.fadeOut;
+    const scale = p.scaleStart + (p.scaleEnd - p.scaleStart) * t;
+
+    p.el.style.transform =
+      `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px) translate(-50%, -50%) scale(${scale.toFixed(2)})`;
+    p.el.style.opacity = alpha.toFixed(2);
+  }
+
+  stats.alive.textContent = particles.length;
+  requestAnimationFrame(tick);
+}
+
+updateReadouts();
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>

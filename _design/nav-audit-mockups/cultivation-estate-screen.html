@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1" />
+<title>Cultivation — Estate Map (future state)</title>
+<style>
+  /* Demonstrates how the Cultivation tab evolves once producers
+     become enterable mini-games. The 3-tab strip (Producers /
+     Upgrades / Sparks) stays — but the Producers tab itself becomes
+     a tappable estate map instead of a flat list, while still
+     supporting the Cookie-Clicker buy verb at the bottom. */
+  :root {
+    --ui-bg-deep:    rgb(14, 12, 8);
+    --ui-bg-panel:   rgba(32, 26, 18, 0.92);
+    --ui-bg-panel-2: rgba(48, 38, 26, 0.75);
+    --ui-border:     rgba(75, 60, 40, 0.6);
+    --ui-tan:        #c8aa78;
+    --ui-cream:      #f5e6c8;
+    --ui-cream-soft: #e8d5a8;
+    --ui-amber:      #dcaf6e;
+    --ui-label:      rgba(210, 195, 170, 0.85);
+    --ui-muted:      rgba(175, 160, 140, 0.7);
+    --jade:          #6fbf9c;
+    --crimson:       #c74848;
+    --font-display:  'Cinzel', Georgia, 'Times New Roman', serif;
+    --font-body:     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #060504;
+    color: var(--ui-cream);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  body {
+    display: flex; justify-content: center;
+    padding: 24px 0;
+    min-height: 100vh;
+  }
+  .device {
+    width: 390px;
+    height: 844px;
+    background: var(--ui-bg-deep);
+    border-radius: 36px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TopBar */
+  .topbar {
+    height: 56px;
+    display: flex; align-items: center;
+    padding: 0 12px; gap: 8px;
+    background: rgba(14, 12, 8, 0.85);
+    border-bottom: 1px solid var(--ui-border);
+    flex-shrink: 0;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    background: rgba(80, 30, 30, 0.5);
+    border: 1px solid rgba(160, 80, 80, 0.5);
+    border-radius: 14px;
+    font-size: 13px;
+    color: #ffd3d3;
+  }
+  .pill-icon {
+    width: 14px; height: 14px;
+    background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+    border-radius: 50%;
+  }
+  .shop-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    color: var(--ui-cream-soft);
+  }
+  .currencies {
+    flex: 1; display: flex; flex-direction: column;
+    gap: 1px; margin-left: 8px;
+    font-size: 12px;
+    color: var(--ui-cream-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .topbar-icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-cream-soft);
+    font-size: 16px;
+  }
+
+  /* Sticky header — qi + rate */
+  .sticky-head {
+    background: linear-gradient(180deg, rgba(20, 14, 8, .95), rgba(14, 10, 6, .85));
+    border-bottom: 1px solid var(--ui-border);
+    padding: 12px 16px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .qi-big {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--ui-cream);
+    font-variant-numeric: tabular-nums;
+  }
+  .qi-rate {
+    font-size: 13px;
+    color: var(--jade);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Sub-tab chip row */
+  .subtabs {
+    display: flex; gap: 6px;
+    padding: 10px 16px;
+    background: rgba(14, 12, 8, 0.7);
+    border-bottom: 1px solid var(--ui-border);
+    flex-shrink: 0;
+  }
+  .subtab {
+    flex: 1;
+    padding: 8px 0;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--ui-muted);
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .subtab.active {
+    background: rgba(220, 175, 110, 0.18);
+    border-color: var(--ui-amber);
+    color: var(--ui-cream);
+    font-weight: 600;
+  }
+
+  /* Estate body */
+  .estate {
+    flex: 1;
+    overflow-y: auto;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 70%),
+      linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .98));
+    padding: 16px 12px 100px 12px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 36px), transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 36px), transparent 100%);
+  }
+
+  .estate-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--ui-cream);
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 4px 0 14px;
+    border-bottom: 1px solid var(--ui-border);
+    margin-bottom: 16px;
+  }
+
+  /* Estate tile grid */
+  .estate-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .tile {
+    aspect-ratio: 1;
+    background:
+      radial-gradient(60% 60% at 50% 30%, rgba(220, 175, 110, 0.15), transparent 70%),
+      linear-gradient(180deg, rgba(48, 38, 26, 0.95), rgba(20, 14, 8, 0.95));
+    border: 1px solid var(--ui-border);
+    border-radius: 14px;
+    padding: 10px;
+    display: flex; flex-direction: column; align-items: stretch;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .tile.enterable {
+    border-color: var(--ui-amber);
+    background:
+      radial-gradient(60% 60% at 50% 30%, rgba(220, 175, 110, 0.28), transparent 70%),
+      linear-gradient(180deg, rgba(60, 46, 30, 0.95), rgba(28, 20, 12, 0.95));
+  }
+  .tile.locked { opacity: 0.4; cursor: not-allowed; }
+  .tile-sprite {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+    color: var(--ui-amber);
+    margin: 4px 0;
+  }
+  .tile.enterable .tile-sprite {
+    color: var(--ui-cream);
+    text-shadow: 0 0 12px rgba(220, 175, 110, 0.7);
+  }
+  .tile-name {
+    font-family: var(--font-display);
+    font-size: 12px;
+    color: var(--ui-cream);
+    text-align: center;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    min-height: 28px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tile-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--ui-cream-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .tile-rate { color: var(--jade); }
+  .tile-count {
+    display: inline-flex; align-items: center; gap: 2px;
+    color: var(--ui-amber);
+    font-weight: 600;
+  }
+  .tile-tag {
+    position: absolute;
+    top: 6px; right: 6px;
+    padding: 2px 6px;
+    background: rgba(111, 191, 156, 0.18);
+    border: 1px solid var(--jade);
+    border-radius: 8px;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--jade);
+  }
+  .tile-tag.lock {
+    background: rgba(75, 60, 40, 0.4);
+    border-color: var(--ui-border);
+    color: var(--ui-muted);
+  }
+  .tile-buy {
+    position: absolute;
+    bottom: 6px; left: 6px; right: 6px;
+    padding: 4px 0;
+    background: rgba(220, 175, 110, 0.2);
+    border: 1px solid var(--ui-amber);
+    border-radius: 8px;
+    color: var(--ui-cream);
+    font-size: 11px;
+    font-family: var(--font-body);
+    text-align: center;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: 0.18s ease;
+  }
+  .tile:active .tile-buy,
+  .tile:hover .tile-buy {
+    opacity: 1; transform: none;
+  }
+  /* Estate map decoration — divider lanes */
+  .estate-divider {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ui-amber);
+    padding: 14px 0 4px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .estate-divider::before, .estate-divider::after {
+    content: ""; flex: 1; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ui-border), transparent);
+  }
+
+  /* Buy bar — sticky bottom action */
+  .buy-bar {
+    position: absolute;
+    left: 12px; right: 12px;
+    bottom: 80px;
+    background: linear-gradient(180deg, rgba(48, 38, 26, .92), rgba(20, 14, 8, .96));
+    border: 1px solid var(--ui-amber);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,.45);
+  }
+  .buy-bar-info {
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+  .buy-bar-name {
+    font-size: 12px;
+    color: var(--ui-cream-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .buy-bar-target {
+    font-family: var(--font-display);
+    font-size: 14px;
+    color: var(--ui-cream);
+    margin-top: 2px;
+  }
+  .buy-bar-cost {
+    font-size: 11px;
+    color: var(--ui-muted);
+    font-variant-numeric: tabular-nums;
+    margin-top: 2px;
+  }
+  .buy-action {
+    padding: 10px 18px;
+    background: linear-gradient(180deg, var(--ui-amber), #b78648);
+    border: none;
+    border-radius: 10px;
+    color: #1c1409;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .buy-mode {
+    display: inline-flex;
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 4px;
+  }
+  .buy-mode button {
+    appearance: none;
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+    color: var(--ui-cream-soft);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .buy-mode button.active {
+    background: rgba(220, 175, 110, 0.25);
+    color: var(--ui-cream);
+    font-weight: 600;
+  }
+
+  /* BottomNav */
+  .navbar {
+    display: flex;
+    height: 68px;
+    background: rgba(14, 12, 8, 0.95);
+    border-top: 1px solid var(--ui-border);
+    position: absolute; bottom: 0; left: 0; right: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    background: transparent; border: none;
+    color: var(--ui-muted);
+    font-size: 11px;
+  }
+  .nav-btn.active { color: var(--ui-amber); }
+  .nav-ico {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+
+  .legend {
+    font-size: 10px;
+    color: var(--ui-muted);
+    text-align: center;
+    padding-top: 4px;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="device">
+
+  <div class="topbar">
+    <button class="pill"><span class="pill-icon"></span> 24</button>
+    <button class="shop-btn" aria-label="Spirit Bazaar">🏮</button>
+    <div class="currencies">
+      <span>QI 50.8M</span>
+      <span>KARMA 42</span>
+    </div>
+    <button class="topbar-icon-btn" aria-label="Reincarnation">☸</button>
+    <button class="topbar-icon-btn" aria-label="Annals">📊</button>
+    <button class="topbar-icon-btn" aria-label="Settings">⚙</button>
+  </div>
+
+  <!-- Sticky qi/rate header -->
+  <div class="sticky-head">
+    <span class="qi-big">50,832,114 Qi</span>
+    <span class="qi-rate">+2.1k / sec</span>
+  </div>
+
+  <!-- Sub-tabs (still 3 — Producers as the estate, Upgrades, Sparks) -->
+  <div class="subtabs">
+    <button class="subtab active">Estate</button>
+    <button class="subtab">Upgrades</button>
+    <button class="subtab">Sparks</button>
+  </div>
+
+  <main class="estate">
+    <div class="estate-title">YOUR ESTATE</div>
+
+    <div class="estate-grid">
+
+      <div class="estate-divider">Tempering Quarter</div>
+
+      <!-- Enterable mini-game: Body Tempering Disciple -->
+      <div class="tile enterable">
+        <span class="tile-tag">Tap to enter</span>
+        <div class="tile-sprite">🥋</div>
+        <div class="tile-name">Body Tempering Disciple</div>
+        <div class="tile-foot">
+          <span class="tile-rate">+14 /s</span>
+          <span class="tile-count">×24</span>
+        </div>
+        <button class="tile-buy">Buy ×1 — 1.2k Qi</button>
+      </div>
+
+      <!-- Enterable mini-game: Spirit Herb Garden -->
+      <div class="tile enterable">
+        <span class="tile-tag">Tap to enter</span>
+        <div class="tile-sprite">🌿</div>
+        <div class="tile-name">Spirit Herb Garden</div>
+        <div class="tile-foot">
+          <span class="tile-rate">+58 /s</span>
+          <span class="tile-count">×12</span>
+        </div>
+        <button class="tile-buy">Buy ×1 — 8.4k Qi</button>
+      </div>
+
+      <div class="estate-divider">Inner Workshop</div>
+
+      <!-- Enterable mini-game: Meridian Furnace -->
+      <div class="tile enterable">
+        <span class="tile-tag">Tap to enter</span>
+        <div class="tile-sprite">🔥</div>
+        <div class="tile-name">Meridian Furnace</div>
+        <div class="tile-foot">
+          <span class="tile-rate">+220 /s</span>
+          <span class="tile-count">×5</span>
+        </div>
+        <button class="tile-buy">Buy ×1 — 50k Qi</button>
+      </div>
+
+      <!-- Not yet enterable — still a flat producer -->
+      <div class="tile">
+        <div class="tile-sprite">🐉</div>
+        <div class="tile-name">Spirit Beast Pact</div>
+        <div class="tile-foot">
+          <span class="tile-rate">+1.4k /s</span>
+          <span class="tile-count">×2</span>
+        </div>
+        <button class="tile-buy">Buy ×1 — 480k Qi</button>
+      </div>
+
+      <div class="estate-divider">Higher Halls</div>
+
+      <div class="tile">
+        <div class="tile-sprite">⛩</div>
+        <div class="tile-name">Sect Outer Hall</div>
+        <div class="tile-foot">
+          <span class="tile-rate">+6.2k /s</span>
+          <span class="tile-count">×1</span>
+        </div>
+        <button class="tile-buy">Buy ×1 — 4.1M Qi</button>
+      </div>
+
+      <!-- Locked teaser — Cookie-Clicker silhouette pattern -->
+      <div class="tile locked">
+        <span class="tile-tag lock">Locked</span>
+        <div class="tile-sprite" style="opacity: .3">▒</div>
+        <div class="tile-name">???</div>
+        <div class="tile-foot">
+          <span class="tile-rate">—</span>
+          <span class="tile-count" style="color: var(--ui-muted)">Saint III</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="legend">
+      Tiles with the amber border can be entered for a mini-game.<br>
+      Long-press any tile to bulk-buy (×10 / ×100).
+    </div>
+
+    <div style="height: 64px"></div>
+  </main>
+
+  <!-- Sticky "Buy Next" action bar -->
+  <div class="buy-bar">
+    <div class="buy-bar-info">
+      <span class="buy-bar-name">Buy next</span>
+      <span class="buy-bar-target">Body Tempering Disciple</span>
+      <span class="buy-bar-cost">×1 — 1,200 Qi · ×10 — 18,400 Qi</span>
+    </div>
+    <div class="buy-mode">
+      <button class="active">×1</button>
+      <button>×10</button>
+      <button>×100</button>
+    </div>
+    <button class="buy-action">Buy</button>
+  </div>
+
+  <nav class="navbar">
+    <button class="nav-btn">
+      <span class="nav-ico">🏯</span>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn active">
+      <span class="nav-ico">🧘</span>
+      <span>Cultivation</span>
+    </button>
+    <button class="nav-btn">
+      <span class="nav-ico">📜</span>
+      <span>Journey</span>
+    </button>
+  </nav>
+
+</div>
+</body>
+</html>

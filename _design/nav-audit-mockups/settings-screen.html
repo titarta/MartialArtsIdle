@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1, viewport-fit=cover" />
+<title>Settings — Screen (proposed)</title>
+<style>
+  /* Lacquer theme — vars lifted from src/index.css */
+  :root {
+    --ui-bg-deep:    rgb(14, 12, 8);
+    --ui-bg-panel:   rgba(32, 26, 18, 0.92);
+    --ui-bg-panel-2: rgba(48, 38, 26, 0.85);
+    --ui-border:     rgba(75, 60, 40, 0.6);
+    --ui-border-strong: rgba(120, 95, 60, 0.75);
+    --ui-tan:        #c8aa78;
+    --ui-cream:      #f5e6c8;
+    --ui-cream-soft: #e8d5a8;
+    --ui-amber:      #dcaf6e;
+    --ui-label:      rgba(210, 195, 170, 0.85);
+    --ui-muted:      rgba(175, 160, 140, 0.7);
+    --danger:        #c74848;
+    --danger-soft:   #ff7878;
+    --font-display:  'Cinzel', Georgia, 'Times New Roman', serif;
+    --font-body:     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  }
+  @font-face {
+    font-family: 'Cinzel';
+    src: local('Cinzel');
+    font-display: swap;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #060504;
+    color: var(--ui-cream);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+    min-height: 100vh;
+  }
+  .device {
+    width: 390px;
+    height: 844px;
+    background: var(--ui-bg-deep);
+    border-radius: 36px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TopBar — Settings active state */
+  .topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    background: rgba(14, 12, 8, 0.85);
+    border-bottom: 1px solid var(--ui-border);
+    flex-shrink: 0;
+    z-index: 5;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: rgba(80, 30, 30, 0.5);
+    border: 1px solid rgba(160, 80, 80, 0.5);
+    border-radius: 14px;
+    font-size: 13px;
+    color: #ffd3d3;
+  }
+  .pill-icon {
+    width: 14px; height: 14px;
+    display: inline-block;
+    background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+    border-radius: 50%;
+  }
+  .shop-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    color: var(--ui-cream-soft);
+  }
+  .currencies {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-left: 8px;
+    font-size: 12px;
+    color: var(--ui-cream-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .topbar-icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-cream-soft);
+    font-size: 16px;
+  }
+  .topbar-icon-btn.active {
+    background: rgba(220, 175, 110, 0.18);
+    border-color: var(--ui-amber);
+    color: var(--ui-amber);
+  }
+
+  /* Screen body */
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    background:
+      linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .95)),
+      radial-gradient(80% 60% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 70%);
+    padding: 20px 16px 100px 16px;
+  }
+  /* Mask the edges so content fades into the chrome */
+  .screen {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 36px), transparent 100%);
+            mask-image: linear-gradient(180deg, transparent 0, #000 20px, #000 calc(100% - 36px), transparent 100%);
+  }
+
+  /* Screen header */
+  .screen-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 4px 16px 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--ui-border);
+  }
+  .screen-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--ui-cream);
+    letter-spacing: 0.06em;
+  }
+  .screen-sub {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ui-muted);
+  }
+
+  /* Sections */
+  .sec {
+    margin-bottom: 20px;
+  }
+  .sec-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ui-amber);
+    margin: 6px 4px 10px 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sec-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--ui-border), transparent);
+  }
+
+  .panel {
+    background: var(--ui-bg-panel);
+    border: 1px solid var(--ui-border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .panel + .panel { margin-top: 8px; }
+
+  /* Audio rows */
+  .audio-row {
+    display: grid;
+    grid-template-columns: 56px 1fr 44px 32px;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 4px;
+  }
+  .audio-row + .audio-row { border-top: 1px solid rgba(75, 60, 40, 0.35); }
+  .audio-label {
+    font-size: 14px;
+    color: var(--ui-cream-soft);
+    font-weight: 500;
+  }
+  .slider {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--ui-amber) var(--v), rgba(75,60,40,0.6) var(--v));
+    outline: none;
+  }
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--ui-cream);
+    box-shadow: 0 0 6px rgba(220, 175, 110, 0.6);
+  }
+  .audio-pct {
+    font-size: 12px;
+    color: var(--ui-cream-soft);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .mute-btn {
+    width: 30px; height: 30px;
+    background: rgba(75, 60, 40, 0.4);
+    border: 1px solid var(--ui-border);
+    border-radius: 6px;
+    color: var(--ui-cream-soft);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Toggle row */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px;
+  }
+  .row + .row { margin-top: 10px; padding-top: 14px; border-top: 1px solid rgba(75,60,40,0.35); }
+  .row-title { font-size: 14px; color: var(--ui-cream); font-weight: 500; }
+  .row-sub { font-size: 12px; color: var(--ui-muted); margin-top: 2px; }
+  .row-info { display: flex; flex-direction: column; }
+
+  .segment {
+    display: inline-flex;
+    background: rgba(14, 12, 8, 0.7);
+    border: 1px solid var(--ui-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .seg-btn {
+    appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--ui-cream-soft);
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .seg-btn.active {
+    background: linear-gradient(180deg, rgba(220, 175, 110, 0.3), rgba(155, 125, 80, 0.3));
+    color: var(--ui-cream);
+    font-weight: 600;
+  }
+  .seg-btn + .seg-btn { border-left: 1px solid var(--ui-border); }
+
+  /* Rendering option cards */
+  .option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .option-card {
+    background: rgba(14, 12, 8, 0.6);
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .option-card.active {
+    background: linear-gradient(180deg, rgba(220, 175, 110, 0.22), rgba(155, 125, 80, 0.18));
+    border-color: var(--ui-amber);
+    box-shadow: 0 0 0 1px rgba(220, 175, 110, 0.35) inset;
+  }
+  .option-icon { font-size: 20px; color: var(--ui-amber); }
+  .option-label { font-size: 13px; color: var(--ui-cream); font-weight: 600; }
+  .option-sub { font-size: 11px; color: var(--ui-muted); letter-spacing: 0.04em; }
+
+  /* Language chips */
+  .lang-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .lang-btn {
+    appearance: none;
+    background: rgba(14, 12, 8, 0.55);
+    border: 1px solid var(--ui-border);
+    color: var(--ui-cream-soft);
+    padding: 7px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-family: var(--font-body);
+    cursor: pointer;
+  }
+  .lang-btn.active {
+    background: rgba(220, 175, 110, 0.22);
+    border-color: var(--ui-amber);
+    color: var(--ui-cream);
+    font-weight: 600;
+  }
+
+  /* Action rows (save data, danger) */
+  .action-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(14, 12, 8, 0.55);
+    border: 1px solid var(--ui-border);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--ui-cream);
+  }
+  .action-row + .action-row { margin-top: 8px; }
+  .action-icon { font-size: 18px; width: 24px; text-align: center; }
+  .action-body { flex: 1; display: flex; flex-direction: column; }
+  .action-label { font-size: 14px; font-weight: 500; }
+  .action-sub { font-size: 12px; color: var(--ui-muted); margin-top: 2px; }
+  .action-chevron { color: var(--ui-muted); font-size: 18px; }
+
+  .danger { color: var(--danger-soft); border-color: rgba(199, 72, 72, 0.4); }
+  .danger .action-icon { color: var(--danger-soft); }
+  .label-danger { color: var(--danger-soft); }
+
+  /* BottomNav placeholder */
+  .navbar {
+    display: flex;
+    height: 68px;
+    background: rgba(14, 12, 8, 0.95);
+    border-top: 1px solid var(--ui-border);
+    flex-shrink: 0;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    color: var(--ui-muted);
+    font-size: 11px;
+    font-family: var(--font-body);
+  }
+  .nav-btn.active {
+    color: var(--ui-amber);
+  }
+  .nav-ico {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .nav-label { font-size: 11px; letter-spacing: 0.03em; }
+
+  /* Back-arrow chip for the screen header */
+  .back-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: none;
+    color: var(--ui-cream-soft); font-size: 13px;
+    font-family: var(--font-body);
+    cursor: pointer;
+    padding: 6px 0;
+    margin-bottom: 4px;
+  }
+  .back-arrow {
+    color: var(--ui-amber);
+    font-size: 16px;
+  }
+
+  /* Tag in screen-head */
+  .tag {
+    display: inline-block;
+    padding: 3px 8px;
+    background: rgba(220, 175, 110, 0.12);
+    border: 1px solid rgba(220, 175, 110, 0.35);
+    border-radius: 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ui-amber);
+  }
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- TopBar (Settings active) -->
+  <div class="topbar">
+    <button class="pill" aria-label="Top Up"><span class="pill-icon"></span> 0</button>
+    <button class="shop-btn" aria-label="Spirit Bazaar">🏮</button>
+    <div class="currencies">
+      <span>QI 50.8M</span>
+      <span>KARMA 42</span>
+    </div>
+    <button class="topbar-icon-btn" aria-label="Reincarnation">☸</button>
+    <button class="topbar-icon-btn" aria-label="Annals">📊</button>
+    <button class="topbar-icon-btn active" aria-label="Settings">⚙</button>
+  </div>
+
+  <!-- Screen body -->
+  <main class="screen">
+    <button class="back-chip"><span class="back-arrow">‹</span> Back</button>
+
+    <div class="screen-head">
+      <div>
+        <div class="screen-title">Settings</div>
+        <div class="screen-sub">Audio · Visuals · Save Data</div>
+      </div>
+      <span class="tag">v1.4</span>
+    </div>
+
+    <!-- Audio -->
+    <section class="sec">
+      <div class="sec-label">Audio</div>
+      <div class="panel">
+        <div class="audio-row">
+          <span class="audio-label">Master</span>
+          <input class="slider" type="range" min="0" max="100" value="80" style="--v: 80%" />
+          <span class="audio-pct">80%</span>
+          <button class="mute-btn">🔊</button>
+        </div>
+        <div class="audio-row">
+          <span class="audio-label">Music</span>
+          <input class="slider" type="range" min="0" max="100" value="65" style="--v: 65%" />
+          <span class="audio-pct">65%</span>
+          <button class="mute-btn">🔊</button>
+        </div>
+        <div class="audio-row">
+          <span class="audio-label">Effects</span>
+          <input class="slider" type="range" min="0" max="100" value="90" style="--v: 90%" />
+          <span class="audio-pct">90%</span>
+          <button class="mute-btn">🔊</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Visuals -->
+    <section class="sec">
+      <div class="sec-label">Visual Effects</div>
+      <div class="panel">
+        <div class="row">
+          <div class="row-info">
+            <span class="row-title">Particles &amp; Animations</span>
+            <span class="row-sub">Disable to save battery on long sessions</span>
+          </div>
+          <div class="segment">
+            <button class="seg-btn active">On</button>
+            <button class="seg-btn">Off</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rendering -->
+    <section class="sec">
+      <div class="sec-label">Rendering Mode</div>
+      <div class="option-grid">
+        <div class="option-card active">
+          <div class="option-icon">〜</div>
+          <div class="option-label">Smooth</div>
+          <div class="option-sub">bilinear</div>
+        </div>
+        <div class="option-card">
+          <div class="option-icon">▦</div>
+          <div class="option-label">Crisp</div>
+          <div class="option-sub">pixelated</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language -->
+    <section class="sec">
+      <div class="sec-label">Language</div>
+      <div class="panel">
+        <div class="lang-row">
+          <button class="lang-btn active">English</button>
+          <button class="lang-btn">Português</button>
+          <button class="lang-btn">中文</button>
+          <button class="lang-btn">Español</button>
+          <button class="lang-btn">日本語</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Save Data -->
+    <section class="sec">
+      <div class="sec-label">Save Data</div>
+      <div class="action-row">
+        <span class="action-icon">📤</span>
+        <span class="action-body">
+          <span class="action-label">Export Save</span>
+          <span class="action-sub">Copy save code to clipboard</span>
+        </span>
+        <span class="action-chevron">›</span>
+      </div>
+      <div class="action-row">
+        <span class="action-icon">📥</span>
+        <span class="action-body">
+          <span class="action-label">Import Save</span>
+          <span class="action-sub">Paste a save code to restore</span>
+        </span>
+        <span class="action-chevron">›</span>
+      </div>
+    </section>
+
+    <!-- Danger -->
+    <section class="sec">
+      <div class="sec-label label-danger">Danger Zone</div>
+      <div class="action-row danger">
+        <span class="action-icon">🗑</span>
+        <span class="action-body">
+          <span class="action-label">Wipe All Save Data</span>
+          <span class="action-sub">Permanently delete all progress</span>
+        </span>
+        <span class="action-chevron">›</span>
+      </div>
+    </section>
+
+    <div style="height: 24px"></div>
+  </main>
+
+  <!-- BottomNav (placeholder — Home is active because Settings has no nav slot;
+       the player came in via TopBar ⚙ which acts like a sibling stack) -->
+  <nav class="navbar">
+    <button class="nav-btn">
+      <span class="nav-ico">🏯</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-btn">
+      <span class="nav-ico">🧘</span>
+      <span class="nav-label">Cultivation</span>
+    </button>
+    <button class="nav-btn">
+      <span class="nav-ico">📜</span>
+      <span class="nav-label">Journey</span>
+    </button>
+  </nav>
+
+</div>
+</body>
+</html>

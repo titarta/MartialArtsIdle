@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1, viewport-fit=cover" />
+<title>Settings — Redesign Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ──────────────────────────────────────────────────────────
+   SETTINGS — Lacquer Tablet Redesign
+   Identity: a personalized cultivator tablet (not a form).
+   - Top: identity plaque (current realm + lives + a single
+     warm-cream line: "Cultivator of the (realm) path")
+   - Middle: 6 grouped cards, each a small panel with brushed
+     section glyph, name, and inline controls
+   - Bottom: a clearly-quarantined "Danger Path" card with
+     warm-red wash and a deliberate two-tap commit
+   No new fonts, no new color systems.
+   ────────────────────────────────────────────────────────── */
+:root{
+  /* Direct lifts from src/index.css */
+  --ui-bg-deep-rgb:    14, 12, 8;
+  --ui-bg-panel-rgb:   32, 26, 18;
+  --ui-purple-rgb:     200, 170, 120;
+  --ui-purple-deep:    #9b7d50;
+  --ui-purple-strong:  #dcaf6e;
+  --ui-purple-soft:    #e8d5a8;
+  --ui-purple-light:   #f5e6c8;
+  --ui-purple-wash:    #f8edd4;
+  --ui-purple-darker:  #4a3520;
+  --ui-label-rgb:      210, 195, 170;
+  --ui-muted-rgb:      175, 160, 140;
+  --ui-border:         rgba(75, 60, 40, 0.6);
+  --ui-border-soft:    rgba(75, 60, 40, 0.35);
+
+  --bg-deep:           rgb(var(--ui-bg-deep-rgb));
+  --bg-panel:          rgba(var(--ui-bg-panel-rgb), 0.92);
+  --bg-nested:         rgba(14, 12, 8, 0.55);
+
+  --danger:            #c74848;
+  --danger-soft:       #ff7878;
+  --danger-wash:       rgba(199, 72, 72, 0.10);
+
+  --font-display:      'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-cn:           'Ma Shan Zheng', 'Cinzel', serif;
+  --font-body:         -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background: #060504;
+  color: var(--ui-purple-light);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+body{
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 20px 0 40px;
+  min-height: 100vh;
+}
+
+/* Device frame */
+.device{
+  width: 390px; height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+
+/* ── Top bar (existing chrome, shown for context) ── */
+.topbar{
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+  background: rgba(14, 12, 8, 0.85);
+  border-bottom: 1px solid var(--ui-border);
+  flex-shrink: 0;
+  z-index: 5;
+}
+.tb-shop{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 14px;
+}
+.tb-curr{
+  flex: 1; display: flex; flex-direction: column; gap: 1px;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.tb-curr-row{ display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ui-purple-soft); }
+.tb-curr-row .dot{
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+}
+.tb-curr-row .dot.gold{ background: radial-gradient(circle, #ffd55a 30%, #6b4a10 70%); }
+.tb-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 16px;
+}
+.tb-icon.active{
+  background: rgba(220, 175, 110, 0.18);
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-strong);
+}
+
+/* ── Screen body (scrollable, edge-fade mask) ── */
+.screen{
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 96px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 65%),
+    linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .95));
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+}
+
+/* ── Back chip (consistent across screens) ── */
+.back-chip{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px 6px 8px;
+  background: var(--bg-nested);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  color: var(--ui-purple-soft);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.back-chip .ar{ font-size: 16px; line-height: 1; margin-right: 2px; }
+
+/* ── Identity plaque — the central design move ── */
+.identity{
+  margin-top: 14px;
+  position: relative;
+  padding: 18px 18px 16px;
+  border-radius: 16px;
+  background:
+    /* hairline highlight */
+    linear-gradient(180deg, rgba(245, 230, 200, 0.10), rgba(245, 230, 200, 0) 30%),
+    /* lacquer face */
+    linear-gradient(160deg, rgba(46, 36, 24, 0.96) 0%, rgba(26, 20, 14, 0.96) 100%);
+  border: 1px solid rgba(212, 184, 136, 0.30);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 225, 170, 0.05),
+    0 12px 28px -18px rgba(0,0,0,0.9);
+  overflow: hidden;
+}
+/* Calligraphy watermark */
+.identity::before{
+  content: "道";
+  font-family: var(--font-cn);
+  position: absolute;
+  right: -10px; top: -22px;
+  font-size: 120px;
+  color: rgba(220, 175, 110, 0.08);
+  line-height: 1;
+  pointer-events: none;
+}
+.id-eyebrow{
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  margin-bottom: 6px;
+}
+.id-title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+  line-height: 1.1;
+}
+.id-realm{
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ui-purple-soft);
+}
+.id-realm-glyph{
+  display: inline-block;
+  width: 22px; height: 22px;
+  background: linear-gradient(135deg, #5d4426 0%, #2d2014 100%);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  border-radius: 4px;
+  position: relative;
+}
+.id-realm-glyph::after{
+  content: "";
+  position: absolute; inset: 4px;
+  border: 1px solid rgba(220, 175, 110, 0.50);
+  border-radius: 2px;
+}
+.id-realm-name{ color: var(--ui-purple-light); font-weight: 600; letter-spacing: 0.04em; }
+.id-realm-stage{ color: rgba(var(--ui-label-rgb), 0.65); }
+.id-meta{
+  margin-top: 10px;
+  display: flex; gap: 12px;
+  font-size: 11px;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.id-meta span b{
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ui-purple-strong);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin-right: 4px;
+}
+.id-divider{
+  display: inline-block;
+  width: 1px; height: 12px;
+  background: var(--ui-border);
+  align-self: center;
+}
+
+/* ── Section label (above each card) ── */
+.sec-label{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--ui-purple-strong);
+  margin: 20px 4px 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after{
+  content: ""; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--ui-border), transparent);
+}
+.sec-label.danger{ color: var(--danger-soft); }
+
+/* ── Panel card ── */
+.card{
+  background: var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.03);
+}
+
+/* ── Audio rows ── */
+.audio-row{
+  display: grid;
+  grid-template-columns: 64px 1fr 36px 28px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 4px;
+}
+.audio-row + .audio-row{ border-top: 1px solid var(--ui-border-soft); }
+.audio-label{
+  font-size: 13px; color: var(--ui-purple-light);
+  font-weight: 500;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+.slider{
+  appearance: none; -webkit-appearance: none;
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--ui-purple-strong) var(--v, 50%), rgba(75,60,40,0.6) var(--v, 50%));
+  outline: none;
+}
+.slider::-webkit-slider-thumb{
+  appearance: none; -webkit-appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--ui-purple-light);
+  box-shadow: 0 0 6px rgba(220, 175, 110, 0.6);
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.audio-pct{
+  font-size: 12px; color: var(--ui-purple-soft);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.mute-btn{
+  width: 26px; height: 26px;
+  background: rgba(75, 60, 40, 0.40);
+  border: 1px solid var(--ui-border);
+  border-radius: 6px;
+  color: var(--ui-purple-soft);
+  font-size: 12px;
+  line-height: 1;
+}
+.mute-btn.muted{ color: rgba(var(--ui-muted-rgb), 0.7); }
+
+/* ── Toggle row (label + segmented) ── */
+.row{
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px;
+}
+.row + .row{
+  margin-top: 8px; padding-top: 12px;
+  border-top: 1px solid var(--ui-border-soft);
+}
+.row-info{ display: flex; flex-direction: column; }
+.row-title{
+  font-size: 13px; color: var(--ui-purple-light);
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.row-sub{
+  font-size: 11px; color: rgba(var(--ui-muted-rgb), 0.7);
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+}
+.segment{
+  display: inline-flex;
+  background: rgba(14, 12, 8, 0.7);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg-btn{
+  background: transparent; border: none;
+  color: var(--ui-purple-soft);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+}
+.seg-btn.active{
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.30), rgba(155, 125, 80, 0.30));
+  color: var(--ui-purple-light); font-weight: 600;
+}
+.seg-btn + .seg-btn{ border-left: 1px solid var(--ui-border); }
+
+/* ── Option grid (rendering) ── */
+.option-grid{
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.option-card{
+  background: var(--bg-nested);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  padding: 12px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.option-card.active{
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.22), rgba(155, 125, 80, 0.18));
+  border-color: var(--ui-purple-strong);
+  box-shadow: 0 0 0 1px rgba(220, 175, 110, 0.30) inset;
+}
+.option-icon{ font-size: 20px; color: var(--ui-purple-strong); line-height: 1; }
+.option-label{
+  font-size: 12px; color: var(--ui-purple-light); font-weight: 600;
+  font-family: var(--font-display); letter-spacing: 0.04em;
+}
+.option-sub{
+  font-size: 10px; color: rgba(var(--ui-muted-rgb), 0.65);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ── Language chips ── */
+.lang-row{ display: flex; flex-wrap: wrap; gap: 6px; }
+.lang-btn{
+  background: rgba(14, 12, 8, 0.55);
+  border: 1px solid var(--ui-border);
+  color: var(--ui-purple-soft);
+  padding: 6px 11px;
+  border-radius: 16px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.lang-btn.active{
+  background: rgba(220, 175, 110, 0.22);
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-light);
+  font-weight: 600;
+}
+
+/* ── Action rows (save data) ── */
+.action-row{
+  width: 100%;
+  display: flex; align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(14, 12, 8, 0.50);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  text-align: left;
+  color: var(--ui-purple-light);
+}
+.action-row + .action-row{ margin-top: 8px; }
+.action-icon{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(220, 175, 110, 0.10);
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 8px;
+  font-size: 16px; color: var(--ui-purple-strong);
+}
+.action-body{ flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.action-label{
+  font-size: 13px;
+  font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 600;
+  color: var(--ui-purple-light);
+}
+.action-sub{ font-size: 11px; color: rgba(var(--ui-muted-rgb), 0.7); }
+.action-chev{ font-size: 18px; color: rgba(var(--ui-muted-rgb), 0.5); }
+
+/* ── Danger card ── */
+.danger-card{
+  background:
+    linear-gradient(180deg, var(--danger-wash), transparent 60%),
+    var(--bg-panel);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 12px;
+  padding: 12px;
+}
+.danger-row{
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px;
+}
+.danger-icon{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(199, 72, 72, 0.15);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 8px;
+  color: var(--danger-soft); font-size: 16px;
+}
+.danger-label{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 13px;
+  color: var(--danger-soft); letter-spacing: 0.05em;
+}
+.danger-sub{
+  font-size: 11px; color: rgba(255, 180, 180, 0.55); margin-top: 2px;
+}
+.danger-body{ flex: 1; display: flex; flex-direction: column; }
+
+.danger-chev{
+  font-size: 18px; color: rgba(255, 180, 180, 0.55);
+}
+
+/* Outer footer note */
+.footer-note{
+  margin: 24px 4px 0;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 0.20em;
+  color: rgba(var(--ui-muted-rgb), 0.40);
+  text-transform: uppercase;
+}
+.footer-note .ver{
+  color: rgba(var(--ui-muted-rgb), 0.65);
+  letter-spacing: 0.10em;
+  text-transform: none;
+}
+
+/* ── Bottom nav (chrome reference) ── */
+.botnav{
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60px;
+  display: flex;
+  background: rgba(14, 12, 8, 0.96);
+  border-top: 1px solid var(--ui-border);
+  padding: 8px 0 10px;
+  z-index: 6;
+}
+.bn-item{
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.bn-item .bni{ font-size: 18px; line-height: 1; }
+.bn-item.active{ color: var(--ui-purple-strong); }
+
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- Existing TopBar (shown for context) -->
+  <div class="topbar">
+    <button class="tb-shop">⌗</button>
+    <div class="tb-curr">
+      <div class="tb-curr-row"><span class="dot"></span>Blood Lotus <b>420</b></div>
+      <div class="tb-curr-row"><span class="dot gold"></span>Karma <b>1,205</b></div>
+    </div>
+    <button class="tb-icon" title="Achievements">🏆</button>
+    <button class="tb-icon active" title="Settings">⚙</button>
+  </div>
+
+  <!-- Settings screen -->
+  <div class="screen">
+
+    <!-- Back chip -->
+    <button class="back-chip"><span class="ar">‹</span> Back</button>
+
+    <!-- IDENTITY PLAQUE -->
+    <div class="identity">
+      <div class="id-eyebrow">Cultivator Tablet</div>
+      <div class="id-title">Settings</div>
+      <div class="id-realm">
+        <span class="id-realm-glyph"></span>
+        <span class="id-realm-name">Saint</span>
+        <span class="id-realm-stage">· Middle Stage</span>
+      </div>
+      <div class="id-meta">
+        <span><b>3</b> Lives</span>
+        <span class="id-divider"></span>
+        <span><b>27</b> Realms Crossed</span>
+        <span class="id-divider"></span>
+        <span><b>2.4d</b> Cultivating</span>
+      </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="sec-label">Audio</div>
+    <div class="card">
+      <div class="audio-row">
+        <span class="audio-label">Master</span>
+        <input type="range" class="slider" min="0" max="100" value="80" style="--v:80%">
+        <span class="audio-pct">80%</span>
+        <button class="mute-btn">🔊</button>
+      </div>
+      <div class="audio-row">
+        <span class="audio-label">Music</span>
+        <input type="range" class="slider" min="0" max="100" value="55" style="--v:55%">
+        <span class="audio-pct">55%</span>
+        <button class="mute-btn">🔊</button>
+      </div>
+      <div class="audio-row">
+        <span class="audio-label">Effects</span>
+        <input type="range" class="slider" min="0" max="100" value="0" style="--v:0%" disabled>
+        <span class="audio-pct">—</span>
+        <button class="mute-btn muted">🔇</button>
+      </div>
+    </div>
+
+    <!-- VISUALS -->
+    <div class="sec-label">Visual Effects</div>
+    <div class="card">
+      <div class="row">
+        <div class="row-info">
+          <span class="row-title">Particles &amp; Animations</span>
+          <span class="row-sub">Qi orbs, breakthrough flashes, ambient motes</span>
+        </div>
+        <div class="segment">
+          <button class="seg-btn active">On</button>
+          <button class="seg-btn">Off</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RENDERING -->
+    <div class="sec-label">Rendering Mode</div>
+    <div class="option-grid">
+      <div class="option-card active">
+        <span class="option-icon">〜</span>
+        <span class="option-label">Smooth</span>
+        <span class="option-sub">bilinear</span>
+      </div>
+      <div class="option-card">
+        <span class="option-icon">▦</span>
+        <span class="option-label">Crisp</span>
+        <span class="option-sub">pixelated</span>
+      </div>
+    </div>
+
+    <!-- LANGUAGE -->
+    <div class="sec-label">Language</div>
+    <div class="card">
+      <div class="lang-row">
+        <button class="lang-btn active">English</button>
+        <button class="lang-btn">中文</button>
+        <button class="lang-btn">Español</button>
+        <button class="lang-btn">Français</button>
+        <button class="lang-btn">Deutsch</button>
+        <button class="lang-btn">日本語</button>
+        <button class="lang-btn">한국어</button>
+        <button class="lang-btn">Português</button>
+        <button class="lang-btn">Русский</button>
+      </div>
+    </div>
+
+    <!-- SAVE DATA -->
+    <div class="sec-label">Save Data</div>
+    <button class="action-row">
+      <span class="action-icon">📤</span>
+      <span class="action-body">
+        <span class="action-label">Export Save</span>
+        <span class="action-sub">Copy save code to clipboard</span>
+      </span>
+      <span class="action-chev">›</span>
+    </button>
+    <button class="action-row">
+      <span class="action-icon">📥</span>
+      <span class="action-body">
+        <span class="action-label">Import Save</span>
+        <span class="action-sub">Paste a save code to restore</span>
+      </span>
+      <span class="action-chev">›</span>
+    </button>
+
+    <!-- DANGER -->
+    <div class="sec-label danger">Danger Path</div>
+    <div class="danger-card">
+      <div class="danger-row">
+        <span class="danger-icon">🗑</span>
+        <span class="danger-body">
+          <span class="danger-label">Wipe Save</span>
+          <span class="danger-sub">Permanently delete all progress. Requires two taps.</span>
+        </span>
+        <span class="danger-chev">›</span>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      Martial Arts Idle <span class="ver">v1.4.2</span>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav reference -->
+  <div class="botnav">
+    <div class="bn-item"><span class="bni">⛰</span>Cultivate</div>
+    <div class="bn-item"><span class="bni">📜</span>Journey</div>
+    <div class="bn-item"><span class="bni">🏮</span>Bazaar</div>
+    <div class="bn-item active"><span class="bni">⚙</span>Settings</div>
+  </div>
+
+</div>
+</body>
+</html>

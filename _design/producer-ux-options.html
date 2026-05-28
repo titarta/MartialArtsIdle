@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Producer Access — UX Mockups</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─────────────────────────────────────────────────────────────────────
+       Tokens borrowed from src/index.css (lacquer theme).
+       Names kept identical so the mockup reads next to the real CSS.
+       ───────────────────────────────────────────────────────────────────── */
+    :root {
+      --ui-bg-deep:        rgb(14, 12, 8);
+      --ui-bg-panel:       rgb(32, 26, 18);
+      --ui-bg-panel-strong:rgba(32, 26, 18, 0.92);
+      --ui-bg-panel-soft:  rgba(32, 26, 18, 0.78);
+      --ui-border-light:   rgba(200, 170, 120, 0.32);
+      --ui-border-faint:   rgba(200, 170, 120, 0.16);
+      --ui-purple:         #c8aa78;       /* warm tan */
+      --ui-purple-deep:    #9b7d50;       /* sandalwood */
+      --ui-purple-strong:  #dcaf6e;       /* lantern amber */
+      --ui-purple-soft:    #e8d5a8;
+      --ui-purple-light:   #f5e6c8;
+      --ui-purple-wash:    #f8edd4;
+      --accent:            #e94560;
+      --accent-soft:       #ff6b81;
+      --gold:              #f5c842;
+      --text-primary:      #eee;
+      --text-secondary:    rgba(210, 195, 170, 0.65);
+      --text-muted:        rgba(175, 160, 140, 0.55);
+      --jade:              #6ec896;
+      --jade-deep:         #387855;
+
+      --font-display:      'Cinzel', Georgia, 'Times New Roman', serif;
+      --font-ui:           -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: #0a0805;
+      color: var(--text-primary);
+      font-family: var(--font-ui);
+      -webkit-font-smoothing: antialiased;
+    }
+    body { padding: 32px 24px 60px; }
+    .page {
+      max-width: 1880px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 26px;
+      letter-spacing: 0.02em;
+      color: var(--ui-purple-light);
+      margin: 0 0 6px;
+    }
+    .lede {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 1100px;
+      line-height: 1.55;
+      margin: 0 0 28px;
+    }
+    .lede strong { color: var(--ui-purple-strong); font-weight: 600; }
+    .lede code {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--ui-purple-soft);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1700px) {
+      .row { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .row { grid-template-columns: 1fr; }
+    }
+    .opt {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .opt-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .opt-letter {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 28px;
+      color: var(--ui-purple-strong);
+      letter-spacing: 0.04em;
+    }
+    .opt-name {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 17px;
+      color: var(--ui-purple-light);
+      letter-spacing: 0.03em;
+    }
+    .opt-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      min-height: 36px;
+    }
+    .state-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+    .pair {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Phone frame — emulates 390x844 viewport with the actual home scene.
+       ───────────────────────────────────────────────────────────────────── */
+    .phone {
+      width: 390px;
+      height: 844px;
+      position: relative;
+      border-radius: 38px;
+      overflow: hidden;
+      background: #0a0805;
+      box-shadow:
+        0 0 0 8px #131210,
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        0 8px 24px rgba(0, 0, 0, 0.45);
+      flex-shrink: 0;
+    }
+    .phone-bg {
+      position: absolute;
+      inset: 0;
+      background: url('http://localhost:5173/backgrounds/home.png') center 32% / cover no-repeat,
+                  linear-gradient(180deg, #261c12, #0a0805);
+    }
+    .phone-bg::after {
+      /* warm dim so the chrome reads */
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10, 6, 2, 0.05) 0%, rgba(10, 6, 2, 0) 30%, rgba(10, 6, 2, 0) 60%, rgba(10, 6, 2, 0.55) 100%);
+      pointer-events: none;
+    }
+
+    /* ── top bar (currency + nav) ─────────────────────────────────────── */
+    .top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 10px 12px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(10, 6, 2, 0.85) 0%, rgba(10, 6, 2, 0) 100%);
+      z-index: 5;
+    }
+    .currencies {
+      display: flex;
+      gap: 8px;
+    }
+    .currency-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 9px 4px 5px;
+      background: rgba(20, 14, 8, 0.85);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+    }
+    .currency-chip .ico {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 11px;
+    }
+    .currency-chip.lotus .ico { background: radial-gradient(circle at 30% 30%, #ff6b81, #b03050); }
+    .currency-chip.lotus-crimson .ico { background: radial-gradient(circle at 30% 30%, #c0392b, #5a1010); }
+    .currency-chip.qi {
+      padding: 4px 9px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0;
+      border-radius: 12px;
+    }
+    .currency-chip.qi .row1 { display: flex; align-items: center; gap: 6px; line-height: 1; }
+    .currency-chip.qi .row1::before {
+      content: '';
+      width: 11px; height: 11px;
+      background: radial-gradient(circle at 30% 30%, #b8d6ff, #4a7ed8);
+      border-radius: 50%;
+      box-shadow: 0 0 4px rgba(184, 214, 255, 0.6);
+    }
+    .currency-chip.qi .karma {
+      font-size: 10px; color: var(--text-secondary);
+      margin-top: 2px; line-height: 1;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .currency-chip.qi .karma::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: radial-gradient(circle at 30% 30%, #d4b3ff, #7c3aed);
+      border-radius: 50%;
+    }
+    .nav-icons { display: flex; gap: 6px; }
+    .nav-btn {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      background: rgba(20, 14, 8, 0.85);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 10px;
+      color: var(--ui-purple-light);
+    }
+
+    /* ── petition tablet (right side, calligraphy plaque) ─────────────── */
+    .petition {
+      position: absolute;
+      top: 70px; right: 8px;
+      width: 76px; height: 158px;
+      background: linear-gradient(180deg, #4a3520 0%, #6b4a28 50%, #4a3520 100%);
+      border: 2px solid #2d1d10;
+      border-radius: 4px;
+      padding: 12px 6px 8px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      box-shadow: 0 0 0 1px rgba(245, 230, 200, 0.15), 0 4px 8px rgba(0, 0, 0, 0.5);
+      z-index: 4;
+    }
+    .petition::before {
+      /* cord */
+      content: '';
+      position: absolute; top: -36px; left: 50%;
+      width: 1px; height: 36px;
+      background: #2a1d10;
+      transform: translateX(-50%);
+    }
+    .petition-label {
+      font-family: var(--font-display);
+      font-size: 8px; letter-spacing: 0.18em;
+      color: var(--ui-purple-light);
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    }
+    .petition-char {
+      font-family: 'Ma Shan Zheng', 'KaiTi', serif;
+      font-size: 36px;
+      color: var(--ui-purple-soft);
+      line-height: 1;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    .petition-rate {
+      font-size: 9px; font-weight: 700;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+    }
+    .petition-time {
+      font-size: 7px;
+      color: var(--ui-purple-soft);
+      letter-spacing: 0.1em;
+    }
+    .petition-cta {
+      font-size: 7px; letter-spacing: 0.1em;
+      color: var(--accent);
+      text-align: center;
+      text-transform: uppercase;
+      line-height: 1.2;
+      margin-top: auto;
+    }
+
+    /* ── crystal area (center-top of scene) ────────────────────────────── */
+    .crystal-area {
+      position: absolute;
+      top: 235px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .crystal-label {
+      font-family: var(--font-display);
+      font-size: 11px; letter-spacing: 0.18em;
+      padding: 4px 14px;
+      background: rgba(20, 14, 8, 0.85);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 999px;
+      color: var(--ui-purple-light);
+      text-transform: uppercase;
+    }
+    .crystal-sprite {
+      width: 76px; height: 76px;
+      background: url('http://localhost:5173/crystals/crystal_1.png') center/contain no-repeat;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 8px rgba(184, 214, 255, 0.45));
+    }
+    .refine-btn {
+      padding: 6px 18px;
+      background: linear-gradient(180deg, #2a1d10, #4a3520);
+      border: 1.5px solid var(--ui-purple-strong);
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px; letter-spacing: 0.18em;
+      color: var(--ui-purple-strong);
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(220, 175, 110, 0.3);
+    }
+
+    /* ── cultivator silhouette + realm strip ──────────────────────────── */
+    .cultivator {
+      position: absolute;
+      bottom: 200px; left: 50%;
+      transform: translateX(-50%);
+      width: 180px; height: 200px;
+      background: url('http://localhost:5173/sprites/cultivator/t3_separation_normal.png') center bottom / contain no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+    }
+    .realm-strip {
+      position: absolute;
+      bottom: 134px; left: 0; right: 0;
+      text-align: center;
+      padding: 0 16px;
+    }
+    .realm-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.08em;
+      color: var(--ui-purple-light);
+      text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+    .realm-layer {
+      font-family: var(--font-display);
+      font-size: 10px; letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .qi-line {
+      position: absolute;
+      bottom: 96px; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 0 26px;
+      font-size: 13px; font-weight: 600;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+    .qi-line .rate { color: var(--jade); }
+    .tier-bar {
+      position: absolute;
+      bottom: 70px; left: 18px; right: 18px;
+      height: 18px;
+      background: linear-gradient(180deg, #2a1d10, #1a1108);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .tier-bar::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 32%;
+      background: linear-gradient(90deg, #6b4a28, var(--ui-purple-strong));
+      box-shadow: 0 0 10px rgba(220, 175, 110, 0.4);
+    }
+    .tier-bar::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 14px; height: 14px;
+      transform: translate(-50%, -50%);
+      background: var(--gold);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(245, 200, 66, 0.7);
+    }
+
+    /* ── bottom nav (3 buttons) ───────────────────────────────────────── */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 56px;
+      display: flex;
+      background: linear-gradient(180deg, rgba(10, 6, 2, 0) 0%, rgba(10, 6, 2, 0.94) 50%, rgba(10, 6, 2, 0.94) 100%);
+      border-top: 1px solid var(--ui-border-faint);
+    }
+    .bottom-nav button {
+      flex: 1;
+      background: transparent;
+      border: 0;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 10px; letter-spacing: 0.16em;
+      text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding-top: 8px;
+    }
+    .bottom-nav button.active { color: var(--gold); }
+    .bottom-nav button .nav-dot {
+      width: 22px; height: 22px;
+      background: rgba(245, 230, 200, 0.4);
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 14px;
+    }
+    .bottom-nav button.active .nav-dot {
+      background: rgba(245, 200, 66, 0.85);
+      color: #1a1108;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Option A — Status quo. Producer list lives on Cultivation tab.
+       ───────────────────────────────────────────────────────────────────── */
+    .cult-tab {
+      position: absolute;
+      top: 60px; left: 12px; right: 12px;
+      bottom: 70px;
+      overflow: hidden;
+    }
+    .cult-segmented {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .cult-segmented button {
+      flex: 1;
+      background: rgba(32, 26, 18, 0.7);
+      border: 1px solid var(--ui-border-faint);
+      border-radius: 10px;
+      padding: 8px;
+      font-family: var(--font-display);
+      font-size: 11px; letter-spacing: 0.14em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+    .cult-segmented button.active {
+      background: rgba(220, 175, 110, 0.15);
+      border-color: var(--ui-purple-strong);
+      color: var(--ui-purple-light);
+    }
+    .buy-mode {
+      display: flex; gap: 6px; align-items: center;
+      margin-bottom: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .buy-mode .seg {
+      padding: 4px 12px;
+      background: rgba(32, 26, 18, 0.55);
+      border: 1px solid var(--ui-border-faint);
+      border-radius: 999px;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 11px;
+    }
+    .buy-mode .seg.active {
+      background: rgba(220, 175, 110, 0.18);
+      border-color: var(--ui-purple-strong);
+      color: var(--ui-purple-strong);
+    }
+
+    /* Producer card — Cookie-Clicker-style row */
+    .p-card {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px 10px 8px;
+      background: rgba(32, 26, 18, 0.78);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .p-card.locked {
+      background: rgba(32, 26, 18, 0.4);
+      border-color: var(--ui-border-faint);
+      opacity: 0.6;
+    }
+    .p-icon {
+      width: 56px; height: 56px;
+      background: rgba(0, 0, 0, 0.45) center/cover no-repeat;
+      border-radius: 10px;
+      image-rendering: pixelated;
+      position: relative;
+    }
+    .p-icon .owned {
+      position: absolute;
+      bottom: -4px; right: -4px;
+      background: var(--gold);
+      color: #1a1108;
+      font-size: 9px; font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 6px;
+    }
+    .p-meta { min-width: 0; }
+    .p-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 12px; letter-spacing: 0.04em;
+      color: var(--ui-purple-light);
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .p-name .lock-tag {
+      color: var(--text-muted);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+    .p-rate {
+      font-size: 10px; color: var(--text-secondary);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .p-buy {
+      padding: 8px 12px;
+      min-width: 76px;
+      background: rgba(20, 14, 8, 0.85);
+      border: 1px solid var(--ui-purple-strong);
+      border-radius: 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .p-buy .mult { font-size: 9px; color: var(--ui-purple-soft); letter-spacing: 0.1em; }
+    .p-buy .cost {
+      font-size: 12px; font-weight: 700;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+    }
+    .p-buy.dis {
+      border-color: var(--ui-border-faint);
+      opacity: 0.5;
+    }
+    .p-buy.afford {
+      background: linear-gradient(180deg, rgba(110, 200, 150, 0.18), rgba(56, 120, 85, 0.32));
+      border-color: var(--jade);
+      box-shadow: 0 0 8px rgba(110, 200, 150, 0.25);
+    }
+    .p-buy.afford .cost { color: var(--jade); }
+    .p-buy.locked-buy {
+      background: transparent;
+      border-color: var(--ui-border-faint);
+      color: var(--text-muted);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Option B — Pull-up sheet (Spotify/Maps pattern)
+       ───────────────────────────────────────────────────────────────────── */
+    .pull-handle {
+      position: absolute;
+      bottom: 56px; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(10, 6, 2, 0), rgba(20, 14, 8, 0.96) 32%, rgba(20, 14, 8, 0.96));
+      border-top: 1px solid var(--ui-border-light);
+      padding: 10px 16px 8px;
+      display: flex; align-items: center; gap: 10px;
+      backdrop-filter: blur(6px);
+    }
+    .pull-grip {
+      position: absolute;
+      top: 6px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px; height: 4px;
+      background: rgba(245, 230, 200, 0.45);
+      border-radius: 2px;
+    }
+    .ph-icon {
+      width: 36px; height: 36px;
+      background: rgba(0, 0, 0, 0.45) center/cover no-repeat;
+      border-radius: 8px;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+    }
+    .ph-meta { flex: 1; min-width: 0; }
+    .ph-label {
+      font-size: 9px; color: var(--text-secondary);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    .ph-name {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700;
+      color: var(--ui-purple-light);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ph-buy {
+      padding: 6px 14px;
+      background: linear-gradient(180deg, rgba(110, 200, 150, 0.22), rgba(56, 120, 85, 0.32));
+      border: 1.5px solid var(--jade);
+      border-radius: 999px;
+      font-size: 12px; font-weight: 700;
+      color: var(--jade);
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 0 8px rgba(110, 200, 150, 0.25);
+    }
+
+    /* Expanded half-sheet */
+    .sheet {
+      position: absolute;
+      bottom: 56px; left: 0; right: 0;
+      height: 480px;
+      background: rgba(14, 10, 6, 0.97);
+      border-top: 1px solid var(--ui-border-light);
+      border-radius: 18px 18px 0 0;
+      box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.65);
+      padding: 16px 14px 70px;
+      overflow: hidden;
+    }
+    .sheet-grip {
+      width: 38px; height: 4px;
+      background: rgba(245, 230, 200, 0.45);
+      border-radius: 2px;
+      margin: 0 auto 12px;
+    }
+    .sheet-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .sheet-title {
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 700;
+      color: var(--ui-purple-light);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .sheet-mode {
+      display: flex; gap: 4px;
+    }
+    .sheet-mode span {
+      font-size: 10px; padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(32, 26, 18, 0.6);
+      border: 1px solid var(--ui-border-faint);
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+    .sheet-mode span.active {
+      border-color: var(--ui-purple-strong);
+      color: var(--ui-purple-strong);
+      background: rgba(220, 175, 110, 0.15);
+    }
+    .sheet .p-card { padding: 8px 10px 8px 6px; margin-bottom: 6px; }
+    .sheet .p-icon { width: 42px; height: 42px; }
+    .sheet .p-name { font-size: 11px; }
+    .sheet .p-rate { font-size: 9px; }
+    .sheet .p-buy { padding: 6px 10px; min-width: 64px; }
+    .sheet .p-buy .cost { font-size: 11px; }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Option C — Smart "buy next" chip (single floating pill).
+       ───────────────────────────────────────────────────────────────────── */
+    .buy-next {
+      position: absolute;
+      bottom: 124px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px 7px 8px;
+      background: rgba(14, 10, 6, 0.95);
+      border: 1.5px solid var(--jade);
+      border-radius: 999px;
+      box-shadow:
+        0 0 16px rgba(110, 200, 150, 0.32),
+        0 4px 8px rgba(0, 0, 0, 0.55);
+      z-index: 4;
+    }
+    .buy-next .bn-icon {
+      width: 30px; height: 30px;
+      background: rgba(0, 0, 0, 0.55) center/cover no-repeat;
+      border-radius: 50%;
+      image-rendering: pixelated;
+      border: 1px solid var(--jade);
+    }
+    .buy-next .bn-text {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+      line-height: 1;
+    }
+    .buy-next .bn-act {
+      font-family: var(--font-display);
+      font-size: 10px; letter-spacing: 0.16em;
+      color: var(--jade);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .buy-next .bn-name {
+      font-size: 11px; font-weight: 600;
+      color: var(--ui-purple-light);
+      letter-spacing: 0.02em;
+    }
+    .buy-next .bn-cost {
+      margin-left: 6px;
+      font-size: 13px; font-weight: 800;
+      color: var(--jade);
+      font-variant-numeric: tabular-nums;
+    }
+    .buy-next .bn-hint {
+      position: absolute;
+      top: -22px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; letter-spacing: 0.14em;
+      color: var(--text-muted);
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .buy-next.dim {
+      border-color: rgba(110, 200, 150, 0.25);
+      box-shadow: none;
+      opacity: 0.6;
+    }
+    .buy-next.dim .bn-act { color: var(--text-muted); }
+    .buy-next.dim .bn-cost { color: var(--text-secondary); }
+    .buy-next.dim .bn-icon { border-color: rgba(245, 230, 200, 0.2); }
+
+    /* Expanded long-press menu */
+    .bn-menu {
+      position: absolute;
+      bottom: 170px; left: 12px; right: 12px;
+      background: rgba(14, 10, 6, 0.97);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 16px;
+      padding: 10px 10px 6px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7);
+      z-index: 4;
+    }
+    .bn-menu-title {
+      font-family: var(--font-display);
+      font-size: 10px; letter-spacing: 0.18em;
+      color: var(--ui-purple-soft);
+      text-transform: uppercase;
+      margin: 2px 0 8px 4px;
+    }
+    .bn-row {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 6px 4px;
+      border-radius: 8px;
+    }
+    .bn-row + .bn-row { border-top: 1px solid var(--ui-border-faint); }
+    .bn-row .ri {
+      width: 30px; height: 30px;
+      background: rgba(0, 0, 0, 0.4) center/cover no-repeat;
+      border-radius: 6px;
+      image-rendering: pixelated;
+    }
+    .bn-row .rn {
+      font-size: 11px;
+      color: var(--ui-purple-light);
+      font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bn-row .rc {
+      font-size: 11px; font-weight: 700;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+    }
+    .bn-row.afford .rc { color: var(--jade); }
+    .bn-row.dis { opacity: 0.45; }
+
+    /* ─────────────────────────────────────────────────────────────────────
+       Option D — Compact producer rail (horizontal scroll above qi line).
+       ───────────────────────────────────────────────────────────────────── */
+    .rail {
+      position: absolute;
+      bottom: 130px; left: 8px; right: 8px;
+      display: flex; gap: 8px;
+      padding: 6px 6px;
+      overflow-x: auto;
+      background: linear-gradient(180deg, rgba(10, 6, 2, 0.05), rgba(10, 6, 2, 0.45));
+      backdrop-filter: blur(2px);
+      border-radius: 12px;
+      scrollbar-width: none;
+      z-index: 4;
+    }
+    .rail::-webkit-scrollbar { display: none; }
+    .rail-chip {
+      flex-shrink: 0;
+      width: 88px;
+      background: rgba(14, 10, 6, 0.85);
+      border: 1px solid var(--ui-border-light);
+      border-radius: 12px;
+      padding: 6px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      position: relative;
+    }
+    .rail-chip .ri {
+      width: 52px; height: 52px;
+      background: rgba(0, 0, 0, 0.45) center/cover no-repeat;
+      border-radius: 8px;
+      image-rendering: pixelated;
+    }
+    .rail-chip .owned {
+      position: absolute;
+      top: 4px; right: 4px;
+      background: var(--gold); color: #1a1108;
+      font-size: 9px; font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 5px;
+      line-height: 1;
+    }
+    .rail-chip .rc-cost {
+      font-size: 11px; font-weight: 700;
+      color: var(--ui-purple-light);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+    .rail-chip .rc-cost.aff { color: var(--jade); }
+    .rail-chip .rc-add {
+      width: 100%;
+      padding: 4px 0;
+      background: rgba(20, 14, 8, 0.85);
+      border: 1px solid var(--ui-purple-strong);
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 10px; letter-spacing: 0.12em;
+      color: var(--ui-purple-strong);
+      text-transform: uppercase;
+      text-align: center;
+      font-weight: 700;
+    }
+    .rail-chip.afford .rc-add {
+      background: linear-gradient(180deg, rgba(110, 200, 150, 0.22), rgba(56, 120, 85, 0.32));
+      border-color: var(--jade);
+      color: var(--jade);
+      box-shadow: 0 0 6px rgba(110, 200, 150, 0.32);
+    }
+    .rail-chip.locked { opacity: 0.4; }
+
+    /* ──── Notes block ──── */
+    .notes {
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      padding: 10px 12px;
+      background: rgba(32, 26, 18, 0.5);
+      border-left: 2px solid var(--ui-purple-strong);
+      border-radius: 4px;
+      max-width: 360px;
+    }
+    .notes strong { color: var(--ui-purple-light); font-weight: 700; }
+
+    /* Foot caption */
+    .foot {
+      margin-top: 60px;
+      font-size: 12px;
+      color: var(--text-muted);
+      max-width: 980px;
+      line-height: 1.5;
+    }
+    .foot a { color: var(--ui-purple-strong); }
+
+    /* utility: hide background when stacked tightly to test contrast */
+    .phone.no-bg .phone-bg { display: none; background: linear-gradient(180deg, #1a1208, #0a0805); }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1>Producer access on mobile — 4 patterns, side-by-side</h1>
+  <p class="lede">
+    Real producer names + qi costs pulled from <code>src/data/producers.js</code>. Lacquer tokens from <code>src/index.css</code>.
+    Each phone is the live 390x844 viewport at the <strong>Separation &amp; Reunion</strong> realm, with ~50M qi banked and 6 producer types unlocked.
+    The cultivator sprite, petition tablet, qi-rate readout, and bottom nav are reproduced as in the actual game so the producer-access pattern can be judged in situ.
+  </p>
+
+  <div class="row">
+
+    <!-- ═════════════════════ OPTION A ═════════════════════ -->
+    <div class="opt">
+      <div class="opt-head">
+        <span class="opt-letter">A</span>
+        <span class="opt-name">Status quo, polished</span>
+      </div>
+      <div class="opt-sub">Producers live on the Cultivation tab; home stays a zen scene. One tap from home to buy anything.</div>
+
+      <div class="state-label">Cultivation tab (one tap from home)</div>
+      <div class="phone no-bg">
+        <div class="phone-bg"></div>
+        <div class="top-bar">
+          <div class="currencies">
+            <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+            <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+            <div class="currency-chip qi">
+              <div class="row1">50.0M</div>
+              <div class="karma">41</div>
+            </div>
+          </div>
+          <div class="nav-icons">
+            <div class="nav-btn">📊</div>
+            <div class="nav-btn">⚙</div>
+          </div>
+        </div>
+
+        <div class="cult-tab">
+          <div class="cult-segmented">
+            <button class="active">Producers</button>
+            <button>Upgrades</button>
+            <button>Sparks</button>
+          </div>
+          <div class="buy-mode">
+            <span style="margin-right: 2px;">Buy:</span>
+            <span class="seg active">×1</span>
+            <span class="seg">×10</span>
+            <span class="seg">×100</span>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')">
+              <span class="owned">12</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Body Tempering Disciple</div>
+              <div class="p-rate">+2.4 Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">152</span>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_herb_garden_bronze.png')">
+              <span class="owned">8</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Spirit Herb Garden</div>
+              <div class="p-rate">+8 Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">540</span>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_meridian_furnace_bronze.png')">
+              <span class="owned">5</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Meridian Furnace</div>
+              <div class="p-rate">+40 Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">3.0K</span>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_treasure_bronze.png')">
+              <span class="owned">3</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Ancestral Treasure</div>
+              <div class="p-rate">+141 Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">22K</span>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_beast_pact_bronze.png')">
+              <span class="owned">2</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Spirit Beast Pact</div>
+              <div class="p-rate">+520 Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">194K</span>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_pillar_bronze.png')">
+              <span class="owned">1</span>
+            </div>
+            <div class="p-meta">
+              <div class="p-name">Heavenly Pillar</div>
+              <div class="p-rate">+1.4K Qi/s</div>
+            </div>
+            <div class="p-buy afford">
+              <span class="mult">×1</span>
+              <span class="cost">1.7M</span>
+            </div>
+          </div>
+
+          <div class="p-card locked">
+            <div class="p-icon" style="background-color: #1a1108;"></div>
+            <div class="p-meta">
+              <div class="p-name"><span class="lock-tag">??? Locked</span></div>
+              <div class="p-rate">Unlocks at Imm. Asc. 1st</div>
+            </div>
+            <div class="p-buy locked-buy">Locked</div>
+          </div>
+        </div>
+
+        <div class="bottom-nav">
+          <button><span class="nav-dot">⌂</span>Home</button>
+          <button class="active"><span class="nav-dot">⚯</span>Cultivation</button>
+          <button><span class="nav-dot">⚭</span>Collection</button>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Tap budget:</strong> Home → Cultivation tab (1) → buy (1) → back to Home (1) = 3 taps per buy cycle.
+        Across a 30-buy session that's 90 navigation taps before you even cultivate.
+      </div>
+    </div>
+
+    <!-- ═════════════════════ OPTION B ═════════════════════ -->
+    <div class="opt">
+      <div class="opt-head">
+        <span class="opt-letter">B</span>
+        <span class="opt-name">Pull-up sheet on home</span>
+      </div>
+      <div class="opt-sub">A 60px peek-handle sits above the bottom nav showing the next affordable producer; drag up for the full half-sheet.</div>
+
+      <div class="pair">
+
+        <div>
+          <div class="state-label">Resting (peek)</div>
+          <div class="phone">
+            <div class="phone-bg"></div>
+            <div class="top-bar">
+              <div class="currencies">
+                <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip qi">
+                  <div class="row1">50.0M</div>
+                  <div class="karma">41</div>
+                </div>
+              </div>
+              <div class="nav-icons">
+                <div class="nav-btn">📊</div>
+                <div class="nav-btn">⚙</div>
+              </div>
+            </div>
+
+            <div class="petition">
+              <div class="petition-label">Heavenly Qi</div>
+              <div class="petition-char">天</div>
+              <div class="petition-rate">×2 QI/s</div>
+              <div class="petition-time">30 MIN</div>
+              <div class="petition-cta">Tap to<br>Petition</div>
+            </div>
+
+            <div class="crystal-area">
+              <div class="crystal-label">Qi Crystal · Lv 0</div>
+              <div class="crystal-sprite"></div>
+              <div class="refine-btn">▲ Refine · 10 Qi</div>
+            </div>
+
+            <div class="cultivator"></div>
+            <div class="realm-strip">
+              <div class="realm-name">Separation &amp; Reunion</div>
+              <div class="realm-layer">2nd Stage</div>
+            </div>
+            <div class="qi-line">
+              <span>22.9K / 36.8M</span>
+              <span class="rate">+2.1K Qi/s</span>
+            </div>
+            <div class="tier-bar"></div>
+
+            <div class="pull-handle">
+              <div class="pull-grip"></div>
+              <div class="ph-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')"></div>
+              <div class="ph-meta">
+                <div class="ph-label">Next · Tier 1</div>
+                <div class="ph-name">Body Tempering Disciple</div>
+              </div>
+              <div class="ph-buy">+1 · 152</div>
+            </div>
+
+            <div class="bottom-nav">
+              <button class="active"><span class="nav-dot">⌂</span>Home</button>
+              <button><span class="nav-dot">⚯</span>Cultivation</button>
+              <button><span class="nav-dot">⚭</span>Collection</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="state-label">Dragged up (half-sheet)</div>
+          <div class="phone">
+            <div class="phone-bg"></div>
+            <div class="top-bar">
+              <div class="currencies">
+                <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip qi">
+                  <div class="row1">50.0M</div>
+                  <div class="karma">41</div>
+                </div>
+              </div>
+              <div class="nav-icons">
+                <div class="nav-btn">📊</div>
+                <div class="nav-btn">⚙</div>
+              </div>
+            </div>
+
+            <div class="petition">
+              <div class="petition-label">Heavenly Qi</div>
+              <div class="petition-char">天</div>
+              <div class="petition-rate">×2 QI/s</div>
+              <div class="petition-time">30 MIN</div>
+              <div class="petition-cta">Tap to<br>Petition</div>
+            </div>
+
+            <!-- cultivator slightly visible behind the dim sheet -->
+            <div class="cultivator" style="opacity: 0.35; bottom: 480px;"></div>
+
+            <div class="sheet">
+              <div class="sheet-grip"></div>
+              <div class="sheet-head">
+                <div class="sheet-title">Producers</div>
+                <div class="sheet-mode">
+                  <span class="active">×1</span>
+                  <span>×10</span>
+                  <span>×100</span>
+                </div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')">
+                  <span class="owned">12</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Body Tempering Disciple</div>
+                  <div class="p-rate">+2.4 Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">152</span></div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_herb_garden_bronze.png')">
+                  <span class="owned">8</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Spirit Herb Garden</div>
+                  <div class="p-rate">+8 Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">540</span></div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_meridian_furnace_bronze.png')">
+                  <span class="owned">5</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Meridian Furnace</div>
+                  <div class="p-rate">+40 Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">3.0K</span></div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_treasure_bronze.png')">
+                  <span class="owned">3</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Ancestral Treasure</div>
+                  <div class="p-rate">+141 Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">22K</span></div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_beast_pact_bronze.png')">
+                  <span class="owned">2</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Spirit Beast Pact</div>
+                  <div class="p-rate">+520 Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">194K</span></div>
+              </div>
+
+              <div class="p-card">
+                <div class="p-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_pillar_bronze.png')">
+                  <span class="owned">1</span>
+                </div>
+                <div class="p-meta">
+                  <div class="p-name">Heavenly Pillar</div>
+                  <div class="p-rate">+1.4K Qi/s</div>
+                </div>
+                <div class="p-buy afford"><span class="mult">×1</span><span class="cost">1.7M</span></div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <button class="active"><span class="nav-dot">⌂</span>Home</button>
+              <button><span class="nav-dot">⚯</span>Cultivation</button>
+              <button><span class="nav-dot">⚭</span>Collection</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="notes">
+        <strong>Tap budget:</strong> Pull (1 swipe, optional) → buy (1) = 1–2 taps per buy. Sheet auto-collapses on outside-tap.
+        Eats 60px of home scene at rest. Most other home decoration must shift up by ~32px to compensate.
+      </div>
+    </div>
+
+    <!-- ═════════════════════ OPTION C ═════════════════════ -->
+    <div class="opt">
+      <div class="opt-head">
+        <span class="opt-letter">C</span>
+        <span class="opt-name">Smart "buy next" chip</span>
+      </div>
+      <div class="opt-sub">A single jade pill near the qi-rate readout always shows the cheapest affordable producer. One tap buys it. Long-press reveals the full list.</div>
+
+      <div class="pair">
+
+        <div>
+          <div class="state-label">Idle (affordable, glowing)</div>
+          <div class="phone">
+            <div class="phone-bg"></div>
+            <div class="top-bar">
+              <div class="currencies">
+                <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip qi">
+                  <div class="row1">50.0M</div>
+                  <div class="karma">41</div>
+                </div>
+              </div>
+              <div class="nav-icons">
+                <div class="nav-btn">📊</div>
+                <div class="nav-btn">⚙</div>
+              </div>
+            </div>
+
+            <div class="petition">
+              <div class="petition-label">Heavenly Qi</div>
+              <div class="petition-char">天</div>
+              <div class="petition-rate">×2 QI/s</div>
+              <div class="petition-time">30 MIN</div>
+              <div class="petition-cta">Tap to<br>Petition</div>
+            </div>
+
+            <div class="crystal-area">
+              <div class="crystal-label">Qi Crystal · Lv 0</div>
+              <div class="crystal-sprite"></div>
+              <div class="refine-btn">▲ Refine · 10 Qi</div>
+            </div>
+
+            <div class="cultivator"></div>
+            <div class="realm-strip">
+              <div class="realm-name">Separation &amp; Reunion</div>
+              <div class="realm-layer">2nd Stage</div>
+            </div>
+            <div class="qi-line">
+              <span>22.9K / 36.8M</span>
+              <span class="rate">+2.1K Qi/s</span>
+            </div>
+            <div class="tier-bar"></div>
+
+            <div class="buy-next">
+              <span class="bn-hint">Hold to see all</span>
+              <div class="bn-icon" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')"></div>
+              <div class="bn-text">
+                <span class="bn-act">+ Buy Next</span>
+                <span class="bn-name">Body Tempering Disciple</span>
+              </div>
+              <span class="bn-cost">152</span>
+            </div>
+
+            <div class="bottom-nav">
+              <button class="active"><span class="nav-dot">⌂</span>Home</button>
+              <button><span class="nav-dot">⚯</span>Cultivation</button>
+              <button><span class="nav-dot">⚭</span>Collection</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="state-label">Long-press (full menu)</div>
+          <div class="phone">
+            <div class="phone-bg"></div>
+            <div class="top-bar">
+              <div class="currencies">
+                <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+                <div class="currency-chip qi">
+                  <div class="row1">50.0M</div>
+                  <div class="karma">41</div>
+                </div>
+              </div>
+              <div class="nav-icons">
+                <div class="nav-btn">📊</div>
+                <div class="nav-btn">⚙</div>
+              </div>
+            </div>
+
+            <div class="petition">
+              <div class="petition-label">Heavenly Qi</div>
+              <div class="petition-char">天</div>
+              <div class="petition-rate">×2 QI/s</div>
+              <div class="petition-time">30 MIN</div>
+              <div class="petition-cta">Tap to<br>Petition</div>
+            </div>
+
+            <div class="cultivator" style="opacity: 0.55;"></div>
+            <div class="realm-strip" style="opacity: 0.55;">
+              <div class="realm-name">Separation &amp; Reunion</div>
+              <div class="realm-layer">2nd Stage</div>
+            </div>
+            <div class="qi-line" style="opacity: 0.55;">
+              <span>22.9K / 36.8M</span>
+              <span class="rate">+2.1K Qi/s</span>
+            </div>
+            <div class="tier-bar" style="opacity: 0.55;"></div>
+
+            <div class="bn-menu">
+              <div class="bn-menu-title">Buy a Producer</div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')"></div>
+                <div class="rn">Body Tempering Disciple (12)</div>
+                <div class="rc">152</div>
+              </div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_herb_garden_bronze.png')"></div>
+                <div class="rn">Spirit Herb Garden (8)</div>
+                <div class="rc">540</div>
+              </div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_meridian_furnace_bronze.png')"></div>
+                <div class="rn">Meridian Furnace (5)</div>
+                <div class="rc">3.0K</div>
+              </div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_treasure_bronze.png')"></div>
+                <div class="rn">Ancestral Treasure (3)</div>
+                <div class="rc">22K</div>
+              </div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_beast_pact_bronze.png')"></div>
+                <div class="rn">Spirit Beast Pact (2)</div>
+                <div class="rc">194K</div>
+              </div>
+              <div class="bn-row afford">
+                <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_pillar_bronze.png')"></div>
+                <div class="rn">Heavenly Pillar (1)</div>
+                <div class="rc">1.7M</div>
+              </div>
+            </div>
+
+            <div class="bottom-nav">
+              <button class="active"><span class="nav-dot">⌂</span>Home</button>
+              <button><span class="nav-dot">⚯</span>Cultivation</button>
+              <button><span class="nav-dot">⚭</span>Collection</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="notes">
+        <strong>Tap budget:</strong> 1 tap per buy on the hot loop. Pill auto-targets cheapest affordable;
+        long-press for "I want the expensive one" branching. Goes dim and inert when nothing's buyable.
+      </div>
+    </div>
+
+    <!-- ═════════════════════ OPTION D ═════════════════════ -->
+    <div class="opt">
+      <div class="opt-head">
+        <span class="opt-letter">D</span>
+        <span class="opt-name">Compact producer rail</span>
+      </div>
+      <div class="opt-sub">A 3-item horizontal scroll of producer chips sits above the qi readout. Each chip: icon + cost + +1 button. Always visible. The AdCap-on-mobile approach.</div>
+
+      <div class="state-label">Default (rail always visible)</div>
+      <div class="phone">
+        <div class="phone-bg"></div>
+        <div class="top-bar">
+          <div class="currencies">
+            <div class="currency-chip lotus"><span class="ico"></span><span>0</span></div>
+            <div class="currency-chip lotus-crimson"><span class="ico"></span><span>0</span></div>
+            <div class="currency-chip qi">
+              <div class="row1">50.0M</div>
+              <div class="karma">41</div>
+            </div>
+          </div>
+          <div class="nav-icons">
+            <div class="nav-btn">📊</div>
+            <div class="nav-btn">⚙</div>
+          </div>
+        </div>
+
+        <div class="petition">
+          <div class="petition-label">Heavenly Qi</div>
+          <div class="petition-char">天</div>
+          <div class="petition-rate">×2 QI/s</div>
+          <div class="petition-time">30 MIN</div>
+          <div class="petition-cta">Tap to<br>Petition</div>
+        </div>
+
+        <div class="crystal-area" style="top: 215px;">
+          <div class="crystal-label">Qi Crystal · Lv 0</div>
+          <div class="crystal-sprite"></div>
+          <div class="refine-btn">▲ Refine · 10 Qi</div>
+        </div>
+
+        <div class="cultivator" style="bottom: 240px; width: 150px; height: 168px;"></div>
+        <div class="realm-strip" style="bottom: 200px;">
+          <div class="realm-name">Separation &amp; Reunion</div>
+          <div class="realm-layer">2nd Stage</div>
+        </div>
+
+        <div class="rail">
+          <div class="rail-chip afford">
+            <span class="owned">12</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_disciple_silver.png')"></div>
+            <div class="rc-cost aff">152</div>
+            <div class="rc-add">+1</div>
+          </div>
+          <div class="rail-chip afford">
+            <span class="owned">8</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_herb_garden_bronze.png')"></div>
+            <div class="rc-cost aff">540</div>
+            <div class="rc-add">+1</div>
+          </div>
+          <div class="rail-chip afford">
+            <span class="owned">5</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_meridian_furnace_bronze.png')"></div>
+            <div class="rc-cost aff">3.0K</div>
+            <div class="rc-add">+1</div>
+          </div>
+          <div class="rail-chip afford">
+            <span class="owned">3</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_treasure_bronze.png')"></div>
+            <div class="rc-cost aff">22K</div>
+            <div class="rc-add">+1</div>
+          </div>
+          <div class="rail-chip afford">
+            <span class="owned">2</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_beast_pact_bronze.png')"></div>
+            <div class="rc-cost aff">194K</div>
+            <div class="rc-add">+1</div>
+          </div>
+          <div class="rail-chip afford">
+            <span class="owned">1</span>
+            <div class="ri" style="background-image:url('http://localhost:5173/sprites/producers/p_pillar_bronze.png')"></div>
+            <div class="rc-cost aff">1.7M</div>
+            <div class="rc-add">+1</div>
+          </div>
+        </div>
+
+        <div class="qi-line">
+          <span>22.9K / 36.8M</span>
+          <span class="rate">+2.1K Qi/s</span>
+        </div>
+        <div class="tier-bar"></div>
+
+        <div class="bottom-nav">
+          <button class="active"><span class="nav-dot">⌂</span>Home</button>
+          <button><span class="nav-dot">⚯</span>Cultivation</button>
+          <button><span class="nav-dot">⚭</span>Collection</button>
+        </div>
+      </div>
+      <div class="notes">
+        <strong>Tap budget:</strong> 1 tap per buy, zero navigation. Side-scroll to reach pricier tiers.
+        Costs ~78px of vertical real estate. Tier glow / owned-count badges still work but density approaches "cluttered".
+      </div>
+    </div>
+
+  </div>
+
+  <p class="foot">
+    Mockups built from real <code>src/data/producers.js</code> values, real sprite paths under <code>/public/sprites/producers/</code>,
+    and real lacquer tokens from <code>src/index.css</code>. Sprite images are loaded from <code>http://localhost:5173</code> so the dev server
+    must be running for icons to render. See <code>_design/producer-ux-evaluation.md</code> for the recommendation and rationale.
+  </p>
+</div>
+</body>
+</html>

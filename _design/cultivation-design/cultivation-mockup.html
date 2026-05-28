@@ -1,0 +1,1492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cultivation Screen — The Estate Pavilions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Cultivation Screen — The Estate Pavilions
+   Each producer is a NAMED PLACE on the player's grounds.
+   The card becomes a tributary plaque hung at the pavilion's
+   gate: vermillion left-rail (qi-tide flowing in), Cinzel name
+   carved across a temple lintel, framed pavilion emblem, and
+   a stamped cost cartouche on the right. Locked = sealed
+   shrine (crossed bamboo + wax seal). Owned upgrades = stamped
+   "成" (achieved) over an inscribed tablet. All three sub-tabs
+   share the same framed-inset vocabulary so the screen feels
+   like one estate, not three lists.
+   Tokens lifted from the live game's lacquer theme + the
+   Bazaar / Petition Tablet / Journey mockups so this drops
+   into the design system without inventing a new palette.
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        #0e0c08;
+  --bg-rail:        rgba(8, 6, 4, 0.96);
+  --bg-panel:       #1a1510;
+  --bg-panel-2:     #221a12;
+
+  --cream:          #f5e6c8;
+  --cream-dim:      rgba(245, 230, 200, 0.62);
+  --cream-faint:    rgba(245, 230, 200, 0.32);
+
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --gold-deep:      #9b7d50;
+  --bronze:         rgba(75, 60, 40, 0.55);
+
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+  --vermillion-deep: #6a1818;
+
+  --ink:            #1a120a;
+  --jade:           #7ec38f;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(900px 700px at 50% -10%, rgba(220,175,110,.06) 0%, transparent 55%),
+    radial-gradient(700px 500px at 50% 110%, rgba(200,56,56,.03) 0%, transparent 55%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 80px;
+  gap: 24px;
+}
+
+.lead{
+  max-width: 480px;
+  text-align: center;
+  color: rgba(245,230,200,.55);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* ── Top toggle row to switch which phone-body sub-tab is showing ── */
+.toggle-row{
+  display: flex; gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.toggle-row button{
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 6px 14px;
+  background: rgba(220,175,110,.08);
+  border: 1px solid rgba(220,175,110,.20);
+  color: var(--cream-dim);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle-row button.on{
+  background: rgba(220,175,110,.20);
+  border-color: var(--gold);
+  color: var(--cream);
+}
+
+/* ── Phone shell ─────────────────────────────────────────── */
+.phone{
+  width: 390px;
+  height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 30px 80px -20px rgba(0,0,0,.9);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+/* Notch / status bar */
+.phone::before{
+  content:'';
+  display: block;
+  height: 52px;
+  background: rgba(8,6,4,.95);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   QI HEADER STRIP — the player's reservoir, always visible.
+   A short hero strip with a calligraphy "炁" (qi) watermark.
+   Reuses the same warmth as the Settings Identity Plaque so
+   the player recognises "this is a tablet of mine" the moment
+   the screen opens.
+   ════════════════════════════════════════════════════════════ */
+.qi-strip{
+  flex-shrink: 0;
+  position: relative;
+  padding: 14px 18px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    rgba(8, 6, 4, .96);
+  border-bottom: 1px solid rgba(220, 175, 110, .12);
+  overflow: hidden;
+}
+.qi-strip::before{
+  content: '炁';
+  position: absolute;
+  right: -10px;
+  top: -22px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 110px;
+  line-height: 1;
+  color: rgba(220, 175, 110, .055);
+  pointer-events: none;
+  user-select: none;
+}
+.qi-strip-l{ position: relative; z-index: 1; }
+.qi-strip-eyebrow{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 3px;
+}
+.qi-strip-amount{
+  font-family: 'Cinzel', serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.qi-strip-r{
+  position: relative; z-index: 1;
+  text-align: right;
+}
+.qi-strip-rate-label{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  margin-bottom: 3px;
+}
+.qi-strip-rate{
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: var(--gold-hot);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   SUB-TAB NAV — verbatim text-tabs pattern from Bazaar.
+   Plain Cinzel uppercase labels + sliding gold underline.
+   Three labels (Producers / Upgrades / Sparks) spaced evenly.
+   ════════════════════════════════════════════════════════════ */
+.cat-rail{
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  padding: 8px 18px 0;
+  background: var(--bg-rail);
+  flex-shrink: 0;
+}
+.cat-rail::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(220, 175, 110, .14) 12%,
+    rgba(220, 175, 110, .14) 88%,
+    transparent 100%);
+}
+.tab{
+  background: none;
+  border: none;
+  padding: 8px 2px 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  transition: color 180ms ease;
+  position: relative;
+}
+.tab .count{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: rgba(245, 230, 200, .35);
+  font-variant-numeric: tabular-nums;
+  transition: color 180ms ease;
+}
+.tab.active{ color: var(--cream); }
+.tab.active .count{ color: var(--gold-hot); }
+.indicator{
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-hot) 18%,
+    var(--gold-hot) 82%,
+    transparent 100%);
+  width: var(--ind-w, 60px);
+  transform: translateX(var(--ind-x, 0px));
+  transition:
+    transform 220ms cubic-bezier(.4, 0, .2, 1),
+    width 220ms cubic-bezier(.4, 0, .2, 1);
+  pointer-events: none;
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(255, 207, 131, .35);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   CONTENT SCROLL AREA — single overflow-y per sub-tab.
+   ════════════════════════════════════════════════════════════ */
+.body{
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 28px;
+  scrollbar-width: none;
+}
+.body::-webkit-scrollbar{ display: none; }
+
+/* ═════════════════════════════════════════════════════════════
+   BUY-MODE PILL ROW — sits above the producer list.
+   Carries the ×1/×10/×100 + Auto chip.
+   ════════════════════════════════════════════════════════════ */
+.buy-mode{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 14px;
+}
+.buy-mode-label{
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  margin-right: 2px;
+}
+.buy-chip{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: 5px 12px;
+  background: rgba(220,175,110,.08);
+  border: 1px solid rgba(220,175,110,.20);
+  color: var(--cream-dim);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.buy-chip.on{
+  background: rgba(220,175,110,.20);
+  border-color: var(--gold);
+  color: var(--cream);
+}
+.buy-mode .spacer{ flex: 1; }
+.auto-chip{
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 5px 12px 5px 10px;
+  background: rgba(126,195,143,.08);
+  border: 1px solid rgba(126,195,143,.25);
+  color: var(--jade);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.auto-dot{
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--jade);
+  box-shadow: 0 0 6px var(--jade);
+}
+
+/* ═════════════════════════════════════════════════════════════
+   PAVILION PLAQUE — the producer card.
+   Anatomy (left → right):
+     [Vermillion left rail]
+     [Pavilion emblem in framed inset]
+     [Lintel (Cinzel name) + tier row + rate readout]
+     [Buy cartouche column with ×N badge + Qi cost]
+   Locked = sealed-shrine variant (overlay).
+   Affordable = vermillion cartouche glows; unaffordable = cream/gold dim.
+   ════════════════════════════════════════════════════════════ */
+.pavilions{ display: flex; flex-direction: column; gap: 12px; }
+.pav{
+  position: relative;
+  display: grid;
+  grid-template-columns: 4px 84px 1fr auto;
+  align-items: stretch;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 24%, rgba(220,175,110,0) 76%, rgba(220,175,110,.05) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 12px;
+  padding: 12px 14px 12px 0;
+  box-shadow:
+    0 1px 0 rgba(255,225,170,.06) inset,
+    0 8px 18px -10px rgba(0,0,0,.7);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.pav .rail{
+  width: 4px;
+  align-self: stretch;
+  margin: 8px 12px 8px 8px;
+  border-radius: 2px;
+  background: linear-gradient(180deg,
+    var(--gold-hot) 0%,
+    var(--vermillion-hot) 22%,
+    var(--vermillion) 78%,
+    var(--vermillion-deep) 100%);
+  box-shadow: 0 0 6px rgba(200,56,56,.35), 0 0 0 1px rgba(0,0,0,.5);
+}
+.pav .frame{
+  width: 64px; height: 64px;
+  align-self: center;
+  position: relative;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220,175,110,.30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* Frame corner notches — carved-finish detail */
+.pav .frame::before,
+.pav .frame::after{
+  content:'';
+  position: absolute;
+  width: 6px; height: 6px;
+  border: 1px solid rgba(220,175,110,.45);
+  border-radius: 1px;
+  top: 3px;
+}
+.pav .frame::before{ left: 3px;  border-right:none; border-bottom:none; }
+.pav .frame::after { right: 3px; border-left: none; border-bottom:none; }
+.pav .emblem{
+  width: 52px; height: 52px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 6px rgba(220,175,110,.18));
+}
+.pav .lintel{
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding-left: 14px;
+  min-width: 0;
+}
+.pav .name{
+  font-family: 'Cinzel', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pav .tier-row{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pav .tier-badge{
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.pav .tier-bronze  { color: #c08858; }
+.pav .tier-silver  { color: #c9c6c0; }
+.pav .tier-gold    { color: var(--gold-hot); }
+.pav .tier-mythic  { color: #c885ff; }
+.pav .owned{
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--cream-dim);
+  font-variant-numeric: tabular-nums;
+}
+.pav .rate{
+  font-size: 11px;
+  color: var(--cream-faint);
+  letter-spacing: .02em;
+  font-variant-numeric: tabular-nums;
+}
+.pav .rate b{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* Buy cartouche — the right-edge column */
+.pav .cart{
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  margin-left: 10px;
+}
+.pav .cart-btn{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 8px 14px 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,200,200,.32);
+  background: linear-gradient(180deg, var(--vermillion-hot) 0%, var(--vermillion) 100%);
+  color: white;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.18) inset,
+    0 0 10px rgba(200,56,56,.35);
+  min-width: 86px;
+}
+.pav .cart-mult{
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .92;
+}
+.pav .cart-cost{
+  font-family: 'Cinzel', serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0,0,0,.4);
+}
+/* Unaffordable variant — cream-tinted, dimmed, no glow */
+.pav .cart-btn.dim{
+  background: linear-gradient(180deg, rgba(60,48,32,.85) 0%, rgba(40,32,22,.92) 100%);
+  border-color: rgba(220,175,110,.22);
+  color: var(--cream-dim);
+  box-shadow: none;
+}
+.pav .cart-btn.dim .cart-cost{ color: var(--cream-dim); }
+.pav .cart-btn.dim .cart-mult{ color: var(--cream-faint); }
+
+/* Tier celebration glow */
+.pav.tier-gold-frame{ border-color: rgba(220,175,110,.38); }
+.pav.tier-gold-frame .frame{ box-shadow: 0 0 0 1px rgba(220,175,110,.18) inset, 0 0 14px -2px rgba(255,207,131,.30); }
+.pav.tier-mythic-frame{ border-color: rgba(200,133,255,.40); }
+
+/* Future-aware "Enter Pavilion" slot — hidden today, present in
+   the markup as a comment-only affordance for the mini-game era.
+   When unlocks land, an .enter-cta replaces the right slot. */
+
+/* ── SEALED SHRINE — the locked-state variant ────────────────
+   Same plaque chassis. Frame is overlaid with crossed bamboo
+   slats, a vermillion wax seal stamped over with "封" (seal),
+   and the gate text below. No vermillion CTA; instead a small
+   "Sealed" cartouche. */
+.pav.locked{
+  filter: saturate(.6);
+}
+.pav.locked .rail{
+  background: linear-gradient(180deg, rgba(150,140,120,.6) 0%, rgba(150,140,120,.25) 100%);
+  box-shadow: none;
+}
+.pav.locked .frame{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(220,175,110,.06) 0px,
+      rgba(220,175,110,.06) 6px,
+      rgba(220,175,110,0) 6px,
+      rgba(220,175,110,0) 12px),
+    linear-gradient(180deg, #15110b 0%, #0a0805 100%);
+  border-color: rgba(220,175,110,.18);
+}
+.pav.locked .frame::before,
+.pav.locked .frame::after{ border-color: rgba(220,175,110,.22); }
+.pav.locked .emblem{
+  filter: brightness(0) saturate(0);
+  opacity: .35;
+}
+/* Wax seal — a vermillion stamp over the frame */
+.seal{
+  position: absolute;
+  width: 28px; height: 28px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--vermillion-hot) 0%, var(--vermillion) 55%, var(--vermillion-deep) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.55),
+    0 0 6px rgba(200,56,56,.45);
+  transform: rotate(-12deg);
+}
+.seal-glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  color: #fff5e0;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+  line-height: 1;
+}
+.pav.locked .name{ color: var(--cream-faint); }
+.pav.locked .tier-row .owned{ color: var(--cream-faint); }
+.pav.locked .gate{
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  color: rgba(220,175,110,.6);
+}
+.pav.locked .gate b{ color: var(--gold); font-weight: 600; }
+.sealed-cart{
+  align-self: center;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 8px 12px 7px;
+  margin-left: 10px;
+  border: 1px dashed rgba(220,175,110,.30);
+  border-radius: 8px;
+  min-width: 86px;
+  background: rgba(0,0,0,.18);
+}
+.sealed-cart .lab{
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(220,175,110,.55);
+}
+.sealed-cart .realm{
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cream-dim);
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   INSCRIBED TABLET — upgrade card (Upgrades tab).
+   Square framed inset like the pavilion emblem, but vertical
+   stack: frame on top with the upgrade glyph, Cinzel name,
+   one-line effect, vermillion cost cartouche at the bottom.
+   Owned variant gets a stamped "成" seal in the corner.
+   ════════════════════════════════════════════════════════════ */
+.up-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.up{
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 10px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.up .frame{
+  width: 56px; height: 56px;
+  position: relative;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220,175,110,.30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.up .frame::before,
+.up .frame::after{
+  content:'';
+  position: absolute;
+  width: 5px; height: 5px;
+  border: 1px solid rgba(220,175,110,.45);
+  border-radius: 1px;
+  top: 3px;
+}
+.up .frame::before{ left: 3px;  border-right:none; border-bottom:none; }
+.up .frame::after { right: 3px; border-left: none; border-bottom:none; }
+.up .glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--cream);
+  text-shadow: 0 0 10px rgba(220,175,110,.35), 0 1px 0 rgba(0,0,0,.5);
+}
+.up .glyph.gold{ color: var(--gold-hot); }
+.up .name{
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  line-height: 1.25;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+.up .desc{
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--cream-faint);
+  min-height: 30px;
+}
+.up .cost{
+  margin-top: 2px;
+  align-self: stretch;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, var(--vermillion-hot) 0%, var(--vermillion) 100%);
+  color: white;
+  border: 1px solid rgba(255,200,200,.32);
+  box-shadow: 0 0 8px rgba(200,56,56,.32), 0 1px 0 rgba(255,255,255,.16) inset;
+  font-variant-numeric: tabular-nums;
+}
+.up .cost.dim{
+  background: linear-gradient(180deg, rgba(60,48,32,.85) 0%, rgba(40,32,22,.92) 100%);
+  border-color: rgba(220,175,110,.22);
+  color: var(--cream-dim);
+  box-shadow: none;
+}
+.up.locked{ filter: saturate(.55); }
+.up.locked .glyph{ color: rgba(220,175,110,.45); text-shadow: none; }
+.up.locked .name{ color: var(--cream-faint); }
+.up.locked .frame{ border-color: rgba(220,175,110,.18); }
+.up.locked .cost{
+  background: rgba(0,0,0,.18);
+  border: 1px dashed rgba(220,175,110,.30);
+  color: rgba(220,175,110,.55);
+  box-shadow: none;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+
+/* Owned stamp — vermillion seal in the top-right corner */
+.up.owned{ filter: none; opacity: .82; }
+.up.owned .cost{
+  background: rgba(126,195,143,.10);
+  border: 1px solid rgba(126,195,143,.30);
+  color: var(--jade);
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: 10px;
+}
+.up-stamp{
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--vermillion-hot) 0%, var(--vermillion) 55%, var(--vermillion-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.55), 0 0 6px rgba(200,56,56,.45);
+  transform: rotate(12deg);
+  z-index: 1;
+}
+.up-stamp-glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 14px;
+  color: #fff5e0;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(0,0,0,.5);
+}
+
+/* Upgrades section heads */
+.up-section{ margin-top: 6px; margin-bottom: 14px; }
+.up-section-head{
+  display: flex; align-items: center;
+  margin: 4px 4px 10px;
+  gap: 10px;
+  padding-left: 14px;
+  position: relative;
+}
+.up-section-head .lantern{
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(180deg,
+    var(--gold-hot) 0%,
+    var(--vermillion-hot) 22%,
+    var(--vermillion) 78%,
+    var(--vermillion-deep) 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(200,56,56,.4), 0 0 0 1px rgba(0,0,0,.5);
+}
+.up-section-head .title{
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.up-section-head .tag{
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  flex: 1;
+}
+.up-section-head .count{
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  background: rgba(220,175,110,.18);
+  color: rgba(245,230,200,.85);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Compact owned-upgrade chips (pile-at-the-bottom Cookie-Clicker pattern) */
+.chip-grid{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0;
+}
+.chip{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 7px;
+  border-radius: 999px;
+  background: rgba(126,195,143,.08);
+  border: 1px solid rgba(126,195,143,.25);
+  color: var(--cream);
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.chip .glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 12px;
+  color: var(--jade);
+  line-height: 1;
+}
+
+/* ═════════════════════════════════════════════════════════════
+   SPARKS TAB — same framed-inset vocabulary as the rest.
+   Rarity is conveyed via a colored corner ribbon, not a border
+   recolour, so the inset still feels like part of the estate.
+   ════════════════════════════════════════════════════════════ */
+.sp-section-head{
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 4px 10px;
+  margin-top: 2px;
+}
+.sp-section-head .title{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.sp-section-head.legendary .title{ color: #f5b95a; }
+.sp-section-head.uncommon  .title{ color: #c885ff; }
+.sp-section-head.mechanic  .title{ color: #6ec896; }
+.sp-section-head .sub{
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  flex: 1;
+}
+.sp-section-head .count{
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  background: rgba(220,175,110,.18);
+  color: rgba(245,230,200,.85);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.sp-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.sp{
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(220,175,110,.05) 0%, rgba(220,175,110,0) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 10px;
+  padding: 12px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  overflow: hidden;
+}
+.sp .frame{
+  width: 48px; height: 48px;
+  position: relative;
+  border-radius: 8px;
+  background:
+    radial-gradient(80% 60% at 50% 35%, rgba(255,207,131,.10) 0%, transparent 70%),
+    linear-gradient(180deg, #1a1208 0%, #0c0805 100%);
+  border: 1px solid rgba(220,175,110,.30);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.4) inset,
+    0 1px 0 rgba(255,225,170,.12) inset;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.sp .frame::before,
+.sp .frame::after{
+  content:'';
+  position: absolute;
+  width: 5px; height: 5px;
+  border: 1px solid rgba(220,175,110,.45);
+  border-radius: 1px;
+  top: 3px;
+}
+.sp .frame::before{ left: 3px; border-right:none; border-bottom:none; }
+.sp .frame::after { right: 3px; border-left: none; border-bottom:none; }
+.sp .glyph{
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 24px;
+  line-height: 1;
+  color: var(--cream);
+  text-shadow: 0 0 10px rgba(220,175,110,.35);
+}
+.sp .name{
+  font-family: 'Cinzel', serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: var(--cream);
+  line-height: 1.25;
+}
+.sp .line{
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--cream-faint);
+}
+.sp .line b{ color: var(--gold); font-weight: 600; }
+/* Rarity ribbon — top-right corner */
+.sp .ribbon{
+  position: absolute;
+  top: 8px;
+  right: -22px;
+  transform: rotate(35deg);
+  padding: 2px 28px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  color: #fff5e0;
+  text-transform: uppercase;
+  box-shadow: 0 0 6px rgba(0,0,0,.4);
+}
+.sp.legendary .ribbon{
+  background: linear-gradient(135deg, #f5b95a, #c98828);
+}
+.sp.uncommon .ribbon{
+  background: linear-gradient(135deg, #c885ff, #6f3fb0);
+}
+.sp.mechanic .ribbon{
+  background: linear-gradient(135deg, #6ec896, #2c7a4b);
+}
+.sp .stack-badge{
+  position: absolute;
+  bottom: 8px; right: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(220,175,110,.30);
+  color: var(--cream);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Trinity convergence banner */
+.trinity{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0 0 14px;
+  border: 1px solid rgba(245,185,90,.45);
+  background:
+    linear-gradient(90deg, rgba(245,185,90,.10) 0%, rgba(245,185,90,.04) 100%),
+    linear-gradient(160deg, #2a2117 0%, #1a1510 100%);
+  border-radius: 10px;
+  position: relative;
+}
+.trinity .mark{
+  color: #f5b95a;
+  font-size: 14px;
+  text-shadow: 0 0 10px rgba(245,185,90,.6);
+}
+.trinity .title{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #f5b95a;
+}
+.trinity .bonus{
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Empty state */
+.empty{
+  margin: 80px 16px;
+  text-align: center;
+}
+.empty .t{
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  margin-bottom: 8px;
+}
+.empty .s{
+  font-size: 12px;
+  color: var(--cream-faint);
+  line-height: 1.55;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* Hide subsections that aren't active */
+.tab-body{ display: none; }
+.tab-body.active{ display: block; }
+
+/* Compare strip below the phone */
+.caption{
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: rgba(245,230,200,.45);
+  letter-spacing: .02em;
+  text-align: center;
+  max-width: 380px;
+  line-height: 1.5;
+}
+.compare{
+  max-width: 760px;
+  margin: 16px auto 0;
+  padding: 20px 22px;
+  border: 1px dashed rgba(220,175,110,.25);
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.compare h3{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.compare p{
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: rgba(245,230,200,.7);
+}
+@media (max-width: 800px){
+  .compare{ grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>Cultivation Screen — The Estate Pavilions</h1>
+  Each producer is a named place on your cultivation grounds.
+  The card is a tributary plaque at the pavilion gate: vermillion qi-rail,
+  framed emblem, carved Cinzel lintel, stamped cost cartouche.
+  Locked producers are sealed shrines (wax seal + bamboo lattice).
+</div>
+
+<div class="toggle-row" id="toggle">
+  <button class="on" data-set="producers">Producers</button>
+  <button data-set="upgrades">Upgrades</button>
+  <button data-set="sparks">Sparks</button>
+</div>
+
+<div class="phone">
+  <!-- Qi reservoir strip — always visible at top -->
+  <header class="qi-strip">
+    <div class="qi-strip-l">
+      <div class="qi-strip-eyebrow">Reservoir</div>
+      <div class="qi-strip-amount">4.82M Qi</div>
+    </div>
+    <div class="qi-strip-r">
+      <div class="qi-strip-rate-label">Flowing</div>
+      <div class="qi-strip-rate">+1,240 / sec</div>
+    </div>
+  </header>
+
+  <!-- Sub-tab rail — text tabs + sliding gold underline (Bazaar pattern) -->
+  <nav class="cat-rail" id="rail">
+    <button class="tab active" data-tab="producers">Producers <span class="count">7</span></button>
+    <button class="tab" data-tab="upgrades">Upgrades <span class="count">12</span></button>
+    <button class="tab" data-tab="sparks">Sparks <span class="count">4</span></button>
+    <span class="indicator" id="indicator"></span>
+  </nav>
+
+  <!-- ── PRODUCERS BODY ───────────────────────────────────── -->
+  <section class="body tab-body active" data-tab-body="producers">
+    <div class="buy-mode">
+      <span class="buy-mode-label">Buy</span>
+      <button class="buy-chip on">×1</button>
+      <button class="buy-chip">×10</button>
+      <button class="buy-chip">×100</button>
+      <span class="spacer"></span>
+      <button class="auto-chip"><span class="auto-dot"></span>Auto</button>
+    </div>
+
+    <div class="pavilions">
+
+      <!-- AFFORDABLE — Spirit Herb Garden (Silver tier, 14 owned) -->
+      <article class="pav">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_herb_garden_silver.png" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="lintel">
+          <div class="name">Spirit Herb Garden</div>
+          <div class="tier-row">
+            <span class="tier-badge tier-silver">Silver</span>
+            <span class="owned">×14 owned</span>
+          </div>
+          <div class="rate">Yields <b>14.0 Qi/s</b></div>
+        </div>
+        <div class="cart">
+          <button class="cart-btn">
+            <span class="cart-mult">Tribute ×1</span>
+            <span class="cart-cost">2,640 Qi</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- AFFORDABLE — Meridian Furnace (Bronze, 6 owned) -->
+      <article class="pav">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_meridian_furnace_bronze.png" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="lintel">
+          <div class="name">Meridian Furnace</div>
+          <div class="tier-row">
+            <span class="tier-badge tier-bronze">Bronze</span>
+            <span class="owned">×6 owned</span>
+          </div>
+          <div class="rate">Yields <b>48.0 Qi/s</b></div>
+        </div>
+        <div class="cart">
+          <button class="cart-btn">
+            <span class="cart-mult">Tribute ×1</span>
+            <span class="cart-cost">3,560 Qi</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- UNAFFORDABLE — Ancestral Treasure (just unlocked, 0 owned, dim cost) -->
+      <article class="pav">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_treasure_bronze.png" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="lintel">
+          <div class="name">Ancestral Treasure</div>
+          <div class="tier-row">
+            <span class="tier-badge tier-bronze">Bronze</span>
+            <span class="owned">×0 owned</span>
+          </div>
+          <div class="rate">Yields <b>47.0 Qi/s</b> per unit</div>
+        </div>
+        <div class="cart">
+          <button class="cart-btn dim" disabled>
+            <span class="cart-mult">Tribute ×1</span>
+            <span class="cart-cost">12,000 Qi</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- AFFORDABLE — Body Tempering Disciple (Gold tier, 30 owned) -->
+      <article class="pav tier-gold-frame">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_disciple_gold.png" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="lintel">
+          <div class="name">Body Tempering Disciple</div>
+          <div class="tier-row">
+            <span class="tier-badge tier-gold">Gold</span>
+            <span class="owned">×30 owned</span>
+          </div>
+          <div class="rate">Yields <b>6.0 Qi/s</b></div>
+        </div>
+        <div class="cart">
+          <button class="cart-btn">
+            <span class="cart-mult">Tribute ×1</span>
+            <span class="cart-cost">8,920 Qi</span>
+          </button>
+        </div>
+      </article>
+
+      <!-- LOCKED — Spirit Beast Pact (sealed shrine, realm 15) -->
+      <article class="pav locked">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_beast_pact_bronze.png" alt="" onerror="this.style.display='none'">
+          <span class="seal"><span class="seal-glyph">封</span></span>
+        </div>
+        <div class="lintel">
+          <div class="name">Spirit Beast Pact</div>
+          <div class="tier-row">
+            <span class="owned">— sealed shrine —</span>
+          </div>
+          <div class="gate">Unsealed at <b>realm 15</b></div>
+        </div>
+        <div class="sealed-cart">
+          <span class="lab">Sealed</span>
+          <span class="realm">R15</span>
+        </div>
+      </article>
+
+      <!-- LOCKED teaser — Heavenly Pillar -->
+      <article class="pav locked">
+        <div class="rail"></div>
+        <div class="frame">
+          <img class="emblem" src="../../public/sprites/producers/p_pillar_bronze.png" alt="" onerror="this.style.display='none'">
+          <span class="seal"><span class="seal-glyph">封</span></span>
+        </div>
+        <div class="lintel">
+          <div class="name">Heavenly Pillar</div>
+          <div class="tier-row">
+            <span class="owned">— sealed shrine —</span>
+          </div>
+          <div class="gate">Unsealed at <b>realm 18</b></div>
+        </div>
+        <div class="sealed-cart">
+          <span class="lab">Sealed</span>
+          <span class="realm">R18</span>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ── UPGRADES BODY ────────────────────────────────────── -->
+  <section class="body tab-body" data-tab-body="upgrades">
+    <div class="up-section">
+      <header class="up-section-head">
+        <span class="lantern"></span>
+        <span class="title">Available</span>
+        <span class="tag">Inscribed tablets, one-time tribute</span>
+        <span class="count">5</span>
+      </header>
+      <div class="up-grid">
+
+        <!-- AFFORDABLE — Spirit Herb Garden I (producer double) -->
+        <div class="up">
+          <div class="frame"><span class="glyph gold">叶</span></div>
+          <div class="name">Spirit Herb Garden I</div>
+          <div class="desc">Doubles output of Spirit Herb Garden.</div>
+          <div class="cost">4,000 Qi</div>
+        </div>
+
+        <!-- UNAFFORDABLE — Body Tempering Disciple II -->
+        <div class="up">
+          <div class="frame"><span class="glyph">体</span></div>
+          <div class="name">Body Tempering Disciple II</div>
+          <div class="desc">Doubles output again (×4 total).</div>
+          <div class="cost dim">3,000 Qi</div>
+        </div>
+
+        <!-- AFFORDABLE — Refined Tap II (crystal upgrade) -->
+        <div class="up">
+          <div class="frame"><span class="glyph gold">珠</span></div>
+          <div class="name">Refined Tap II</div>
+          <div class="desc">Doubles crystal-tap qi at empty reservoir.</div>
+          <div class="cost">4,000 Qi</div>
+        </div>
+
+        <!-- AFFORDABLE — Deeper Breath I (focus mult) -->
+        <div class="up">
+          <div class="frame"><span class="glyph">息</span></div>
+          <div class="name">Deeper Breath I</div>
+          <div class="desc">+35% to the focus multiplier when holding.</div>
+          <div class="cost">5,000 Qi</div>
+        </div>
+
+        <!-- LOCKED — Crystal Reservoir III (mechanic tier) -->
+        <div class="up locked">
+          <div class="frame"><span class="glyph">蓄</span></div>
+          <div class="name">Crystal Reservoir III</div>
+          <div class="desc">Reservoir fills 70% of qi/s (up to 4 min).</div>
+          <div class="cost">Locked · Crystal L25</div>
+        </div>
+
+        <!-- LOCKED — Idle Cultivation I -->
+        <div class="up locked">
+          <div class="frame"><span class="glyph">眠</span></div>
+          <div class="name">Idle Cultivation I</div>
+          <div class="desc">+5% to offline qi accrual rate.</div>
+          <div class="cost">Locked · Realm 9</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="up-section">
+      <header class="up-section-head">
+        <span class="lantern"></span>
+        <span class="title">Inscribed</span>
+        <span class="tag">Permanent tribute received this run</span>
+        <span class="count">3</span>
+      </header>
+      <div class="chip-grid">
+        <div class="chip"><span class="glyph">体</span>Body Tempering Disciple I</div>
+        <div class="chip"><span class="glyph">叶</span>Refined Tap I</div>
+        <div class="chip"><span class="glyph">蓄</span>Crystal Reservoir II</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SPARKS BODY ──────────────────────────────────────── -->
+  <section class="body tab-body" data-tab-body="sparks">
+    <!-- Trinity banner (active) -->
+    <div class="trinity">
+      <span class="mark">✦</span>
+      <span class="title">Trinity Convergence</span>
+      <span class="bonus">+50% global qi/s</span>
+    </div>
+
+    <!-- Legendary section -->
+    <div class="sp-section-head legendary">
+      <span class="title">Legendary</span>
+      <span class="sub">Producer synergies</span>
+      <span class="count">1</span>
+    </div>
+    <div class="sp-grid">
+      <div class="sp legendary">
+        <span class="ribbon">Legendary</span>
+        <div class="frame"><span class="glyph" style="color:#f5b95a;">凤</span></div>
+        <div class="name">Phoenix Reborn</div>
+        <div class="line">2 rebirths · others <b>×4</b></div>
+      </div>
+    </div>
+
+    <!-- Permanent (uncommon) section -->
+    <div class="sp-section-head uncommon">
+      <span class="title">Permanent</span>
+      <span class="sub">Lasts this run</span>
+      <span class="count">2</span>
+    </div>
+    <div class="sp-grid">
+      <div class="sp uncommon">
+        <span class="ribbon">Uncommon</span>
+        <div class="frame"><span class="glyph" style="color:#c885ff;">忍</span></div>
+        <div class="name">Master's Patience</div>
+        <div class="line"><b>+18%</b> qi/s · 90s held</div>
+        <span class="stack-badge">×3</span>
+      </div>
+      <div class="sp uncommon">
+        <span class="ribbon">Uncommon</span>
+        <div class="frame"><span class="glyph" style="color:#c885ff;">命</span></div>
+        <div class="name">Vital Stream</div>
+        <div class="line"><b>+2</b> base qi/s</div>
+        <span class="stack-badge">×2</span>
+      </div>
+    </div>
+
+    <!-- Mechanic section -->
+    <div class="sp-section-head mechanic">
+      <span class="title">Mechanics</span>
+      <span class="sub">From crystal evolution</span>
+      <span class="count">1</span>
+    </div>
+    <div class="sp-grid">
+      <div class="sp mechanic">
+        <span class="ribbon">Mechanic</span>
+        <div class="frame"><span class="glyph" style="color:#6ec896;">蓄</span></div>
+        <div class="name">Crystal Reservoir II</div>
+        <div class="line">Tier <b>2</b> · 50% qi/s, 3 min</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="caption">
+  Tap any tab above the phone (or any sub-tab in the rail) to swap the active
+  body. Pavilion plaques use the same framed inset, vermillion rail, and
+  Cinzel lintel as the bazaar &mdash; one estate, three rooms.
+</div>
+
+<div class="compare">
+  <div>
+    <h3>Before — generic dark cards</h3>
+    <p>
+      Three sub-tabs of identical dark rectangles. The producer name is small
+      sans, the sprite floats with no frame, the buy button is a flat pill,
+      and the locked state shows "??? Locked &middot; Unlocks at realm N" as
+      grey text. Nothing on the screen says <em>place</em>. Nothing tells the
+      player "this Garden, this Furnace, this Pillar &mdash; they are <strong>yours</strong>."
+    </p>
+  </div>
+  <div>
+    <h3>After — The Estate Pavilions</h3>
+    <p>
+      Each producer is a tributary plaque at the pavilion gate. The vermillion
+      rail says <em>qi flows in from here.</em> The framed inset gives the
+      emblem somewhere to live. The Cinzel lintel names the place. Sealed
+      shrines stay visible &mdash; players see the wax seal and bamboo lattice
+      and know there&rsquo;s a destination behind it. When mini-games unlock,
+      the buy cartouche slides left and an &ldquo;Enter Pavilion&rdquo; CTA
+      lands in the same slot &mdash; the chassis doesn&rsquo;t change.
+    </p>
+  </div>
+</div>
+
+<script>
+  const rail = document.getElementById('rail');
+  const indicator = document.getElementById('indicator');
+  const toggle = document.getElementById('toggle');
+
+  function moveIndicatorTo(tab){
+    const railRect = rail.getBoundingClientRect();
+    const tRect = tab.getBoundingClientRect();
+    const w = tRect.width - 4;
+    const x = tRect.left - railRect.left + 2;
+    indicator.style.setProperty('--ind-w', `${w}px`);
+    indicator.style.setProperty('--ind-x', `${x}px`);
+  }
+
+  function setActive(name){
+    // Tabs
+    rail.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    const active = rail.querySelector(`.tab[data-tab="${name}"]`);
+    if (active) moveIndicatorTo(active);
+    // Bodies
+    document.querySelectorAll('.tab-body').forEach(b => b.classList.toggle('active', b.dataset.tabBody === name));
+    // Top toggle row
+    toggle.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.set === name));
+  }
+
+  // Init: indicator under first tab once layout settles
+  requestAnimationFrame(() => requestAnimationFrame(() => setActive('producers')));
+  rail.addEventListener('click', e => {
+    const t = e.target.closest('.tab');
+    if (t) setActive(t.dataset.tab);
+  });
+  toggle.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') setActive(e.target.dataset.set);
+  });
+</script>
+
+</body>
+</html>

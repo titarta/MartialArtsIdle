@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tracing Meridians . redesign study . MartialArtsIdle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Ma+Shan+Zheng&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brass-edge:     #dcaf6e;
+  --brass-deep:     #8a5a28;
+  --brass-glow:     #ffcf83;
+  --brass-bright:   #ffe2a0;
+  --lacquer-1:      #1f1208;
+  --lacquer-2:      #150e07;
+  --lacquer-3:      #0c0805;
+  --cream:          #f5e6c8;
+  --cream-hot:      #fff8e0;
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+  --vermillion-deep:#8c1e1e;
+  --jade:           #4ea372;
+  --jade-deep:      #2a5a3e;
+  --jade-glow:      #7fc69e;
+  --page-bg:        #181016;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(220, 175, 110, 0.06), transparent 60%),
+    var(--page-bg);
+  color: #e8d7c0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 36px 24px 80px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 0 0 6px;
+}
+h1 .sub {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(220, 175, 110, 0.75);
+  margin-top: 4px;
+}
+
+.lede {
+  max-width: 920px;
+  margin: 8px 0 32px;
+  color: rgba(232, 215, 192, 0.78);
+}
+.lede strong { color: var(--brass-edge); font-weight: 600; }
+.lede em { color: var(--vermillion-hot); font-style: normal; font-weight: 600; }
+.lede .jade { color: var(--jade-glow); font-weight: 600; }
+
+/* ── Phone rail ──────────────────────────────────────────────────────── */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(3, 380px);
+  gap: 32px;
+  overflow-x: auto;
+  padding-bottom: 24px;
+  scrollbar-color: #553c20 transparent;
+}
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel-head { display: flex; align-items: baseline; gap: 10px; }
+.panel-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid rgba(220, 175, 110, 0.35);
+  color: var(--brass-edge);
+  border-radius: 2px;
+}
+.panel-tag.today { color: rgba(232, 215, 192, 0.45); border-color: rgba(255,255,255,0.2); }
+.panel-tag.new   { color: #ffd28a; border-color: rgba(255, 210, 138, 0.6); background: rgba(220, 175, 110, 0.10); }
+.panel-tag.states{ color: #b9d6a2; border-color: rgba(140, 220, 160, 0.55); background: rgba(74, 151, 120, 0.10); }
+
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+}
+.panel-desc {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: rgba(232, 215, 192, 0.68);
+  margin: 0;
+}
+
+/* ── Phone frame (375 × 720 inner) ────────────────────────────────────── */
+.phone {
+  width: 380px;
+  height: 720px;
+  border-radius: 38px;
+  background: #000;
+  padding: 12px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+.phone-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 200, 130, 0.06), transparent 50%),
+    linear-gradient(180deg, #0d0707 0%, #1a0d09 40%, #221409 100%);
+}
+
+/* Faux top bar (chrome) */
+.fxbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 58px;
+  background: linear-gradient(180deg, rgba(20,12,8,0.92), rgba(20,12,8,0.55));
+  border-bottom: 1px solid rgba(220, 175, 110, 0.18);
+  z-index: 30;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(220, 175, 110, 0.55);
+}
+.fxnav {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 48px;
+  background: linear-gradient(0deg, rgba(20,12,8,0.95), rgba(20,12,8,0.7));
+  border-top: 1px solid rgba(220, 175, 110, 0.18);
+  z-index: 30;
+  display: flex; align-items: center; justify-content: space-around;
+  font-family: 'Inter', sans-serif;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: rgba(232, 215, 192, 0.35);
+  text-transform: uppercase;
+}
+.fxnav span:nth-child(2) { color: var(--brass-edge); }
+
+/* Faux cultivator silhouette (atmospheric, lives under overlay) */
+.fxsil {
+  position: absolute;
+  left: 50%;
+  bottom: 90px;
+  width: 200px;
+  height: 280px;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,180,120,0.10), transparent 60%),
+    radial-gradient(ellipse at 50% 30%, rgba(220,150,90,0.18), transparent 65%);
+  opacity: 0.55;
+  filter: blur(1px);
+}
+.fxsil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 20%, rgba(0,0,0,0.4) 100%);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   PANEL A — TODAY (current implementation, basic feel)
+   ────────────────────────────────────────────────────────────────────── */
+.today-overlay {
+  position: absolute;
+  top: 58px; left: 0; right: 0; bottom: 48px;
+  background: rgba(0, 0, 0, 0.38);
+  z-index: 20;
+}
+.today-timer-track {
+  position: absolute;
+  top: 8px; left: 10%; right: 10%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.today-timer-bar {
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  transform-origin: left center;
+}
+.today-dot {
+  position: absolute;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 2px solid rgba(167, 139, 250, 0.6);
+  background: rgba(25, 15, 45, 0.88);
+  color: #c4b5fd;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  display: flex; align-items: center; justify-content: center;
+  transform: translate(-50%, -50%);
+}
+.today-dot.current {
+  border-color: #c4b5fd;
+  background: rgba(55, 35, 90, 0.95);
+  color: #ede9fe;
+  box-shadow: 0 0 14px 5px rgba(167, 139, 250, 0.45);
+}
+.today-dot.waiting { opacity: 0.38; }
+.today-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.today-svg line {
+  stroke: rgba(200, 185, 255, 0.28);
+  stroke-width: 2px;
+  stroke-dasharray: 7 5;
+}
+.today-svg line.active { stroke: rgba(210, 195, 255, 0.72); stroke-dasharray: none; stroke-width: 2.5px; }
+
+.today-anno {
+  position: absolute;
+  bottom: 60px;
+  left: 10px; right: 10px;
+  padding: 8px 10px;
+  background: rgba(140, 30, 30, 0.20);
+  border: 1px dashed rgba(255, 91, 91, 0.5);
+  border-radius: 4px;
+  color: rgba(255, 200, 200, 0.9);
+  font-size: 10px;
+  line-height: 1.5;
+  z-index: 25;
+}
+.today-anno strong { color: var(--vermillion-hot); }
+
+/* ──────────────────────────────────────────────────────────────────────
+   PANEL B — REDESIGN: "Tracing Meridians"
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Overlay backdrop: ink wash + vermillion vignette, atmospheric */
+.mt-overlay {
+  position: absolute;
+  top: 58px; left: 0; right: 0; bottom: 48px;
+  z-index: 20;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(200, 60, 60, 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.35) 30%, rgba(0,0,0,0.62) 100%);
+  overflow: hidden;
+}
+/* Subtle qi-mist field — radial dots, very faint */
+.mt-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(220, 175, 110, 0.10) 0%, transparent 2%),
+    radial-gradient(circle at 70% 65%, rgba(220, 175, 110, 0.08) 0%, transparent 1.5%),
+    radial-gradient(circle at 45% 80%, rgba(220, 175, 110, 0.07) 0%, transparent 2%),
+    radial-gradient(circle at 85% 15%, rgba(127, 198, 158, 0.06) 0%, transparent 2%),
+    radial-gradient(circle at 15% 75%, rgba(127, 198, 158, 0.06) 0%, transparent 1.5%);
+  pointer-events: none;
+  opacity: 0.75;
+}
+/* Bottom-corner watermark glyph 氣 (qi) for atmosphere */
+.mt-overlay::after {
+  content: '氣';
+  position: absolute;
+  bottom: 8px; right: 14px;
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 96px;
+  color: rgba(220, 175, 110, 0.08);
+  line-height: 0.8;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Title strip at top: tiny Cinzel + brush Chinese */
+.mt-title-strip {
+  position: absolute;
+  top: 10px; left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 1px;
+  pointer-events: none;
+  z-index: 5;
+}
+.mt-title-cn {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 16px;
+  color: var(--brass-edge);
+  letter-spacing: 0.2em;
+  line-height: 1;
+}
+.mt-title-en {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 8.5px;
+  letter-spacing: 0.32em;
+  color: rgba(232, 215, 192, 0.55);
+  text-transform: uppercase;
+}
+
+/* Incense timer — slim horizontal column with burning tip */
+.mt-incense {
+  position: absolute;
+  top: 50px;
+  left: 32px; right: 32px;
+  height: 6px;
+  background: linear-gradient(180deg, var(--lacquer-2), var(--lacquer-1));
+  border-radius: 3px;
+  box-shadow:
+    inset 0 1px 0 rgba(220, 175, 110, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  overflow: visible;
+}
+.mt-incense-track {
+  position: absolute; inset: 0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mt-incense-burn {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  width: 62%;
+  background: linear-gradient(90deg,
+    rgba(255, 180, 110, 0.0) 0%,
+    rgba(255, 180, 110, 0.55) 25%,
+    rgba(255, 220, 150, 0.95) 90%,
+    var(--cream-hot) 100%);
+  box-shadow: 0 0 8px 2px rgba(255, 200, 130, 0.55);
+}
+.mt-incense-burn::after {
+  content: '';
+  position: absolute;
+  right: -3px; top: -2px; bottom: -2px;
+  width: 6px;
+  background: radial-gradient(circle, var(--cream-hot) 0%, rgba(255, 200, 130, 0.7) 50%, transparent 100%);
+  filter: blur(1px);
+}
+.mt-incense-cap {
+  position: absolute;
+  left: -1px; top: -2px; bottom: -2px;
+  width: 2px;
+  background: var(--brass-edge);
+  border-radius: 1px;
+}
+/* End cap */
+.mt-incense::after {
+  content: '';
+  position: absolute;
+  right: -1px; top: -2px; bottom: -2px;
+  width: 2px;
+  background: rgba(220, 175, 110, 0.35);
+  border-radius: 1px;
+}
+
+/* Ink connection SVG — overlay-wide */
+.mt-ink {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  width: 100%; height: 100%;
+}
+.mt-ink path,
+.mt-ink line {
+  fill: none;
+  stroke: rgba(220, 175, 110, 0.35);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 5;
+  stroke-linecap: round;
+}
+.mt-ink path.consumed,
+.mt-ink line.consumed { opacity: 0; }
+.mt-ink path.active,
+.mt-ink line.active {
+  stroke: var(--brass-glow);
+  stroke-width: 2.2;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 4px rgba(255, 200, 130, 0.55));
+}
+
+/* Acupressure node — base */
+.mt-node {
+  position: absolute;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 2;
+}
+/* Three rings: outer brass, middle lacquer, inner glow */
+.mt-node::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(45, 30, 18, 0.95) 0%,
+      rgba(28, 18, 11, 0.96) 60%,
+      rgba(20, 12, 8, 0.96) 100%);
+  border: 1.5px solid var(--brass-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+/* Outer glow ring */
+.mt-node::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  pointer-events: none;
+}
+.mt-node > span {
+  position: relative;
+  z-index: 1;
+}
+
+/* WAITING — dim jade */
+.mt-node.waiting { color: rgba(127, 198, 158, 0.45); }
+.mt-node.waiting::before {
+  border-color: rgba(74, 151, 120, 0.35);
+}
+.mt-node.waiting::after {
+  inset: -1px;
+  border-color: rgba(127, 198, 158, 0.15);
+  box-shadow: 0 0 6px rgba(127, 198, 158, 0.10);
+}
+
+/* CURRENT — vermillion pulse + rotating brass ring */
+.mt-node.current { color: var(--cream-hot); }
+.mt-node.current::before {
+  border-color: var(--brass-edge);
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(80, 25, 25, 0.95) 0%,
+      rgba(50, 15, 12, 0.95) 60%,
+      rgba(28, 10, 8, 0.95) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 150, 0.30),
+    inset 0 0 8px rgba(255, 91, 91, 0.35),
+    0 0 18px 4px rgba(255, 91, 91, 0.45),
+    0 0 36px 8px rgba(200, 56, 56, 0.20);
+}
+/* Spinning brass rim, with vermillion-tip notch */
+.mt-node.current::after {
+  inset: -7px;
+  border: 1.5px solid transparent;
+  border-top-color: var(--brass-glow);
+  border-right-color: var(--brass-edge);
+  border-bottom-color: var(--vermillion-hot);
+  border-left-color: var(--brass-deep);
+  border-radius: 50%;
+  animation: mt-spin 2.2s linear infinite;
+}
+
+/* TAPPED — burst into 印 stamp and fade */
+.mt-node.tapped {
+  pointer-events: none;
+  color: var(--vermillion-hot);
+  font-family: 'Ma Shan Zheng', cursive;
+}
+.mt-node.tapped::before {
+  background: rgba(200, 56, 56, 0.18);
+  border-color: var(--vermillion);
+  box-shadow: 0 0 20px 6px rgba(255, 91, 91, 0.45);
+  animation: mt-stamp 0.45s ease-out forwards;
+}
+.mt-node.tapped::after { display: none; }
+.mt-node.tapped > span {
+  animation: mt-stamp-glyph 0.45s ease-out forwards;
+}
+
+@keyframes mt-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes mt-stamp {
+  0%   { transform: scale(1);   opacity: 1; }
+  40%  { transform: scale(1.45); opacity: 0.85; }
+  100% { transform: scale(1.05); opacity: 0; }
+}
+@keyframes mt-stamp-glyph {
+  0%   { transform: scale(1) rotate(-8deg); }
+  100% { transform: scale(1.5) rotate(-12deg); opacity: 0; }
+}
+
+/* Traveling qi orb along active connection (decorative for mockup) */
+.mt-traveler {
+  position: absolute;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--cream-hot) 0%, var(--brass-glow) 60%, transparent 100%);
+  box-shadow: 0 0 10px 4px rgba(255, 200, 130, 0.55);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   PANEL C — STATE INVENTORY
+   ────────────────────────────────────────────────────────────────────── */
+.states-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 24px;
+}
+.state-cell {
+  border: 1px solid rgba(220, 175, 110, 0.15);
+  border-radius: 8px;
+  background: rgba(20, 12, 8, 0.5);
+  padding: 18px 12px 14px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px;
+}
+.state-cell-label {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--brass-edge);
+  text-transform: uppercase;
+}
+.state-cell-note {
+  font-size: 10px;
+  color: rgba(232, 215, 192, 0.55);
+  text-align: center;
+  line-height: 1.4;
+}
+.state-stage {
+  position: relative;
+  width: 76px; height: 76px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Timer states demo row */
+.timer-states {
+  display: flex; flex-direction: column;
+  gap: 10px;
+  padding: 0 16px 18px;
+}
+.timer-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.timer-row-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  color: var(--brass-edge);
+  width: 80px;
+  text-transform: uppercase;
+}
+.timer-demo {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  background: linear-gradient(180deg, var(--lacquer-2), var(--lacquer-1));
+  border-radius: 3px;
+  overflow: visible;
+}
+.timer-demo-burn {
+  position: absolute; top: 0; left: 0; bottom: 0;
+  border-radius: 3px;
+  box-shadow: 0 0 8px 2px rgba(255, 200, 130, 0.55);
+}
+.timer-demo.healthy .timer-demo-burn {
+  width: 78%;
+  background: linear-gradient(90deg,
+    rgba(255, 180, 110, 0.0) 0%,
+    rgba(255, 180, 110, 0.55) 25%,
+    rgba(255, 220, 150, 0.95) 90%,
+    var(--cream-hot) 100%);
+}
+.timer-demo.warning .timer-demo-burn {
+  width: 38%;
+  background: linear-gradient(90deg,
+    rgba(255, 140, 80, 0.0) 0%,
+    rgba(255, 140, 80, 0.6) 25%,
+    rgba(255, 180, 110, 0.95) 90%,
+    var(--cream-hot) 100%);
+}
+.timer-demo.urgent .timer-demo-burn {
+  width: 14%;
+  background: linear-gradient(90deg,
+    rgba(255, 91, 91, 0.0) 0%,
+    rgba(255, 91, 91, 0.6) 25%,
+    rgba(255, 140, 100, 0.95) 90%,
+    var(--cream-hot) 100%);
+  box-shadow: 0 0 10px 3px rgba(255, 91, 91, 0.6);
+}
+
+/* ── Bug + Fix panel ─────────────────────────────────────────────────── */
+.bug {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1200px;
+}
+.bug-card {
+  border-radius: 10px;
+  padding: 22px 24px;
+  border: 1px solid rgba(220, 175, 110, 0.18);
+  background: linear-gradient(180deg, rgba(28, 16, 10, 0.7), rgba(20, 12, 8, 0.6));
+}
+.bug-card h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass-edge);
+  margin: 0 0 12px;
+}
+.bug-card.fix h3 { color: var(--jade-glow); }
+.bug-card p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(232, 215, 192, 0.78);
+  margin: 0 0 10px;
+}
+.bug-card code {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 11px;
+  color: var(--brass-bright);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(220, 175, 110, 0.15);
+}
+.bug-card ul {
+  margin: 0; padding: 0 0 0 20px;
+  font-size: 11.5px;
+  color: rgba(232, 215, 192, 0.78);
+  line-height: 1.65;
+}
+.bug-card li + li { margin-top: 4px; }
+
+/* ── Footer ──────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: 60px;
+  max-width: 1200px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(220, 175, 110, 0.15);
+  color: rgba(232, 215, 192, 0.55);
+  font-size: 11px;
+}
+.footer strong { color: var(--brass-edge); }
+</style>
+</head>
+<body>
+
+<h1>Tracing Meridians<span class="sub">REDESIGN STUDY . MAY 2026 . MOBILE-FIRST</span></h1>
+
+<p class="lede">
+The pattern-click mini-game today looks like an <em>osu! ripoff</em>: numbered purple discs on a flat black scrim, with a generic <em>purple→blue gradient timer bar</em>. There is no thematic anchor for what the player is doing. The mechanic is called <strong>Tracing Meridians</strong> — the player is supposed to be channelling qi through acupressure points along the body's meridian channels. That fantasy is invisible today.
+</p>
+<p class="lede">
+This pass replaces the dots with <span class="jade">acupressure node medallions</span> (lacquer-and-brass, with Chinese numerals inside), the timer with a <strong>burning-incense bar</strong> (dark column with a glowing tip that recedes), and the SVG lines with <strong>calligraphic ink-meridian strokes</strong> that the active segment lights up in brass. Also fixes the dot-placement bug so the nodes never spawn behind permanent UI.
+</p>
+
+<div class="rail">
+
+  <!-- ────────────────────────────────────────────────────────────────────
+       PANEL A — TODAY
+       ──────────────────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <div class="panel-head">
+      <span class="panel-tag today">Today</span>
+      <span class="panel-title">Numbered discs</span>
+    </div>
+    <p class="panel-desc">
+      Flat black scrim. Generic gradient timer. Numbered purple circles. No theme. Dots can land behind the top chip stack, the timer bar, the Petition Tablet, or the active BT button.
+    </p>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="fxbar">SANCTUM</div>
+        <div class="fxsil"></div>
+
+        <div class="today-overlay">
+          <div class="today-timer-track"><div class="today-timer-bar"></div></div>
+
+          <svg class="today-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="18" y1="22" x2="80" y2="35" />
+            <line x1="80" y1="35" x2="32" y2="58" class="active" />
+            <line x1="32" y1="58" x2="68" y2="78" />
+          </svg>
+
+          <div class="today-dot waiting" style="left:18%; top:22%;">1</div>
+          <div class="today-dot waiting" style="left:80%; top:35%;">2</div>
+          <div class="today-dot current" style="left:32%; top:58%;">3</div>
+          <div class="today-dot waiting" style="left:68%; top:78%;">4</div>
+        </div>
+
+        <div class="today-anno">
+          <strong>BUG:</strong> y=14–79% maps to the overlay (viewport minus chrome). Dot #4 at y:78% lands right at the bottom edge near the nav bar (only safe by a few px). At T5 with 7 dots, MIN_DIST=20% breaks routinely on small phones — fallback grid kicks in, dots clump diagonally.
+        </div>
+
+        <div class="fxnav"><span>HOME</span><span>CULT</span><span>JOUR</span><span>SHOP</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────────────────────────────────────────
+       PANEL B — REDESIGN
+       ──────────────────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <div class="panel-head">
+      <span class="panel-tag new">Redesign</span>
+      <span class="panel-title">Acupressure trace</span>
+    </div>
+    <p class="panel-desc">
+      Lacquer-and-brass medallions with <strong>Ma Shan Zheng numerals</strong>. Burning-incense timer above. Active connection lights up in brass with a traveling qi orb. Atmospheric vermillion vignette + 氣 watermark replace the flat black.
+    </p>
+    <div class="phone">
+      <div class="phone-inner">
+        <div class="fxbar">SANCTUM</div>
+        <div class="fxsil"></div>
+
+        <div class="mt-overlay">
+
+          <div class="mt-title-strip">
+            <div class="mt-title-cn">氣脈</div>
+            <div class="mt-title-en">Trace the meridians</div>
+          </div>
+
+          <!-- Incense timer -->
+          <div class="mt-incense">
+            <div class="mt-incense-cap"></div>
+            <div class="mt-incense-track">
+              <div class="mt-incense-burn"></div>
+            </div>
+          </div>
+
+          <!-- Connection ink-strokes -->
+          <svg class="mt-ink" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <!-- 1→2 (consumed) -->
+            <path d="M 22,28 Q 50,18 78,30" class="consumed" />
+            <!-- 2→3 (consumed) -->
+            <path d="M 78,30 Q 65,52 42,52" class="consumed" />
+            <!-- 3→4 active -->
+            <path d="M 42,52 Q 25,66 22,82" class="active" />
+            <!-- 4→5 dim -->
+            <path d="M 22,82 Q 50,76 78,82" />
+          </svg>
+
+          <!-- Traveler dot on the active line (decorative) -->
+          <div class="mt-traveler" style="left: 32%; top: 70%;"></div>
+
+          <!-- Nodes: 1+2 tapped (now showing 印 stamps fading), 3 current, 4+5 waiting -->
+          <div class="mt-node tapped" style="left: 22%; top: 28%;"><span>印</span></div>
+          <div class="mt-node tapped" style="left: 78%; top: 30%;"><span>印</span></div>
+          <div class="mt-node current" style="left: 42%; top: 52%;"><span>三</span></div>
+          <div class="mt-node waiting" style="left: 22%; top: 82%;"><span>四</span></div>
+          <div class="mt-node waiting" style="left: 78%; top: 82%;"><span>五</span></div>
+        </div>
+
+        <div class="fxnav"><span>HOME</span><span>CULT</span><span>JOUR</span><span>SHOP</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ────────────────────────────────────────────────────────────────────
+       PANEL C — STATES
+       ──────────────────────────────────────────────────────────────────── -->
+  <section class="panel">
+    <div class="panel-head">
+      <span class="panel-tag states">States</span>
+      <span class="panel-title">Node + timer inventory</span>
+    </div>
+    <p class="panel-desc">
+      Each acupressure node has three states. Timer has three urgency tiers. All shown isolated so you can compare without scene clutter.
+    </p>
+
+    <div class="phone">
+      <div class="phone-inner" style="background: linear-gradient(180deg, #0d0707 0%, #150b07 100%);">
+        <div class="fxbar">STATES</div>
+
+        <div class="states-grid">
+
+          <div class="state-cell">
+            <div class="state-cell-label">Waiting</div>
+            <div class="state-stage">
+              <div class="mt-node waiting" style="position: relative; left:auto; top:auto; transform:none;"><span>七</span></div>
+            </div>
+            <div class="state-cell-note">Dim jade rim<br>0.45 opacity glyph</div>
+          </div>
+
+          <div class="state-cell">
+            <div class="state-cell-label">Current</div>
+            <div class="state-stage">
+              <div class="mt-node current" style="position: relative; left:auto; top:auto; transform:none;"><span>三</span></div>
+            </div>
+            <div class="state-cell-note">Vermillion pulse<br>spinning brass rim</div>
+          </div>
+
+          <div class="state-cell">
+            <div class="state-cell-label">Tapped</div>
+            <div class="state-stage">
+              <div class="mt-node tapped" style="position: relative; left:auto; top:auto; transform:none; opacity:0.7;"><span>印</span></div>
+            </div>
+            <div class="state-cell-note">Bursts into 印 seal<br>fades in 450ms</div>
+          </div>
+
+          <div class="state-cell">
+            <div class="state-cell-label">Spark prompt</div>
+            <div class="state-stage">
+              <div class="mt-node current" style="position: relative; left:auto; top:auto; transform:none; width:36px; height:36px; font-size:16px;"><span>氣</span></div>
+            </div>
+            <div class="state-cell-note">Smaller; "tap to begin"<br>spawns in scene first</div>
+          </div>
+
+        </div>
+
+        <!-- Timer state demos -->
+        <div class="timer-states">
+          <div class="timer-row">
+            <div class="timer-row-label">Healthy</div>
+            <div class="timer-demo healthy"><div class="timer-demo-burn"></div></div>
+          </div>
+          <div class="timer-row">
+            <div class="timer-row-label">Half</div>
+            <div class="timer-demo warning"><div class="timer-demo-burn"></div></div>
+          </div>
+          <div class="timer-row">
+            <div class="timer-row-label">Urgent</div>
+            <div class="timer-demo urgent"><div class="timer-demo-burn"></div></div>
+          </div>
+        </div>
+
+        <div class="fxnav"><span>HOME</span><span>CULT</span><span>JOUR</span><span>SHOP</span></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ────────────────────────────────────────────────────────────────────
+     BUG DIAGNOSIS + FIX
+     ──────────────────────────────────────────────────────────────────── -->
+<div class="bug">
+  <div class="bug-card">
+    <h3>The placement bug</h3>
+    <p>
+      <code>generateDotPositions()</code> rolls coords as <code>x = 8 + Math.random() * 80</code> and <code>y = 14 + Math.random() * 65</code>. Those percentages map to <strong>the overlay's box</strong>, not the viewport. The overlay is already <code>top: var(--top-bar-h); bottom: var(--nav-h)</code> — so the 14% y-margin and 65% y-range are doing <strong>double duty</strong> beyond what the overlay already excludes.
+    </p>
+    <p>
+      Worse: the safe-zone math ignores the in-scene UI that lives <em>inside</em> the overlay's bounds: top-left chip stack (~20% × 30% top-left), Petition Tablet (~20% × 32% top-right), crystal + cultivator (~40% × 50% centre-bottom), and the BT button when pending (~80% × 18% bottom centre). The dots roll uniformly across that whole rectangle — so on most rolls, at least one dot lands underneath a chip, the tablet, or the cultivator. Tapping the cultivator passes the tap to the dot, but tapping the tablet (or chip) opens that UI instead of the dot.
+    </p>
+    <p>
+      At T5 (7 dots) with <code>MIN_DIST = 20%</code>, the 400-attempt loop times out routinely on tall phones, and the fallback grid kicks in — dots clump on a diagonal staircase.
+    </p>
+  </div>
+
+  <div class="bug-card fix">
+    <h3>The fix</h3>
+    <ul>
+      <li><strong>Reuse the existing safe-zone discipline.</strong> The Sanctum layout already uses <code>SPARK_SAFE_ZONES</code> (two side-channel bands flanking the cultivator) for divine_qi orbs and the prompt itself — use the SAME bands for dot generation.</li>
+      <li><strong>Constrain dot positions to the safe channels.</strong> Each dot rolls a zone (alternating L/R for spatial flow), then random within the zone. No collision with chips, tablet, cultivator, BT button.</li>
+      <li><strong>Drop the redundant top-margin.</strong> The overlay already excludes the top bar; the title strip + incense timer take ~60px from the top of the overlay box — encode that as a 14% offset of the OVERLAY (not viewport) and call it once.</li>
+      <li><strong>Lower MIN_DIST adaptive.</strong> Scale by <code>dotCount</code>: 3 dots can afford 22%, 7 dots needs ~14% to avoid fallback. Add jitter on retry.</li>
+      <li><strong>Anchor SVG paths to the same coord system as the dots.</strong> Use <code>viewBox="0 0 100 100" preserveAspectRatio="none"</code> on the ink SVG so % paths and % dots use the identical projection.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>Implementation order:</strong> (1) fix dot placement bug — single-PR — small + risk-free; (2) ship the redesigned overlay + nodes + incense timer; (3) ship the ink-stroke connections + traveler orb. <strong>CSS-only motion</strong> throughout — no React state thrash for the spin, stamp, or burn animations.
+</div>
+
+</body>
+</html>

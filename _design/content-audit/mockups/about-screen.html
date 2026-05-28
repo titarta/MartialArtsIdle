@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1, viewport-fit=cover" />
+<title>About — Credits screen (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* About / Credits — pushed from Settings.
+   Lacquer aesthetic, single hero ("道" watermark) then segmented sections:
+   App version (top-card), Team, Fonts, Open-source, Links.
+   Footer line is a calligraphy stamp.
+*/
+:root{
+  --ui-bg-deep-rgb:    14, 12, 8;
+  --ui-bg-panel-rgb:   32, 26, 18;
+  --ui-purple-deep:    #9b7d50;
+  --ui-purple-strong:  #dcaf6e;
+  --ui-purple-soft:    #e8d5a8;
+  --ui-purple-light:   #f5e6c8;
+  --ui-purple-wash:    #f8edd4;
+  --ui-label-rgb:      210, 195, 170;
+  --ui-muted-rgb:      175, 160, 140;
+  --ui-border:         rgba(75, 60, 40, 0.6);
+  --ui-border-soft:    rgba(75, 60, 40, 0.35);
+
+  --bg-deep:           rgb(var(--ui-bg-deep-rgb));
+  --bg-panel:          rgba(var(--ui-bg-panel-rgb), 0.92);
+  --bg-nested:         rgba(14, 12, 8, 0.55);
+
+  --font-display:      'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-cn:           'Ma Shan Zheng', 'Cinzel', serif;
+  --font-body:         -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background: #060504;
+  color: var(--ui-purple-light);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+body{
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 20px 0 40px;
+  min-height: 100vh;
+}
+.device{
+  width: 390px; height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+
+.topbar{
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+  background: rgba(14, 12, 8, 0.85);
+  border-bottom: 1px solid var(--ui-border);
+  flex-shrink: 0;
+  z-index: 5;
+}
+.tb-shop{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 14px;
+}
+.tb-curr{
+  flex: 1; display: flex; flex-direction: column; gap: 1px;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.tb-curr-row{ display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ui-purple-soft); }
+.tb-curr-row .dot{
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+}
+.tb-curr-row .dot.gold{ background: radial-gradient(circle, #ffd55a 30%, #6b4a10 70%); }
+.tb-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 16px;
+}
+.tb-icon.active{
+  background: rgba(220, 175, 110, 0.18);
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-strong);
+}
+
+.screen{
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 88px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 65%),
+    linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .95));
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+}
+
+.back-chip{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px 6px 8px;
+  background: var(--bg-nested);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  color: var(--ui-purple-soft);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.back-chip .ar{ font-size: 16px; line-height: 1; margin-right: 2px; }
+
+/* Hero — large title with calligraphy watermark */
+.hero{
+  position: relative;
+  margin-top: 16px;
+  padding: 22px 18px 18px;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(245, 230, 200, 0.10), rgba(245, 230, 200, 0) 30%),
+    linear-gradient(160deg, rgba(46, 36, 24, 0.96) 0%, rgba(26, 20, 14, 0.96) 100%);
+  border: 1px solid rgba(212, 184, 136, 0.30);
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.05);
+  overflow: hidden;
+  text-align: center;
+}
+.hero::before{
+  content: "道";
+  font-family: var(--font-cn);
+  position: absolute;
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+  font-size: 180px;
+  color: rgba(220, 175, 110, 0.08);
+  line-height: 0.9;
+  pointer-events: none;
+}
+.hero-eyebrow{
+  font-size: 10px; letter-spacing: 0.30em; text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+  position: relative; z-index: 2;
+}
+.hero-title{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 26px; letter-spacing: 0.10em;
+  color: var(--ui-purple-light);
+  margin-top: 6px;
+  position: relative; z-index: 2;
+}
+.hero-tagline{
+  font-family: var(--font-cn);
+  font-size: 14px;
+  color: var(--ui-purple-soft);
+  margin-top: 6px;
+  letter-spacing: 0.1em;
+  position: relative; z-index: 2;
+}
+.hero-version{
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 10px;
+  background: rgba(220, 175, 110, 0.15);
+  border: 1px solid var(--ui-purple-strong);
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ui-purple-strong);
+  position: relative; z-index: 2;
+}
+
+/* Section labels */
+.sec-label{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.22em;
+  color: var(--ui-purple-strong);
+  margin: 22px 4px 8px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after{ content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--ui-border), transparent); }
+
+.card{
+  background: var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.03);
+}
+
+/* Team rows */
+.team-grid{ display: flex; flex-direction: column; gap: 12px; }
+.team-row{
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+.team-glyph{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #5d4426 0%, #2d2014 100%);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  border-radius: 50%;
+  color: var(--ui-purple-strong);
+  font-family: var(--font-display); font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.team-name{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 13px;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+}
+.team-role{
+  font-size: 11px;
+  color: rgba(var(--ui-label-rgb), 0.65);
+  letter-spacing: 0.05em;
+}
+
+/* Font / license rows */
+.kv-row{
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 8px 0;
+}
+.kv-row + .kv-row{ border-top: 1px solid var(--ui-border-soft); }
+.kv-key{
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+}
+.kv-val{
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.75);
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+.kv-val .lic{
+  display: inline-block;
+  padding: 1px 7px;
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--ui-purple-soft);
+  letter-spacing: 0.06em;
+  margin-left: 4px;
+}
+
+/* Links */
+.link-row{
+  width: 100%;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px;
+  background: rgba(14, 12, 8, 0.50);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  text-align: left; color: var(--ui-purple-light);
+}
+.link-row + .link-row{ margin-top: 8px; }
+.link-icon{
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(220, 175, 110, 0.10);
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 7px;
+  font-size: 14px; color: var(--ui-purple-strong);
+}
+.link-body{ flex: 1; }
+.link-label{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--ui-purple-light);
+}
+.link-sub{
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.65);
+}
+.link-chev{ font-size: 16px; color: rgba(var(--ui-muted-rgb), 0.55); }
+
+/* Calligraphy stamp footer */
+.stamp{
+  margin: 24px auto 0;
+  text-align: center;
+}
+.stamp-mark{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px;
+  background: rgba(199, 72, 72, 0.85);
+  color: #f8edd4;
+  font-family: var(--font-cn);
+  font-size: 22px;
+  border-radius: 6px;
+  transform: rotate(-4deg);
+  box-shadow: 0 4px 12px rgba(199, 72, 72, 0.20);
+  letter-spacing: 0;
+}
+.stamp-line{
+  margin-top: 10px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  text-transform: uppercase;
+}
+
+.botnav{
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60px;
+  display: flex;
+  background: rgba(14, 12, 8, 0.96);
+  border-top: 1px solid var(--ui-border);
+  padding: 8px 0 10px;
+  z-index: 6;
+}
+.bn-item{
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase;
+}
+.bn-item .bni{ font-size: 18px; line-height: 1; }
+.bn-item.active{ color: var(--ui-purple-strong); }
+
+</style>
+</head>
+<body>
+<div class="device">
+
+  <div class="topbar">
+    <button class="tb-shop">⌗</button>
+    <div class="tb-curr">
+      <div class="tb-curr-row"><span class="dot"></span>Blood Lotus <b>420</b></div>
+      <div class="tb-curr-row"><span class="dot gold"></span>Karma <b>1,205</b></div>
+    </div>
+    <button class="tb-icon" title="Codex">📜</button>
+    <button class="tb-icon active" title="Settings">⚙</button>
+  </div>
+
+  <div class="screen">
+
+    <button class="back-chip"><span class="ar">‹</span> Settings</button>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-eyebrow">About this app</div>
+      <div class="hero-title">Martial Arts Idle</div>
+      <div class="hero-tagline">修行无止境</div>
+      <div class="hero-version">v1.4.2 · build 482</div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="sec-label">Cultivators</div>
+    <div class="card">
+      <div class="team-grid">
+        <div class="team-row">
+          <span class="team-glyph">М</span>
+          <span>
+            <div class="team-name">Miguel</div>
+            <div class="team-role">Producer · Monetization · Deployment</div>
+          </span>
+        </div>
+        <div class="team-row">
+          <span class="team-glyph">A</span>
+          <span>
+            <div class="team-name">Alex</div>
+            <div class="team-role">Lead Designer · Gameplay Systems</div>
+          </span>
+        </div>
+        <div class="team-row">
+          <span class="team-glyph">✦</span>
+          <span>
+            <div class="team-name">Claude</div>
+            <div class="team-role">Pair-programmer · UI Audit · Typography</div>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FONTS -->
+    <div class="sec-label">Type</div>
+    <div class="card">
+      <div class="kv-row">
+        <span class="kv-key">Cinzel</span>
+        <span class="kv-val">Natanael Gama <span class="lic">OFL</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">Ma Shan Zheng</span>
+        <span class="kv-val">Steve Matteson · Han-Yi <span class="lic">OFL</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">System sans</span>
+        <span class="kv-val">native fallback</span>
+      </div>
+    </div>
+
+    <!-- OPEN-SOURCE -->
+    <div class="sec-label">Open Source</div>
+    <div class="card">
+      <div class="kv-row">
+        <span class="kv-key">React</span>
+        <span class="kv-val">Meta <span class="lic">MIT</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">Vite</span>
+        <span class="kv-val">Evan You & contributors <span class="lic">MIT</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">Capacitor</span>
+        <span class="kv-val">Ionic <span class="lic">MIT</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">i18next</span>
+        <span class="kv-val">Jan Mühlemann & contributors <span class="lic">MIT</span></span>
+      </div>
+      <div class="kv-row">
+        <span class="kv-key">Pixel art</span>
+        <span class="kv-val">PixelLab API <span class="lic">licensed</span></span>
+      </div>
+    </div>
+
+    <!-- LINKS -->
+    <div class="sec-label">Links</div>
+    <button class="link-row">
+      <span class="link-icon">✉</span>
+      <span class="link-body">
+        <div class="link-label">Contact support</div>
+        <div class="link-sub">theninjatoa@gmail.com</div>
+      </span>
+      <span class="link-chev">›</span>
+    </button>
+    <button class="link-row">
+      <span class="link-icon">🔒</span>
+      <span class="link-body">
+        <div class="link-label">Privacy policy</div>
+        <div class="link-sub">opens in browser</div>
+      </span>
+      <span class="link-chev">›</span>
+    </button>
+    <button class="link-row">
+      <span class="link-icon">§</span>
+      <span class="link-body">
+        <div class="link-label">Terms of service</div>
+        <div class="link-sub">opens in browser</div>
+      </span>
+      <span class="link-chev">›</span>
+    </button>
+
+    <!-- Stamp footer -->
+    <div class="stamp">
+      <div class="stamp-mark">印</div>
+      <div class="stamp-line">Made with patience · 2024–2026</div>
+    </div>
+
+  </div>
+
+  <div class="botnav">
+    <div class="bn-item"><span class="bni">⛰</span>Home</div>
+    <div class="bn-item"><span class="bni">🪷</span>Cultivate</div>
+    <div class="bn-item"><span class="bni">📜</span>Journey</div>
+  </div>
+
+</div>
+</body>
+</html>

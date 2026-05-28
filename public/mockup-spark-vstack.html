@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mockup — Vertical Stack + Tap-to-Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-page:        #0f1418;
+      --text:           #e6f0ee;
+      --text-dim:       #8aa39e;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg-page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
+    body { padding: 24px; max-width: 1300px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 6px; }
+    .intro { color: var(--text-dim); font-size: 13px; line-height: 1.55; margin: 0 0 24px; max-width: 760px; }
+    .intro strong { color: var(--text); }
+    .scene-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 32px 0 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .scene-note { font-size: 12px; color: var(--text-dim); margin: 0 0 16px; line-height: 1.5; }
+
+    .device-frame {
+      width: 390px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #050708;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+    .device-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      padding: 6px 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── Spark overlay ─────────────────────────────────────────────── */
+    .spark-overlay {
+      min-height: 760px;
+      background:
+        radial-gradient(ellipse at center top, rgba(167, 139, 250, 0.06), transparent 60%),
+        linear-gradient(180deg, rgba(8, 12, 18, 0.95), rgba(4, 6, 10, 0.98));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 14px 18px;
+      position: relative;
+    }
+    .spark-overlay-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(230, 240, 238, 0.95);
+      text-shadow: 0 0 12px rgba(167, 139, 250, 0.5);
+      margin-bottom: 4px;
+    }
+    .spark-overlay-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    /* ── Vertical stack ─────────────────────────────────────────────── */
+    .v-stack {
+      width: 100%;
+      max-width: 358px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .v-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity);
+      box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+      position: relative;
+    }
+    .v-card-common    { --card-rarity: rgba(156, 163, 175, 0.55); --card-glow: rgba(156, 163, 175, 0.20); }
+    .v-card-uncommon  { --card-rarity: rgba(74, 222, 128, 0.65);  --card-glow: rgba(74, 222, 128, 0.30); }
+    .v-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.85);
+      --card-glow:   rgba(255, 215, 100, 0.45);
+      animation: legendary-breathe 2.6s ease-in-out infinite;
+    }
+    @keyframes legendary-breathe {
+      0%, 100% { box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65); }
+      50%      { box-shadow: 0 0 26px rgba(255, 220, 130, 0.6), 0 6px 22px rgba(0, 0, 0, 0.8); }
+    }
+
+    /* Tap target — image + body. Pick/reroll buttons sit BELOW this and
+       stop propagation so they're never confused with "open detail". */
+    .v-card-tap {
+      display: flex;
+      gap: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-family: inherit;
+      width: 100%;
+      color: inherit;
+    }
+    .v-card-tap:hover { background: rgba(255, 255, 255, 0.03); }
+
+    .v-card-img {
+      flex-shrink: 0;
+      width: 86px;
+      height: 86px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(40, 48, 60, 0.6), rgba(20, 24, 32, 0.8));
+      border: 1px solid var(--card-rarity);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .v-card-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 60%); }
+    .v-card-img img    { width: 72px; height: 72px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .v-card-img .emoji { font-size: 44px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+
+    .v-card-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .v-card-head { display: flex; align-items: center; gap: 8px; }
+    .v-card-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.01em;
+      flex: 1;
+      min-width: 0;
+    }
+    .v-card-legendary .v-card-name {
+      color: #fff4d4;
+      text-shadow: 0 0 8px rgba(255, 215, 100, 0.5);
+    }
+    .v-card-rarity-tag {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      color: #fff;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+    }
+    .v-card-common    .v-card-rarity-tag { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+    .v-card-uncommon  .v-card-rarity-tag { background: linear-gradient(135deg, #4ade80, #16a34a); }
+    .v-card-legendary .v-card-rarity-tag { background: linear-gradient(135deg, #ffe770, #b8860b); color: #1a1a1a; text-shadow: none; }
+
+    .v-card-effect {
+      font-size: 12.5px;
+      line-height: 1.4;
+      color: rgba(230, 235, 240, 0.92);
+    }
+    .v-card-info-hint {
+      font-size: 10px;
+      color: rgba(167, 139, 250, 0.65);
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .v-card-info-hint::before { content: 'ⓘ'; font-size: 12px; }
+
+    /* Actions row */
+    .v-card-actions {
+      display: flex;
+      gap: 8px;
+      padding: 0 12px 10px;
+    }
+    .v-btn {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: filter 0.15s, background 0.15s;
+    }
+    .v-btn-pick {
+      flex: 1.4;            /* slightly wider — the primary action */
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.4), rgba(110, 80, 200, 0.55));
+      color: #fff;
+      border: 1px solid rgba(167, 139, 250, 0.75);
+    }
+    .v-card-legendary .v-btn-pick {
+      background: linear-gradient(180deg, rgba(255, 200, 80, 0.4), rgba(180, 130, 40, 0.55));
+      border-color: rgba(255, 215, 100, 0.85);
+      color: #fff4d4;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+    }
+    .v-btn-pick:hover { filter: brightness(1.15); }
+    .v-btn-reroll {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+    }
+    .v-btn-reroll:hover { background: rgba(74, 222, 128, 0.28); }
+
+    /* Footer */
+    .spark-footer { margin-top: auto; padding-top: 16px; }
+    .spark-footer-meta {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .spark-footer-meta strong { color: #ffd66b; }
+
+    /* ── DETAIL OVERLAY — opens on card body tap ───────────────────── */
+    .detail-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 4, 8, 0.94);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 14px 14px;
+      z-index: 10;
+      animation: detail-pop 0.22s ease-out;
+    }
+    .detail-overlay.open { display: flex; }
+    @keyframes detail-pop {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .detail-panel {
+      width: 100%;
+      max-width: 358px;
+      max-height: 100%;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.98), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity, rgba(255, 215, 100, 0.85));
+      border-radius: 14px;
+      overflow: auto;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 0 0 30px var(--card-glow, rgba(255, 215, 100, 0.4));
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-close {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 11;
+    }
+    .detail-close:hover { background: rgba(255, 255, 255, 0.1); }
+
+    .detail-hero {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(180deg, rgba(30, 35, 45, 0.6), rgba(15, 20, 28, 0.8));
+      border-bottom: 1px solid var(--card-rarity);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .detail-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 65%); }
+    .detail-hero img { width: 140px; height: 140px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.7)); }
+    .detail-hero .emoji { font-size: 90px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.7)); }
+    .detail-rarity-banner {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      padding: 3px 14px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #fff;
+      border-radius: 4px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    }
+    .detail-panel.r-common    .detail-rarity-banner { background: linear-gradient(90deg, #9ca3af, #6b7280); }
+    .detail-panel.r-uncommon  .detail-rarity-banner { background: linear-gradient(90deg, #4ade80, #16a34a); }
+    .detail-panel.r-legendary .detail-rarity-banner {
+      background: linear-gradient(90deg, #b8860b, #ffe770, #b8860b);
+      color: #1a1a1a;
+      text-shadow: none;
+    }
+
+    .detail-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+    .detail-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .detail-panel.r-legendary .detail-name {
+      color: #fff4d4;
+      text-shadow: 0 0 10px rgba(255, 215, 100, 0.6);
+    }
+    .detail-section {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .detail-section-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(167, 139, 250, 0.85);
+    }
+    .detail-panel.r-legendary .detail-section-label { color: rgba(255, 215, 100, 0.85); }
+    .detail-effect-text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(230, 235, 240, 0.95);
+    }
+    .detail-example {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: rgba(167, 243, 196, 0.85);
+      padding: 8px 12px;
+      background: rgba(74, 222, 128, 0.08);
+      border-left: 2px solid rgba(74, 222, 128, 0.5);
+      border-radius: 0 6px 6px 0;
+    }
+    .detail-example strong { color: #d1fae5; }
+    .detail-lore {
+      font-size: 12px;
+      line-height: 1.55;
+      color: rgba(220, 220, 220, 0.65);
+      font-style: italic;
+      padding: 0 4px;
+      border-left: 2px solid rgba(255, 255, 255, 0.08);
+      padding-left: 10px;
+    }
+    .detail-trinity-note {
+      font-size: 11px;
+      line-height: 1.5;
+      color: rgba(255, 215, 100, 0.85);
+      padding: 8px 12px;
+      background: rgba(120, 80, 20, 0.25);
+      border: 1px solid rgba(255, 215, 100, 0.4);
+      border-radius: 6px;
+      text-align: center;
+    }
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spark Choice — Vertical Stack, Plain English, Tap-for-Detail</h1>
+  <p class="intro">
+    Vertical-stack layout with <strong>readable game copy</strong> in the
+    card body (no compressed jargon). The whole card body is a tap target
+    — <strong>tap the card</strong> to open a deep-detail panel with the
+    full effect explanation, a numerical example, and the lore. The
+    <strong>Pick</strong> and <strong>↺ Reroll</strong> buttons are
+    discrete so taps to them won't be confused with "open details".
+  </p>
+
+  <p class="scene-label">Scene — Legendary + Common offer</p>
+  <p class="scene-note">Tap the card body to open the detail panel. Tap the close button or anywhere outside to dismiss.</p>
+
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+      <div class="v-stack">
+        <!-- LEGENDARY CARD -->
+        <div class="v-card v-card-legendary" data-card="dragon_hoard">
+          <button class="v-card-tap" onclick="openDetail('dragon_hoard')">
+            <div class="v-card-img"><img src="/sprites/producers/p_dragon_mythic.png" alt=""/></div>
+            <div class="v-card-info">
+              <div class="v-card-head">
+                <span class="v-card-name">Dragon's Hoard</span>
+                <span class="v-card-rarity-tag">Legendary</span>
+              </div>
+              <div class="v-card-effect">
+                Your Slumbering Spirit Dragon grows <strong>60% stronger</strong> for every Ancestral Treasure you own.
+              </div>
+              <span class="v-card-info-hint">tap for example + lore</span>
+            </div>
+          </button>
+          <div class="v-card-actions">
+            <button class="v-btn v-btn-pick">Pick</button>
+            <button class="v-btn v-btn-reroll">↺ Free reroll</button>
+          </div>
+        </div>
+
+        <!-- COMMON CARD -->
+        <div class="v-card v-card-common" data-card="quick_burst">
+          <button class="v-card-tap" onclick="openDetail('quick_burst')">
+            <div class="v-card-img"><span class="emoji">⚡</span></div>
+            <div class="v-card-info">
+              <div class="v-card-head">
+                <span class="v-card-name">Quick Burst</span>
+                <span class="v-card-rarity-tag">Common</span>
+              </div>
+              <div class="v-card-effect">
+                Gain a burst of qi worth <strong>30 seconds</strong> of your current qi/s, instantly.
+              </div>
+              <span class="v-card-info-hint">tap for example + lore</span>
+            </div>
+          </button>
+          <div class="v-card-actions">
+            <button class="v-btn v-btn-pick">Pick</button>
+            <button class="v-btn v-btn-reroll">↺ Free reroll</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="spark-footer">
+        <div class="spark-footer-meta">
+          <span>✦ <strong>3%</strong> legendary chance per card</span>
+          <span style="opacity:0.4">·</span>
+          <span>Pity in <strong>12</strong> realms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Detail overlay — sits inside the device-frame ────────────── -->
+    <div class="detail-overlay" id="detail" onclick="if(event.target===this) closeDetail()">
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+      <div class="detail-panel" id="detail-panel"></div>
+    </div>
+  </div>
+
+  <p class="scene-label">Scene — Phoenix Reborn (the longest effect, alone)</p>
+  <p class="scene-note">Same card design, but with the longest effect text. Wraps naturally without locking card height — tap for full detail still available.</p>
+
+  <div class="device-frame">
+    <div class="device-label">iPhone 13 — 390 px</div>
+    <div class="spark-overlay">
+      <div class="spark-overlay-title">Qi Spark</div>
+      <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+      <div class="v-stack">
+        <div class="v-card v-card-legendary" data-card="phoenix_reborn">
+          <button class="v-card-tap" onclick="openDetail('phoenix_reborn')">
+            <div class="v-card-img"><img src="/sprites/producers/p_phoenix_mythic.png" alt=""/></div>
+            <div class="v-card-info">
+              <div class="v-card-head">
+                <span class="v-card-name">Phoenix Reborn</span>
+                <span class="v-card-rarity-tag">Legendary</span>
+              </div>
+              <div class="v-card-effect">
+                Every major realm breakthrough resets your Phoenix count to <strong>zero</strong>, but permanently <strong>doubles</strong> every other producer's qi/s for this run.
+              </div>
+              <span class="v-card-info-hint">tap for example + lore</span>
+            </div>
+          </button>
+          <div class="v-card-actions">
+            <button class="v-btn v-btn-pick">Pick</button>
+            <button class="v-btn v-btn-reroll">↺ Free reroll</button>
+          </div>
+        </div>
+
+        <div class="v-card v-card-uncommon" data-card="steady_cultivation">
+          <button class="v-card-tap" onclick="openDetail('steady_cultivation')">
+            <div class="v-card-img"><span class="emoji">🌱</span></div>
+            <div class="v-card-info">
+              <div class="v-card-head">
+                <span class="v-card-name">Steady Cultivation</span>
+                <span class="v-card-rarity-tag">Uncommon</span>
+              </div>
+              <div class="v-card-effect">
+                Permanently gain <strong>+1 base qi/s</strong> for the rest of this run. Stacks if drawn again.
+              </div>
+              <span class="v-card-info-hint">tap for example + lore</span>
+            </div>
+          </button>
+          <div class="v-card-actions">
+            <button class="v-btn v-btn-pick">Pick</button>
+            <button class="v-btn v-btn-reroll">↺ Free reroll</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="spark-footer">
+        <div class="spark-footer-meta">
+          <span>✦ <strong>3%</strong> legendary chance per card</span>
+          <span style="opacity:0.4">·</span>
+          <span>Pity in <strong>5</strong> realms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Each device-frame has its own detail overlay -->
+    <div class="detail-overlay" id="detail2" onclick="if(event.target===this) closeDetail()">
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+      <div class="detail-panel" id="detail-panel2"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Card data — readable, mobile-tuned copy ─────────────────────
+    const CARDS = {
+      dragon_hoard: {
+        rarity: 'legendary',
+        name: "Dragon's Hoard",
+        sprite: '/sprites/producers/p_dragon_mythic.png',
+        effect: "Your Slumbering Spirit Dragon grows 60% stronger for every Ancestral Treasure you own. The bonus is multiplicative — five treasures means your dragon outputs four times its normal qi/s.",
+        example: "If you own <strong>1 dragon</strong> and <strong>5 treasures</strong>, your dragon's qi/s is multiplied by ×4 (1 + 5 × 0.60). At 10 treasures, that becomes ×7.",
+        lore: "The dragon's pearl is whatever you offered it. Every relic you've kept, it has folded into itself."
+      },
+      phoenix_reborn: {
+        rarity: 'legendary',
+        name: 'Phoenix Reborn',
+        sprite: '/sprites/producers/p_phoenix_mythic.png',
+        effect: "Every time you cross into a new major realm (Qi Transformation → True Element, etc.), your owned Sovereign Phoenixes are consumed — set to zero. In exchange, every OTHER producer permanently doubles its qi/s output for the rest of this run. The bonus stacks across major realms.",
+        example: "If you cross 3 major realms with this spark active, every non-phoenix producer ends the run with <strong>×8 their normal output</strong> (2 × 2 × 2). You'll lose all your phoenixes — but you'll be unrecognisable by the end.",
+        lore: "Fenghuang is reborn from its own ashes — to bless the sect of its hearth."
+      },
+      quick_burst: {
+        rarity: 'common',
+        name: 'Quick Burst',
+        emoji: '⚡',
+        effect: "On pick: instantly gain a one-time chunk of qi equal to 30 seconds of your current production. The qi lands in your balance immediately and can be spent on producers, upgrades, or breakthrough cost.",
+        example: "If your qi/s is currently <strong>1.2 million</strong>, picking this spark adds <strong>36 million qi</strong> to your balance.",
+        lore: "A breath drawn quick — and the world tilts toward you."
+      },
+      steady_cultivation: {
+        rarity: 'uncommon',
+        name: 'Steady Cultivation',
+        emoji: '🌱',
+        effect: "Permanently adds +1 to your BASE qi/s (the flat rate before any multipliers) for the rest of this run. If you draw this spark again later, the bonus stacks: 2 stacks gives +2 base, 3 gives +3, etc. Resets only on reincarnation.",
+        example: "Drawn three times this run → <strong>+3 base qi/s</strong>. This flat bonus is then multiplied by crystal level, focus, law, and other multipliers — so the real impact at endgame can be enormous.",
+        lore: "One breath at dawn, one at dusk. The thousandth breath is the same as the first, and that is the whole secret."
+      },
+    };
+
+    // ── Detail open / close ─────────────────────────────────────────
+    let activeOverlay = null;
+
+    function openDetail(cardKey) {
+      const card = CARDS[cardKey];
+      if (!card) return;
+      // Find the enclosing device-frame and its overlay
+      const frame = event.currentTarget.closest('.device-frame');
+      const overlay = frame.querySelector('.detail-overlay');
+      const panel   = overlay.querySelector('.detail-panel');
+      panel.className = 'detail-panel r-' + card.rarity;
+      panel.innerHTML = `
+        <div class="detail-hero">
+          ${card.sprite
+            ? `<img src="${card.sprite}" alt=""/>`
+            : `<span class="emoji">${card.emoji}</span>`}
+          <div class="detail-rarity-banner">${card.rarity}</div>
+        </div>
+        <div class="detail-body">
+          <div class="detail-name">${card.name}</div>
+          <div class="detail-section">
+            <div class="detail-section-label">Effect</div>
+            <div class="detail-effect-text">${card.effect}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">Example</div>
+            <div class="detail-example">${card.example}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">Lore</div>
+            <div class="detail-lore">${card.lore}</div>
+          </div>
+          <div class="detail-actions">
+            <button class="v-btn v-btn-pick">Pick this spark</button>
+            <button class="v-btn v-btn-reroll">↺ Free reroll</button>
+          </div>
+        </div>
+      `;
+      overlay.classList.add('open');
+      activeOverlay = overlay;
+    }
+    function closeDetail() {
+      if (activeOverlay) {
+        activeOverlay.classList.remove('open');
+        activeOverlay = null;
+      }
+    }
+  </script>
+</body>
+</html>

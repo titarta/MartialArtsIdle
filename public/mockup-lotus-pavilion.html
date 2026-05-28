@@ -1,0 +1,1079 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lotus Pavilion — Design Mockup</title>
+<style>
+  /* ─── Game palette, lifted from src/index.css ──────────────────────────── */
+  :root {
+    --ui-purple-rgb:         139,  92, 246;
+    --ui-purple-deep-rgb:    124,  58, 237;
+    --ui-purple-strong-rgb:  168,  85, 247;
+    --ui-purple-soft-rgb:    167, 139, 250;
+    --ui-purple-light-rgb:   196, 181, 253;
+    --ui-purple-darker:      #5b21b6;
+    --ui-purple-deep:        #7c3aed;
+    --ui-purple-strong:      #a855f7;
+    --ui-purple-soft:        #a78bfa;
+    --ui-purple-light:       #c4b5fd;
+    --ui-purple-wash:        #e0d8ff;
+    --ui-purple-pale:        #e9d5ff;
+    --ui-label-rgb:          180, 160, 220;
+    --gold:                  #f4c560;
+    --gold-deep:             #d49b2c;
+    --crimson:               #e54a6e;
+
+    --bg-page:    #0a0814;
+    --bg-card:    rgba(14, 12, 30, 0.97);
+    --bg-cell:    rgba(255, 255, 255, 0.035);
+    --bg-cell-hi: rgba(var(--ui-purple-strong-rgb), 0.08);
+    --border-c:   rgba(var(--ui-purple-strong-rgb), 0.22);
+    --border-hi:  rgba(var(--ui-purple-strong-rgb), 0.50);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(var(--ui-purple-strong-rgb), 0.12), transparent 60%),
+      radial-gradient(ellipse at 50% 110%, rgba(var(--ui-purple-deep-rgb), 0.10), transparent 60%),
+      var(--bg-page);
+    color: var(--ui-purple-wash);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  img { image-rendering: pixelated; }
+
+  /* ─── Mockup chrome ────────────────────────────────────────────────────── */
+  .page-header {
+    padding: 18px 24px 6px;
+    border-bottom: 1px solid var(--border-c);
+  }
+  .page-header h1 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ui-purple-light);
+  }
+  .page-header p {
+    margin: 0;
+    font-size: 12.5px;
+    color: rgba(var(--ui-label-rgb), 0.60);
+  }
+  .page-header p code {
+    background: rgba(var(--ui-purple-strong-rgb), 0.10);
+    color: var(--ui-purple-light);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+
+  /* ─── Phone frame, mimics the app's mobile-first card width ────────────── */
+  .phone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 32px;
+    padding: 28px 24px 60px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-c);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow:
+      0 30px 80px rgba(0,0,0,0.55),
+      0 0 0 1px rgba(var(--ui-purple-strong-rgb), 0.06),
+      0 0 50px rgba(var(--ui-purple-strong-rgb), 0.07);
+  }
+
+  /* ─── HUD-style top bar — matches game's TopBar look ───────────────────── */
+  .pav-topbar {
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,0,0,0.25);
+    border-bottom: 1px solid var(--border-c);
+  }
+  .pav-topbar .back {
+    width: 28px; height: 28px;
+    border: none; background: rgba(255,255,255,0.05);
+    color: rgba(var(--ui-label-rgb), 0.85);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .pav-topbar .title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ui-purple-light);
+    letter-spacing: 0.03em;
+  }
+  .pav-topbar .balance {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(var(--ui-purple-strong-rgb), 0.10);
+    border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.35);
+    padding: 5px 10px 5px 7px;
+    border-radius: 999px;
+    color: var(--ui-purple-light);
+    font-weight: 800;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pav-topbar .balance img { width: 18px; height: 18px; filter: brightness(1.25); }
+
+  /* ─── Lore strip ───────────────────────────────────────────────────────── */
+  .pav-lore {
+    padding: 10px 16px 12px;
+    font-size: 11.5px;
+    font-style: italic;
+    line-height: 1.55;
+    color: rgba(var(--ui-label-rgb), 0.55);
+    border-bottom: 1px solid rgba(var(--ui-purple-strong-rgb), 0.10);
+    text-align: center;
+  }
+
+  /* ─── Tabs ─────────────────────────────────────────────────────────────── */
+  .pav-tabs {
+    display: flex;
+    padding: 8px 8px 0;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-c);
+  }
+  .pav-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    color: rgba(var(--ui-label-rgb), 0.55);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 10px 6px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .pav-tab:hover { color: var(--ui-purple-light); }
+  .pav-tab.active {
+    color: var(--ui-purple-light);
+    border-bottom-color: var(--ui-purple-strong);
+  }
+
+  /* ─── Tab panels ───────────────────────────────────────────────────────── */
+  .pav-panel { display: none; padding: 16px; }
+  .pav-panel.active { display: block; }
+
+  /* ─── Refresh countdown header ─────────────────────────────────────────── */
+  .pav-refresh {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: rgba(var(--ui-label-rgb), 0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .pav-refresh .timer {
+    color: var(--ui-purple-light);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+  }
+
+  /* ─── BOUNTY GRID (Tab 1) ──────────────────────────────────────────────── */
+  .bounty-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .bounty {
+    position: relative;
+    background: var(--bg-cell);
+    border: 1px solid var(--border-c);
+    border-radius: 12px;
+    padding: 14px 10px 12px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .bounty:hover {
+    background: var(--bg-cell-hi);
+    border-color: var(--border-hi);
+    transform: translateY(-2px);
+  }
+  .bounty.sold-out { opacity: 0.45; cursor: default; }
+  .bounty.sold-out:hover { transform: none; }
+  .bounty-badge {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ui-purple-light);
+    color: #12112a;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+  }
+  .bounty-badge.hot { background: var(--gold); }
+  .bounty-badge.new { background: var(--crimson); color: #fff; }
+  .bounty-icon {
+    width: 56px; height: 56px;
+    margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .bounty-icon img { width: 100%; height: 100%; filter: brightness(1.2); }
+  .bounty-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ui-purple-light);
+    text-align: center;
+    line-height: 1.3;
+  }
+  .bounty-sub {
+    font-size: 10px;
+    color: rgba(var(--ui-label-rgb), 0.55);
+    text-align: center;
+    line-height: 1.3;
+    min-height: 26px;
+  }
+  .bounty-cost {
+    margin-top: 6px;
+    display: flex; align-items: center; gap: 4px;
+    background: rgba(var(--ui-purple-strong-rgb), 0.18);
+    border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.40);
+    padding: 4px 10px;
+    border-radius: 999px;
+    color: var(--ui-purple-light);
+    font-weight: 800;
+    font-size: 12px;
+  }
+  .bounty-cost img { width: 14px; height: 14px; filter: brightness(1.25); }
+  .bounty-stock {
+    margin-top: 4px;
+    font-size: 10px;
+    color: rgba(var(--ui-label-rgb), 0.40);
+  }
+
+  /* Mystery box pulsing glow */
+  @keyframes mystery-pulse {
+    0%, 100% { filter: brightness(1.0) drop-shadow(0 0 4px rgba(var(--ui-purple-strong-rgb), 0.3)); }
+    50%      { filter: brightness(1.3) drop-shadow(0 0 14px rgba(var(--ui-purple-strong-rgb), 0.7)); }
+  }
+  .bounty .mystery-icon {
+    width: 52px; height: 52px;
+    background: linear-gradient(135deg, var(--ui-purple-deep) 0%, var(--ui-purple-strong) 60%, var(--ui-purple-light) 100%);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    color: var(--ui-purple-pale);
+    text-shadow: 0 0 8px rgba(255,255,255,0.6);
+    animation: mystery-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* ─── FORGE (Tab 2) ────────────────────────────────────────────────────── */
+  .pav-featured {
+    background: linear-gradient(135deg,
+      rgba(229, 74, 110, 0.12) 0%,
+      rgba(var(--ui-purple-strong-rgb), 0.16) 100%);
+    border: 1px solid rgba(229, 74, 110, 0.40);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pav-featured::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(229, 74, 110, 0.10), transparent 50%);
+    pointer-events: none;
+  }
+  .pav-featured .preview {
+    width: 96px; height: 96px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .pav-featured .info {
+    flex: 1;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    z-index: 1;
+  }
+  .pav-featured .tag {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--crimson);
+  }
+  .pav-featured .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ui-purple-wash);
+  }
+  .pav-featured .desc {
+    font-size: 11px;
+    color: rgba(var(--ui-label-rgb), 0.65);
+    line-height: 1.4;
+  }
+  .pav-featured .row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .pav-featured .countdown {
+    font-size: 10.5px;
+    color: var(--crimson);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+  .pav-featured .buy {
+    background: linear-gradient(135deg, var(--ui-purple-deep), var(--ui-purple-strong));
+    border: none;
+    color: white;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    box-shadow: 0 4px 12px rgba(var(--ui-purple-strong-rgb), 0.4);
+  }
+  .pav-featured .buy img { width: 14px; height: 14px; filter: brightness(1.3); }
+
+  /* Halo grid */
+  .forge-section-label {
+    font-size: 10.5px;
+    color: rgba(var(--ui-label-rgb), 0.50);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 4px 0 10px;
+    font-weight: 700;
+  }
+  .halo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .halo {
+    background: var(--bg-cell);
+    border: 1px solid var(--border-c);
+    border-radius: 12px;
+    padding: 10px 8px 12px;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    position: relative;
+  }
+  .halo:hover:not(.locked):not(.equipped) {
+    background: var(--bg-cell-hi);
+    border-color: var(--border-hi);
+    transform: translateY(-2px);
+  }
+  .halo.equipped {
+    background: rgba(244, 197, 96, 0.06);
+    border-color: rgba(244, 197, 96, 0.50);
+  }
+  .halo.equipped::after {
+    content: 'EQUIPPED';
+    position: absolute;
+    top: -7px; right: 8px;
+    background: var(--gold);
+    color: #2a1a05;
+    font-size: 8.5px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+  }
+  .halo.locked { opacity: 0.40; cursor: not-allowed; }
+  .halo.locked .halo-cost { display: none; }
+  .halo.locked::after {
+    content: '🔒  Realm '  attr(data-realm) ' required';
+    position: absolute;
+    bottom: 14px; left: 8px; right: 8px;
+    text-align: center;
+    font-size: 9.5px;
+    color: rgba(var(--ui-label-rgb), 0.60);
+  }
+  .halo-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ui-purple-light);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .halo-tier {
+    font-size: 9px;
+    color: rgba(var(--ui-label-rgb), 0.45);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .halo-cost {
+    margin-top: 4px;
+    display: flex; align-items: center; gap: 4px;
+    color: var(--ui-purple-light);
+    font-weight: 800;
+    font-size: 11px;
+  }
+  .halo-cost img { width: 12px; height: 12px; filter: brightness(1.25); }
+
+  /* Halo preview canvas — cultivator silhouette + animated ring */
+  .halo-preview {
+    width: 110px; height: 110px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .halo-preview .cult {
+    position: absolute;
+    width: 56px; height: 56px;
+    bottom: 22px;
+    z-index: 2;
+    filter: brightness(0.95);
+  }
+  /* Halo background — radial-gradient bloom in tier colour */
+  .halo-preview .bloom {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0.55;
+    filter: blur(8px);
+  }
+  /* Orbiting dots — each rotates a different speed */
+  .halo-preview .orbit {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .halo-preview .orbit .dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    transform-origin: 0 0;
+  }
+  @keyframes orbit-rotate { to { transform: rotate(360deg); } }
+  @keyframes orbit-rotate-r { to { transform: rotate(-360deg); } }
+  @keyframes bloom-breathe {
+    0%, 100% { opacity: 0.45; transform: scale(1); }
+    50%      { opacity: 0.75; transform: scale(1.08); }
+  }
+
+  /* Per-tier halo flavor */
+  .halo-t1 .bloom { background: radial-gradient(circle, rgba(167, 139, 250, 0.55) 0%, transparent 65%); }
+  .halo-t1 .orbit { animation: orbit-rotate 14s linear infinite; }
+  .halo-t1 .orbit .dot { background: rgba(196, 181, 253, 0.85); box-shadow: 0 0 6px rgba(196, 181, 253, 0.9); }
+
+  .halo-t2 .bloom { background: radial-gradient(circle, rgba(168, 85, 247, 0.65) 0%, transparent 60%); animation: bloom-breathe 3s ease-in-out infinite; }
+  .halo-t2 .orbit { animation: orbit-rotate 10s linear infinite; }
+  .halo-t2 .orbit .dot { background: rgba(196, 181, 253, 0.95); box-shadow: 0 0 8px rgba(168, 85, 247, 1); }
+
+  .halo-t3 .bloom { background: radial-gradient(circle, rgba(168, 85, 247, 0.55) 0%, rgba(244, 197, 96, 0.20) 50%, transparent 70%); animation: bloom-breathe 2.6s ease-in-out infinite; }
+  .halo-t3 .orbit { animation: orbit-rotate 8s linear infinite; }
+  .halo-t3 .orbit:nth-child(3) { animation: orbit-rotate-r 12s linear infinite; }
+  .halo-t3 .orbit .dot { background: rgba(244, 197, 96, 0.95); box-shadow: 0 0 8px rgba(244, 197, 96, 1); }
+  .halo-t3 .orbit:nth-child(3) .dot { background: rgba(196, 181, 253, 0.95); box-shadow: 0 0 6px rgba(196, 181, 253, 0.9); }
+
+  .halo-t4 .bloom { background: radial-gradient(circle, rgba(229, 74, 110, 0.50) 0%, rgba(168, 85, 247, 0.35) 55%, transparent 75%); animation: bloom-breathe 2.2s ease-in-out infinite; }
+  .halo-t4 .orbit { animation: orbit-rotate 7s linear infinite; }
+  .halo-t4 .orbit:nth-child(3) { animation: orbit-rotate-r 10s linear infinite; }
+  .halo-t4 .orbit .dot { background: rgba(229, 74, 110, 1); box-shadow: 0 0 10px rgba(229, 74, 110, 1); width: 7px; height: 7px; }
+  .halo-t4 .orbit:nth-child(3) .dot { background: rgba(244, 197, 96, 1); box-shadow: 0 0 8px rgba(244, 197, 96, 1); }
+
+  .halo-t5 .bloom { background: radial-gradient(circle, rgba(244, 197, 96, 0.60) 0%, rgba(229, 74, 110, 0.30) 45%, rgba(168, 85, 247, 0.25) 65%, transparent 80%); animation: bloom-breathe 1.8s ease-in-out infinite; }
+  .halo-t5 .orbit { animation: orbit-rotate 6s linear infinite; }
+  .halo-t5 .orbit:nth-child(3) { animation: orbit-rotate-r 9s linear infinite; }
+  .halo-t5 .orbit:nth-child(4) { animation: orbit-rotate 13s linear infinite; }
+  .halo-t5 .orbit .dot { background: rgba(255, 220, 100, 1); box-shadow: 0 0 12px rgba(255, 220, 100, 1); width: 8px; height: 8px; }
+  .halo-t5 .orbit:nth-child(3) .dot { background: rgba(229, 74, 110, 1); box-shadow: 0 0 10px rgba(229, 74, 110, 1); }
+  .halo-t5 .orbit:nth-child(4) .dot { background: rgba(196, 181, 253, 1); box-shadow: 0 0 8px rgba(196, 181, 253, 1); }
+
+  /* Locked halo preview — desaturated */
+  .halo.locked .halo-preview { filter: grayscale(1) brightness(0.4); }
+
+  /* Seasonal featured halo — crimson-violet, fast */
+  .halo-seasonal .bloom { background: radial-gradient(circle, rgba(229, 74, 110, 0.60) 0%, rgba(168, 85, 247, 0.30) 60%, transparent 80%); animation: bloom-breathe 2s ease-in-out infinite; }
+  .halo-seasonal .orbit { animation: orbit-rotate 6s linear infinite; }
+  .halo-seasonal .orbit:nth-child(3) { animation: orbit-rotate-r 9s linear infinite; }
+  .halo-seasonal .orbit .dot { background: rgba(229, 74, 110, 1); box-shadow: 0 0 10px rgba(229, 74, 110, 1); width: 7px; height: 7px; }
+  .halo-seasonal .orbit:nth-child(3) .dot { background: rgba(244, 197, 96, 1); box-shadow: 0 0 8px rgba(244, 197, 96, 1); }
+
+  /* ─── REFINEMENT (Tab 3) ───────────────────────────────────────────────── */
+  .refine-list {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .refine-card {
+    background: var(--bg-cell);
+    border: 1px solid var(--border-c);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .refine-card:hover {
+    background: var(--bg-cell-hi);
+    border-color: var(--border-hi);
+  }
+  .refine-icon {
+    width: 44px; height: 44px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(var(--ui-purple-strong-rgb), 0.10);
+    border: 1px solid rgba(var(--ui-purple-strong-rgb), 0.30);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .refine-body {
+    flex: 1;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .refine-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ui-purple-light);
+  }
+  .refine-desc {
+    font-size: 11px;
+    color: rgba(var(--ui-label-rgb), 0.60);
+    line-height: 1.4;
+  }
+  .refine-meta {
+    font-size: 10px;
+    color: rgba(var(--ui-label-rgb), 0.40);
+    margin-top: 2px;
+  }
+  .refine-meta.warn { color: var(--gold); }
+  .refine-action {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+    flex-shrink: 0;
+  }
+  .refine-cost {
+    display: flex; align-items: center; gap: 4px;
+    color: var(--ui-purple-light);
+    font-weight: 800;
+    font-size: 12px;
+  }
+  .refine-cost img { width: 13px; height: 13px; filter: brightness(1.25); }
+  .refine-btn {
+    background: linear-gradient(135deg, var(--ui-purple-deep), var(--ui-purple-strong));
+    border: none;
+    color: white;
+    font-weight: 800;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    box-shadow: 0 3px 8px rgba(var(--ui-purple-strong-rgb), 0.3);
+  }
+  .refine-btn:hover { filter: brightness(1.15); }
+  .refine-btn.disabled {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* ─── Notes column ─────────────────────────────────────────────────────── */
+  .notes-col {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 6px;
+    color: rgba(var(--ui-label-rgb), 0.72);
+    font-size: 12.5px;
+    line-height: 1.6;
+  }
+  .notes-col h2 {
+    color: var(--ui-purple-light);
+    font-size: 14px;
+    margin: 24px 0 6px;
+    letter-spacing: 0.03em;
+  }
+  .notes-col h2:first-child { margin-top: 0; }
+  .notes-col p { margin: 0 0 8px; }
+  .notes-col ul { margin: 0 0 12px; padding-left: 18px; }
+  .notes-col li { margin: 0 0 4px; }
+  .notes-col code {
+    background: rgba(var(--ui-purple-strong-rgb), 0.10);
+    color: var(--ui-purple-light);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .notes-col .pillar {
+    background: rgba(255,255,255,0.025);
+    border-left: 3px solid var(--ui-purple-strong);
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 10px 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <h1>Lotus Pavilion — Design Mockup</h1>
+  <p>Three side-by-side panels demonstrating each tab. Use the in-card tabs to switch within a panel. Halo previews use the live <code>t1_qi_transformation_normal.png</code> sprite to show scale. Designed against the live <code>--ui-purple-*</code> palette so the visual register matches the existing Blood Lotus Shop card 1-to-1.</p>
+</header>
+
+<div class="phone-grid">
+
+  <!-- ════════════════════════ PHONE 1 — BOUNTY (default) ═══════════════════ -->
+  <div class="phone">
+    <div class="pav-topbar">
+      <button class="back" aria-label="Back">‹</button>
+      <span class="title">Lotus Pavilion</span>
+      <div class="balance">
+        <img src="/sprites/items/blood_lotus.png" alt="">
+        <span>342</span>
+      </div>
+    </div>
+
+    <div class="pav-lore">
+      "Blood Lotus blooms only where the world's qi has saturated the earth for a thousand years.<br>
+      Too precious to spend lightly, too potent to leave on the vine."
+    </div>
+
+    <div class="pav-tabs">
+      <button class="pav-tab active" data-tab="phone1-bounty">Today's Bounty</button>
+      <button class="pav-tab" data-tab="phone1-forge">Lotus Forge</button>
+      <button class="pav-tab" data-tab="phone1-refine">Refinement</button>
+    </div>
+
+    <div class="pav-panel active" data-panel="phone1-bounty">
+      <div class="pav-refresh">
+        <span>4 slots · 1 each per refresh</span>
+        <span class="timer" id="timer-1">14:22:08</span>
+      </div>
+
+      <div class="bounty-grid">
+
+        <div class="bounty">
+          <div class="bounty-icon"><img src="/sprites/vfx/qi_particles/qi_orb_bright.png" alt=""></div>
+          <div class="bounty-title">Refined Qi Bundle</div>
+          <div class="bounty-sub">5× Silver-tier Qi Stones, instantly refined to Qi.</div>
+          <div class="bounty-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>40</span></div>
+          <div class="bounty-stock">1 in stock</div>
+        </div>
+
+        <div class="bounty">
+          <span class="bounty-badge new">NEW</span>
+          <div class="bounty-icon">
+            <div style="position:relative; width:56px; height:56px;">
+              <div style="position:absolute; inset:8px; border-radius:50%; background:radial-gradient(circle, rgba(167,139,250,0.7) 0%, transparent 70%); animation:bloom-breathe 2.5s ease-in-out infinite;"></div>
+              <div style="position:absolute; inset:14px; border-radius:50%; border:2px solid rgba(196,181,253,0.85); box-shadow: 0 0 10px rgba(168,85,247,0.7);"></div>
+            </div>
+          </div>
+          <div class="bounty-title">Verdant Cloud Halo</div>
+          <div class="bounty-sub">Permanent aura · Pale violet ring.</div>
+          <div class="bounty-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>60</span></div>
+          <div class="bounty-stock">1 in stock</div>
+        </div>
+
+        <div class="bounty">
+          <div class="bounty-icon"><div class="mystery-icon">?</div></div>
+          <div class="bounty-title">Sealed Lotus Cache</div>
+          <div class="bounty-sub">Random reward weighted to your current realm.</div>
+          <div class="bounty-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>80</span></div>
+          <div class="bounty-stock">2 in stock</div>
+        </div>
+
+        <div class="bounty">
+          <span class="bounty-badge hot">HOT</span>
+          <div class="bounty-icon"><img src="/sprites/vfx/qi_particles/qi_spark_star.png" alt=""></div>
+          <div class="bounty-title">Heaven's Whim</div>
+          <div class="bounty-sub">Today: 1× Free Law Reroll token.</div>
+          <div class="bounty-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>120</span></div>
+          <div class="bounty-stock">1 in stock</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pav-panel" data-panel="phone1-forge">
+      <div class="pav-refresh">
+        <span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 2 →</strong> to see Forge</span>
+      </div>
+    </div>
+
+    <div class="pav-panel" data-panel="phone1-refine">
+      <div class="pav-refresh">
+        <span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 3 →</strong> to see Refinement</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════ PHONE 2 — FORGE ═════════════════════════════ -->
+  <div class="phone">
+    <div class="pav-topbar">
+      <button class="back" aria-label="Back">‹</button>
+      <span class="title">Lotus Pavilion</span>
+      <div class="balance">
+        <img src="/sprites/items/blood_lotus.png" alt="">
+        <span>342</span>
+      </div>
+    </div>
+
+    <div class="pav-lore">
+      "An aura forged of Blood Lotus does not fade with the dao —<br>
+      it bonds to the cultivator's qi and ascends with them."
+    </div>
+
+    <div class="pav-tabs">
+      <button class="pav-tab" data-tab="phone2-bounty">Today's Bounty</button>
+      <button class="pav-tab active" data-tab="phone2-forge">Lotus Forge</button>
+      <button class="pav-tab" data-tab="phone2-refine">Refinement</button>
+    </div>
+
+    <div class="pav-panel" data-panel="phone2-bounty">
+      <div class="pav-refresh"><span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 1 ←</strong> to see Bounty</span></div>
+    </div>
+
+    <div class="pav-panel active" data-panel="phone2-forge">
+
+      <!-- Featured seasonal -->
+      <div class="pav-featured">
+        <div class="preview halo-seasonal">
+          <div class="bloom"></div>
+          <div class="orbit" id="seasonal-o1"></div>
+          <div class="orbit" id="seasonal-o2"></div>
+          <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="" style="position:absolute; bottom:14px; left:50%; transform:translateX(-50%); width:48px; height:48px; z-index:2;">
+        </div>
+        <div class="info">
+          <span class="tag">Limited · Lunar Lotus Bloom</span>
+          <span class="name">Crimson Petal Halo</span>
+          <span class="desc">Twin orbits of crimson and gold petals. Rotates seasonally — won't return for a year.</span>
+          <div class="row">
+            <span class="countdown">⏳ 8d 14h left</span>
+            <button class="buy"><img src="/sprites/items/blood_lotus.png" alt="">800</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="forge-section-label">Realm Halos · 10 tiers</div>
+
+      <div class="halo-grid">
+
+        <div class="halo equipped">
+          <div class="halo-preview halo-t1">
+            <div class="bloom"></div>
+            <div class="orbit" id="t1-o1"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 1 · Qi Transformation</div>
+          <div class="halo-name">Drifting Mote</div>
+        </div>
+
+        <div class="halo">
+          <div class="halo-preview halo-t2">
+            <div class="bloom"></div>
+            <div class="orbit" id="t2-o1"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 2 · True Element</div>
+          <div class="halo-name">Violet Cinder</div>
+          <div class="halo-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>200</span></div>
+        </div>
+
+        <div class="halo">
+          <div class="halo-preview halo-t3">
+            <div class="bloom"></div>
+            <div class="orbit" id="t3-o1"></div>
+            <div class="orbit" id="t3-o2"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 3 · Separation</div>
+          <div class="halo-name">Gilded Lotus</div>
+          <div class="halo-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>400</span></div>
+        </div>
+
+        <div class="halo locked" data-realm="4">
+          <div class="halo-preview halo-t4">
+            <div class="bloom"></div>
+            <div class="orbit" id="t4-o1"></div>
+            <div class="orbit" id="t4-o2"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 4 · Immortal Ascension</div>
+          <div class="halo-name">Crimson Pyre</div>
+          <div class="halo-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>800</span></div>
+        </div>
+
+        <div class="halo locked" data-realm="5">
+          <div class="halo-preview halo-t5">
+            <div class="bloom"></div>
+            <div class="orbit" id="t5-o1"></div>
+            <div class="orbit" id="t5-o2"></div>
+            <div class="orbit" id="t5-o3"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 5 · Saint</div>
+          <div class="halo-name">Divine Convergence</div>
+          <div class="halo-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>1200</span></div>
+        </div>
+
+        <div class="halo locked" data-realm="6">
+          <div class="halo-preview halo-t5">
+            <div class="bloom"></div>
+            <div class="orbit" id="t6-o1"></div>
+            <div class="orbit" id="t6-o2"></div>
+            <div class="orbit" id="t6-o3"></div>
+            <img class="cult" src="/sprites/cultivator/t1_qi_transformation_normal.png" alt="">
+          </div>
+          <div class="halo-tier">Tier 6 · Saint King</div>
+          <div class="halo-name">Heaven's Mantle</div>
+          <div class="halo-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>1800</span></div>
+        </div>
+
+      </div>
+
+      <div class="forge-section-label" style="margin-top:18px">Sect Emblems · Profile flair · 100 BL each</div>
+
+      <div class="halo-grid">
+        <div class="halo" style="aspect-ratio: 2.2/1; flex-direction:row; align-items:center; padding:8px 12px; gap:10px;">
+          <div style="width:32px; height:32px; flex-shrink:0; background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; box-shadow:0 0 8px rgba(168,85,247,0.6);">青</div>
+          <div style="flex:1; display:flex; flex-direction:column;">
+            <div class="halo-name" style="text-align:left; margin:0;">Azure Sect</div>
+            <div class="halo-cost" style="margin:2px 0 0;"><img src="/sprites/items/blood_lotus.png" alt=""><span>100</span></div>
+          </div>
+        </div>
+        <div class="halo equipped" style="aspect-ratio: 2.2/1; flex-direction:row; align-items:center; padding:8px 12px; gap:10px;">
+          <div style="width:32px; height:32px; flex-shrink:0; background:linear-gradient(135deg,#5b21b6,#e54a6e); border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:14px; box-shadow:0 0 8px rgba(229,74,110,0.6);">血</div>
+          <div style="flex:1; display:flex; flex-direction:column;">
+            <div class="halo-name" style="text-align:left; margin:0;">Blood Pact</div>
+            <div class="halo-tier" style="text-align:left; margin:0;">Owned</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="pav-panel" data-panel="phone2-refine">
+      <div class="pav-refresh"><span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 3 →</strong> to see Refinement</span></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════ PHONE 3 — REFINEMENT ════════════════════════ -->
+  <div class="phone">
+    <div class="pav-topbar">
+      <button class="back" aria-label="Back">‹</button>
+      <span class="title">Lotus Pavilion</span>
+      <div class="balance">
+        <img src="/sprites/items/blood_lotus.png" alt="">
+        <span>342</span>
+      </div>
+    </div>
+
+    <div class="pav-lore">
+      "Even the dao may be retraced. The lotus permits one to undo<br>
+      a single thread of fate per realm — no more, lest balance fracture."
+    </div>
+
+    <div class="pav-tabs">
+      <button class="pav-tab" data-tab="phone3-bounty">Today's Bounty</button>
+      <button class="pav-tab" data-tab="phone3-forge">Lotus Forge</button>
+      <button class="pav-tab active" data-tab="phone3-refine">Refinement</button>
+    </div>
+
+    <div class="pav-panel" data-panel="phone3-bounty">
+      <div class="pav-refresh"><span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 1 ←</strong> to see Bounty</span></div>
+    </div>
+
+    <div class="pav-panel" data-panel="phone3-forge">
+      <div class="pav-refresh"><span style="opacity:0.6">Switch to <strong style="color:var(--ui-purple-light)">Phone 2 ←</strong> to see Forge</span></div>
+    </div>
+
+    <div class="pav-panel active" data-panel="phone3-refine">
+
+      <div class="refine-list">
+
+        <div class="refine-card">
+          <div class="refine-icon">🪷</div>
+          <div class="refine-body">
+            <div class="refine-name">Dao Reset Stone</div>
+            <div class="refine-desc">Re-spec one past law selection without losing realm progress.</div>
+            <div class="refine-meta warn">⚠ Limited to 1 per major realm tier</div>
+          </div>
+          <div class="refine-action">
+            <div class="refine-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>300</span></div>
+            <button class="refine-btn">USE</button>
+          </div>
+        </div>
+
+        <div class="refine-card">
+          <div class="refine-icon">✦</div>
+          <div class="refine-body">
+            <div class="refine-name">Spark Banking</div>
+            <div class="refine-desc">Carry an unused Qi Spark choice into your next breakthrough instead of letting it expire.</div>
+            <div class="refine-meta">Available · 0 banked</div>
+          </div>
+          <div class="refine-action">
+            <div class="refine-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>100</span></div>
+            <button class="refine-btn">BANK</button>
+          </div>
+        </div>
+
+        <div class="refine-card">
+          <div class="refine-icon">↺</div>
+          <div class="refine-body">
+            <div class="refine-name">Minor Spark Reroll</div>
+            <div class="refine-desc">Reroll a minor-realm Qi Spark selection. Cheaper than a major-realm reroll.</div>
+            <div class="refine-meta">Wired up — activates the existing <code style="background:rgba(168,85,247,0.12); padding:1px 4px; border-radius:3px; font-size:9.5px; color:#c4b5fd; font-family:monospace;">reroll_minor</code> sink</div>
+          </div>
+          <div class="refine-action">
+            <div class="refine-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>50</span></div>
+            <button class="refine-btn">REROLL</button>
+          </div>
+        </div>
+
+        <div class="refine-card" style="opacity:0.55;">
+          <div class="refine-icon">🜂</div>
+          <div class="refine-body">
+            <div class="refine-name">Law Reroll · Major</div>
+            <div class="refine-desc">Reroll one law card during a major realm breakthrough. (Available only at breakthrough moments.)</div>
+            <div class="refine-meta" style="opacity:0.7">Existing system · shown here for context</div>
+          </div>
+          <div class="refine-action">
+            <div class="refine-cost"><img src="/sprites/items/blood_lotus.png" alt=""><span>150</span></div>
+            <button class="refine-btn disabled">N/A</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════ DESIGN NOTES ═══════════════════════════════════ -->
+<div class="notes-col">
+
+  <h2>How this maps to the codebase</h2>
+
+  <div class="pillar">
+    <strong>Entry point.</strong> The existing TopBar Blood Lotus button at <code>src/components/TopBar.jsx:25</code> opens <code>BloodLotusShopModal</code> today. Change that handler to open the Pavilion <em>by default</em> and demote the IAP modal to a "+" button at the top of the Pavilion card. Today's shop becomes "buy more lotus"; the Pavilion becomes "spend lotus".
+  </div>
+
+  <div class="pillar">
+    <strong>Tab 1 · Today's Bounty.</strong> Daily rotation, 4 slots, 1 purchase each, reset 04:00 local. Stock seed derives from <code>YYYY-MM-DD + userId</code> hash so the same player sees the same items per-day across devices. Each slot has a <em>category</em> (catalyst / cosmetic / mystery / wildcard) and the pool per category is what you tune.
+  </div>
+
+  <div class="pillar">
+    <strong>Tab 2 · Lotus Forge.</strong> Permanent unlocks. Halos render on a new VFX layer around the cultivator on Home — sits next to <code>.home-fighter-stage.stage-boosted::before</code> (the existing cf-rung-* aura system) without fighting it. Tier halos gate on realm reached, not on Blood Lotus alone — protects the "earned" feel. Seasonal halo is the time-limited FOMO slot.
+  </div>
+
+  <div class="pillar">
+    <strong>Tab 3 · Refinement.</strong> Activates <code>reroll_minor</code> at <code>bloodLotus.js:79</code> (dead code today) and adds Dao Reset Stone + Spark Banking. The major-realm Law Reroll already exists in <code>useLawOffers.js:140</code> and lives here for discoverability — disabled outside breakthrough windows.
+  </div>
+
+  <h2>F2P economy sanity check</h2>
+  <ul>
+    <li><strong>Daily income</strong> (existing): ~14 BL/day average from <code>dailyBonus.js:13</code></li>
+    <li><strong>Rebirth bonus</strong> (existing): +50 BL/life when al_4 perk owned</li>
+    <li><strong>Daily Bounty cheapest slot</strong>: 40 BL → ~3 days of saving for a catalyst</li>
+    <li><strong>First halo</strong> (T1 unlock free): immediately satisfying flex</li>
+    <li><strong>T2 halo</strong>: 200 BL → ~2 weeks of saving — feels earned, not grindy</li>
+    <li><strong>Seasonal halo</strong>: 800 BL → ~2 months base, or a single $4.99 pack — clean monetization moment without paywalling F2P</li>
+  </ul>
+
+  <h2>What the mockup does NOT show yet</h2>
+  <ul>
+    <li>Halo equip / preview-in-context flow (would live on Home, swap layer in real-time)</li>
+    <li>Mystery Box reveal animation (1-2 second slot-machine reveal — easy CSS keyframe pass)</li>
+    <li>Sound design (each tab has a different ambient lotus chime per pillar)</li>
+    <li>Achievement-gated halos (e.g. "First T10 ascension" earns a free halo nobody can buy)</li>
+  </ul>
+
+</div>
+
+<script>
+  // ─── Tab switching (per phone — each phone has its own tab strip) ─────────
+  document.querySelectorAll('.phone').forEach(phone => {
+    const tabs   = phone.querySelectorAll('.pav-tab');
+    const panels = phone.querySelectorAll('.pav-panel');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        panels.forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        phone.querySelector(`.pav-panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+      });
+    });
+  });
+
+  // ─── Refresh countdown ─────────────────────────────────────────────────────
+  const timerEl = document.getElementById('timer-1');
+  function tick() {
+    if (!timerEl) return;
+    const now = new Date();
+    const next = new Date(now);
+    next.setHours(28, 0, 0, 0); // 04:00 next day
+    const diff = next - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    timerEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  setInterval(tick, 1000);
+  tick();
+
+  // ─── Halo orbital dots — distribute N dots along each orbit at radius R ───
+  function fillOrbit(orbitEl, n, radius) {
+    if (!orbitEl) return;
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      const x = Math.cos(a) * radius;
+      const y = Math.sin(a) * radius;
+      dot.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      orbitEl.appendChild(dot);
+    }
+  }
+
+  // Tier 1 — 4 sparse dots
+  fillOrbit(document.getElementById('t1-o1'), 4, 38);
+  // Tier 2 — 6 denser dots
+  fillOrbit(document.getElementById('t2-o1'), 6, 40);
+  // Tier 3 — 6 gold + 4 violet counter
+  fillOrbit(document.getElementById('t3-o1'), 6, 38);
+  fillOrbit(document.getElementById('t3-o2'), 4, 44);
+  // Tier 4 — 8 crimson + 5 gold counter
+  fillOrbit(document.getElementById('t4-o1'), 8, 38);
+  fillOrbit(document.getElementById('t4-o2'), 5, 46);
+  // Tier 5 — 10 gold + 6 crimson counter + 4 violet outer
+  fillOrbit(document.getElementById('t5-o1'), 10, 36);
+  fillOrbit(document.getElementById('t5-o2'), 6, 44);
+  fillOrbit(document.getElementById('t5-o3'), 4, 50);
+  // Tier 6 — denser still
+  fillOrbit(document.getElementById('t6-o1'), 12, 36);
+  fillOrbit(document.getElementById('t6-o2'), 8, 44);
+  fillOrbit(document.getElementById('t6-o3'), 5, 50);
+  // Seasonal
+  fillOrbit(document.getElementById('seasonal-o1'), 8, 36);
+  fillOrbit(document.getElementById('seasonal-o2'), 5, 44);
+</script>
+
+</body>
+</html>

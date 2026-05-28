@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spirit Bazaar — Category nav (Simple text tabs)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────
+   Spirit Bazaar category nav — simple text tabs.
+   The nav's only job: tell the player "here are the categories,
+   here's the one you're viewing." It should not be a design
+   statement. The shop content (Featured Hero, buff tiles, Buy
+   CTAs) is the visual focus.
+   Pattern: iOS Music / Spotify / App Store text tabs with a
+   sliding underline indicator. Tabs are plain Cinzel uppercase
+   labels with a small inline count. Active tab brightens and
+   gets a 2px gold underline. That's it.
+   ──────────────────────────────────────────────────────────── */
+:root{
+  --bg-deep:        #0e0c08;
+  --bg-rail:        rgba(8, 6, 4, 0.96);
+  --cream:          #f5e6c8;
+  --cream-dim:      rgba(245, 230, 200, 0.45);
+  --cream-faint:    rgba(245, 230, 200, 0.28);
+  --gold:           #dcaf6e;
+  --gold-hot:       #ffcf83;
+  --bronze:         rgba(75, 60, 40, 0.55);
+  --vermillion:     #c83838;
+  --vermillion-hot: #ff5b5b;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background:
+    radial-gradient(800px 600px at 50% -10%, rgba(220,175,110,.05) 0%, transparent 50%),
+    linear-gradient(180deg, #07060a 0%, #15110b 60%, #07060a 100%);
+  color: var(--cream);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 80px;
+  gap: 24px;
+}
+.lead{
+  max-width: 460px;
+  text-align: center;
+  color: rgba(245,230,200,.55);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+.lead h1{
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .22em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.toggle-row{
+  display: flex; gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.toggle-row button{
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  padding: 6px 12px;
+  background: rgba(220,175,110,.08);
+  border: 1px solid rgba(220,175,110,.20);
+  color: var(--cream-dim);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.toggle-row button.on{
+  background: rgba(220,175,110,.20);
+  border-color: var(--gold);
+  color: var(--cream);
+}
+
+/* ── Phone shell ─────────────────────────────────────────── */
+.phone{
+  width: 390px;
+  height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04),
+    0 30px 80px -20px rgba(0,0,0,.9);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.phone::before{
+  content:'';
+  display: block;
+  height: 52px;
+  background: rgba(8,6,4,.95);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
+}
+
+/* ── Featured Hero tail (for nav-to-content context) ───── */
+.featured-tail{
+  padding: 14px 16px 18px;
+  flex-shrink: 0;
+}
+.featured-card{
+  background: linear-gradient(180deg, rgba(80, 24, 24, .45) 0%, rgba(40, 10, 10, .65) 100%);
+  border: 1px solid rgba(200, 80, 80, .35);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.featured-card::before{
+  content: 'TODAY\'S PICK';
+  position: absolute;
+  top: 8px; right: -28px;
+  transform: rotate(35deg);
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  color: #fff5e0;
+  background: linear-gradient(135deg, var(--vermillion-hot), var(--vermillion));
+  padding: 3px 36px;
+  box-shadow: 0 0 8px rgba(255,91,91,.5);
+}
+.featured-name{
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff5e0;
+  letter-spacing: .04em;
+}
+.featured-meta{
+  font-size: 10.5px;
+  color: rgba(255,200,200,.65);
+  margin-top: 2px;
+}
+.featured-cta{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: 8px 14px;
+  background: linear-gradient(180deg, var(--vermillion-hot) 0%, var(--vermillion) 100%);
+  border: 1px solid rgba(255,200,200,.4);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(200,56,56,.4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CATEGORY RAIL — plain text tabs with sliding underline
+   ═══════════════════════════════════════════════════════════ */
+.cat-rail{
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 8px 18px 0;
+  background: linear-gradient(180deg,
+    var(--bg-rail) 0%,
+    var(--bg-rail) 85%,
+    rgba(8, 6, 4, 0) 100%);
+  /* hairline separator under the rail */
+  position: relative;
+  flex-shrink: 0;
+}
+.cat-rail::after{
+  /* hairline divider at the rail's bottom edge — gives the
+     rail an anchor + separates it from the content below. */
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 18px;
+  right: 18px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(220, 175, 110, .14) 12%,
+    rgba(220, 175, 110, .14) 88%,
+    transparent 100%);
+}
+
+.tab{
+  background: none;
+  border: none;
+  padding: 8px 2px 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  transition: color 180ms ease;
+  position: relative;
+}
+.tab:hover{ color: var(--cream-dim); }
+.tab .count{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: rgba(245, 230, 200, .35);
+  font-variant-numeric: tabular-nums;
+  transition: color 180ms ease;
+}
+.tab.active{
+  color: var(--cream);
+}
+.tab.active .count{
+  color: var(--gold-hot);
+}
+
+/* The sliding underline indicator. Sits at the rail bottom and
+   moves between active tabs. Width matches the active tab's
+   content width (computed in JS for the demo; in React we'll
+   measure the tab's offsetLeft/offsetWidth). */
+.indicator{
+  position: absolute;
+  bottom: -1px;          /* sits on the hairline */
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--gold-hot) 18%,
+    var(--gold-hot) 82%,
+    transparent 100%);
+  width: var(--ind-w, 60px);
+  transform: translateX(var(--ind-x, 0px));
+  transition:
+    transform 220ms cubic-bezier(.4, 0, .2, 1),
+    width 220ms cubic-bezier(.4, 0, .2, 1);
+  pointer-events: none;
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(255, 207, 131, .35);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BUFFS AISLE excerpt — shows nav-to-content continuity
+   ═══════════════════════════════════════════════════════════ */
+.aisle{
+  padding: 16px 16px 24px;
+  flex: 1;
+  overflow: hidden;
+}
+.aisle-head{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  position: relative;
+  padding-left: 14px;
+}
+.lantern{
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg,
+    var(--gold-hot) 0%,
+    var(--vermillion-hot) 20%,
+    var(--vermillion) 80%,
+    #6a1818 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(200,56,56,.4), 0 0 0 1px rgba(0,0,0,.5);
+}
+.aisle-title{
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #fff5e0;
+}
+.aisle-tag{
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(245,230,200,.42);
+  flex: 1;
+}
+.aisle-count{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 7px;
+  background: rgba(220,175,110,.18);
+  color: rgba(245,230,200,.85);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.buff-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.buff-tile{
+  background: linear-gradient(160deg, #2a2218 0%, #1a1510 100%);
+  border: 1px solid rgba(75, 60, 40, .55);
+  border-radius: 10px;
+  padding: 14px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.buff-icon{
+  width: 36px; height: 36px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,140,140,.85) 0%, var(--vermillion) 60%, #821818 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(255,200,200,.25);
+  box-shadow: 0 0 8px rgba(200,56,56,.3);
+}
+.buff-headline{
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--cream);
+}
+.buff-name{
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(245,230,200,.75);
+  letter-spacing: .03em;
+}
+.buff-dur{
+  font-size: 9.5px;
+  padding: 1px 7px;
+  background: rgba(220,175,110,.14);
+  color: rgba(245,230,200,.75);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .08em;
+}
+.buff-buy{
+  margin-top: 4px;
+  width: 100%;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: 8px;
+  background: linear-gradient(180deg, var(--vermillion-hot), var(--vermillion));
+  color: white;
+  border-radius: 6px;
+  border: 1px solid rgba(255,200,200,.3);
+  box-shadow: 0 0 8px rgba(200,56,56,.3);
+  font-variant-numeric: tabular-nums;
+}
+
+.caption{
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: rgba(245,230,200,.45);
+  letter-spacing: .02em;
+  text-align: center;
+  max-width: 360px;
+}
+</style>
+</head>
+<body>
+
+<div class="lead">
+  <h1>Spirit Bazaar — Category nav</h1>
+  Plain text tabs with a sliding gold underline. The nav tells the player
+  what categories exist and which one they&rsquo;re viewing, then gets
+  out of the way so the shop content can breathe.
+</div>
+
+<div class="toggle-row" id="toggle">
+  <button class="on" data-set="buff">Buffs</button>
+  <button data-set="consumable">Consumables</button>
+  <button data-set="qol">QoL</button>
+  <button data-set="cosmetic">Cosmetics</button>
+</div>
+
+<div class="phone">
+  <div class="featured-tail">
+    <div class="featured-card">
+      <div>
+        <div class="featured-name">Crimson Aura &mdash; 4h</div>
+        <div class="featured-meta">&times;2 qi/s for 4 hours &middot; resets in 23h 44m</div>
+      </div>
+      <div class="featured-cta">120 BL</div>
+    </div>
+  </div>
+
+  <nav class="cat-rail" id="rail">
+    <button class="tab active" data-cat="buff">Buffs <span class="count">5</span></button>
+    <button class="tab" data-cat="consumable">Consumables <span class="count">1</span></button>
+    <button class="tab" data-cat="qol">QoL <span class="count">&mdash;</span></button>
+    <button class="tab" data-cat="cosmetic">Cosmetics <span class="count">20</span></button>
+    <span class="indicator" id="indicator"></span>
+  </nav>
+
+  <section class="aisle">
+    <header class="aisle-head">
+      <span class="lantern"></span>
+      <h3 class="aisle-title" id="aisle-title">Buffs</h3>
+      <span class="aisle-tag" id="aisle-tag">Power-ups &middot; stack with everything</span>
+      <span class="aisle-count" id="aisle-count">5</span>
+    </header>
+    <div class="buff-grid">
+      <div class="buff-tile">
+        <div class="buff-icon"></div>
+        <div class="buff-headline">&times;2 QI/S</div>
+        <div class="buff-name">Crimson Aura</div>
+        <div class="buff-dur">1H</div>
+        <div class="buff-buy">50 BL</div>
+      </div>
+      <div class="buff-tile">
+        <div class="buff-icon"></div>
+        <div class="buff-headline">&times;2 QI/S</div>
+        <div class="buff-name">Crimson Aura</div>
+        <div class="buff-dur">4H</div>
+        <div class="buff-buy">150 BL</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="caption">
+  Tap any tab above the phone (or any tab in the rail) to swap active.
+  Underline slides to fit the new label width.
+</div>
+
+<script>
+  const rail = document.getElementById('rail');
+  const indicator = document.getElementById('indicator');
+  const aisleTitle = document.getElementById('aisle-title');
+  const aisleTag = document.getElementById('aisle-tag');
+  const aisleCount = document.getElementById('aisle-count');
+  const toggle = document.getElementById('toggle');
+  const meta = {
+    buff:       { title: 'Buffs',           tag: 'Power-ups · stack with everything',    count: 5  },
+    consumable: { title: 'Consumables',     tag: 'One-shot talismans · keep until used', count: 1  },
+    qol:        { title: 'Quality of Life', tag: 'Permanent unlocks · less friction',    count: 0  },
+    cosmetic:   { title: 'Cosmetics',       tag: 'Recolours · skins · backdrops',        count: 20 },
+  };
+  function moveIndicatorTo(tab){
+    const railRect = rail.getBoundingClientRect();
+    const tRect = tab.getBoundingClientRect();
+    // Indicator width = tab content width (excluding the 2px L/R padding so
+    // it lines up with the LABEL not the tap target)
+    const w = tRect.width - 4;
+    const x = tRect.left - railRect.left + 2;
+    indicator.style.setProperty('--ind-w', `${w}px`);
+    indicator.style.setProperty('--ind-x', `${x}px`);
+  }
+  function setActive(cat){
+    rail.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+    const active = rail.querySelector(`.tab[data-cat="${cat}"]`);
+    if (active) moveIndicatorTo(active);
+    const m = meta[cat];
+    aisleTitle.textContent = m.title;
+    aisleTag.textContent = m.tag;
+    aisleCount.textContent = m.count;
+    toggle.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.set === cat));
+  }
+  // Init: indicator under first tab once layout settles
+  requestAnimationFrame(() => requestAnimationFrame(() => setActive('buff')));
+  rail.addEventListener('click', e => {
+    const t = e.target.closest('.tab');
+    if (t) setActive(t.dataset.cat);
+  });
+  toggle.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') setActive(e.target.dataset.set);
+  });
+</script>
+
+</body>
+</html>

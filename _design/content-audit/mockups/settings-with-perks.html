@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=390, initial-scale=1, viewport-fit=cover" />
+<title>Settings + Active Perks + About row (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Cinzel:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Reuses the lacquer-tablet language from screens-design-pass/settings-mockup.html.
+   Adds:
+   - "Active Perks" section between Save Data and Danger Path (reads inv.qol + inv.stacks)
+   - "About" action row at the bottom of Save Data, pushing to an About screen
+   - Audio compressed to one row preview so the new sections fit at 390x844
+*/
+:root{
+  --ui-bg-deep-rgb:    14, 12, 8;
+  --ui-bg-panel-rgb:   32, 26, 18;
+  --ui-purple-deep:    #9b7d50;
+  --ui-purple-strong:  #dcaf6e;
+  --ui-purple-soft:    #e8d5a8;
+  --ui-purple-light:   #f5e6c8;
+  --ui-purple-wash:    #f8edd4;
+  --ui-label-rgb:      210, 195, 170;
+  --ui-muted-rgb:      175, 160, 140;
+  --ui-border:         rgba(75, 60, 40, 0.6);
+  --ui-border-soft:    rgba(75, 60, 40, 0.35);
+
+  --bg-deep:           rgb(var(--ui-bg-deep-rgb));
+  --bg-panel:          rgba(var(--ui-bg-panel-rgb), 0.92);
+  --bg-nested:         rgba(14, 12, 8, 0.55);
+
+  --danger:            #c74848;
+  --danger-soft:       #ff7878;
+  --danger-wash:       rgba(199, 72, 72, 0.10);
+
+  --perk-tint:         rgba(143, 200, 138, 0.10);
+  --perk-border:       rgba(143, 200, 138, 0.45);
+  --perk-text:         #9fdc94;
+
+  --font-display:      'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-cn:           'Ma Shan Zheng', 'Cinzel', serif;
+  --font-body:         -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+}
+*{ box-sizing: border-box; margin: 0; padding: 0; }
+html, body{
+  background: #060504;
+  color: var(--ui-purple-light);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+body{
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 20px 0 40px;
+  min-height: 100vh;
+}
+.device{
+  width: 390px; height: 844px;
+  background: var(--bg-deep);
+  border-radius: 36px;
+  box-shadow: 0 8px 60px rgba(0,0,0,.6), 0 0 0 8px #0e0c08;
+  overflow: hidden;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+
+/* Topbar context */
+.topbar{
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 12px; gap: 8px;
+  background: rgba(14, 12, 8, 0.85);
+  border-bottom: 1px solid var(--ui-border);
+  flex-shrink: 0;
+  z-index: 5;
+}
+.tb-shop{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 14px;
+}
+.tb-curr{
+  flex: 1; display: flex; flex-direction: column; gap: 1px;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.tb-curr-row{ display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ui-purple-soft); }
+.tb-curr-row .dot{
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle, #ff6864 30%, #6e1a1a 70%);
+}
+.tb-curr-row .dot.gold{ background: radial-gradient(circle, #ffd55a 30%, #6b4a10 70%); }
+.tb-icon{
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg-panel); border: 1px solid var(--ui-border);
+  border-radius: 8px; color: var(--ui-purple-soft); font-size: 16px;
+}
+.tb-icon.active{
+  background: rgba(220, 175, 110, 0.18);
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-strong);
+}
+
+.screen{
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 88px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 80, 40, 0.18), transparent 65%),
+    linear-gradient(180deg, rgba(20, 14, 8, .85), rgba(8, 6, 4, .95));
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 12px, #000 calc(100% - 32px), transparent 100%);
+}
+
+.back-chip{
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px 6px 8px;
+  background: var(--bg-nested);
+  border: 1px solid var(--ui-border);
+  border-radius: 14px;
+  color: var(--ui-purple-soft);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.back-chip .ar{ font-size: 16px; line-height: 1; margin-right: 2px; }
+
+/* Identity plaque (compressed) */
+.identity{
+  margin-top: 12px;
+  position: relative;
+  padding: 14px 16px 12px;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(245, 230, 200, 0.10), rgba(245, 230, 200, 0) 30%),
+    linear-gradient(160deg, rgba(46, 36, 24, 0.96) 0%, rgba(26, 20, 14, 0.96) 100%);
+  border: 1px solid rgba(212, 184, 136, 0.30);
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.05);
+  overflow: hidden;
+}
+.identity::before{
+  content: "道";
+  font-family: var(--font-cn);
+  position: absolute;
+  right: -10px; top: -22px;
+  font-size: 100px;
+  color: rgba(220, 175, 110, 0.08);
+  line-height: 1;
+}
+.id-eyebrow{
+  font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+}
+.id-title{
+  font-family: var(--font-display); font-weight: 700;
+  font-size: 20px; letter-spacing: 0.06em;
+  color: var(--ui-purple-light);
+  line-height: 1.1; margin-top: 2px;
+}
+.id-realm{ display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: var(--ui-purple-soft); }
+.id-realm-glyph{
+  display: inline-block; width: 20px; height: 20px;
+  background: linear-gradient(135deg, #5d4426 0%, #2d2014 100%);
+  border: 1px solid rgba(220, 175, 110, 0.40);
+  border-radius: 4px; position: relative;
+}
+.id-realm-glyph::after{
+  content: ""; position: absolute; inset: 3px;
+  border: 1px solid rgba(220, 175, 110, 0.50);
+  border-radius: 2px;
+}
+.id-realm-name{ color: var(--ui-purple-light); font-weight: 600; letter-spacing: 0.04em; }
+.id-realm-stage{ color: rgba(var(--ui-label-rgb), 0.65); }
+.id-meta{
+  margin-top: 8px;
+  display: flex; gap: 10px;
+  font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+  color: rgba(var(--ui-label-rgb), 0.55);
+}
+.id-meta b{
+  font-family: var(--font-display); font-weight: 600;
+  color: var(--ui-purple-strong); font-size: 11px;
+  letter-spacing: 0.04em; margin-right: 3px;
+}
+.id-divider{ display: inline-block; width: 1px; height: 10px; background: var(--ui-border); align-self: center; }
+
+.sec-label{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.22em;
+  color: var(--ui-purple-strong);
+  margin: 16px 4px 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after{ content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--ui-border), transparent); }
+.sec-label.danger{ color: var(--danger-soft); }
+.sec-label.perk{ color: var(--perk-text); }
+
+.card{
+  background: var(--bg-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: inset 0 1px 0 rgba(255, 225, 170, 0.03);
+}
+
+/* Audio one-row preview */
+.audio-row{
+  display: grid;
+  grid-template-columns: 56px 1fr 30px 24px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+}
+.audio-label{
+  font-size: 12px; color: var(--ui-purple-light);
+  font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 500;
+}
+.slider{
+  appearance: none; -webkit-appearance: none;
+  height: 5px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--ui-purple-strong) var(--v, 50%), rgba(75,60,40,0.6) var(--v, 50%));
+}
+.audio-pct{
+  font-size: 11px; color: var(--ui-purple-soft);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.mute-btn{
+  width: 22px; height: 22px;
+  background: rgba(75, 60, 40, 0.40);
+  border: 1px solid var(--ui-border);
+  border-radius: 5px;
+  color: var(--ui-purple-soft);
+  font-size: 11px; line-height: 1;
+}
+.audio-collapsed-hint{
+  text-align: center;
+  font-size: 10px;
+  color: rgba(var(--ui-muted-rgb), 0.55);
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ── ACTIVE PERKS — the new section ── */
+.perk-card{
+  background:
+    linear-gradient(180deg, var(--perk-tint), transparent 60%),
+    var(--bg-panel);
+  border: 1px solid var(--perk-border);
+  border-radius: 12px;
+  padding: 4px 4px;
+}
+.perk-row{
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 8px;
+}
+.perk-row + .perk-row{ border-top: 1px solid var(--ui-border-soft); }
+.perk-icon{
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(143, 200, 138, 0.15);
+  border: 1px solid var(--perk-border);
+  border-radius: 7px;
+  color: var(--perk-text); font-size: 16px;
+}
+.perk-body{
+  display: flex; flex-direction: column; gap: 1px;
+  min-width: 0;
+}
+.perk-name{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 12px; color: var(--ui-purple-light);
+  letter-spacing: 0.04em;
+}
+.perk-effect{
+  font-size: 11px; color: rgba(var(--ui-label-rgb), 0.75);
+  line-height: 1.3;
+}
+.perk-state{
+  display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+}
+.perk-badge{
+  font-family: var(--font-display);
+  font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--perk-text);
+  color: #0e1a0e;
+  font-weight: 700;
+}
+.perk-badge.stack{
+  background: rgba(220, 175, 110, 0.85);
+  color: #1a1208;
+}
+.perk-toggle{
+  font-size: 10px;
+  color: var(--ui-purple-soft);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+.perk-empty{
+  font-size: 11px;
+  text-align: center;
+  padding: 10px;
+  color: rgba(var(--ui-muted-rgb), 0.65);
+  font-style: italic;
+}
+
+/* Visual + render rows */
+.row{ display: flex; align-items: center; justify-content: space-between; padding: 4px; }
+.row + .row{ margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--ui-border-soft); }
+.row-info{ display: flex; flex-direction: column; }
+.row-title{
+  font-size: 13px; color: var(--ui-purple-light);
+  font-family: var(--font-display); letter-spacing: 0.04em; font-weight: 600;
+}
+.row-sub{ font-size: 11px; color: rgba(var(--ui-muted-rgb), 0.7); margin-top: 2px; letter-spacing: 0.04em; }
+.segment{
+  display: inline-flex;
+  background: rgba(14, 12, 8, 0.7);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg-btn{
+  background: transparent; border: none;
+  color: var(--ui-purple-soft);
+  padding: 5px 12px; font-size: 12px;
+  font-family: var(--font-body); letter-spacing: 0.04em;
+}
+.seg-btn.active{
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.30), rgba(155, 125, 80, 0.30));
+  color: var(--ui-purple-light); font-weight: 600;
+}
+.seg-btn + .seg-btn{ border-left: 1px solid var(--ui-border); }
+
+/* Action rows (Save Data + About) */
+.action-row{
+  width: 100%;
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: rgba(14, 12, 8, 0.50);
+  border: 1px solid var(--ui-border);
+  border-radius: 10px;
+  text-align: left; color: var(--ui-purple-light);
+}
+.action-row + .action-row{ margin-top: 8px; }
+.action-icon{
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(220, 175, 110, 0.10);
+  border: 1px solid rgba(220, 175, 110, 0.25);
+  border-radius: 7px;
+  font-size: 14px; color: var(--ui-purple-strong);
+}
+.action-body{ flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.action-label{
+  font-size: 13px;
+  font-family: var(--font-display); letter-spacing: 0.05em; font-weight: 600;
+  color: var(--ui-purple-light);
+}
+.action-sub{ font-size: 11px; color: rgba(var(--ui-muted-rgb), 0.7); }
+.action-chev{ font-size: 18px; color: rgba(var(--ui-muted-rgb), 0.5); }
+.action-row.about .action-icon{
+  background: rgba(220, 175, 110, 0.18);
+  border-color: var(--ui-purple-strong);
+  color: var(--ui-purple-light);
+}
+
+/* Danger card */
+.danger-card{
+  background:
+    linear-gradient(180deg, var(--danger-wash), transparent 60%),
+    var(--bg-panel);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 12px;
+  padding: 10px;
+}
+.danger-row{ display: flex; align-items: center; gap: 12px; padding: 6px; }
+.danger-icon{
+  width: 30px; height: 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(199, 72, 72, 0.15);
+  border: 1px solid rgba(199, 72, 72, 0.35);
+  border-radius: 7px;
+  color: var(--danger-soft); font-size: 14px;
+}
+.danger-label{
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 13px; color: var(--danger-soft); letter-spacing: 0.05em;
+}
+.danger-sub{ font-size: 11px; color: rgba(255, 180, 180, 0.55); margin-top: 2px; }
+.danger-body{ flex: 1; display: flex; flex-direction: column; }
+.danger-chev{ font-size: 18px; color: rgba(255, 180, 180, 0.55); }
+
+.botnav{
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 60px;
+  display: flex;
+  background: rgba(14, 12, 8, 0.96);
+  border-top: 1px solid var(--ui-border);
+  padding: 8px 0 10px;
+  z-index: 6;
+}
+.bn-item{
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: rgba(var(--ui-muted-rgb), 0.7);
+  font-size: 9px; letter-spacing: 0.10em; text-transform: uppercase;
+}
+.bn-item .bni{ font-size: 18px; line-height: 1; }
+.bn-item.active{ color: var(--ui-purple-strong); }
+
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- Topbar context -->
+  <div class="topbar">
+    <button class="tb-shop">⌗</button>
+    <div class="tb-curr">
+      <div class="tb-curr-row"><span class="dot"></span>Blood Lotus <b>420</b></div>
+      <div class="tb-curr-row"><span class="dot gold"></span>Karma <b>1,205</b></div>
+    </div>
+    <button class="tb-icon" title="Codex">📜</button>
+    <button class="tb-icon active" title="Settings">⚙</button>
+  </div>
+
+  <!-- Settings screen -->
+  <div class="screen">
+
+    <button class="back-chip"><span class="ar">‹</span> Back</button>
+
+    <!-- Identity plaque (compressed) -->
+    <div class="identity">
+      <div class="id-eyebrow">Cultivator Tablet</div>
+      <div class="id-title">Settings</div>
+      <div class="id-realm">
+        <span class="id-realm-glyph"></span>
+        <span class="id-realm-name">Saint</span>
+        <span class="id-realm-stage">· Middle Stage</span>
+      </div>
+      <div class="id-meta">
+        <span><b>3</b> Lives</span>
+        <span class="id-divider"></span>
+        <span><b>27</b> Realms</span>
+        <span class="id-divider"></span>
+        <span><b>2.4d</b> Cultivating</span>
+      </div>
+    </div>
+
+    <!-- AUDIO (collapsed to a single row preview to save vertical real estate) -->
+    <div class="sec-label">Audio</div>
+    <div class="card">
+      <div class="audio-row">
+        <span class="audio-label">Master</span>
+        <input type="range" class="slider" min="0" max="100" value="80" style="--v:80%">
+        <span class="audio-pct">80%</span>
+        <button class="mute-btn">🔊</button>
+      </div>
+      <div class="audio-collapsed-hint">Music · Effects · expand to adjust</div>
+    </div>
+
+    <!-- VISUAL EFFECTS -->
+    <div class="sec-label">Visual Effects</div>
+    <div class="card">
+      <div class="row">
+        <div class="row-info">
+          <span class="row-title">Particles &amp; Animations</span>
+          <span class="row-sub">Qi orbs, breakthrough flashes</span>
+        </div>
+        <div class="segment">
+          <button class="seg-btn active">On</button>
+          <button class="seg-btn">Off</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NEW: ACTIVE PERKS ─── -->
+    <div class="sec-label perk">Active Perks</div>
+    <div class="perk-card">
+      <div class="perk-row">
+        <span class="perk-icon">⚡</span>
+        <span class="perk-body">
+          <span class="perk-name">Decisive Heart</span>
+          <span class="perk-effect">Auto-confirms major breakthroughs.</span>
+        </span>
+        <span class="perk-state">
+          <span class="perk-badge">Active</span>
+        </span>
+      </div>
+      <div class="perk-row">
+        <span class="perk-icon">🤖</span>
+        <span class="perk-body">
+          <span class="perk-name">Disciple's Diligence</span>
+          <span class="perk-effect">Auto-Buy toggle on Cultivation screen.</span>
+        </span>
+        <span class="perk-state">
+          <span class="perk-badge">Active</span>
+          <span class="perk-toggle">Enabled</span>
+        </span>
+      </div>
+      <div class="perk-row">
+        <span class="perk-icon">⏳</span>
+        <span class="perk-body">
+          <span class="perk-name">Patient Mind</span>
+          <span class="perk-effect">+4h offline qi cap (8h base → 12h current).</span>
+        </span>
+        <span class="perk-state">
+          <span class="perk-badge stack">×2 / 3</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- SAVE DATA -->
+    <div class="sec-label">Save Data</div>
+    <button class="action-row">
+      <span class="action-icon">📤</span>
+      <span class="action-body">
+        <span class="action-label">Export Save</span>
+        <span class="action-sub">Copy save code to clipboard</span>
+      </span>
+      <span class="action-chev">›</span>
+    </button>
+    <button class="action-row">
+      <span class="action-icon">📥</span>
+      <span class="action-body">
+        <span class="action-label">Import Save</span>
+        <span class="action-sub">Paste a save code to restore</span>
+      </span>
+      <span class="action-chev">›</span>
+    </button>
+
+    <!-- ── NEW: ABOUT row pushes to the dedicated About screen ── -->
+    <button class="action-row about">
+      <span class="action-icon">ℹ︎</span>
+      <span class="action-body">
+        <span class="action-label">About this app</span>
+        <span class="action-sub">Credits · fonts · licenses · v1.4.2</span>
+      </span>
+      <span class="action-chev">›</span>
+    </button>
+
+    <!-- DANGER PATH -->
+    <div class="sec-label danger">Danger Path</div>
+    <div class="danger-card">
+      <div class="danger-row">
+        <span class="danger-icon">🗑</span>
+        <span class="danger-body">
+          <span class="danger-label">Wipe Save</span>
+          <span class="danger-sub">Permanently delete all progress. Requires two taps.</span>
+        </span>
+        <span class="danger-chev">›</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav reference -->
+  <div class="botnav">
+    <div class="bn-item"><span class="bni">⛰</span>Home</div>
+    <div class="bn-item"><span class="bni">🪷</span>Cultivate</div>
+    <div class="bn-item"><span class="bni">📜</span>Journey</div>
+  </div>
+
+</div>
+</body>
+</html>

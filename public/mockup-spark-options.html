@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mockup — Spark Modal Patterns (interactive)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ── Page chrome ─────────────────────────────────────────────────── */
+    :root {
+      --bg-page:        #0f1418;
+      --text:           #e6f0ee;
+      --text-dim:       #8aa39e;
+      --rarity-common:    #9ca3af;
+      --rarity-uncommon:  #4ade80;
+      --rarity-legendary: #ffd66b;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg-page);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+    }
+    body { padding: 24px; max-width: 1300px; margin: 0 auto; }
+    h1 { font-size: 22px; margin: 0 0 6px; }
+    .intro { color: var(--text-dim); font-size: 13px; line-height: 1.5; margin: 0 0 20px; max-width: 760px; }
+    .intro strong { color: var(--text); }
+
+    /* Tab nav */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 12px;
+    }
+    .tab {
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(20, 28, 36, 0.7);
+      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: var(--text); background: rgba(40, 50, 64, 0.8); }
+    .tab.active {
+      color: #fff;
+      background: rgba(167, 139, 250, 0.18);
+      border-color: rgba(167, 139, 250, 0.6);
+      box-shadow: 0 0 14px rgba(167, 139, 250, 0.25);
+    }
+
+    .option-section { display: none; }
+    .option-section.active { display: block; }
+
+    .option-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #fff;
+      margin: 0 0 4px;
+    }
+    .option-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin: 0 0 16px;
+      line-height: 1.5;
+      max-width: 600px;
+    }
+
+    /* Phone frame */
+    .device-frame {
+      width: 390px;
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #050708;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+    .device-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      padding: 6px 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Backdrop shared across all options */
+    .spark-overlay {
+      min-height: 720px;
+      background:
+        radial-gradient(ellipse at center top, rgba(167, 139, 250, 0.06), transparent 60%),
+        linear-gradient(180deg, rgba(8, 12, 18, 0.95), rgba(4, 6, 10, 0.98));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 14px 18px;
+      position: relative;
+    }
+    .spark-overlay-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(230, 240, 238, 0.95);
+      text-shadow: 0 0 12px rgba(167, 139, 250, 0.5);
+      margin-bottom: 4px;
+    }
+    .spark-overlay-subtitle {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    .spark-footer {
+      margin-top: auto;
+      padding-top: 16px;
+    }
+    .spark-footer-meta {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      color: var(--text-dim);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+    .spark-footer-meta strong { color: #ffd66b; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OPTION ① — EFFECT-FIRST (peek + ⓘ to reveal lore)
+       ═══════════════════════════════════════════════════════════════ */
+
+    .opt1-card {
+      width: 100%;
+      max-width: 358px;
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity);
+      box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65);
+      margin-bottom: 10px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .opt1-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 22px var(--card-glow), 0 6px 22px rgba(0, 0, 0, 0.8);
+    }
+    .opt1-card-common    { --card-rarity: rgba(156, 163, 175, 0.55); --card-glow: rgba(156, 163, 175, 0.20); }
+    .opt1-card-uncommon  { --card-rarity: rgba(74, 222, 128, 0.65);  --card-glow: rgba(74, 222, 128, 0.30); }
+    .opt1-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.85);
+      --card-glow:   rgba(255, 215, 100, 0.45);
+      animation: legendary-breathe 2.6s ease-in-out infinite;
+    }
+    @keyframes legendary-breathe {
+      0%, 100% { box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65); }
+      50%      { box-shadow: 0 0 26px rgba(255, 220, 130, 0.65), 0 6px 22px rgba(0, 0, 0, 0.8); }
+    }
+    .opt1-card-img {
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(40, 48, 60, 0.6), rgba(20, 24, 32, 0.8));
+      border: 1px solid var(--card-rarity);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .opt1-card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 60%);
+    }
+    .opt1-card-img img { width: 70px; height: 70px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt1-card-img .emoji { font-size: 42px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt1-card-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .opt1-card-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .opt1-card-name { font-size: 14px; font-weight: 800; color: #fff; flex: 1; min-width: 0; }
+    .opt1-card-rarity-tag {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #1a1a1a;
+      flex-shrink: 0;
+    }
+    .opt1-card-common    .opt1-card-rarity-tag { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+    .opt1-card-uncommon  .opt1-card-rarity-tag { background: linear-gradient(135deg, #4ade80, #16a34a); color: #fff; }
+    .opt1-card-legendary .opt1-card-rarity-tag { background: linear-gradient(135deg, #ffe770, #b8860b); color: #1a1a1a; }
+    .opt1-card-effect {
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(220, 230, 235, 0.92);
+      margin-bottom: 6px;
+    }
+    .opt1-card-lore-toggle {
+      font-size: 10px;
+      color: rgba(167, 139, 250, 0.7);
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+      align-self: flex-start;
+      font-family: inherit;
+      letter-spacing: 0.04em;
+    }
+    .opt1-card-lore-toggle:hover { color: rgba(167, 139, 250, 1); }
+    .opt1-card-lore {
+      font-size: 11px;
+      line-height: 1.4;
+      color: rgba(220, 220, 220, 0.55);
+      font-style: italic;
+      margin-top: 4px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.2s;
+    }
+    .opt1-card.lore-open .opt1-card-lore { max-height: 120px; opacity: 1; margin-top: 6px; }
+    .opt1-card.lore-open .opt1-card-lore-toggle { color: rgba(167, 139, 250, 1); }
+    .opt1-card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .opt1-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .opt1-btn-pick {
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.4), rgba(110, 80, 200, 0.5));
+      color: #fff;
+      border: 1px solid rgba(167, 139, 250, 0.7);
+    }
+    .opt1-btn-pick:hover { filter: brightness(1.15); }
+    .opt1-btn-reroll {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+      border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+    .opt1-btn-reroll:hover { background: rgba(74, 222, 128, 0.26); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OPTION ② — HYBRID EXPAND-IN-PLACE
+       ═══════════════════════════════════════════════════════════════ */
+    .opt2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+      max-width: 358px;
+      transition: grid-template-columns 0.35s ease;
+    }
+    /* When one card is expanded, that column grows */
+    .opt2-grid.expanded-0 { grid-template-columns: 1fr 0.35fr; }
+    .opt2-grid.expanded-1 { grid-template-columns: 0.35fr 1fr; }
+
+    .opt2-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity);
+      box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65);
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      min-height: 180px;
+    }
+    .opt2-card-common    { --card-rarity: rgba(156, 163, 175, 0.55); --card-glow: rgba(156, 163, 175, 0.20); }
+    .opt2-card-uncommon  { --card-rarity: rgba(74, 222, 128, 0.65);  --card-glow: rgba(74, 222, 128, 0.30); }
+    .opt2-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.85);
+      --card-glow:   rgba(255, 215, 100, 0.45);
+      animation: legendary-breathe 2.6s ease-in-out infinite;
+    }
+    .opt2-card:hover { transform: translateY(-2px); }
+    .opt2-card-img {
+      width: 100%;
+      height: 90px;
+      background: linear-gradient(180deg, rgba(30, 35, 45, 0.6), rgba(15, 20, 28, 0.8));
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--card-rarity);
+      transition: height 0.3s ease;
+    }
+    .opt2-card.expanded .opt2-card-img { height: 130px; }
+    .opt2-card-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 60%); }
+    .opt2-card-img img { position: relative; z-index: 1; width: 70px; height: 70px; object-fit: contain; transition: all 0.3s; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt2-card.expanded .opt2-card-img img { width: 100px; height: 100px; }
+    .opt2-card-img .emoji { font-size: 42px; line-height: 1; position: relative; z-index: 1; transition: font-size 0.3s; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt2-card.expanded .opt2-card-img .emoji { font-size: 60px; }
+    .opt2-card-rarity-strip {
+      padding: 3px 8px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+      text-align: center;
+    }
+    .opt2-card-common    .opt2-card-rarity-strip { background: linear-gradient(90deg, rgba(80, 86, 96, 0.6), rgba(120, 128, 140, 0.4)); }
+    .opt2-card-uncommon  .opt2-card-rarity-strip { background: linear-gradient(90deg, rgba(40, 80, 60, 0.7), rgba(40, 130, 90, 0.5)); }
+    .opt2-card-legendary .opt2-card-rarity-strip { background: linear-gradient(90deg, rgba(95, 60, 28, 0.95), rgba(140, 95, 40, 0.85)); }
+    .opt2-card-body {
+      padding: 8px 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .opt2-card-name { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .opt2-card-legendary .opt2-card-name { color: #fff4d4; text-shadow: 0 0 6px rgba(255, 215, 100, 0.5); }
+    .opt2-card-summary { font-size: 11px; color: rgba(220, 230, 235, 0.85); font-weight: 600; line-height: 1.3; }
+    .opt2-card-desc { display: none; font-size: 11px; line-height: 1.4; color: rgba(220, 230, 235, 0.7); }
+    .opt2-card-lore { display: none; font-size: 10.5px; line-height: 1.4; color: rgba(220, 220, 220, 0.55); font-style: italic; }
+    .opt2-card.expanded .opt2-card-desc { display: block; }
+    .opt2-card.expanded .opt2-card-lore { display: block; margin-top: 4px; }
+    .opt2-card.expanded .opt2-card-summary { display: none; }
+    .opt2-card-actions {
+      display: none;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .opt2-card.expanded .opt2-card-actions { display: flex; }
+    .opt2-btn {
+      flex: 1;
+      padding: 7px 8px;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .opt2-btn-pick {
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.4), rgba(110, 80, 200, 0.5));
+      color: #fff;
+      border: 1px solid rgba(167, 139, 250, 0.7);
+    }
+    .opt2-btn-reroll {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+      border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+    /* Collapsed card's text fades nicely */
+    .opt2-grid.expanded-0 .opt2-card:not(.expanded) .opt2-card-summary,
+    .opt2-grid.expanded-1 .opt2-card:not(.expanded) .opt2-card-summary { font-size: 10px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OPTION ③ — VERTICAL STACK (full-width cards)
+       ═══════════════════════════════════════════════════════════════ */
+    .opt3-stack {
+      width: 100%;
+      max-width: 358px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .opt3-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 1.5px solid var(--card-rarity);
+      box-shadow: 0 0 14px var(--card-glow), 0 4px 16px rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+    }
+    .opt3-card-common    { --card-rarity: rgba(156, 163, 175, 0.55); --card-glow: rgba(156, 163, 175, 0.20); }
+    .opt3-card-uncommon  { --card-rarity: rgba(74, 222, 128, 0.65);  --card-glow: rgba(74, 222, 128, 0.30); }
+    .opt3-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.85);
+      --card-glow:   rgba(255, 215, 100, 0.45);
+      animation: legendary-breathe 2.6s ease-in-out infinite;
+    }
+    .opt3-card-top {
+      display: flex;
+      gap: 12px;
+      padding: 10px 12px;
+    }
+    .opt3-card-img {
+      flex-shrink: 0;
+      width: 92px;
+      height: 92px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(40, 48, 60, 0.6), rgba(20, 24, 32, 0.8));
+      border: 1px solid var(--card-rarity);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .opt3-card-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 60%); }
+    .opt3-card-img img { width: 78px; height: 78px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt3-card-img .emoji { font-size: 48px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.6)); }
+    .opt3-card-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .opt3-card-head { display: flex; align-items: center; gap: 8px; }
+    .opt3-card-name { font-size: 14px; font-weight: 800; color: #fff; flex: 1; min-width: 0; }
+    .opt3-card-legendary .opt3-card-name { color: #fff4d4; text-shadow: 0 0 6px rgba(255, 215, 100, 0.5); }
+    .opt3-card-rarity-tag {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .opt3-card-common    .opt3-card-rarity-tag { background: linear-gradient(135deg, #9ca3af, #6b7280); }
+    .opt3-card-uncommon  .opt3-card-rarity-tag { background: linear-gradient(135deg, #4ade80, #16a34a); }
+    .opt3-card-legendary .opt3-card-rarity-tag { background: linear-gradient(135deg, #ffe770, #b8860b); color: #1a1a1a; }
+    .opt3-card-effect { font-size: 12px; line-height: 1.35; color: rgba(220, 230, 235, 0.95); font-weight: 600; }
+    .opt3-card-lore { font-size: 11px; line-height: 1.42; color: rgba(220, 220, 220, 0.55); font-style: italic; padding: 0 12px 8px; }
+    .opt3-card-actions {
+      display: flex;
+      gap: 8px;
+      padding: 8px 12px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .opt3-btn {
+      flex: 1;
+      padding: 9px 10px;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .opt3-btn-pick {
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.4), rgba(110, 80, 200, 0.5));
+      color: #fff;
+      border: 1px solid rgba(167, 139, 250, 0.7);
+    }
+    .opt3-btn-reroll {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+      border: 1px solid rgba(74, 222, 128, 0.4);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OPTION ④ — SINGLE-CARD CAROUSEL (swipe / dots)
+       ═══════════════════════════════════════════════════════════════ */
+    .opt4-carousel {
+      width: 100%;
+      max-width: 358px;
+      position: relative;
+    }
+    .opt4-indicator {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .opt4-dots { display: flex; gap: 8px; }
+    .opt4-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .opt4-dot.active { background: #ffd66b; box-shadow: 0 0 8px rgba(255, 215, 100, 0.7); transform: scale(1.2); }
+
+    .opt4-arrow {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text);
+      font-size: 16px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .opt4-arrow:hover { background: rgba(167, 139, 250, 0.2); border-color: rgba(167, 139, 250, 0.6); }
+
+    .opt4-track {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      gap: 0;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .opt4-track::-webkit-scrollbar { display: none; }
+
+    .opt4-card {
+      flex: 0 0 100%;
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(20, 24, 32, 0.95), rgba(10, 14, 20, 0.98));
+      border: 2px solid var(--card-rarity);
+      box-shadow: 0 0 20px var(--card-glow), 0 6px 22px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+    .opt4-card-common    { --card-rarity: rgba(156, 163, 175, 0.65); --card-glow: rgba(156, 163, 175, 0.25); }
+    .opt4-card-uncommon  { --card-rarity: rgba(74, 222, 128, 0.7);   --card-glow: rgba(74, 222, 128, 0.35); }
+    .opt4-card-legendary {
+      --card-rarity: rgba(255, 215, 100, 0.9);
+      --card-glow:   rgba(255, 215, 100, 0.5);
+      animation: legendary-breathe 2.6s ease-in-out infinite;
+    }
+    .opt4-card-hero {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(180deg, rgba(30, 35, 45, 0.6), rgba(15, 20, 28, 0.9));
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--card-rarity);
+    }
+    .opt4-card-hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, var(--card-glow), transparent 70%); pointer-events: none; }
+    .opt4-card-hero img { width: 160px; height: 160px; object-fit: contain; position: relative; z-index: 1; filter: drop-shadow(0 4px 14px rgba(0,0,0,0.7)); }
+    .opt4-card-hero .emoji { font-size: 110px; line-height: 1; position: relative; z-index: 1; filter: drop-shadow(0 4px 14px rgba(0,0,0,0.7)); }
+    .opt4-card-rarity-banner {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      padding: 4px 14px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+      border-radius: 4px;
+    }
+    .opt4-card-common    .opt4-card-rarity-banner { background: linear-gradient(90deg, rgba(80, 86, 96, 0.95), rgba(120, 128, 140, 0.85)); }
+    .opt4-card-uncommon  .opt4-card-rarity-banner { background: linear-gradient(90deg, rgba(40, 80, 60, 0.95), rgba(40, 130, 90, 0.85)); }
+    .opt4-card-legendary .opt4-card-rarity-banner {
+      background: linear-gradient(90deg, rgba(95, 60, 28, 0.98), rgba(180, 130, 50, 0.95), rgba(95, 60, 28, 0.98));
+      color: #fff4d4;
+      text-shadow: 0 0 8px rgba(255, 200, 80, 0.8);
+    }
+    .opt4-card-body {
+      padding: 18px 18px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .opt4-card-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+    .opt4-card-legendary .opt4-card-name {
+      color: #fff4d4;
+      text-shadow: 0 0 12px rgba(255, 215, 100, 0.6);
+    }
+    .opt4-card-effect {
+      font-size: 13px;
+      line-height: 1.4;
+      color: rgba(220, 230, 235, 0.95);
+      font-weight: 600;
+      text-align: center;
+    }
+    .opt4-card-lore {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: rgba(220, 220, 220, 0.55);
+      font-style: italic;
+      text-align: center;
+      padding: 6px 4px 0;
+    }
+    .opt4-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 12px;
+    }
+    .opt4-btn {
+      flex: 1;
+      padding: 12px 10px;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .opt4-btn-pick {
+      background: linear-gradient(180deg, rgba(167, 139, 250, 0.4), rgba(110, 80, 200, 0.55));
+      color: #fff;
+      border: 1px solid rgba(167, 139, 250, 0.75);
+      box-shadow: 0 0 14px rgba(167, 139, 250, 0.3);
+    }
+    .opt4-btn-pick:hover { filter: brightness(1.15); }
+    .opt4-btn-reroll {
+      background: rgba(74, 222, 128, 0.16);
+      color: #a7f3c4;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Spark Modal — 4 Interactive Patterns</h1>
+  <p class="intro">
+    All four options use the <strong>same real data</strong> (Phoenix Reborn legendary
+    + Quick Burst common) and render at <strong>iPhone 13 width (390 px)</strong>.
+    Tap, swipe, and tap-to-expand actually work. Use the tabs to switch between
+    patterns and feel the difference.
+  </p>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-opt="1">① Effect-First</button>
+    <button class="tab"        data-opt="2">② Hybrid Expand</button>
+    <button class="tab"        data-opt="3">③ Vertical Stack</button>
+    <button class="tab"        data-opt="4">④ Carousel</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 1 — Effect-First -->
+  <section class="option-section active" id="opt-1">
+    <h2 class="option-title">① Effect-First — Peek, then dig</h2>
+    <p class="option-desc">
+      Compact horizontal cards. Effect shown plainly. Lore hidden behind
+      <strong>ⓘ tap for lore</strong> — try it to expand the lore inline.
+      Each card ~145 px tall, both fit comfortably with no scroll.
+    </p>
+    <div class="device-frame">
+      <div class="device-label">iPhone 13 — 390 px</div>
+      <div class="spark-overlay">
+        <div class="spark-overlay-title">Qi Spark</div>
+        <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+        <div class="opt1-card opt1-card-legendary" data-card-1>
+          <div class="opt1-card-img"><img src="/sprites/producers/p_phoenix_mythic.png" alt=""/></div>
+          <div class="opt1-card-body">
+            <div class="opt1-card-head">
+              <span class="opt1-card-name">Phoenix Reborn</span>
+              <span class="opt1-card-rarity-tag">LEG</span>
+            </div>
+            <div class="opt1-card-effect">Each major realm: Phoenix → 0, all other producers ×2 permanent.</div>
+            <button class="opt1-card-lore-toggle" onclick="this.parentElement.parentElement.classList.toggle('lore-open')">ⓘ tap for lore</button>
+            <div class="opt1-card-lore">"Fenghuang is reborn from its own ashes — to bless the sect of its hearth."</div>
+            <div class="opt1-card-actions">
+              <button class="opt1-btn opt1-btn-pick">Pick</button>
+              <button class="opt1-btn opt1-btn-reroll">↺ Free</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="opt1-card opt1-card-common">
+          <div class="opt1-card-img"><span class="emoji">⚡</span></div>
+          <div class="opt1-card-body">
+            <div class="opt1-card-head">
+              <span class="opt1-card-name">Quick Burst</span>
+              <span class="opt1-card-rarity-tag">COM</span>
+            </div>
+            <div class="opt1-card-effect">Instant qi gain worth 30 seconds of your current qi/s.</div>
+            <button class="opt1-card-lore-toggle" onclick="this.parentElement.parentElement.classList.toggle('lore-open')">ⓘ tap for lore</button>
+            <div class="opt1-card-lore">"A breath drawn quick — and the world tilts toward you."</div>
+            <div class="opt1-card-actions">
+              <button class="opt1-btn opt1-btn-pick">Pick</button>
+              <button class="opt1-btn opt1-btn-reroll">↺ Free</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="spark-footer">
+          <div class="spark-footer-meta">
+            <span>✦ <strong>3%</strong> legendary chance per card</span>
+            <span style="opacity:0.4">·</span>
+            <span>Pity in <strong>12</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 2 — Hybrid Expand-In-Place -->
+  <section class="option-section" id="opt-2">
+    <h2 class="option-title">② Hybrid — Compact, tap to expand</h2>
+    <p class="option-desc">
+      Both cards visible at-a-glance. <strong>Tap a card</strong> — it expands
+      in place; the other minimises. Tap the expanded card again (or the
+      smaller one) to switch focus. Effects shown compact by default; full
+      desc + lore + pick/reroll appear only on focus.
+    </p>
+    <div class="device-frame">
+      <div class="device-label">iPhone 13 — 390 px</div>
+      <div class="spark-overlay">
+        <div class="spark-overlay-title">Qi Spark</div>
+        <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+        <div class="opt2-grid" id="opt2-grid">
+          <div class="opt2-card opt2-card-legendary" data-idx="0" onclick="opt2Toggle(0)">
+            <div class="opt2-card-img"><img src="/sprites/producers/p_phoenix_mythic.png" alt=""/></div>
+            <div class="opt2-card-rarity-strip">Legendary</div>
+            <div class="opt2-card-body">
+              <div class="opt2-card-name">Phoenix Reborn</div>
+              <div class="opt2-card-summary">Phoenix → 0 / others ×2</div>
+              <div class="opt2-card-desc">Each major realm: Phoenix count → 0, all other producers ×2 permanent.</div>
+              <div class="opt2-card-lore">"Fenghuang is reborn from its own ashes — to bless the sect of its hearth."</div>
+              <div class="opt2-card-actions">
+                <button class="opt2-btn opt2-btn-pick">Pick</button>
+                <button class="opt2-btn opt2-btn-reroll">↺ Free</button>
+              </div>
+            </div>
+          </div>
+          <div class="opt2-card opt2-card-common" data-idx="1" onclick="opt2Toggle(1)">
+            <div class="opt2-card-img"><span class="emoji">⚡</span></div>
+            <div class="opt2-card-rarity-strip">Common</div>
+            <div class="opt2-card-body">
+              <div class="opt2-card-name">Quick Burst</div>
+              <div class="opt2-card-summary">+30s qi instant</div>
+              <div class="opt2-card-desc">Instant qi gain worth 30 seconds of your current qi/s.</div>
+              <div class="opt2-card-lore">"A breath drawn quick — and the world tilts toward you."</div>
+              <div class="opt2-card-actions">
+                <button class="opt2-btn opt2-btn-pick">Pick</button>
+                <button class="opt2-btn opt2-btn-reroll">↺ Free</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="spark-footer">
+          <div class="spark-footer-meta">
+            <span>✦ <strong>3%</strong> legendary chance per card</span>
+            <span style="opacity:0.4">·</span>
+            <span>Pity in <strong>12</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 3 — Vertical Stack -->
+  <section class="option-section" id="opt-3">
+    <h2 class="option-title">③ Vertical Stack — Editorial, full-width</h2>
+    <p class="option-desc">
+      Full-width cards stacked. Image gets generous room, lore reads
+      cleanly. <strong>Scroll the phone</strong> to see both cards if needed —
+      modal scrolls naturally on small screens.
+    </p>
+    <div class="device-frame">
+      <div class="device-label">iPhone 13 — 390 px</div>
+      <div class="spark-overlay">
+        <div class="spark-overlay-title">Qi Spark</div>
+        <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+        <div class="opt3-stack">
+          <div class="opt3-card opt3-card-legendary">
+            <div class="opt3-card-top">
+              <div class="opt3-card-img"><img src="/sprites/producers/p_phoenix_mythic.png" alt=""/></div>
+              <div class="opt3-card-info">
+                <div class="opt3-card-head">
+                  <span class="opt3-card-name">Phoenix Reborn</span>
+                  <span class="opt3-card-rarity-tag">LEG</span>
+                </div>
+                <div class="opt3-card-effect">Each major realm: Phoenix → 0, all other producers ×2 permanent.</div>
+              </div>
+            </div>
+            <div class="opt3-card-lore">"Fenghuang is reborn from its own ashes — to bless the sect of its hearth."</div>
+            <div class="opt3-card-actions">
+              <button class="opt3-btn opt3-btn-pick">Pick</button>
+              <button class="opt3-btn opt3-btn-reroll">↺ Free reroll</button>
+            </div>
+          </div>
+
+          <div class="opt3-card opt3-card-common">
+            <div class="opt3-card-top">
+              <div class="opt3-card-img"><span class="emoji">⚡</span></div>
+              <div class="opt3-card-info">
+                <div class="opt3-card-head">
+                  <span class="opt3-card-name">Quick Burst</span>
+                  <span class="opt3-card-rarity-tag">COM</span>
+                </div>
+                <div class="opt3-card-effect">Instant qi gain worth 30 seconds of your current qi/s.</div>
+              </div>
+            </div>
+            <div class="opt3-card-lore">"A breath drawn quick — and the world tilts toward you."</div>
+            <div class="opt3-card-actions">
+              <button class="opt3-btn opt3-btn-pick">Pick</button>
+              <button class="opt3-btn opt3-btn-reroll">↺ Free reroll</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="spark-footer">
+          <div class="spark-footer-meta">
+            <span>✦ <strong>3%</strong> legendary chance per card</span>
+            <span style="opacity:0.4">·</span>
+            <span>Pity in <strong>12</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 4 — Carousel -->
+  <section class="option-section" id="opt-4">
+    <h2 class="option-title">④ Single-Card Carousel — Draft-pick theatre</h2>
+    <p class="option-desc">
+      One card at a time, full-screen. <strong>Swipe horizontally</strong>
+      or <strong>tap the arrows / dots</strong> to switch. Maximum room
+      for hero image + text. Each card feels like a moment.
+    </p>
+    <div class="device-frame">
+      <div class="device-label">iPhone 13 — 390 px</div>
+      <div class="spark-overlay">
+        <div class="spark-overlay-title">Qi Spark</div>
+        <div class="spark-overlay-subtitle">A spark of dao reaches you. Choose one.</div>
+
+        <div class="opt4-carousel">
+          <div class="opt4-indicator">
+            <button class="opt4-arrow" onclick="opt4Move(-1)">◀</button>
+            <span id="opt4-page">Card 1 of 2</span>
+            <div class="opt4-dots">
+              <div class="opt4-dot active" data-idx="0" onclick="opt4GoTo(0)"></div>
+              <div class="opt4-dot"        data-idx="1" onclick="opt4GoTo(1)"></div>
+            </div>
+            <button class="opt4-arrow" onclick="opt4Move(1)">▶</button>
+          </div>
+          <div class="opt4-track" id="opt4-track">
+            <div class="opt4-card opt4-card-legendary">
+              <div class="opt4-card-hero">
+                <img src="/sprites/producers/p_phoenix_mythic.png" alt=""/>
+                <div class="opt4-card-rarity-banner">Legendary</div>
+              </div>
+              <div class="opt4-card-body">
+                <div class="opt4-card-name">Phoenix Reborn</div>
+                <div class="opt4-card-effect">Each major realm: Phoenix → 0, all other producers ×2 permanent.</div>
+                <div class="opt4-card-lore">"Fenghuang is reborn from its own ashes — to bless the sect of its hearth."</div>
+                <div class="opt4-card-actions">
+                  <button class="opt4-btn opt4-btn-pick">Pick This</button>
+                  <button class="opt4-btn opt4-btn-reroll">↺ Free</button>
+                </div>
+              </div>
+            </div>
+            <div class="opt4-card opt4-card-common">
+              <div class="opt4-card-hero">
+                <span class="emoji">⚡</span>
+                <div class="opt4-card-rarity-banner">Common</div>
+              </div>
+              <div class="opt4-card-body">
+                <div class="opt4-card-name">Quick Burst</div>
+                <div class="opt4-card-effect">Instant qi gain worth 30 seconds of your current qi/s.</div>
+                <div class="opt4-card-lore">"A breath drawn quick — and the world tilts toward you."</div>
+                <div class="opt4-card-actions">
+                  <button class="opt4-btn opt4-btn-pick">Pick This</button>
+                  <button class="opt4-btn opt4-btn-reroll">↺ Free</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="spark-footer">
+          <div class="spark-footer-meta">
+            <span>✦ <strong>3%</strong> legendary chance per card</span>
+            <span style="opacity:0.4">·</span>
+            <span>Pity in <strong>12</strong> realms</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Tab switching
+    document.getElementById('tabs').addEventListener('click', (e) => {
+      const t = e.target.closest('.tab');
+      if (!t) return;
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.option-section').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('opt-' + t.dataset.opt).classList.add('active');
+    });
+
+    // Option ② — toggle expand
+    function opt2Toggle(idx) {
+      const grid = document.getElementById('opt2-grid');
+      const cards = grid.querySelectorAll('.opt2-card');
+      const wasExpanded = cards[idx].classList.contains('expanded');
+      cards.forEach(c => c.classList.remove('expanded'));
+      grid.classList.remove('expanded-0', 'expanded-1');
+      if (!wasExpanded) {
+        cards[idx].classList.add('expanded');
+        grid.classList.add('expanded-' + idx);
+      }
+    }
+    // Start with first card expanded so the pattern is obvious
+    opt2Toggle(0);
+
+    // Option ④ — carousel
+    const opt4Track = document.getElementById('opt4-track');
+    const opt4Pg    = document.getElementById('opt4-page');
+    const opt4Dots  = document.querySelectorAll('.opt4-dot');
+    function opt4GoTo(idx) {
+      const cards = opt4Track.children;
+      cards[idx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+    function opt4Move(delta) {
+      const cur = opt4CurrentIdx();
+      const next = Math.max(0, Math.min(opt4Track.children.length - 1, cur + delta));
+      opt4GoTo(next);
+    }
+    function opt4CurrentIdx() {
+      // Find which card is closest to the scroll center
+      const trackRect = opt4Track.getBoundingClientRect();
+      const centerX = trackRect.left + trackRect.width / 2;
+      let bestIdx = 0, bestDist = Infinity;
+      Array.from(opt4Track.children).forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const dist = Math.abs(cx - centerX);
+        if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+      });
+      return bestIdx;
+    }
+    opt4Track.addEventListener('scroll', () => {
+      const cur = opt4CurrentIdx();
+      opt4Pg.textContent = `Card ${cur + 1} of 2`;
+      opt4Dots.forEach((d, i) => d.classList.toggle('active', i === cur));
+    });
+  </script>
+</body>
+</html>
