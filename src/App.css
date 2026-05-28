@@ -30,6 +30,7 @@ html, body, * {
    queue's currentEvent.kind matches one of the three blocking kinds. */
 body.event-cinematic .top-bar,
 body.event-cinematic .nav-bar,
+body.event-cinematic .navbar,
 body.event-cinematic .home-cultivation-zone .home-fighter-stage,
 body.event-cinematic .home-crystal-anchor,
 body.event-cinematic .home-pc-left,
@@ -25860,7 +25861,10 @@ img.pp-emblem-locked { font-size: 0; }
 .offline-stage {
   position: fixed;
   inset: 0;
-  z-index: 300;
+  /* Above ALL app chrome (top bar z-700, nav bar z-100) so the veil covers the
+     whole screen and intercepts every tap. Only Collect / Watch x2 stay
+     reachable. Matches the breakthrough/crystal cinematic overlay layer. */
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;

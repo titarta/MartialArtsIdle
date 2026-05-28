@@ -85,8 +85,13 @@ export function EventQueueProvider({ children }) {
   const head = queue[0] ?? null;
   const isBlocked = blockerCount > 0;
   const value = {
-    // Visible to renderers — null while blocked so consumers don't show the event.
-    currentEvent: isBlocked ? null : head,
+    // Visible to renderers. Normally null while a blocker is present so a
+    // queued event doesn't pop over a modal the player is actively using.
+    // EXCEPTION: a `pinned` event (offline earnings) must never be masked or
+    // unmounted out from under the player. Keeping it visible through blockers
+    // is what makes the offline modal uncloseable: its render gate, the
+    // event-cinematic chrome lock, and the navigate() lock all key off this.
+    currentEvent: (isBlocked && head?.priority !== 'pinned') ? null : head,
     isBlocked,
     queueLength: queue.length,
     enqueue,

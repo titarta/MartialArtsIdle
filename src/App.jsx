@@ -245,7 +245,8 @@ function AppInner() {
     const kind = currentEvent?.kind;
     const lock = kind === 'breakthrough'
               || kind === 'character-evolution'
-              || kind === 'crystal-evolution';
+              || kind === 'crystal-evolution'
+              || kind === 'offline-earnings';
     if (!lock) return undefined;
     document.body.classList.add('event-cinematic');
     return () => document.body.classList.remove('event-cinematic');
@@ -1576,6 +1577,11 @@ function AppInner() {
   // stale notification or external nav call can't strand the player on a
   // hidden surface.
   const navigate = (screen, param = null) => {
+    // Hard lock: while offline earnings are showing, that event is the pinned
+    // head of the queue and the player MUST collect (or watch x2) first. Refuse
+    // ALL navigation so no nav tab, top-bar action, deep link, or notification
+    // can strand them past the modal. Cleared the instant they collect.
+    if (currentEvent?.kind === 'offline-earnings') return;
     const target = isScreenAllowed(screen) ? screen : 'home';
     setCurrentScreen(target);
     setScreenParam(param);
