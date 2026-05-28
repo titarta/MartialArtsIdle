@@ -646,27 +646,25 @@ ELEMENTS = {
         "desc": (
             "Divine cultivation formation circle, xianxia VFX overlay, pixel art, top-down. "
             "256x256 RGBA. Radially symmetric. "
-            "TRANSPARENT FIELD: the vast majority of the canvas is fully transparent. "
-            "Only the glowing lines, runes, and symbols have any opacity. "
-            "No solid filled areas, no dark backgrounds, no opaque bands. "
-            "Center (r < 55 px) fully transparent. Exterior (r > 122 px) fully transparent. "
+            "TRANSPARENCY RULE: every pixel that is not part of a glowing line, rune, or symbol "
+            "must be alpha=0 (fully transparent). No dark fills, no background colour, no gutter "
+            "fill, no black or grey areas. Between the rings is empty space, not a filled band. "
+            "Center (r < 55 px) and exterior (r > 118 px) are completely empty. "
             ""
-            "Three concentric glowing ring lines: "
-            "r=58 px: thin 1-2 px pale gold-white (#fff8c8) circle, slightly broken into arcs. "
-            "r=88 px: main ring, 2 px bright divine gold (#ffd060) continuous circle. "
-            "  At 8 evenly spaced points (every 45 deg): a small ancient bagua trigram symbol, "
-            "  each about 10 px tall, floating just outside the ring in divine gold (#ffd060). "
-            "  Between each pair of trigrams: a faint radial spoke line (1 px, 50% alpha) "
-            "  connecting the inner circle to the outer circle. "
-            "r=112 px: 2 px amber-gold (#e09020) outer ring. "
-            "  At N/S/E/W: a small ornate diamond lozenge accent (~8 px) in bright gold-white. "
-            "  Outermost 2 px: very faint amber glow at 25% alpha only. "
+            "Three concentric glowing ring lines on transparent background: "
+            "r=60 px: thin 1-2 px pale gold-white circle, slightly broken into short arcs. "
+            "r=88 px: main ring, 2-3 px bright divine gold (#ffd060) continuous circle with "
+            "soft 1 px semi-transparent glow fringe on both sides. "
+            "  At 8 evenly spaced positions (every 45 deg): a small bagua trigram glyph, "
+            "  10-12 px tall, in bright gold, floating above the ring line. "
+            "  Between trigrams: thin radial spoke lines (1 px, semi-transparent gold). "
+            "r=110 px: 2 px amber-gold outer ring. At N/S/E/W: small diamond accent. "
             ""
-            "All ring lines and symbols glow softly: 1-2 px semi-transparent halo around them "
-            "(40-60% alpha) in pale gold-white, as if light is bleeding from the lines. "
-            "Palette: divine gold (#ffd060), pale gold-white (#fff8c8), amber (#e09020), "
-            "faint amber glow (alpha 25-40% max). Nothing fully opaque except the line cores. "
-            "No figure, no solid fill, no carved stone, no dark borders, no text labels. "
+            "All lines have smooth anti-aliased soft pixel edges with 1-3 px alpha falloff "
+            "so they read as luminous glowing light, not hard pixel blocks. "
+            "Palette: divine gold (#ffd060), pale gold-white (#fff8e0), amber (#e09020). "
+            "Semi-transparent glow pixels (alpha 30-120) allowed only around line edges. "
+            "No filled bands, no dark pixels, no background of any kind. "
             f"{S}"
         ),
     },
@@ -901,10 +899,12 @@ def _style_ref_for(element_id):
     if element_id == "karma":
         p = OUT_DIR / "qi.png"
         return p if p.exists() else None
-    # Halo is a VFX overlay — no style reference; carved-stone upgrade icons
-    # would pull the generation toward opaque heavy borders, opposite of intent.
+    # Halo: use the previously finalised halo as a style reference so the model
+    # sees the desired ring structure and gold palette without pulling toward
+    # the carved-stone upgrade-icon aesthetic.
     if element_id == "cultivator_halo":
-        return None
+        p = OUT_DIR / "cultivator_halo.png"
+        return p if p.exists() else None
     return None
 
 
