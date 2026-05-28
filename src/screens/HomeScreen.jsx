@@ -1754,6 +1754,34 @@ function usePatternClick({ activeSparks, rateRef, qiRef }) {
     releaseAttention();
   }, [releaseAttention]);
 
+  /**
+   * Debug entry point. `gd.openMeridians(tier=5)` dispatches this event with
+   * the requested tier's spark config baked into `detail`, so we can open the
+   * minigame directly without waiting on the 15s spawn timer or even having
+   * the spark active in the player's actual run. No coordinator claim (we
+   * intentionally bypass the divine-qi exclusion so the debugger can layer
+   * mechanics if they want). The handler is module-private; nothing in prod
+   * triggers this event.
+   */
+  useEffect(() => {
+    const handler = (e) => {
+      const d = e?.detail;
+      if (!d || !d.dotCount) return;
+      setActivePrompt(null);
+      setActivePattern({
+        id:                Date.now(),
+        dots:              generateDotPositions(d.dotCount),
+        windowMs:          d.windowMs        ?? 15_000,
+        burstSeconds:      d.burstSeconds    ?? 30,
+        doubleOnFullClear: d.doubleOnFullClear ?? false,
+        rateMult:          d.rateMult        ?? 2.0,
+        rateBuffMs:        d.rateBuffMs      ?? 15_000,
+      });
+    };
+    window.addEventListener('mai:debug-open-meridian', handler);
+    return () => window.removeEventListener('mai:debug-open-meridian', handler);
+  }, []);
+
   const completePattern = useCallback((wasFullClear) => {
     const cfg = configRef.current;
     if (wasFullClear && cfg) {

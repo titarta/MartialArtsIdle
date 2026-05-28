@@ -500,6 +500,38 @@ export function initDebug(hooksRef) {
     },
 
     /**
+     * Open the Tracing Meridians minigame overlay RIGHT NOW with the given
+     * tier's config (default T5 = 7 dots / 18s window / 90s qi + ×1.5 buff).
+     * Bypasses the 15s spawn timer and the spark-attention coordinator -
+     * the player doesn't even need the pattern_click spark active. Pure
+     * debug/preview path; production code never dispatches this event.
+     *
+     * Examples:
+     *   gd.openMeridians()      → T5 (7 dots)
+     *   gd.openMeridians(1)     → T1 (3 dots, 10s)
+     *   gd.openMeridians(3)     → T3 (5 dots, 14s)
+     */
+    openMeridians(tier = 5) {
+      const id  = `pattern_click_t${tier}`;
+      const cfg = QI_SPARK_BY_ID[id];
+      if (!cfg) {
+        console.warn(`[debug] No pattern_click T${tier} (valid: 1-5)`);
+        return;
+      }
+      window.dispatchEvent(new CustomEvent('mai:debug-open-meridian', {
+        detail: {
+          dotCount:          cfg.dotCount,
+          windowMs:          cfg.windowMs,
+          burstSeconds:      cfg.burstSeconds,
+          doubleOnFullClear: cfg.doubleOnFullClear ?? false,
+          rateMult:          cfg.rateMult,
+          rateBuffMs:        cfg.rateBuffMs,
+        },
+      }));
+      console.log(`[debug] Opened Tracing Meridians T${tier} - ${cfg.dotCount} dots / ${cfg.windowMs}ms window / ${cfg.burstSeconds}s burst.`);
+    },
+
+    /**
      * Force the next breakthrough's card-pick offer to roll right now.
      * Useful for testing offer-modal flow without waiting on cultivation.
      */
@@ -828,6 +860,7 @@ export function initDebug(hooksRef) {
       console.log('    ids: consecutive_focus | crystal_click | divine_qi | pattern_click');
       console.log('  gd.rollQiSparkOffer()                   — trigger next offer immediately');
       console.log('  gd.clearQiSparks()                      — wipe all active sparks');
+      console.log('  gd.openMeridians(tier=5)                — open Tracing Meridians overlay NOW (no wait, no spark needed)');
       console.log('  gd.bypassConsecutiveFocus(on=true)      — ignore hold-duration threshold');
       console.log('%cTheme', 'font-weight: bold');
       console.log('  gd.themeShift(hue=0, sat=1, light=0) — full UI recolor preview');
