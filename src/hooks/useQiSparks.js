@@ -265,7 +265,16 @@ export default function useQiSparks({ cultivation, isFeatureUnlocked, producerUn
 
   // Persist
   useEffect(() => { saveJSON(ACTIVE_KEY,  activeSparks); }, [activeSparks]);
-  useEffect(() => { saveJSON(PENDING_KEY, pendingOffers); }, [pendingOffers]);
+  useEffect(() => {
+    // Persist the queue, but REMOVE the key when empty rather than writing
+    // `[]`. An empty array is a truthy "poison" value: any consumer that
+    // reads the raw key and assumes "present means a real offer object" (as
+    // the pre-queue loader did) crashes on `offer.cards`. Absence is the
+    // natural "no pending offers" state: loadJSON falls back to `null`,
+    // yielding an empty queue.
+    if (pendingOffers.length > 0) saveJSON(PENDING_KEY, pendingOffers);
+    else { try { localStorage.removeItem(PENDING_KEY); } catch {} }
+  }, [pendingOffers]);
   useEffect(() => { saveJSON(PITY_KEY,    pityCounter);  }, [pityCounter]);
   // Ref mirror for pity — setState updaters need fresh value (the breakthrough
   // effect calls drawOffer() with forceLegendary based on the current pity).

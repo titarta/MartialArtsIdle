@@ -191,7 +191,11 @@ function QiSparkChoiceModal({
   const handleReroll = () => { rerollFn?.(); };
   const handleClose  = () => { dismissFn?.(); };
 
-  if (!offer) return null;
+  // Strict guard: an empty array (or any offer lacking a non-empty `cards`
+  // array) is truthy and would slip past `!offer`, then crash at
+  // `offer.cards.map(...)` below, taking down the whole app via the
+  // top-level ErrorBoundary. Bail out unless we have real cards to render.
+  if (!offer || !Array.isArray(offer.cards) || offer.cards.length === 0) return null;
 
   // Reroll cost: tier-locked redesign uses one offer-level cost. The
   // legacy per-card signature is accepted and resolved against index 0.
