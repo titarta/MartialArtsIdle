@@ -20691,24 +20691,6 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* Heavenly aura — 120% size so the flames extend past the cultivator's
    silhouette, anchored to center. Pulses opacity gently for an alive feel
    on top of the 4-frame loop. */
-/* TEMP: cultivator halo test — remove once placement confirmed */
-.home-cultivator-halo-temp {
-  position: absolute;
-  left: 50%;
-  top:  50%;
-  width:  180%;
-  height: 180%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  pointer-events: none;
-  animation: home-halo-spin 12s linear infinite;
-  image-rendering: auto;
-}
-@keyframes home-halo-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
 .home-cultivator-aura {
   position: absolute !important;
   left: 50%;
