@@ -3050,6 +3050,16 @@ function HomeScreen({
                   style={{ width: '120%', height: '120%' }}
                 />
               )}
+              {/* TEMP: cultivator halo — placed here to test size/position/layer.
+                  Remove once final placement is confirmed. */}
+              <img
+                src={`${BASE}ui/cultivator_halo.png`}
+                alt=""
+                aria-hidden="true"
+                className="home-cultivator-halo-temp"
+                draggable="false"
+              />
+
               {/* Cultivator — static 256×256 PNG. CSS breathing pulse adds
                   life without API-side animation. We render BOTH poses
                   (normal + focused) stacked and toggle visibility via

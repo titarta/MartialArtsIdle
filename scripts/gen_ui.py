@@ -630,6 +630,40 @@ ELEMENTS = {
         ),
     },
 
+    # ── Cultivator halo — rotates behind the character sprite ────────────────
+    # 256×256 RGBA. Only the ring band (r≈70..128 px from centre) is opaque;
+    # centre and exterior are transparent so it composites cleanly behind any
+    # cultivator tier. Must be radially symmetric so CSS rotation is seamless.
+    "cultivator_halo": {
+        "size": (256, 256),
+        "desc": (
+            "Divine cultivation formation circle, xianxia VFX overlay, pixel art, top-down. "
+            "256x256 RGBA. Radially symmetric. "
+            "TRANSPARENT FIELD: the vast majority of the canvas is fully transparent. "
+            "Only the glowing lines, runes, and symbols have any opacity. "
+            "No solid filled areas, no dark backgrounds, no opaque bands. "
+            "Center (r < 55 px) fully transparent. Exterior (r > 122 px) fully transparent. "
+            ""
+            "Three concentric glowing ring lines: "
+            "r=58 px: thin 1-2 px pale gold-white (#fff8c8) circle, slightly broken into arcs. "
+            "r=88 px: main ring, 2 px bright divine gold (#ffd060) continuous circle. "
+            "  At 8 evenly spaced points (every 45 deg): a small ancient bagua trigram symbol, "
+            "  each about 10 px tall, floating just outside the ring in divine gold (#ffd060). "
+            "  Between each pair of trigrams: a faint radial spoke line (1 px, 50% alpha) "
+            "  connecting the inner circle to the outer circle. "
+            "r=112 px: 2 px amber-gold (#e09020) outer ring. "
+            "  At N/S/E/W: a small ornate diamond lozenge accent (~8 px) in bright gold-white. "
+            "  Outermost 2 px: very faint amber glow at 25% alpha only. "
+            ""
+            "All ring lines and symbols glow softly: 1-2 px semi-transparent halo around them "
+            "(40-60% alpha) in pale gold-white, as if light is bleeding from the lines. "
+            "Palette: divine gold (#ffd060), pale gold-white (#fff8c8), amber (#e09020), "
+            "faint amber glow (alpha 25-40% max). Nothing fully opaque except the line cores. "
+            "No figure, no solid fill, no carved stone, no dark borders, no text labels. "
+            f"{S}"
+        ),
+    },
+
     # ── Cultivation QI bar — red lacquer & gold, matching cultivation bg ──────
     "qi_bar_red": {
         "size": (320, 60),
@@ -860,6 +894,10 @@ def _style_ref_for(element_id):
     if element_id == "karma":
         p = OUT_DIR / "qi.png"
         return p if p.exists() else None
+    # Halo is a VFX overlay — no style reference; carved-stone upgrade icons
+    # would pull the generation toward opaque heavy borders, opposite of intent.
+    if element_id == "cultivator_halo":
+        return None
     return None
 
 
