@@ -1296,33 +1296,119 @@ function HomePCLeftPanel({ realmName, realmStage, qiRef, progressRef, costRef, r
   );
 }
 
-// ── Pattern Clicking — numbered dot mechanic ─────────────────────────────────
+// ── Tracing Meridians — acupressure-node mechanic ────────────────────────────
 
-/** Generate `count` dot positions with minimum separation (in % units).
- *  Coordinates are viewport-relative (the overlay is position:fixed inset:0).
- *  Safe zone avoids the top bar (~12%) and bottom nav (~18%) on typical phones. */
+/**
+ * Chinese numerals 1-7 displayed on acupressure nodes (Ma Shan Zheng brush).
+ * Pattern click currently caps at 7 dots (T5). Index 0 = "一" = num 1.
+ */
+const MERIDIAN_NUMERALS = ['一', '二', '三', '四', '五', '六', '七'];
+
+/**
+ * Overlay-relative safe-zone bands for dot placement. Two vertical channels
+ * flanking the cultivator silhouette — same logical zones as SPARK_SAFE_ZONES
+ * (used by the prompt spawn) but expressed in OVERLAY coords (the overlay is
+ * `position: fixed; top: var(--top-bar-h); bottom: var(--nav-h)` so its box
+ * already excludes the chrome). Avoids:
+ *  - top ~16% (title strip + incense timer)
+ *  - centre-x 26-74% (crystal stack, cultivator, REFINE, BT button)
+ *  - top-left 0-25% × 0-30% (active-buffs / selection chips)
+ *  - top-right 75-100% × 0-32% (Petition Tablet)
+ *  - bottom 82-100% (bottom plate)
+ *
+ * The dot generator alternates between LEFT and RIGHT zones per step so the
+ * traced path reads as a zig-zag channel up/down the meridians — perfect
+ * thematic fit for the mechanic name.
+ */
+const OVERLAY_DOT_ZONES = [
+  { id: 'L', x:  4, y: 18, w: 22, h: 60 },
+  { id: 'R', x: 74, y: 18, w: 22, h: 60 },
+];
+
+/**
+ * Generate `count` acupressure node positions inside the overlay's safe
+ * channels. Alternates L/R for zigzag flow. Within a channel, candidates
+ * are accepted if they stay outside `MIN_DIST_Y` of other same-channel
+ * dots — scaled by how many dots have to fit in that channel. If random
+ * placement keeps colliding (rare; the 80-try budget is generous), falls
+ * back to even vertical spacing so we ALWAYS return `count` placed dots.
+ */
 function generateDotPositions(count) {
-  const MIN_DIST = 20; // % units minimum separation
+  const sameChannelMax = Math.ceil(count / 2);
+  // Available y-range inside a zone is `h - 8` (a small safety margin).
+  // Divide by how many dots have to share the channel for the min spacing.
+  // Floor at 7% so even count=7 keeps a readable gap.
+  const MIN_DIST_Y = Math.max(7, (OVERLAY_DOT_ZONES[0].h - 8) / Math.max(1, sameChannelMax));
   const positions = [];
-  let attempts = 0;
-  while (positions.length < count && attempts < 400) {
-    attempts++;
-    const x = 8  + Math.random() * 80; // 8%..88% — avoids side edges
-    const y = 14 + Math.random() * 65; // 14%..79% — below top bar, above bottom nav
-    const ok = positions.every(p => Math.hypot(p.x - x, p.y - y) >= MIN_DIST);
-    if (ok) positions.push({ num: positions.length + 1, x, y });
-  }
-  // Fallback for extreme collision runs (shouldn't happen with reasonable counts)
-  while (positions.length < count) {
-    const i = positions.length;
-    positions.push({ num: i + 1, x: 15 + (i * 12) % 65, y: 20 + (i * 15) % 55 });
+  for (let i = 0; i < count; i++) {
+    const zone = OVERLAY_DOT_ZONES[i % 2];
+    let attempts = 0;
+    let placed = null;
+    while (attempts < 80 && !placed) {
+      attempts++;
+      const x = zone.x + Math.random() * zone.w;
+      const y = zone.y + Math.random() * zone.h;
+      const ok = positions.every((p, j) => {
+        if ((j % 2) !== (i % 2)) return true; // different channel — fine
+        return Math.abs(p.y - y) >= MIN_DIST_Y;
+      });
+      if (ok) placed = { num: i + 1, x, y };
+    }
+    if (!placed) {
+      // Deterministic fallback — even vertical spacing with slight x jitter.
+      const myChannelIdx = Math.floor(i / 2);
+      const step = zone.h / Math.max(1, sameChannelMax);
+      placed = {
+        num: i + 1,
+        x: zone.x + zone.w * (0.30 + (myChannelIdx % 3) * 0.20),
+        y: zone.y + step * (myChannelIdx + 0.5),
+      };
+    }
+    positions.push(placed);
   }
   return positions;
 }
 
-/** Single numbered dot button — phases: current (pulsing) | waiting (dim) | tapped (burst-vanish). */
+/**
+ * Build a gentle quadratic-Bezier path between two dots so connections curve
+ * inward toward the cultivator (centre of the overlay) rather than chopping
+ * across the scene in straight lines. Output coords are in 0-100 viewBox
+ * space (the SVG uses `viewBox="0 0 100 100" preserveAspectRatio="none"` so
+ * the path scales 1:1 with overlay percentages, matching the dot positions).
+ */
+function meridianPath(x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const len = Math.hypot(dx, dy) || 1;
+  // Perpendicular normal — pick the side that bows toward 50,50 (centre).
+  const nx = -dy / len;
+  const ny =  dx / len;
+  const sign = ((50 - mx) * nx + (50 - my) * ny) > 0 ? 1 : -1;
+  const offset = len * 0.18;
+  const cx = mx + nx * offset * sign;
+  const cy = my + ny * offset * sign;
+  return `M ${x1.toFixed(2)},${y1.toFixed(2)} Q ${cx.toFixed(2)},${cy.toFixed(2)} ${x2.toFixed(2)},${y2.toFixed(2)}`;
+}
+
+/**
+ * Acupressure node medallion. Phases:
+ *  - waiting: dim jade rim, dim numeral
+ *  - current: spinning brass rim + vermillion inner pulse + bright numeral
+ *  - tapped:  bursts into a 印 seal-stamp glyph in vermillion then fades
+ *
+ * Internally still keyed by numeric `dot.num` (1..count) for tap-order
+ * validation + audio pitch ramp + VFX floater queries. The glyph is purely
+ * a render-layer decoration — `data-num` stays numeric.
+ */
 function PatternDot({ dot, isCurrent, isTapped, onClick }) {
   const phase = isTapped ? 'tapped' : isCurrent ? 'current' : 'waiting';
+  // Tapped → 印 seal. Waiting/current → Chinese numeral. Fallback to "?" if
+  // someone bumps dot counts above the numeral pool without expanding it.
+  const glyph = isTapped
+    ? '印'
+    : (MERIDIAN_NUMERALS[dot.num - 1] ?? '?');
   return (
     <button
       className={`pc-dot pc-dot-${phase}`}
@@ -1330,9 +1416,9 @@ function PatternDot({ dot, isCurrent, isTapped, onClick }) {
       onClick={onClick}
       data-num={dot.num}
       data-sfx="none"
-      aria-label={`Pattern dot ${dot.num}`}
+      aria-label={`Acupressure node ${dot.num}`}
     >
-      {dot.num}
+      <span className="pc-dot-glyph" aria-hidden="true">{glyph}</span>
     </button>
   );
 }
@@ -1418,27 +1504,44 @@ function PatternClickOverlay({ pattern, onComplete, rateRef, spawnVFX }) {
   return (
     <div className={`pc-overlay pc-overlay-${phase}`} aria-label="Tracing Meridians challenge">
 
-      {/* osu-style connecting lines — SVG spanning full overlay */}
-      <svg className="pc-connections" aria-hidden="true">
+      {/* Atmospheric title strip — brush 气脉 + Cinzel subtitle anchored at
+          the very top of the overlay so the mechanic identifies itself. */}
+      <div className="pc-title-strip" aria-hidden="true">
+        <div className="pc-title-cn">气脉</div>
+        <div className="pc-title-en">Trace the Meridians</div>
+      </div>
+
+      {/* Incense timer — slim dark column with a glowing brass-hot tip that
+          recedes. `pc-timer-bar` keeps the rAF-driven scaleX shrink + the
+          `pc-timer-urgent` class toggle (CSS swaps the gradient to vermillion
+          under 25%). The end-cap is a small brass tick at the right edge so
+          the player has an anchor for "how much is left to burn". */}
+      <div className="pc-timer-track">
+        <div ref={timerBarRef} className="pc-timer-bar" />
+        <div className="pc-timer-endcap" aria-hidden="true" />
+      </div>
+
+      {/* Ink-meridian connections — viewBox + non-uniform aspect ratio so
+          path coords in 0-100 space map 1:1 to overlay percentages (matching
+          the dot positions). `vector-effect: non-scaling-stroke` keeps the
+          stroke width constant despite the non-uniform aspect projection. */}
+      <svg className="pc-connections" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         {pattern.dots.map((dot, i) => {
-          if (i === pattern.dots.length - 1) return null; // last dot has no outgoing line
+          if (i === pattern.dots.length - 1) return null; // last dot has no outgoing path
           const next = pattern.dots[i + 1];
-          if (tapped.has(dot.num)) return null;           // already tapped — line consumed
-          const isActive = dot.num === nextNum;            // current → next: brighter line
+          if (tapped.has(dot.num)) return null;           // already tapped → path consumed
+          const isActive = dot.num === nextNum;
           return (
-            <line
+            <path
               key={`${dot.num}-${next.num}`}
-              x1={`${dot.x}%`} y1={`${dot.y}%`}
-              x2={`${next.x}%`} y2={`${next.y}%`}
+              d={meridianPath(dot.x, dot.y, next.x, next.y)}
               className={`pc-connection${isActive ? ' pc-connection-active' : ''}`}
+              vectorEffect="non-scaling-stroke"
             />
           );
         })}
       </svg>
 
-      <div className="pc-timer-track">
-        <div ref={timerBarRef} className="pc-timer-bar" />
-      </div>
       {pattern.dots.map(dot => (
         <PatternDot
           key={dot.num}
@@ -1763,13 +1866,22 @@ function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
     // splash (10 orbs) since divine qi is a rarer, more rewarding moment.
     // Explicit gold pc/sc — divine bursts ignore the active crystal tier
     // so they always feel "divine" regardless of progression.
+    //
+    // NOTE: orb.x/y are percentages intended for the orb button's own CSS
+    // (position:relative + left/top offset). The burst divs use
+    // position:absolute inside the zone, so we must read the orb's ACTUAL
+    // rendered center via getBoundingClientRect and convert to zone-local px.
     try {
-      const zone = document.querySelector('.home-cultivation-zone');
-      if (zone) {
+      const zone   = document.querySelector('.home-cultivation-zone');
+      const orbEl  = e.currentTarget;
+      if (zone && orbEl) {
+        const zr   = zone.getBoundingClientRect();
+        const or_  = orbEl.getBoundingClientRect();
+        const px   = or_.left + or_.width  / 2 - zr.left;
+        const py   = or_.top  + or_.height / 2 - zr.top;
         spawnClickBurst({
           parent: zone,
-          x: orb.x, y: orb.y,
-          xUnit: '%', yUnit: '%',
+          x: px, y: py,
           count: 10,
           pc: '#ffbb22',
           sc: '#fffacc',
