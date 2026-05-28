@@ -91,17 +91,21 @@ function slotLabel(slot) {
 /**
  * ParticleShowcase — preview for the PARTICLES cosmetic slot.
  * Shows 5 animated orbs using the 3-layer mask pipeline with the actual
- * qi_orb_c9_N variant for that item. Colors cascade from the active crystal
- * tier on body so the preview always shows the player's live tint.
+ * qi_orb_c9_N variant for that item. Each orb gets an explicit tier color
+ * sampled across the full spectrum (blue → cyan → violet+gold → purple+gold
+ * → orange-gold) so the card always shows the shape across multiple tints,
+ * regardless of which crystal tier the player is currently at.
  */
 function ParticleShowcase({ variant = '1' }) {
   const maskBase = `${BASE}sprites/vfx/qi_particles/qi_orb_c9_${variant}`;
+  // Five representative tier tints: T2 blue, T3 cyan, T6 violet+gold,
+  // T9 purple+gold, T10 orange-gold.
   const orbs = [
-    { x: 12, delay: 0.0 },
-    { x: 30, delay: 1.4 },
-    { x: 50, delay: 0.7 },
-    { x: 70, delay: 2.1 },
-    { x: 88, delay: 0.4 },
+    { x: 12, delay: 0.0, pc: '#3377aa', sc: '#88bbdd' },
+    { x: 30, delay: 1.4, pc: '#00aaaa', sc: '#aaffee' },
+    { x: 50, delay: 0.7, pc: '#4e17bb', sc: '#e8d870' },
+    { x: 70, delay: 2.1, pc: '#9c4492', sc: '#f6dd84' },
+    { x: 88, delay: 0.4, pc: '#ff9900', sc: '#ffe566' },
   ];
   return (
     <div className="bls-skin-proc bls-skin-proc-particles" aria-hidden="true">
@@ -110,10 +114,12 @@ function ParticleShowcase({ variant = '1' }) {
           key={i}
           className="bls-particle-orb"
           style={{
-            left:                    `${o.x}%`,
-            width:                   '44px',
-            height:                  '44px',
-            animationDelay:          `${o.delay}s`,
+            left:               `${o.x}%`,
+            width:              '44px',
+            height:             '44px',
+            animationDelay:     `${o.delay}s`,
+            '--pc':             o.pc,
+            '--sc':             o.sc,
             '--mask-primary':   `url(${maskBase}_mask_primary.png)`,
             '--mask-secondary': `url(${maskBase}_mask_secondary.png)`,
             '--mask-shine':     `url(${maskBase}_mask_shine.png)`,
