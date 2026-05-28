@@ -930,10 +930,14 @@ function spawnQiFlowOrb(layer, eff, animationOffsetMs = 0) {
   wrap.style.setProperty('--qf-dy',          `${dy}px`);
   wrap.style.setProperty('--qf-life',        `${life}ms`);
   // Per-orb size variation so the inflow reads as a mix of small glints
-  // and larger orbs rather than uniform pops.
-  const sizeVar = 0.65 + Math.random() * 0.35;
-  wrap.style.setProperty('--qf-scale-start', (0.28 * sizeVar).toFixed(2));
-  wrap.style.setProperty('--qf-scale-end',   (0.55 * sizeVar).toFixed(2));
+  // and larger orbs rather than uniform pops. Wider range (0.55-1.40 vs
+  // the old 0.65-1.0) + bumped end scale (0.62 vs 0.55) so the biggest
+  // orbs read clearly larger while small glints stay delicate. Max
+  // rendered scale 0.62*1.40 = 0.87 stays under 1.0 so the orb never
+  // clips the 44px wrapper canvas.
+  const sizeVar = 0.55 + Math.random() * 0.85;
+  wrap.style.setProperty('--qf-scale-start', (0.30 * sizeVar).toFixed(2));
+  wrap.style.setProperty('--qf-scale-end',   (0.62 * sizeVar).toFixed(2));
   if (animationOffsetMs > 0) {
     const offset = Math.min(animationOffsetMs, Math.max(0, life - 50));
     wrap.style.animationDelay = `-${offset}ms`;
@@ -982,14 +986,17 @@ function spawnClickBurst({ parent, x, y, xUnit = 'px', yUnit = 'px', count = 4, 
     const bx = (Math.random() - 0.5) * 70;        // -35 → +35 px horizontal final
     const byPeak = -22 - Math.random() * 22;      // -22 → -44 px peak height
     const byLand = 28 + Math.random() * 24;       // +28 → +52 px landing depth
-    const sizeVar = 0.8 + Math.random() * 0.35;
+    // Wider size spread (0.70-1.55 vs old 0.8-1.15) + bumped peak scale
+    // (0.56 vs 0.50) so a tap throws a mix of small sparks and a few big
+    // orbs. Max peak scale 0.56*1.55 = 0.87 stays under the 44px canvas.
+    const sizeVar = 0.70 + Math.random() * 0.85;
     wrap.style.setProperty('--bx-mid',  `${(bx * 0.5).toFixed(1)}px`);
     wrap.style.setProperty('--bx-end',  `${bx.toFixed(1)}px`);
     wrap.style.setProperty('--by-peak', `${byPeak.toFixed(1)}px`);
     wrap.style.setProperty('--by-land', `${byLand.toFixed(1)}px`);
-    wrap.style.setProperty('--bscale-0', (0.27 * sizeVar).toFixed(2));
-    wrap.style.setProperty('--bscale-1', (0.50 * sizeVar).toFixed(2));
-    wrap.style.setProperty('--bscale-2', (0.39 * sizeVar).toFixed(2));
+    wrap.style.setProperty('--bscale-0', (0.29 * sizeVar).toFixed(2));
+    wrap.style.setProperty('--bscale-1', (0.56 * sizeVar).toFixed(2));
+    wrap.style.setProperty('--bscale-2', (0.43 * sizeVar).toFixed(2));
     const lp = document.createElement('div'); lp.className = 'layer-p';
     const ls = document.createElement('div'); ls.className = 'layer-s';
     const lg = document.createElement('div'); lg.className = 'layer-g';
