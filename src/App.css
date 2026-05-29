@@ -16972,14 +16972,12 @@ body.sheet-open {
   line-height: 1;
   padding: 4px 6px;
   color: rgba(var(--ui-purple-strong-rgb), 0.85);
-  transition: color 0.15s, transform 0.15s;
+  transition: color 0.15s;
   -webkit-tap-highlight-color: transparent;
-  filter: drop-shadow(0 0 4px rgba(var(--ui-purple-strong-rgb), 0.4));
 }
-.home-hud-reinc:hover {
-  color: rgba(200, 130, 255, 1);
-  transform: scale(1.15) rotate(-20deg);
-}
+/* No rotate/scale/glow on hover — reinc reads as a plain icon button matching
+   the unified Codex/Settings ring. Hover styling comes from the shared
+   ".home-hud-reinc, .home-hud-progress, .home-hud-settings:hover" rules. */
 
 /* ── Reincarnation screen ─────────────────────────────────────────────────── */
 .reinc-screen {
@@ -26290,6 +26288,16 @@ img.pp-emblem-locked { font-size: 0; }
 .home-hud-progress:active,
 .home-hud-settings:active {
   transform: translateY(1px);
+}
+
+/* Pixel-art icon sitting inside a TopBar action ring (Reinc / Codex /
+   Settings) — sized to sit comfortably within the ~30px ring, same role the
+   emoji glyph used to play. */
+.topbar-nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 /* Currency inscription: the row IS the container. Drop any old pill

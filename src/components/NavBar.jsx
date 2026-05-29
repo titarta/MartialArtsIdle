@@ -5,13 +5,13 @@ const BASE = import.meta.env.BASE_URL;
 
 const SCREENS = [
   { id: 'home',         tKey: 'nav.home'                              },
-  // The qi-investment shop (Cookie-Clicker-style producers + upgrades).
-  // Reuses training.png as a placeholder sprite until a dedicated icon ships.
-  { id: 'cultivation',  tKey: 'nav.cultivation', sprite: 'training'  },
+  // The qi-investment shop (Cookie-Clicker-style producers + upgrades),
+  // labelled "Sect" in the nav — the producers are the sect's pavilions.
+  // The route id stays 'cultivation' so navigation/routing is unchanged.
+  { id: 'cultivation',  tKey: 'nav.cultivation', sprite: 'sect'      },
   // Journey — chronicle screen promoted out of the ProgressHubModal during
   // the nav-audit (verdict: place-you-live-in, not a check-on surface).
-  // Emoji glyph until a dedicated 📜 pixel-art nav icon ships.
-  { id: 'journey',      tKey: 'nav.journey',     emoji: '📜'         },
+  { id: 'journey',      tKey: 'nav.journey'                          },
   { id: 'worlds',       tKey: 'nav.worlds'                            },
   { id: 'character',    tKey: 'nav.character'                         },
   // Collection was a 4th tab in the original layout (locked, 封 wax-seal).

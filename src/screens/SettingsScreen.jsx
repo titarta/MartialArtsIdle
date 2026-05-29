@@ -141,7 +141,7 @@ const PERK_ROWS = [
     kind:  'permanent',
     icon:  '🤖',
     name:  "Disciple's Diligence",
-    effect:'Auto-Buy toggle on the Cultivation screen.',
+    effect:'Auto-Buy toggle on the Sect screen.',
   },
   {
     id:    'qol_offline_cap_2h',

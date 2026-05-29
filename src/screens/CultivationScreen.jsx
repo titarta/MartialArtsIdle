@@ -277,7 +277,7 @@ export default function CultivationScreen({
       {/* Sub-tab rail — shared .tab-rail primitive (same one the
           Spirit Bazaar uses). Non-sticky here because each sub-tab
           is its own scroll container, not a single long aisle. */}
-      <nav className="tab-rail" ref={railRef} aria-label="Cultivation sections">
+      <nav className="tab-rail" ref={railRef} aria-label="Sect sections">
         <button
           type="button"
           data-tab="producers"

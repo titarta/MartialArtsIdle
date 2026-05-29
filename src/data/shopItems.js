@@ -120,7 +120,7 @@ export const SHOP_ITEMS = [
     id: 'qol_autobuy_cheapest',
     category: 'qol',
     name: 'Disciple\'s Diligence',
-    desc: 'Unlocks an Auto-Buy toggle on the Cultivation screen. While enabled, qi auto-spends on the cheapest available producer.',
+    desc: 'Unlocks an Auto-Buy toggle on the Sect screen. While enabled, qi auto-spends on the cheapest available producer.',
     icon: '🤖',
     cost: 250,
     ownership: 'permanent',

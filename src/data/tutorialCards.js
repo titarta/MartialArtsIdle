@@ -88,7 +88,7 @@ const CARDS = {
   [TUTORIAL_IDS.PRODUCERS_HINT]: {
     kicker:  'A whisper from the path',
     title:   'You do not climb alone',
-    body:    'Your breath alone fills the meridians slowly. Other hands can draw the heavens down with you. Visit the Cultivation hall to gather disciples, raise gardens, and shape the sources that gather qi while you sit still.',
+    body:    'Your breath alone fills the meridians slowly. Other hands can draw the heavens down with you. Visit the Sect hall to gather disciples, raise gardens, and shape the sources that gather qi while you sit still.',
     glyph:   '宗',
     ctaText: 'Show me',
   },

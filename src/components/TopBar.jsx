@@ -100,11 +100,16 @@ export default function TopBar({
       <div className="home-hud-spacer" />
       {reincarnationUnlocked && (
         <button
-          className="home-hud-reinc"
+          className={`home-hud-reinc${currentScreen === 'reincarnation' ? ' top-bar-btn--active' : ''}`}
           onClick={onOpenReincarnation}
           aria-label="Reincarnation"
         >
-          ☸
+          <img
+            src={`${BASE}sprites/nav/eternal_tree.png`}
+            className="topbar-nav-icon"
+            alt=""
+            draggable="false"
+          />
         </button>
       )}
       {/* Codex. Single entry point that opens a tabbed modal (Wardrobe
@@ -116,7 +121,12 @@ export default function TopBar({
         onClick={onOpenProgress}
         aria-label="Codex"
       >
-        📊
+        <img
+          src={`${BASE}sprites/nav/codex.png`}
+          className="topbar-nav-icon"
+          alt=""
+          draggable="false"
+        />
         {hasNewAchievement && <span className="home-hud-trophy-badge" />}
       </button>
       <button
@@ -124,7 +134,12 @@ export default function TopBar({
         onClick={onOpenSettings}
         aria-label="Settings"
       >
-        ⚙
+        <img
+          src={`${BASE}sprites/nav/settings.png`}
+          className="topbar-nav-icon"
+          alt=""
+          draggable="false"
+        />
       </button>
     </div>
   );
