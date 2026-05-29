@@ -1,6 +1,8 @@
 import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
 import { getSpriteTier, SPRITE_TIERS } from '../data/producers';
+import { getMinigame } from '../data/minigames';
+import './minigames/minigames.css';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -39,11 +41,14 @@ export default function ProducerDetailModal({
   unlocked,
   upgradeMult,         // multiplier from producer-doubling upgrades for this id
   baseGameRate,        // base production qi/s = BASE_RATE + sum(producer raw outputs)
+  onEnterMinigame,     // (producerId) => void — opens the Mythic-tier minigame
   onClose,
 }) {
   const tier      = unlocked ? getSpriteTier(owned) : null;
   const spriteIdx = tier?.idx ?? 0;
   const sprite    = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
+  const minigame  = getMinigame(producer.id);
+  const isMythic  = tier?.name === 'mythic';
 
   const perUnitRate   = producer.startQiPerSec * (upgradeMult ?? 1);
   const totalFromHere = owned * perUnitRate;
@@ -130,6 +135,30 @@ export default function ProducerDetailModal({
                 </div>
               )}
             </div>
+
+            {minigame && (isMythic || import.meta.env.DEV) && (
+              <div className="pdm-minigame">
+                <button
+                  type="button"
+                  className={`pdm-mg-enter${isMythic ? '' : ' pdm-mg-enter-dev'}`}
+                  onClick={() => onEnterMinigame?.(producer.id)}
+                >
+                  <span className="pdm-mg-glyph" aria-hidden="true">{minigame.glyph}</span>
+                  <span className="pdm-mg-text">
+                    <span className="pdm-mg-kicker">
+                      {isMythic
+                        ? (minigame.ready ? 'Mythic art unlocked' : 'Mythic · coming soon')
+                        : 'Preview · dev'}
+                    </span>
+                    <span className="pdm-mg-name">{minigame.name}</span>
+                  </span>
+                  <span className="pdm-mg-arrow" aria-hidden="true">▶</span>
+                </button>
+                {!isMythic && (
+                  <div className="pdm-mg-locknote">Unlocks at Mythic tier · 100 owned.</div>
+                )}
+              </div>
+            )}
           </>
         )}
     </DetailModal>

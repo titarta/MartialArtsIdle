@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
-import PRODUCERS from '../data/producers';
+import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
 import PavilionPlaque from '../components/PavilionPlaque';
 import ProducerDetailModal from '../components/ProducerDetailModal';
+import MiniGameMode from '../components/minigames/MiniGameMode';
 import InscribedTablet, { OwnedUpgradeChip } from '../components/UpgradeCard';
 import SparksTab from '../components/SparksTab';
 import { fmt, fmtRate } from '../utils/format';
@@ -50,6 +51,9 @@ export default function CultivationScreen({
   // Producer detail modal — opens when the player taps a lane's leader sprite.
   // Stores the producer object directly so the modal can read sprites/desc.
   const [detailProducer, setDetailProducer] = useState(null);
+  // Producer minigame ("Hidden Art") — full-screen overlay opened from the
+  // detail modal's Mythic CTA. Holds the producer id whose game is active.
+  const [minigameId, setMinigameId] = useState(null);
 
   // Poll the cultivation refs ~10×/sec for the sticky header.
   // useCultivation deliberately never re-renders on qi/rate change, so we
@@ -375,10 +379,38 @@ export default function CultivationScreen({
             unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
             upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
             baseGameRate={baseProductionRate}
+            onEnterMinigame={(pid) => { setDetailProducer(null); setMinigameId(pid); }}
             onClose={() => setDetailProducer(null)}
           />
         );
       })()}
+
+      {minigameId && PRODUCERS_BY_ID[minigameId] && (
+        <MiniGameMode
+          producer={PRODUCERS_BY_ID[minigameId]}
+          owned={producers.getOwned(minigameId)}
+          // Reward scales with qi/s. The live `rate` ref can read a transient 0
+          // (e.g. right after a reload), so floor it with the stable base
+          // production rate so a minigame payout is never spuriously zero.
+          ratePerSec={Math.max(rate, 1 + producers.getRate((pid) => upgrades?.getProducerMult?.(pid) ?? 1))}
+          // Grant the cash-out as a qi burst. qiRef is the single source of
+          // truth for the spendable balance (same path spendQi/debug use).
+          onAward={(amt) => {
+            if (!Number.isFinite(amt) || amt <= 0) return;
+            cultivation.qiRef.current += amt;
+            setQi(cultivation.qiRef.current);
+          }}
+          // Recruit = buy more of this producer (spends Qi, via the existing
+          // purchase path). Batch of 10 keeps each tap meaningful at Mythic scale.
+          recruit={{
+            batch: 10,
+            cost: producers.getCost(minigameId, 10),
+            qi,
+            buy: () => handleBuy(minigameId, 10),
+          }}
+          onClose={() => setMinigameId(null)}
+        />
+      )}
 
       {tab === 'upgrades' && (
         visibleUpgrades.length === 0 ? (
