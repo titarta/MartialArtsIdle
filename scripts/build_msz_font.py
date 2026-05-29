@@ -58,6 +58,16 @@ CHARS = sorted(set(
     + "凰龍玄"                      # legendary seal per-spark variants
     + "突印"                        # BT button: 突 watermark + 印 seal stamp
     + "脉一二三四五六七"            # Tracing Meridians: title 脉 + numerals 1-7
+    # 2026-05-29 coverage fix: glyphs rendered with the Ma Shan Zheng stack
+    # that were missing from the subset, so they fell back to a system serif.
+    + "市"                          # Spirit Bazaar watermark + blood-lotus achievement
+    + "关宗弟念符"                  # tutorial card glyphs (TutorialModal)
+    + "封眠舍"                      # achievement plaque seals (AchievementPlaque)
+    + "失蓮"                        # Blood Lotus shop glyphs
+    + "時解賞"                      # toast / event glyphs (App.jsx)
+    + "山"                          # notification glyph (useNotifications)
+    + "修境无止行收时"             # About screen + Offline-earnings modal glyphs
+    + "丹兵兽盾矛祖苗虛香鳳昇壁憩戰徵火練群銳閉風鼓"  # producer minigames + disciple army
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.
