@@ -6622,9 +6622,20 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
 
 /* Tappable state — pointer cursor, scale feedback on press */
 .home-crystal-tappable { cursor: pointer; }
-.home-crystal-tappable:active .home-crystal-float {
-  transform: scale(0.93);
-  transition: transform 0.08s ease;
+/* Tactile tap feedback (Cookie-Clicker squish). Scales .home-crystal-img-wrap,
+   NOT .home-crystal-float: the float runs the bob animation (transform:
+   translateY), and a running CSS animation overrides a transition's transform,
+   so a press-scale on the float never showed. The wrap has no animation, so the
+   squish reads in every state — including the 100%-fill overcharge, which
+   animates the sprite's OWN transform. Pure CSS :active means no JS and no React
+   re-render per tap, so rapid spamming costs nothing (the collect handler stays
+   on the click; this is purely visual). */
+.home-crystal-img-wrap {
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1); /* springy pop-back on release */
+}
+.home-crystal-tappable:active .home-crystal-img-wrap {
+  transform: scale(0.88) rotate(-2.5deg);
+  transition: transform 0.05s ease-out;                          /* snappy squish on press */
 }
 
 /* Pulse when reservoir is completely full */
@@ -26740,8 +26751,13 @@ img.pp-emblem-locked { font-size: 0; }
 .topbar-currencies {
   flex-direction: row !important;
   align-items: center !important;
-  gap: 14px !important;
-  margin: 0 auto !important;
+  gap: 9px !important;
+  /* Left-aligned (not 0 auto / centered): the reincarnation button spawns on
+     the right, so a centered currency block crowded the karma readout. The
+     .home-hud-spacer (flex:1) now holds all the gap between karma and the
+     right-side action buttons. */
+  margin: 0 !important;
+  margin-right: auto !important;
   padding: 0 !important;
   background: none !important;
   border: none !important;
@@ -26777,11 +26793,11 @@ img.pp-emblem-locked { font-size: 0; }
    "grow away" from the divider — qi extends LEFT into its slot,
    karma extends RIGHT into its slot. Per home-pass/home-v2-mockup. */
 .topbar-currency-qi {
-  min-width: 84px;
+  min-width: 56px;
   justify-content: flex-end;
 }
 .topbar-currency-karma {
-  min-width: 60px;
+  min-width: 40px;
   justify-content: flex-start;
 }
 .topbar-currency-sep {
