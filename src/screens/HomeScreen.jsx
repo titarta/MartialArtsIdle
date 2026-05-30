@@ -7,7 +7,7 @@ import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import ActiveBuffsChip from '../components/ActiveBuffsChip';
 import { useVFX } from '../components/VFXLayer';
-import { useRewardedAd, formatCooldown } from '../ads/useRewardedAd';
+import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
 import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue } from '../contexts/EventQueueContext';

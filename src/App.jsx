@@ -13,7 +13,7 @@ import JourneyScreen from './screens/JourneyScreen';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
-import { initAds } from './ads/adService';
+import { initAds } from './rewards/rewardService';
 import { restoreResolution } from './systems/desktopResolution';
 import {
   initAnalytics,

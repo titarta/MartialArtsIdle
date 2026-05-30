@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { loadRewardedAd, showRewardedAd } from './adService';
+import { loadRewardedAd, showRewardedAd } from './rewardService';
 import AudioManager from '../audio/AudioManager';
 import { trackAdEvent } from '../analytics';
 
