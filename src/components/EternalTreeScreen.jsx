@@ -1,63 +1,90 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
 import './eternalTree.css';
 
 // ── Layout ───────────────────────────────────────────────────────────────────
-const COL_W   = 138;
-const ROW_H   = 92;
 const NODE_R  = 30;
-const PADDING = 44;
+const COL_W   = 132;
+const ROW_H   = 116;
+const PADDING = 70;
 
-const NUM_COLS  = Math.max(...NODES.map(n => n.col)) + 1;
-const NUM_ROWS  = Math.max(...NODES.map(n => n.row)) + 1;
-const CANVAS_W  = PADDING * 2 + NUM_COLS * COL_W;
-const CANVAS_H  = PADDING * 2 + NUM_ROWS * ROW_H;
+/** Visualisation placeholders. NOT part of the real save data — they only
+ *  exist so the player can see the grid fanning out and the diagonals working.
+ *  Each one is rendered dimmed and dashed, never buyable. */
+const PLACEHOLDER_NODES = [
+  // Right wing — martial path
+  { id: 'p_m1', label: 'Iron Tendons',    glyph: '筋', col: 2, row: 0, placeholder: true },
+  { id: 'p_m2', label: 'Stone Skin',      glyph: '岩', col: 3, row: 0, placeholder: true },
+  { id: 'p_m3', label: 'Heart of Steel',  glyph: '勇', col: 2, row: 1, placeholder: true },
+  { id: 'p_m4', label: 'Untamed Will',    glyph: '野', col: 3, row: 1, placeholder: true },
+  // Far right — will / soul branch
+  { id: 'p_w1', label: 'Calm Mind',       glyph: '靜', col: 4, row: 1, placeholder: true },
+  { id: 'p_w2', label: 'Soul Anchor',     glyph: '魂', col: 4, row: 2, placeholder: true },
+  // Lower right — fate branch
+  { id: 'p_f1', label: 'Threads of Fate', glyph: '命', col: 2, row: 2, placeholder: true },
+  { id: 'p_f2', label: 'Auspicious Star', glyph: '辰', col: 3, row: 3, placeholder: true },
+  { id: 'p_f3', label: 'Heavenward',      glyph: '昇', col: 4, row: 4, placeholder: true },
+  // Centre keystone
+  { id: 'p_k',  label: 'Eternal Anchor',  glyph: '永', col: 2, row: 4, placeholder: true },
+];
+
+const ALL_NODES = [...NODES, ...PLACEHOLDER_NODES];
+const ALL_NODES_BY_ID = Object.fromEntries(ALL_NODES.map(n => [n.id, n]));
+
+const NUM_COLS = Math.max(...ALL_NODES.map(n => n.col)) + 1;
+const NUM_ROWS = Math.max(...ALL_NODES.map(n => n.row)) + 1;
+const CANVAS_W = PADDING * 2 + (NUM_COLS - 1) * COL_W;
+const CANVAS_H = PADDING * 2 + (NUM_ROWS - 1) * ROW_H;
 
 const nodeCenter = (n) => ({
-  cx: PADDING + n.col * COL_W + COL_W / 2,
-  cy: PADDING + n.row * ROW_H + ROW_H / 2,
+  cx: PADDING + n.col * COL_W,
+  cy: PADDING + n.row * ROW_H,
 });
 
-/** Gentle Bézier curve between two node centres, starting/ending on the disc
- *  edge. Bow direction alternates by a deterministic hash so adjacent edges
- *  don't all curve the same way. */
-function edgePath(from, to) {
-  const f = nodeCenter(from);
-  const t = nodeCenter(to);
-  const dx = t.cx - f.cx, dy = t.cy - f.cy;
+function edgePath(a, b) {
+  const fa = nodeCenter(a);
+  const fb = nodeCenter(b);
+  const dx = fb.cx - fa.cx, dy = fb.cy - fa.cy;
   const len = Math.hypot(dx, dy);
   if (len < 1) return '';
   const ux = dx / len, uy = dy / len;
-  const sx = f.cx + ux * NODE_R, sy = f.cy + uy * NODE_R;
-  const ex = t.cx - ux * NODE_R, ey = t.cy - uy * NODE_R;
+  const sx = fa.cx + ux * NODE_R, sy = fa.cy + uy * NODE_R;
+  const ex = fb.cx - ux * NODE_R, ey = fb.cy - uy * NODE_R;
+  // gentle bow, alternating direction so neighbours read distinctly
   const mx = (sx + ex) / 2, my = (sy + ey) / 2;
-  const bow = 24 + Math.min(40, len * 0.18);
-  const sign = (from.row + to.col) % 2 === 0 ? 1 : -1;
+  const bow = Math.min(18, len * 0.08);
+  const sign = (a.row + b.col) % 2 === 0 ? 1 : -1;
   const cx = mx + (-uy) * bow * sign;
   const cy = my + (ux) * bow * sign;
   return `M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
 }
 
+// Grid adjacency edges (horizontal, vertical, AND diagonal between neighbours).
 const EDGES = (() => {
   const out = [];
-  for (const n of NODES) for (const pid of n.prereqs) if (NODES_BY_ID[pid]) out.push({ from: pid, to: n.id });
+  const seen = new Set();
+  for (let i = 0; i < ALL_NODES.length; i++) {
+    for (let j = i + 1; j < ALL_NODES.length; j++) {
+      const a = ALL_NODES[i], b = ALL_NODES[j];
+      const dr = Math.abs(a.row - b.row), dc = Math.abs(a.col - b.col);
+      if (dr <= 1 && dc <= 1 && (dr + dc) > 0) {
+        const k = [a.id, b.id].sort().join('|');
+        if (seen.has(k)) continue;
+        seen.add(k);
+        out.push({ from: a.id, to: b.id });
+      }
+    }
+  }
   return out;
 })();
 
-// CJK sigil per node — each path of karma gets its own glyph so the
-// constellation reads as faces, not words.
+// Per-node calligraphy sigil (real nodes only; placeholders carry their own).
 const NODE_GLYPH = {
-  n_1: '道', // Devoted Path
-  n_2: '星', // Star Disciple (coming soon)
-  n_3: '晶', // Crystalline Focus
-  n_4: '眼', // Discerning Eye
-  n_5: '儉', // Frugal Cultivation
-  n_6: '響', // Sect Resonance
-  n_7: '長', // Senior's Guidance
+  n_1: '道', n_2: '星', n_3: '晶', n_4: '眼',
+  n_5: '儉', n_6: '響', n_7: '長',
 };
 
-// Starfield — deterministic so it doesn't dance on each render.
 function makeStars(count) {
   let seed = 7;
   const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
@@ -79,38 +106,46 @@ function makeStars(count) {
 // ── Node ─────────────────────────────────────────────────────────────────────
 function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
   const { cx, cy } = nodeCenter(node);
-  const isPurchased  = state === 'purchased';
-  const isAvailable  = state === 'available';
-  const isLocked     = state === 'locked';
-  const isComingSoon = node.id === 'n_2';
-  const canBuy = isAvailable && !isComingSoon && karma >= node.cost;
+  const isPlaceholder = !!node.placeholder;
+  const isPurchased   = state === 'purchased';
+  const isAvailable   = state === 'available';
+  const isComingSoon  = node.id === 'n_2';
+  const canBuy = !isPlaceholder && isAvailable && !isComingSoon && karma >= node.cost;
 
-  const variant = isPurchased ? 'owned'
-                : canBuy      ? 'can'
-                : isAvailable ? 'avail'
-                :               'locked';
+  const variant = isPlaceholder ? 'placeholder'
+                : isPurchased   ? 'owned'
+                : canBuy        ? 'can'
+                : isAvailable   ? 'avail'
+                :                  'locked';
   const cls = `et-node et-node-${variant}${isComingSoon ? ' et-node-soon' : ''}`;
+  const glyph = NODE_GLYPH[node.id] ?? node.glyph ?? '◇';
 
-  const onEnter = (e) => {
+  const onEnter = () => {
     const tt = tooltipRef.current; if (!tt) return;
-    const parts = [`<strong>${node.label}</strong>`, `<div>${node.description}</div>`];
-    if (isComingSoon)       parts.push('<div class="et-tt-soon">✦ coming soon</div>');
-    else if (isPurchased)   parts.push('<div class="et-tt-owned">✓ anchored</div>');
-    else {
-      parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
-      if (canBuy)            parts.push('<div class="et-tt-go">tap to anchor</div>');
-      else if (isAvailable)  parts.push(`<div class="et-tt-poor">need ${node.cost - karma} more karma</div>`);
-      else                   parts.push('<div class="et-tt-soon">prerequisites still bound</div>');
+    const parts = [`<strong>${node.label}</strong>`];
+    if (isPlaceholder) {
+      parts.push('<div>Concept node. Placeholder for layout iteration.</div>');
+      parts.push('<div class="et-tt-soon">✦ not yet inscribed</div>');
+    } else {
+      parts.push(`<div>${node.description}</div>`);
+      if (isComingSoon)      parts.push('<div class="et-tt-soon">✦ coming soon</div>');
+      else if (isPurchased)  parts.push('<div class="et-tt-owned">✓ anchored</div>');
+      else {
+        parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
+        if (canBuy)            parts.push('<div class="et-tt-go">tap to anchor</div>');
+        else if (isAvailable)  parts.push(`<div class="et-tt-poor">need ${node.cost - karma} more karma</div>`);
+        else                   parts.push('<div class="et-tt-soon">prerequisites still bound</div>');
+      }
     }
     tt.innerHTML = parts.join('');
     tt.style.display = 'block';
   };
   const onMove = (e) => {
     const tt = tooltipRef.current; if (!tt) return;
-    const svg = e.currentTarget.closest('svg');
-    if (!svg) return;
-    const r = svg.getBoundingClientRect();
-    tt.style.left = (e.clientX - r.left + 14) + 'px';
+    const stage = e.currentTarget.closest('.et-stage');
+    if (!stage) return;
+    const r = stage.getBoundingClientRect();
+    tt.style.left = (e.clientX - r.left + 12) + 'px';
     tt.style.top  = (e.clientY - r.top  - 8) + 'px';
   };
   const onLeave = () => { if (tooltipRef.current) tooltipRef.current.style.display = 'none'; };
@@ -119,20 +154,18 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
     <g
       className={cls}
       transform={`translate(${cx},${cy})`}
-      onClick={canBuy ? () => onBuy(node.id, node.cost) : undefined}
+      onClick={canBuy ? (e) => { e.stopPropagation(); onBuy(node.id, node.cost); } : undefined}
       onMouseEnter={onEnter}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
       <circle className="et-node-halo" r={NODE_R + 7} />
       <circle className="et-node-disc" r={NODE_R} />
-      <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">
-        {NODE_GLYPH[node.id] ?? '◇'}
+      <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">{glyph}</text>
+      <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">
+        {isPlaceholder ? '✦' : isPurchased ? '✓' : isComingSoon ? '✦' : `${node.cost}`}
       </text>
-      <text className="et-node-badge" x={0} y={NODE_R + 17} textAnchor="middle">
-        {isPurchased ? '✓' : isComingSoon ? '✦' : `${node.cost}`}
-      </text>
-      <text className="et-node-label" x={0} y={NODE_R + 33} textAnchor="middle">
+      <text className="et-node-label" x={0} y={NODE_R + 31} textAnchor="middle">
         {node.label.toUpperCase()}
       </text>
     </g>
@@ -141,18 +174,13 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
 
 // ── Screen ───────────────────────────────────────────────────────────────────
 export default function EternalTreeScreen({
-  karma,
-  karmaEarnedThisLife,
-  cumulativeQi = 0,
-  qiForNextKarma = 0,
-  tree,
-  lives,
-  realmIndex,
-  onReincarnate,
-  onClose,
+  karma, karmaEarnedThisLife, cumulativeQi = 0, qiForNextKarma = 0,
+  tree, lives, realmIndex,
+  onReincarnate, onClose,
 }) {
   const tooltipRef = useRef(null);
-  const stars = useMemo(() => makeStars(120), []);
+  const stageRef   = useRef(null);
+  const stars = useMemo(() => makeStars(140), []);
 
   const { purchased, isAvailable, buyNode } = tree;
 
@@ -166,13 +194,103 @@ export default function EternalTreeScreen({
     return out;
   }, [purchased, isAvailable]);
 
-  const handleBuy = (id, cost) => { if (karma >= cost) buyNode(id); };
+  // ── Pan / Zoom ────────────────────────────────────────────────────────────
+  const [scale, setScale] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  // Keep latest state in a ref so non-React listeners read fresh values.
+  const liveRef = useRef({ pan, scale });
+  liveRef.current = { pan, scale };
+  const dragRef  = useRef(null);
+  const pinchRef = useRef(null);
 
+  const clampScale = (s) => Math.max(0.4, Math.min(2.5, s));
+
+  const fitToStage = () => {
+    const el = stageRef.current; if (!el) return 1;
+    const r = el.getBoundingClientRect();
+    return Math.max(0.45, Math.min(1, Math.min((r.width - 40) / CANVAS_W, (r.height - 40) / CANVAS_H)));
+  };
+
+  // Fit on mount.
+  useEffect(() => { setScale(fitToStage()); }, []);
+
+  // Non-passive touch listeners for pinch + drag.
+  useEffect(() => {
+    const el = stageRef.current; if (!el) return undefined;
+    const tDist = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+
+    const onTS = (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        pinchRef.current = { startDist: tDist(e.touches[0], e.touches[1]), startScale: liveRef.current.scale };
+        dragRef.current = null;
+      } else if (e.touches.length === 1) {
+        const t = e.touches[0];
+        dragRef.current = { sx: t.clientX, sy: t.clientY, px: liveRef.current.pan.x, py: liveRef.current.pan.y, moved: false };
+      }
+    };
+    const onTM = (e) => {
+      if (e.touches.length === 2 && pinchRef.current) {
+        e.preventDefault();
+        const d = tDist(e.touches[0], e.touches[1]);
+        setScale(clampScale(pinchRef.current.startScale * (d / pinchRef.current.startDist)));
+      } else if (e.touches.length === 1 && dragRef.current) {
+        const t = e.touches[0];
+        const dx = t.clientX - dragRef.current.sx;
+        const dy = t.clientY - dragRef.current.sy;
+        if (Math.hypot(dx, dy) > 5) {
+          e.preventDefault();
+          dragRef.current.moved = true;
+          setPan({ x: dragRef.current.px + dx, y: dragRef.current.py + dy });
+        }
+      }
+    };
+    const onTE = (e) => {
+      if (e.touches.length === 0) { dragRef.current = null; pinchRef.current = null; }
+    };
+    el.addEventListener('touchstart', onTS, { passive: false });
+    el.addEventListener('touchmove',  onTM, { passive: false });
+    el.addEventListener('touchend',   onTE);
+    el.addEventListener('touchcancel',onTE);
+    return () => {
+      el.removeEventListener('touchstart', onTS);
+      el.removeEventListener('touchmove',  onTM);
+      el.removeEventListener('touchend',   onTE);
+      el.removeEventListener('touchcancel',onTE);
+    };
+  }, []);
+
+  // Mouse drag (movement threshold keeps node taps working).
+  const onMouseDown = (e) => {
+    if (e.button !== 0) return;
+    if (e.target.closest('button')) return;
+    dragRef.current = { sx: e.clientX, sy: e.clientY, px: pan.x, py: pan.y, moved: false };
+  };
+  const onMouseMove = (e) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.sx;
+    const dy = e.clientY - dragRef.current.sy;
+    if (Math.hypot(dx, dy) > 4) {
+      dragRef.current.moved = true;
+      setPan({ x: dragRef.current.px + dx, y: dragRef.current.py + dy });
+    }
+  };
+  const onMouseUp = () => { dragRef.current = null; };
+  const onWheel = (e) => {
+    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+    setScale(s => clampScale(s * factor));
+  };
+
+  const zoomIn    = () => setScale(s => clampScale(s * 1.2));
+  const zoomOut   = () => setScale(s => clampScale(s / 1.2));
+  const zoomReset = () => { setScale(fitToStage()); setPan({ x: 0, y: 0 }); };
+
+  // ── Karma side ──────────────────────────────────────────────────────────
+  const handleBuy = (id, cost) => { if (karma >= cost) buyNode(id); };
   const karmaSpentOnTree = purchased.size;
   const canReincarnate   = realmIndex >= 24;
-
-  const qiToNext  = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
-  const progress  = qiForNextKarma > 0
+  const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
+  const progress = qiForNextKarma > 0
     ? Math.max(0, Math.min(1, (cumulativeQi ?? 0) / qiForNextKarma))
     : 0;
 
@@ -180,93 +298,100 @@ export default function EternalTreeScreen({
     <div className="et-screen" role="dialog" aria-modal="true" aria-label="Eternal Tree">
       <div className="et-stars" aria-hidden="true">
         {stars.map((s, i) => (
-          <span
-            key={i}
+          <span key={i}
             className={`et-star${s.kind === 'bri' ? ' et-star-bri' : s.kind === 'gold' ? ' et-star-gold' : ''}`}
             style={{ left: s.left, top: s.top, animationDelay: s.delay, animationDuration: s.duration }}
           />
         ))}
       </div>
 
-      <div className="et-content">
-        <header className="et-header">
+      <header className="et-bar et-bar-top">
+        <div className="et-bar-titles">
           <div className="et-eyebrow">Between Lives</div>
           <h1 className="et-title">Eternal Tree</h1>
-          <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
-        </header>
+        </div>
+        <div className="et-bar-chips">
+          <div className="et-chip"><span className="et-chip-sigil">◈</span><b>{karma}</b><span>karma</span></div>
+          <div className="et-chip et-chip-soft"><b>{karmaSpentOnTree}</b><span>anchored</span></div>
+          <div className="et-chip et-chip-soft"><b>{lives ?? 0}</b><span>{(lives ?? 0) === 1 ? 'life' : 'lives'}</span></div>
+        </div>
+        <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
+      </header>
 
-        {/* Karma card */}
-        <section className="et-karma-card" aria-label="Karma">
-          <div className="et-karma-main">
-            <span className="et-karma-sigil" aria-hidden="true">◈</span>
-            <span className="et-karma-val">{karma}</span>
-            <span className="et-karma-lbl">karma unspent</span>
-          </div>
-          <div className="et-karma-meta">
-            <span><b>{karmaSpentOnTree}</b> anchored</span>
-            <span><b>{lives ?? 0}</b> {(lives ?? 0) === 1 ? 'life' : 'lives'} lived</span>
-            <span><b>{karmaEarnedThisLife ?? 0}</b> earned this life</span>
-          </div>
-          <div className="et-karma-progress" title={`${fmt(qiToNext)} Qi to next karma`}>
-            <div className="et-karma-progress-fill" style={{ width: `${progress * 100}%` }} />
-          </div>
-          <div className="et-karma-meta" style={{ marginTop: -2 }}>
-            <span style={{ fontSize: 10.5 }}>Next karma at {fmt(qiForNextKarma)} total Qi</span>
-            <span style={{ fontSize: 10.5 }}>{fmt(qiToNext)} to go</span>
-          </div>
-        </section>
-
-        {/* Constellation */}
-        <div className="et-canvas-wrap">
+      <div
+        className="et-stage"
+        ref={stageRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        onWheel={onWheel}
+      >
+        <div className="et-panel" aria-hidden="true" />
+        <div className="et-zoom">
+          <button type="button" onClick={zoomIn}    aria-label="Zoom in">+</button>
+          <button type="button" onClick={zoomReset} aria-label="Fit to view">⤢</button>
+          <button type="button" onClick={zoomOut}   aria-label="Zoom out">−</button>
+        </div>
+        <div
+          className="et-content"
+          style={{
+            width: CANVAS_W, height: CANVAS_H,
+            transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
+          }}
+        >
           <div className="et-watermark" aria-hidden="true">業</div>
-          <svg
-            className="et-canvas"
-            width={CANVAS_W}
-            height={CANVAS_H}
-            viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
-          >
-            {/* Edges first (behind nodes) */}
+          <svg className="et-canvas" width={CANVAS_W} height={CANVAS_H} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}>
+            {/* Grid adjacency edges */}
             {EDGES.map(({ from, to }) => {
-              const fState = nodeStates[from];
-              const tState = nodeStates[to];
-              const lit   = fState === 'purchased' && tState === 'purchased';
-              const pulse = fState === 'purchased' && tState !== 'purchased';
-              const cls   = `et-edge ${lit ? 'et-edge-lit' : pulse ? 'et-edge-pulse' : 'et-edge-dim'}`;
-              return <path key={`${from}-${to}`} className={cls} d={edgePath(NODES_BY_ID[from], NODES_BY_ID[to])} />;
+              const a = ALL_NODES_BY_ID[from];
+              const b = ALL_NODES_BY_ID[to];
+              const aReal = !a.placeholder, bReal = !b.placeholder;
+              const aOwn = aReal && nodeStates[a.id] === 'purchased';
+              const bOwn = bReal && nodeStates[b.id] === 'purchased';
+              const aAvail = aReal && nodeStates[a.id] === 'available' && a.id !== 'n_2';
+              const bAvail = bReal && nodeStates[b.id] === 'available' && b.id !== 'n_2';
+              const lit   = aOwn && bOwn;
+              const pulse = !lit && ((aOwn && bAvail) || (bOwn && aAvail));
+              const cls = `et-edge ${lit ? 'et-edge-lit' : pulse ? 'et-edge-pulse' : 'et-edge-dim'}`;
+              return <path key={`${from}-${to}`} className={cls} d={edgePath(a, b)} />;
             })}
-
             {/* Nodes */}
-            {NODES.map(n => (
+            {ALL_NODES.map(n => (
               <TreeNode
                 key={n.id}
                 node={n}
-                state={nodeStates[n.id]}
+                state={n.placeholder ? 'placeholder' : nodeStates[n.id]}
                 karma={karma}
                 onBuy={handleBuy}
                 tooltipRef={tooltipRef}
               />
             ))}
           </svg>
-
-          <div ref={tooltipRef} className="et-tooltip" />
         </div>
-
-        {/* Reincarnate */}
-        <section className="et-reincarnate-wrap">
-          <p className="et-reincarnate-blurb">
-            Reincarnation resets your cultivation and producers, but karma and the anchored tree endure across lives.
-          </p>
-          <button
-            type="button"
-            className={`et-reincarnate${canReincarnate ? '' : ' et-reincarnate-locked'}`}
-            onClick={canReincarnate ? onReincarnate : undefined}
-            disabled={!canReincarnate}
-          >
-            <span className="et-reincarnate-glyph" aria-hidden="true">輪</span>
-            <span>{canReincarnate ? 'Reincarnate' : 'Reach Saint to reincarnate'}</span>
-          </button>
-        </section>
+        <div ref={tooltipRef} className="et-tooltip" />
       </div>
+
+      <footer className="et-bar et-bar-bot">
+        <div className="et-progress">
+          <div className="et-progress-meta">
+            <span>Next karma at {fmt(qiForNextKarma)} Qi</span>
+            <span>{fmt(qiToNext)} to go</span>
+          </div>
+          <div className="et-progress-bar">
+            <div className="et-progress-fill" style={{ width: `${progress * 100}%` }} />
+          </div>
+        </div>
+        <button
+          type="button"
+          className={`et-reincarnate${canReincarnate ? '' : ' et-reincarnate-locked'}`}
+          onClick={canReincarnate ? onReincarnate : undefined}
+          disabled={!canReincarnate}
+        >
+          <span className="et-reincarnate-glyph" aria-hidden="true">輪</span>
+          <span>{canReincarnate ? 'Reincarnate' : 'Reach Saint'}</span>
+        </button>
+      </footer>
     </div>
   );
 }
