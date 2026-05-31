@@ -126,15 +126,7 @@
   pointer-events: auto;
 }
 
-.et-watermark {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
-  font-size: 340px; line-height: 1;
-  color: rgba(107, 70, 193, 0.07);
-  pointer-events: none; user-select: none;
-  text-shadow: 0 0 80px rgba(107, 70, 193, 0.18);
-}
-.et-canvas { display: block; position: relative; z-index: 1; }
+.et-canvas { display: block; position: relative; z-index: 1; overflow: visible; }
 
 /* ── Nodes ───────────────────────────────────────────────────────────────── */
 .et-node { transition: transform 0.12s; }

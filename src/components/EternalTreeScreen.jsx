@@ -221,8 +221,7 @@ export default function EternalTreeScreen({
     return Math.max(0.45, Math.min(1, Math.min((r.width - 40) / CANVAS_W, (r.height - 40) / CANVAS_H)));
   };
 
-  // Fit on mount.
-  useEffect(() => { setScale(fitToStage()); }, []);
+  // Start at 1.0 so nodes are visible at full size; user can pinch/wheel to adjust.
 
   // Non-passive touch listeners for pinch + drag.
   useEffect(() => {
@@ -349,7 +348,6 @@ export default function EternalTreeScreen({
             transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           }}
         >
-          <div className="et-watermark" aria-hidden="true">業</div>
           <svg className="et-canvas" width={CANVAS_W} height={CANVAS_H} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}>
             {/* Grid adjacency edges */}
             {EDGES.map(({ from, to }) => {
