@@ -9,24 +9,33 @@ const COL_W   = 132;
 const ROW_H   = 116;
 const PADDING = 70;
 
-/** Visualisation placeholders. NOT part of the real save data — they only
- *  exist so the player can see the grid fanning out and the diagonals working.
- *  Each one is rendered dimmed and dashed, never buyable. */
+/** Preview nodes for visualisation. NOT part of the real save data — they
+ *  render like locked real nodes (sigil + cost) so you can see how the full
+ *  tree would shape up. The player cannot purchase them. */
 const PLACEHOLDER_NODES = [
-  // Right wing — martial path
-  { id: 'p_m1', label: 'Iron Tendons',    glyph: '筋', col: 2, row: 0, placeholder: true },
-  { id: 'p_m2', label: 'Stone Skin',      glyph: '岩', col: 3, row: 0, placeholder: true },
-  { id: 'p_m3', label: 'Heart of Steel',  glyph: '勇', col: 2, row: 1, placeholder: true },
-  { id: 'p_m4', label: 'Untamed Will',    glyph: '野', col: 3, row: 1, placeholder: true },
-  // Far right — will / soul branch
-  { id: 'p_w1', label: 'Calm Mind',       glyph: '靜', col: 4, row: 1, placeholder: true },
-  { id: 'p_w2', label: 'Soul Anchor',     glyph: '魂', col: 4, row: 2, placeholder: true },
-  // Lower right — fate branch
-  { id: 'p_f1', label: 'Threads of Fate', glyph: '命', col: 2, row: 2, placeholder: true },
-  { id: 'p_f2', label: 'Auspicious Star', glyph: '辰', col: 3, row: 3, placeholder: true },
-  { id: 'p_f3', label: 'Heavenward',      glyph: '昇', col: 4, row: 4, placeholder: true },
-  // Centre keystone
-  { id: 'p_k',  label: 'Eternal Anchor',  glyph: '永', col: 2, row: 4, placeholder: true },
+  // Row 0
+  { id: 'p_a', label: 'Iron Tendons',    glyph: '筋', col: 2, row: 0, cost: 2, placeholder: true, description: 'Body tempered first. +permanent vitality.' },
+  { id: 'p_b', label: 'Stone Skin',      glyph: '岩', col: 3, row: 0, cost: 2, placeholder: true, description: 'Skin like a quiet mountain. Lessens combat damage.' },
+  { id: 'p_c', label: 'Sky-Eye',         glyph: '瞳', col: 4, row: 0, cost: 3, placeholder: true, description: 'See further than this life. Reveals hidden drops.' },
+  // Row 1
+  { id: 'p_d', label: 'Untamed Heart',   glyph: '勇', col: 2, row: 1, cost: 3, placeholder: true, description: 'Courage fuelled by past lives. +breakthrough chance.' },
+  { id: 'p_e', label: 'Quiet Mind',      glyph: '靜', col: 3, row: 1, cost: 3, placeholder: true, description: 'A still pond reflects the moon. +focus duration.' },
+  { id: 'p_f', label: 'Soul Anchor',     glyph: '魂', col: 4, row: 1, cost: 4, placeholder: true, description: 'Soul roots deepen. Reduces reincarnation cost.' },
+  // Row 2
+  { id: 'p_g', label: 'Twin Stars',      glyph: '雙', col: 1, row: 2, cost: 3, placeholder: true, description: 'Pair the daos. +1 active law slot.' },
+  { id: 'p_h', label: 'Thunder Stride',  glyph: '雷', col: 2, row: 2, cost: 4, placeholder: true, description: 'Travel between cells of the heavens. +realm speed.' },
+  { id: 'p_i', label: 'Wind Whisper',    glyph: '風', col: 3, row: 2, cost: 4, placeholder: true, description: 'Hear the dao on the breeze. +qi spark rate.' },
+  { id: 'p_j', label: 'Mist Veil',       glyph: '霧', col: 4, row: 2, cost: 5, placeholder: true, description: 'Step beyond ambushes. Combat enemies hit softer first.' },
+  // Row 3
+  { id: 'p_k', label: 'Lotus Bloom',     glyph: '蓮', col: 1, row: 3, cost: 4, placeholder: true, description: 'The lotus rises from mud. +pill effect.' },
+  { id: 'p_l', label: 'Threads of Fate', glyph: '命', col: 2, row: 3, cost: 5, placeholder: true, description: 'Read the weave. +rare drop chance.' },
+  { id: 'p_m', label: 'Auspicious Star', glyph: '辰', col: 3, row: 3, cost: 5, placeholder: true, description: 'Born under a kind sign. +artefact roll quality.' },
+  { id: 'p_n', label: 'Three Treasures', glyph: '三', col: 4, row: 3, cost: 5, placeholder: true, description: 'Jing, qi, shen aligned. +cultivation speed.' },
+  // Row 4 — deeper / keystones
+  { id: 'p_o', label: 'Eternal Anchor',  glyph: '永', col: 1, row: 4, cost: 6, placeholder: true, description: 'A pillar across lives. Preserves a small qi reserve through reincarnation.' },
+  { id: 'p_p', label: 'Heavenward',      glyph: '昇', col: 2, row: 4, cost: 6, placeholder: true, description: 'Climb past the ninth heaven. Unlocks higher realms sooner.' },
+  { id: 'p_q', label: 'Beyond Form',     glyph: '玄', col: 3, row: 4, cost: 7, placeholder: true, description: 'The dao without name. +karma earned per life.' },
+  { id: 'p_r', label: 'Crown of Lives',  glyph: '冕', col: 4, row: 4, cost: 8, placeholder: true, description: 'The crown of one thousand lives. All gains amplified.' },
 ];
 
 const ALL_NODES = [...NODES, ...PLACEHOLDER_NODES];
@@ -124,8 +133,9 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
     const tt = tooltipRef.current; if (!tt) return;
     const parts = [`<strong>${node.label}</strong>`];
     if (isPlaceholder) {
-      parts.push('<div>Concept node. Placeholder for layout iteration.</div>');
-      parts.push('<div class="et-tt-soon">✦ not yet inscribed</div>');
+      parts.push(`<div>${node.description ?? 'A future path of karma.'}</div>`);
+      if (node.cost != null) parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
+      parts.push('<div class="et-tt-soon">✦ preview · not yet inscribed</div>');
     } else {
       parts.push(`<div>${node.description}</div>`);
       if (isComingSoon)      parts.push('<div class="et-tt-soon">✦ coming soon</div>');
@@ -163,7 +173,7 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
       <circle className="et-node-disc" r={NODE_R} />
       <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">{glyph}</text>
       <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">
-        {isPlaceholder ? '✦' : isPurchased ? '✓' : isComingSoon ? '✦' : `${node.cost}`}
+        {isPurchased ? '✓' : isComingSoon ? '✦' : (node.cost != null ? `${node.cost}` : '✦')}
       </text>
       <text className="et-node-label" x={0} y={NODE_R + 31} textAnchor="middle">
         {node.label.toUpperCase()}
@@ -327,7 +337,6 @@ export default function EternalTreeScreen({
         onMouseLeave={onMouseUp}
         onWheel={onWheel}
       >
-        <div className="et-panel" aria-hidden="true" />
         <div className="et-zoom">
           <button type="button" onClick={zoomIn}    aria-label="Zoom in">+</button>
           <button type="button" onClick={zoomReset} aria-label="Fit to view">⤢</button>
