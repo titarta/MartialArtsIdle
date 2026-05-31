@@ -3,80 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Eternal Tree · Design Study v2 (image-aware)</title>
+<title>Eternal Tree · Fog-of-War Prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    background: #0a0810;
-    color: #e8e6f5;
-    overflow-x: hidden;
-  }
-
-  /* ── Header / tab bar ─────────────────────────────────────────────────── */
-  .study-header {
-    position: sticky; top: 0; z-index: 10;
-    padding: 14px 16px 12px;
-    background: rgba(10, 8, 16, 0.94);
-    backdrop-filter: blur(10px) saturate(120%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .study-eyebrow { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
-  .study-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; margin-top: 2px; }
-  .study-sub { font-size: 11px; opacity: 0.6; margin-top: 3px; }
-  .study-tabs { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
-  .study-tab {
-    font: inherit; font-size: 11px; font-weight: 600;
-    padding: 7px 12px; border-radius: 8px;
-    background: transparent; border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.55); cursor: pointer;
-    letter-spacing: 0.04em; white-space: nowrap;
-    transition: all 0.15s;
-  }
-  .study-tab:hover { color: #fff; border-color: rgba(255, 255, 255, 0.35); }
-  .study-tab-on { background: #fff; color: #0a0810; border-color: #fff; }
-
-  .study-stage {
-    position: relative; min-height: calc(100vh - 130px);
-    display: flex; flex-direction: column;
-    transition: background 0.45s ease;
-    overflow: hidden;
-  }
-  .study-stage::before { content: ''; position: absolute; inset: 0; pointer-events: none; }
-  .design-meta { position: relative; z-index: 2; padding: 18px 18px 4px; }
-  .design-name { font-size: 24px; letter-spacing: 0.08em; line-height: 1.1; }
-  .design-desc { font-size: 12.5px; line-height: 1.55; margin-top: 6px; max-width: 480px; opacity: 0.82; }
-  .stage-wrap {
-    position: relative; z-index: 2;
-    flex: 1; display: grid; place-items: center;
-    padding: 22px 16px 28px;
-  }
-  .constellation { width: 100%; max-width: 320px; height: auto; display: block; }
-  .node-image { image-rendering: pixelated; image-rendering: crisp-edges; }
-  .node-label { user-select: none; }
-  /* default: locked image is desaturated; design CSS can override */
-  .node.s-locked .node-image { filter: grayscale(0.85) brightness(0.5); opacity: 0.55; }
-  .node.s-available .node-image { /* full color */ }
-  .node.s-owned .node-image { filter: saturate(1.15) brightness(1.06); }
-  /* gem on top of frame (only visible in Iconic Roundel) */
-  .node-gem { display: none; }
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     1. COSMIC LEDGER v2 (image-friendly)
-     A subtle dark "scrim" radial-gradient sits around each node so the
-     starfield does not compete with the sprite, and the violet/gold ring
-     carries the entire state communication.
-     ═══════════════════════════════════════════════════════════════════════ */
-  .design-cosmic {
     background:
       radial-gradient(120% 80% at 50% -10%, rgba(107, 70, 193, 0.20), transparent 55%),
       radial-gradient(80% 60% at 50% 50%, #0c0a26, #06051a 70%);
+    color: #ece9f7;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
-  .design-cosmic::before {
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
     background:
       radial-gradient(1.5px 1.5px at 12% 18%, #d4d2ee, transparent),
       radial-gradient(1px 1px at 27% 73%, #e8e6ff, transparent),
@@ -90,335 +33,405 @@
       radial-gradient(1px 1px at 70% 35%, #e8e6ff, transparent),
       radial-gradient(1.5px 1.5px at 8% 88%, #f5e4a8, transparent),
       radial-gradient(1px 1px at 55% 12%, #d4d2ee, transparent);
-    opacity: 0.85;
+    opacity: 0.55;
+    z-index: 0;
   }
-  .design-cosmic .design-name { font-family: 'Cinzel', serif; font-weight: 700; color: #ece9f7; text-shadow: 0 0 18px rgba(183, 148, 246, 0.42); }
-  .design-cosmic .design-desc { color: rgba(236, 233, 247, 0.72); }
-  /* node layers */
-  .design-cosmic .node-bg { fill: rgba(6, 5, 26, 0.85); }     /* dim the starfield near the sprite */
-  .design-cosmic .node-disc { fill: #0c0a26; stroke: none; }
-  .design-cosmic .node-ring { fill: none; stroke: #6b46c1; stroke-width: 1.5; }
-  .design-cosmic .node.s-available .node-ring { stroke: #b794f6; stroke-width: 2; filter: drop-shadow(0 0 8px rgba(107, 70, 193, 0.55)); }
-  .design-cosmic .node.s-owned .node-ring { stroke: #f5c842; stroke-width: 2.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.55)); }
-  .design-cosmic .node-label { font-family: 'Cinzel', serif; fill: rgba(236, 233, 247, 0.55); font-size: 8.5px; letter-spacing: 0.08em; }
-  .design-cosmic .node.s-owned .node-label { fill: #ece9f7; }
-  .design-cosmic .edge { fill: none; stroke-linecap: round; }
-  .design-cosmic .edge.s-locked { stroke: #6b46c1; stroke-width: 1.2; stroke-dasharray: 3 6; opacity: 0.38; }
-  .design-cosmic .edge.s-pulse { stroke: #b794f6; stroke-width: 1.8; opacity: 0.85; filter: drop-shadow(0 0 6px rgba(183, 148, 246, 0.5)); }
-  .design-cosmic .edge.s-lit { stroke: #f5c842; stroke-width: 2.2; stroke-dasharray: 6 8; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.45)); }
 
-  /* ═══════════════════════════════════════════════════════════════════════
-     2. ICONIC ROUNDEL (replaces Stained Glass)
-     Religious-icon framing: ornate metal ring holds the sprite in a clear
-     cream pane. A cabochon gem at the top of each frame shifts colour by
-     state. Background is deep cobalt with a faint gold damask suggestion.
-     ═══════════════════════════════════════════════════════════════════════ */
-  .design-roundel {
-    background:
-      radial-gradient(120% 80% at 50% 0%, rgba(245, 200, 66, 0.08), transparent 50%),
-      radial-gradient(80% 60% at 50% 60%, #0e1538, #060919 80%);
+  /* Header */
+  .hdr {
+    position: sticky; top: 0; z-index: 5;
+    padding: 14px 16px 12px;
+    background: rgba(10, 8, 16, 0.85);
+    backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
-  .design-roundel::before {
-    /* faint gold cross-damask scatter */
-    background:
-      radial-gradient(2px 2px at 18% 22%, rgba(212, 176, 112, 0.28), transparent 70%),
-      radial-gradient(2px 2px at 68% 14%, rgba(212, 176, 112, 0.22), transparent 70%),
-      radial-gradient(2px 2px at 32% 78%, rgba(212, 176, 112, 0.26), transparent 70%),
-      radial-gradient(2px 2px at 82% 68%, rgba(212, 176, 112, 0.24), transparent 70%),
-      radial-gradient(2px 2px at 50% 45%, rgba(212, 176, 112, 0.20), transparent 70%);
+  .hdr-eyebrow { font-size: 9px; letter-spacing: 0.3em; opacity: 0.5; text-transform: uppercase; }
+  .hdr-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; margin-top: 2px; }
+  .hdr-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 10px; gap: 8px; flex-wrap: wrap;
   }
-  .design-roundel .design-name { font-family: 'Cinzel Decorative', serif; font-weight: 900; color: #f4e2b0; text-shadow: 0 0 18px rgba(245, 200, 66, 0.5); }
-  .design-roundel .design-desc { color: rgba(244, 226, 176, 0.7); }
-  .design-roundel .node-bg { fill: #221a32; }                 /* deep frame backplate */
-  .design-roundel .node-disc { fill: #f0e5c4; stroke: none; } /* pale icon-pane */
-  .design-roundel .node-ring { fill: none; stroke: #8b6f3a; stroke-width: 6; }
-  .design-roundel .node.s-available .node-ring { stroke: #c0b8a8; stroke-width: 6; filter: drop-shadow(0 0 6px rgba(220, 200, 160, 0.5)); }
-  .design-roundel .node.s-owned .node-ring {
-    stroke: #f5c842; stroke-width: 7;
-    filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.65));
+  .karma-pill {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    padding: 6px 12px; border-radius: 20px;
+    background: rgba(245, 200, 66, 0.12);
+    border: 1px solid rgba(245, 200, 66, 0.42);
+    color: #f5c842;
+    font-size: 13px; font-weight: 700; font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
   }
-  .design-roundel .node-gem { display: block; stroke: rgba(0, 0, 0, 0.35); stroke-width: 0.6; }
-  .design-roundel .node.s-locked .node-gem { fill: #2a1a1a; }
-  .design-roundel .node.s-available .node-gem { fill: #4a90e0; filter: drop-shadow(0 0 4px rgba(74, 144, 224, 0.6)); }
-  .design-roundel .node.s-owned .node-gem { fill: #d22a3a; filter: drop-shadow(0 0 5px rgba(210, 42, 58, 0.7)); }
-  /* image filter overrides for this design: parchment-friendly */
-  .design-roundel .node.s-locked .node-image { filter: grayscale(1) brightness(0.55) sepia(0.15); opacity: 0.55; }
-  .design-roundel .node-label { font-family: 'Cinzel', serif; fill: rgba(244, 226, 176, 0.62); font-size: 8.5px; letter-spacing: 0.1em; }
-  .design-roundel .node.s-owned .node-label { fill: #f4e2b0; }
-  .design-roundel .edge { fill: none; stroke-linecap: round; }
-  .design-roundel .edge.s-locked { stroke: #4a3a22; stroke-width: 2.5; opacity: 0.55; }
-  .design-roundel .edge.s-pulse { stroke: #b8a070; stroke-width: 3; opacity: 0.85; }
-  .design-roundel .edge.s-lit { stroke: #f5c842; stroke-width: 3.5; filter: drop-shadow(0 0 8px rgba(245, 200, 66, 0.55)); }
+  .karma-pill .lbl { opacity: 0.7; font-weight: 600; font-size: 9px; letter-spacing: 0.18em; }
+  .discovered-pill {
+    font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    opacity: 0.55; font-weight: 600;
+  }
+  .hdr-actions { display: flex; gap: 6px; }
+  .hdr-btn {
+    font: inherit; font-size: 10.5px; font-weight: 600;
+    padding: 6px 10px; border-radius: 14px;
+    background: transparent; color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .hdr-btn:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+  .hdr-btn.give { color: #f5c842; border-color: rgba(245, 200, 66, 0.4); }
 
-  /* ═══════════════════════════════════════════════════════════════════════
-     3. ORACLE BONE SCROLL v2 (image-friendly)
-     The cream parchment background flatters almost any sprite. Bone-edge
-     border, cinnabar wax for the anchored states; locked sprites get a
-     sepia/ink wash so they read as "rubbing" not full image.
-     ═══════════════════════════════════════════════════════════════════════ */
-  .design-scroll {
-    background:
-      radial-gradient(120% 80% at 30% 20%, rgba(180, 140, 80, 0.22), transparent 60%),
-      radial-gradient(100% 60% at 70% 75%, rgba(160, 100, 40, 0.25), transparent 50%),
-      linear-gradient(180deg, #ecdcae 0%, #d4be88 100%);
-    color: #2a1408;
+  /* Stage */
+  .stage {
+    position: relative; z-index: 1;
+    display: grid; place-items: center;
+    padding: 14px 16px 220px;
   }
-  .design-scroll::before {
-    background:
-      radial-gradient(2.5px 2.5px at 23% 45%, rgba(120, 80, 30, 0.35), transparent),
-      radial-gradient(4px 4px at 68% 78%, rgba(140, 90, 40, 0.32), transparent),
-      radial-gradient(2.5px 2.5px at 15% 80%, rgba(120, 80, 30, 0.4), transparent),
-      radial-gradient(3px 3px at 85% 25%, rgba(160, 100, 50, 0.32), transparent),
-      radial-gradient(120px 80px at 18% 35%, rgba(100, 60, 20, 0.12), transparent 70%),
-      radial-gradient(150px 100px at 78% 60%, rgba(120, 70, 25, 0.10), transparent 70%);
-    mix-blend-mode: multiply;
-  }
-  .design-scroll .design-name { font-family: 'EB Garamond', serif; font-style: italic; font-weight: 500; color: #2a1408; font-size: 26px; letter-spacing: 0.04em; }
-  .design-scroll .design-desc { color: rgba(42, 20, 8, 0.72); }
-  .design-scroll .node-bg { fill: rgba(120, 80, 30, 0.08); }
-  .design-scroll .node-disc { fill: #ecdcb0; stroke: none; }
-  .design-scroll .node-ring { fill: none; stroke: #5a3818; stroke-width: 1.5; }
-  .design-scroll .node.s-available .node-ring { stroke: #b03020; stroke-width: 2; }
-  .design-scroll .node.s-owned .node-ring {
-    stroke: #a01818; stroke-width: 2.8;
-    filter: drop-shadow(0 0 8px rgba(176, 48, 32, 0.45));
-  }
-  .design-scroll .node.s-owned .node-disc { fill: #f4e3b6; }
-  .design-scroll .node.s-locked .node-image { filter: sepia(0.6) grayscale(0.4) brightness(0.85); opacity: 0.65; }
-  .design-scroll .node-label { font-family: 'EB Garamond', serif; font-style: italic; fill: #5a3818; font-size: 9.5px; }
-  .design-scroll .node.s-owned .node-label { fill: #a01818; font-weight: 700; }
-  .design-scroll .edge { fill: none; stroke-linecap: round; }
-  .design-scroll .edge.s-locked { stroke: #8a6840; stroke-width: 1.6; stroke-dasharray: 2 4; opacity: 0.55; }
-  .design-scroll .edge.s-pulse { stroke: #c43820; stroke-width: 2.4; opacity: 0.88; }
-  .design-scroll .edge.s-lit { stroke: #a01818; stroke-width: 3; filter: drop-shadow(0 1px 1px rgba(80, 20, 10, 0.4)); }
+  .tree-svg { width: 100%; max-width: 340px; height: auto; display: block; }
 
-  /* ═══════════════════════════════════════════════════════════════════════
-     4. BRONZE RITUAL CAULDRON v2 (image-friendly)
-     Each sprite sits in a hammered coin recess. The bronze rim does the
-     state work: oxidised dark for locked, polished bronze for available,
-     molten gold for anchored. Edges remain chiselled channels.
-     ═══════════════════════════════════════════════════════════════════════ */
-  .design-bronze {
-    background: radial-gradient(130% 90% at 50% 30%, #5a4a28 0%, #2a2010 65%, #150e08 100%);
-  }
-  .design-bronze::before {
-    background:
-      radial-gradient(60px 45px at 22% 18%, rgba(60, 130, 95, 0.22), transparent 65%),
-      radial-gradient(75px 55px at 78% 62%, rgba(70, 140, 100, 0.28), transparent 65%),
-      radial-gradient(50px 38px at 15% 75%, rgba(60, 130, 95, 0.18), transparent 65%),
-      radial-gradient(40px 32px at 85% 30%, rgba(70, 140, 100, 0.20), transparent 65%),
-      radial-gradient(3px 3px at 8% 15%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
-      radial-gradient(3px 3px at 92% 15%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
-      radial-gradient(3px 3px at 8% 85%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
-      radial-gradient(3px 3px at 92% 85%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%);
-  }
-  .design-bronze .design-name { font-family: 'Cinzel', serif; font-weight: 700; color: #d4b070; text-shadow: 0 0 18px rgba(212, 176, 112, 0.42); }
-  .design-bronze .design-desc { color: rgba(212, 176, 112, 0.72); }
-  /* dark recess shadow + bronze coin face */
-  .design-bronze .node-bg { fill: rgba(0, 0, 0, 0.45); }
-  .design-bronze .node-disc { fill: url(#bronze-base); }
-  .design-bronze .node-ring { fill: none; stroke: #3a2810; stroke-width: 2.5; }
-  .design-bronze .node.s-available .node-ring { stroke: #a47830; stroke-width: 3; filter: drop-shadow(0 0 8px rgba(170, 140, 80, 0.5)); }
-  .design-bronze .node.s-owned .node-disc { fill: url(#bronze-gold); }
-  .design-bronze .node.s-owned .node-ring { stroke: #f5c842; stroke-width: 3.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.6)); }
-  .design-bronze .node.s-locked .node-image { filter: grayscale(0.7) sepia(0.35) brightness(0.5); opacity: 0.55; }
-  .design-bronze .node-label { font-family: 'Cinzel', serif; fill: rgba(212, 176, 112, 0.6); font-size: 8.5px; letter-spacing: 0.08em; }
-  .design-bronze .node.s-owned .node-label { fill: #d4b070; }
-  .design-bronze .edge { fill: none; stroke-linecap: round; }
-  .design-bronze .edge.s-locked { stroke: #3a2810; stroke-width: 2.2; opacity: 0.7; }
-  .design-bronze .edge.s-pulse { stroke: #a47830; stroke-width: 2.8; opacity: 0.9; filter: drop-shadow(0 0 5px rgba(170, 140, 80, 0.5)); }
-  .design-bronze .edge.s-lit { stroke: #f5c842; stroke-width: 3.4; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.6)); }
+  /* Node base */
+  .node { cursor: pointer; }
+  .node .node-disc { fill: #0c0a26; transition: fill 0.2s; }
+  .node .node-ring { fill: none; transition: stroke 0.3s, stroke-width 0.3s; }
+  .node .node-label { user-select: none; pointer-events: none; font-family: 'Cinzel', serif; font-size: 8.5px; letter-spacing: 0.08em; }
+  .node .node-glyph { user-select: none; pointer-events: none; font-family: 'Cinzel', serif; font-size: 18px; }
+  .node .node-cost  { user-select: none; pointer-events: none; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.04em; }
 
-  /* small note at the bottom of every stage */
-  .study-foot {
-    padding: 6px 18px 22px;
-    font-size: 10.5px; line-height: 1.5; opacity: 0.55;
+  /* Owned: gold glow */
+  .node.s-owned .node-ring { stroke: #f5c842; stroke-width: 2.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.55)); }
+  .node.s-owned .node-glyph { fill: #f5c842; font-weight: 700; }
+  .node.s-owned .node-label { fill: #ece9f7; }
+
+  /* Available: violet pulse */
+  .node.s-available .node-ring { stroke: #b794f6; stroke-width: 2; filter: drop-shadow(0 0 8px rgba(107, 70, 193, 0.55)); animation: avail-pulse 2.4s ease-in-out infinite; }
+  .node.s-available .node-glyph { fill: #b794f6; font-weight: 700; }
+  .node.s-available .node-label { fill: rgba(236, 233, 247, 0.85); }
+  .node.s-available .node-cost { fill: #f5c842; }
+  .node.s-available.is-poor .node-cost { fill: rgba(245, 200, 66, 0.4); }
+  @keyframes avail-pulse {
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 1; }
+  }
+
+  /* Fog: dim, no info */
+  .node.s-fog .node-disc { fill: rgba(12, 10, 38, 0.5); }
+  .node.s-fog .node-ring { stroke: rgba(120, 90, 200, 0.28); stroke-width: 1; stroke-dasharray: 2 3; }
+  .node.s-fog .node-glyph { fill: rgba(180, 160, 220, 0.45); font-weight: 400; font-size: 22px; }
+  .node.s-fog .node-label { display: none; }
+  .node.s-fog .node-cost  { display: none; }
+
+  /* Newly-revealed pop */
+  .node.s-newly-revealed { animation: reveal 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); transform-origin: center; transform-box: fill-box; }
+  @keyframes reveal {
+    0%   { opacity: 0; transform: scale(0.55); }
+    55%  { opacity: 1; transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+
+  /* Selected */
+  .node.is-selected .node-disc { fill: #1a1640; }
+  .node.is-selected .node-ring { stroke-width: 3; }
+
+  /* Edges */
+  .edge { fill: none; stroke-linecap: round; transition: stroke 0.3s, opacity 0.3s; }
+  .edge.s-lit   { stroke: #f5c842; stroke-width: 2.2; stroke-dasharray: 6 8; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.45)); }
+  .edge.s-pulse { stroke: #b794f6; stroke-width: 1.8; opacity: 0.85; filter: drop-shadow(0 0 6px rgba(183, 148, 246, 0.5)); }
+  .edge.s-dim   { stroke: rgba(120, 90, 200, 0.22); stroke-width: 1; stroke-dasharray: 2 5; }
+
+  /* Detail card */
+  .detail {
+    position: fixed; left: 12px; right: 12px; bottom: 14px;
+    z-index: 10;
+    background: rgba(12, 10, 38, 0.94);
+    backdrop-filter: blur(16px) saturate(130%);
+    border: 1px solid rgba(183, 148, 246, 0.35);
+    border-radius: 14px;
+    padding: 14px 16px 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    transform: translateY(140%);
+    transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.2, 1);
+    max-width: 480px; margin: 0 auto;
+  }
+  .detail.is-open { transform: translateY(0); }
+  .detail-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .detail-name { font-family: 'Cinzel', serif; font-weight: 700; font-size: 15px; letter-spacing: 0.08em; color: #ece9f7; }
+  .detail-name.fog { color: rgba(180, 160, 220, 0.6); font-style: italic; letter-spacing: 0.22em; }
+  .detail-cost { font-family: 'Cinzel', serif; font-weight: 700; font-size: 12px; color: #f5c842; letter-spacing: 0.05em; white-space: nowrap; }
+  .detail-effect { font-size: 12.5px; line-height: 1.5; margin-top: 8px; color: rgba(236, 233, 247, 0.85); }
+  .detail-effect.fog { color: rgba(180, 160, 220, 0.55); font-style: italic; }
+  .detail-foot { margin-top: 12px; display: flex; gap: 8px; align-items: center; }
+  .detail-btn {
+    flex: 1;
+    font: inherit; font-family: 'Cinzel', serif; font-weight: 700;
+    padding: 11px 14px; border-radius: 9px;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid; cursor: pointer; transition: filter 0.15s;
+  }
+  .detail-btn-buy { background: linear-gradient(180deg, #f5c842, #c89a18); border-color: #f5c842; color: #1a1408; }
+  .detail-btn-buy:hover { filter: brightness(1.1); }
+  .detail-btn-disabled { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.45); cursor: not-allowed; }
+  .detail-close { font: inherit; background: transparent; border: 0; color: rgba(255,255,255,0.45); font-size: 22px; line-height: 1; cursor: pointer; padding: 4px 8px; }
+  .detail-close:hover { color: #fff; }
+
+  /* Footnote */
+  .stage-foot {
+    position: relative; z-index: 1;
+    padding: 4px 18px 18px;
+    font-size: 11px; line-height: 1.55; opacity: 0.55;
     text-align: center; max-width: 480px; margin: 0 auto;
   }
 </style>
 </head>
 <body>
 
-<header class="study-header">
-  <div class="study-eyebrow">Eternal Tree</div>
-  <div class="study-title">Design Study v2</div>
-  <div class="study-sub">Image-aware variants. Each node holds a real game sprite as a stand-in for the upgrade's eventual dedicated icon.</div>
-  <nav class="study-tabs" id="tabs">
-    <button class="study-tab study-tab-on" data-design="cosmic">Cosmic Ledger</button>
-    <button class="study-tab" data-design="roundel">Iconic Roundel</button>
-    <button class="study-tab" data-design="scroll">Oracle Bone</button>
-    <button class="study-tab" data-design="bronze">Bronze Cauldron</button>
-  </nav>
+<header class="hdr">
+  <div class="hdr-eyebrow">Eternal Tree</div>
+  <div class="hdr-title">Fog-of-War Prototype</div>
+  <div class="hdr-row">
+    <span class="karma-pill"><span class="lbl">KARMA</span><span id="karma">25</span></span>
+    <span class="discovered-pill" id="discovered">4 / 13 known</span>
+    <div class="hdr-actions">
+      <button class="hdr-btn give" id="give">+10 K</button>
+      <button class="hdr-btn" id="reset">Reset</button>
+    </div>
+  </div>
 </header>
 
-<main class="study-stage design-cosmic" id="stage">
-  <div class="design-meta">
-    <div class="design-name" id="design-name">Cosmic Ledger</div>
-    <p class="design-desc" id="design-desc">
-      Indigo void with a soft scrim around each node so the sprite is not
-      fighting the starfield. The ring carries the state: dim violet for
-      locked, brighter violet halo for available, gold ring + gold glow for
-      anchored. Locked sprites are desaturated and dimmed; anchored ones
-      get a slight saturation lift.
-    </p>
-  </div>
-
-  <div class="stage-wrap">
-    <svg class="constellation" viewBox="0 0 250 620" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <clipPath id="clip-node"><circle r="34" /></clipPath>
-        <radialGradient id="bronze-base" cx="0.5" cy="0.38" r="0.62">
-          <stop offset="0%"  stop-color="#b4844a"/>
-          <stop offset="55%" stop-color="#6a4818"/>
-          <stop offset="100%" stop-color="#3a2810"/>
-        </radialGradient>
-        <radialGradient id="bronze-gold" cx="0.5" cy="0.38" r="0.62">
-          <stop offset="0%"  stop-color="#ffd866"/>
-          <stop offset="55%" stop-color="#c49018"/>
-          <stop offset="100%" stop-color="#6a4818"/>
-        </radialGradient>
-      </defs>
-
-      <!-- ── Edges (drawn behind nodes) ── -->
-      <g class="edges">
-        <!-- n_1 (owned) -> n_2 (locked) : pulse -->
-        <path class="edge s-pulse" d="M 100,60 Q 125,42 150,60" />
-        <!-- n_1 (owned) -> n_3 (owned) : lit -->
-        <path class="edge s-lit"   d="M 60,100 Q 48,140 60,140" />
-        <!-- n_3 (owned) -> n_4 (available) : pulse -->
-        <path class="edge s-pulse" d="M 100,180 Q 125,162 150,180" />
-        <!-- n_3 (owned) -> n_5 (owned) : lit -->
-        <path class="edge s-lit"   d="M 60,220 Q 48,260 60,260" />
-        <!-- n_5 (owned) -> n_6 (locked) : pulse -->
-        <path class="edge s-pulse" d="M 60,340 Q 48,380 60,380" />
-        <!-- n_6 (locked) -> n_7 (locked) : locked -->
-        <path class="edge s-locked" d="M 60,460 Q 48,500 60,500" />
-      </g>
-
-      <!-- ── Nodes ── -->
-      <!-- n_1 Devoted Path · owned · spirit_stone -->
-      <g class="node s-owned" transform="translate(60, 60)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/spirit_stone.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">DEVOTED PATH</text>
-      </g>
-
-      <!-- n_2 Star Disciple · locked · iron_herb_2 -->
-      <g class="node s-locked" transform="translate(190, 60)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/iron_herb_2.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">STAR DISCIPLE</text>
-      </g>
-
-      <!-- n_3 Crystalline Focus · owned · origin_crystal -->
-      <g class="node s-owned" transform="translate(60, 180)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/origin_crystal.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">CRYSTALLINE</text>
-      </g>
-
-      <!-- n_4 Discerning Eye · available · elemental_essence_bead -->
-      <g class="node s-available" transform="translate(190, 180)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/elemental_essence_bead.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">DISCERNING EYE</text>
-      </g>
-
-      <!-- n_5 Frugal Cultivation · owned · profound_accumulation_pill -->
-      <g class="node s-owned" transform="translate(60, 300)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/profound_accumulation_pill.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">FRUGAL</text>
-      </g>
-
-      <!-- n_6 Sect Resonance · locked · heaven_spirit_dew -->
-      <g class="node s-locked" transform="translate(60, 420)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/heaven_spirit_dew.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">RESONANCE</text>
-      </g>
-
-      <!-- n_7 Senior's Guidance · locked · jade_heart_flower -->
-      <g class="node s-locked" transform="translate(60, 540)">
-        <circle class="node-bg" r="46"/>
-        <circle class="node-disc" r="40"/>
-        <image class="node-image" href="/sprites/items/jade_heart_flower.png"
-               x="-34" y="-34" width="68" height="68"
-               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
-        <circle class="node-ring" r="40"/>
-        <circle class="node-gem" cx="0" cy="-42" r="4"/>
-        <text class="node-label" x="0" y="56" text-anchor="middle">SENIOR'S GUIDANCE</text>
-      </g>
-    </svg>
-  </div>
-
-  <div class="study-foot">
-    Same 7 nodes in every variant: <strong>Devoted Path / Crystalline / Frugal</strong> anchored, <strong>Discerning Eye</strong> available next, <strong>Star Disciple / Resonance / Guidance</strong> still bound. Sprites are real game pixel art used as placeholders for the eventual dedicated upgrade icons.
-  </div>
+<main class="stage">
+  <svg class="tree-svg" id="tree" viewBox="0 0 250 720" xmlns="http://www.w3.org/2000/svg">
+    <g id="edges"></g>
+    <g id="nodes"></g>
+  </svg>
 </main>
 
-<script>
-  const DESIGNS = {
-    cosmic: {
-      name: 'Cosmic Ledger',
-      desc: "Indigo void with a soft scrim around each node so the sprite is not fighting the starfield. The ring carries the state: dim violet for locked, brighter violet halo for available, gold ring + gold glow for anchored. Locked sprites are desaturated and dimmed; anchored ones get a slight saturation lift."
-    },
-    roundel: {
-      name: 'Iconic Roundel',
-      desc: "Religious-icon framing: each node is a circular pale pane held inside a thick metal ring, with a cabochon gem at the top of the frame that changes colour by state (dark stone locked, sapphire available, ruby anchored). Background is deep cobalt with a faint gold damask. The sprite is the saint; the frame is the reliquary."
-    },
-    scroll: {
-      name: 'Oracle Bone Scroll',
-      desc: "Aged parchment with water stains and grain. Sprites sit inscribed on bone-coloured roundels, the dark bone-edge stroke acting as the frame. Anchored nodes earn a cinnabar ring; locked nodes are washed in sepia like a rubbing rather than a full painting. Edges are silk cord (locked) or red wax (anchored)."
-    },
-    bronze: {
-      name: 'Bronze Ritual Cauldron',
-      desc: "Patinated Shang-bronze plate with verdigris and rivets. Each sprite sits in a hammered coin recess, the bronze rim doing the state work: oxidised dark for locked, polished bronze for available, molten gold for anchored. Edges are chiselled channels filling with gold as you commit karma."
-    },
-  };
-  const stage   = document.getElementById('stage');
-  const tabs    = document.getElementById('tabs');
-  const nameEl  = document.getElementById('design-name');
-  const descEl  = document.getElementById('design-desc');
+<div class="stage-foot">
+  Tap a glowing violet node to inspect or anchor it. Tap a fogged "?" to peer in (you cannot see what it grants until a connected node is anchored). Convergence nodes like <em>Three Treasures</em> and <em>Heavenward</em> require <em>every</em> parent anchored before they reveal.
+</div>
 
-  tabs.addEventListener('click', (e) => {
-    const t = e.target.closest('.study-tab'); if (!t) return;
-    const key = t.dataset.design;
-    [...tabs.children].forEach(x => x.classList.toggle('study-tab-on', x === t));
-    stage.className = 'study-stage design-' + key;
-    nameEl.textContent = DESIGNS[key].name;
-    descEl.textContent = DESIGNS[key].desc;
-  });
+<div class="detail" id="detail">
+  <div class="detail-head">
+    <span class="detail-name" id="dname"></span>
+    <span class="detail-cost" id="dcost"></span>
+  </div>
+  <p class="detail-effect" id="deffect"></p>
+  <div class="detail-foot">
+    <button class="detail-btn detail-btn-buy" id="dbtn">Anchor</button>
+    <button class="detail-close" id="dclose" aria-label="Close">×</button>
+  </div>
+</div>
+
+<script>
+  // ── Tree data ───────────────────────────────────────────────────────────
+  const NODES = {
+    root: { label: 'Foundation',      cost: 0,  effect: 'The seed of every cultivation. Always carried.',                                 pos: [125,  50], parents: [] },
+    a1:   { label: 'Iron Tendons',    cost: 1,  effect: '+5% strike weight per realm. The body remembers.',                               pos: [ 55, 145], parents: ['root'] },
+    a2:   { label: 'Quiet Mind',      cost: 1,  effect: '+10% qi/s while idle. Stillness compounds.',                                     pos: [125, 145], parents: ['root'] },
+    a3:   { label: 'Sky-Eye',         cost: 1,  effect: '+15% law gain. Insight pierces the veil.',                                       pos: [195, 145], parents: ['root'] },
+    b1:   { label: 'Stone Skin',      cost: 2,  effect: '+20% endurance. Blows landed do not bruise.',                                    pos: [ 55, 240], parents: ['a1'] },
+    b2:   { label: 'Lotus Bloom',     cost: 2,  effect: '+1 spirit garden plot. The dew runs deeper.',                                    pos: [125, 240], parents: ['a2'] },
+    b3:   { label: 'Wind Whisper',    cost: 2,  effect: '+25% mantra cycle speed. Breath travels far.',                                   pos: [195, 240], parents: ['a3'] },
+    c1:   { label: 'Three Treasures', cost: 5,  effect: 'Jing, qi, and shen converge. +50% to all yields. Requires the three roots.',     pos: [125, 340], parents: ['b1','b2','b3'] },
+    d1:   { label: 'Soul Anchor',     cost: 3,  effect: 'Keep one technique through reincarnation.',                                      pos: [ 70, 440], parents: ['c1'] },
+    d2:   { label: 'Twin Stars',      cost: 3,  effect: 'Begin each life with 2 minor anchors pre-paid.',                                 pos: [180, 440], parents: ['c1'] },
+    e1:   { label: 'Thunder Stride',  cost: 4,  effect: '+1 active dao slot. The path widens.',                                           pos: [ 70, 540], parents: ['d1'] },
+    e2:   { label: 'Auspicious Star', cost: 4,  effect: 'Drop rates +35% across all sources.',                                            pos: [180, 540], parents: ['d2'] },
+    f1:   { label: 'Heavenward',      cost: 10, effect: 'Carry one full realm through reincarnation. The capstone.',                      pos: [125, 640], parents: ['e1','e2'] },
+  };
+  const STARTING_KARMA = 25;
+  const ROOT_OWNED = ['root'];
+
+  // ── State ───────────────────────────────────────────────────────────────
+  let owned = new Set(ROOT_OWNED);
+  let karma = STARTING_KARMA;
+  let selected = null;
+  const prevStates = new Map();
+
+  function stateOf(id) {
+    if (owned.has(id)) return 'owned';
+    const n = NODES[id];
+    if (!n.parents || n.parents.length === 0) return 'available';
+    return n.parents.every(p => owned.has(p)) ? 'available' : 'fog';
+  }
+
+  function* edgesList() {
+    for (const id in NODES) {
+      const n = NODES[id];
+      if (!n.parents) continue;
+      for (const p of n.parents) yield [p, id];
+    }
+  }
+
+  function edgeState(from, to) {
+    const fs = stateOf(from), ts = stateOf(to);
+    if (fs === 'owned' && ts === 'owned')     return 'lit';
+    if (fs === 'owned' && ts === 'available') return 'pulse';
+    return 'dim';
+  }
+
+  function curvePath([x1, y1], [x2, y2]) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 4) return `M ${x1},${y1} L ${x2},${y2}`;
+    const r = 28;
+    const ux = dx / dist, uy = dy / dist;
+    const sx = x1 + ux * r, sy = y1 + uy * r;
+    const ex = x2 - ux * r, ey = y2 - uy * r;
+    const px = -uy, py = ux;
+    const cx = (sx + ex) / 2 + px * 7;
+    const cy = (sy + ey) / 2 + py * 7;
+    return `M ${sx},${sy} Q ${cx},${cy} ${ex},${ey}`;
+  }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const edgesG = document.getElementById('edges');
+  const nodesG = document.getElementById('nodes');
+
+  function render() {
+    edgesG.replaceChildren();
+    nodesG.replaceChildren();
+
+    for (const [from, to] of edgesList()) {
+      const el = document.createElementNS(NS, 'path');
+      el.setAttribute('class', `edge s-${edgeState(from, to)}`);
+      el.setAttribute('d', curvePath(NODES[from].pos, NODES[to].pos));
+      edgesG.appendChild(el);
+    }
+
+    let discovered = 0;
+    for (const id in NODES) {
+      const n = NODES[id];
+      const s = stateOf(id);
+      const prev = prevStates.get(id);
+      const wasNewlyRevealed = prev === 'fog' && s !== 'fog';
+      if (s !== 'fog') discovered++;
+      const isPoor = s === 'available' && karma < n.cost;
+      const isSel = selected === id;
+      const cls = ['node', `s-${s}`];
+      if (wasNewlyRevealed) cls.push('s-newly-revealed');
+      if (isPoor) cls.push('is-poor');
+      if (isSel) cls.push('is-selected');
+
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('class', cls.join(' '));
+      g.setAttribute('transform', `translate(${n.pos[0]},${n.pos[1]})`);
+      g.addEventListener('click', () => { selected = id; renderDetail(); render(); });
+
+      const disc = document.createElementNS(NS, 'circle');
+      disc.setAttribute('class', 'node-disc');
+      disc.setAttribute('r', 28);
+      g.appendChild(disc);
+
+      const ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('class', 'node-ring');
+      ring.setAttribute('r', 28);
+      g.appendChild(ring);
+
+      const glyph = document.createElementNS(NS, 'text');
+      glyph.setAttribute('class', 'node-glyph');
+      glyph.setAttribute('text-anchor', 'middle');
+      glyph.setAttribute('dominant-baseline', 'central');
+      glyph.textContent = s === 'fog' ? '?' : '✦';
+      g.appendChild(glyph);
+
+      if (s !== 'fog') {
+        const label = document.createElementNS(NS, 'text');
+        label.setAttribute('class', 'node-label');
+        label.setAttribute('text-anchor', 'middle');
+        label.setAttribute('y', 46);
+        label.textContent = n.label.toUpperCase();
+        g.appendChild(label);
+      }
+
+      if (s === 'available' && n.cost > 0) {
+        const cost = document.createElementNS(NS, 'text');
+        cost.setAttribute('class', 'node-cost');
+        cost.setAttribute('text-anchor', 'middle');
+        cost.setAttribute('y', -34);
+        cost.textContent = `${n.cost} ✧`;
+        g.appendChild(cost);
+      }
+
+      nodesG.appendChild(g);
+      prevStates.set(id, s);
+    }
+
+    document.getElementById('karma').textContent = karma;
+    const total = Object.keys(NODES).length;
+    document.getElementById('discovered').textContent = `${discovered} / ${total} known`;
+  }
+
+  // ── Detail card ─────────────────────────────────────────────────────────
+  const detailEl = document.getElementById('detail');
+  const dname    = document.getElementById('dname');
+  const dcost    = document.getElementById('dcost');
+  const deffect  = document.getElementById('deffect');
+  const dbtn     = document.getElementById('dbtn');
+
+  function renderDetail() {
+    if (!selected) { detailEl.classList.remove('is-open'); return; }
+    const n = NODES[selected];
+    const s = stateOf(selected);
+
+    if (s === 'fog') {
+      dname.textContent   = '??? Veiled';
+      dname.className     = 'detail-name fog';
+      dcost.textContent   = '';
+      deffect.textContent = 'Something stirs here, but its nature is hidden. Anchor a connected node to discover what awaits.';
+      deffect.className   = 'detail-effect fog';
+      dbtn.className      = 'detail-btn detail-btn-disabled';
+      dbtn.textContent    = '✦ Unknown';
+      dbtn.disabled       = true;
+    } else if (s === 'owned') {
+      dname.textContent   = n.label;
+      dname.className     = 'detail-name';
+      dcost.textContent   = '';
+      deffect.textContent = n.effect;
+      deffect.className   = 'detail-effect';
+      dbtn.className      = 'detail-btn detail-btn-disabled';
+      dbtn.textContent    = '✓ Anchored';
+      dbtn.disabled       = true;
+    } else {
+      dname.textContent   = n.label;
+      dname.className     = 'detail-name';
+      dcost.textContent   = n.cost > 0 ? `${n.cost} ✧ karma` : 'free';
+      deffect.textContent = n.effect;
+      deffect.className   = 'detail-effect';
+      if (karma < n.cost) {
+        dbtn.className   = 'detail-btn detail-btn-disabled';
+        dbtn.textContent = `Need ${n.cost - karma} more karma`;
+        dbtn.disabled    = true;
+      } else {
+        dbtn.className   = 'detail-btn detail-btn-buy';
+        dbtn.textContent = n.cost > 0 ? `Anchor for ${n.cost} ✧` : 'Anchor (free)';
+        dbtn.disabled    = false;
+      }
+    }
+    detailEl.classList.add('is-open');
+  }
+
+  function buy() {
+    if (!selected) return;
+    const n = NODES[selected];
+    if (stateOf(selected) !== 'available' || karma < n.cost) return;
+    karma -= n.cost;
+    owned.add(selected);
+    selected = null;
+    renderDetail();
+    render();
+  }
+
+  function reset() {
+    owned = new Set(ROOT_OWNED);
+    karma = STARTING_KARMA;
+    selected = null;
+    prevStates.clear();
+    renderDetail();
+    render();
+  }
+
+  function give() { karma += 10; render(); renderDetail(); }
+
+  dbtn.addEventListener('click', buy);
+  document.getElementById('dclose').addEventListener('click', () => { selected = null; renderDetail(); render(); });
+  document.getElementById('reset').addEventListener('click', reset);
+  document.getElementById('give').addEventListener('click', give);
+
+  render();
 </script>
 
 </body>
