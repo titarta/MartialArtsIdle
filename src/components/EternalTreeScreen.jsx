@@ -1,171 +1,145 @@
 import { useMemo, useRef } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
+import './eternalTree.css';
 
-// ── Layout constants ──────────────────────────────────────────────────────────
-const COL_W   = 120; // px per column
-const ROW_H   = 100; // px per row
-const NODE_W  = 80;
-const NODE_H  = 64;
-const PADDING = 40;  // canvas padding
+// ── Layout ───────────────────────────────────────────────────────────────────
+const COL_W   = 138;
+const ROW_H   = 92;
+const NODE_R  = 30;
+const PADDING = 44;
 
-// Pre-compute pixel center for each node
-function nodeCenter(n) {
-  return {
-    cx: PADDING + n.col * COL_W + NODE_W / 2,
-    cy: PADDING + n.row * ROW_H + NODE_H / 2,
-  };
+const NUM_COLS  = Math.max(...NODES.map(n => n.col)) + 1;
+const NUM_ROWS  = Math.max(...NODES.map(n => n.row)) + 1;
+const CANVAS_W  = PADDING * 2 + NUM_COLS * COL_W;
+const CANVAS_H  = PADDING * 2 + NUM_ROWS * ROW_H;
+
+const nodeCenter = (n) => ({
+  cx: PADDING + n.col * COL_W + COL_W / 2,
+  cy: PADDING + n.row * ROW_H + ROW_H / 2,
+});
+
+/** Gentle Bézier curve between two node centres, starting/ending on the disc
+ *  edge. Bow direction alternates by a deterministic hash so adjacent edges
+ *  don't all curve the same way. */
+function edgePath(from, to) {
+  const f = nodeCenter(from);
+  const t = nodeCenter(to);
+  const dx = t.cx - f.cx, dy = t.cy - f.cy;
+  const len = Math.hypot(dx, dy);
+  if (len < 1) return '';
+  const ux = dx / len, uy = dy / len;
+  const sx = f.cx + ux * NODE_R, sy = f.cy + uy * NODE_R;
+  const ex = t.cx - ux * NODE_R, ey = t.cy - uy * NODE_R;
+  const mx = (sx + ex) / 2, my = (sy + ey) / 2;
+  const bow = 24 + Math.min(40, len * 0.18);
+  const sign = (from.row + to.col) % 2 === 0 ? 1 : -1;
+  const cx = mx + (-uy) * bow * sign;
+  const cy = my + (ux) * bow * sign;
+  return `M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
 }
 
-// Build edge list from node prereqs
-function buildEdges() {
-  const edges = [];
-  for (const n of NODES) {
-    for (const pid of n.prereqs) {
-      if (NODES_BY_ID[pid]) {
-        edges.push({ from: pid, to: n.id });
-      }
-    }
+const EDGES = (() => {
+  const out = [];
+  for (const n of NODES) for (const pid of n.prereqs) if (NODES_BY_ID[pid]) out.push({ from: pid, to: n.id });
+  return out;
+})();
+
+// CJK sigil per node — each path of karma gets its own glyph so the
+// constellation reads as faces, not words.
+const NODE_GLYPH = {
+  n_1: '道', // Devoted Path
+  n_2: '星', // Star Disciple (coming soon)
+  n_3: '晶', // Crystalline Focus
+  n_4: '眼', // Discerning Eye
+  n_5: '儉', // Frugal Cultivation
+  n_6: '響', // Sect Resonance
+  n_7: '長', // Senior's Guidance
+};
+
+// Starfield — deterministic so it doesn't dance on each render.
+function makeStars(count) {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+  const arr = [];
+  for (let i = 0; i < count; i++) {
+    const r = rnd();
+    const kind = r < 0.06 ? 'gold' : r < 0.18 ? 'bri' : 'reg';
+    arr.push({
+      left:     (rnd() * 100).toFixed(2) + '%',
+      top:      (rnd() * 100).toFixed(2) + '%',
+      delay:    (rnd() * 5).toFixed(2) + 's',
+      duration: (2 + rnd() * 4).toFixed(2) + 's',
+      kind,
+    });
   }
-  return edges;
-}
-const EDGES = buildEdges();
-
-const ARROW_SIZE = 10; // px — arrowhead length in user-space
-
-/** Border-to-border endpoints for an edge.
- *  Since edges only go right (Δcol>0) or down (Δrow>0), we can snap
- *  the exit/entry points to the exact node faces.
- */
-function edgeEndpoints(fromNode, toNode) {
-  const fc = nodeCenter(fromNode);
-  const tc = nodeCenter(toNode);
-  const isRight = toNode.col > fromNode.col;
-  if (isRight) {
-    return {
-      x1: fc.cx + NODE_W / 2,
-      y1: fc.cy,
-      x2: tc.cx - NODE_W / 2,
-      y2: tc.cy,
-    };
-  }
-  // Downward
-  return {
-    x1: fc.cx,
-    y1: fc.cy + NODE_H / 2,
-    x2: tc.cx,
-    y2: tc.cy - NODE_H / 2,
-  };
+  return arr;
 }
 
-// Canvas dimensions
-const NUM_COLS = Math.max(...NODES.map(n => n.col)) + 1;
-const NUM_ROWS = Math.max(...NODES.map(n => n.row)) + 1;
-const CANVAS_W = PADDING * 2 + NUM_COLS * COL_W;
-const CANVAS_H = PADDING * 2 + NUM_ROWS * ROW_H;
-
-// ── Node component ────────────────────────────────────────────────────────────
+// ── Node ─────────────────────────────────────────────────────────────────────
 function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
-  const center = nodeCenter(node);
-  const x = center.cx - NODE_W / 2;
-  const y = center.cy - NODE_H / 2;
-
+  const { cx, cy } = nodeCenter(node);
   const isPurchased  = state === 'purchased';
   const isAvailable  = state === 'available';
   const isLocked     = state === 'locked';
   const isComingSoon = node.id === 'n_2';
-
   const canBuy = isAvailable && !isComingSoon && karma >= node.cost;
 
-  const bg = isPurchased ? '#4a1d8a'
-           : isAvailable ? '#2a1850'
-           : '#161020';
-  const border = isPurchased ? '#c084fc'
-               : isAvailable ? '#7c3aed'
-               : '#3b2a55';
-  const textColor = isPurchased ? '#e9d5ff'
-                  : isAvailable ? '#c4b5fd'
-                  : '#6b5f80';
-  const opacity = isLocked ? 0.5 : 1;
+  const variant = isPurchased ? 'owned'
+                : canBuy      ? 'can'
+                : isAvailable ? 'avail'
+                :               'locked';
+  const cls = `et-node et-node-${variant}${isComingSoon ? ' et-node-soon' : ''}`;
+
+  const onEnter = (e) => {
+    const tt = tooltipRef.current; if (!tt) return;
+    const parts = [`<strong>${node.label}</strong>`, `<div>${node.description}</div>`];
+    if (isComingSoon)       parts.push('<div class="et-tt-soon">✦ coming soon</div>');
+    else if (isPurchased)   parts.push('<div class="et-tt-owned">✓ anchored</div>');
+    else {
+      parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
+      if (canBuy)            parts.push('<div class="et-tt-go">tap to anchor</div>');
+      else if (isAvailable)  parts.push(`<div class="et-tt-poor">need ${node.cost - karma} more karma</div>`);
+      else                   parts.push('<div class="et-tt-soon">prerequisites still bound</div>');
+    }
+    tt.innerHTML = parts.join('');
+    tt.style.display = 'block';
+  };
+  const onMove = (e) => {
+    const tt = tooltipRef.current; if (!tt) return;
+    const svg = e.currentTarget.closest('svg');
+    if (!svg) return;
+    const r = svg.getBoundingClientRect();
+    tt.style.left = (e.clientX - r.left + 14) + 'px';
+    tt.style.top  = (e.clientY - r.top  - 8) + 'px';
+  };
+  const onLeave = () => { if (tooltipRef.current) tooltipRef.current.style.display = 'none'; };
 
   return (
     <g
-      transform={`translate(${x},${y})`}
-      style={{ cursor: canBuy ? 'pointer' : 'default', opacity }}
+      className={cls}
+      transform={`translate(${cx},${cy})`}
       onClick={canBuy ? () => onBuy(node.id, node.cost) : undefined}
-      onMouseEnter={(e) => {
-        if (tooltipRef.current) {
-          tooltipRef.current.style.display = 'block';
-          tooltipRef.current.innerHTML = `<strong>${node.label}</strong><br/>${node.description}${
-            isComingSoon ? '' : `<br/><span style="color:#a78bfa">Cost: ${node.cost} karma</span>`
-          }${
-            isPurchased ? '<br/><span style="color:#86efac">✓ Purchased</span>' : ''
-          }${
-            canBuy ? '<br/><span style="color:#fde68a">Click to purchase</span>' : ''
-          }${
-            isAvailable && !canBuy && !isComingSoon ? '<br/><span style="color:#fca5a5">Not enough karma</span>' : ''
-          }`;
-        }
-      }}
-      onMouseMove={(e) => {
-        if (tooltipRef.current) {
-          const rect = e.currentTarget.closest('svg').getBoundingClientRect();
-          tooltipRef.current.style.left = (e.clientX - rect.left + 12) + 'px';
-          tooltipRef.current.style.top  = (e.clientY - rect.top  - 8) + 'px';
-        }
-      }}
-      onMouseLeave={() => {
-        if (tooltipRef.current) tooltipRef.current.style.display = 'none';
-      }}
+      onMouseEnter={onEnter}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
     >
-      {/* Glow for purchased */}
-      {isPurchased && (
-        <rect
-          x={-3} y={-3} width={NODE_W + 6} height={NODE_H + 6}
-          rx={19} ry={19}
-          fill="none"
-          stroke="#a855f7"
-          strokeWidth={2}
-          opacity={0.5}
-          style={{ filter: 'blur(2px)' }}
-        />
-      )}
-      {/* Body */}
-      <rect
-        width={NODE_W} height={NODE_H}
-        rx={16} ry={16}
-        fill={bg}
-        stroke={border}
-        strokeWidth={isPurchased ? 2 : 1}
-      />
-      {/* Label */}
-      <text
-        x={NODE_W / 2} y={NODE_H / 2 - 6}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill={textColor}
-        fontSize={11}
-        fontWeight={isPurchased ? 'bold' : 'normal'}
-        style={{ userSelect: 'none', fontFamily: 'inherit' }}
-      >
-        {node.label}
+      <circle className="et-node-halo" r={NODE_R + 7} />
+      <circle className="et-node-disc" r={NODE_R} />
+      <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">
+        {NODE_GLYPH[node.id] ?? '◇'}
       </text>
-      {/* Cost / status badge */}
-      <text
-        x={NODE_W / 2} y={NODE_H / 2 + 12}
-        textAnchor="middle"
-        dominantBaseline="middle"
-        fill={isPurchased ? '#86efac' : isComingSoon ? '#7c3aed' : textColor}
-        fontSize={10}
-        style={{ userSelect: 'none', fontFamily: 'inherit' }}
-      >
-        {isPurchased ? '✓ owned' : isComingSoon ? '✦ soon' : `${node.cost} karma`}
+      <text className="et-node-badge" x={0} y={NODE_R + 17} textAnchor="middle">
+        {isPurchased ? '✓' : isComingSoon ? '✦' : `${node.cost}`}
+      </text>
+      <text className="et-node-label" x={0} y={NODE_R + 33} textAnchor="middle">
+        {node.label.toUpperCase()}
       </text>
     </g>
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Screen ───────────────────────────────────────────────────────────────────
 export default function EternalTreeScreen({
   karma,
   karmaEarnedThisLife,
@@ -178,223 +152,120 @@ export default function EternalTreeScreen({
   onClose,
 }) {
   const tooltipRef = useRef(null);
+  const stars = useMemo(() => makeStars(120), []);
 
   const { purchased, isAvailable, buyNode } = tree;
 
-  // Node states
   const nodeStates = useMemo(() => {
     const out = {};
     for (const n of NODES) {
-      if (purchased.has(n.id)) {
-        out[n.id] = 'purchased';
-      } else if (isAvailable(n.id)) {
-        out[n.id] = 'available';
-      } else {
-        out[n.id] = 'locked';
-      }
+      if (purchased.has(n.id)) out[n.id] = 'purchased';
+      else if (isAvailable(n.id)) out[n.id] = 'available';
+      else out[n.id] = 'locked';
     }
     return out;
   }, [purchased, isAvailable]);
 
-  const handleBuy = (id, cost) => {
-    if (karma < cost) return;
-    buyNode(id);
-  };
+  const handleBuy = (id, cost) => { if (karma >= cost) buyNode(id); };
 
   const karmaSpentOnTree = purchased.size;
   const canReincarnate   = realmIndex >= 24;
 
-  // Cumulative cube-root model: the next karma point unlocks once all-time
-  // Qi reaches qiForNextKarma. Show progress toward it.
-  const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
+  const qiToNext  = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
+  const progress  = qiForNextKarma > 0
+    ? Math.max(0, Math.min(1, (cumulativeQi ?? 0) / qiForNextKarma))
+    : 0;
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0,
-      background: 'rgba(0,0,0,0.85)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center',
-      zIndex: 1000,
-      overflowY: 'auto',
-      padding: '24px 16px',
-    }}>
-      {/* Header */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        width: '100%', maxWidth: 480,
-        marginBottom: 8,
-      }}>
-        <h2 style={{ margin: 0, color: '#e9d5ff', fontSize: 20, fontWeight: 'bold' }}>
-          Eternal Tree
-        </h2>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'none', border: 'none',
-            color: '#a78bfa', fontSize: 22, cursor: 'pointer', lineHeight: 1,
-          }}
-        >✕</button>
+    <div className="et-screen" role="dialog" aria-modal="true" aria-label="Eternal Tree">
+      <div className="et-stars" aria-hidden="true">
+        {stars.map((s, i) => (
+          <span
+            key={i}
+            className={`et-star${s.kind === 'bri' ? ' et-star-bri' : s.kind === 'gold' ? ' et-star-gold' : ''}`}
+            style={{ left: s.left, top: s.top, animationDelay: s.delay, animationDuration: s.duration }}
+          />
+        ))}
       </div>
 
-      {/* Karma stats bar */}
-      <div style={{
-        width: '100%', maxWidth: 480,
-        background: '#1e1030',
-        border: '1px solid #3b2a55',
-        borderRadius: 12,
-        padding: '10px 16px',
-        marginBottom: 16,
-        display: 'flex', flexDirection: 'column', gap: 4,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-          <span style={{ color: '#c4b5fd', fontSize: 13 }}>
-            ◈ <strong style={{ color: '#e9d5ff' }}>{karma}</strong> karma unspent
-          </span>
-          <span style={{ color: '#c4b5fd', fontSize: 13 }}>
-            <strong style={{ color: '#e9d5ff' }}>{karmaSpentOnTree}</strong> spent on tree
-          </span>
-          <span style={{ color: '#c4b5fd', fontSize: 13 }}>
-            <strong style={{ color: '#e9d5ff' }}>{lives ?? 0}</strong> lives lived
-          </span>
+      <div className="et-content">
+        <header className="et-header">
+          <div className="et-eyebrow">Between Lives</div>
+          <h1 className="et-title">Eternal Tree</h1>
+          <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
+        </header>
+
+        {/* Karma card */}
+        <section className="et-karma-card" aria-label="Karma">
+          <div className="et-karma-main">
+            <span className="et-karma-sigil" aria-hidden="true">◈</span>
+            <span className="et-karma-val">{karma}</span>
+            <span className="et-karma-lbl">karma unspent</span>
+          </div>
+          <div className="et-karma-meta">
+            <span><b>{karmaSpentOnTree}</b> anchored</span>
+            <span><b>{lives ?? 0}</b> {(lives ?? 0) === 1 ? 'life' : 'lives'} lived</span>
+            <span><b>{karmaEarnedThisLife ?? 0}</b> earned this life</span>
+          </div>
+          <div className="et-karma-progress" title={`${fmt(qiToNext)} Qi to next karma`}>
+            <div className="et-karma-progress-fill" style={{ width: `${progress * 100}%` }} />
+          </div>
+          <div className="et-karma-meta" style={{ marginTop: -2 }}>
+            <span style={{ fontSize: 10.5 }}>Next karma at {fmt(qiForNextKarma)} total Qi</span>
+            <span style={{ fontSize: 10.5 }}>{fmt(qiToNext)} to go</span>
+          </div>
+        </section>
+
+        {/* Constellation */}
+        <div className="et-canvas-wrap">
+          <div className="et-watermark" aria-hidden="true">業</div>
+          <svg
+            className="et-canvas"
+            width={CANVAS_W}
+            height={CANVAS_H}
+            viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
+          >
+            {/* Edges first (behind nodes) */}
+            {EDGES.map(({ from, to }) => {
+              const fState = nodeStates[from];
+              const tState = nodeStates[to];
+              const lit   = fState === 'purchased' && tState === 'purchased';
+              const pulse = fState === 'purchased' && tState !== 'purchased';
+              const cls   = `et-edge ${lit ? 'et-edge-lit' : pulse ? 'et-edge-pulse' : 'et-edge-dim'}`;
+              return <path key={`${from}-${to}`} className={cls} d={edgePath(NODES_BY_ID[from], NODES_BY_ID[to])} />;
+            })}
+
+            {/* Nodes */}
+            {NODES.map(n => (
+              <TreeNode
+                key={n.id}
+                node={n}
+                state={nodeStates[n.id]}
+                karma={karma}
+                onBuy={handleBuy}
+                tooltipRef={tooltipRef}
+              />
+            ))}
+          </svg>
+
+          <div ref={tooltipRef} className="et-tooltip" />
         </div>
-        <div style={{ color: '#7c6a9a', fontSize: 11 }}>
-          Next karma at {fmt(qiForNextKarma)} total Qi
-          {' '}({fmt(qiToNext)} to go · earned {karmaEarnedThisLife ?? 0} this life)
-        </div>
-      </div>
 
-      {/* Tree SVG */}
-      <div style={{ position: 'relative', marginBottom: 16 }}>
-        <svg
-          width={CANVAS_W}
-          height={CANVAS_H}
-          style={{ display: 'block', overflow: 'visible' }}
-        >
-          <defs>
-            {/* Lit arrow — both nodes purchased */}
-            <marker
-              id="arrow-lit"
-              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
-              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
-              orient="auto"
-              markerUnits="userSpaceOnUse"
-            >
-              <path
-                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
-                fill="#c084fc"
-              />
-            </marker>
-            {/* Mid arrow — source purchased, target not yet */}
-            <marker
-              id="arrow-mid"
-              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
-              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
-              orient="auto"
-              markerUnits="userSpaceOnUse"
-            >
-              <path
-                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
-                fill="#7c3aed"
-              />
-            </marker>
-            {/* Dim arrow — source not purchased */}
-            <marker
-              id="arrow-dim"
-              markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE * 0.7}
-              refX={ARROW_SIZE} refY={ARROW_SIZE * 0.35}
-              orient="auto"
-              markerUnits="userSpaceOnUse"
-            >
-              <path
-                d={`M0,0 L0,${ARROW_SIZE * 0.7} L${ARROW_SIZE},${ARROW_SIZE * 0.35} z`}
-                fill="#2d1b4e"
-              />
-            </marker>
-          </defs>
-
-          {/* Edges */}
-          {EDGES.map(({ from, to }) => {
-            const bothPurchased = nodeStates[from] === 'purchased' && nodeStates[to] === 'purchased';
-            const fromPurchased = nodeStates[from] === 'purchased';
-            const { x1, y1, x2, y2 } = edgeEndpoints(NODES_BY_ID[from], NODES_BY_ID[to]);
-            // Shorten line endpoint so arrowhead tip lands exactly on node border
-            const markerId = bothPurchased ? 'arrow-lit' : fromPurchased ? 'arrow-mid' : 'arrow-dim';
-            return (
-              <line
-                key={`${from}-${to}`}
-                x1={x1} y1={y1}
-                x2={x2} y2={y2}
-                stroke={bothPurchased ? '#c084fc' : fromPurchased ? '#7c3aed' : '#2d1b4e'}
-                strokeWidth={bothPurchased ? 2.5 : fromPurchased ? 1.5 : 1}
-                strokeDasharray={fromPurchased ? undefined : '5 4'}
-                opacity={bothPurchased ? 1 : fromPurchased ? 0.7 : 0.4}
-                markerEnd={`url(#${markerId})`}
-              />
-            );
-          })}
-
-          {/* Nodes */}
-          {NODES.map(n => (
-            <TreeNode
-              key={n.id}
-              node={n}
-              state={nodeStates[n.id]}
-              karma={karma}
-              onBuy={handleBuy}
-              tooltipRef={tooltipRef}
-            />
-          ))}
-        </svg>
-
-        {/* Floating tooltip */}
-        <div
-          ref={tooltipRef}
-          style={{
-            display: 'none',
-            position: 'absolute',
-            background: '#1e1030',
-            border: '1px solid #7c3aed',
-            borderRadius: 8,
-            padding: '8px 12px',
-            fontSize: 12,
-            color: '#e9d5ff',
-            pointerEvents: 'none',
-            zIndex: 10,
-            maxWidth: 200,
-            lineHeight: 1.5,
-          }}
-        />
-      </div>
-
-      {/* Reincarnate button */}
-      <div style={{
-        width: '100%', maxWidth: 480,
-        background: '#1e1030',
-        border: '1px solid #3b2a55',
-        borderRadius: 12,
-        padding: '14px 16px',
-        textAlign: 'center',
-      }}>
-        <div style={{ color: '#c4b5fd', fontSize: 13, marginBottom: 10 }}>
-          Reincarnation resets your cultivation and producers but preserves
-          karma and tree nodes.
-        </div>
-        <button
-          onClick={canReincarnate ? onReincarnate : undefined}
-          disabled={!canReincarnate}
-          style={{
-            background: canReincarnate ? '#5b21b6' : '#2a1850',
-            border: `1px solid ${canReincarnate ? '#a855f7' : '#3b2a55'}`,
-            color: canReincarnate ? '#e9d5ff' : '#6b5f80',
-            borderRadius: 8,
-            padding: '10px 28px',
-            fontSize: 14,
-            fontWeight: 'bold',
-            cursor: canReincarnate ? 'pointer' : 'not-allowed',
-            transition: 'all 0.15s',
-          }}
-        >
-          {canReincarnate ? '✦ Reincarnate' : 'Reach Saint realm to reincarnate'}
-        </button>
+        {/* Reincarnate */}
+        <section className="et-reincarnate-wrap">
+          <p className="et-reincarnate-blurb">
+            Reincarnation resets your cultivation and producers, but karma and the anchored tree endure across lives.
+          </p>
+          <button
+            type="button"
+            className={`et-reincarnate${canReincarnate ? '' : ' et-reincarnate-locked'}`}
+            onClick={canReincarnate ? onReincarnate : undefined}
+            disabled={!canReincarnate}
+          >
+            <span className="et-reincarnate-glyph" aria-hidden="true">輪</span>
+            <span>{canReincarnate ? 'Reincarnate' : 'Reach Saint to reincarnate'}</span>
+          </button>
+        </section>
       </div>
     </div>
   );
