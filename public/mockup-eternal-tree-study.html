@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Eternal Tree · Design Study</title>
+<title>Eternal Tree · Design Study v2 (image-aware)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,500;1,500&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -26,13 +26,9 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   .study-eyebrow { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.5; }
-  .study-title {
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 19px;
-    letter-spacing: 0.08em; margin-top: 2px;
-  }
-  .study-tabs {
-    display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap;
-  }
+  .study-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 19px; letter-spacing: 0.08em; margin-top: 2px; }
+  .study-sub { font-size: 11px; opacity: 0.6; margin-top: 3px; }
+  .study-tabs { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
   .study-tab {
     font: inherit; font-size: 11px; font-weight: 600;
     padding: 7px 12px; border-radius: 8px;
@@ -45,40 +41,35 @@
   .study-tab-on { background: #fff; color: #0a0810; border-color: #fff; }
 
   .study-stage {
-    position: relative;
-    min-height: calc(100vh - 110px);
+    position: relative; min-height: calc(100vh - 130px);
     display: flex; flex-direction: column;
     transition: background 0.45s ease;
     overflow: hidden;
   }
-  .study-stage::before {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-  }
-  .design-meta {
-    position: relative; z-index: 2;
-    padding: 18px 18px 4px;
-  }
-  .design-name {
-    font-size: 24px; letter-spacing: 0.08em; line-height: 1.1;
-  }
-  .design-desc {
-    font-size: 12.5px; line-height: 1.55; margin-top: 6px;
-    max-width: 480px; opacity: 0.82;
-  }
+  .study-stage::before { content: ''; position: absolute; inset: 0; pointer-events: none; }
+  .design-meta { position: relative; z-index: 2; padding: 18px 18px 4px; }
+  .design-name { font-size: 24px; letter-spacing: 0.08em; line-height: 1.1; }
+  .design-desc { font-size: 12.5px; line-height: 1.55; margin-top: 6px; max-width: 480px; opacity: 0.82; }
   .stage-wrap {
     position: relative; z-index: 2;
     flex: 1; display: grid; place-items: center;
-    padding: 24px 16px 32px;
+    padding: 22px 16px 28px;
   }
-  .constellation {
-    width: 100%; max-width: 360px; height: auto; display: block;
-  }
-
-  /* shared SVG text reset */
-  .node-glyph, .node-label { user-select: none; }
+  .constellation { width: 100%; max-width: 320px; height: auto; display: block; }
+  .node-image { image-rendering: pixelated; image-rendering: crisp-edges; }
+  .node-label { user-select: none; }
+  /* default: locked image is desaturated; design CSS can override */
+  .node.s-locked .node-image { filter: grayscale(0.85) brightness(0.5); opacity: 0.55; }
+  .node.s-available .node-image { /* full color */ }
+  .node.s-owned .node-image { filter: saturate(1.15) brightness(1.06); }
+  /* gem on top of frame (only visible in Iconic Roundel) */
+  .node-gem { display: none; }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     1. COSMIC LEDGER (the current shipped design)
+     1. COSMIC LEDGER v2 (image-friendly)
+     A subtle dark "scrim" radial-gradient sits around each node so the
+     starfield does not compete with the sprite, and the violet/gold ring
+     carries the entire state communication.
      ═══════════════════════════════════════════════════════════════════════ */
   .design-cosmic {
     background:
@@ -103,59 +94,67 @@
   }
   .design-cosmic .design-name { font-family: 'Cinzel', serif; font-weight: 700; color: #ece9f7; text-shadow: 0 0 18px rgba(183, 148, 246, 0.42); }
   .design-cosmic .design-desc { color: rgba(236, 233, 247, 0.72); }
-  .design-cosmic .node-disc { fill: #0c0a26; stroke: #6b46c1; stroke-width: 1.5; }
-  .design-cosmic .node.s-available .node-disc { fill: rgba(34, 28, 84, 0.85); stroke: #b794f6; stroke-width: 2; filter: drop-shadow(0 0 8px rgba(107, 70, 193, 0.5)); }
-  .design-cosmic .node.s-owned .node-disc { fill: #1f1a3e; stroke: #f5c842; stroke-width: 2.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.55)); }
-  .design-cosmic .node-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', serif; fill: rgba(236, 233, 247, 0.42); font-size: 22px; }
-  .design-cosmic .node.s-available .node-glyph { fill: #d4baff; }
-  .design-cosmic .node.s-owned .node-glyph { fill: #ffd866; }
-  .design-cosmic .node-label { font-family: 'Cinzel', serif; fill: rgba(236, 233, 247, 0.5); font-size: 8px; letter-spacing: 0.08em; }
+  /* node layers */
+  .design-cosmic .node-bg { fill: rgba(6, 5, 26, 0.85); }     /* dim the starfield near the sprite */
+  .design-cosmic .node-disc { fill: #0c0a26; stroke: none; }
+  .design-cosmic .node-ring { fill: none; stroke: #6b46c1; stroke-width: 1.5; }
+  .design-cosmic .node.s-available .node-ring { stroke: #b794f6; stroke-width: 2; filter: drop-shadow(0 0 8px rgba(107, 70, 193, 0.55)); }
+  .design-cosmic .node.s-owned .node-ring { stroke: #f5c842; stroke-width: 2.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.55)); }
+  .design-cosmic .node-label { font-family: 'Cinzel', serif; fill: rgba(236, 233, 247, 0.55); font-size: 8.5px; letter-spacing: 0.08em; }
   .design-cosmic .node.s-owned .node-label { fill: #ece9f7; }
   .design-cosmic .edge { fill: none; stroke-linecap: round; }
   .design-cosmic .edge.s-locked { stroke: #6b46c1; stroke-width: 1.2; stroke-dasharray: 3 6; opacity: 0.38; }
-  .design-cosmic .edge.s-pulse  { stroke: #b794f6; stroke-width: 1.8; opacity: 0.85; filter: drop-shadow(0 0 6px rgba(183, 148, 246, 0.5)); }
-  .design-cosmic .edge.s-lit    { stroke: #f5c842; stroke-width: 2.2; stroke-dasharray: 6 8; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.45)); }
+  .design-cosmic .edge.s-pulse { stroke: #b794f6; stroke-width: 1.8; opacity: 0.85; filter: drop-shadow(0 0 6px rgba(183, 148, 246, 0.5)); }
+  .design-cosmic .edge.s-lit { stroke: #f5c842; stroke-width: 2.2; stroke-dasharray: 6 8; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.45)); }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     2. STAINED GLASS CATHEDRAL
+     2. ICONIC ROUNDEL (replaces Stained Glass)
+     Religious-icon framing: ornate metal ring holds the sprite in a clear
+     cream pane. A cabochon gem at the top of each frame shifts colour by
+     state. Background is deep cobalt with a faint gold damask suggestion.
      ═══════════════════════════════════════════════════════════════════════ */
-  .design-cathedral {
+  .design-roundel {
     background:
-      radial-gradient(120% 80% at 50% -15%, rgba(255, 200, 60, 0.18), transparent 40%),
-      linear-gradient(180deg, #1a0410 0%, #0a0208 70%, #050104 100%);
+      radial-gradient(120% 80% at 50% 0%, rgba(245, 200, 66, 0.08), transparent 50%),
+      radial-gradient(80% 60% at 50% 60%, #0e1538, #060919 80%);
   }
-  .design-cathedral::before {
+  .design-roundel::before {
+    /* faint gold cross-damask scatter */
     background:
-      /* vertical mullion stripes — dim columns of lead */
-      repeating-linear-gradient(90deg,
-        rgba(0, 0, 0, 0) 0,
-        rgba(0, 0, 0, 0) 56px,
-        rgba(40, 16, 12, 0.45) 56px,
-        rgba(40, 16, 12, 0.45) 58px,
-        rgba(0, 0, 0, 0) 58px,
-        rgba(0, 0, 0, 0) 116px
-      ),
-      /* faint rose-window glow at top */
-      radial-gradient(70% 30% at 50% 0%, rgba(200, 40, 40, 0.18), transparent 70%);
+      radial-gradient(2px 2px at 18% 22%, rgba(212, 176, 112, 0.28), transparent 70%),
+      radial-gradient(2px 2px at 68% 14%, rgba(212, 176, 112, 0.22), transparent 70%),
+      radial-gradient(2px 2px at 32% 78%, rgba(212, 176, 112, 0.26), transparent 70%),
+      radial-gradient(2px 2px at 82% 68%, rgba(212, 176, 112, 0.24), transparent 70%),
+      radial-gradient(2px 2px at 50% 45%, rgba(212, 176, 112, 0.20), transparent 70%);
   }
-  .design-cathedral .design-name { font-family: 'Cinzel Decorative', serif; font-weight: 900; color: #f8e8b0; text-shadow: 0 0 18px rgba(245, 200, 66, 0.5); }
-  .design-cathedral .design-desc { color: rgba(248, 232, 176, 0.7); }
-  .design-cathedral .node-disc { fill: #1a0608; stroke: #3a2814; stroke-width: 5; }
-  .design-cathedral .node.s-locked .node-disc { fill: #120406; stroke: #28190c; opacity: 0.7; }
-  .design-cathedral .node.s-available .node-disc { fill: url(#glass-sapphire); stroke: #5a3e1a; stroke-width: 5; filter: drop-shadow(0 0 12px rgba(120, 180, 255, 0.45)); }
-  .design-cathedral .node.s-owned .node-disc { fill: url(#glass-ruby); stroke: #8b5e10; stroke-width: 6; filter: drop-shadow(0 0 16px rgba(245, 200, 66, 0.6)); }
-  .design-cathedral .node-glyph { font-family: 'Cinzel Decorative', serif; font-weight: 700; fill: rgba(255, 240, 200, 0.4); font-size: 20px; }
-  .design-cathedral .node.s-available .node-glyph { fill: #fff8e0; }
-  .design-cathedral .node.s-owned .node-glyph { fill: #fff4c8; }
-  .design-cathedral .node-label { font-family: 'Cinzel', serif; fill: rgba(248, 232, 176, 0.55); font-size: 8px; letter-spacing: 0.1em; }
-  .design-cathedral .node.s-owned .node-label { fill: #f8e8b0; }
-  .design-cathedral .edge { fill: none; stroke-linecap: round; }
-  .design-cathedral .edge.s-locked { stroke: #28190c; stroke-width: 3.5; opacity: 0.6; }
-  .design-cathedral .edge.s-pulse  { stroke: #6a4818; stroke-width: 4; opacity: 0.95; }
-  .design-cathedral .edge.s-lit    { stroke: #f5c842; stroke-width: 4.5; filter: drop-shadow(0 0 8px rgba(245, 200, 66, 0.55)); }
+  .design-roundel .design-name { font-family: 'Cinzel Decorative', serif; font-weight: 900; color: #f4e2b0; text-shadow: 0 0 18px rgba(245, 200, 66, 0.5); }
+  .design-roundel .design-desc { color: rgba(244, 226, 176, 0.7); }
+  .design-roundel .node-bg { fill: #221a32; }                 /* deep frame backplate */
+  .design-roundel .node-disc { fill: #f0e5c4; stroke: none; } /* pale icon-pane */
+  .design-roundel .node-ring { fill: none; stroke: #8b6f3a; stroke-width: 6; }
+  .design-roundel .node.s-available .node-ring { stroke: #c0b8a8; stroke-width: 6; filter: drop-shadow(0 0 6px rgba(220, 200, 160, 0.5)); }
+  .design-roundel .node.s-owned .node-ring {
+    stroke: #f5c842; stroke-width: 7;
+    filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.65));
+  }
+  .design-roundel .node-gem { display: block; stroke: rgba(0, 0, 0, 0.35); stroke-width: 0.6; }
+  .design-roundel .node.s-locked .node-gem { fill: #2a1a1a; }
+  .design-roundel .node.s-available .node-gem { fill: #4a90e0; filter: drop-shadow(0 0 4px rgba(74, 144, 224, 0.6)); }
+  .design-roundel .node.s-owned .node-gem { fill: #d22a3a; filter: drop-shadow(0 0 5px rgba(210, 42, 58, 0.7)); }
+  /* image filter overrides for this design: parchment-friendly */
+  .design-roundel .node.s-locked .node-image { filter: grayscale(1) brightness(0.55) sepia(0.15); opacity: 0.55; }
+  .design-roundel .node-label { font-family: 'Cinzel', serif; fill: rgba(244, 226, 176, 0.62); font-size: 8.5px; letter-spacing: 0.1em; }
+  .design-roundel .node.s-owned .node-label { fill: #f4e2b0; }
+  .design-roundel .edge { fill: none; stroke-linecap: round; }
+  .design-roundel .edge.s-locked { stroke: #4a3a22; stroke-width: 2.5; opacity: 0.55; }
+  .design-roundel .edge.s-pulse { stroke: #b8a070; stroke-width: 3; opacity: 0.85; }
+  .design-roundel .edge.s-lit { stroke: #f5c842; stroke-width: 3.5; filter: drop-shadow(0 0 8px rgba(245, 200, 66, 0.55)); }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     3. ORACLE BONE SCROLL
+     3. ORACLE BONE SCROLL v2 (image-friendly)
+     The cream parchment background flatters almost any sprite. Bone-edge
+     border, cinnabar wax for the anchored states; locked sprites get a
+     sepia/ink wash so they read as "rubbing" not full image.
      ═══════════════════════════════════════════════════════════════════════ */
   .design-scroll {
     background:
@@ -176,35 +175,38 @@
   }
   .design-scroll .design-name { font-family: 'EB Garamond', serif; font-style: italic; font-weight: 500; color: #2a1408; font-size: 26px; letter-spacing: 0.04em; }
   .design-scroll .design-desc { color: rgba(42, 20, 8, 0.72); }
-  .design-scroll .node-disc { fill: #ecdcb0; stroke: #5a3818; stroke-width: 1.5; filter: drop-shadow(1.5px 2px 2.5px rgba(80, 40, 10, 0.32)); }
-  .design-scroll .node.s-locked .node-disc { fill: #d8c890; opacity: 0.68; }
-  .design-scroll .node.s-available .node-disc { fill: #f4e8be; stroke: #b03020; stroke-width: 1.8; }
-  .design-scroll .node.s-owned .node-disc { fill: #f8ecbe; stroke: #a01818; stroke-width: 2.6; filter: drop-shadow(0 0 8px rgba(176, 48, 32, 0.45)) drop-shadow(1.5px 2px 2.5px rgba(80, 40, 10, 0.32)); }
-  .design-scroll .node-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', serif; fill: #2a1408; font-size: 22px; }
-  .design-scroll .node.s-locked .node-glyph { fill: rgba(42, 20, 8, 0.5); }
-  .design-scroll .node.s-owned .node-glyph { fill: #a01818; }
-  .design-scroll .node-label { font-family: 'EB Garamond', serif; font-style: italic; fill: #5a3818; font-size: 9px; letter-spacing: 0.04em; }
+  .design-scroll .node-bg { fill: rgba(120, 80, 30, 0.08); }
+  .design-scroll .node-disc { fill: #ecdcb0; stroke: none; }
+  .design-scroll .node-ring { fill: none; stroke: #5a3818; stroke-width: 1.5; }
+  .design-scroll .node.s-available .node-ring { stroke: #b03020; stroke-width: 2; }
+  .design-scroll .node.s-owned .node-ring {
+    stroke: #a01818; stroke-width: 2.8;
+    filter: drop-shadow(0 0 8px rgba(176, 48, 32, 0.45));
+  }
+  .design-scroll .node.s-owned .node-disc { fill: #f4e3b6; }
+  .design-scroll .node.s-locked .node-image { filter: sepia(0.6) grayscale(0.4) brightness(0.85); opacity: 0.65; }
+  .design-scroll .node-label { font-family: 'EB Garamond', serif; font-style: italic; fill: #5a3818; font-size: 9.5px; }
   .design-scroll .node.s-owned .node-label { fill: #a01818; font-weight: 700; }
   .design-scroll .edge { fill: none; stroke-linecap: round; }
   .design-scroll .edge.s-locked { stroke: #8a6840; stroke-width: 1.6; stroke-dasharray: 2 4; opacity: 0.55; }
-  .design-scroll .edge.s-pulse  { stroke: #c43820; stroke-width: 2.4; opacity: 0.88; }
-  .design-scroll .edge.s-lit    { stroke: #a01818; stroke-width: 3; filter: drop-shadow(0 1px 1px rgba(80, 20, 10, 0.4)); }
+  .design-scroll .edge.s-pulse { stroke: #c43820; stroke-width: 2.4; opacity: 0.88; }
+  .design-scroll .edge.s-lit { stroke: #a01818; stroke-width: 3; filter: drop-shadow(0 1px 1px rgba(80, 20, 10, 0.4)); }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     4. BRONZE RITUAL CAULDRON
+     4. BRONZE RITUAL CAULDRON v2 (image-friendly)
+     Each sprite sits in a hammered coin recess. The bronze rim does the
+     state work: oxidised dark for locked, polished bronze for available,
+     molten gold for anchored. Edges remain chiselled channels.
      ═══════════════════════════════════════════════════════════════════════ */
   .design-bronze {
-    background:
-      radial-gradient(130% 90% at 50% 30%, #5a4a28 0%, #2a2010 65%, #150e08 100%);
+    background: radial-gradient(130% 90% at 50% 30%, #5a4a28 0%, #2a2010 65%, #150e08 100%);
   }
   .design-bronze::before {
     background:
-      /* verdigris patina blotches */
       radial-gradient(60px 45px at 22% 18%, rgba(60, 130, 95, 0.22), transparent 65%),
       radial-gradient(75px 55px at 78% 62%, rgba(70, 140, 100, 0.28), transparent 65%),
       radial-gradient(50px 38px at 15% 75%, rgba(60, 130, 95, 0.18), transparent 65%),
       radial-gradient(40px 32px at 85% 30%, rgba(70, 140, 100, 0.20), transparent 65%),
-      /* embossed rivets along the edges */
       radial-gradient(3px 3px at 8% 15%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
       radial-gradient(3px 3px at 92% 15%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
       radial-gradient(3px 3px at 8% 85%, rgba(240, 200, 130, 0.35), rgba(60, 40, 20, 0.5) 60%, transparent 70%),
@@ -212,19 +214,20 @@
   }
   .design-bronze .design-name { font-family: 'Cinzel', serif; font-weight: 700; color: #d4b070; text-shadow: 0 0 18px rgba(212, 176, 112, 0.42); }
   .design-bronze .design-desc { color: rgba(212, 176, 112, 0.72); }
-  .design-bronze .node-disc { fill: url(#bronze-base); stroke: #3a2810; stroke-width: 2.5; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); }
-  .design-bronze .node.s-locked .node-disc { opacity: 0.6; }
-  .design-bronze .node.s-available .node-disc { stroke: #a47830; stroke-width: 3; filter: drop-shadow(0 0 10px rgba(170, 140, 80, 0.5)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); }
-  .design-bronze .node.s-owned .node-disc { fill: url(#bronze-gold); stroke: #8b5e10; stroke-width: 3.5; filter: drop-shadow(0 0 18px rgba(245, 200, 66, 0.6)) drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); }
-  .design-bronze .node-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', serif; fill: #1a0e02; font-size: 22px; }
-  .design-bronze .node.s-locked .node-glyph { fill: rgba(26, 14, 2, 0.55); }
-  .design-bronze .node.s-owned .node-glyph { fill: #3a1c02; }
-  .design-bronze .node-label { font-family: 'Cinzel', serif; fill: rgba(212, 176, 112, 0.6); font-size: 8px; letter-spacing: 0.08em; }
+  /* dark recess shadow + bronze coin face */
+  .design-bronze .node-bg { fill: rgba(0, 0, 0, 0.45); }
+  .design-bronze .node-disc { fill: url(#bronze-base); }
+  .design-bronze .node-ring { fill: none; stroke: #3a2810; stroke-width: 2.5; }
+  .design-bronze .node.s-available .node-ring { stroke: #a47830; stroke-width: 3; filter: drop-shadow(0 0 8px rgba(170, 140, 80, 0.5)); }
+  .design-bronze .node.s-owned .node-disc { fill: url(#bronze-gold); }
+  .design-bronze .node.s-owned .node-ring { stroke: #f5c842; stroke-width: 3.5; filter: drop-shadow(0 0 14px rgba(245, 200, 66, 0.6)); }
+  .design-bronze .node.s-locked .node-image { filter: grayscale(0.7) sepia(0.35) brightness(0.5); opacity: 0.55; }
+  .design-bronze .node-label { font-family: 'Cinzel', serif; fill: rgba(212, 176, 112, 0.6); font-size: 8.5px; letter-spacing: 0.08em; }
   .design-bronze .node.s-owned .node-label { fill: #d4b070; }
   .design-bronze .edge { fill: none; stroke-linecap: round; }
   .design-bronze .edge.s-locked { stroke: #3a2810; stroke-width: 2.2; opacity: 0.7; }
-  .design-bronze .edge.s-pulse  { stroke: #a47830; stroke-width: 2.8; opacity: 0.9; filter: drop-shadow(0 0 5px rgba(170, 140, 80, 0.5)); }
-  .design-bronze .edge.s-lit    { stroke: #f5c842; stroke-width: 3.4; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.6)); }
+  .design-bronze .edge.s-pulse { stroke: #a47830; stroke-width: 2.8; opacity: 0.9; filter: drop-shadow(0 0 5px rgba(170, 140, 80, 0.5)); }
+  .design-bronze .edge.s-lit { stroke: #f5c842; stroke-width: 3.4; filter: drop-shadow(0 0 10px rgba(245, 200, 66, 0.6)); }
 
   /* small note at the bottom of every stage */
   .study-foot {
@@ -238,10 +241,11 @@
 
 <header class="study-header">
   <div class="study-eyebrow">Eternal Tree</div>
-  <div class="study-title">Design Study</div>
+  <div class="study-title">Design Study v2</div>
+  <div class="study-sub">Image-aware variants. Each node holds a real game sprite as a stand-in for the upgrade's eventual dedicated icon.</div>
   <nav class="study-tabs" id="tabs">
     <button class="study-tab study-tab-on" data-design="cosmic">Cosmic Ledger</button>
-    <button class="study-tab" data-design="cathedral">Stained Glass</button>
+    <button class="study-tab" data-design="roundel">Iconic Roundel</button>
     <button class="study-tab" data-design="scroll">Oracle Bone</button>
     <button class="study-tab" data-design="bronze">Bronze Cauldron</button>
   </nav>
@@ -251,93 +255,135 @@
   <div class="design-meta">
     <div class="design-name" id="design-name">Cosmic Ledger</div>
     <p class="design-desc" id="design-desc">
-      Indigo void over a star-strewn canvas. CJK sigils on circular medallions, edges curve like ley lines between souls. Karma is the single gold accent; everything else is silver and violet. (This is what is shipped on main today.)
+      Indigo void with a soft scrim around each node so the sprite is not
+      fighting the starfield. The ring carries the state: dim violet for
+      locked, brighter violet halo for available, gold ring + gold glow for
+      anchored. Locked sprites are desaturated and dimmed; anchored ones
+      get a slight saturation lift.
     </p>
   </div>
 
   <div class="stage-wrap">
-    <svg class="constellation" viewBox="0 0 240 460" xmlns="http://www.w3.org/2000/svg">
+    <svg class="constellation" viewBox="0 0 250 620" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="glass-sapphire" cx="0.5" cy="0.4" r="0.6">
-          <stop offset="0%"  stop-color="#5a9aff"/>
-          <stop offset="55%" stop-color="#1a3e8a"/>
-          <stop offset="100%" stop-color="#0a1648"/>
-        </radialGradient>
-        <radialGradient id="glass-ruby" cx="0.5" cy="0.4" r="0.6">
-          <stop offset="0%"  stop-color="#ff8e8e"/>
-          <stop offset="55%" stop-color="#a01a2a"/>
-          <stop offset="100%" stop-color="#5a0810"/>
-        </radialGradient>
-        <radialGradient id="bronze-base" cx="0.5" cy="0.4" r="0.6">
+        <clipPath id="clip-node"><circle r="34" /></clipPath>
+        <radialGradient id="bronze-base" cx="0.5" cy="0.38" r="0.62">
           <stop offset="0%"  stop-color="#b4844a"/>
           <stop offset="55%" stop-color="#6a4818"/>
           <stop offset="100%" stop-color="#3a2810"/>
         </radialGradient>
-        <radialGradient id="bronze-gold" cx="0.5" cy="0.4" r="0.6">
+        <radialGradient id="bronze-gold" cx="0.5" cy="0.38" r="0.62">
           <stop offset="0%"  stop-color="#ffd866"/>
           <stop offset="55%" stop-color="#c49018"/>
           <stop offset="100%" stop-color="#6a4818"/>
         </radialGradient>
       </defs>
 
-      <!-- ── Edges first (behind nodes) ──
-           n_1(owned) - n_2(locked)     pulse
-           n_1(owned) - n_3(owned)      lit
-           n_3(owned) - n_4(available)  pulse
-           n_3(owned) - n_5(owned)      lit
-           n_5(owned) - n_6(locked)     pulse
-           n_6(locked) - n_7(locked)    locked
-      -->
+      <!-- ── Edges (drawn behind nodes) ── -->
       <g class="edges">
-        <path class="edge s-pulse" d="M 68 52  Q 90 38  100 52" />
-        <path class="edge s-lit"   d="M 50 70  Q 38 92  50 110" />
-        <path class="edge s-pulse" d="M 68 132 Q 90 118 100 132" />
-        <path class="edge s-lit"   d="M 50 150 Q 38 172 50 190" />
-        <path class="edge s-pulse" d="M 50 230 Q 38 252 50 270" />
-        <path class="edge s-locked" d="M 50 310 Q 38 332 50 350" />
+        <!-- n_1 (owned) -> n_2 (locked) : pulse -->
+        <path class="edge s-pulse" d="M 100,60 Q 125,42 150,60" />
+        <!-- n_1 (owned) -> n_3 (owned) : lit -->
+        <path class="edge s-lit"   d="M 60,100 Q 48,140 60,140" />
+        <!-- n_3 (owned) -> n_4 (available) : pulse -->
+        <path class="edge s-pulse" d="M 100,180 Q 125,162 150,180" />
+        <!-- n_3 (owned) -> n_5 (owned) : lit -->
+        <path class="edge s-lit"   d="M 60,220 Q 48,260 60,260" />
+        <!-- n_5 (owned) -> n_6 (locked) : pulse -->
+        <path class="edge s-pulse" d="M 60,340 Q 48,380 60,380" />
+        <!-- n_6 (locked) -> n_7 (locked) : locked -->
+        <path class="edge s-locked" d="M 60,460 Q 48,500 60,500" />
       </g>
 
       <!-- ── Nodes ── -->
-      <g class="node s-owned" transform="translate(50, 50)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">道</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">DEVOTED PATH</text>
+      <!-- n_1 Devoted Path · owned · spirit_stone -->
+      <g class="node s-owned" transform="translate(60, 60)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/spirit_stone.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">DEVOTED PATH</text>
       </g>
-      <g class="node s-locked" transform="translate(118, 50)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">星</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">STAR DISCIPLE</text>
+
+      <!-- n_2 Star Disciple · locked · iron_herb_2 -->
+      <g class="node s-locked" transform="translate(190, 60)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/iron_herb_2.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">STAR DISCIPLE</text>
       </g>
-      <g class="node s-owned" transform="translate(50, 130)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">晶</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">CRYSTALLINE</text>
+
+      <!-- n_3 Crystalline Focus · owned · origin_crystal -->
+      <g class="node s-owned" transform="translate(60, 180)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/origin_crystal.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">CRYSTALLINE</text>
       </g>
-      <g class="node s-available" transform="translate(118, 130)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">眼</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">DISCERNING EYE</text>
+
+      <!-- n_4 Discerning Eye · available · elemental_essence_bead -->
+      <g class="node s-available" transform="translate(190, 180)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/elemental_essence_bead.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">DISCERNING EYE</text>
       </g>
-      <g class="node s-owned" transform="translate(50, 210)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">儉</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">FRUGAL</text>
+
+      <!-- n_5 Frugal Cultivation · owned · profound_accumulation_pill -->
+      <g class="node s-owned" transform="translate(60, 300)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/profound_accumulation_pill.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">FRUGAL</text>
       </g>
-      <g class="node s-locked" transform="translate(50, 290)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">響</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">RESONANCE</text>
+
+      <!-- n_6 Sect Resonance · locked · heaven_spirit_dew -->
+      <g class="node s-locked" transform="translate(60, 420)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/heaven_spirit_dew.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">RESONANCE</text>
       </g>
-      <g class="node s-locked" transform="translate(50, 370)">
-        <circle class="node-disc" r="18"/>
-        <text class="node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">長</text>
-        <text class="node-label" x="0" y="30" text-anchor="middle">SENIOR'S GUIDANCE</text>
+
+      <!-- n_7 Senior's Guidance · locked · jade_heart_flower -->
+      <g class="node s-locked" transform="translate(60, 540)">
+        <circle class="node-bg" r="46"/>
+        <circle class="node-disc" r="40"/>
+        <image class="node-image" href="/sprites/items/jade_heart_flower.png"
+               x="-34" y="-34" width="68" height="68"
+               clip-path="url(#clip-node)" preserveAspectRatio="xMidYMid meet"/>
+        <circle class="node-ring" r="40"/>
+        <circle class="node-gem" cx="0" cy="-42" r="4"/>
+        <text class="node-label" x="0" y="56" text-anchor="middle">SENIOR'S GUIDANCE</text>
       </g>
     </svg>
   </div>
 
   <div class="study-foot">
-    Same 7 nodes, same edges, same state distribution in every variant: <strong>道 / 晶 / 儉</strong> anchored, <strong>眼</strong> available next, <strong>星 / 響 / 長</strong> still bound. Two edges are lit, three are mid-anchor, one is fully locked.
+    Same 7 nodes in every variant: <strong>Devoted Path / Crystalline / Frugal</strong> anchored, <strong>Discerning Eye</strong> available next, <strong>Star Disciple / Resonance / Guidance</strong> still bound. Sprites are real game pixel art used as placeholders for the eventual dedicated upgrade icons.
   </div>
 </main>
 
@@ -345,19 +391,19 @@
   const DESIGNS = {
     cosmic: {
       name: 'Cosmic Ledger',
-      desc: "Indigo void over a star-strewn canvas. CJK sigils on circular medallions, edges curve like ley lines between souls. Karma is the single gold accent; everything else is silver and violet. (This is what is shipped on main today.)"
+      desc: "Indigo void with a soft scrim around each node so the sprite is not fighting the starfield. The ring carries the state: dim violet for locked, brighter violet halo for available, gold ring + gold glow for anchored. Locked sprites are desaturated and dimmed; anchored ones get a slight saturation lift."
     },
-    cathedral: {
-      name: 'Stained Glass Cathedral',
-      desc: "Deep oxblood interior with leaded vertical mullions. Each node is a stained glass roundel — sapphire for what is open to you, ruby for what is anchored — set in thick bronze lead. Reads as sacred and ceremonial, a chapel you visit once per pilgrimage."
+    roundel: {
+      name: 'Iconic Roundel',
+      desc: "Religious-icon framing: each node is a circular pale pane held inside a thick metal ring, with a cabochon gem at the top of the frame that changes colour by state (dark stone locked, sapphire available, ruby anchored). Background is deep cobalt with a faint gold damask. The sprite is the saint; the frame is the reliquary."
     },
     scroll: {
       name: 'Oracle Bone Scroll',
-      desc: "Aged parchment with water stains and paper grain. Nodes are inscribed bone fragments held together by cinnabar silk cord. The reincarnation tree as an ancestral divination scroll — red wax flows between bones as karma is committed."
+      desc: "Aged parchment with water stains and grain. Sprites sit inscribed on bone-coloured roundels, the dark bone-edge stroke acting as the frame. Anchored nodes earn a cinnabar ring; locked nodes are washed in sepia like a rubbing rather than a full painting. Edges are silk cord (locked) or red wax (anchored)."
     },
     bronze: {
       name: 'Bronze Ritual Cauldron',
-      desc: "Patinated bronze plate with verdigris patches and embossed rivets. Each node is a circular bronze seal hammered into the surface; connections are chiselled channels that fill with molten gold as the karma is anchored. Heavy, ritualistic, Shang-dynasty energy."
+      desc: "Patinated Shang-bronze plate with verdigris and rivets. Each sprite sits in a hammered coin recess, the bronze rim doing the state work: oxidised dark for locked, polished bronze for available, molten gold for anchored. Edges are chiselled channels filling with gold as you commit karma."
     },
   };
   const stage   = document.getElementById('stage');
