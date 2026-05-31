@@ -113,7 +113,7 @@ function makeStars(count) {
 }
 
 // ── Node ─────────────────────────────────────────────────────────────────────
-function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
+function TreeNode({ node, state, karma, isSelected, onSelect }) {
   const { cx, cy } = nodeCenter(node);
   const isPlaceholder = !!node.placeholder;
   const isPurchased   = state === 'purchased';
@@ -126,48 +126,15 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
                 : canBuy        ? 'can'
                 : isAvailable   ? 'avail'
                 :                  'locked';
-  const cls = `et-node et-node-${variant}${isComingSoon ? ' et-node-soon' : ''}`;
+  const cls = `et-node et-node-${variant}${isComingSoon ? ' et-node-soon' : ''}${isSelected ? ' et-node-selected' : ''}`;
   const glyph = NODE_GLYPH[node.id] ?? node.glyph ?? '◇';
-
-  const onEnter = () => {
-    const tt = tooltipRef.current; if (!tt) return;
-    const parts = [`<strong>${node.label}</strong>`];
-    if (isPlaceholder) {
-      parts.push(`<div>${node.description ?? 'A future path of karma.'}</div>`);
-      if (node.cost != null) parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
-      parts.push('<div class="et-tt-soon">✦ preview · not yet inscribed</div>');
-    } else {
-      parts.push(`<div>${node.description}</div>`);
-      if (isComingSoon)      parts.push('<div class="et-tt-soon">✦ coming soon</div>');
-      else if (isPurchased)  parts.push('<div class="et-tt-owned">✓ anchored</div>');
-      else {
-        parts.push(`<div class="et-tt-cost">${node.cost} karma</div>`);
-        if (canBuy)            parts.push('<div class="et-tt-go">tap to anchor</div>');
-        else if (isAvailable)  parts.push(`<div class="et-tt-poor">need ${node.cost - karma} more karma</div>`);
-        else                   parts.push('<div class="et-tt-soon">prerequisites still bound</div>');
-      }
-    }
-    tt.innerHTML = parts.join('');
-    tt.style.display = 'block';
-  };
-  const onMove = (e) => {
-    const tt = tooltipRef.current; if (!tt) return;
-    const stage = e.currentTarget.closest('.et-stage');
-    if (!stage) return;
-    const r = stage.getBoundingClientRect();
-    tt.style.left = (e.clientX - r.left + 12) + 'px';
-    tt.style.top  = (e.clientY - r.top  - 8) + 'px';
-  };
-  const onLeave = () => { if (tooltipRef.current) tooltipRef.current.style.display = 'none'; };
 
   return (
     <g
       className={cls}
       transform={`translate(${cx},${cy})`}
-      onClick={canBuy ? (e) => { e.stopPropagation(); onBuy(node.id, node.cost); } : undefined}
-      onMouseEnter={onEnter}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
+      onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}
+      style={{ cursor: 'pointer' }}
     >
       <circle className="et-node-halo" r={NODE_R + 7} />
       <circle className="et-node-disc" r={NODE_R} />
@@ -182,15 +149,26 @@ function TreeNode({ node, state, karma, onBuy, tooltipRef }) {
   );
 }
 
+/** Compute the action button state for the bottom detail card. */
+function detailAction(node, state, karma) {
+  if (!node) return null;
+  if (node.placeholder)         return { text: 'Preview only',                disabled: true,  variant: 'soft' };
+  if (state === 'purchased')    return { text: '✓ Anchored',                  disabled: true,  variant: 'owned' };
+  if (node.id === 'n_2')        return { text: '✦ Coming soon',               disabled: true,  variant: 'soft' };
+  if (state !== 'available')    return { text: 'Prerequisites still bound',   disabled: true,  variant: 'soft' };
+  if (karma < node.cost)        return { text: `Need ${node.cost - karma} more karma`, disabled: true, variant: 'poor' };
+  return { text: `Anchor for ${node.cost} karma`, disabled: false, variant: 'go' };
+}
+
 // ── Screen ───────────────────────────────────────────────────────────────────
 export default function EternalTreeScreen({
   karma, karmaEarnedThisLife, cumulativeQi = 0, qiForNextKarma = 0,
   tree, lives, realmIndex,
   onReincarnate, onClose,
 }) {
-  const tooltipRef = useRef(null);
-  const stageRef   = useRef(null);
+  const stageRef = useRef(null);
   const stars = useMemo(() => makeStars(140), []);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
 
   const { purchased, isAvailable, buyNode } = tree;
 
@@ -295,7 +273,18 @@ export default function EternalTreeScreen({
   const zoomReset = () => { setScale(fitToStage()); setPan({ x: 0, y: 0 }); };
 
   // ── Karma side ──────────────────────────────────────────────────────────
-  const handleBuy = (id, cost) => { if (karma >= cost) buyNode(id); };
+  const handleSelect = (id) => setSelectedNodeId(id);
+  const handleAnchor = () => {
+    const node = selectedNodeId ? ALL_NODES_BY_ID[selectedNodeId] : null;
+    if (!node || node.placeholder) return;
+    const st = nodeStates[node.id];
+    if (st !== 'available' || node.id === 'n_2') return;
+    if (karma < node.cost) return;
+    buyNode(node.id);
+  };
+  const selectedNode  = selectedNodeId ? ALL_NODES_BY_ID[selectedNodeId] : null;
+  const selectedState = selectedNode && !selectedNode.placeholder ? nodeStates[selectedNode.id] : null;
+  const action        = detailAction(selectedNode, selectedState, karma);
   const karmaSpentOnTree = purchased.size;
   const canReincarnate   = realmIndex >= 24;
   const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
@@ -335,6 +324,11 @@ export default function EternalTreeScreen({
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
         onWheel={onWheel}
+        onClick={(e) => {
+          // Tap on empty stage area dismisses any selected node.
+          if (e.target.closest('.et-node, .et-detail, .et-zoom')) return;
+          if (selectedNodeId !== null) setSelectedNodeId(null);
+        }}
       >
         <div className="et-zoom">
           <button type="button" onClick={zoomIn}    aria-label="Zoom in">+</button>
@@ -370,13 +364,45 @@ export default function EternalTreeScreen({
                 node={n}
                 state={n.placeholder ? 'placeholder' : nodeStates[n.id]}
                 karma={karma}
-                onBuy={handleBuy}
-                tooltipRef={tooltipRef}
+                isSelected={selectedNodeId === n.id}
+                onSelect={handleSelect}
               />
             ))}
           </svg>
         </div>
-        <div ref={tooltipRef} className="et-tooltip" />
+
+        {/* Detail card — pinned just above the footer when a node is selected */}
+        {selectedNode && (
+          <div className="et-detail" onClick={(e) => e.stopPropagation()}>
+            <div className="et-detail-row">
+              <div className="et-detail-glyph" aria-hidden="true">
+                {NODE_GLYPH[selectedNode.id] ?? selectedNode.glyph ?? '◇'}
+              </div>
+              <div className="et-detail-body">
+                <div className="et-detail-name">{selectedNode.label}</div>
+                <div className="et-detail-desc">
+                  {selectedNode.description ?? 'A future path of karma.'}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="et-detail-close"
+                onClick={(e) => { e.stopPropagation(); setSelectedNodeId(null); }}
+                aria-label="Close details"
+              >✕</button>
+            </div>
+            {action && (
+              <button
+                type="button"
+                className={`et-detail-action et-detail-action-${action.variant}`}
+                disabled={action.disabled}
+                onClick={(e) => { e.stopPropagation(); if (!action.disabled) handleAnchor(); }}
+              >
+                {action.text}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <footer className="et-bar et-bar-bot">
