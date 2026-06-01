@@ -771,6 +771,8 @@ function AppInner() {
 
       // Restart the pop animation on every upward edge.
       if (upward) {
+        // Consecutive Focus escalation: rung N plays focus_cultivate variant N.
+        try { AudioManager.playSfx('focus_cultivate', { variant: rung }); } catch {}
         body.classList.remove('cf-rung-pop');
         // Force reflow so the animation can replay back-to-back rung-ups.
         // eslint-disable-next-line no-unused-expressions

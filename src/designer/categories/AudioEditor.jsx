@@ -5,67 +5,55 @@ import { loadPat } from '../pat.js';
 // ── Static metadata ───────────────────────────────────────────────────────────
 
 const BGM_META = [
-  { id: 'cultivation', label: 'Cultivation',  desc: 'Calm meditative loop — Home screen, default cultivation state', defaultVol: 1.0 },
-  { id: 'combat',      label: 'Combat',        desc: 'High-energy loop — active Combat screen',                       defaultVol: 1.0 },
-  { id: 'world',       label: 'World',         desc: 'Ambient exploration — Worlds, Gathering, Mining screens',       defaultVol: 1.0 },
-  { id: 'menu',        label: 'Menu',          desc: 'Soft ambient — Settings, Inventory, Stats screens',             defaultVol: 0.6 },
+  { id: 'cultivation', label: 'Main Theme',  desc: 'The single continuous track that plays on every v1 screen', defaultVol: 1.0 },
 ];
 
+// Only sounds reachable in the current v1 build are listed. Combat + item/crafting
+// SFX still exist in the engine manifest (sounds.js), kept compilable for the v2
+// combat update, but are hidden from this panel until those surfaces ship.
 const SFX_GROUPS = [
   {
     label: 'UI',
     items: [
-      { id: 'ui_click',   label: 'Click',   desc: 'Generic button / tap feedback' },
-      { id: 'ui_notify',  label: 'Notify',  desc: 'Notification / alert ping'     },
+      { id: 'ui_click',   label: 'Click',   desc: 'Generic button / tap feedback (auto-wired to every button)' },
+      { id: 'ui_notify',  label: 'Notify',  desc: 'Notification / alert ping'                                  },
     ],
   },
   {
     label: 'Cultivation',
     items: [
-      { id: 'cult_breakthrough',  label: 'Breakthrough',   desc: 'Major milestone — realm breakthrough' },
-    ],
-  },
-  {
-    label: 'Combat',
-    items: [
-      // Hit / dodge / death sounds use 3-variant pools — every trigger picks one
-      // at random + applies a small rate jitter to break up repetition.
-      { id: 'combat_hit_player', label: 'Player Hit',   desc: 'Player lands a hit on an enemy',     variants: 3 },
-      { id: 'combat_hit_enemy',  label: 'Enemy Hit',    desc: 'Enemy lands a hit on the player',    variants: 3 },
-      { id: 'combat_critical',   label: 'Critical',     desc: 'Critical hit — either side',         variants: 3 },
-      { id: 'combat_dodge',      label: 'Dodge',        desc: 'Dodge / miss',                       variants: 3 },
-      { id: 'combat_enemy_die',  label: 'Enemy Death',  desc: 'Enemy dies mid-wave',                variants: 3 },
-      { id: 'combat_technique',  label: 'Technique',    desc: 'Secret technique activated'                       },
-      { id: 'combat_heal',       label: 'Heal',         desc: 'Heal effect applied'                              },
-      { id: 'combat_victory',    label: 'Victory',      desc: 'Player wins the fight'                            },
-      { id: 'combat_defeat',     label: 'Defeat',       desc: 'Player is defeated'                               },
+      { id: 'cult_breakthrough', label: 'Major Breakthrough', desc: 'Major realm breakthrough: the big milestone beat' },
+      {
+        id: 'focus_cultivate',
+        label: 'Focus Cultivation',
+        desc: 'Fires each time the player climbs a Consecutive Focus rung while holding focus. One sample per rung, escalating as they hold. Leave higher rungs empty to reuse a single sample.',
+        variants: 5,
+        variantLabel: 'Rung',
+      },
     ],
   },
   {
     label: 'Qi Crystal',
     items: [
-      { id: 'crystal_tap',       label: 'Crystal Tap',     desc: 'Tap on the crystal to collect the reservoir (Crystal Click spark)' },
-      { id: 'crystal_tap_max',   label: 'Crystal Tap Max', desc: 'Tap when the reservoir is at full cap — bigger payoff feel'        },
-      { id: 'crystal_evolve',    label: 'Crystal Evolve',  desc: 'Crystal jumps to a new visual tier after a feed'                   },
-      { id: 'divine_qi_collect', label: 'Divine Qi',       desc: 'Tap a Divine Qi orb to collect its burst'                          },
+      { id: 'crystal_tap',        label: 'Crystal Tap',        desc: 'Tap the crystal to collect its reservoir'                    },
+      { id: 'crystal_tap_max',    label: 'Crystal Tap (Full)', desc: 'Tap when the reservoir is at full cap, for a bigger payoff feel' },
+      { id: 'crystal_level_up',   label: 'Crystal Level Up',   desc: 'Crystal gains a level from refining (no visual tier change)'  },
+      { id: 'crystal_evolve',     label: 'Crystal Evolve',     desc: 'Crystal crosses a visual tier (shatter + reform)'             },
+      { id: 'divine_qi_collect',  label: 'Divine Qi',          desc: 'Tap a Divine Qi orb to collect its burst'                    },
+    ],
+  },
+  {
+    label: 'Sect (Producers)',
+    items: [
+      { id: 'producer_tier_up', label: 'Producer Tier Up', desc: 'A producer crosses Bronze → Silver → Gold → Mythic' },
     ],
   },
   {
     label: 'Qi Sparks',
     items: [
-      { id: 'spark_pattern_tap',   label: 'Pattern Tap',   desc: 'Tap a numbered dot in Pattern Clicking — pitch rises with each note' },
-      { id: 'spark_pattern_clear', label: 'Pattern Clear', desc: 'Last dot tapped successfully — full clear payoff'                    },
-      { id: 'spark_pattern_miss',  label: 'Pattern Miss',  desc: 'Pattern Clicking failed — wrong dot or window expired'               },
-    ],
-  },
-  {
-    label: 'Items & Crafting',
-    items: [
-      { id: 'item_craft',    label: 'Craft',    desc: 'Pill brewed (per craftPill call)'                              },
-      { id: 'item_upgrade',  label: 'Upgrade',  desc: 'Artefact upgrade level applied'                                },
-      { id: 'item_equip',    label: 'Equip',    desc: 'Artefact or technique equipped'                                },
-      { id: 'item_unequip',  label: 'Unequip',  desc: 'Artefact or technique unequipped'                              },
-      { id: 'item_pill_use', label: 'Pill Use', desc: 'Pill consumed (PillDrawer Use button)'                         },
+      { id: 'spark_pattern_tap',   label: 'Pattern Tap',   desc: 'Tap a numbered dot in Pattern Clicking: pitch rises with each note' },
+      { id: 'spark_pattern_clear', label: 'Pattern Clear', desc: 'Last dot tapped successfully: full clear payoff'                    },
+      { id: 'spark_pattern_miss',  label: 'Pattern Miss',  desc: 'Pattern Clicking failed: wrong dot or window expired'               },
     ],
   },
 ];
@@ -254,6 +242,7 @@ function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onU
   const [expanded, setExpanded] = useState(false);
   const variantCount = item.variants ?? 1;
   const isVariant    = variantCount > 1;
+  const variantLabel = item.variantLabel ?? 'Variation';
 
   // Per-variant uploaded paths (null = empty slot).
   const variationSlots = isVariant
@@ -329,7 +318,7 @@ function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onU
             return (
               <div key={i} className="au-variant-block">
                 <div className="au-variant-header">
-                  <span className="au-variant-label">Variation {i + 1}</span>
+                  <span className="au-variant-label">{variantLabel} {i + 1}</span>
                   {!slotSrc && <span className="au-variant-empty">empty</span>}
                 </div>
                 {slotSrc && (

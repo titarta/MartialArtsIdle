@@ -2715,14 +2715,19 @@ function HomeScreen({
     if (!crystal || !isCrystalUnlocked) return;
     const cost = Math.max(0, (crystal.requiredForNext ?? 0) - (crystal.refinedQi ?? 0));
     if (cost <= 0) return;
+    const prevLevel = crystal.level ?? 0;
     const result = crystal.feedQi?.(cost, cultivation?.spendQi);
     if (!result) return;
+    const leveledUp = (result.newLevel ?? prevLevel) > prevLevel;
     if (result.tierChanged) {
       handleCrystalEvolve({
         previousTier: result.previousTier,
         newTier:      result.newTier,
         newLevel:     result.newLevel,
       });
+    } else if (leveledUp) {
+      // Gained a level without crossing a visual tier; evolve carries its own sound.
+      try { AudioManager.playSfx('crystal_level_up'); } catch {}
     }
   }, [crystal, isCrystalUnlocked, cultivation, handleCrystalEvolve]);
 

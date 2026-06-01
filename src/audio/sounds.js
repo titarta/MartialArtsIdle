@@ -24,6 +24,10 @@
  * combat hit picks one of N samples at random. A SFX entry can declare either
  * `src` (single sample) OR `variations: [{ src }, ...]`. AudioManager normalises
  * single-src entries to a one-element variation list internally.
+ *
+ * A pool can also be played BY INDEX rather than at random. Pass
+ * `playSfx(id, { variant: n })` to pick variant n (1-based, clamped). This is how
+ * Consecutive Focus escalates: rung 1..5 maps to focus_cultivate variants 1..5.
  */
 
 import audioOverride from '../data/config/audio.override.json';
@@ -92,31 +96,22 @@ function sfxVariants(stem, count, ...exts) {
 }
 
 // ── Background music ─────────────────────────────────────────────────────────
+// v1 plays ONE continuous track everywhere (`cultivation`); `combat` is reserved
+// for the combat-arena that ships with the v2 combat update. The old per-screen
+// `world` / `menu` swaps were retired. Do not reintroduce them.
 
 const _BGM_BASE = {
-  /** Calm meditative loop — Home screen, default cultivation state. */
+  /** The single continuous main track. Plays on every v1 screen. */
   cultivation: {
     src:    [`${BASE}audio/bgm/cultivation.ogg`, `${BASE}audio/bgm/cultivation.mp3`],
     loop:   true,
     volume: 1.0,
   },
-  /** High-energy loop — active Combat screen. */
+  /** v2 (combat): high-energy loop for the combat-arena. Hidden until combat ships. */
   combat: {
     src:    [`${BASE}audio/bgm/combat.ogg`, `${BASE}audio/bgm/combat.mp3`],
     loop:   true,
     volume: 1.0,
-  },
-  /** Ambient exploration — Worlds + Production screens. */
-  world: {
-    src:    [`${BASE}audio/bgm/world.ogg`, `${BASE}audio/bgm/world.mp3`],
-    loop:   true,
-    volume: 1.0,
-  },
-  /** Soft ambient — meta / management screens (Character, Build, Collection, Reincarnation). */
-  menu: {
-    src:    [`${BASE}audio/bgm/menu.ogg`, `${BASE}audio/bgm/menu.mp3`],
-    loop:   true,
-    volume: 0.6,
   },
 };
 
@@ -133,6 +128,11 @@ const _SFX_BASE = {
 
   // ── Cultivation ───────────────────────────────────────────────────────────
   cult_breakthrough:   { src: sfx('cult_breakthrough',   'ogg', 'mp3') },
+  // Consecutive Focus: one sample per rung (1..5). Unlike combat pools (random),
+  // this is played BY INDEX: rung N → variant N, so the loop escalates as the
+  // player holds focus. See AudioManager.playSfx({ variant }). Designer can leave
+  // higher rungs empty to reuse a single sample, or fill all 5 for a full ladder.
+  focus_cultivate:     { variations: sfxVariants('focus_cultivate', 5, 'ogg', 'mp3') },
 
   // ── Combat ────────────────────────────────────────────────────────────────
   // Hit / dodge / death sounds use 3-variant pools so consecutive triggers don't
@@ -151,8 +151,12 @@ const _SFX_BASE = {
   // ── Qi Crystal ────────────────────────────────────────────────────────────
   crystal_tap:         { src: sfx('crystal_tap',         'ogg', 'mp3') },
   crystal_tap_max:     { src: sfx('crystal_tap_max',     'ogg', 'mp3') },
+  crystal_level_up:    { src: sfx('crystal_level_up',    'ogg', 'mp3') },
   crystal_evolve:      { src: sfx('crystal_evolve',      'ogg', 'mp3') },
   divine_qi_collect:   { src: sfx('divine_qi_collect',   'ogg', 'mp3') },
+
+  // ── Sect (Producers) ────────────────────────────────────────────────────────
+  producer_tier_up:    { src: sfx('producer_tier_up',    'ogg', 'mp3') },
 
   // ── Qi Sparks ─────────────────────────────────────────────────────────────
   spark_pattern_tap:   { src: sfx('spark_pattern_tap',   'ogg', 'mp3') },

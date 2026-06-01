@@ -314,10 +314,13 @@ const AudioManager = {
    * back-to-back triggers never sound bit-perfect identical.
    *
    * @param {string} sfxId - Key from SFX (e.g. 'ui_click', 'combat_hit_player')
-   * @param {{ rate?: number }} [opts] - rate=1 is normal speed; >1 raises pitch.
-   *   Used for things like the Pattern Click osu-style rising-pitch taps.
+   * @param {{ rate?: number, variant?: number }} [opts]
+   *   rate=1 is normal speed; >1 raises pitch (Pattern Click rising-pitch taps).
+   *   variant picks a specific sample from a pool by 1-based index (clamped to
+   *   the available count) instead of at random, used by Consecutive Focus to
+   *   map rung 1..N onto focus_cultivate variants 1..N. Omit for random pools.
    */
-  playSfx(sfxId, { rate } = {}) {
+  playSfx(sfxId, { rate, variant } = {}) {
     if (!unlocked) return;
     // Safety net (see playBgm). Cheap idempotent check that keeps SFX
     // alive even if a backgrounding event somehow left the context
@@ -330,9 +333,18 @@ const AudioManager = {
     const howls = _getSfxHowls(sfxId);
     if (!howls || howls.length === 0) return;
 
-    const howl = howls.length === 1
-      ? howls[0]
-      : howls[Math.floor(Math.random() * howls.length)];
+    let howl;
+    if (Number.isFinite(variant) && howls.length > 1) {
+      // Indexed pick (1-based, clamped). NOTE: a partially-uploaded override
+      // pool compacts away empty slots, so for an exact rung→variant mapping
+      // fill every slot (the base manifest already does).
+      const idx = Math.min(howls.length, Math.max(1, Math.round(variant))) - 1;
+      howl = howls[idx];
+    } else {
+      howl = howls.length === 1
+        ? howls[0]
+        : howls[Math.floor(Math.random() * howls.length)];
+    }
 
     // Set howl-group volume + rate BEFORE play() — setting these on the id
     // returned by play() races when the howl is still loading (id is a placeholder).

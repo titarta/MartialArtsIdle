@@ -1,6 +1,7 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { fmt, fmtRate } from '../utils/format';
 import { getSpriteTier } from '../data/producers';
+import AudioManager from '../audio/AudioManager';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -71,6 +72,7 @@ export default function PavilionPlaque({
     const nextRank = ranks.indexOf(next);
     if (nextRank > prevRank && next != null) {
       setCelebrating(true);
+      try { AudioManager.playSfx('producer_tier_up'); } catch {}
       const t = setTimeout(() => setCelebrating(false), 1400);
       prevTierNameRef.current = next;
       return () => clearTimeout(t);
