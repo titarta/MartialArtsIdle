@@ -53,6 +53,9 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.cjs'),
       devTools: isDev,
+      // Desktop is a trusted shell, so let BGM autoplay on launch instead of
+      // waiting for a click (Chromium defaults to requiring a user gesture).
+      autoplayPolicy: 'no-user-gesture-required',
     },
     title: `The Long Road to Heaven${isDev ? ' (DEV)' : ''}`,
     backgroundColor: '#1a1a2e',

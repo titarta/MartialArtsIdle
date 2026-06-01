@@ -204,12 +204,36 @@ function _getSfxHowls(sfxId) {
 function ensureContextRunning() {
   const ctx = Howler.ctx;
   if (!ctx) return;
+  attachContextLifecycle();
   // 'running' is the only state where audio actually plays. Any other
   // state ('suspended', iOS-only 'interrupted', or 'closed') needs an
   // explicit resume(). Idempotent on 'running' contexts.
   if (ctx.state !== 'running') {
     ctx.resume().catch(() => {});
   }
+}
+
+// iOS fires AudioContext 'statechange' → 'interrupted' for interruptions that
+// don't come with a visibilitychange (incoming call, Siri, Control Center).
+// Hook it so BGM is paused on interruption and cleanly restarted when the
+// context returns, independent of the page-visibility path. Attached lazily
+// because Howler.ctx doesn't exist until the first sound is created.
+let ctxLifecycleAttached = false;
+function attachContextLifecycle() {
+  const ctx = Howler.ctx;
+  if (!ctx || ctxLifecycleAttached || typeof ctx.addEventListener !== 'function') return;
+  ctxLifecycleAttached = true;
+  ctx.addEventListener('statechange', () => {
+    const st = ctx.state;
+    if (st === 'interrupted' || st === 'suspended') {
+      if (bgmHowl && bgmHowl.playing()) { try { bgmHowl.pause(); } catch { /* non-fatal */ } }
+      bgmPaused = !!bgmHowl;
+    } else if (st === 'running') {
+      // Only restart when the page is actually visible; otherwise the
+      // visibility/pageshow handler owns the resume and this would race it.
+      if (typeof document === 'undefined' || !document.hidden) resumeBgmFromBackground();
+    }
+  });
 }
 
 function pauseAllBgmForBackground() {
@@ -221,11 +245,27 @@ function pauseAllBgmForBackground() {
     if (howl.playing()) howl.pause();
   }
   bgmPaused = !!bgmHowl;
+  suspendContextForBackground();
+}
+
+// Proactively suspend the whole AudioContext when backgrounding. iOS otherwise
+// yanks a still-playing WebAudio buffer mid-sample on app/tab close, producing
+// the "scratch" artifact (and an App Store review fail). A clean suspend halts
+// the audio clock with no glitch, so when iOS then interrupts the page it finds
+// an already-silent context. resume() on return (ensureContextRunning) revives it.
+function suspendContextForBackground() {
+  const ctx = Howler.ctx;
+  if (ctx && ctx.state === 'running') {
+    try { ctx.suspend(); } catch { /* non-fatal */ }
+  }
 }
 
 function resumeBgmFromBackground() {
   ensureContextRunning();
-  if (bgmPaused && !adPlaying && bgmHowl) {
+  // `!bgmHowl.playing()` guards against a double-start: this can be driven by
+  // BOTH the visibility/pageshow handler and the context 'statechange' handler,
+  // and play() on an already-live howl would stack a second, doubled track.
+  if (bgmPaused && !adPlaying && bgmHowl && !bgmHowl.playing()) {
     bgmHowl.play();
     bgmHowl.fade(bgmHowl.volume(), effectiveBgmVol(), 400);
   }
@@ -419,19 +459,25 @@ const AudioManager = {
    * and starts any BGM that was requested before unlock. Idempotent.
    */
   unlock() {
-    if (unlocked) return;
+    const firstTime = !unlocked;
     unlocked = true;
 
-    if (Howler.ctx && Howler.ctx.state === 'suspended') {
-      Howler.ctx.resume().catch(() => {});
+    // Resume the context. Works inside a user gesture (browser / iOS) and also
+    // freely in autoplay-friendly shells (Electron with autoplayPolicy, or a
+    // native WebView configured to not require a gesture).
+    ensureContextRunning();
+
+    if (firstTime) {
+      // Preload everything now that the context is allowed to run.
+      this.preloadBgm(['cultivation', 'combat']);
+      this.preload();
     }
 
-    // Preload everything now that the context is allowed to run.
-    this.preloadBgm(['cultivation', 'combat']);
-    this.preload();
-
-    if (pendingBgmTrackId) {
-      const trackId = pendingBgmTrackId;
+    // (Re)start whatever track was requested. Intentionally re-entrant: a launch
+    // autoplay attempt that the platform blocked leaves the context suspended,
+    // so the first user gesture calls unlock() again and THIS restarts the BGM.
+    const trackId = pendingBgmTrackId || bgmTrackId;
+    if (trackId && (!bgmHowl || !bgmHowl.playing())) {
       pendingBgmTrackId = null;
       this.playBgm(trackId);
     }

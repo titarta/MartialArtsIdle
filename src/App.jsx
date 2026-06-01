@@ -89,6 +89,7 @@ import SelectionModal from './components/SelectionModal';
 import QiSparkChoiceModal from './components/QiSparkChoiceModal';
 import { AudioManager } from './audio';
 import { installGlobalClickSfx } from './audio/clickSfx';
+import { Platform } from './platform';
 import { EventQueueProvider, useEventQueue, useBlockingPresence } from './contexts/EventQueueContext';
 import './App.css';
 
@@ -1540,10 +1541,26 @@ function AppInner() {
   hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm, crystal, qiSparks };
   useEffect(() => { initDebug(hooksRef); }, []);
 
-  // Audio unlock: browsers block the AudioContext until a user gesture.
-  // Defer preload + BGM start until the first pointerdown/keydown so we
-  // don't get stuck in a half-suspended state.
+  // Audio start-up. BGM is requested immediately; how it actually starts depends
+  // on the platform. Native app (Capacitor) and desktop (Electron/Steam) allow
+  // autoplay, so we unlock right now and music plays on launch like a native
+  // game. Browser / PWA hard-blocks autoplay, so we arm a first-gesture unlock;
+  // unlock() is re-entrant, so even on a shell that refused autoplay the first
+  // tap still kicks the music in.
   useEffect(() => {
+    // One global click→ui_click handler for every <button> in the app.
+    // Idempotent; safe to call before unlock (playSfx no-ops until unlocked).
+    installGlobalClickSfx();
+
+    // Request the initial track now; playBgm buffers it until unlock fires.
+    AudioManager.playBgm('cultivation');
+
+    // Autoplay-capable shells: start immediately, no gesture needed.
+    if (Platform.isNative || Platform.isSteam) {
+      AudioManager.unlock();
+    }
+
+    // Browser fallback (and recovery net for a shell that blocked autoplay).
     const onFirstGesture = () => {
       AudioManager.unlock();
       document.removeEventListener('pointerdown', onFirstGesture);
@@ -1551,13 +1568,6 @@ function AppInner() {
     };
     document.addEventListener('pointerdown', onFirstGesture);
     document.addEventListener('keydown',     onFirstGesture);
-
-    // One global click→ui_click handler for every <button> in the app.
-    // Idempotent; safe to call before unlock (playSfx no-ops until unlocked).
-    installGlobalClickSfx();
-
-    // Request the initial track now — playBgm buffers it until unlock fires.
-    AudioManager.playBgm('cultivation');
 
     return () => {
       document.removeEventListener('pointerdown', onFirstGesture);
