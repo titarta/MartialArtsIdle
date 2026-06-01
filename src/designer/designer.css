@@ -20,7 +20,12 @@
 .dz-root {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  /* Fixed viewport height (not min-height): html/body are overflow:hidden +
+     position:fixed (see index.css), so the page itself never scrolls. The root
+     must be exactly one viewport tall so .dz-main becomes the scroll region and
+     the footer stays pinned, instead of the root growing and clipping content. */
+  height: 100dvh;
+  overflow: hidden;
   background: var(--dz-bg);
   color: var(--dz-text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
@@ -37,6 +42,7 @@
   padding: 12px 20px;
   background: var(--dz-surface);
   border-bottom: 1px solid var(--dz-border);
+  flex-shrink: 0;
 }
 .dz-header-title {
   display: flex;
@@ -82,11 +88,13 @@
 
 .dz-nav {
   width: 200px;
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   padding: 12px 8px;
   background: var(--dz-surface);
   border-right: 1px solid var(--dz-border);
+  overflow-y: auto;
 }
 .dz-nav-section {
   padding: 12px 14px 4px;
@@ -196,6 +204,7 @@
   padding: 12px 20px;
   background: var(--dz-surface);
   border-top: 1px solid var(--dz-border);
+  flex-shrink: 0;
 }
 .dz-footer-info {
   flex: 1;

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { putBinaryFile } from '../github.js';
+import { putBinaryFile, getFile } from '../github.js';
 import { loadPat } from '../pat.js';
 
 // ── Static metadata ───────────────────────────────────────────────────────────
@@ -399,12 +399,20 @@ function AudioUploadRow({ fileStem, folder, onUploaded }) {
   }
 
   async function uploadOne(file, ext, label) {
+    const pat  = loadPat();
+    const path = `${basePath}.${ext}`;
     setMsg({ type: 'info', text: `Uploading ${fileStem}.${ext}…` });
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const res = await putBinaryFile(loadPat(), {
-      path:    `${basePath}.${ext}`,
+    // Overwriting an existing asset needs its current SHA. GitHub's Contents API
+    // rejects a PUT over an existing path without one (the 409 "may already
+    // exist" conflict). Look it up first; stays null for a brand-new file.
+    let sha = null;
+    try { sha = (await getFile(pat, path)).sha; } catch { /* treat as a new file */ }
+    const res = await putBinaryFile(pat, {
+      path,
       bytes,
-      message: `design: audio — upload ${folder}/${fileStem}.${ext}`,
+      sha,
+      message: `design: audio upload ${folder}/${fileStem}.${ext}`,
     });
     if (!res.ok) throw new Error(uploadError(label, res));
     // Store as a BASE-relative path so it works on any deployment base URL.
@@ -477,6 +485,6 @@ function AudioUploadRow({ fileStem, folder, onUploaded }) {
 }
 
 function uploadError(ext, res) {
-  if (res.conflict) return `${ext} upload rejected — file may already exist on GitHub. It will be overwritten on retry if you add a SHA; try committing first then re-uploading.`;
+  if (res.conflict) return `${ext} upload hit a version conflict (the file changed on GitHub between read and write). Just press Upload again.`;
   return `${ext} upload failed (HTTP ${res.status}).`;
 }
