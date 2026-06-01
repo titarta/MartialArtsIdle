@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-05-01T03:35:53.955Z",
+  "updatedAt": "2026-06-01T23:43:31.125Z",
   "records": {
     "ui_click": {
       "src": [
@@ -19,7 +19,7 @@
     },
     "bgm_cultivation": {
       "src": [
-        "/audio/bgm/cultivation.mp3"
+        "audio/bgm/cultivation.mp3"
       ]
     },
     "bgm_world": {
@@ -70,6 +70,36 @@
     "spark_pattern_tap": {
       "src": [
         "audio/sfx/spark_pattern_tap.mp3"
+      ]
+    },
+    "focus_cultivate": {
+      "variations": [
+        null,
+        {
+          "src": [
+            "audio/sfx/focus_cultivate_2.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/focus_cultivate_3.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/focus_cultivate_4.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/focus_cultivate_5.wav"
+          ]
+        }
+      ]
+    },
+    "cult_breakthrough": {
+      "src": [
+        "audio/sfx/cult_breakthrough.wav"
       ]
     }
   }
