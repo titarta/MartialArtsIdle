@@ -764,14 +764,19 @@ function AppInner() {
     const RUNG_CLASSES = ['cf-rung-1', 'cf-rung-2', 'cf-rung-3', 'cf-rung-4', 'cf-rung-5'];
     let popTimer = 0;
 
-    // Focus-cultivation loop: a sample that loops the whole time the player
-    // holds focus, swapping up to the current rung's variant as Consecutive
-    // Focus climbs. `focusLoopVariant` is the variant currently looping (0 =
-    // none) so a redundant rung event never restarts the same sample.
+    // Focus-cultivation audio escalates in "levels". Level 1 is the plain hold
+    // (fired on press); each Consecutive Focus rung climbed bumps the level by
+    // one (rung N → level N+1, see onRung), capped at the 5 uploaded samples.
+    // Entering a NEW level plays an instant focus_tick AND (re)starts the
+    // focus_cultivate loop, both at that level's variant. `focusLoopVariant` is
+    // the level currently playing (0 = none) so a no-op event (same level,
+    // e.g. a rung edge that maps to the level already playing) never re-fires.
+    const FOCUS_LEVELS = 5;
     let focusLoopVariant = 0;
-    const startOrSwapFocusLoop = (variant) => {
-      const v = Math.max(1, variant || 1);
+    const startOrSwapFocusLoop = (level) => {
+      const v = Math.min(FOCUS_LEVELS, Math.max(1, level || 1));
       if (v === focusLoopVariant) return;
+      try { AudioManager.playSfx('focus_tick', { variant: v }); } catch {}
       try { AudioManager.stopSfx('focus_cultivate'); } catch {}
       try { AudioManager.playSfx('focus_cultivate', { loop: true, variant: v }); } catch {}
       focusLoopVariant = v;
@@ -797,10 +802,10 @@ function AppInner() {
       if (rung > 0) body.classList.add(`cf-rung-${rung}`);
       body.classList.toggle('deep-meditation', !!deep);
 
-      // Climbing a rung swaps the held focus loop up to that rung's sample and
-      // restarts the pop animation.
+      // Climbing rung N escalates focus audio to level N+1 (level 1 is the
+      // plain hold), and restarts the pop animation.
       if (upward) {
-        startOrSwapFocusLoop(rung);
+        startOrSwapFocusLoop(rung + 1);
         body.classList.remove('cf-rung-pop');
         // Force reflow so the animation can replay back-to-back rung-ups.
         // eslint-disable-next-line no-unused-expressions

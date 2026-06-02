@@ -140,11 +140,14 @@ const _SFX_BASE = {
   cult_breakthrough_transition: { src: sfx('cult_breakthrough_transition', 'ogg', 'mp3') },
   cult_breakthrough_loop:       { src: sfx('cult_breakthrough_loop',       'ogg', 'mp3') },
   cult_breakthrough_continue:   { src: sfx('cult_breakthrough_continue',   'ogg', 'mp3') },
-  // Consecutive Focus: one sample per rung (1..5). Unlike combat pools (random),
-  // this is played BY INDEX: rung N → variant N, so the loop escalates as the
-  // player holds focus. See AudioManager.playSfx({ variant }). Designer can leave
-  // higher rungs empty to reuse a single sample, or fill all 5 for a full ladder.
+  // Focus-cultivation escalating LOOP, played BY INDEX (variant = focus level).
+  // Level 1 = the plain hold; each Consecutive Focus rung climbed = the next
+  // level (App.jsx maps rung N → level N+1), capped at 5. Designer can leave
+  // higher levels empty to reuse a lower sample.
   focus_cultivate:     { variations: sfxVariants('focus_cultivate', 5, 'ogg', 'mp3') },
+  // Instant "tick" fired at each focus-level transition (paired with the loop
+  // above). One per level (1..5), played by index: level N → variant N.
+  focus_tick:          { variations: sfxVariants('focus_tick', 5, 'ogg', 'mp3') },
 
   // ── Combat ────────────────────────────────────────────────────────────────
   // Hit / dodge / death sounds use 3-variant pools so consecutive triggers don't
