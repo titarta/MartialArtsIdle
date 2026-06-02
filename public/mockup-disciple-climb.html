@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sect Climb · Deckbuilder Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(107, 70, 193, 0.20), transparent 55%),
+      radial-gradient(80% 60% at 50% 50%, #0c0a26, #06051a 70%);
+    color: #ece9f7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(1.5px 1.5px at 12% 18%, #d4d2ee, transparent),
+      radial-gradient(1px 1px at 27% 73%, #e8e6ff, transparent),
+      radial-gradient(2px 2px at 45% 30%, #f5e4a8, transparent),
+      radial-gradient(1px 1px at 62% 88%, #d4d2ee, transparent),
+      radial-gradient(1.5px 1.5px at 80% 14%, #e8e6ff, transparent),
+      radial-gradient(1.5px 1.5px at 88% 65%, #d4d2ee, transparent),
+      radial-gradient(1px 1px at 5% 50%, #d4d2ee, transparent),
+      radial-gradient(2px 2px at 35% 55%, #d4d2ee, transparent),
+      radial-gradient(1px 1px at 70% 35%, #e8e6ff, transparent),
+      radial-gradient(1.5px 1.5px at 8% 88%, #f5e4a8, transparent);
+    opacity: 0.42;
+    z-index: 0;
+  }
+
+  /* Header */
+  .hdr {
+    position: sticky; top: 0; z-index: 5;
+    padding: 12px 14px 10px;
+    background: rgba(10, 8, 16, 0.88);
+    backdrop-filter: blur(10px) saturate(120%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hdr-eyebrow { font-size: 9px; letter-spacing: 0.3em; opacity: 0.5; text-transform: uppercase; }
+  .hdr-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; letter-spacing: 0.08em; margin-top: 2px; }
+  .hdr-sub { font-size: 11px; opacity: 0.65; margin-top: 3px; line-height: 1.4; }
+  .hdr-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 8px; flex-wrap: wrap; }
+  .hdr-actions { display: flex; gap: 6px; }
+  .hdr-btn {
+    font: inherit; font-size: 10px; font-weight: 600;
+    padding: 5px 9px; border-radius: 12px;
+    background: transparent; color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    cursor: pointer; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .hdr-btn:hover { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  /* Main game area */
+  main {
+    position: relative; z-index: 1;
+    padding: 12px 12px 24px;
+    max-width: 480px; margin: 0 auto;
+  }
+
+  /* ── Idle screen ──────────────────────────────────────────────────────── */
+  .idle-card {
+    text-align: center;
+    padding: 28px 20px 24px;
+    border: 1px solid rgba(183, 148, 246, 0.25);
+    border-radius: 14px;
+    background: rgba(14, 11, 32, 0.55);
+  }
+  .idle-glyph { font-size: 36px; color: #b794f6; margin-bottom: 6px; font-family: 'Ma Shan Zheng', serif; }
+  .idle-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px; letter-spacing: 0.1em; }
+  .idle-sub { font-size: 12px; opacity: 0.7; margin-top: 6px; line-height: 1.5; }
+  .march-btn {
+    margin-top: 18px;
+    font: inherit; font-family: 'Cinzel', serif; font-weight: 700;
+    padding: 14px 22px; border-radius: 10px;
+    font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
+    border: 1px solid #f5c842;
+    background: linear-gradient(180deg, #f5c842, #c89a18);
+    color: #1a1408; cursor: pointer; transition: filter 0.15s;
+  }
+  .march-btn:hover { filter: brightness(1.1); }
+  .idle-deck-preview {
+    margin-top: 22px;
+    text-align: left;
+  }
+  .idle-deck-title {
+    font-size: 9px; letter-spacing: 0.22em;
+    opacity: 0.55; text-transform: uppercase;
+    text-align: center; margin-bottom: 10px;
+  }
+  .deck-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  /* ── Climb HUD ─────────────────────────────────────────────────────────── */
+  .climb { display: flex; flex-direction: column; gap: 10px; }
+
+  .stats-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(14, 11, 32, 0.55);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+  }
+  .stat { text-align: center; }
+  .stat-k { font-size: 8.5px; letter-spacing: 0.16em; opacity: 0.55; text-transform: uppercase; }
+  .stat-v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 17px; margin-top: 2px; color: #ece9f7; }
+  .stat-v.gold { color: #f5c842; }
+  .stat-v.violet { color: #b794f6; }
+  .stat-v.warn { color: #ff9966; }
+
+  .vigor-wrap { padding: 10px 12px; background: rgba(14, 11, 32, 0.55); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; }
+  .vigor-row { display: flex; justify-content: space-between; font-size: 10px; letter-spacing: 0.14em; margin-bottom: 6px; text-transform: uppercase; }
+  .vigor-row .k { opacity: 0.6; }
+  .vigor-row .v { color: #b794f6; font-weight: 700; font-family: 'Cinzel', serif; }
+  .vigor-bar { height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; position: relative; }
+  .vigor-fill { height: 100%; background: linear-gradient(90deg, #6b46c1, #b794f6); transition: width 0.32s ease; }
+  .vigor-fill.is-low { background: linear-gradient(90deg, #c44, #f87); }
+
+  .next-push { padding: 8px 12px; margin-top: 6px; border-radius: 8px; background: rgba(245, 200, 66, 0.06); border: 1px solid rgba(245, 200, 66, 0.22); font-size: 11px; letter-spacing: 0.04em; }
+  .next-push.is-risky { background: rgba(255, 80, 50, 0.12); border-color: rgba(255, 80, 50, 0.4); color: #ffb59a; }
+  .next-push .lbl { opacity: 0.7; }
+  .next-push .v { color: #f5c842; font-weight: 700; margin-left: 4px; }
+  .next-push .reveal { color: #6bcaf6; }
+
+  .mods-row {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    min-height: 24px;
+  }
+  .mod-chip {
+    font-size: 10px; padding: 3px 8px; border-radius: 11px;
+    background: rgba(107, 70, 193, 0.18); border: 1px solid rgba(183, 148, 246, 0.4);
+    color: #d8c2ff; letter-spacing: 0.04em;
+  }
+  .mod-chip.gold { background: rgba(245, 200, 66, 0.15); border-color: rgba(245, 200, 66, 0.45); color: #f5c842; }
+  .mod-chip.cyan { background: rgba(107, 202, 246, 0.12); border-color: rgba(107, 202, 246, 0.45); color: #a8e0ff; }
+  .mod-empty { font-size: 10px; opacity: 0.4; font-style: italic; padding: 3px 6px; }
+
+  /* ── Action row ────────────────────────────────────────────────────────── */
+  .action-row { display: flex; gap: 8px; }
+  .act-btn {
+    flex: 1;
+    font: inherit; font-family: 'Cinzel', serif; font-weight: 700;
+    padding: 12px 8px; border-radius: 9px;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    border: 1px solid; cursor: pointer; transition: filter 0.15s;
+  }
+  .act-btn-bank { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.25); color: #ece9f7; }
+  .act-btn-bank:hover { background: rgba(255,255,255,0.08); }
+  .act-btn-push { background: linear-gradient(180deg, #f5c842, #c89a18); border-color: #f5c842; color: #1a1408; }
+  .act-btn-push:hover { filter: brightness(1.1); }
+  .act-btn-push.is-risky { background: linear-gradient(180deg, #ff7050, #c83a18); border-color: #ff7050; color: #1a1408; }
+  .act-btn-push .cost-num { display: inline-block; margin-left: 6px; padding: 0 6px; background: rgba(26, 20, 8, 0.35); border-radius: 4px; }
+  .act-btn-push.is-safe .cost-num { background: rgba(52, 200, 90, 0.32); color: #fff; }
+
+  /* ── Hand ──────────────────────────────────────────────────────────────── */
+  .hand-wrap {
+    padding: 10px 8px 12px;
+    border-radius: 12px;
+    background: rgba(14, 11, 32, 0.55);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .hand-title { display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px 6px; }
+  .hand-title-k { font-size: 9px; letter-spacing: 0.22em; opacity: 0.55; text-transform: uppercase; }
+  .piles { font-size: 9.5px; opacity: 0.55; }
+  .piles span { color: #b794f6; font-weight: 700; }
+  .hand {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  /* ── Card ──────────────────────────────────────────────────────────────── */
+  .card {
+    aspect-ratio: 72 / 108;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #1a1640, #0c0a26);
+    border: 1.5px solid #6b46c1;
+    padding: 6px 4px 6px;
+    display: flex; flex-direction: column;
+    cursor: pointer; user-select: none;
+    transition: transform 0.15s, filter 0.15s, border-color 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    position: relative;
+  }
+  .card:hover { transform: translateY(-3px); border-color: #b794f6; }
+  .card:active { transform: translateY(-1px) scale(0.97); }
+  .card.is-disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.7); }
+  .card.is-disabled:hover { transform: none; border-color: #6b46c1; }
+  .card.is-free { border-color: #f5c842; }
+  .card.is-free:hover { border-color: #f5e4a8; }
+  .card.kind-action { border-color: #6bcaf6; }
+  .card.kind-action.is-free { border-color: #f5c842; }
+  .card.preview-only { cursor: default; transform: none; }
+  .card.preview-only:hover { transform: none; }
+
+  .card-cost {
+    position: absolute; top: 4px; right: 4px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #0c0a26; border: 1.5px solid #b794f6;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 10px;
+    color: #b794f6;
+  }
+  .card.is-free .card-cost { border-color: #f5c842; color: #f5c842; }
+  .card-glyph {
+    font-family: 'Ma Shan Zheng', serif;
+    font-size: 28px; text-align: center;
+    color: #b794f6; line-height: 1;
+    margin-top: 14px; margin-bottom: 4px;
+  }
+  .card.kind-action .card-glyph { color: #6bcaf6; }
+  .card.is-free .card-glyph { color: #f5c842; }
+  .card-name {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 8.5px; text-align: center;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: #ece9f7; margin-top: 2px;
+  }
+  .card-effect {
+    font-size: 7.5px; text-align: center;
+    margin-top: 4px; padding: 0 1px;
+    color: rgba(236, 233, 247, 0.62); line-height: 1.2;
+    flex: 1; display: flex; align-items: center; justify-content: center;
+  }
+
+  .hand-empty { padding: 24px 8px; text-align: center; font-size: 11px; opacity: 0.5; font-style: italic; }
+
+  /* ── Log toast ─────────────────────────────────────────────────────────── */
+  .log {
+    position: fixed; left: 50%; top: 100px;
+    transform: translateX(-50%);
+    z-index: 8;
+    display: flex; flex-direction: column; gap: 4px;
+    pointer-events: none;
+    max-width: 360px; width: calc(100% - 24px);
+  }
+  .log-line {
+    background: rgba(12, 10, 38, 0.95);
+    border: 1px solid rgba(183, 148, 246, 0.45);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 11.5px; line-height: 1.3;
+    color: #ece9f7;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    animation: log-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), log-out 0.5s ease-in 2.6s forwards;
+    text-align: center;
+  }
+  .log-line.is-warn { border-color: rgba(255, 100, 60, 0.5); color: #ffb59a; }
+  .log-line.is-good { border-color: rgba(245, 200, 66, 0.6); color: #f5c842; }
+  @keyframes log-in {
+    from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes log-out {
+    from { opacity: 1; }
+    to { opacity: 0; transform: translateY(-4px); }
+  }
+
+  /* ── Result modal ──────────────────────────────────────────────────────── */
+  .scrim {
+    position: fixed; inset: 0; z-index: 20;
+    background: rgba(6, 4, 18, 0.75);
+    backdrop-filter: blur(6px);
+    display: grid; place-items: center;
+    padding: 16px;
+  }
+  .result {
+    background: rgba(14, 11, 32, 0.98);
+    border: 1px solid rgba(183, 148, 246, 0.4);
+    border-radius: 16px;
+    padding: 24px 22px 22px;
+    max-width: 360px; width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+  }
+  .result.is-busted { border-color: rgba(255, 100, 60, 0.5); }
+  .result-eyebrow { font-size: 9px; letter-spacing: 0.3em; opacity: 0.55; text-transform: uppercase; }
+  .result-record { font-family: 'Cinzel', serif; font-weight: 700; font-size: 13px; color: #f5c842; letter-spacing: 0.15em; text-transform: uppercase; }
+  .result-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px; margin-top: 6px; letter-spacing: 0.08em; }
+  .result-wave { font-family: 'Cinzel', serif; font-weight: 700; font-size: 34px; color: #b794f6; margin-top: 14px; line-height: 1; }
+  .result-wave-lbl { font-size: 10px; letter-spacing: 0.2em; opacity: 0.55; text-transform: uppercase; margin-top: 4px; }
+  .result-spoils { font-family: 'Cinzel', serif; font-weight: 700; font-size: 22px; color: #f5c842; margin-top: 14px; }
+  .result-spoils-lbl { font-size: 10px; letter-spacing: 0.2em; opacity: 0.55; text-transform: uppercase; }
+  .result-bonus { font-size: 11px; color: #6bcaf6; margin-top: 6px; }
+  .result-bust-line { font-size: 11px; opacity: 0.7; margin-top: 6px; font-style: italic; color: #ffb59a; }
+  .result-btn {
+    margin-top: 22px; width: 100%;
+    font: inherit; font-family: 'Cinzel', serif; font-weight: 700;
+    padding: 12px 18px; border-radius: 10px;
+    font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+    border: 1px solid #f5c842;
+    background: linear-gradient(180deg, #f5c842, #c89a18);
+    color: #1a1408; cursor: pointer; transition: filter 0.15s;
+  }
+  .result-btn:hover { filter: brightness(1.1); }
+
+  /* ── Footnote ──────────────────────────────────────────────────────────── */
+  .footnote { font-size: 10.5px; line-height: 1.5; opacity: 0.5; text-align: center; padding: 12px 18px 6px; max-width: 460px; margin: 0 auto; }
+  .footnote b { color: rgba(245, 200, 66, 0.8); font-weight: 700; }
+
+  /* ── Wave-change pulse ─────────────────────────────────────────────────── */
+  .stats-row.wave-pulse { animation: stats-pulse 0.5s ease-out; }
+  @keyframes stats-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(183, 148, 246, 0.6); }
+    100% { box-shadow: 0 0 0 12px rgba(183, 148, 246, 0); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-eyebrow">Sect · Disciple Climb</div>
+  <div class="hdr-title">Deckbuilder Prototype</div>
+  <div class="hdr-sub">Every wave: draw a hand of 4, play cards, then push or bank. Cards change the shape of the next push. Push-luck still beneath.</div>
+  <div class="hdr-row">
+    <div></div>
+    <div class="hdr-actions">
+      <button class="hdr-btn" id="reset-btn">Reset run</button>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<div class="log" id="log"></div>
+
+<div class="footnote">
+  <b>What this proves:</b> the climb becomes a hand-of-decisions per wave (which card, then push or bank) instead of one button. The push-luck risk math underneath is unchanged.
+</div>
+
+<script>
+  // ── Card definitions (all values are STARTING VALUES — tune via sim) ───
+  const CARDS = {
+    brace: {
+      name: 'Brace',
+      glyph: '盾',
+      cost: 0,
+      kind: 'mod',
+      effect: 'Next push: no Vigor, cannot break',
+    },
+    rally: {
+      name: 'Rally',
+      glyph: '鼓',
+      cost: 0,
+      kind: 'action',
+      effect: 'Restore 40% of max Vigor',
+    },
+    ironWall: {
+      name: 'Iron Wall',
+      glyph: '壁',
+      cost: 1,
+      kind: 'mod',
+      effect: 'Next push: cost is exact, no variance',
+    },
+    volley: {
+      name: 'Volley',
+      glyph: '矢',
+      cost: 2,
+      kind: 'action',
+      effect: 'Advance 1 wave at no Vigor cost',
+    },
+    diviner: {
+      name: "Diviner's Eye",
+      glyph: '眼',
+      cost: 0,
+      kind: 'action',
+      effect: 'Reveal the exact cost of the next 3 pushes',
+    },
+    standard: {
+      name: 'Standard Bearer',
+      glyph: '旗',
+      cost: 1,
+      kind: 'mod',
+      effect: '+30% spoils if you Bank within 3 waves',
+    },
+  };
+
+  const STARTER_DECK = ['brace', 'brace', 'brace', 'rally', 'ironWall', 'volley', 'diviner', 'standard'];
+
+  // ── Tuning constants (STARTING VALUES) ─────────────────────────────────
+  const STARTING_VIGOR = 100;
+  const PUSH_COST_BASE = 5;
+  const PUSH_COST_PER_WAVE = 1.3;
+  const PUSH_COST_VARIANCE = 0.25;
+  const HAND_SIZE = 4;
+  const RALLY_FRAC = 0.40;
+  const STANDARD_BONUS = 0.30;
+  const STANDARD_WAVES = 3;
+  const BANK_BUST_KEEP = 0.30;  // fraction kept if busted
+
+  // ── State machine ──────────────────────────────────────────────────────
+  let state;
+  function resetState() {
+    state = {
+      phase: 'idle',          // 'idle' | 'climbing' | 'result'
+      wave: 0,
+      vigor: STARTING_VIGOR,
+      vigorMax: STARTING_VIGOR,
+      deck: [],
+      hand: [],
+      discard: [],
+      mods: {
+        braced: false,
+        ironWalled: false,
+        bankBonusUntilWave: null,
+        revealedCosts: [],
+      },
+      bestWave: state ? state.bestWave : 0,
+      result: null,
+      lockUntil: 0,
+    };
+  }
+  resetState();
+
+  // ── Math ───────────────────────────────────────────────────────────────
+  const baseCost = (wave) => PUSH_COST_BASE + wave * PUSH_COST_PER_WAVE;
+  function rollPushCost(wave) {
+    const c = baseCost(wave);
+    return Math.max(1, Math.round(c * (1 + (Math.random() * 2 - 1) * PUSH_COST_VARIANCE)));
+  }
+  function pushCostRange(wave) {
+    const c = baseCost(wave);
+    return [Math.max(1, Math.round(c * (1 - PUSH_COST_VARIANCE))), Math.round(c * (1 + PUSH_COST_VARIANCE))];
+  }
+  function nextPushCostDescriptor() {
+    if (state.mods.braced) return { text: 'SAFE (0 Vigor, cannot break)', safe: true, exact: 0 };
+    if (state.mods.revealedCosts.length > 0) return { text: state.mods.revealedCosts[0] + ' Vigor (revealed)', exact: state.mods.revealedCosts[0], revealed: true };
+    if (state.mods.ironWalled) return { text: Math.round(baseCost(state.wave)) + ' Vigor (no variance)', exact: Math.round(baseCost(state.wave)), exactSet: true };
+    const [lo, hi] = pushCostRange(state.wave);
+    return { text: `${lo}–${hi} Vigor`, lo, hi };
+  }
+  function spoilsAt(wave) {
+    return wave;  // simplified spoils: 1 per wave reached
+  }
+  function bankSpoils() {
+    let s = spoilsAt(state.wave);
+    let bonused = false;
+    if (state.mods.bankBonusUntilWave !== null && state.wave <= state.mods.bankBonusUntilWave) {
+      s = Math.round(s * (1 + STANDARD_BONUS));
+      bonused = true;
+    }
+    return { spoils: s, bonused };
+  }
+  function bustSpoils() {
+    return Math.round(spoilsAt(state.wave) * BANK_BUST_KEEP);
+  }
+
+  // ── Deck ops ───────────────────────────────────────────────────────────
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function drawToHandSize(target) {
+    while (state.hand.length < target) {
+      if (state.deck.length === 0) {
+        if (state.discard.length === 0) return;  // truly empty
+        state.deck = shuffle(state.discard);
+        state.discard = [];
+      }
+      state.hand.push(state.deck.shift());
+    }
+  }
+
+  // ── Log toast ──────────────────────────────────────────────────────────
+  function pushLog(text, kind) {
+    const logEl = document.getElementById('log');
+    const line = document.createElement('div');
+    line.className = 'log-line' + (kind === 'warn' ? ' is-warn' : kind === 'good' ? ' is-good' : '');
+    line.textContent = text;
+    logEl.appendChild(line);
+    setTimeout(() => line.remove(), 3200);
+  }
+
+  // ── Card play ──────────────────────────────────────────────────────────
+  function playCard(idx) {
+    if (state.phase !== 'climbing') return;
+    if (Date.now() < state.lockUntil) return;
+    const cardId = state.hand[idx];
+    const card = CARDS[cardId];
+    if (!card) return;
+    if (card.cost > state.vigor) return;
+
+    state.vigor -= card.cost;
+    let messages = [];
+
+    if (cardId === 'brace') {
+      state.mods.braced = true;
+      messages.push('Brace played: next push is safe.');
+    } else if (cardId === 'rally') {
+      const gain = Math.round(state.vigorMax * RALLY_FRAC);
+      const before = state.vigor;
+      state.vigor = Math.min(state.vigorMax, state.vigor + gain);
+      messages.push(`Rally: +${state.vigor - before} Vigor.`);
+    } else if (cardId === 'ironWall') {
+      state.mods.ironWalled = true;
+      messages.push('Iron Wall: next push cost is exact.');
+    } else if (cardId === 'volley') {
+      // Advance one wave at no cost
+      state.wave += 1;
+      // Consume per-push mods (Volley counts as the push)
+      state.mods.braced = false;
+      state.mods.ironWalled = false;
+      if (state.mods.revealedCosts.length > 0) state.mods.revealedCosts.shift();
+      state.hand.splice(idx, 1);
+      state.discard.push(cardId);
+      drawToHandSize(HAND_SIZE);
+      state.lockUntil = Date.now() + 220;
+      pushLog(`Volley: advanced to wave ${state.wave} at no cost.`, 'good');
+      flashWaveChange();
+      render();
+      return;
+    } else if (cardId === 'diviner') {
+      state.mods.revealedCosts = [
+        Math.round(baseCost(state.wave)),
+        Math.round(baseCost(state.wave + 1)),
+        Math.round(baseCost(state.wave + 2)),
+      ];
+      messages.push(`Diviner's Eye: pushes will cost ${state.mods.revealedCosts.join(', ')}.`);
+    } else if (cardId === 'standard') {
+      state.mods.bankBonusUntilWave = state.wave + STANDARD_WAVES;
+      messages.push(`Standard Bearer: +${Math.round(STANDARD_BONUS * 100)}% spoils if banked by wave ${state.mods.bankBonusUntilWave}.`);
+    }
+
+    // Move to discard
+    state.hand.splice(idx, 1);
+    state.discard.push(cardId);
+    state.lockUntil = Date.now() + 180;
+
+    messages.forEach(m => pushLog(m));
+    render();
+  }
+
+  // ── Push ───────────────────────────────────────────────────────────────
+  function flashWaveChange() {
+    const sr = document.querySelector('.stats-row');
+    if (!sr) return;
+    sr.classList.remove('wave-pulse');
+    void sr.offsetWidth;  // restart animation
+    sr.classList.add('wave-pulse');
+  }
+  function push() {
+    if (state.phase !== 'climbing') return;
+    if (Date.now() < state.lockUntil) return;
+
+    // Compute cost
+    let cost, safe = false;
+    if (state.mods.braced) { cost = 0; safe = true; }
+    else if (state.mods.revealedCosts.length > 0) { cost = state.mods.revealedCosts[0]; }
+    else if (state.mods.ironWalled) { cost = Math.round(baseCost(state.wave)); }
+    else { cost = rollPushCost(state.wave); }
+
+    if (!safe && cost > state.vigor) {
+      // Bust
+      pushLog(`The line broke at wave ${state.wave}!`, 'warn');
+      finish(state.wave, true);
+      return;
+    }
+
+    state.vigor -= cost;
+    state.wave += 1;
+    // Consume per-push mods
+    state.mods.braced = false;
+    state.mods.ironWalled = false;
+    if (state.mods.revealedCosts.length > 0) state.mods.revealedCosts.shift();
+    drawToHandSize(HAND_SIZE);
+    state.lockUntil = Date.now() + 220;
+
+    if (safe) pushLog(`Wave ${state.wave} (safe). Vigor unchanged.`);
+    else pushLog(`Wave ${state.wave}. Spent ${cost} Vigor.`);
+    flashWaveChange();
+    render();
+  }
+
+  // ── Bank ───────────────────────────────────────────────────────────────
+  function bank() {
+    if (state.phase !== 'climbing') return;
+    if (Date.now() < state.lockUntil) return;
+    finish(state.wave, false);
+  }
+
+  function finish(atWave, busted) {
+    let spoils, bonused = false, isRecord = false;
+    if (busted) {
+      spoils = bustSpoils();
+    } else {
+      const b = bankSpoils();
+      spoils = b.spoils;
+      bonused = b.bonused;
+      isRecord = atWave > state.bestWave;
+    }
+    if (atWave > state.bestWave) state.bestWave = atWave;
+    state.phase = 'result';
+    state.result = { wave: atWave, busted, spoils, bonused, isRecord };
+    render();
+  }
+
+  // ── March start ────────────────────────────────────────────────────────
+  function startMarch() {
+    state.phase = 'climbing';
+    state.wave = 0;
+    state.vigor = STARTING_VIGOR;
+    state.vigorMax = STARTING_VIGOR;
+    state.deck = shuffle(STARTER_DECK);
+    state.hand = [];
+    state.discard = [];
+    state.mods = { braced: false, ironWalled: false, bankBonusUntilWave: null, revealedCosts: [] };
+    state.result = null;
+    drawToHandSize(HAND_SIZE);
+    render();
+  }
+
+  function collectAndReset() {
+    state.phase = 'idle';
+    state.result = null;
+    render();
+  }
+
+  function fullReset() {
+    state = null;
+    resetState();
+    render();
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────
+  function renderCard(cardId, opts = {}) {
+    const card = CARDS[cardId];
+    if (!card) return '';
+    const disabled = opts.disabled || (state.phase === 'climbing' && card.cost > state.vigor);
+    const free = card.cost === 0;
+    const cls = [
+      'card',
+      `kind-${card.kind}`,
+      free ? 'is-free' : '',
+      disabled && !opts.previewOnly ? 'is-disabled' : '',
+      opts.previewOnly ? 'preview-only' : '',
+    ].filter(Boolean).join(' ');
+    const costContent = free ? '—' : card.cost;
+    const onClick = opts.previewOnly ? '' : `onclick="playCard(${opts.idx})"`;
+    return `
+      <div class="${cls}" ${onClick}>
+        <span class="card-cost">${costContent}</span>
+        <div class="card-glyph">${card.glyph}</div>
+        <div class="card-name">${card.name}</div>
+        <div class="card-effect">${card.effect}</div>
+      </div>
+    `;
+  }
+
+  function renderIdle() {
+    return `
+      <div class="idle-card">
+        <div class="idle-glyph">兵</div>
+        <div class="idle-title">Ready to march</div>
+        <div class="idle-sub">
+          Push for spoils, wave after wave. Each wave you draw 4 cards from an 8-card starter deck and decide what to play before you push.<br>
+          Best so far: <b style="color:#f5c842">Wave ${state.bestWave}</b>
+        </div>
+        <button class="march-btn" onclick="startMarch()">March out</button>
+        <div class="idle-deck-preview">
+          <div class="idle-deck-title">Your starter deck (8)</div>
+          <div class="deck-grid">
+            ${STARTER_DECK.map((c) => renderCard(c, { previewOnly: true })).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderClimb() {
+    const cost = nextPushCostDescriptor();
+    const vigorPct = (state.vigor / state.vigorMax) * 100;
+    const vigorLow = state.vigor < (cost.hi || cost.exact || 0);
+    const { spoils: bankPreview, bonused } = bankSpoils();
+
+    // Mods chips
+    const chips = [];
+    if (state.mods.braced) chips.push('<span class="mod-chip gold">⛨ Brace ✓</span>');
+    if (state.mods.ironWalled) chips.push('<span class="mod-chip">壁 Iron Wall ✓</span>');
+    if (state.mods.bankBonusUntilWave !== null) {
+      const remaining = state.mods.bankBonusUntilWave - state.wave;
+      if (remaining >= 0) {
+        chips.push(`<span class="mod-chip gold">旗 Bank by W${state.mods.bankBonusUntilWave} for +${Math.round(STANDARD_BONUS*100)}%</span>`);
+      }
+    }
+    if (state.mods.revealedCosts.length > 0) {
+      chips.push(`<span class="mod-chip cyan">眼 Revealed: ${state.mods.revealedCosts.join(', ')}</span>`);
+    }
+    const modsHtml = chips.length > 0 ? chips.join('') : '<span class="mod-empty">no modifiers active</span>';
+
+    // Push button styling
+    let pushBtnCls = 'act-btn act-btn-push';
+    if (cost.safe) pushBtnCls += ' is-safe';
+    else if (vigorLow) pushBtnCls += ' is-risky';
+
+    // Cost displayed on push button
+    let pushCostNum;
+    if (cost.safe) pushCostNum = 'SAFE';
+    else if (cost.exact !== undefined && cost.exact !== null && !cost.lo) pushCostNum = `−${cost.exact}`;
+    else pushCostNum = `−${cost.lo}…${cost.hi}`;
+
+    // Risky banner if low vigor
+    const nextPushClass = vigorLow && !cost.safe ? 'next-push is-risky' : 'next-push';
+
+    return `
+      <div class="climb">
+
+        <div class="stats-row">
+          <div class="stat"><div class="stat-k">Wave</div><div class="stat-v violet">${state.wave}</div></div>
+          <div class="stat"><div class="stat-k">If you bank</div><div class="stat-v gold">+${bankPreview}${bonused ? ' ◈' : ''}</div></div>
+          <div class="stat"><div class="stat-k">Best</div><div class="stat-v">${state.bestWave}</div></div>
+        </div>
+
+        <div class="vigor-wrap">
+          <div class="vigor-row"><span class="k">Vigor</span><span class="v">${Math.max(0, Math.round(state.vigor))} / ${state.vigorMax}</span></div>
+          <div class="vigor-bar"><div class="vigor-fill ${vigorLow ? 'is-low' : ''}" style="width:${Math.max(0, vigorPct)}%"></div></div>
+          <div class="${nextPushClass}">
+            <span class="lbl">Next push:</span><span class="v">${cost.text}</span>
+            ${vigorLow && !cost.safe ? ' · <em>line could break</em>' : ''}
+          </div>
+        </div>
+
+        <div class="mods-row">${modsHtml}</div>
+
+        <div class="action-row">
+          <button class="act-btn act-btn-bank" onclick="bank()">⌂ Bank &amp; retreat</button>
+          <button class="${pushBtnCls}" onclick="push()">Push <span class="cost-num">${pushCostNum}</span></button>
+        </div>
+
+        <div class="hand-wrap">
+          <div class="hand-title">
+            <span class="hand-title-k">Your hand</span>
+            <span class="piles">Deck <span>${state.deck.length}</span> · Discard <span>${state.discard.length}</span></span>
+          </div>
+          ${state.hand.length === 0
+            ? '<div class="hand-empty">No cards left. Push or bank.</div>'
+            : `<div class="hand">${state.hand.map((c, i) => renderCard(c, { idx: i })).join('')}</div>`
+          }
+        </div>
+
+      </div>
+    `;
+  }
+
+  function renderResult() {
+    const r = state.result;
+    return `
+      ${state.phase === 'climbing' ? renderClimb() : renderIdle()}
+      <div class="scrim">
+        <div class="result ${r.busted ? 'is-busted' : ''}">
+          <div class="result-eyebrow">${r.busted ? 'Rout' : 'Banked'}</div>
+          ${r.isRecord ? '<div class="result-record">◈ New record ◈</div>' : ''}
+          <div class="result-title">${r.busted ? 'The line broke' : 'Spoils secured'}</div>
+          <div class="result-wave">${r.wave}</div>
+          <div class="result-wave-lbl">Wave reached</div>
+          <div class="result-spoils">+${r.spoils}</div>
+          <div class="result-spoils-lbl">Spoils${r.bonused ? ' (Standard Bearer bonus)' : ''}</div>
+          ${r.busted ? `<div class="result-bust-line">Most spoils lost to the rout (kept ${Math.round(BANK_BUST_KEEP*100)}%).</div>` : ''}
+          <button class="result-btn" onclick="collectAndReset()">Collect &amp; regroup</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function render() {
+    const root = document.getElementById('main');
+    if (state.phase === 'idle') root.innerHTML = renderIdle();
+    else if (state.phase === 'climbing') root.innerHTML = renderClimb();
+    else if (state.phase === 'result') root.innerHTML = renderResult();
+  }
+
+  // Make functions globally callable from inline onclick
+  window.playCard = playCard;
+  window.push = push;
+  window.bank = bank;
+  window.startMarch = startMarch;
+  window.collectAndReset = collectAndReset;
+
+  document.getElementById('reset-btn').addEventListener('click', fullReset);
+
+  render();
+</script>
+
+</body>
+</html>
