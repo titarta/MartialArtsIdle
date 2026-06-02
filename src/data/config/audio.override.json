@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-02T01:18:01.854Z",
+  "updatedAt": "2026-06-02T01:47:22.334Z",
   "records": {
     "ui_click": {
       "src": [
@@ -163,6 +163,27 @@
     "cult_breakthrough_continue": {
       "src": [
         "audio/sfx/cult_breakthrough_continue.wav"
+      ]
+    },
+    "focus_tick": {
+      "variations": [
+        {
+          "src": [
+            "audio/sfx/focus_tick_1.wav"
+          ]
+        },
+        null,
+        {
+          "src": [
+            "audio/sfx/focus_tick_3.wav"
+          ]
+        },
+        null,
+        {
+          "src": [
+            "audio/sfx/focus_tick_5.wav"
+          ]
+        }
       ]
     }
   }
