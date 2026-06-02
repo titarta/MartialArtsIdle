@@ -67,11 +67,13 @@ function _applySfx(id, cfg) {
     ...(patch.volume !== undefined && { volume: patch.volume }),
   };
   if (patch.variations !== undefined) {
-    // Designer pads unfilled slots with null so indexes stay stable in the JSON;
-    // strip those (and any malformed entries) before the manager sees them.
+    // Keep the array index-stable: the designer pads unfilled slots with null so
+    // indexed playback (variant = rung) maps slot N to index N-1. Preserve those
+    // nulls (don't compact) and let AudioManager handle them: it skips nulls on a
+    // random pick and falls back to the nearest filled slot on an indexed pick.
+    // Malformed entries also normalise to null.
     next.variations = patch.variations
-      .filter(v => v && Array.isArray(v.src) && v.src.length > 0)
-      .map(v => ({ ...v, src: _prefixSrc(v.src) }));
+      .map(v => (v && Array.isArray(v.src) && v.src.length > 0) ? { ...v, src: _prefixSrc(v.src) } : null);
     delete next.src;
   } else if (patch.src !== undefined) {
     next.src = _prefixSrc(patch.src);

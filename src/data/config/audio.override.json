@@ -74,7 +74,11 @@
     },
     "focus_cultivate": {
       "variations": [
-        null,
+        {
+          "src": [
+            "audio/sfx/focus_cultivate_1.wav"
+          ]
+        },
         {
           "src": [
             "audio/sfx/focus_cultivate_2.wav"

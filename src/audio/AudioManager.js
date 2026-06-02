@@ -152,31 +152,36 @@ function _getSfxHowls(sfxId) {
   }
 
   // Normalise: variation pool wins over single src; otherwise wrap src.
-  // Defensive filter: drop null / malformed slots (Designer pads partially-
-  // uploaded pools with null so the JSON keeps stable indexes).
   const rawVariations = config.variations?.length
     ? config.variations
     : (config.src ? [{ src: config.src }] : []);
-  const variations = rawVariations.filter(v => v && Array.isArray(v.src) && v.src.length > 0);
 
-  if (variations.length === 0) {
+  // Build an INDEX-STABLE array: empty / malformed slots become null
+  // placeholders rather than being compacted away. Indexed playback (the
+  // `variant` option) maps slot N → index N-1, so compacting would shift every
+  // later sample up by one (the focus-rung off-by-one). Random playback skips
+  // the nulls at pick time instead.
+  const howls = rawVariations.map((variant, i) => {
+    if (!variant || !Array.isArray(variant.src) || variant.src.length === 0) return null;
+    return new Howl({
+      src:    variant.src,
+      volume: config.volume ?? 1.0,
+      html5:  false,
+      preload: false,
+      onloaderror: (_id, err) => {
+        console.error(`[Audio] SFX "${sfxId}"${rawVariations.length > 1 ? ` variant ${i + 1}` : ''} failed to load (tried: ${variant.src.join(', ')}):`, err);
+      },
+      onplayerror: (_id, err) => {
+        console.error(`[Audio] SFX "${sfxId}"${rawVariations.length > 1 ? ` variant ${i + 1}` : ''} failed to play:`, err);
+      },
+    });
+  });
+
+  if (!howls.some(Boolean)) {
     console.warn(`[Audio] SFX "${sfxId}" has no audio sources`);
     sfxCache[sfxId] = [];
     return sfxCache[sfxId];
   }
-
-  const howls = variations.map((variant, i) => new Howl({
-    src:    variant.src,
-    volume: config.volume ?? 1.0,
-    html5:  false,
-    preload: false,
-    onloaderror: (_id, err) => {
-      console.error(`[Audio] SFX "${sfxId}"${variations.length > 1 ? ` variant ${i + 1}` : ''} failed to load (tried: ${variant.src.join(', ')}):`, err);
-    },
-    onplayerror: (_id, err) => {
-      console.error(`[Audio] SFX "${sfxId}"${variations.length > 1 ? ` variant ${i + 1}` : ''} failed to play:`, err);
-    },
-  }));
 
   sfxCache[sfxId] = howls;
   return howls;
@@ -377,17 +382,19 @@ const AudioManager = {
     if (!howls || howls.length === 0) return;
 
     let howl;
-    if (Number.isFinite(variant) && howls.length > 1) {
-      // Indexed pick (1-based, clamped). NOTE: a partially-uploaded override
-      // pool compacts away empty slots, so for an exact rung→variant mapping
-      // fill every slot (the base manifest already does).
-      const idx = Math.min(howls.length, Math.max(1, Math.round(variant))) - 1;
-      howl = howls[idx];
+    if (Number.isFinite(variant)) {
+      // Indexed pick (1-based). The pool is index-stable, so slot N is index
+      // N-1 regardless of which other slots are filled. If the requested slot
+      // is empty, fall back to the nearest filled slot below it, then any.
+      let idx = Math.min(howls.length, Math.max(1, Math.round(variant))) - 1;
+      while (idx >= 0 && !howls[idx]) idx--;
+      howl = idx >= 0 ? howls[idx] : howls.find(Boolean);
     } else {
-      howl = howls.length === 1
-        ? howls[0]
-        : howls[Math.floor(Math.random() * howls.length)];
+      // Random pick among filled slots only (skip null placeholders).
+      const filled = howls.filter(Boolean);
+      howl = filled.length === 1 ? filled[0] : filled[Math.floor(Math.random() * filled.length)];
     }
+    if (!howl) return undefined;
 
     // Set howl-group volume + rate BEFORE play() — setting these on the id
     // returned by play() races when the howl is still loading (id is a placeholder).
@@ -414,8 +421,9 @@ const AudioManager = {
     const howls = sfxCache[sfxId];
     if (!howls) return;
     for (const howl of howls) {
-      try { howl.stop(); } catch { /* non-fatal */ }
+      if (howl) { try { howl.stop(); } catch { /* non-fatal */ } }
     }
+
   },
 
   /**
@@ -559,7 +567,7 @@ const AudioManager = {
       const howls = _getSfxHowls(id);
       if (!howls) continue;
       for (const howl of howls) {
-        if (howl.state() === 'unloaded') howl.load();
+        if (howl && howl.state() === 'unloaded') howl.load();
       }
     }
   },
