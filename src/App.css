@@ -30406,13 +30406,15 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 
 /* ────────────────────────────────────────────────────────────────────────
    Focus-only rate row (2026-06-02). When the focus multiplier is the ONLY
-   chip (no Heavenly Qi), drop the empty heavenly column so the chip sits in
-   the slot right beside the rate instead of floating one column over. This is
-   purely a column change: two tracks (rate | focus) instead of three. The
-   both-chips layout (rate | heavenly | focus) and the idle layout above are
-   untouched, and the chip keeps all its existing styling. */
+   chip (no Heavenly Qi), move it into the FIRST chip slot so it sits right
+   beside the rate instead of floating in the third column. Crucially the
+   total reserved width is identical to the 3-col both/idle layout
+   (44 + 32 + gaps), so the 1fr rate track keeps the exact same width and the
+   right-aligned rate text does NOT move when focus starts. Only the chip
+   column widths swap (focus 44px first, empty 32px trailing). Both-chips
+   (rate | heavenly | focus) and idle layouts are untouched. */
 .home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child:has(.qi-rate-badge-cf):not(:has(.qi-rate-badge-ad)) {
-  grid-template-columns: 1fr 44px !important;
+  grid-template-columns: 1fr 44px 32px !important;
 }
 .home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child:has(.qi-rate-badge-cf):not(:has(.qi-rate-badge-ad)) .qi-rate-badge-cf {
   grid-column: 2 !important;
