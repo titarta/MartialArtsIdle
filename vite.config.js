@@ -200,11 +200,18 @@ export default defineConfig(({ command, mode }) => {
           cleanupOutdatedCaches: true,
           runtimeCaching: [
             {
-              // BGM streams and any audio not in precache — network first, cache on fetch.
+              // BGM streams and any audio not in precache. StaleWhileRevalidate
+              // (not CacheFirst) so a file the designer overwrites in place
+              // (same filename, e.g. cultivation.mp3) refreshes in the
+              // background instead of being pinned for 30 days. Serves instantly
+              // from cache (offline-friendly), then revalidates; the background
+              // fetch is a cheap 304 via ETag when the file is unchanged, and a
+              // full download only when it actually changed. The cacheName is
+              // bumped to v2 so existing stale CacheFirst entries are abandoned.
               urlPattern: /\/audio\//,
-              handler: 'CacheFirst',
+              handler: 'StaleWhileRevalidate',
               options: {
-                cacheName: 'audio-cache',
+                cacheName: 'audio-cache-v2',
                 expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
               },
             },
