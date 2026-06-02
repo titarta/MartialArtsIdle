@@ -354,13 +354,16 @@ const AudioManager = {
    * back-to-back triggers never sound bit-perfect identical.
    *
    * @param {string} sfxId - Key from SFX (e.g. 'ui_click', 'combat_hit_player')
-   * @param {{ rate?: number, variant?: number }} [opts]
+   * @param {{ rate?: number, variant?: number, loop?: boolean }} [opts]
    *   rate=1 is normal speed; >1 raises pitch (Pattern Click rising-pitch taps).
    *   variant picks a specific sample from a pool by 1-based index (clamped to
    *   the available count) instead of at random, used by Consecutive Focus to
    *   map rung 1..N onto focus_cultivate variants 1..N. Omit for random pools.
+   *   loop=true repeats the sound until stopSfx(sfxId) is called (the
+   *   breakthrough "hold" loop while the player decides to continue).
+   * @returns {number|undefined} the Howler sound id, or undefined if not played.
    */
-  playSfx(sfxId, { rate, variant } = {}) {
+  playSfx(sfxId, { rate, variant, loop } = {}) {
     if (!unlocked) return;
     // Safety net (see playBgm). Cheap idempotent check that keeps SFX
     // alive even if a backgrounding event somehow left the context
@@ -389,12 +392,30 @@ const AudioManager = {
     // Set howl-group volume + rate BEFORE play() — setting these on the id
     // returned by play() races when the howl is still loading (id is a placeholder).
     howl.volume(vol);
+    // Set loop on the howl group before play(). Always set it explicitly (even
+    // to false) so a cached howl can't carry stale loop state from a prior
+    // looped play into a later one-shot.
+    howl.loop(!!loop);
     let finalRate = rate ?? 1;
     if (COMBAT_HIT_SFX.has(sfxId)) {
       finalRate *= 1 + (Math.random() * 2 - 1) * SFX_JITTER;
     }
     howl.rate(finalRate);
-    howl.play();
+    return howl.play();
+  },
+
+  /**
+   * Stop every playing instance of a SFX. Used to end a looped sound (e.g. the
+   * breakthrough hold loop) when the player continues. No-op if never played.
+   *
+   * @param {string} sfxId - Key from SFX.
+   */
+  stopSfx(sfxId) {
+    const howls = sfxCache[sfxId];
+    if (!howls) return;
+    for (const howl of howls) {
+      try { howl.stop(); } catch { /* non-fatal */ }
+    }
   },
 
   /**

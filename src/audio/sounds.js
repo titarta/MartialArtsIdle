@@ -127,7 +127,17 @@ const _SFX_BASE = {
   ui_notify:      { src: sfx('ui_notify',      'ogg', 'mp3') },
 
   // ── Cultivation ───────────────────────────────────────────────────────────
+  // Peak (sub-realm) breakthrough: the lightweight 2.6s banner.
   cult_breakthrough:   { src: sfx('cult_breakthrough',   'ogg', 'mp3') },
+  // Major breakthrough cinematic, split into four beats (see CharacterEvolutionOverlay):
+  //   start:      the moment the cinematic begins (player pressed Breakthrough)
+  //   transition: the morph beat (old dissolves, new tier descends)
+  //   loop:       LOOPS after the morph completes, until the player taps continue
+  //   continue:   the resolve when the player taps to dismiss
+  cult_breakthrough_start:      { src: sfx('cult_breakthrough_start',      'ogg', 'mp3') },
+  cult_breakthrough_transition: { src: sfx('cult_breakthrough_transition', 'ogg', 'mp3') },
+  cult_breakthrough_loop:       { src: sfx('cult_breakthrough_loop',       'ogg', 'mp3') },
+  cult_breakthrough_continue:   { src: sfx('cult_breakthrough_continue',   'ogg', 'mp3') },
   // Consecutive Focus: one sample per rung (1..5). Unlike combat pools (random),
   // this is played BY INDEX: rung N → variant N, so the loop escalates as the
   // player holds focus. See AudioManager.playSfx({ variant }). Designer can leave
@@ -152,8 +162,18 @@ const _SFX_BASE = {
   crystal_tap:         { src: sfx('crystal_tap',         'ogg', 'mp3') },
   crystal_tap_max:     { src: sfx('crystal_tap_max',     'ogg', 'mp3') },
   crystal_level_up:    { src: sfx('crystal_level_up',    'ogg', 'mp3') },
-  crystal_evolve:      { src: sfx('crystal_evolve',      'ogg', 'mp3') },
-  divine_qi_collect:   { src: sfx('divine_qi_collect',   'ogg', 'mp3') },
+  // Crystal evolution, split into four beats (see CrystalEvolutionOverlay):
+  //   start:    pickup/lift as the evolution begins
+  //   break:    the old crystal shatters (~18% of the play)
+  //   rebuild:  the new crystal bursts in (~68%). Keeps the legacy id crystal_evolve.
+  //   continue: the resolve when the player taps to dismiss
+  crystal_evolve_start:    { src: sfx('crystal_evolve_start',    'ogg', 'mp3') },
+  crystal_evolve_break:    { src: sfx('crystal_evolve_break',    'ogg', 'mp3') },
+  crystal_evolve:          { src: sfx('crystal_evolve',          'ogg', 'mp3') },
+  crystal_evolve_continue: { src: sfx('crystal_evolve_continue', 'ogg', 'mp3') },
+  // Divine Qi orbs are tapped repeatedly, so a 3-sample pool (random) avoids the
+  // machine-gun repeat feel (same model as combat hits).
+  divine_qi_collect:   { variations: sfxVariants('divine_qi_collect', 3, 'ogg', 'mp3') },
 
   // ── Sect (Producers) ────────────────────────────────────────────────────────
   producer_tier_up:    { src: sfx('producer_tier_up',    'ogg', 'mp3') },

@@ -542,6 +542,10 @@ const CRYSTAL_TIER_NAMES = {
 const CES_STAGE_SIZE = 220;
 const CES_PLAY_MS    = 3800;  // pickup + shatter + settle at centre
 const CES_RETURN_MS  = 500;   // tap → shrink back to anchor + unmount
+// Sub-beats inside the play phase, aligned to the shatter CSS keyframes so the
+// audio lands on the visuals (tunable). ~18% = shards spawn, ~68% = new crystal.
+const CES_BREAK_MS   = 700;
+const CES_REBUILD_MS = 2580;
 
 function CrystalEvolutionOverlay({ event, onDone }) {
   const onDoneRef = useRef(onDone);
@@ -549,12 +553,15 @@ function CrystalEvolutionOverlay({ event, onDone }) {
   // Phase state — overlay waits at 'settled' for a tap before 'returning'.
   const [phase, setPhase] = useState('playing');
 
-  // Play phase → settled (after transition finishes)
+  // Play phase: four-beat sound timeline (start → break → rebuild), then settle.
+  // crystal_evolve is the legacy id, now used as the "rebuild" (impact) beat.
   useEffect(() => {
     if (!event || phase !== 'playing') return undefined;
-    try { AudioManager.playSfx('crystal_evolve'); } catch {}
-    const id = setTimeout(() => setPhase('settled'), CES_PLAY_MS);
-    return () => clearTimeout(id);
+    try { AudioManager.playSfx('crystal_evolve_start'); } catch {}
+    const breakId   = setTimeout(() => { try { AudioManager.playSfx('crystal_evolve_break'); } catch {} }, CES_BREAK_MS);
+    const rebuildId = setTimeout(() => { try { AudioManager.playSfx('crystal_evolve'); } catch {} }, CES_REBUILD_MS);
+    const settleId  = setTimeout(() => setPhase('settled'), CES_PLAY_MS);
+    return () => { clearTimeout(breakId); clearTimeout(rebuildId); clearTimeout(settleId); };
   }, [event, phase]);
 
   // Tap anywhere → begin returning
@@ -565,9 +572,10 @@ function CrystalEvolutionOverlay({ event, onDone }) {
     return () => window.removeEventListener('pointerdown', handler);
   }, [phase]);
 
-  // Return phase → unmount
+  // Return phase → continue beat + unmount
   useEffect(() => {
     if (phase !== 'returning') return undefined;
+    try { AudioManager.playSfx('crystal_evolve_continue'); } catch {}
     const id = setTimeout(() => onDoneRef.current?.(), CES_RETURN_MS);
     return () => clearTimeout(id);
   }, [phase]);
@@ -703,28 +711,40 @@ function CrystalEvolutionOverlay({ event, onDone }) {
 const CES_CHAR_STAGE_SIZE = 256;  // cultivator sprites are 256×256
 const CES_CHAR_PLAY_MS    = 4200;
 const CES_CHAR_RETURN_MS  = 500;
+// Transition beat ~62% of the play, where the new tier sprite lands (cheNew
+// keyframe). Tunable independently of the visuals.
+const CES_CHAR_TRANSITION_MS = 2600;
 
 function CharacterEvolutionOverlay({ event, onDone }) {
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   const [phase, setPhase] = useState('playing');
 
+  // Play phase: start beat, then the transition beat as the new tier lands, then settle.
   useEffect(() => {
     if (!event || phase !== 'playing') return undefined;
-    try { AudioManager.playSfx('cult_breakthrough'); } catch {}
-    const id = setTimeout(() => setPhase('settled'), CES_CHAR_PLAY_MS);
-    return () => clearTimeout(id);
+    try { AudioManager.playSfx('cult_breakthrough_start'); } catch {}
+    const transId  = setTimeout(() => { try { AudioManager.playSfx('cult_breakthrough_transition'); } catch {} }, CES_CHAR_TRANSITION_MS);
+    const settleId = setTimeout(() => setPhase('settled'), CES_CHAR_PLAY_MS);
+    return () => { clearTimeout(transId); clearTimeout(settleId); };
   }, [event, phase]);
 
+  // Settled (morph complete): loop the hold sound until the player taps. The
+  // cleanup stops the loop, and the returning effect plays the continue beat.
   useEffect(() => {
     if (phase !== 'settled') return undefined;
+    try { AudioManager.playSfx('cult_breakthrough_loop', { loop: true }); } catch {}
     const handler = () => setPhase('returning');
     window.addEventListener('pointerdown', handler, { once: true });
-    return () => window.removeEventListener('pointerdown', handler);
+    return () => {
+      window.removeEventListener('pointerdown', handler);
+      try { AudioManager.stopSfx('cult_breakthrough_loop'); } catch {}
+    };
   }, [phase]);
 
   useEffect(() => {
     if (phase !== 'returning') return undefined;
+    try { AudioManager.playSfx('cult_breakthrough_continue'); } catch {}
     const id = setTimeout(() => onDoneRef.current?.(), CES_CHAR_RETURN_MS);
     return () => clearTimeout(id);
   }, [phase]);

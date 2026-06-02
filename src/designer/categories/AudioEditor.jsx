@@ -22,7 +22,11 @@ const SFX_GROUPS = [
   {
     label: 'Cultivation',
     items: [
-      { id: 'cult_breakthrough', label: 'Major Breakthrough', desc: 'Major realm breakthrough: the big milestone beat' },
+      { id: 'cult_breakthrough', label: 'Breakthrough (peak)', desc: 'Sub-realm peak breakthrough: the lightweight banner that auto-dismisses (no continue)' },
+      { id: 'cult_breakthrough_start',      label: 'Major BT: Start',      desc: 'Major realm cinematic begins, right after the player presses Breakthrough' },
+      { id: 'cult_breakthrough_transition', label: 'Major BT: Transition', desc: 'The morph beat: old form dissolves and the new tier descends' },
+      { id: 'cult_breakthrough_loop',       label: 'Major BT: Loop',       desc: 'Loops after the morph completes, until the player taps to continue', loops: true },
+      { id: 'cult_breakthrough_continue',   label: 'Major BT: Continue',   desc: 'Plays when the player taps to dismiss the cinematic' },
       {
         id: 'focus_cultivate',
         label: 'Focus Cultivation',
@@ -38,8 +42,11 @@ const SFX_GROUPS = [
       { id: 'crystal_tap',        label: 'Crystal Tap',        desc: 'Tap the crystal to collect its reservoir'                    },
       { id: 'crystal_tap_max',    label: 'Crystal Tap (Full)', desc: 'Tap when the reservoir is at full cap, for a bigger payoff feel' },
       { id: 'crystal_level_up',   label: 'Crystal Level Up',   desc: 'Crystal gains a level from refining (no visual tier change)'  },
-      { id: 'crystal_evolve',     label: 'Crystal Evolve',     desc: 'Crystal crosses a visual tier (shatter + reform)'             },
-      { id: 'divine_qi_collect',  label: 'Divine Qi',          desc: 'Tap a Divine Qi orb to collect its burst'                    },
+      { id: 'crystal_evolve_start',    label: 'Crystal Evolve: Start',    desc: 'Pickup / lift as the evolution cinematic begins' },
+      { id: 'crystal_evolve_break',    label: 'Crystal Evolve: Break',    desc: 'The old crystal shatters' },
+      { id: 'crystal_evolve',          label: 'Crystal Evolve: Rebuild',  desc: 'The new crystal bursts in and reforms (the evolution payoff)' },
+      { id: 'crystal_evolve_continue', label: 'Crystal Evolve: Continue', desc: 'Plays when the player taps to dismiss' },
+      { id: 'divine_qi_collect',  label: 'Divine Qi',          desc: 'Tap a Divine Qi orb to collect its burst. 3-sample pool (random) to avoid repetition.', variants: 3 },
     ],
   },
   {
@@ -256,6 +263,7 @@ function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onU
         <div className="au-sfx-row-info">
           <span className="au-sound-label">{item.label}</span>
           {isVariant && <span className="au-badge-variant">×{variantCount}</span>}
+          {item.loops && <span className="au-badge-variant">loop</span>}
           {isDirty && <span className="au-badge-dirty">edited</span>}
           <span className="au-sound-desc">{item.desc}</span>
         </div>
