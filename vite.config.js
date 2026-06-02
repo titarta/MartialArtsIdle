@@ -184,11 +184,16 @@ export default defineConfig(({ command, mode }) => {
         registerType: 'autoUpdate',
         workbox: {
           navigateFallback: 'index.html',
-          // Precache SFX (small) but not BGM (4-5 MB each — too large for precache).
+          // Precache only COMPRESSED SFX (ogg/mp3, small). WAV is uncompressed
+          // and uploaded samples routinely exceed the 3 MiB precache cap, which
+          // makes vite-plugin-pwa fail the whole build (and the Pages deploy).
+          // WAVs are runtime-cached via the /audio/ StaleWhileRevalidate rule
+          // below instead, same as BGM. (Re-export SFX as ogg/mp3 to get them
+          // back into the precache for first-launch offline playback.)
           // woff/woff2 covers bundled fonts (Ma Shan Zheng for the 天 glyph on
           // the Petition Tablet) so the calligraphy renders correctly on first
           // offline launch instead of falling back to system serif.
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,woff,woff2}', 'audio/sfx/*.{ogg,mp3,wav}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,woff,woff2}', 'audio/sfx/*.{ogg,mp3}'],
           // Play Store assets (screenshots, feature graphic, dev tooling .exe) live
           // in public/store/ so they get mirrored into the Android Capacitor build,
           // but they have no business in the PWA precache — some exceed the 3 MiB
