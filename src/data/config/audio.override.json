@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-01T23:43:31.125Z",
+  "updatedAt": "2026-06-02T01:18:01.854Z",
   "records": {
     "ui_click": {
       "src": [
@@ -29,7 +29,7 @@
     },
     "crystal_evolve": {
       "src": [
-        "audio/sfx/crystal_evolve.mp3"
+        "audio/sfx/crystal_evolve.wav"
       ]
     },
     "ui_notify": {
@@ -104,6 +104,65 @@
     "cult_breakthrough": {
       "src": [
         "audio/sfx/cult_breakthrough.wav"
+      ]
+    },
+    "divine_qi_collect": {
+      "variations": [
+        {
+          "src": [
+            "audio/sfx/divine_qi_collect_1.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/divine_qi_collect_2.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/divine_qi_collect_3.wav"
+          ]
+        }
+      ]
+    },
+    "producer_tier_up": {
+      "src": [
+        "audio/sfx/producer_tier_up.wav"
+      ]
+    },
+    "crystal_evolve_start": {
+      "src": [
+        "audio/sfx/crystal_evolve_start.wav"
+      ]
+    },
+    "crystal_evolve_break": {
+      "src": [
+        "audio/sfx/crystal_evolve_break.wav"
+      ]
+    },
+    "crystal_evolve_continue": {
+      "src": [
+        "audio/sfx/crystal_evolve_continue.wav"
+      ]
+    },
+    "cult_breakthrough_start": {
+      "src": [
+        "audio/sfx/cult_breakthrough_start.wav"
+      ]
+    },
+    "cult_breakthrough_transition": {
+      "src": [
+        "audio/sfx/cult_breakthrough_transition.wav"
+      ]
+    },
+    "cult_breakthrough_loop": {
+      "src": [
+        "audio/sfx/cult_breakthrough_loop.wav"
+      ]
+    },
+    "cult_breakthrough_continue": {
+      "src": [
+        "audio/sfx/cult_breakthrough_continue.wav"
       ]
     }
   }
