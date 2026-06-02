@@ -560,6 +560,14 @@ export default function useCultivation() {
       if (!prevBoostStateRef.current && boostRef.current) {
         boostStartTimeRef.current = now;
       }
+      // Edge-only: broadcast focus press/release so the audio layer can start
+      // and stop the held focus-cultivation loop (App.jsx owns the loop). Fires
+      // only on a state change, so this stays cheap inside the per-tick loop.
+      if (prevBoostStateRef.current !== boostRef.current) {
+        try {
+          window.dispatchEvent(new CustomEvent('mai:focus-boost', { detail: { active: boostRef.current } }));
+        } catch { /* non-fatal */ }
+      }
       prevBoostStateRef.current = boostRef.current;
 
       // Consecutive Focus bonus — only active while boost is held AND has

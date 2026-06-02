@@ -763,6 +763,33 @@ function AppInner() {
   useEffect(() => {
     const RUNG_CLASSES = ['cf-rung-1', 'cf-rung-2', 'cf-rung-3', 'cf-rung-4', 'cf-rung-5'];
     let popTimer = 0;
+
+    // Focus-cultivation loop: a sample that loops the whole time the player
+    // holds focus, swapping up to the current rung's variant as Consecutive
+    // Focus climbs. `focusLoopVariant` is the variant currently looping (0 =
+    // none) so a redundant rung event never restarts the same sample.
+    let focusLoopVariant = 0;
+    const startOrSwapFocusLoop = (variant) => {
+      const v = Math.max(1, variant || 1);
+      if (v === focusLoopVariant) return;
+      try { AudioManager.stopSfx('focus_cultivate'); } catch {}
+      try { AudioManager.playSfx('focus_cultivate', { loop: true, variant: v }); } catch {}
+      focusLoopVariant = v;
+    };
+    const stopFocusLoop = () => {
+      if (!focusLoopVariant) return;
+      try { AudioManager.stopSfx('focus_cultivate'); } catch {}
+      focusLoopVariant = 0;
+    };
+
+    // Focus pressed → start the loop at variant 1; released → stop it. This
+    // fires for a plain hold too, so focus has sound before Consecutive Focus
+    // even unlocks.
+    const onBoost = (e) => {
+      if (e.detail?.active) startOrSwapFocusLoop(1);
+      else stopFocusLoop();
+    };
+
     const onRung = (e) => {
       const { rung, deep, upward } = e.detail ?? {};
       const body = document.body;
@@ -770,10 +797,10 @@ function AppInner() {
       if (rung > 0) body.classList.add(`cf-rung-${rung}`);
       body.classList.toggle('deep-meditation', !!deep);
 
-      // Restart the pop animation on every upward edge.
+      // Climbing a rung swaps the held focus loop up to that rung's sample and
+      // restarts the pop animation.
       if (upward) {
-        // Consecutive Focus escalation: rung N plays focus_cultivate variant N.
-        try { AudioManager.playSfx('focus_cultivate', { variant: rung }); } catch {}
+        startOrSwapFocusLoop(rung);
         body.classList.remove('cf-rung-pop');
         // Force reflow so the animation can replay back-to-back rung-ups.
         // eslint-disable-next-line no-unused-expressions
@@ -784,9 +811,13 @@ function AppInner() {
         popTimer = setTimeout(() => body.classList.remove('cf-rung-pop'), 800);
       }
     };
+
+    window.addEventListener('mai:focus-boost', onBoost);
     window.addEventListener('mai:cf-rung', onRung);
     return () => {
+      window.removeEventListener('mai:focus-boost', onBoost);
       window.removeEventListener('mai:cf-rung', onRung);
+      stopFocusLoop();
       clearTimeout(popTimer);
       const body = document.body;
       body.classList.remove(...RUNG_CLASSES, 'cf-rung-pop', 'deep-meditation');
