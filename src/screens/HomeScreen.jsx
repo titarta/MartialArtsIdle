@@ -155,11 +155,8 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
   return (
     <div className={cls}>
       <span ref={textRef} className="qi-rate-value">—</span>
-      {/* Heavenly Qi (ad) chip takes the first slot when active; the focus
-          chip then follows in second. With only one of them, it sits first,
-          right beside the rate. */}
-      {adBoostActive && <span className="qi-rate-badge qi-rate-badge-ad">×2</span>}
       {boosting      && <span ref={boostRef} className="qi-rate-badge qi-rate-badge-cf">×3</span>}
+      {adBoostActive && <span className="qi-rate-badge qi-rate-badge-ad">×2</span>}
     </div>
   );
 }

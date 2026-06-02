@@ -30405,25 +30405,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 }
 
 /* ────────────────────────────────────────────────────────────────────────
-   Multiplier chips hug the rate (2026-06-02). The fixed reserved-slot grid
-   above parked a lone focus chip in the LAST column, leaving an empty
-   Heavenly-Qi slot (~44px) between it and the rate. Instead, lay the rate +
-   chips out as a simple hugging flex: with one multiplier the chip sits in
-   the FIRST slot right beside the rate; when Heavenly Qi is also active it
-   takes the first slot and focus follows in second (DOM order: rate,
-   heavenly, focus). The half keeps its outer-grid column span, so the rate's
-   left edge stays put. */
-.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child {
-  display: flex !important;
-  justify-content: flex-start !important;
-  align-items: center !important;
-  gap: 6px !important;
+   Focus-only rate row (2026-06-02). When the focus multiplier is the ONLY
+   chip (no Heavenly Qi), drop the empty heavenly column so the chip sits in
+   the slot right beside the rate instead of floating one column over. This is
+   purely a column change: two tracks (rate | focus) instead of three. The
+   both-chips layout (rate | heavenly | focus) and the idle layout above are
+   untouched, and the chip keeps all its existing styling. */
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child:has(.qi-rate-badge-cf):not(:has(.qi-rate-badge-ad)) {
+  grid-template-columns: 1fr 44px !important;
 }
-.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child .qi-rate {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  width: auto !important;
+.home-scene-bottom .home-scene-overlay-row .home-overlay-half:last-child:has(.qi-rate-badge-cf):not(:has(.qi-rate-badge-ad)) .qi-rate-badge-cf {
+  grid-column: 2 !important;
 }
 
 /* ────────────────────────────────────────────────────────────────────────
