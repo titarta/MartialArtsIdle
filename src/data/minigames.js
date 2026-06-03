@@ -34,11 +34,11 @@ export function computeReward(ratePerSec, performance01, band = REWARD_BAND) {
  */
 export const MINIGAMES = {
   p_disciple: {
-    component: 'skirmish',
-    name: 'Sect Skirmish',
-    glyph: '兵',
-    tagline: 'March your army through an endless gauntlet, then drill them stronger and push further.',
-    mode: 'Push · train · repeat',
+    component: 'merge',
+    name: 'The Roster',
+    glyph: '升',
+    tagline: 'Promote your disciples up the cultivation ranks. The board sum lifts every disciple’s qi output.',
+    mode: 'Active · merge grid',
     ready: true,
   },
   p_herb_garden: {

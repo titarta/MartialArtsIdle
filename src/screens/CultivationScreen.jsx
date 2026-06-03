@@ -3,8 +3,6 @@ import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
 import PavilionPlaque from '../components/PavilionPlaque';
 import ProducerDetailModal from '../components/ProducerDetailModal';
 import MiniGameMode from '../components/minigames/MiniGameMode';
-import SectMergeSheet from '../components/SectMergeSheet';
-import useDiscipleMerge from '../hooks/useDiscipleMerge';
 import InscribedTablet, { OwnedUpgradeChip } from '../components/UpgradeCard';
 import SparksTab from '../components/SparksTab';
 import { fmt, fmtRate } from '../utils/format';
@@ -56,11 +54,6 @@ export default function CultivationScreen({
   // Producer minigame ("Hidden Art") — full-screen overlay opened from the
   // detail modal's Mythic CTA. Holds the producer id whose game is active.
   const [minigameId, setMinigameId] = useState(null);
-  // Disciple Promotion Roster sheet — opens from the chip on the disciple
-  // plaque, presents the 4×4 merge grid as a full-screen sheet that mirrors
-  // MiniGameMode's chrome (so it feels at home in the minigame stack).
-  const [showRoster, setShowRoster] = useState(false);
-  const discipleMerge = useDiscipleMerge();
 
   // Poll the cultivation refs ~10×/sec for the sticky header.
   // useCultivation deliberately never re-renders on qi/rate change, so we
@@ -350,35 +343,20 @@ export default function CultivationScreen({
             )}
           </div>
           <div className="cs-pavilions">
-            {visibleProducers.map(p => {
-              const ownedCount = producers.getOwned(p.id);
-              const unlocked   = producers.isUnlocked(p.id, realmIndex);
-              // Disciple roster chip — only the disciple producer carries one,
-              // and only once the player owns at least one disciple (so the
-              // chip is born meaningful, not as a CTA on a locked lane).
-              const rosterChip = (p.id === 'p_disciple' && unlocked && ownedCount > 0 && discipleMerge)
-                ? {
-                    tileCount: discipleMerge.tileCount,
-                    bonusPct:  discipleMerge.perDiscipleBonusPct * 100,
-                    onClick:   () => setShowRoster(true),
-                  }
-                : null;
-              return (
-                <PavilionPlaque
-                  key={p.id}
-                  producer={p}
-                  owned={ownedCount}
-                  unlocked={unlocked}
-                  buyMode={buyMode}
-                  qi={qi}
-                  producers={producers}
-                  onBuy={handleBuy}
-                  onShowDetail={setDetailProducer}
-                  costDiscount={producerCostDiscountFrac}
-                  rosterChip={rosterChip}
-                />
-              );
-            })}
+            {visibleProducers.map(p => (
+              <PavilionPlaque
+                key={p.id}
+                producer={p}
+                owned={producers.getOwned(p.id)}
+                unlocked={producers.isUnlocked(p.id, realmIndex)}
+                buyMode={buyMode}
+                qi={qi}
+                producers={producers}
+                onBuy={handleBuy}
+                onShowDetail={setDetailProducer}
+                costDiscount={producerCostDiscountFrac}
+              />
+            ))}
           </div>
         </>
       )}
@@ -433,8 +411,6 @@ export default function CultivationScreen({
           onClose={() => setMinigameId(null)}
         />
       )}
-
-      {showRoster && <SectMergeSheet onClose={() => setShowRoster(false)} />}
 
       {tab === 'upgrades' && (
         visibleUpgrades.length === 0 ? (

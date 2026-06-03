@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { getMinigame, computeReward } from '../../data/minigames';
 import { fmt } from '../../utils/format';
-import SectSkirmish from './SectSkirmish';
+import SectMerge from './SectMerge';
 import SpiritGarden from './SpiritGarden';
 import PillRefinement from './PillRefinement';
 import './minigames.css';
@@ -11,7 +11,7 @@ const BASE = import.meta.env.BASE_URL;
 const spriteUrl = (s) =>
   (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
 
-const GAMES = { skirmish: SectSkirmish, garden: SpiritGarden, refine: PillRefinement };
+const GAMES = { merge: SectMerge, garden: SpiritGarden, refine: PillRefinement };
 
 /**
  * Shared cash-out banner. Every minigame funnels its 0..1 performance score
