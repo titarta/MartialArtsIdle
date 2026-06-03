@@ -33,6 +33,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import AboutScreen    from './screens/AboutScreen';
 import useReincarnationKarma from './hooks/useReincarnationKarma';
 import useReincarnationTree  from './hooks/useReincarnationTree';
+import { useDiscipleMergeProvider, DiscipleMergeContext } from './hooks/useDiscipleMerge';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
 import useCultivation from './hooks/useCultivation';
 import useInventory   from './hooks/useInventory';
@@ -66,6 +67,7 @@ import { FEATURES } from './data/featureFlags';
 import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
 import { PRODUCERS_BY_ID } from './data/producers';
+import { loadGarden, gardenActiveQiMult } from './data/spiritGarden';
 import { fireTutorialOnce } from './systems/fireTutorial';
 import { hasSeenTutorial, markTutorialSeen } from './systems/tutorialSeen';
 import { TUTORIAL_IDS } from './data/tutorialCards';
@@ -208,6 +210,7 @@ function AppInner() {
   const stats           = useStats();
   const shopInventory   = useShopInventory();
   const cultivation     = useCultivation();
+  const discipleMerge   = useDiscipleMergeProvider();
   const inventory       = useInventory();
   const karma           = useReincarnationKarma();
   const tree            = useReincarnationTree({ karma: karma.karma, spendKarma: karma.spendKarma, lives: karma.lives });
@@ -496,10 +499,15 @@ function AppInner() {
     // callback so it stacks naturally with upgrade-driven and spark-
     // driven per-producer multipliers (multiplicative chain).
     const shopProducerMult = shopInventory.getActiveBuffMult('producer_mult');
+    // Disciple Promotion grid (merge minigame) → +X% to p_disciple per-unit
+    // qi/s. Folded into perProducer so it composes with upgrade doubling,
+    // spark synergies, and shop buffs in the same multiplicative chain.
+    const discipleMergeMult = discipleMerge?.producerMult ?? 1;
     const perProducer = (pid) =>
       upgrades.getProducerMult(pid)
         * qiSparks.getProducerSparkMult(pid, ownedMap)
-        * shopProducerMult;
+        * shopProducerMult
+        * (pid === 'p_disciple' ? discipleMergeMult : 1);
     // 2026-05-21 Dial-9 — Sect Discipline (common timed spark) adds +N to
     // every producer's per-unit qi/s while active. Read from the spark ref
     // (default 0). The bonus flows through per-producer mults and all
@@ -518,7 +526,7 @@ function AppInner() {
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phoenix Reborn (legendary E2) — useQiSparks dispatches this event when
   // a major realm transition fires while the spark is active. Reset the
@@ -607,6 +615,22 @@ function AppInner() {
       cultivation.shopBuffCrystalTapMultRef.current = shopInventory.getActiveBuffMult('crystal_tap_mult');
     }
   }, [shopInventory.inv, cultivation.shopBuffQiMultRef, cultivation.shopBuffCrystalTapMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Mirror the Spirit Garden elixir buff into cultivation once per second. The
+  // garden persists to localStorage independently of this component tree, so we
+  // poll rather than subscribe: the qi/s multiplier stays live whether the
+  // garden overlay is open, closed, or the elixir was brewed in a past session
+  // (timed buffs expire on a timestamp, so only polling catches the expiry).
+  useEffect(() => {
+    const apply = () => {
+      if (cultivation.gardenBuffQiMultRef) {
+        cultivation.gardenBuffQiMultRef.current = gardenActiveQiMult(loadGarden());
+      }
+    };
+    apply();
+    const id = setInterval(apply, 1000);
+    return () => clearInterval(id);
+  }, [cultivation.gardenBuffQiMultRef]);
 
   // Mirror Qi Sparks multipliers + flags into cultivation refs each render.
   // Cheap; runs only when activeSparks identity changes (the hook returns
@@ -1764,6 +1788,7 @@ function AppInner() {
   const BASE = import.meta.env.BASE_URL;
 
   return (
+    <DiscipleMergeContext.Provider value={discipleMerge}>
     <div className="app" style={{ '--screen-bg-url': `url(${BASE}backgrounds/ui_screens.png)` }}>
       {/* Inline SVG filter — referenced by .pl-leader-silhouette (Cookie-
           Clicker producer-teaser). feColorMatrix crushes RGB to 0 (black);
@@ -1986,6 +2011,7 @@ function AppInner() {
         />
       )}
     </div>
+    </DiscipleMergeContext.Provider>
   );
 }
 
