@@ -1,8 +1,10 @@
 /* ════════════════════════════════════════════════════════════════════════
    Reincarnation confirmation: the gate before the Eternal Tree.
-   Cosmic "between lives" aesthetic shared with eternalTree.css: deep void,
-   violet aurora, a slowly turning gold samsara wheel. Solemn and final by
-   design, this is the one decision the game will not let the player take back.
+   "The Severing Rite" -- a cinematic between-lives ceremony. Deep void with a
+   violet aurora above and a crimson severing-glow below, a custom dharma Wheel
+   of Rebirth turning at the centre, rising qi-motes, and a staggered reveal.
+   Solemn and final by design: the one decision the game will not let the
+   player take back.
    ════════════════════════════════════════════════════════════════════════ */
 
 .rc-overlay {
@@ -10,71 +12,138 @@
   display: grid; place-items: center;
   padding: 24px;
   background:
-    radial-gradient(125% 90% at 50% 10%, rgba(107, 70, 193, 0.30), transparent 60%),
-    rgba(4, 3, 16, 0.86);
-  backdrop-filter: blur(7px) saturate(115%);
-  -webkit-backdrop-filter: blur(7px) saturate(115%);
-  animation: rc-fade 240ms ease-out;
+    radial-gradient(130% 95% at 50% 8%, rgba(107, 70, 193, 0.32), transparent 58%),
+    radial-gradient(120% 90% at 50% 108%, rgba(150, 24, 40, 0.22), transparent 55%),
+    rgba(3, 2, 12, 0.88);
+  backdrop-filter: blur(8px) saturate(118%);
+  -webkit-backdrop-filter: blur(8px) saturate(118%);
+  animation: rc-fade 260ms ease-out;
 }
 @keyframes rc-fade { from { opacity: 0; } to { opacity: 1; } }
 
 .rc-card {
-  position: relative;
-  width: min(420px, 100%);
+  position: relative; isolation: isolate; overflow: hidden;
+  width: min(424px, 100%);
   display: flex; flex-direction: column; align-items: center;
   text-align: center;
-  padding: 28px 24px 22px;
-  border-radius: 20px;
+  padding: 30px 26px 24px;
+  border-radius: 22px;
   color: #ece9f7;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  background: radial-gradient(140% 100% at 50% 0%, rgba(34, 28, 84, 0.94), rgba(8, 6, 28, 0.97));
-  border: 1px solid rgba(183, 148, 246, 0.34);
+  background:
+    radial-gradient(150% 80% at 50% -8%, rgba(45, 36, 104, 0.95), transparent 60%),
+    linear-gradient(180deg, rgba(16, 12, 46, 0.97), rgba(7, 5, 24, 0.98));
+  border: 1px solid rgba(183, 148, 246, 0.30);
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.7),
-    0 0 60px rgba(107, 70, 193, 0.28),
-    inset 0 1px 0 rgba(212, 186, 255, 0.18);
-  animation: rc-rise 340ms cubic-bezier(0.2, 0.9, 0.25, 1);
+    0 36px 90px rgba(0, 0, 0, 0.72),
+    0 0 64px rgba(107, 70, 193, 0.26),
+    inset 0 1px 0 rgba(212, 186, 255, 0.20);
+  animation: rc-rise-card 360ms cubic-bezier(0.2, 0.9, 0.25, 1);
 }
-@keyframes rc-rise {
-  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+@keyframes rc-rise-card {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
   to   { opacity: 1; transform: none; }
 }
+/* Crimson severing-glow bleeding up from the base, behind the content. */
+.rc-card::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -40%; height: 70%;
+  z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(200, 40, 56, 0.30), transparent 70%);
+}
+/* Hairline rim highlight for a forged-metal edge. */
+.rc-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 22px;
+  z-index: -1; pointer-events: none;
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(212, 186, 255, 0.22), transparent 30%) border-box;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
 
-/* ── Samsara wheel: the focal sigil, turning slowly inside a gold ring ───── */
-.rc-wheel-wrap {
-  position: relative; width: 90px; height: 90px;
-  display: grid; place-items: center; margin-bottom: 8px;
+/* ── Rising qi-motes (behind the content, upper region of the card) ──────── */
+.rc-embers { position: absolute; left: 0; right: 0; top: 0; height: 62%; overflow: hidden; pointer-events: none; z-index: 0; }
+.rc-ember {
+  position: absolute; width: 2px; height: 2px; border-radius: 50%;
+  background: #ffe2a0; box-shadow: 0 0 6px rgba(245, 200, 66, 0.75);
+  opacity: 0; animation-name: rc-ember-rise; animation-timing-function: linear; animation-iteration-count: infinite;
 }
-.rc-wheel {
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
-  font-size: 52px; line-height: 1; color: #ffd866;
-  text-shadow: 0 0 22px rgba(245, 200, 66, 0.6), 0 0 50px rgba(245, 200, 66, 0.3);
-  animation: rc-spin 28s linear infinite;
+@keyframes rc-ember-rise {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.7); }
+  18%  { opacity: 0.85; }
+  72%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-52px) scale(1.15); }
 }
-.rc-wheel-ring {
-  position: absolute; inset: 4px; border-radius: 50%;
-  border: 1px solid rgba(245, 200, 66, 0.32);
-  box-shadow: 0 0 30px rgba(245, 200, 66, 0.20), inset 0 0 24px rgba(107, 70, 193, 0.45);
+
+/* ── Content stagger ─────────────────────────────────────────────────────── */
+.rc-content { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.rc-content > *:not(.rc-sigil) { opacity: 0; animation: rc-rise 540ms cubic-bezier(0.2, 0.9, 0.25, 1) both; }
+.rc-content > *:nth-child(2) { animation-delay: 0.10s; }
+.rc-content > *:nth-child(3) { animation-delay: 0.16s; }
+.rc-content > *:nth-child(4) { animation-delay: 0.22s; }
+.rc-content > *:nth-child(5) { animation-delay: 0.28s; }
+.rc-content > *:nth-child(6) { animation-delay: 0.34s; }
+.rc-content > *:nth-child(7) { animation-delay: 0.40s; }
+.rc-content > *:nth-child(8) { animation-delay: 0.46s; }
+@keyframes rc-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* ── The dharma Wheel of Rebirth ─────────────────────────────────────────── */
+.rc-sigil {
+  position: relative; width: 112px; height: 112px;
+  display: grid; place-items: center; margin-bottom: 10px;
+  animation: rc-sigil-in 760ms cubic-bezier(0.2, 0.85, 0.25, 1) both;
 }
-.rc-wheel-ring::before {
-  content: ''; position: absolute; inset: -9px; border-radius: 50%;
-  border: 1px dashed rgba(183, 148, 246, 0.32);
-  animation: rc-spin 46s linear infinite reverse;
+@keyframes rc-sigil-in {
+  from { opacity: 0; transform: scale(0.6) rotate(-32deg); }
+  to   { opacity: 1; transform: none; }
 }
+.rc-sigil-glow {
+  position: absolute; inset: 6px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(245, 200, 66, 0.30), rgba(107, 70, 193, 0.18) 55%, transparent 72%);
+  filter: blur(2px);
+  animation: rc-glow-pulse 3.4s ease-in-out infinite;
+}
+@keyframes rc-glow-pulse { 0%, 100% { opacity: 0.7; transform: scale(0.98); } 50% { opacity: 1; transform: scale(1.05); } }
+
+.rc-wheel-svg { position: relative; overflow: visible; }
+.rc-wheel-spin { transform-box: fill-box; transform-origin: center; animation: rc-spin 30s linear infinite; }
 @keyframes rc-spin { to { transform: rotate(360deg); } }
 
+.rc-wheel-rim   { fill: none; stroke: #f5c842; stroke-width: 2.4; filter: drop-shadow(0 0 6px rgba(245, 200, 66, 0.55)); }
+.rc-wheel-rim2  { fill: none; stroke: rgba(183, 148, 246, 0.55); stroke-width: 1; }
+.rc-wheel-spoke { stroke: #c9a8ff; stroke-width: 2; opacity: 0.92; }
+.rc-wheel-stud  { fill: #ffd866; }
+.rc-wheel-hub   { fill: #1f1a3e; stroke: #ffd866; stroke-width: 2; }
+.rc-wheel-hub-core { fill: #ffe9a8; filter: drop-shadow(0 0 5px rgba(245, 200, 66, 0.8)); }
+.rc-wheel-motes {
+  fill: none; stroke: rgba(212, 186, 255, 0.5); stroke-width: 1;
+  stroke-dasharray: 1.5 7; transform-box: fill-box; transform-origin: center;
+  animation: rc-spin-rev 22s linear infinite;
+}
+@keyframes rc-spin-rev { to { transform: rotate(-360deg); } }
+
+/* Stilled + dimmed for the "wheel is closed" (below Saint) state. */
+.rc-sigil-stilled .rc-wheel-spin,
+.rc-sigil-stilled .rc-wheel-motes { animation: none; }
+.rc-sigil-stilled .rc-sigil-glow  { animation: none; opacity: 0.35; background: radial-gradient(circle, rgba(120, 120, 150, 0.22), transparent 70%); }
+.rc-sigil-stilled .rc-wheel-rim   { stroke: rgba(170, 165, 190, 0.6); filter: none; }
+.rc-sigil-stilled .rc-wheel-spoke { stroke: rgba(150, 145, 175, 0.55); }
+.rc-sigil-stilled .rc-wheel-stud,
+.rc-sigil-stilled .rc-wheel-hub-core { fill: rgba(180, 175, 200, 0.6); filter: none; }
+.rc-sigil-stilled .rc-wheel-hub   { stroke: rgba(170, 165, 190, 0.6); }
+
+/* ── Type ────────────────────────────────────────────────────────────────── */
 .rc-eyebrow {
-  font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
-  color: rgba(183, 148, 246, 0.85); margin-bottom: 8px;
+  font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+  color: rgba(196, 168, 255, 0.9); margin-bottom: 8px;
 }
 .rc-title {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 26px; font-weight: 700; line-height: 1.1; letter-spacing: 0.03em;
-  margin: 0 0 10px; color: #f3eeff;
-  text-shadow: 0 0 24px rgba(183, 148, 246, 0.45);
+  font-size: 27px; font-weight: 700; line-height: 1.08; letter-spacing: 0.03em;
+  margin: 0 0 11px; color: #f5f1ff;
+  text-shadow: 0 0 26px rgba(183, 148, 246, 0.5);
 }
 .rc-body {
-  font-size: 13.5px; line-height: 1.55; margin: 0 0 16px;
+  font-size: 13.5px; line-height: 1.58; margin: 0 0 16px; max-width: 34ch;
   color: rgba(236, 233, 247, 0.82);
 }
 .rc-body b { color: #ffd866; font-weight: 700; }
@@ -82,28 +151,38 @@
 /* ── Ledger: what is lost vs what endures ───────────────────────────────── */
 .rc-ledger { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .rc-ledger-row {
-  display: flex; align-items: center; gap: 10px; text-align: left;
-  padding: 9px 12px; border-radius: 11px;
-  font-size: 12.5px; line-height: 1.35;
-  background: rgba(12, 10, 38, 0.6); border: 1px solid rgba(183, 148, 246, 0.16);
+  display: flex; align-items: center; gap: 11px; text-align: left;
+  padding: 10px 13px; border-radius: 12px;
+  font-size: 12.5px; line-height: 1.36;
+  background: linear-gradient(180deg, rgba(20, 16, 54, 0.7), rgba(12, 10, 38, 0.55));
+  border: 1px solid rgba(183, 148, 246, 0.14);
 }
 .rc-ledger-mark {
-  flex: 0 0 auto; width: 22px; height: 22px;
-  display: grid; place-items: center; border-radius: 7px; font-size: 12px;
+  flex: 0 0 auto; width: 24px; height: 24px;
+  display: grid; place-items: center; border-radius: 8px; font-size: 12px; font-weight: 700;
 }
-.rc-lose { color: rgba(255, 200, 208, 0.92); }
-.rc-lose .rc-ledger-mark { color: #ff8a9b; background: rgba(233, 69, 96, 0.16); border: 1px solid rgba(233, 69, 96, 0.4); }
+.rc-lose { color: rgba(255, 202, 210, 0.92); }
+.rc-lose .rc-ledger-mark { color: #ff8a9b; background: rgba(233, 69, 96, 0.18); border: 1px solid rgba(233, 69, 96, 0.45); box-shadow: 0 0 12px rgba(233, 69, 96, 0.18); }
 .rc-keep { color: rgba(236, 233, 247, 0.9); }
-.rc-keep .rc-ledger-mark { color: #ffd866; background: rgba(245, 200, 66, 0.14); border: 1px solid rgba(245, 200, 66, 0.4); }
+.rc-keep .rc-ledger-mark { color: #ffd866; background: rgba(245, 200, 66, 0.16); border: 1px solid rgba(245, 200, 66, 0.45); box-shadow: 0 0 12px rgba(245, 200, 66, 0.18); }
 
 .rc-karma { font-size: 12.5px; color: rgba(236, 233, 247, 0.8); margin-bottom: 12px; }
 .rc-karma b { font-family: 'Cinzel', Georgia, serif; color: #ffd866; }
 
+/* Severing warning: flanked by crimson hairlines that fade outward. */
 .rc-warn {
-  font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-  color: #ff8a9b; margin-bottom: 18px;
-  text-shadow: 0 0 16px rgba(233, 69, 96, 0.4);
+  display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center;
+  margin-bottom: 20px;
 }
+.rc-warn span {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap;
+  color: #ff8a9b; text-shadow: 0 0 16px rgba(233, 69, 96, 0.45);
+}
+.rc-warn::before, .rc-warn::after {
+  content: ''; height: 1px; flex: 1 1 auto; max-width: 56px;
+  background: linear-gradient(90deg, transparent, rgba(233, 69, 96, 0.55));
+}
+.rc-warn::after { background: linear-gradient(90deg, rgba(233, 69, 96, 0.55), transparent); }
 
 /* ── Actions ─────────────────────────────────────────────────────────────── */
 .rc-actions { display: flex; gap: 10px; width: 100%; }
@@ -111,28 +190,43 @@
 .rc-btn {
   flex: 1; padding: 13px 16px; border-radius: 12px;
   font: inherit; font-weight: 700; letter-spacing: 0.06em; font-size: 13px;
-  cursor: pointer; transition: transform 0.08s, filter 0.14s, background 0.14s, color 0.14s;
+  cursor: pointer; transition: transform 0.08s, filter 0.14s, background 0.14s, color 0.14s, border-color 0.14s;
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
 .rc-actions-single .rc-btn { flex: 0 1 220px; }
 .rc-cancel {
-  background: rgba(22, 18, 64, 0.7); color: rgba(236, 233, 247, 0.85);
-  border: 1px solid rgba(183, 148, 246, 0.34);
+  background: rgba(22, 18, 64, 0.66); color: rgba(236, 233, 247, 0.85);
+  border: 1px solid rgba(183, 148, 246, 0.32);
 }
-.rc-cancel:hover  { background: rgba(183, 148, 246, 0.18); color: #fff; }
+.rc-cancel:hover  { background: rgba(183, 148, 246, 0.18); color: #fff; border-color: rgba(183, 148, 246, 0.5); }
 .rc-cancel:active { transform: translateY(1px); }
+
 .rc-confirm {
+  position: relative; overflow: hidden;
   color: #2a1606;
-  background: linear-gradient(180deg, #ffd866, #f5c842);
-  border: 1px solid rgba(255, 220, 130, 0.8);
-  box-shadow: 0 8px 24px rgba(245, 200, 66, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.5);
+  background: linear-gradient(180deg, #ffe08a, #f5c842 55%, #e0a82e);
+  border: 1px solid rgba(255, 224, 138, 0.85);
+  box-shadow: 0 8px 22px rgba(245, 200, 66, 0.32), 0 0 22px rgba(245, 200, 66, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55);
   text-transform: uppercase; letter-spacing: 0.08em;
 }
-.rc-confirm:hover  { filter: brightness(1.07); }
+.rc-confirm:hover  { filter: brightness(1.08) saturate(1.05); }
 .rc-confirm:active { transform: translateY(1px); }
 .rc-confirm-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif; font-size: 17px; }
+/* A slow gold light sweeping across the commit button, drawing the eye to the
+   weighty choice without nagging. */
+.rc-confirm::after {
+  content: ''; position: absolute; top: -10%; left: -70%; width: 45%; height: 120%;
+  transform: skewX(-20deg); pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: rc-shine 5s ease-in-out infinite;
+}
+@keyframes rc-shine { 0%, 22% { left: -70%; } 46%, 100% { left: 135%; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .rc-overlay, .rc-card, .rc-wheel, .rc-wheel-ring::before { animation: none; }
+  .rc-overlay, .rc-card, .rc-content > *, .rc-sigil,
+  .rc-sigil-glow, .rc-wheel-spin, .rc-wheel-motes, .rc-ember, .rc-confirm::after {
+    animation: none !important;
+  }
+  .rc-content > *:not(.rc-sigil) { opacity: 1; }
 }
