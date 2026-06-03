@@ -57,11 +57,14 @@ export function useDiscipleMergeProvider() {
   const sum = boardSum(state.tiles);
   const perDiscipleBonusPct = sum * BONUS_PER_BOARD_SUM;
   const producerMult = 1 + perDiscipleBonusPct;
+  let tileCount = 0;
+  for (const t of state.tiles) if (t) tileCount++;
 
   return {
     state,
     place, drop, seclude, reset,
     sum,
+    tileCount,
     perDiscipleBonusPct,
     producerMult,
   };

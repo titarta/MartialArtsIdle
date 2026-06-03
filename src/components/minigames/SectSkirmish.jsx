@@ -7,7 +7,6 @@ import {
   DEV_MIN_TROOPS, pickFoe, tokenLayout, MAX_TOKENS,
   TACTICS, startingVigor, pushCost, pushCostRange, rollPushCost, rallyAmount, BUST_PENALTY,
 } from '../../data/discipleArmy';
-import SectMerge from './SectMerge';
 
 function fmtDur(ms) {
   const s = Math.max(0, Math.ceil(ms / 1000));
@@ -176,10 +175,6 @@ export default function SectSkirmish({ owned, ratePerSec, onAward, recruit }) {
           <span className="da-tab-glyph">練</span> Drill Grounds
           {army.status === 'drilling' && <span className="da-tab-dot" aria-hidden="true" />}
         </button>
-        <button type="button" role="tab" aria-selected={tab === 'promote'}
-          className={`da-tab${tab === 'promote' ? ' da-tab-on' : ''}`} onClick={() => setTab('promote')}>
-          <span className="da-tab-glyph">升</span> Promotions
-        </button>
       </div>
 
       {/* ─── WAR FRONT ─────────────────────────────────────────────────────── */}
@@ -326,9 +321,6 @@ export default function SectSkirmish({ owned, ratePerSec, onAward, recruit }) {
           )}
         </div>
       )}
-
-      {/* ─── PROMOTIONS (Merge grid) ───────────────────────────────────────── */}
-      {tab === 'promote' && <SectMerge />}
     </div>
   );
 }

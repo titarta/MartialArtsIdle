@@ -54,6 +54,10 @@ export default function PavilionPlaque({
   onBuy,
   onShowDetail,
   costDiscount = 0,
+  // Optional roster chip — currently only the disciple producer carries
+  // one (opens the Promotion Grid sheet). Shape: { tileCount, bonusPct,
+  // onClick } or null. Renders a small pill inside the lintel.
+  rosterChip = null,
 }) {
   // Resolve current tier + sprite. Tier null when 0 owned.
   const tier = unlocked ? getSpriteTier(owned) : null;
@@ -164,6 +168,28 @@ export default function PavilionPlaque({
           <div className="pp-rate">Yields <b>{fmtRate(totalQiPerSec)} Qi/s</b></div>
         ) : (
           <div className="pp-rate">Yields <b>{fmtRate(producer.startQiPerSec)} Qi/s</b> per unit</div>
+        )}
+        {rosterChip && (
+          <button
+            type="button"
+            className={`pp-roster${rosterChip.tileCount > 0 ? ' pp-roster-active' : ' pp-roster-empty'}`}
+            onClick={(e) => { e.stopPropagation(); rosterChip.onClick?.(); }}
+            aria-label="Open the disciple roster"
+          >
+            <span className="pp-roster-glyph" aria-hidden="true">升</span>
+            {rosterChip.tileCount > 0 ? (
+              <>
+                <span className="pp-roster-label">Roster ×{rosterChip.tileCount}</span>
+                <span className="pp-roster-sep" aria-hidden="true">·</span>
+                <span className="pp-roster-bonus">+{rosterChip.bonusPct.toFixed(1)}%</span>
+              </>
+            ) : (
+              <>
+                <span className="pp-roster-label">Begin Roster</span>
+                <span className="pp-roster-arrow" aria-hidden="true">▸</span>
+              </>
+            )}
+          </button>
         )}
       </div>
       <div className="pp-cart">
