@@ -24068,12 +24068,11 @@ body.body-crimson-aura-active .home-fighter-stage::before {
      8px+12px+8px horizontal spec was confusing for a 4px column. */
   margin: 10px 10px 10px 0;
   border-radius: 2px;
-  background: linear-gradient(180deg,
-    #ffcf83 0%,
-    #ff5b5b 22%,
-    #c83838 78%,
-    #6a1818 100%);
-  box-shadow: 0 0 6px rgba(200, 56, 56, .35), 0 0 0 1px rgba(0,0,0,.5);
+  /* Default = unlocked but 0 owned: an "off / not active" rail. Dim, cool and
+     glow-less so it reads as dormant beside the lit, glowing tier rails below.
+     getSpriteTier() assigns a tier (and its lit coloured rail) once owned >= 1. */
+  background: linear-gradient(180deg, #6c7682 0%, #4e565f 48%, #363c43 100%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5);
 }
 /* Rail takes the producer's tier colour so its rank reads at a glance from the
    left edge (bronze, silver, gold, mythic), matching the tier badge palette.
