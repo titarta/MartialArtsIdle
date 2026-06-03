@@ -1,5 +1,5 @@
 // @refresh reset
-import { useCallback, useState, useRef, useEffect, useMemo } from 'react';
+import { useCallback, useState, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
@@ -20,9 +20,19 @@ import { hasSeenTutorial } from '../systems/tutorialSeen';
 import { TUTORIAL_IDS } from '../data/tutorialCards';
 import WORLDS from '../data/worlds';
 import AudioManager from '../audio/AudioManager';
+import { getAudioTimeline } from '../data/audioTimeline';
 import { eventStat } from '../systems/statsRecorder';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
+// Dev-only Audio Lab (?audioLab): timeline tool for placing the crystal /
+// breakthrough cinematic sounds. import.meta.env.DEV folds to a literal false in
+// ship builds, so this constant is false and the lazy import (the whole tool) is
+// tree-shaken out of the bundle.
+const AUDIO_LAB_ON = import.meta.env.DEV
+  && typeof window !== 'undefined'
+  && new URLSearchParams(window.location.search).has('audioLab');
+const AudioLab = AUDIO_LAB_ON ? lazy(() => import('../components/AudioLab.jsx')) : null;
 
 // Active particle mask base path. Updated by HomeScreen via useEffect when
 // the equipped particle item changes. ID pattern: cos_particles_c9_N maps to
@@ -540,12 +550,10 @@ const CRYSTAL_TIER_NAMES = {
 // origin rect at the start/end of the animation, so the "picked-up" crystal
 // appears identical in size to the one sitting in the anchor.
 const CES_STAGE_SIZE = 220;
-const CES_PLAY_MS    = 3800;  // pickup + shatter + settle at centre
+const CES_PLAY_MS    = 3800;  // pickup + shatter + settle at centre (matches CSS)
 const CES_RETURN_MS  = 500;   // tap → shrink back to anchor + unmount
-// Sub-beats inside the play phase, aligned to the shatter CSS keyframes so the
-// audio lands on the visuals (tunable). ~18% = shards spawn, ~68% = new crystal.
-const CES_BREAK_MS   = 700;
-const CES_REBUILD_MS = 2580;
+// Per-beat sound trigger times live in data/audioTimeline.js (tunable in the dev
+// Audio Lab) so a riser can be placed ahead of its visual beat.
 
 function CrystalEvolutionOverlay({ event, onDone }) {
   const onDoneRef = useRef(onDone);
@@ -553,15 +561,15 @@ function CrystalEvolutionOverlay({ event, onDone }) {
   // Phase state — overlay waits at 'settled' for a tap before 'returning'.
   const [phase, setPhase] = useState('playing');
 
-  // Play phase: four-beat sound timeline (start → break → rebuild), then settle.
-  // crystal_evolve is the legacy id, now used as the "rebuild" (impact) beat.
+  // Play phase: fire each timeline sound at its configured time (data/audioTimeline,
+  // editable in the Audio Lab), then settle when the CSS animation completes.
   useEffect(() => {
     if (!event || phase !== 'playing') return undefined;
-    try { AudioManager.playSfx('crystal_evolve_start'); } catch {}
-    const breakId   = setTimeout(() => { try { AudioManager.playSfx('crystal_evolve_break'); } catch {} }, CES_BREAK_MS);
-    const rebuildId = setTimeout(() => { try { AudioManager.playSfx('crystal_evolve'); } catch {} }, CES_REBUILD_MS);
-    const settleId  = setTimeout(() => setPhase('settled'), CES_PLAY_MS);
-    return () => { clearTimeout(breakId); clearTimeout(rebuildId); clearTimeout(settleId); };
+    const timers = getAudioTimeline().crystal.sounds.map(
+      (s) => setTimeout(() => { try { AudioManager.playSfx(s.id); } catch {} }, Math.max(0, s.t)),
+    );
+    const settleId = setTimeout(() => setPhase('settled'), CES_PLAY_MS);
+    return () => { timers.forEach(clearTimeout); clearTimeout(settleId); };
   }, [event, phase]);
 
   // Tap anywhere → begin returning
@@ -709,24 +717,24 @@ function CrystalEvolutionOverlay({ event, onDone }) {
  * in the background while the player savours the moment.
  */
 const CES_CHAR_STAGE_SIZE = 256;  // cultivator sprites are 256×256
-const CES_CHAR_PLAY_MS    = 4200;
+const CES_CHAR_PLAY_MS    = 4200; // matches cheOld/cheNew 4.2s in App.css
 const CES_CHAR_RETURN_MS  = 500;
-// Transition beat ~62% of the play, where the new tier sprite lands (cheNew
-// keyframe). Tunable independently of the visuals.
-const CES_CHAR_TRANSITION_MS = 2600;
+// Per-beat sound trigger times live in data/audioTimeline.js (Audio Lab editable).
 
 function CharacterEvolutionOverlay({ event, onDone }) {
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   const [phase, setPhase] = useState('playing');
 
-  // Play phase: start beat, then the transition beat as the new tier lands, then settle.
+  // Play phase: fire each timeline sound at its configured time (Audio Lab
+  // editable), then settle when the CSS animation completes.
   useEffect(() => {
     if (!event || phase !== 'playing') return undefined;
-    try { AudioManager.playSfx('cult_breakthrough_start'); } catch {}
-    const transId  = setTimeout(() => { try { AudioManager.playSfx('cult_breakthrough_transition'); } catch {} }, CES_CHAR_TRANSITION_MS);
+    const timers = getAudioTimeline().breakthrough.sounds.map(
+      (s) => setTimeout(() => { try { AudioManager.playSfx(s.id); } catch {} }, Math.max(0, s.t)),
+    );
     const settleId = setTimeout(() => setPhase('settled'), CES_CHAR_PLAY_MS);
-    return () => { clearTimeout(transId); clearTimeout(settleId); };
+    return () => { timers.forEach(clearTimeout); clearTimeout(settleId); };
   }, [event, phase]);
 
   // Settled (morph complete): loop the hold sound until the player taps. The
@@ -2830,6 +2838,9 @@ function HomeScreen({
 
   return (
     <div className={`screen home-screen${boosting ? ' home-boosting' : ''}`}>
+      {AUDIO_LAB_ON && AudioLab && (
+        <Suspense fallback={null}><AudioLab /></Suspense>
+      )}
       {/* Full-screen background — center bottom so the hall floor and archway
           sit at the same visual depth regardless of screen aspect ratio */}
       <div className="home-bg" style={{ backgroundImage: `url(${BASE}backgrounds/home.png)` }} />
