@@ -313,7 +313,12 @@ export default function EternalTreeScreen({
           <div className="et-chip et-chip-soft"><b>{karmaSpentOnTree}</b><span>anchored</span></div>
           <div className="et-chip et-chip-soft"><b>{lives ?? 0}</b><span>{(lives ?? 0) === 1 ? 'life' : 'lives'}</span></div>
         </div>
-        <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
+        {/* Close ✕ only when a cancel path is allowed. In the committed
+            reincarnation flow no onClose is passed, so there is no way out but
+            to turn the wheel. */}
+        {onClose && (
+          <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
+        )}
       </header>
 
       <div

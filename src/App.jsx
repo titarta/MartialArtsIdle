@@ -13,6 +13,7 @@ import JourneyScreen from './screens/JourneyScreen';
 import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
+import ReincarnationConfirmModal from './components/ReincarnationConfirmModal';
 import { initAds } from './rewards/rewardService';
 import { restoreResolution } from './systems/desktopResolution';
 import {
@@ -102,6 +103,10 @@ function AppInner() {
   // Toggling the same key closes it; opening a new key replaces the current one.
   const [activeModal, setActiveModal] = useState(null);
   const [hasNewAch,   setHasNewAch]   = useState(false);
+  // Reincarnation flow: null = closed, 'confirm' = the warning modal, 'tree' =
+  // the committed full-screen Eternal Tree (no nav, no cancel). Confirming the
+  // modal is the point of no return; the tree's only exit is to reincarnate.
+  const [reincarnationStage, setReincarnationStage] = useState(null);
 
   const openModal = useCallback((key, sideEffect) => {
     setActiveModal(prev => {
@@ -132,7 +137,7 @@ function AppInner() {
   // Player-driven modals pause the queue while open (Settings, Achievements,
   // Journey, Shop, Pills, Daily Bonus tap-opened, mid-session reward cards
   // tap-opened). Spontaneous events queued behind them wait until they close.
-  useBlockingPresence(!!activeModal || selectionModalOpen);
+  useBlockingPresence(!!activeModal || selectionModalOpen || reincarnationStage !== null);
 
   // Auto-enqueue daily bonus on login if uncollected — the queue presents it
   // when nothing else (offline gains, breakthrough, etc.) is in front.
@@ -1750,17 +1755,10 @@ function AppInner() {
                   autoBuyEnabled={autoBuyEnabled}
                 />,
     about:      <AboutScreen onBack={() => navigate('settings')} />,
-    reincarnation: <EternalTreeScreen
-                     karma={karma.karma}
-                     karmaEarnedThisLife={karma.karmaEarnedThisLife}
-                     cumulativeQi={karma.cumulativeQi}
-                     qiForNextKarma={karma.qiForNextKarma}
-                     tree={tree}
-                     lives={karma.lives}
-                     realmIndex={cultivation.realmIndex}
-                     onReincarnate={handleReincarnate}
-                     onClose={() => navigate('home')}
-                   />,
+    // The Eternal Tree (reincarnation) is no longer a routed screen. It opens as
+    // a root-level full-screen overlay behind a confirmation gate so it sits
+    // above the nav and cannot be escaped once entered. See the overlay render
+    // at the bottom of this component and reincarnationStage.
   };
 
   const BASE = import.meta.env.BASE_URL;
@@ -1810,7 +1808,7 @@ function AppInner() {
         hasNewAchievement={hasNewAch}
         activeModal={activeModal}
         currentScreen={currentScreen}
-        onOpenReincarnation={() => navigate('reincarnation')}
+        onOpenReincarnation={() => setReincarnationStage('confirm')}
         reincarnationUnlocked={reincarnationUnlocked}
         qiRef={cultivation.qiRef}
         karma={karma.karma}
@@ -1824,7 +1822,7 @@ function AppInner() {
         getHint={featureFlags.getHint}
         getDesc={featureFlags.getDesc}
       />
-      <main className={`screen-container${(currentScreen === 'home' || currentScreen === 'reincarnation') ? ' sc-fullbleed' : ''}`}>
+      <main className={`screen-container${currentScreen === 'home' ? ' sc-fullbleed' : ''}`}>
         {/* HomeScreen is ALWAYS mounted AND always laid out. Previously
             switched to display:none on tab change, which destroyed
             layout - qi-flow particle layer's clientWidth dropped to 0,
@@ -1960,6 +1958,31 @@ function AppInner() {
             setActiveModal(null);
             if (currentEvent?.kind === 'daily-bonus') dismiss(currentEvent.id);
           }}
+        />
+      )}
+      {/* Reincarnation. A confirmation gate, then the Eternal Tree as a
+          root-level full-screen overlay (above the nav, no escape but to turn
+          the wheel). Rendered here, OUTSIDE screen-container, so its fixed
+          z-index covers the chrome instead of being trapped beneath it. */}
+      {reincarnationStage === 'confirm' && (
+        <ReincarnationConfirmModal
+          canReincarnate={cultivation.realmIndex >= 24}
+          karma={karma.karma}
+          realmName={cultivation.realmMajor}
+          onConfirm={() => setReincarnationStage('tree')}
+          onCancel={() => setReincarnationStage(null)}
+        />
+      )}
+      {reincarnationStage === 'tree' && (
+        <EternalTreeScreen
+          karma={karma.karma}
+          karmaEarnedThisLife={karma.karmaEarnedThisLife}
+          cumulativeQi={karma.cumulativeQi}
+          qiForNextKarma={karma.qiForNextKarma}
+          tree={tree}
+          lives={karma.lives}
+          realmIndex={cultivation.realmIndex}
+          onReincarnate={handleReincarnate}
         />
       )}
     </div>
