@@ -7,9 +7,10 @@ import {
 } from '../data/audioTimeline';
 
 /**
- * Audio Lab: dev-only timeline tool for placing the per-beat sounds of the
- * crystal-evolution and major-breakthrough cinematics. Reached via ?audioLab on
- * a dev build (tree-shaken out of ship builds; see the HomeScreen mount guard).
+ * Audio Lab: designer-only timeline tool for placing the per-beat sounds of the
+ * crystal-evolution and major-breakthrough cinematics. Reached via ?audioLab in
+ * dev or the deployed designer build (tree-shaken out of ship builds; see the
+ * HomeScreen AUDIO_LAB_ON mount guard).
  *
  * Drag a sound marker along the timeline (or nudge it) to set when it fires,
  * relative to the overlay mount. Reference lines mark the animation's visual

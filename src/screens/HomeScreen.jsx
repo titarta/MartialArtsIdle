@@ -25,11 +25,17 @@ import { eventStat } from '../systems/statsRecorder';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
-// Dev-only Audio Lab (?audioLab): timeline tool for placing the crystal /
-// breakthrough cinematic sounds. import.meta.env.DEV folds to a literal false in
-// ship builds, so this constant is false and the lazy import (the whole tool) is
-// tree-shaken out of the bundle.
-const AUDIO_LAB_ON = import.meta.env.DEV
+// Audio Lab (?audioLab): timeline tool for placing the crystal / breakthrough
+// cinematic sounds. This is the same build-time gate as DESIGNER_ENABLED (see
+// src/designer/enabled.js and main.jsx), but written INLINE on purpose: Vite
+// replaces import.meta.env.MODE/.DEV with literals, so Rollup folds this to
+// false in every ship build (browser/native/steam/demo) and drops the dynamic
+// import, tree-shaking the whole tool out of player bundles. Importing the
+// const instead would defeat the fold and ship the chunk. Reachable on the dev
+// server and on the deployed designer build (where audio gets uploaded).
+const AUDIO_LAB_ON =
+  (import.meta.env.MODE === 'designer'
+    || (import.meta.env.DEV && import.meta.env.MODE !== 'native'))
   && typeof window !== 'undefined'
   && new URLSearchParams(window.location.search).has('audioLab');
 const AudioLab = AUDIO_LAB_ON ? lazy(() => import('../components/AudioLab.jsx')) : null;
