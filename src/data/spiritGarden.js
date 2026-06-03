@@ -1,0 +1,349 @@
+/**
+ * spiritGarden.js — data + pure logic for the Spirit Garden producer minigame.
+ *
+ * The garden is a SELF-CONTAINED cropping + alchemy loop:
+ *   sow spirit seeds → crops ripen over real time (offline-safe) → harvest into
+ *   a basket → spend the basket three ways:
+ *     Sell   → Spirit Dew (the garden-local soft currency)
+ *     Brew   → a timed qi/s elixir buff (feeds the main cultivation economy)
+ *     Channel→ an instant QI burst (the shared minigame cash-out model)
+ *
+ * Spirit Dew (灵露) never leaves the garden; QI only enters via the optional
+ * Channel cash-out. So the loop stays fully playable even if the player never
+ * unlocks another minigame and never sits on a dead resource.
+ *
+ * Persistence: one localStorage key (mai_garden). The React component holds
+ * only transient UI state. Growth is derived from plantedAt timestamps, so
+ * offline progress needs no background ticking: when the player returns, the
+ * crops are simply already ripe.
+ *
+ * STATUS: v1 STARTING VALUES, not balanced final content. Tune SEED / RECIPE
+ * costs + durations against playtest and scripts/sim-cultivation.mjs.
+ */
+import { HERBS, RARITY } from './materials';
+
+const KEY = 'mai_garden';
+const VERSION = 1;
+
+// ── Tunable economy constants ────────────────────────────────────────────────
+export const MAX_PLOTS   = 6;     // hard ceiling on garden beds
+export const START_PLOTS = 4;     // beds a fresh garden opens with
+export const STARTER_DEW = 20;    // grant on first open, seeds the bootstrap
+export const DISCOVERY_BONUS = 5; // Dew awarded the first time a herb is harvested
+
+// Channel → QI cash-out shaping. A basket worth CHANNEL_TARGET (in Dew value)
+// maps to a max-performance burst; below CHANNEL_MIN_VALUE the option is locked
+// so a single cheap crop cannot farm the shared reward-band floor.
+export const CHANNEL_MIN_VALUE = 40;
+export const CHANNEL_TARGET    = 200;
+
+// Dew price to unlock the Nth plot. Absent key = not purchasable (maxed).
+export const PLOT_COSTS = { 5: 150, 6: 400 };
+
+const MIN = 60_000;
+const HR  = 60 * MIN;
+
+// ── Seeds ─────────────────────────────────────────────────────────────────────
+// Seed id === the herb id it yields, so we reuse the herb name / rarity / sprite.
+// dewCost is paid at plant time (no separate seed inventory). The tier-1 seed is
+// free and infinite — the permanent anti-stuck floor of the loop.
+const RAW_SEEDS = [
+  { id: 'iron_herb_1',   dewCost: 0,  growMs: 3 * MIN,   sell: 2,  yield: 1, free: true },
+  { id: 'iron_herb_2',   dewCost: 4,  growMs: 8 * MIN,   sell: 3,  yield: 1 },
+  { id: 'bronze_herb_1', dewCost: 12, growMs: 30 * MIN,  sell: 8,  yield: 1 },
+  { id: 'bronze_herb_2', dewCost: 20, growMs: 1 * HR,    sell: 12, yield: 1 },
+  { id: 'silver_herb_1', dewCost: 50, growMs: 3 * HR,    sell: 30, yield: 2 },
+  { id: 'silver_herb_2', dewCost: 90, growMs: 8 * HR,    sell: 55, yield: 2 },
+];
+
+/** Enriched, display-ready seed list (name / rarity / colour / sprite folded in). */
+export const SEEDS = RAW_SEEDS.map((s) => {
+  const herb = HERBS[s.id] || {};
+  return {
+    ...s,
+    name:   herb.name || s.id,
+    rarity: herb.rarity || 'Iron',
+    color:  RARITY[herb.rarity]?.color || '#9ca3af',
+    sprite: `/sprites/items/${s.id}.png`,
+  };
+});
+
+export const SEEDS_BY_ID = Object.fromEntries(SEEDS.map((s) => [s.id, s]));
+
+/** Herbs teased in the almanac but not yet cultivable (v2 content). */
+export const LOCKED_SEEDS = ['gold_herb_1', 'gold_herb_2', 'transcendent_herb_1', 'transcendent_herb_2'];
+
+/** How many distinct herbs are discoverable right now (almanac denominator). */
+export const ALMANAC_TOTAL = SEEDS.length;
+
+// ── Recipes (elixirs) ──────────────────────────────────────────────────────────
+// One active buff slot. Brewing replaces any current buff. Each elixir mirrors a
+// flat qi/s multiplier into the live cultivation rate for its duration.
+const RAW_RECIPES = [
+  { id: 'e_verdant', name: 'Verdant Tonic',       inputs: { iron_herb_1: 3 },                  mult: 1.12, durationMs: 30 * MIN },
+  { id: 'e_jade',    name: 'Jade Dew Draught',    inputs: { iron_herb_2: 2, bronze_herb_1: 1 }, mult: 1.25, durationMs: 45 * MIN },
+  { id: 'e_spirit',  name: 'Spirit Bloom Elixir', inputs: { bronze_herb_2: 2, silver_herb_1: 1 }, mult: 1.45, durationMs: 1 * HR },
+];
+
+export const RECIPES = RAW_RECIPES.map((r) => ({
+  ...r,
+  pct:  Math.round((r.mult - 1) * 100),
+  desc: `+${Math.round((r.mult - 1) * 100)}% qi/s for ${growLabel(r.durationMs)}.`,
+}));
+
+export const RECIPES_BY_ID = Object.fromEntries(RECIPES.map((r) => [r.id, r]));
+
+// ── Persistence ─────────────────────────────────────────────────────────────────
+export function defaultGarden() {
+  return {
+    v: VERSION,
+    dew: STARTER_DEW,
+    plotCount: START_PLOTS,
+    plots: Array.from({ length: START_PLOTS }, () => null), // each: null | { seed, at }
+    basket: {},      // herbId → count
+    discovered: {},  // herbId → true (almanac)
+    buff: null,      // null | { recipeId, mult, expiresAt }
+    stats: { planted: 0, harvested: 0, brewed: 0, channeled: 0 },
+  };
+}
+
+function migrate(data) {
+  const base = defaultGarden();
+  const g = { ...base, ...data };
+  g.basket     = { ...(data.basket || {}) };
+  g.discovered = { ...(data.discovered || {}) };
+  g.stats      = { ...base.stats, ...(data.stats || {}) };
+  g.dew        = Number.isFinite(data.dew) ? Math.max(0, data.dew) : STARTER_DEW;
+  g.plotCount  = Math.max(START_PLOTS, Math.min(MAX_PLOTS, data.plotCount || START_PLOTS));
+
+  // Reconcile the plot array length against plotCount, and drop any plot whose
+  // seed no longer exists (e.g. a removed seed id from an older save).
+  const raw = Array.isArray(data.plots) ? data.plots.slice(0, g.plotCount) : [];
+  while (raw.length < g.plotCount) raw.push(null);
+  g.plots = raw.map((p) =>
+    p && SEEDS_BY_ID[p.seed] && Number.isFinite(p.at) ? { seed: p.seed, at: p.at } : null
+  );
+
+  if (g.buff && !(g.buff.expiresAt > 0)) g.buff = null;
+  return g;
+}
+
+export function loadGarden() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return defaultGarden();
+    return migrate(JSON.parse(raw));
+  } catch {
+    return defaultGarden();
+  }
+}
+
+export function saveGarden(g) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(g));
+  } catch {
+    /* storage full / unavailable — non-fatal for an idle minigame */
+  }
+}
+
+// ── Growth derivation (offline-safe, time-based) ────────────────────────────────
+/** 'empty' | 'seed' | 'sprout' (>=50% grown) | 'bloom' (ripe). */
+export function stageOf(plot, now = Date.now()) {
+  if (!plot) return 'empty';
+  const seed = SEEDS_BY_ID[plot.seed];
+  if (!seed) return 'empty';
+  const age = now - plot.at;
+  if (age >= seed.growMs) return 'bloom';
+  if (age >= seed.growMs * 0.5) return 'sprout';
+  return 'seed';
+}
+
+/** 0..1 growth fraction for a progress ring. */
+export function growthProgress(plot, now = Date.now()) {
+  if (!plot) return 0;
+  const seed = SEEDS_BY_ID[plot.seed];
+  if (!seed) return 0;
+  return Math.max(0, Math.min(1, (now - plot.at) / seed.growMs));
+}
+
+/** Count of ripe (harvestable) plots. */
+export function ripeCount(g, now = Date.now()) {
+  return g.plots.reduce((n, p) => n + (stageOf(p, now) === 'bloom' ? 1 : 0), 0);
+}
+
+/** Timestamp the next plot will ripen, or null if nothing is growing. */
+export function nextRipeAt(g, now = Date.now()) {
+  let soonest = Infinity;
+  for (const p of g.plots) {
+    if (!p) continue;
+    const seed = SEEDS_BY_ID[p.seed];
+    if (!seed) continue;
+    const at = p.at + seed.growMs;
+    if (at > now && at < soonest) soonest = at;
+  }
+  return soonest === Infinity ? null : soonest;
+}
+
+// ── Plot actions (pure: return a fresh garden, never mutate) ─────────────────────
+export function plantSeed(g, plotIndex, seedId, now = Date.now()) {
+  const seed = SEEDS_BY_ID[seedId];
+  if (!seed) return { ok: false, reason: 'no-seed', garden: g };
+  if (plotIndex < 0 || plotIndex >= g.plotCount) return { ok: false, reason: 'bad-plot', garden: g };
+  if (g.plots[plotIndex]) return { ok: false, reason: 'occupied', garden: g };
+  const cost = seed.dewCost || 0;
+  if (cost > g.dew) return { ok: false, reason: 'dew', garden: g };
+
+  const plots = g.plots.slice();
+  plots[plotIndex] = { seed: seedId, at: now };
+  return {
+    ok: true,
+    garden: { ...g, dew: g.dew - cost, plots, stats: { ...g.stats, planted: g.stats.planted + 1 } },
+  };
+}
+
+export function harvestPlot(g, plotIndex, now = Date.now()) {
+  const plot = g.plots[plotIndex];
+  if (stageOf(plot, now) !== 'bloom') return { ok: false, reason: 'not-ripe', garden: g };
+
+  const seed   = SEEDS_BY_ID[plot.seed];
+  const herbId = plot.seed;
+  const amount = seed.yield || 1;
+
+  const basket = { ...g.basket, [herbId]: (g.basket[herbId] || 0) + amount };
+  const plots  = g.plots.slice();
+  plots[plotIndex] = null;
+
+  const firstTime  = !g.discovered[herbId];
+  const discovered = { ...g.discovered, [herbId]: true };
+  const dew        = g.dew + (firstTime ? DISCOVERY_BONUS : 0);
+
+  return {
+    ok: true,
+    firstTime,
+    gained: { herbId, amount },
+    garden: { ...g, basket, plots, discovered, dew, stats: { ...g.stats, harvested: g.stats.harvested + amount } },
+  };
+}
+
+/** Harvest every ripe plot in one pass. Returns aggregate + newly discovered ids. */
+export function harvestAll(g, now = Date.now()) {
+  let cur = g;
+  let total = 0;
+  const firsts = [];
+  for (let i = 0; i < cur.plots.length; i++) {
+    if (stageOf(cur.plots[i], now) === 'bloom') {
+      const r = harvestPlot(cur, i, now);
+      if (r.ok) {
+        cur = r.garden;
+        total += r.gained.amount;
+        if (r.firstTime) firsts.push(r.gained.herbId);
+      }
+    }
+  }
+  return { garden: cur, total, firsts };
+}
+
+// ── Basket valuation ─────────────────────────────────────────────────────────────
+export function basketValue(g) {
+  let v = 0;
+  for (const [id, n] of Object.entries(g.basket)) {
+    const seed = SEEDS_BY_ID[id];
+    if (seed) v += (seed.sell || 0) * n;
+  }
+  return v;
+}
+
+export function basketCount(g) {
+  return Object.values(g.basket).reduce((a, b) => a + b, 0);
+}
+
+// ── Sell → Dew ────────────────────────────────────────────────────────────────
+export function sellHerb(g, herbId) {
+  const n = g.basket[herbId] || 0;
+  const seed = SEEDS_BY_ID[herbId];
+  if (n <= 0 || !seed) return { ok: false, gained: 0, garden: g };
+  const gained = (seed.sell || 0) * n;
+  const basket = { ...g.basket };
+  delete basket[herbId];
+  return { ok: true, gained, garden: { ...g, dew: g.dew + gained, basket } };
+}
+
+export function sellBasket(g) {
+  const gained = basketValue(g);
+  if (gained <= 0) return { ok: false, gained: 0, garden: g };
+  return { ok: true, gained, garden: { ...g, dew: g.dew + gained, basket: {} } };
+}
+
+// ── Brew → timed qi/s buff ──────────────────────────────────────────────────────
+export function canBrew(g, recipeId) {
+  const r = RECIPES_BY_ID[recipeId];
+  if (!r) return false;
+  return Object.entries(r.inputs).every(([id, n]) => (g.basket[id] || 0) >= n);
+}
+
+export function brew(g, recipeId, now = Date.now()) {
+  const r = RECIPES_BY_ID[recipeId];
+  if (!r) return { ok: false, reason: 'no-recipe', garden: g };
+  if (!canBrew(g, recipeId)) return { ok: false, reason: 'inputs', garden: g };
+
+  const basket = { ...g.basket };
+  for (const [id, n] of Object.entries(r.inputs)) {
+    basket[id] = (basket[id] || 0) - n;
+    if (basket[id] <= 0) delete basket[id];
+  }
+  const buff = { recipeId, mult: r.mult, expiresAt: now + r.durationMs };
+  return { ok: true, garden: { ...g, basket, buff, stats: { ...g.stats, brewed: g.stats.brewed + 1 } } };
+}
+
+/** The live qi/s multiplier App.jsx mirrors into cultivation. 1 = no buff. */
+export function gardenActiveQiMult(g, now = Date.now()) {
+  if (!g || !g.buff) return 1;
+  return g.buff.expiresAt > now ? (g.buff.mult || 1) : 1;
+}
+
+export function buffRemainingMs(g, now = Date.now()) {
+  if (!g || !g.buff) return 0;
+  return Math.max(0, g.buff.expiresAt - now);
+}
+
+// ── Channel → QI burst ──────────────────────────────────────────────────────────
+/** 0..1 performance for computeReward, driven by basket Dew-value. */
+export function channelPerformance(g) {
+  return Math.min(1, basketValue(g) / CHANNEL_TARGET);
+}
+
+export function canChannel(g) {
+  return basketValue(g) >= CHANNEL_MIN_VALUE;
+}
+
+/** Empty the basket after a successful Channel cash-out. */
+export function clearBasket(g) {
+  return { ...g, basket: {}, stats: { ...g.stats, channeled: g.stats.channeled + 1 } };
+}
+
+// ── Plot expansion (Dew sink) ────────────────────────────────────────────────────
+export function nextPlotCost(plotCount) {
+  return PLOT_COSTS[plotCount + 1] ?? null;
+}
+
+export function expandPlot(g) {
+  const cost = nextPlotCost(g.plotCount);
+  if (cost == null) return { ok: false, reason: 'maxed', garden: g };
+  if (g.dew < cost) return { ok: false, reason: 'dew', garden: g };
+  const plots = g.plots.slice();
+  plots.push(null);
+  return { ok: true, garden: { ...g, dew: g.dew - cost, plotCount: g.plotCount + 1, plots } };
+}
+
+// ── Almanac ─────────────────────────────────────────────────────────────────────
+export function discoveredCount(g) {
+  return Object.keys(g.discovered || {}).filter((id) => g.discovered[id]).length;
+}
+
+// ── Small format helper (durations shown on seeds / recipes) ─────────────────────
+export function growLabel(ms) {
+  const min = ms / 60000;
+  if (min < 60) return `${Math.round(min)} min`;
+  const hr = min / 60;
+  return hr % 1 === 0 ? `${hr} hr` : `${hr.toFixed(1)} hr`;
+}
