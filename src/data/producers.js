@@ -35,16 +35,16 @@
  * Each producer carries a `sprites` array of 4 strings — placeholder emojis
  * for now; you'll replace these with PNG paths once you generate sprite art.
  * Index follows SPRITE_TIERS below: 0=Bronze (1-9 owned), 1=Silver (10-24),
- * 2=Gold (25-99), 3=Mythic (100+). When the player crosses a threshold, all
+ * 2=Gold (25-49), 3=Mythic (50+). When the player crosses a threshold, all
  * lane sprites swap to the new variant simultaneously. CSS adds tier glow.
  */
 
 /** Ownership thresholds → sprite-tier index + tier name + UI accent. */
 export const SPRITE_TIERS = [
-  { idx: 0, name: 'bronze', label: 'Bronze',   minOwned: 1   },
-  { idx: 1, name: 'silver', label: 'Silver',   minOwned: 10  },
-  { idx: 2, name: 'gold',   label: 'Gold',     minOwned: 25  },
-  { idx: 3, name: 'mythic', label: 'Mythic',   minOwned: 100 },
+  { idx: 0, name: 'bronze', label: 'Bronze',   minOwned: 1  },
+  { idx: 1, name: 'silver', label: 'Silver',   minOwned: 10 },
+  { idx: 2, name: 'gold',   label: 'Gold',     minOwned: 25 },
+  { idx: 3, name: 'mythic', label: 'Mythic',   minOwned: 50 },
 ];
 
 /** Resolves an owned count to its tier descriptor, or null if 0/locked. */

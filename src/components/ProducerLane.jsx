@@ -34,7 +34,7 @@ function Sprite({ sprite, className }) {
  *   [Leader sprite] [Name + meta + tier badge] [Sprite stack with overflow] [Buy button]
  *
  * The leader sprite + every unit in the stack swap to a tier-specific sprite
- * variant when ownership crosses 10 / 25 / 100 (see SPRITE_TIERS in producers.js).
+ * variant when ownership crosses 10 / 25 / 50 (see SPRITE_TIERS in producers.js).
  * CSS class `pl-tier-<bronze|silver|gold|mythic>` drives the glow escalation.
  *
  * A short celebration animation plays on threshold crossings via the

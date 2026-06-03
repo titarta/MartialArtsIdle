@@ -155,7 +155,7 @@ export default function ProducerDetailModal({
                   <span className="pdm-mg-arrow" aria-hidden="true">▶</span>
                 </button>
                 {!isMythic && (
-                  <div className="pdm-mg-locknote">Unlocks at Mythic tier · 100 owned.</div>
+                  <div className="pdm-mg-locknote">Unlocks at Mythic tier · 50 owned.</div>
                 )}
               </div>
             )}
