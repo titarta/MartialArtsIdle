@@ -154,16 +154,36 @@ function Sequence({ seq, onSetT, onReplay, onReset }) {
           </div>
         ))}
       </div>
+
+      {/* Event-driven sounds: part of this cinematic but fired on a discrete
+          event (settle / tap), so they have no timeline position. Listed here
+          so the full sound set is visible. */}
+      {seq.events && seq.events.length > 0 && (
+        <div style={S.events}>
+          <span style={S.hint}>Event-driven (fires on the cinematic, no timing to set):</span>
+          {seq.events.map((ev) => (
+            <div key={ev.id} style={S.eventRow} title={ev.id}>
+              <span style={S.eventDot} />
+              <span style={{ minWidth: 70 }}>{ev.label}</span>
+              <span style={S.hint}>{ev.when}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
 const S = {
   panel: {
-    position: 'fixed', left: 8, right: 8, bottom: 8, zIndex: 99999,
+    // Lifted clear of the 49px bottom navbar (+ mobile safe-area) so the last
+    // sequence's controls are never hidden under it. Capped between the top bar
+    // and the nav, with internal scroll for taller content.
+    position: 'fixed', left: 8, right: 8,
+    bottom: 'calc(57px + env(safe-area-inset-bottom, 0px))', zIndex: 99999,
     background: 'rgba(12,14,18,0.96)', border: '1px solid #2a323c', borderRadius: 10,
     color: '#e6edf3', font: '12px ui-monospace, monospace', boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
-    maxHeight: '70vh', overflowY: 'auto',
+    maxHeight: 'calc(100dvh - 130px)', overflowY: 'auto',
   },
   titleRow: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderBottom: '1px solid #2a323c' },
   hint: { color: '#8b949e', fontSize: 11 },
@@ -183,6 +203,9 @@ const S = {
   },
   rows: { display: 'flex', flexDirection: 'column', gap: 4 },
   row: { display: 'flex', alignItems: 'center', gap: 6 },
+  events: { marginTop: 10, paddingTop: 8, borderTop: '1px dashed #2a323c', display: 'flex', flexDirection: 'column', gap: 4 },
+  eventRow: { display: 'flex', alignItems: 'center', gap: 8, color: '#8b949e' },
+  eventDot: { width: 8, height: 8, borderRadius: '50%', background: '#6e7681', flexShrink: 0 },
   num: { width: 64, background: '#0d1116', color: '#e6edf3', border: '1px solid #2a323c', borderRadius: 4, padding: '2px 4px', font: 'inherit' },
   nudge: { background: '#1c232c', color: '#e6edf3', border: '1px solid #2a323c', borderRadius: 4, padding: '2px 6px', cursor: 'pointer', font: 'inherit' },
   btn: { background: '#1c232c', color: '#e6edf3', border: '1px solid #2a323c', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', font: 'inherit' },

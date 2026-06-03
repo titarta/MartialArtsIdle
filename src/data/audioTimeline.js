@@ -11,7 +11,9 @@
  * BEFORE its beat so a riser/buildup peaks on the beat.
  *
  * The loop + continue sounds are event-driven (fire on settle / on tap), not on
- * this timeline, so they live in the overlay code, not here.
+ * this timeline; their trigger logic lives in the overlay code. They are listed
+ * per cinematic under `events` purely so the Lab can show the full sound set
+ * (they have no editable `t`).
  *
  * The Audio Lab writes a localStorage override (sound `t` values only); the
  * cinematics read it live via getAudioTimeline() so every replay uses the
@@ -36,7 +38,11 @@ export const AUDIO_TIMELINE_DEFAULTS = {
       { id: 'crystal_evolve_break', label: 'Break',   t: 700 },
       { id: 'crystal_evolve',       label: 'Rebuild', t: 2580 },
     ],
-    // crystal_evolve_continue fires on tap (overlay code).
+    // Event-driven, not time-tuned (fired by the overlay on a discrete event).
+    // Shown in the Lab for completeness so the full sound set is visible.
+    events: [
+      { id: 'crystal_evolve_continue', label: 'Continue', when: 'on tap' },
+    ],
   },
   breakthrough: {
     label:  'Major Breakthrough',
@@ -51,7 +57,12 @@ export const AUDIO_TIMELINE_DEFAULTS = {
       { id: 'cult_breakthrough_start',      label: 'Start',      t: 0 },
       { id: 'cult_breakthrough_transition', label: 'Transition', t: 2600 },
     ],
-    // cult_breakthrough_loop fires on settle, cult_breakthrough_continue on tap.
+    // Event-driven, not time-tuned (fired by the overlay on a discrete event).
+    // Shown in the Lab for completeness so the full sound set is visible.
+    events: [
+      { id: 'cult_breakthrough_loop',     label: 'Loop',     when: 'on settle, until tap' },
+      { id: 'cult_breakthrough_continue', label: 'Continue', when: 'on tap' },
+    ],
   },
 };
 
