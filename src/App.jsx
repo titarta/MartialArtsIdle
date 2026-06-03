@@ -772,18 +772,22 @@ function AppInner() {
     // the level currently playing (0 = none) so a no-op event (same level,
     // e.g. a rung edge that maps to the level already playing) never re-fires.
     const FOCUS_LEVELS = 5;
+    const FOCUS_XFADE_MS = 350;        // crossfade between focus loop levels
+    const FOCUS_RELEASE_FADE_MS = 220; // gentle fade when focus is released
     let focusLoopVariant = 0;
     const startOrSwapFocusLoop = (level) => {
       const v = Math.min(FOCUS_LEVELS, Math.max(1, level || 1));
       if (v === focusLoopVariant) return;
       try { AudioManager.playSfx('focus_tick', { variant: v }); } catch {}
-      try { AudioManager.stopSfx('focus_cultivate'); } catch {}
-      try { AudioManager.playSfx('focus_cultivate', { loop: true, variant: v }); } catch {}
+      // Crossfade the underlying loop to the new level so the change glides
+      // instead of hard-cutting. The tick above still punctuates the moment.
+      try { AudioManager.crossfadeSfxLoop('focus_cultivate', { variant: v, duration: FOCUS_XFADE_MS }); } catch {}
       focusLoopVariant = v;
     };
     const stopFocusLoop = () => {
       if (!focusLoopVariant) return;
-      try { AudioManager.stopSfx('focus_cultivate'); } catch {}
+      // Short fade on release so the loop tails off instead of clicking.
+      try { AudioManager.stopSfx('focus_cultivate', { fade: FOCUS_RELEASE_FADE_MS }); } catch {}
       focusLoopVariant = 0;
     };
 

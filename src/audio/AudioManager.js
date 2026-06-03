@@ -187,6 +187,22 @@ function _getSfxHowls(sfxId) {
   return howls;
 }
 
+// Resolve which Howl in a variation pool a request maps to. With a 1-based
+// `variant` it picks slot N, falling back to the nearest filled slot below it
+// (the pool is index-stable with null placeholders); without one it picks at
+// random among the filled slots. Returns null if the pool is empty.
+function _resolveVariantHowl(howls, variant) {
+  if (!howls || howls.length === 0) return null;
+  if (Number.isFinite(variant)) {
+    let idx = Math.min(howls.length, Math.max(1, Math.round(variant))) - 1;
+    while (idx >= 0 && !howls[idx]) idx--;
+    return idx >= 0 ? howls[idx] : (howls.find(Boolean) || null);
+  }
+  const filled = howls.filter(Boolean);
+  if (filled.length === 0) return null;
+  return filled.length === 1 ? filled[0] : filled[Math.floor(Math.random() * filled.length)];
+}
+
 // ── AudioContext lifecycle (iOS Safari hardening) ────────────────────────────
 // iOS Safari forcibly puts the AudioContext into 'suspended' (or its own
 // 'interrupted' state) when the page is backgrounded via the app switcher.
@@ -381,19 +397,7 @@ const AudioManager = {
     const howls = _getSfxHowls(sfxId);
     if (!howls || howls.length === 0) return;
 
-    let howl;
-    if (Number.isFinite(variant)) {
-      // Indexed pick (1-based). The pool is index-stable, so slot N is index
-      // N-1 regardless of which other slots are filled. If the requested slot
-      // is empty, fall back to the nearest filled slot below it, then any.
-      let idx = Math.min(howls.length, Math.max(1, Math.round(variant))) - 1;
-      while (idx >= 0 && !howls[idx]) idx--;
-      howl = idx >= 0 ? howls[idx] : howls.find(Boolean);
-    } else {
-      // Random pick among filled slots only (skip null placeholders).
-      const filled = howls.filter(Boolean);
-      howl = filled.length === 1 ? filled[0] : filled[Math.floor(Math.random() * filled.length)];
-    }
+    const howl = _resolveVariantHowl(howls, variant);
     if (!howl) return undefined;
 
     // Set howl-group volume + rate BEFORE play() — setting these on the id
@@ -416,14 +420,66 @@ const AudioManager = {
    * breakthrough hold loop) when the player continues. No-op if never played.
    *
    * @param {string} sfxId - Key from SFX.
+   * @param {{ fade?: number }} [opts] fade>0 fades out over that many ms (and
+   *   then stops) instead of cutting instantly, so a loop does not click off.
    */
-  stopSfx(sfxId) {
+  stopSfx(sfxId, { fade = 0 } = {}) {
     const howls = sfxCache[sfxId];
     if (!howls) return;
     for (const howl of howls) {
-      if (howl) { try { howl.stop(); } catch { /* non-fatal */ } }
+      if (!howl) continue;
+      if (fade > 0) _fadeOutAndStop(howl, fade);
+      else { try { howl.stop(); } catch { /* non-fatal */ } }
+    }
+  },
+
+  /**
+   * Crossfade a looping SFX to a new variant. Used by Consecutive Focus so
+   * climbing a level glides between the loop samples instead of hard-cutting.
+   * Fades any currently-playing instance(s) of this SFX down to silence (and
+   * stops them) while fading the target variant up from silence, both over
+   * `duration` ms. Safe to call from a stopped state (it just fades the new
+   * loop in). Returns the new Howler sound id, or undefined.
+   *
+   * @param {string} sfxId
+   * @param {{ variant?: number, rate?: number, duration?: number }} [opts]
+   */
+  crossfadeSfxLoop(sfxId, { variant, rate, duration = 350 } = {}) {
+    if (!unlocked) return undefined;
+    ensureContextRunning();
+
+    const howls = _getSfxHowls(sfxId);
+    if (!howls || howls.length === 0) return undefined;
+
+    const target = _resolveVariantHowl(howls, variant);
+    if (!target) return undefined;
+
+    const vol = effectiveSfxVol();
+    // Muted: nothing audible to blend, just make sure no instance lingers.
+    if (vol === 0) {
+      for (const h of howls) { if (h) { try { h.stop(); } catch { /* non-fatal */ } } }
+      return undefined;
     }
 
+    // Fade out + stop every OTHER playing instance (the loop we are leaving).
+    for (const h of howls) {
+      if (h && h !== target) _fadeOutAndStop(h, duration);
+    }
+
+    // Bring the target up. If it is already playing (a null slot can make the
+    // fallback land on the same sample), cancel any pending stop and ride its
+    // volume back to full instead of restarting it.
+    _cancelPendingStop(target);
+    target.loop(true);
+    target.rate(rate ?? 1);
+    if (target.playing()) {
+      target.fade(target.volume(), vol, duration);
+      return undefined;
+    }
+    target.volume(0);
+    const id = target.play();
+    target.fade(0, vol, duration);
+    return id;
   },
 
   /**
