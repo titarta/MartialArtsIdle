@@ -24075,6 +24075,27 @@ body.body-crimson-aura-active .home-fighter-stage::before {
     #6a1818 100%);
   box-shadow: 0 0 6px rgba(200, 56, 56, .35), 0 0 0 1px rgba(0,0,0,.5);
 }
+/* Rail takes the producer's tier colour so its rank reads at a glance from the
+   left edge (bronze, silver, gold, mythic), matching the tier badge palette.
+   Gold + mythic get a slightly hotter glow to echo the frame escalation. A
+   0-owned unlocked producer has no tier and keeps the vermillion rail above as
+   an "unstarted" cue. */
+.pp-tier-bronze .pp-rail {
+  background: linear-gradient(180deg, #e3b88e 0%, #c08858 30%, #a06c3e 72%, #5e3a20 100%);
+  box-shadow: 0 0 6px rgba(192, 136, 88, .40), 0 0 0 1px rgba(0,0,0,.5);
+}
+.pp-tier-silver .pp-rail {
+  background: linear-gradient(180deg, #f2f0eb 0%, #c9c6c0 30%, #a9a6a0 72%, #6e6a63 100%);
+  box-shadow: 0 0 6px rgba(201, 198, 192, .42), 0 0 0 1px rgba(0,0,0,.5);
+}
+.pp-tier-gold .pp-rail {
+  background: linear-gradient(180deg, #ffe7ba 0%, #ffcf83 30%, #d99f4e 72%, #7a531f 100%);
+  box-shadow: 0 0 7px rgba(255, 207, 131, .48), 0 0 0 1px rgba(0,0,0,.5);
+}
+.pp-tier-mythic .pp-rail {
+  background: linear-gradient(180deg, #e6c0ff 0%, #c885ff 30%, #9a55d8 72%, #5a2a8c 100%);
+  box-shadow: 0 0 8px rgba(200, 133, 255, .55), 0 0 0 1px rgba(0,0,0,.5);
+}
 .pp-frame {
   width: 64px; height: 64px;
   align-self: center;
