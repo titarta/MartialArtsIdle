@@ -202,16 +202,20 @@
   fill: rgba(110, 200, 150, 0.85);
   filter: drop-shadow(0 0 6px rgba(110, 200, 150, 0.6));
 }
-.sr-tree-leaves circle:nth-child(1)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2160ms both; }
-.sr-tree-leaves circle:nth-child(2)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2200ms both; }
-.sr-tree-leaves circle:nth-child(3)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2260ms both; }
-.sr-tree-leaves circle:nth-child(4)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2300ms both; }
-.sr-tree-leaves circle:nth-child(5)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2340ms both; }
-.sr-tree-leaves circle:nth-child(6)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2360ms both; }
-.sr-tree-leaves circle:nth-child(7)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2400ms both; }
-.sr-tree-leaves circle:nth-child(8)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2440ms both; }
-.sr-tree-leaves circle:nth-child(9)  { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2200ms both; }
-.sr-tree-leaves circle:nth-child(10) { animation: sr-leaf-bloom 420ms cubic-bezier(0.2, 1.2, 0.4, 1) 2240ms both; }
+/* Bloom: 280ms each, started in a tight 2020-2120ms window so the LAST leaf
+   lands the same frame the fade begins (RITE_MS = 2400ms in the JSX), no
+   perceptual idle between "tree complete" and "fade-out start". The varied
+   delays inside the window keep the swarm organic instead of one block. */
+.sr-tree-leaves circle:nth-child(1)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2020ms both; }
+.sr-tree-leaves circle:nth-child(2)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2040ms both; }
+.sr-tree-leaves circle:nth-child(3)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2060ms both; }
+.sr-tree-leaves circle:nth-child(4)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2080ms both; }
+.sr-tree-leaves circle:nth-child(5)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2100ms both; }
+.sr-tree-leaves circle:nth-child(6)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2120ms both; }
+.sr-tree-leaves circle:nth-child(7)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2060ms both; }
+.sr-tree-leaves circle:nth-child(8)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2100ms both; }
+.sr-tree-leaves circle:nth-child(9)  { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2040ms both; }
+.sr-tree-leaves circle:nth-child(10) { animation: sr-leaf-bloom 280ms cubic-bezier(0.2, 1.2, 0.4, 1) 2080ms both; }
 @keyframes sr-leaf-bloom {
   0%   { opacity: 0; transform: scale(0); }
   60%  { opacity: 1; transform: scale(1.25); }

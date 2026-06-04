@@ -2,7 +2,7 @@
  * SeveringRite — the cinematic between confirming reincarnation and the
  * Eternal Tree screen opening.
  *
- * Plays as a single ~2.6 second ceremony, picking up the modal's
+ * Plays as a single ~2.4 second ceremony, picking up the modal's
  * vocabulary so the confirmation and the rite read as one continuous
  * gesture:
  *
@@ -13,8 +13,8 @@
  *   1300  ms  the seed at the trunk base lights gold
  *   1400  ms  trunk draws itself upward (stroke-dashoffset)
  *   1800  ms  branches unfurl
- *   2200  ms  leaves bloom one by one in jade (staggered)
- *   2600  ms  onComplete → App swaps to EternalTreeScreen
+ *   2020  ms  leaves bloom one by one in jade (tight staggers, 280ms each)
+ *   2400  ms  onComplete → App swaps to 'rising' (cross-fade begins)
  *
  * Reduced-motion users skip the cinematic entirely (immediate
  * onComplete) — the rite is for those who chose to see it.
@@ -27,8 +27,10 @@ import { createPortal } from 'react-dom';
 import { AudioManager } from '../audio';
 import './severingRite.css';
 
-// Total cinematic duration (ms). onComplete fires at this mark.
-const RITE_MS = 2600;
+// Total cinematic duration (ms). onComplete fires at this mark, aligned
+// so that the LAST leaf finishes blooming the same frame the fade begins —
+// no perceptual idle hold between "tree complete" and "fade-out start".
+const RITE_MS = 2400;
 // The moment of severing — SFX + haptic + white flash all align here.
 const GONG_MS = 1000;
 
