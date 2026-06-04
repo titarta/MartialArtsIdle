@@ -13,6 +13,8 @@
  *   pointerup (window)   → call merge.drop(fromIdx, toIdx)
  *
  * Grid size is dynamic (3..7) via inline CSS custom property.
+ *
+ * Imports: TIERS / BONUS_PER_BOARD_SUM / gridIsFull from discipleMerge.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import useDiscipleMerge, { currentMerit } from '../../hooks/useDiscipleMerge';
@@ -321,6 +323,21 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi }) {
       <div className="dmg-hint">
         Owned disciples generate Merit. Spend it to Place new T1s; merge to promote ranks. Each merge yields Merit equal to the new tile’s value.
       </div>
+
+      {import.meta.env.DEV && (
+        <button
+          type="button"
+          className="dmg-dev-reset"
+          onClick={() => {
+            if (window.confirm('Reset the roster to a fresh 3×3 (you will lose every tile and your Merit balance)?')) {
+              merge.reset();
+              setSelectedIdx(null);
+            }
+          }}
+        >
+          Reset roster (dev)
+        </button>
+      )}
 
     </div>
   );

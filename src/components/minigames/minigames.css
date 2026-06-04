@@ -669,3 +669,22 @@
   opacity: 0.55; text-align: center;
   padding: 6px 12px 4px;
 }
+
+/* Dev-only — wiped from production by import.meta.env.DEV gate in the
+   component. Tiny ghost button so testing migrations / fresh-board
+   states doesn't require fiddling with DevTools. */
+.dmg-dev-reset {
+  align-self: center;
+  margin-top: 2px;
+  font: inherit; font-family: 'Cinzel', Georgia, serif;
+  font-weight: 600; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 12px;
+  background: transparent; color: rgba(255, 255, 255, 0.42);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+}
+.dmg-dev-reset:hover {
+  color: #ff9966; border-color: rgba(255, 150, 102, 0.5);
+  background: rgba(80, 30, 20, 0.22);
+}
