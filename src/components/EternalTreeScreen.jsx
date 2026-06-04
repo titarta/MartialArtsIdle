@@ -1,3 +1,7 @@
+// Eternal Tree screen — the between-lives prestige graph.
+// Header was simplified to a single Karma Coin (the 業 medallion) — the
+// anchored count is already visible on the tree itself (gold-ringed nodes)
+// and the lives count belongs on the home topbar, not here.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
@@ -309,7 +313,6 @@ export default function EternalTreeScreen({
   const selectedNode  = selectedNodeId ? ALL_NODES_BY_ID[selectedNodeId] : null;
   const selectedState = selectedNode && !selectedNode.placeholder ? nodeStates[selectedNode.id] : null;
   const action        = detailAction(selectedNode, selectedState, karma);
-  const karmaSpentOnTree = purchased.size;
   const canReincarnate   = realmIndex >= 24;
   const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
   const progress = qiForNextKarma > 0
@@ -332,10 +335,18 @@ export default function EternalTreeScreen({
           <div className="et-eyebrow">Between Lives</div>
           <h1 className="et-title">Eternal Tree</h1>
         </div>
-        <div className="et-bar-chips">
-          <div className="et-chip"><span className="et-chip-sigil">◈</span><b>{karma}</b><span>karma</span></div>
-          <div className="et-chip et-chip-soft"><b>{karmaSpentOnTree}</b><span>anchored</span></div>
-          <div className="et-chip et-chip-soft"><b>{lives ?? 0}</b><span>{(lives ?? 0) === 1 ? 'life' : 'lives'}</span></div>
+        {/* Karma Coin — the one stat that matters on this screen. The 業
+            (yè, "karma") sigil + a Cinzel display readout. Anchored count is
+            already visible in the tree itself (gold-ringed nodes); lives are
+            already in the home screen header. Both were noise here. */}
+        <div className="et-karma" role="status" aria-label={`${karma} karma`}>
+          <div className="et-karma-seal" aria-hidden="true">
+            <span className="et-karma-seal-glyph">業</span>
+          </div>
+          <div className="et-karma-readout">
+            <span className="et-karma-count">{fmt(karma)}</span>
+            <span className="et-karma-label">karma</span>
+          </div>
         </div>
         {/* Close ✕ only when a cancel path is allowed. In the committed
             reincarnation flow no onClose is passed, so there is no way out but

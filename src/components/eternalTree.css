@@ -54,34 +54,120 @@
   -webkit-backdrop-filter: blur(8px) saturate(110%);
 }
 .et-bar-top {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 14px 10px;
-  background: linear-gradient(180deg, rgba(6, 5, 26, 0.86), rgba(6, 5, 26, 0.4));
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px 12px;
+  background:
+    /* Soft warm halo at the upper-right where the karma medallion sits */
+    radial-gradient(40% 120% at 92% 30%, rgba(245, 200, 66, 0.10), transparent 70%),
+    linear-gradient(180deg, rgba(6, 5, 26, 0.88), rgba(6, 5, 26, 0.42));
   border-bottom: 1px solid var(--et-line);
+  /* Hairline gold lustre at the very bottom of the header, just under the
+     violet border — sells the "between lives" threshold feel without
+     screaming for attention. */
+  box-shadow: inset 0 -1px 0 rgba(245, 200, 66, 0.18);
 }
-.et-bar-titles { display: flex; flex-direction: column; gap: 2px; flex: 0 0 auto; }
-.et-eyebrow { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--et-silver-mute); }
+.et-bar-titles {
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1 1 auto;          /* let title shrink before karma medallion */
+  min-width: 0;             /* allow proper truncation on cramped widths */
+}
+.et-eyebrow {
+  font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--et-silver-mute);
+}
 .et-title {
   font-family: 'Cinzel', Georgia, serif;
   font-weight: 700; font-size: 20px; line-height: 1.1; letter-spacing: 0.1em;
   color: var(--et-silver); margin: 0;
   text-shadow: 0 0 18px rgba(183, 148, 246, 0.4);
+  /* Tiny gold underline ornament — a horizontal lustre that fades toward
+     the right. Anchors the title without competing with the karma coin. */
+  position: relative;
+  padding-bottom: 6px;
 }
-.et-bar-chips {
-  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
-  margin-left: auto; padding-top: 4px;
+.et-title::after {
+  content: '';
+  position: absolute; left: 0; bottom: 0;
+  width: 56px; height: 1px;
+  background: linear-gradient(to right,
+    var(--et-gold) 0%,
+    rgba(245, 200, 66, 0.6) 40%,
+    transparent 100%);
+  box-shadow: 0 0 8px rgba(245, 200, 66, 0.45);
 }
-.et-chip {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 5px 10px; border-radius: 999px;
-  border: 1px solid var(--et-line-strong);
-  background: rgba(22, 18, 64, 0.55);
-  font-size: 11px; color: var(--et-silver);
+
+/* ── Karma Coin ─────────────────────────────────────────────────────────────
+   業 (yè) — the canonical Chinese character for karma. Reads as a sect-
+   master's signet pressed onto the player's ledger of lives. */
+.et-karma {
+  display: inline-flex; align-items: center;
+  gap: 11px;
+  margin-left: auto;
+  flex: 0 0 auto;
+  padding: 4px 12px 4px 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+    rgba(245, 200, 66, 0.08),
+    rgba(245, 200, 66, 0.02));
+  border: 1px solid rgba(245, 200, 66, 0.32);
+  box-shadow:
+    0 0 22px rgba(245, 200, 66, 0.10),
+    inset 0 1px 0 rgba(255, 240, 200, 0.12);
 }
-.et-chip b { font-family: 'Cinzel', Georgia, serif; font-weight: 700; color: var(--et-silver); }
-.et-chip span { color: var(--et-silver-soft); font-size: 10px; letter-spacing: 0.04em; }
-.et-chip-sigil { font-size: 13px; color: var(--et-gold); text-shadow: 0 0 10px rgba(245, 200, 66, 0.5); }
-.et-chip-soft { background: rgba(12, 10, 38, 0.4); }
+.et-karma-seal {
+  position: relative;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background:
+    /* Highlight to make the medallion read as a struck coin, not flat */
+    radial-gradient(circle at 35% 28%, rgba(255, 240, 200, 0.55), transparent 55%),
+    radial-gradient(circle, rgba(245, 200, 66, 0.22), rgba(60, 38, 12, 0.72) 70%);
+  border: 1.5px solid var(--et-gold);
+  box-shadow:
+    0 0 14px rgba(245, 200, 66, 0.35),
+    inset 0 1px 0 rgba(255, 240, 200, 0.45),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+  /* Slow breath so the coin reads as a living token, not a static badge. */
+  animation: et-karma-breath 4.6s ease-in-out infinite;
+}
+@keyframes et-karma-breath {
+  0%, 100% { filter: brightness(1)    saturate(1); }
+  50%      { filter: brightness(1.12) saturate(1.05); }
+}
+/* Faint outer halo ring — gives the medallion a "sealed wax" outline */
+.et-karma-seal::before {
+  content: '';
+  position: absolute; inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  pointer-events: none;
+}
+.et-karma-seal-glyph {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 22px; line-height: 1;
+  color: var(--et-gold);
+  text-shadow: 0 0 8px rgba(245, 200, 66, 0.65);
+}
+.et-karma-readout {
+  display: flex; flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+.et-karma-count {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700; font-size: 22px;
+  color: var(--et-gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 18px rgba(245, 200, 66, 0.42);
+}
+.et-karma-label {
+  font-size: 9px; letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(212, 186, 255, 0.7);
+  margin-top: 3px;
+}
 .et-close {
   width: 32px; height: 32px; border-radius: 9px;
   background: rgba(22, 18, 64, 0.6); border: 1px solid var(--et-line-strong);
@@ -383,5 +469,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .et-screen, .et-star, .et-edge-pulse, .et-edge-lit,
-  .et-node-can .et-node-halo { animation: none; }
+  .et-node-can .et-node-halo, .et-karma-seal { animation: none; }
 }
