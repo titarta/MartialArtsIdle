@@ -1306,9 +1306,17 @@ function AppInner() {
       // ── Progression ──────────────────────────────────────────────────────
       realmIndex:             cultivation.realmIndex,
       // ── Crystal / tap ────────────────────────────────────────────────────
-      totalCrystalTaps:       lifetime.cultivatorTaps      ?? 0,
+      // totalCrystalTaps drives the "Featherlight / Hand of God / Stone
+      // Hammer / Mountain Crusher" ladder which is QI-CRYSTAL taps only,
+      // NOT cultivator-sprite taps. useCultivation.js increments
+      // crystalTaps on crystal taps and cultivatorTaps on sprite taps
+      // separately. This line used to read .cultivatorTaps, which made
+      // tapping the cultivator unlock the crystal-tap achievements.
+      totalCrystalTaps:       lifetime.crystalTaps         ?? 0,
       peakTapsPerSec:         lifetime.peakTapsPerSec      ?? 0,
       longestHoldSec:         lifetime.longestHoldSec      ?? 0,
+      // cultivatorSpriteTaps drives ONLY "Tickle the Master" and is
+      // intentionally the cultivator counter, not the crystal one.
       cultivatorSpriteTaps:   lifetime.cultivatorTaps      ?? 0,
       // ── Sparks ───────────────────────────────────────────────────────────
       qiSparksCaught:         lifetime.qiSparksCaught      ?? 0,
