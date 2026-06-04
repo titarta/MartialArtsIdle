@@ -218,6 +218,109 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   The Crossing — 800ms cross-fade from the rite into the Eternal Tree
+   screen. Applied by adding `.sr-fading` once App.jsx swaps to the
+   'rising' stage.
+
+   Choreography:
+     0     ms  fading begins. EternalTreeScreen has just mounted beneath.
+     0     ms  jade leaves DETACH and ascend with staggered offsets,
+               drifting up past where the Eternal Tree's constellation
+               sits — the player sees the cinematic's leaves rise toward
+               the destination tree.
+     0     ms  trunk, branches, roots, seed-glow start fading to nothing.
+     0     ms  cosmic void backdrop dissolves to reveal the et-screen.
+     0     ms  a soft gold "arrival burst" blooms outward from the seed
+               position, marking the moment the new life touches down.
+     800   ms  overlay unmounts; only EternalTreeScreen remains.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.sr-fading {
+  /* Let pointer events fall through to the screen mounting beneath */
+  pointer-events: none;
+}
+
+/* Void backdrop dissolves to transparent so et-screen shows through */
+.sr-fading .sr-void {
+  animation: sr-void-fade 760ms cubic-bezier(0.42, 0, 0.58, 1) forwards;
+}
+@keyframes sr-void-fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Rising motes container fades; individual motes stop spawning */
+.sr-fading .sr-motes {
+  animation: sr-motes-fade 560ms ease-out forwards;
+}
+@keyframes sr-motes-fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Trunk, branches, roots, and the seed dissolve */
+.sr-fading .sr-tree-trunk,
+.sr-fading .sr-tree-crown path,
+.sr-fading .sr-tree-root,
+.sr-fading .sr-tree-seed,
+.sr-fading .sr-tree-seed-glow {
+  animation: sr-tree-fade 620ms ease-out forwards;
+}
+@keyframes sr-tree-fade {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* Jade leaves DETACH — each rises straight up and fades. Staggered offsets
+   make the swarm look organic instead of one chunk lifting in unison. The
+   transform-origin was already set at bloom-time so we can re-use it. */
+.sr-fading .sr-tree-leaves circle {
+  /* Brighten briefly before they let go */
+  filter: drop-shadow(0 0 18px rgba(110, 200, 150, 1));
+}
+.sr-fading .sr-tree-leaves circle:nth-child(1)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)   0ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(2)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  60ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(3)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  40ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(4)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(5)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  80ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(6)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1) 130ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(7)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1) 110ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(8)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  20ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(9)  { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  90ms forwards; }
+.sr-fading .sr-tree-leaves circle:nth-child(10) { animation: sr-leaf-ascend 780ms cubic-bezier(0.4, 0, 0.2, 1)  50ms forwards; }
+@keyframes sr-leaf-ascend {
+  0%   { transform: translateY(0)      scale(1);    opacity: 1; }
+  30%  { transform: translateY(-12px)  scale(1.25); opacity: 1; }
+  100% { transform: translateY(-340px) scale(0.35); opacity: 0; }
+}
+
+/* Gold "arrival burst" radiates from where the seed was. Marks the moment
+   the rite hands off to the new life. Positioned 76% from the top to align
+   with the seed's centre in the 0..620 viewBox. */
+.sr-fading::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 76%;
+  transform: translate(-50%, -50%);
+  width: 0; height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 224, 138, 0.85) 0%,
+    rgba(245, 200, 66, 0.55) 28%,
+    rgba(245, 200, 66, 0.18) 55%,
+    transparent 75%);
+  filter: blur(2px);
+  pointer-events: none;
+  animation: sr-arrival-burst 800ms cubic-bezier(0.18, 0.85, 0.3, 1) forwards;
+  z-index: 5;
+}
+@keyframes sr-arrival-burst {
+  0%   { width: 0;       height: 0;       opacity: 0; }
+  18%  { width: 30vmin;  height: 30vmin;  opacity: 1; }
+  100% { width: 180vmin; height: 180vmin; opacity: 0; }
+}
+
 /* ── Reduced motion: the JSX hook short-circuits the timeline, but if a
    user toggles motion off mid-rite we still don't want flashes. ────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -233,8 +336,10 @@
   .sr-tree-crown path,
   .sr-tree-root,
   .sr-tree-leaves circle,
-  .sr-mote {
+  .sr-mote,
+  .sr-fading::before {
     animation: none !important;
   }
   .sr-flash { opacity: 0 !important; }
+  .sr-fading { opacity: 0; }
 }

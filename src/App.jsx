@@ -109,7 +109,15 @@ function AppInner() {
   // Reincarnation flow: null = closed, 'confirm' = the warning modal, 'tree' =
   // the committed full-screen Eternal Tree (no nav, no cancel). Confirming the
   // modal is the point of no return; the tree's only exit is to reincarnate.
+  // Stages: 'confirm' → 'severing' → 'rising' → 'tree'. 'rising' is the 800ms
+  // overlap where the cinematic fades while the Eternal Tree screen mounts
+  // beneath — the cross-fade that lets the two scenes hand off cleanly.
   const [reincarnationStage, setReincarnationStage] = useState(null);
+  useEffect(() => {
+    if (reincarnationStage !== 'rising') return;
+    const t = setTimeout(() => setReincarnationStage('tree'), 800);
+    return () => clearTimeout(t);
+  }, [reincarnationStage]);
 
   const openModal = useCallback((key, sideEffect) => {
     setActiveModal(prev => {
@@ -2014,10 +2022,13 @@ function AppInner() {
           onCancel={() => setReincarnationStage(null)}
         />
       )}
-      {reincarnationStage === 'severing' && (
-        <SeveringRite onComplete={() => setReincarnationStage('tree')} />
+      {(reincarnationStage === 'severing' || reincarnationStage === 'rising') && (
+        <SeveringRite
+          fading={reincarnationStage === 'rising'}
+          onComplete={() => setReincarnationStage('rising')}
+        />
       )}
-      {reincarnationStage === 'tree' && (
+      {(reincarnationStage === 'rising' || reincarnationStage === 'tree') && (
         <EternalTreeScreen
           karma={karma.karma}
           karmaEarnedThisLife={karma.karmaEarnedThisLife}

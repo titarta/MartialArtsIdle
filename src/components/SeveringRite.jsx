@@ -80,7 +80,7 @@ function CinematicTree() {
   );
 }
 
-export default function SeveringRite({ onComplete }) {
+export default function SeveringRite({ onComplete, fading = false }) {
   useEffect(() => {
     // Honour reduced-motion: skip the rite entirely and advance to the tree.
     const reduced = typeof window !== 'undefined'
@@ -107,7 +107,7 @@ export default function SeveringRite({ onComplete }) {
   }, [onComplete]);
 
   return createPortal(
-    <div className="sr-overlay" role="presentation" aria-hidden="true">
+    <div className={`sr-overlay${fading ? ' sr-fading' : ''}`} role="presentation" aria-hidden="true">
       {/* Deep void backdrop — fades in over the world below */}
       <div className="sr-void" />
 
