@@ -168,9 +168,32 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
       <circle className="et-node-halo" r={NODE_R + 7} />
       <circle className="et-node-disc" r={NODE_R} />
       <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">{glyph}</text>
-      <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">
-        {isPurchased ? '✓' : isComingSoon ? '✦' : (node.cost != null ? `${node.cost}` : '✦')}
-      </text>
+      {(() => {
+        // Cost badge below the disc. Owned shows ✓, coming-soon and
+        // null-cost show ✦, otherwise the karma cost number with the
+        // ui/karma.png sprite next to it so the cost reads the same way
+        // the topbar + the Eternal Tree header already do.
+        if (isPurchased) {
+          return <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">✓</text>;
+        }
+        if (isComingSoon || node.cost == null) {
+          return <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">✦</text>;
+        }
+        return (
+          <g>
+            <text className="et-node-badge" x={-3} y={NODE_R + 16} textAnchor="end">
+              {node.cost}
+            </text>
+            <image
+              className="et-node-badge-icon"
+              href={`${BASE}ui/karma.png`}
+              x="1" y={NODE_R + 7}
+              width="12" height="12"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </g>
+        );
+      })()}
       <text className="et-node-label" x={0} y={NODE_R + 31} textAnchor="middle">
         {node.label.toUpperCase()}
       </text>
@@ -185,8 +208,12 @@ function detailAction(node, state, karma) {
   if (state === 'purchased')    return { text: '✓ Anchored',                  disabled: true,  variant: 'owned' };
   if (node.id === 'n_2')        return { text: '✦ Coming soon',               disabled: true,  variant: 'soft' };
   if (state !== 'available')    return { text: 'Prerequisites still bound',   disabled: true,  variant: 'soft' };
-  if (karma < node.cost)        return { text: `Need ${node.cost - karma} more karma`, disabled: true, variant: 'poor' };
-  return { text: `Anchor for ${node.cost} karma`, disabled: false, variant: 'go' };
+  // The 'karma' suffix is rendered as the ui/karma.png sprite by the
+  // button JSX below, so detailAction returns just the leading text + the
+  // cost number — the icon is appended in JSX instead of being baked into
+  // the string. costAmount = null means "no karma icon, this isn't a buy".
+  if (karma < node.cost)        return { text: `Need ${node.cost - karma} more`, costAmount: node.cost - karma, disabled: true, variant: 'poor' };
+  return { text: `Anchor for ${node.cost}`, costAmount: node.cost, disabled: false, variant: 'go' };
 }
 
 // ── Screen ───────────────────────────────────────────────────────────────────
@@ -462,7 +489,18 @@ export default function EternalTreeScreen({
                 disabled={action.disabled}
                 onClick={(e) => { e.stopPropagation(); if (!action.disabled) handleAnchor(); }}
               >
-                {action.text}
+                <span>{action.text}</span>
+                {/* Render the karma sprite next to the cost number for buy /
+                    can't-afford actions. Same sprite as the header readout. */}
+                {action.costAmount != null && (
+                  <img
+                    className="et-detail-action-icon"
+                    src={`${BASE}ui/karma.png`}
+                    alt=""
+                    draggable="false"
+                    aria-hidden="true"
+                  />
+                )}
               </button>
             )}
           </div>

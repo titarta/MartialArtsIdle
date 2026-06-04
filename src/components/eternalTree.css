@@ -237,22 +237,25 @@
   50%      { opacity: 0.9; transform: scale(1.06); }
 }
 
+/* Node discs sit ON the cosmic void but read as warm bronze ledger tiles —
+   matches the PavilionPlaque material. Locked discs are deepest brown,
+   available + can-buy warm to a faint amber, owned are bronze-on-gold. */
 .et-node-disc {
-  fill: var(--et-void-soft); stroke: var(--et-violet-deep); stroke-width: 1.5;
+  fill: #1a120a; stroke: var(--et-violet-deep); stroke-width: 1.5;
   filter: drop-shadow(0 0 10px rgba(140, 90, 40, 0.32));
   transition: fill 0.2s, stroke 0.2s, stroke-width 0.2s;
 }
 .et-node-avail .et-node-disc, .et-node-can .et-node-disc {
-  fill: rgba(40, 28, 16, 0.88); stroke: var(--et-violet);
+  fill: rgba(40, 28, 16, 0.92); stroke: var(--et-violet);
 }
 .et-node-owned .et-node-disc {
-  fill: #1f1a3e; stroke: var(--et-gold); stroke-width: 2.5;
+  fill: #2a1c08; stroke: var(--et-gold); stroke-width: 2.5;
   filter: drop-shadow(0 0 18px rgba(245, 200, 66, 0.6));
 }
 .et-node-soon .et-node-disc { stroke-dasharray: 4 4; }
 .et-node-placeholder { opacity: 0.55; }
 .et-node-placeholder .et-node-disc {
-  fill: var(--et-void-soft); stroke: var(--et-violet-deep);
+  fill: #1a120a; stroke: var(--et-violet-deep);
   stroke-width: 1.5;
   filter: drop-shadow(0 0 8px rgba(140, 90, 40, 0.22));
 }
@@ -278,6 +281,16 @@
 .et-node-owned .et-node-badge { fill: var(--et-jade); }
 .et-node-soon  .et-node-badge { fill: var(--et-violet); }
 .et-node-placeholder .et-node-badge { fill: rgba(220, 190, 130, 0.42); }
+/* Karma sprite next to the cost number on every buyable node. Pixel art
+   stays crisp; a soft gold drop-shadow lifts it off the cosmic backdrop. */
+.et-node-badge-icon {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 0 4px rgba(245, 200, 66, 0.45));
+  pointer-events: none;
+  user-select: none;
+}
+.et-node-placeholder .et-node-badge-icon { opacity: 0.65; }
 
 .et-node-label {
   font-size: 10px; letter-spacing: 0.06em;
@@ -400,8 +413,25 @@
   background: rgba(32, 22, 14, 0.55);
   color: var(--et-silver);
   transition: transform 0.08s, filter 0.12s, background 0.12s;
+  /* Layout: text on the left, the karma sprite (if any) tucked beside it */
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
 }
 .et-detail-action:disabled { cursor: not-allowed; }
+/* Karma sprite inside the buy / can't-afford action buttons. Same
+   ui/karma.png the header reads; sized to match the text x-height. */
+.et-detail-action-icon {
+  width: 18px; height: 18px;
+  flex: 0 0 auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(245, 200, 66, 0.55));
+}
+.et-detail-action-go .et-detail-action-icon {
+  /* On the gold gradient face the icon's gold halo would wash out — drop
+     the glow so the sprite reads as struck metal on a coin. */
+  filter: drop-shadow(0 1px 0 rgba(60, 30, 8, 0.4));
+}
 .et-detail-action-go {
   color: var(--et-void);
   background: linear-gradient(180deg, var(--et-gold-bri), var(--et-gold));
