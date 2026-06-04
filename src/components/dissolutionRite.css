@@ -221,6 +221,32 @@
   100% { width: 260vmin; height: 260vmin; opacity: 0.92; }
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   App-level reincarnation wash. Persists across the AppInner remount that
+   happens on mai:full-reset, so the cinematic's whiteout doesn't vanish
+   when its parent unmounts. Starts at full opacity (matching the
+   DissolutionRite's own whiteout at its peak), holds while the new home
+   screen mounts beneath, then fades out.
+   ════════════════════════════════════════════════════════════════════════ */
+.app-reset-wash {
+  position: fixed; inset: 0;
+  z-index: 14500;
+  pointer-events: none;
+  background: radial-gradient(75% 75% at 50% 55%,
+    rgba(255, 250, 232, 1)  0%,
+    rgba(255, 238, 200, 1) 40%,
+    rgba(248, 222, 168, 1) 72%,
+    rgba(220, 178, 112, 0.96) 100%);
+  /* Same slow breath as the DissolutionRite's whiteout so the held wash
+     never reads as "frozen" while the new life mounts. */
+  animation: dr-dawn-breath 2.6s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.6, 1);
+}
+.app-reset-wash.is-finishing {
+  opacity: 0;
+}
+
 /* ── Reduced motion — JSX short-circuits the timeline; nullify anim too ── */
 @media (prefers-reduced-motion: reduce) {
   .dr-overlay,

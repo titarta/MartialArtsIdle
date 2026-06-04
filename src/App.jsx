@@ -1723,16 +1723,23 @@ function AppInner() {
     karma.reincarnate();
 
     // Give React a tick to flush the karma state to localStorage before we
-    // wipe the rest of the save + hard-reload.
+    // wipe the rest of the save + remount the tree.
     setTimeout(() => {
       // Stats — wipe the in-memory run bucket BEFORE wipeReincarnation
-      // so the beforeunload flush (triggered by reload below) doesn't
-      // restore the old run counters. resetRun also persists, so when
-      // wipeReincarnation reads mai_stats it sees the correct lifetime
+      // so the next-mount lifetime read sees the correct values
       // (including the +1 livesLived just fired by karma.reincarnate()).
       try { stats.resetRun(); } catch {}
       wipeReincarnation();
-      window.location.reload();
+      // Continuous-experience reincarnation: dispatch a reset event
+      // instead of window.location.reload(). The outer App wrapper
+      // catches this, mounts a cream-wash overlay, bumps the key on
+      // AppInner so every hook unmounts + remounts (re-reading the
+      // now-correctly-pruned localStorage), then fades the wash out.
+      // No browser reload, no full document fetch, no re-fire of
+      // already-earned achievements or already-seen tutorial cards
+      // (those are preserved across reincarnation by wipeReincarnation
+      // since reincarnation is a NEW life, not a NEW player).
+      window.dispatchEvent(new CustomEvent('mai:full-reset'));
     }, 50);
   }, [karma, cultivation.realmIndex, stats]);
 
@@ -2076,10 +2083,70 @@ function AppInner() {
   );
 }
 
+/**
+ * Continuous-experience reincarnation.
+ *
+ * handleReincarnate dispatches a `mai:full-reset` event INSTEAD of calling
+ * window.location.reload(). This outer App catches the event and:
+ *
+ *   1. Sets `transitioning = true` — a cream-wash overlay mounts at full
+ *      opacity, painted before the next React commit. The DissolutionRite's
+ *      own whiteout was at ~75% opacity at this exact moment, so the
+ *      handoff reads as a single continuous wash.
+ *   2. requestAnimationFrame → bumps `gen`. AppInner unmounts (every hook
+ *      cleans up, the DissolutionRite portal unmounts with it) and remounts
+ *      with the new key. The fresh AppInner re-reads localStorage, which
+ *      wipeReincarnation just pruned correctly — karma + tree + laws +
+ *      stats lifetime + achievements + tutorial-seen + feature-seen +
+ *      world-seen all survive.
+ *   3. After 1100ms (enough for the new home screen to mount + paint),
+ *      the cream wash fades over 600ms and unmounts. Net effect: cinematic
+ *      flows directly into the new life with no browser reload pause and
+ *      no re-firing of already-earned achievements or tutorial cards.
+ */
 function App() {
+  const [gen, setGen]                   = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
+  const timersRef                       = useRef([]);
+
+  useEffect(() => {
+    const onReset = () => {
+      // Clear any timers from a previous reset that might still be pending
+      // (defensive — should never happen in practice).
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+
+      // Mount the wash at opacity 1 immediately. The DissolutionRite's own
+      // whiteout is at ~75% at this moment, so the eye sees a small ~25%
+      // brightness pop in a single frame, then a continuous wash. No fade-
+      // in animation because a partially-transparent wash during the
+      // AppInner remount would briefly expose the background.
+      setTransitioning(true);
+      // One paint frame later, bump gen so AppInner unmounts + remounts
+      // BENEATH the wash — the wash covers the reconcile, the new home
+      // screen mounts invisibly.
+      requestAnimationFrame(() => setGen(g => g + 1));
+      // 800ms hold: enough for the new AppInner to mount + paint even on
+      // mid-tier mobile. Then begin the cream fade-out via .is-finishing.
+      const fadeT = setTimeout(() => {
+        const node = document.querySelector('.app-reset-wash');
+        if (node) node.classList.add('is-finishing');
+      }, 800);
+      // Fade-out is 700ms (CSS transition), so unmount at 1500ms.
+      const endT = setTimeout(() => setTransitioning(false), 1500);
+      timersRef.current = [fadeT, endT];
+    };
+    window.addEventListener('mai:full-reset', onReset);
+    return () => {
+      window.removeEventListener('mai:full-reset', onReset);
+      timersRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
   return (
     <EventQueueProvider>
-      <AppInner />
+      <AppInner key={gen} />
+      {transitioning && <div className="app-reset-wash" aria-hidden="true" />}
     </EventQueueProvider>
   );
 }

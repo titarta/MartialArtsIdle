@@ -138,14 +138,23 @@ export function wipeReincarnation() {
   const snapshot = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
   const restore  = (key, val) => { if (val != null) { try { localStorage.setItem(key, val); } catch {} } };
 
-  const karma        = snapshot('mai_reincarnation');
-  const tree         = snapshot('mai_reincarnation_tree');
-  const ownedLawsRaw = snapshot('mai_owned_laws');
+  const karma         = snapshot('mai_reincarnation');
+  const tree          = snapshot('mai_reincarnation_tree');
+  const ownedLawsRaw  = snapshot('mai_owned_laws');
   const pinnedRecipes = snapshot('mai_pinned_recipes');
   // Cookie-Clicker stats — lifetime + sinceTs survive reincarnation; the
   // run bucket is wiped to zero and the player starts the new life with
   // fresh per-run counters.
-  const statsRaw     = snapshot('mai_stats');
+  const statsRaw      = snapshot('mai_stats');
+  // "I've already seen this" meta-state — survives across lives so the
+  // player doesn't re-receive already-earned achievements, doesn't get
+  // re-onboarded by tutorial cards they've already dismissed, and doesn't
+  // get re-toasted by feature/world reveals they've already discovered.
+  // Reincarnation is a NEW life, not a NEW player; this is the difference.
+  const achievements  = snapshot('mai_achievements');
+  const tutorialSeen  = snapshot('mai_tutorial_seen');
+  const seenFeatures  = snapshot('mai_seen_features');
+  const seenWorlds    = snapshot('mai_seen_worlds');
 
   wipeSave();
 
@@ -155,6 +164,12 @@ export function wipeReincarnation() {
   // Those nodes no longer exist — the keys are intentionally not restored.)
   restore('mai_reincarnation',      karma);
   restore('mai_reincarnation_tree', tree);
+  // Re-seed the "I've seen this" meta-state. None of these change between
+  // lives — they're about what the PLAYER (not the character) knows.
+  restore('mai_achievements',  achievements);
+  restore('mai_tutorial_seen', tutorialSeen);
+  restore('mai_seen_features', seenFeatures);
+  restore('mai_seen_worlds',   seenWorlds);
 
   // Re-seed stats — preserve lifetime + sinceTs, reset run + stamp a
   // fresh runStartedTs so the "run started X ago" readout starts from
