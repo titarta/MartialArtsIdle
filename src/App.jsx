@@ -14,6 +14,7 @@ import DailyBonusModal from './components/DailyBonusModal';
 import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
 import ReincarnationConfirmModal from './components/ReincarnationConfirmModal';
+import SeveringRite from './components/SeveringRite';
 import { initAds } from './rewards/rewardService';
 import { restoreResolution } from './systems/desktopResolution';
 import {
@@ -2009,9 +2010,12 @@ function AppInner() {
           canReincarnate={cultivation.realmIndex >= 24}
           karma={karma.karma}
           realmName={cultivation.realmMajor}
-          onConfirm={() => setReincarnationStage('tree')}
+          onConfirm={() => setReincarnationStage('severing')}
           onCancel={() => setReincarnationStage(null)}
         />
+      )}
+      {reincarnationStage === 'severing' && (
+        <SeveringRite onComplete={() => setReincarnationStage('tree')} />
       )}
       {reincarnationStage === 'tree' && (
         <EternalTreeScreen
