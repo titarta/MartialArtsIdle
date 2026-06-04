@@ -1,10 +1,11 @@
 /* ════════════════════════════════════════════════════════════════════════
-   Reincarnation confirmation: the gate before the Eternal Tree.
-   "The Severing Rite" -- a cinematic between-lives ceremony. Deep void with a
-   violet aurora above and a crimson severing-glow below, a custom dharma Wheel
-   of Rebirth turning at the centre, rising qi-motes, and a staggered reveal.
-   Solemn and final by design: the one decision the game will not let the
-   player take back.
+   The Severing Rite — the gate before the Eternal Tree.
+   "Threshold of Lives": a silhouetted Eternal Tree behind everything, the
+   dharma Wheel of Rebirth turning in its crown, roots descending through
+   the warning beneath. Jade leaf-clusters pulse at branch tips (the only
+   thing alive in the modal). Cinnabar 渡 seal stamped on the wheel —
+   the cultivation glyph for "crossing" major realms. Solemn and final by
+   design: the one decision the game will not let the player take back.
    ════════════════════════════════════════════════════════════════════════ */
 
 .rc-overlay {
@@ -58,6 +59,74 @@
   background: linear-gradient(180deg, rgba(212, 186, 255, 0.22), transparent 30%) border-box;
   -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
+}
+
+/* ── Eternal Tree backdrop ─────────────────────────────────────────────────
+   Silhouette tree filling the card. Trunk runs centre, crown opens around
+   the wheel position, roots descend through the warning + actions area.
+   Jade leaves pulse at branch tips. Withered when the rite is closed. */
+.rc-tree {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+  animation: rc-tree-in 1100ms ease-out 80ms both;
+}
+@keyframes rc-tree-in {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 0.18; transform: none; }
+}
+.rc-tree-trunk, .rc-tree-branch, .rc-tree-root {
+  fill: none;
+  stroke: rgba(212, 186, 255, 0.75);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rc-tree-trunk        { stroke-width: 3; }
+.rc-tree-branch       { stroke-width: 1.7; }
+.rc-tree-branch-mid   { stroke-width: 1.3; opacity: 0.72; }
+.rc-tree-root         { stroke-width: 1.6; opacity: 0.66; }
+.rc-tree-root-thin    { stroke-width: 1; opacity: 0.5; }
+.rc-tree-leaf {
+  fill: rgba(110, 200, 150, 0.75);
+  filter: drop-shadow(0 0 5px rgba(110, 200, 150, 0.55));
+  animation: rc-leaf-pulse 4.6s ease-in-out infinite;
+}
+.rc-tree-leaf-small {
+  fill: rgba(110, 200, 150, 0.55);
+  filter: none;
+  animation: rc-leaf-pulse 4.6s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+.rc-tree-leaves circle:nth-child(odd)  { animation-delay: 2.2s; }
+.rc-tree-leaves circle:nth-child(3n)   { animation-delay: 0.9s; }
+@keyframes rc-leaf-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+/* Withered state — the rite is closed, the Tree dreams */
+.rc-tree-stilled {
+  animation: rc-tree-in-stilled 1100ms ease-out 80ms both;
+}
+@keyframes rc-tree-in-stilled {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 0.10; transform: none; }
+}
+.rc-tree-stilled .rc-tree-trunk,
+.rc-tree-stilled .rc-tree-branch,
+.rc-tree-stilled .rc-tree-root,
+.rc-tree-stilled .rc-tree-branch-mid,
+.rc-tree-stilled .rc-tree-root-thin {
+  stroke: rgba(170, 165, 190, 0.5);
+}
+.rc-tree-stilled .rc-tree-leaf,
+.rc-tree-stilled .rc-tree-leaf-small {
+  fill: rgba(150, 145, 175, 0.35);
+  filter: none;
+  animation: none;
 }
 
 /* ── Rising qi-motes (behind the content, upper region of the card) ──────── */
@@ -121,7 +190,7 @@
 }
 @keyframes rc-spin-rev { to { transform: rotate(-360deg); } }
 
-/* Stilled + dimmed for the "wheel is closed" (below Saint) state. */
+/* Stilled + dimmed for the "threshold sealed" (below Saint) state. */
 .rc-sigil-stilled .rc-wheel-spin,
 .rc-sigil-stilled .rc-wheel-motes { animation: none; }
 .rc-sigil-stilled .rc-sigil-glow  { animation: none; opacity: 0.35; background: radial-gradient(circle, rgba(120, 120, 150, 0.22), transparent 70%); }
@@ -130,6 +199,43 @@
 .rc-sigil-stilled .rc-wheel-stud,
 .rc-sigil-stilled .rc-wheel-hub-core { fill: rgba(180, 175, 200, 0.6); filter: none; }
 .rc-sigil-stilled .rc-wheel-hub   { stroke: rgba(170, 165, 190, 0.6); }
+
+/* 渡 seal — the cultivation glyph for "crossing" major realms. Stamped on
+   the wheel lower-right like a personal vow. Reads as a cinnabar wax mark
+   pressed into a covenant. Withered when the rite is sealed. */
+.rc-sigil-seal {
+  position: absolute;
+  right: -8px; bottom: -2px;
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
+  font-size: 19px;
+  line-height: 1;
+  color: #ff5566;
+  text-shadow: 0 0 9px rgba(255, 80, 95, 0.55);
+  padding: 4px 7px 5px;
+  border: 1.5px solid rgba(255, 80, 95, 0.62);
+  background: rgba(70, 8, 18, 0.62);
+  border-radius: 4px;
+  transform: rotate(8deg);
+  letter-spacing: 0;
+  z-index: 2;
+  animation: rc-seal-stamp 760ms cubic-bezier(0.18, 0.9, 0.3, 1) 420ms both;
+  box-shadow:
+    inset 0 0 8px rgba(255, 80, 95, 0.25),
+    0 4px 12px rgba(120, 20, 30, 0.4);
+}
+@keyframes rc-seal-stamp {
+  0%   { opacity: 0; transform: rotate(-16deg) scale(2.2); }
+  60%  { opacity: 1; transform: rotate(10deg) scale(0.92); }
+  100% { transform: rotate(8deg) scale(1); }
+}
+.rc-sigil-stilled .rc-sigil-seal {
+  color: rgba(170, 165, 190, 0.55);
+  border-color: rgba(170, 165, 190, 0.32);
+  background: rgba(38, 35, 50, 0.42);
+  text-shadow: none;
+  box-shadow: none;
+  animation: none;
+}
 
 /* ── Type ────────────────────────────────────────────────────────────────── */
 .rc-eyebrow {
@@ -148,26 +254,88 @@
 }
 .rc-body b { color: #ffd866; font-weight: 700; }
 
-/* ── Ledger: what is lost vs what endures ───────────────────────────────── */
+/* ── Ledger: two tablets — obsidian for what is lost, jade for what endures ─ */
 .rc-ledger { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .rc-ledger-row {
   display: flex; align-items: center; gap: 11px; text-align: left;
   padding: 10px 13px; border-radius: 12px;
   font-size: 12.5px; line-height: 1.36;
-  background: linear-gradient(180deg, rgba(20, 16, 54, 0.7), rgba(12, 10, 38, 0.55));
-  border: 1px solid rgba(183, 148, 246, 0.14);
+  position: relative;
 }
 .rc-ledger-mark {
   flex: 0 0 auto; width: 24px; height: 24px;
   display: grid; place-items: center; border-radius: 8px; font-size: 12px; font-weight: 700;
 }
-.rc-lose { color: rgba(255, 202, 210, 0.92); }
-.rc-lose .rc-ledger-mark { color: #ff8a9b; background: rgba(233, 69, 96, 0.18); border: 1px solid rgba(233, 69, 96, 0.45); box-shadow: 0 0 12px rgba(233, 69, 96, 0.18); }
-.rc-keep { color: rgba(236, 233, 247, 0.9); }
-.rc-keep .rc-ledger-mark { color: #ffd866; background: rgba(245, 200, 66, 0.16); border: 1px solid rgba(245, 200, 66, 0.45); box-shadow: 0 0 12px rgba(245, 200, 66, 0.18); }
+/* LOSE — obsidian tablet, cinnabar inscription */
+.rc-lose {
+  background: linear-gradient(180deg, rgba(44, 12, 20, 0.78), rgba(20, 6, 12, 0.62));
+  border: 1px solid rgba(233, 69, 96, 0.32);
+  color: rgba(255, 200, 200, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 100, 110, 0.10),
+    inset 0 0 14px rgba(0, 0, 0, 0.5);
+}
+.rc-lose .rc-ledger-mark {
+  color: #ff8a9b;
+  background: rgba(233, 69, 96, 0.18);
+  border: 1px solid rgba(233, 69, 96, 0.55);
+  box-shadow: 0 0 12px rgba(233, 69, 96, 0.22);
+}
+/* KEEP — jade tablet, gold inscription. The Tree’s leaf colour. */
+.rc-keep {
+  background: linear-gradient(180deg, rgba(18, 54, 38, 0.66), rgba(10, 30, 22, 0.55));
+  border: 1px solid rgba(110, 200, 150, 0.36);
+  color: rgba(224, 250, 232, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(150, 230, 175, 0.12),
+    inset 0 0 14px rgba(0, 0, 0, 0.3);
+}
+.rc-keep .rc-ledger-mark {
+  color: #ffd866;
+  background: rgba(245, 200, 66, 0.16);
+  border: 1px solid rgba(245, 200, 66, 0.55);
+  box-shadow: 0 0 12px rgba(245, 200, 66, 0.22);
+}
 
-.rc-karma { font-size: 12.5px; color: rgba(236, 233, 247, 0.8); margin-bottom: 12px; }
-.rc-karma b { font-family: 'Cinzel', Georgia, serif; color: #ffd866; }
+/* ── Karma cartouche — gold medallion (or violet for the realm name) ─────── */
+.rc-karma-cartouche {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 18px;
+  margin-bottom: 14px;
+  align-self: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(245, 200, 66, 0.14), rgba(245, 200, 66, 0.04));
+  border: 1px solid rgba(245, 200, 66, 0.5);
+  box-shadow:
+    0 0 24px rgba(245, 200, 66, 0.14),
+    inset 0 1px 0 rgba(255, 240, 200, 0.22);
+}
+.rc-karma-label {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 230, 200, 0.72);
+}
+.rc-karma-value {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 16px; font-weight: 700;
+  color: #ffd866;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 14px rgba(245, 200, 66, 0.42);
+}
+/* Realm-name variant (closed state) — violet instead of gold. */
+.rc-karma-cartouche-realm {
+  background: linear-gradient(180deg, rgba(183, 148, 246, 0.12), rgba(183, 148, 246, 0.04));
+  border-color: rgba(183, 148, 246, 0.45);
+  box-shadow: 0 0 22px rgba(183, 148, 246, 0.14), inset 0 1px 0 rgba(232, 215, 255, 0.18);
+}
+.rc-karma-cartouche-realm .rc-karma-value {
+  color: #d4baff;
+  text-shadow: 0 0 14px rgba(183, 148, 246, 0.45);
+}
 
 /* Severing warning: flanked by crimson hairlines that fade outward. */
 .rc-warn {
@@ -225,8 +393,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rc-overlay, .rc-card, .rc-content > *, .rc-sigil,
-  .rc-sigil-glow, .rc-wheel-spin, .rc-wheel-motes, .rc-ember, .rc-confirm::after {
+  .rc-sigil-glow, .rc-wheel-spin, .rc-wheel-motes, .rc-ember, .rc-confirm::after,
+  .rc-tree, .rc-tree-stilled, .rc-tree-leaf, .rc-tree-leaf-small, .rc-sigil-seal {
     animation: none !important;
   }
   .rc-content > *:not(.rc-sigil) { opacity: 1; }
+  .rc-tree { opacity: 0.18; }
+  .rc-tree-stilled { opacity: 0.10; }
+  .rc-sigil-seal { opacity: 1; transform: rotate(8deg); }
 }

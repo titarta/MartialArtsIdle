@@ -3,20 +3,26 @@ import { fmt } from '../utils/format';
 import './reincarnationConfirm.css';
 
 /**
- * ReincarnationConfirmModal: the single gate before the Eternal Tree.
+ * ReincarnationConfirmModal: the gate before the Eternal Tree.
  *
- * Reincarnation is the one irreversible act in the game (it wipes the current
- * life). This modal is the decision point. Confirming opens the Eternal Tree
- * full screen with no way out but to reincarnate, so the warning lives here.
+ * Reincarnation is the one irreversible act in the game — it wipes the
+ * current life. This modal is the decision point. Confirming opens the
+ * Eternal Tree full-screen with no way out but to turn the wheel.
+ *
+ * Visual concept: "Threshold of Lives". A silhouetted Eternal Tree sits
+ * behind everything; the dharma Wheel of Rebirth turns in its crown; the
+ * roots descend into the warning beneath. Jade leaves pulse at the branch
+ * tips — the only thing in the modal that is alive. The cinnabar 渡
+ * (dù — crossing) seal is stamped on the wheel, the cultivation glyph for
+ * crossing the threshold between realms.
  *
  * Two states:
- *   - ready  (realm >= Saint): the full warning, "Turn the Wheel" / "Not yet".
- *     The wheel turns.
- *   - closed (below Saint):    explains the gate, single dismiss. The wheel is
- *     stilled and dimmed.
+ *   ready  (realm ≥ Saint) — the rite is open. Wheel turns, leaves pulse.
+ *   closed (below Saint)   — the threshold is sealed. Wheel stilled, leaves
+ *                            withered, seal greyed.
  */
 
-// Eight spokes of the dharma wheel, precomputed on a 100x100 viewBox. Hub at
+// Eight spokes of the dharma wheel, precomputed on a 100×100 viewBox. Hub at
 // r=8, rim at r=37; each spoke also carries a stud where it meets the rim.
 const SPOKES = Array.from({ length: 8 }, (_, i) => {
   const a = (i * 45) * Math.PI / 180;
@@ -41,6 +47,64 @@ const EMBERS = [
   { left: '58%', top: '44%', delay: '4.2s', dur: '7.2s' },
 ];
 
+/**
+ * Silhouetted Eternal Tree drawn behind everything in the card. Trunk runs
+ * vertically through the middle, crown branches open at the top (around the
+ * wheel position), roots descend through the bottom (around the warning +
+ * actions). Jade leaf-clusters pulse at the branch tips. Withered in the
+ * closed state — the rite is sealed and the tree dreams.
+ */
+function EternalTreeBackdrop({ stilled }) {
+  return (
+    <svg
+      className={`rc-tree${stilled ? ' rc-tree-stilled' : ''}`}
+      viewBox="0 0 200 360"
+      preserveAspectRatio="xMidYMid meet"
+      aria-hidden="true"
+    >
+      {/* Roots — descend through the lower half of the card */}
+      <g className="rc-tree-roots">
+        <path className="rc-tree-root" d="M100 224 C 80 250, 55 272, 38 320" />
+        <path className="rc-tree-root" d="M100 224 C 120 250, 145 272, 162 320" />
+        <path className="rc-tree-root" d="M100 224 L 100 326" />
+        <path className="rc-tree-root rc-tree-root-thin" d="M100 232 C 86 262, 68 294, 58 332" />
+        <path className="rc-tree-root rc-tree-root-thin" d="M100 232 C 114 262, 132 294, 142 332" />
+      </g>
+      {/* Trunk */}
+      <path className="rc-tree-trunk" d="M100 60 L100 222" />
+      {/* Crown branches — open outward around where the wheel sits */}
+      <g className="rc-tree-crown">
+        <path className="rc-tree-branch" d="M100 74 C 75 56, 48 50, 26 32" />
+        <path className="rc-tree-branch" d="M100 74 C 125 56, 152 50, 174 32" />
+        <path className="rc-tree-branch" d="M100 92 C 70 82, 42 94, 20 86" />
+        <path className="rc-tree-branch" d="M100 92 C 130 82, 158 94, 180 86" />
+        <path className="rc-tree-branch rc-tree-branch-mid" d="M100 112 C 80 108, 60 120, 44 134" />
+        <path className="rc-tree-branch rc-tree-branch-mid" d="M100 112 C 120 108, 140 120, 156 134" />
+        <path className="rc-tree-branch rc-tree-branch-mid" d="M100 136 C 88 138, 76 148, 70 162" />
+        <path className="rc-tree-branch rc-tree-branch-mid" d="M100 136 C 112 138, 124 148, 130 162" />
+      </g>
+      {/* Leaf clusters at the branch tips — the only thing in the modal that
+          is alive. Jade green, faint glow, slow staggered pulse. */}
+      <g className="rc-tree-leaves">
+        <circle className="rc-tree-leaf"       cx="26"  cy="32"  r="3.6" />
+        <circle className="rc-tree-leaf"       cx="174" cy="32"  r="3.6" />
+        <circle className="rc-tree-leaf"       cx="20"  cy="86"  r="2.9" />
+        <circle className="rc-tree-leaf"       cx="180" cy="86"  r="2.9" />
+        <circle className="rc-tree-leaf rc-tree-leaf-small" cx="44"  cy="134" r="2.4" />
+        <circle className="rc-tree-leaf rc-tree-leaf-small" cx="156" cy="134" r="2.4" />
+        <circle className="rc-tree-leaf rc-tree-leaf-small" cx="70"  cy="162" r="1.9" />
+        <circle className="rc-tree-leaf rc-tree-leaf-small" cx="130" cy="162" r="1.9" />
+      </g>
+    </svg>
+  );
+}
+
+/**
+ * The dharma Wheel of Rebirth. Spinning rim with 8 spokes + studs; a
+ * counter-spinning motes ring outside it; a glow halo behind. A cinnabar
+ * 渡 (dù) seal — the cultivation glyph for "crossing" major realms — is
+ * stamped at the lower-right, vow-style.
+ */
 function WheelSigil({ stilled }) {
   return (
     <div className={`rc-sigil${stilled ? ' rc-sigil-stilled' : ''}`} aria-hidden="true">
@@ -60,6 +124,7 @@ function WheelSigil({ stilled }) {
           <circle className="rc-wheel-hub-core" cx="50" cy="50" r="3.2" />
         </g>
       </svg>
+      <span className="rc-sigil-seal">渡</span>
     </div>
   );
 }
@@ -71,8 +136,8 @@ export default function ReincarnationConfirmModal({
   onConfirm,
   onCancel,
 }) {
-  // Esc backs out (same as "Not yet"). Confirm is never key-bound: turning the
-  // wheel must be a deliberate tap.
+  // Esc backs out (same as "Hold the wheel"). Confirm is never key-bound:
+  // turning the wheel must be a deliberate tap.
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onCancel?.(); };
     window.addEventListener('keydown', onKey);
@@ -88,6 +153,7 @@ export default function ReincarnationConfirmModal({
       onClick={onCancel}
     >
       <div className={`rc-card${canReincarnate ? '' : ' rc-card-closed'}`} onClick={(e) => e.stopPropagation()}>
+        <EternalTreeBackdrop stilled={!canReincarnate} />
         <div className="rc-embers" aria-hidden="true">
           {EMBERS.map((e, i) => (
             <span
@@ -100,32 +166,36 @@ export default function ReincarnationConfirmModal({
 
         <div className="rc-content">
           <WheelSigil stilled={!canReincarnate} />
-          <div className="rc-eyebrow">The Wheel of Rebirth</div>
+          <div className="rc-eyebrow">The Severing Rite</div>
 
           {canReincarnate ? (
             <>
               <h2 className="rc-title">Sever this life?</h2>
               <p className="rc-body">
-                To turn the wheel is to end this incarnation. Your realm, your qi, and
-                all you have built this life will dissolve into the void.
+                To turn the wheel is to end this incarnation. The realm you have climbed, the
+                qi you have gathered, the sect you have raised — all dissolve as the wheel turns.
+                Only what is grafted to the <b>Eternal Tree</b> endures.
               </p>
               <div className="rc-ledger">
                 <div className="rc-ledger-row rc-lose">
                   <span className="rc-ledger-mark" aria-hidden="true">✕</span>
-                  <span>This life undone: realm, qi, producers, every gain.</span>
+                  <span>This incarnation: realms climbed, qi pooled, every disciple’s vow.</span>
                 </div>
                 <div className="rc-ledger-row rc-keep">
                   <span className="rc-ledger-mark" aria-hidden="true">◈</span>
-                  <span>Your karma and the Eternal Tree endure across lives.</span>
+                  <span>Grafted to the Tree: karma earned, sigils carved, the next dawn’s seed.</span>
                 </div>
               </div>
               {karma > 0 && (
-                <div className="rc-karma">You carry <b>{fmt(karma)}</b> karma into the dark.</div>
+                <div className="rc-karma-cartouche">
+                  <span className="rc-karma-label">Karma carried across</span>
+                  <span className="rc-karma-value">{fmt(karma)}</span>
+                </div>
               )}
-              <div className="rc-warn"><span>There is no coming back</span></div>
+              <div className="rc-warn"><span>Beyond this rite, no path leads back</span></div>
               <div className="rc-actions">
                 <button type="button" className="rc-btn rc-cancel" onClick={onCancel}>
-                  Not yet
+                  Hold the wheel
                 </button>
                 <button type="button" className="rc-btn rc-confirm" onClick={onConfirm}>
                   <span className="rc-confirm-glyph" aria-hidden="true">輪</span>
@@ -135,12 +205,18 @@ export default function ReincarnationConfirmModal({
             </>
           ) : (
             <>
-              <h2 className="rc-title">The wheel is closed</h2>
+              <h2 className="rc-title">The threshold is sealed</h2>
               <p className="rc-body">
-                Only at the <b>Saint</b> realm does the cycle open to you. Cultivate
-                further, then return to sever this life and begin anew.
+                The Wheel of Lives turns only for those who have walked the <b>Saint</b> realm.
+                The Eternal Tree dreams; the rite is closed. Cultivate further, and the
+                threshold will open to you.
               </p>
-              {realmName && <div className="rc-karma">You stand at <b>{realmName}</b>.</div>}
+              {realmName && (
+                <div className="rc-karma-cartouche rc-karma-cartouche-realm">
+                  <span className="rc-karma-label">You stand at</span>
+                  <span className="rc-karma-value">{realmName}</span>
+                </div>
+              )}
               <div className="rc-actions rc-actions-single">
                 <button type="button" className="rc-btn rc-cancel" onClick={onCancel}>
                   Understood
