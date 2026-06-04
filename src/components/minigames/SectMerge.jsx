@@ -20,6 +20,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import useDiscipleMerge, { currentMerit } from '../../hooks/useDiscipleMerge';
 import { TIERS, BONUS_PER_BOARD_SUM, gridIsFull } from '../../data/discipleMerge';
 import { fmt } from '../../utils/format';
+import { AudioManager } from '../../audio';
 
 const BASE = import.meta.env.BASE_URL;
 const spriteUrl = (s) =>
@@ -128,6 +129,11 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi }) {
       if (result?.action === 'merge') {
         flagAnim(toIdx, 'merge', 720);
         setSelectedIdx(null);
+        // Tier-up SFX. Reuses the producer tier-up sound (same audible
+        // identity as crossing Bronze → Silver → Gold → Mythic on a
+        // producer plaque) until a bespoke Roster promotion stinger is
+        // recorded. Swallow the error in case audio isn't unlocked yet.
+        try { AudioManager.playSfx('producer_tier_up'); } catch {}
       } else if (result?.action === 'move' || result?.action === 'swap') {
         setSelectedIdx(null);
       }
