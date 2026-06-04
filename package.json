@@ -12,6 +12,8 @@
     "build:browser": "vite build --mode browser",
     "build:native": "vite build --mode native",
     "build:android": "npm run build:native && cap sync android && cap open android",
+    "release:android": "npm run build:native && cap sync android && cd android && .\\gradlew.bat :app:bundleRelease",
+    "release:android:apk": "npm run build:native && cap sync android && cd android && .\\gradlew.bat :app:assembleRelease",
     "build:ios": "npm run build:native && cap sync ios && cap open ios",
     "build:steam": "vite build --mode steam",
     "build:demo": "vite build --mode demo",
