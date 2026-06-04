@@ -69,20 +69,41 @@ function edgePath(a, b) {
   return `M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
 }
 
-// Grid adjacency edges (horizontal, vertical, AND diagonal between neighbours).
+/**
+ * Edges. Two distinct kinds so the player can read at a glance what is a
+ * real prereq chain and what is a "future paths" preview:
+ *
+ *   kind='real'  — between real nodes, derived from each node's `prereqs`
+ *                  array (the same data useReincarnationTree uses to gate
+ *                  purchases). 6 edges for the current 7-node tree.
+ *   kind='ghost' — between placeholder preview nodes only, drawn on
+ *                  cardinal grid adjacency (right + down, no diagonals)
+ *                  so the preview block reads as a tidy lattice rather
+ *                  than a snarl. Rendered dashed + very dim so the eye
+ *                  reads "these are sketches, not the live tree."
+ *
+ * Critically, NO edges are ever drawn between a real node and a placeholder.
+ * Mixing the two implied prereq relationships that don't exist in code.
+ */
 const EDGES = (() => {
   const out = [];
   const seen = new Set();
-  for (let i = 0; i < ALL_NODES.length; i++) {
-    for (let j = i + 1; j < ALL_NODES.length; j++) {
-      const a = ALL_NODES[i], b = ALL_NODES[j];
+  const push = (from, to, kind) => {
+    const k = [from, to].sort().join('|');
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push({ from, to, kind });
+  };
+  // Real prereq edges — drive every gold/pulse/dim state from real data.
+  for (const n of NODES) {
+    for (const pid of (n.prereqs || [])) push(pid, n.id, 'real');
+  }
+  // Placeholder preview lattice — cardinal adjacency only, between placeholders.
+  for (let i = 0; i < PLACEHOLDER_NODES.length; i++) {
+    for (let j = i + 1; j < PLACEHOLDER_NODES.length; j++) {
+      const a = PLACEHOLDER_NODES[i], b = PLACEHOLDER_NODES[j];
       const dr = Math.abs(a.row - b.row), dc = Math.abs(a.col - b.col);
-      if (dr <= 1 && dc <= 1 && (dr + dc) > 0) {
-        const k = [a.id, b.id].sort().join('|');
-        if (seen.has(k)) continue;
-        seen.add(k);
-        out.push({ from: a.id, to: b.id });
-      }
+      if (dr + dc === 1) push(a.id, b.id, 'ghost');
     }
   }
   return out;
@@ -351,17 +372,22 @@ export default function EternalTreeScreen({
           }}
         >
           <svg className="et-canvas" width={CANVAS_W} height={CANVAS_H} viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}>
-            {/* Grid adjacency edges */}
-            {EDGES.map(({ from, to }) => {
+            {/* Edges: real prereqs vs placeholder preview lattice (see EDGES above). */}
+            {EDGES.map(({ from, to, kind }) => {
               const a = ALL_NODES_BY_ID[from];
               const b = ALL_NODES_BY_ID[to];
-              const aReal = !a.placeholder, bReal = !b.placeholder;
-              const aOwn = aReal && nodeStates[a.id] === 'purchased';
-              const bOwn = bReal && nodeStates[b.id] === 'purchased';
-              const aAvail = aReal && nodeStates[a.id] === 'available' && a.id !== 'n_2';
-              const bAvail = bReal && nodeStates[b.id] === 'available' && b.id !== 'n_2';
-              const lit   = aOwn && bOwn;
-              const pulse = !lit && ((aOwn && bAvail) || (bOwn && aAvail));
+              if (kind === 'ghost') {
+                // Placeholder preview lattice — dashed, dim, no animation.
+                return <path key={`${from}-${to}`} className="et-edge et-edge-ghost" d={edgePath(a, b)} />;
+              }
+              // Real prereq edge — gold lit (both owned), violet pulse (one
+              // owned + child available), dim (neither end is owned yet).
+              const aOwn   = nodeStates[a.id] === 'purchased';
+              const bOwn   = nodeStates[b.id] === 'purchased';
+              const aAvail = nodeStates[a.id] === 'available' && a.id !== 'n_2';
+              const bAvail = nodeStates[b.id] === 'available' && b.id !== 'n_2';
+              const lit    = aOwn && bOwn;
+              const pulse  = !lit && ((aOwn && bAvail) || (bOwn && aAvail));
               const cls = `et-edge ${lit ? 'et-edge-lit' : pulse ? 'et-edge-pulse' : 'et-edge-dim'}`;
               return <path key={`${from}-${to}`} className={cls} d={edgePath(a, b)} />;
             })}

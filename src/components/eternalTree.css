@@ -200,6 +200,14 @@
   stroke: var(--et-violet-deep); stroke-width: 1.1;
   stroke-dasharray: 3 6; opacity: 0.32;
 }
+/* Ghost edges — between placeholder preview nodes only. Drawn even subtler
+   than .et-edge-dim so the eye separates "future paths sketched in" from
+   "real prereq chain that just isn't lit yet." Same dash rhythm, thinner
+   stroke, half the opacity. */
+.et-edge-ghost {
+  stroke: var(--et-violet-deep); stroke-width: 0.9;
+  stroke-dasharray: 2 5; opacity: 0.16;
+}
 .et-edge-pulse {
   stroke: var(--et-violet); stroke-width: 1.8; opacity: 0.85;
   filter: drop-shadow(0 0 6px rgba(183, 148, 246, 0.5));
