@@ -433,10 +433,18 @@
 .dmg-stat-violet { color: #b794f6; }
 .dmg-stat-gold { color: var(--mg-amber-bright); }
 .dmg-stat-cyan { color: #6bcaf6; }
+.dmg-stat-merit { color: #6bcaf6; text-shadow: 0 0 6px rgba(107, 202, 246, 0.4); }
+.dmg-stat-sub {
+  font-size: 9px; letter-spacing: 0.08em;
+  opacity: 0.55; margin-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
 
 .dmg-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* Dynamic columns driven by inline --dmg-cols (3..7) so 3×3 → 7×7 share
+     the same styles. Defaults to 4 in case a stale state has no var. */
+  grid-template-columns: repeat(var(--dmg-cols, 4), 1fr);
   gap: 7px;
   padding: 8px;
   background: rgba(14, 11, 32, 0.55);
@@ -599,9 +607,62 @@
 }
 .dmg-seclude:hover { background: rgba(100, 30, 30, 0.55); }
 
-/* Actions */
-.dmg-actions { display: flex; gap: 8px; }
-.dmg-place { flex: 1; }
+/* Actions — two-button row: Place (Merit cost, primary) + Expand (Qi cost, ghost) */
+.dmg-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.dmg-act {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-radius: 9px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+}
+.dmg-act-label {
+  font-size: 11.5px;
+  text-align: center;
+}
+.dmg-act-cost {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  opacity: 0.88;
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.22);
+}
+.dmg-act-place { /* inherits mg-btn-primary base styling for gold/dark */ }
+.dmg-act-place .dmg-act-cost { color: #6bcaf6; background: rgba(20, 50, 80, 0.55); }
+.dmg-act-place:disabled .dmg-act-cost { opacity: 0.55; }
+.dmg-act-expand { /* ghost button */ }
+.dmg-act-expand .dmg-act-cost { color: var(--mg-amber-bright); }
+.dmg-act-expand .dmg-act-cost.dmg-act-locked { color: #ff9966; }
+.dmg-act-maxed {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  padding: 10px 8px;
+  border-radius: 9px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(245, 200, 66, 0.08);
+  border: 1px dashed rgba(245, 200, 66, 0.4);
+  color: var(--mg-amber-bright);
+  text-transform: uppercase;
+  font-size: 11.5px;
+  text-align: center;
+}
+.dmg-act-maxed .dmg-act-cost { font-size: 10px; opacity: 0.7; }
 
 .dmg-hint {
   font-size: 10.5px; line-height: 1.5;

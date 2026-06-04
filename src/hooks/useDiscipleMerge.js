@@ -1,19 +1,34 @@
 /**
- * useDiscipleMerge — React seam for the disciple promotion grid.
+ * useDiscipleMerge — React seam for the Roster (Disciple Promotion grid).
  *
- * Owns the merge state + actions. Exposes a Context so the SectMerge tab can
- * read it without prop drilling, while App.jsx reads the same instance to
- * fold the per-disciple multiplier into the disciple producer's qi/s.
+ * Owns the merge state + actions. Exposes a Context so SectMerge can read
+ * it without prop drilling, while App.jsx reads the same instance to:
+ *   1. Fold producerMult into the disciple producer's qi/s rate
+ *   2. Settle Merit accumulation when disciple count changes (so accruals
+ *      use the right disciple count for the elapsed period)
  *
- * Pattern: call `useDiscipleMergeProvider()` at App.jsx, wrap children in
- * <DiscipleMergeContext.Provider value={merge}>, then any descendant can
- * `useDiscipleMerge()` for read + actions.
+ * Merit accumulates LAZILY:
+ *   state.meritStored = balance at meritLastUpdate
+ *   "current" Merit  = stored + (now − last) × disciples × MERIT_RATE
+ * No 1Hz tick in App.jsx — the SectMerge component runs its own local
+ * tick just for display while open.
+ *
+ * Action semantics:
+ *   place(discipleCount)   → settles, deducts Place cost from Merit, drops T1
+ *   drop(from, to)         → resolves merge/swap/move; merges add yield to Merit
+ *   expand(spendQi)        → checks tier gate, calls spendQi(qiCost), grows grid
+ *   seclude(idx)           → removes a tile (no refund)
+ *   settle(discipleCount)  → fold accumulated Merit into stored (used by App.jsx
+ *                            when disciple count changes so offline-style accrual
+ *                            uses the correct count for each interval)
+ *   reset()                → wipe to default (3×3, 0 Merit)
  */
 import { useState, useEffect, useCallback, useContext, createContext } from 'react';
 import {
   defaultMerge, loadMerge, saveMerge,
-  spawnTile, resolveDrop, secludeTile,
-  boardSum, discipleProducerMult, BONUS_PER_BOARD_SUM,
+  tryPlace, resolveDrop, secludeTile, expandGrid, settleMerit,
+  boardSum, tileCount, currentMerit, placeCost, nextExpansion,
+  BONUS_PER_BOARD_SUM, MERIT_RATE,
 } from '../data/discipleMerge';
 
 export const DiscipleMergeContext = createContext(null);
@@ -22,16 +37,18 @@ export const DiscipleMergeContext = createContext(null);
 export function useDiscipleMergeProvider() {
   const [state, setState] = useState(loadMerge);
 
-  // Persist on every state change.
+  // Persist on every state change. Merit lazy-compute means setState only
+  // fires on actual actions (place / drop / expand / seclude / settle), not
+  // every animation frame — so this is cheap.
   useEffect(() => { saveMerge(state); }, [state]);
 
-  const place = useCallback(() => {
+  const place = useCallback((discipleCount) => {
     let out;
     setState(prev => {
-      out = spawnTile(prev, 1);
+      out = tryPlace(prev, discipleCount);
       return out.state;
     });
-    return out;  // { state, idx, placed }
+    return out;  // { state, placed, idx, cost, reason? }
   }, []);
 
   const drop = useCallback((fromIdx, toIdx) => {
@@ -40,7 +57,7 @@ export function useDiscipleMergeProvider() {
       out = resolveDrop(prev, fromIdx, toIdx);
       return out.state;
     });
-    return out;  // { state, action, newTier? }
+    return out;  // { state, action, newTier?, meritYield }
   }, []);
 
   const seclude = useCallback((idx) => {
@@ -52,21 +69,58 @@ export function useDiscipleMergeProvider() {
     return out;  // { state, removed }
   }, []);
 
+  /**
+   * Try to expand. spendQi(amount) must return true if qi was deducted.
+   * Returns { expanded, reason?, need?, qiCost?, newSize? }.
+   */
+  const expand = useCallback((spendQi) => {
+    let out = { expanded: false };
+    setState(prev => {
+      const next = nextExpansion(prev.gridSize);
+      if (!next) { out = { expanded: false, reason: 'maxed' }; return prev; }
+      if (prev.highestTier < next.unlockTier) {
+        out = { expanded: false, reason: 'tier', need: next.unlockTier };
+        return prev;
+      }
+      const ok = spendQi(next.qiCost);
+      if (!ok) { out = { expanded: false, reason: 'qi', qiCost: next.qiCost }; return prev; }
+      const e = expandGrid(prev);
+      if (!e.expanded) { out = { expanded: false, reason: e.reason, need: e.need }; return prev; }
+      out = { expanded: true, newSize: e.next.size, qiCost: next.qiCost };
+      return e.state;
+    });
+    return out;
+  }, []);
+
+  /** Settle Merit using a known disciple count. Used by App.jsx when the
+   *  count changes, so the accrual for the prior interval uses the right
+   *  count rather than over- or under-counting after the change. */
+  const settle = useCallback((discipleCount) => {
+    setState(prev => settleMerit(prev, discipleCount));
+  }, []);
+
   const reset = useCallback(() => setState(defaultMerge()), []);
 
+  // Read-side derivations — pure, recomputed each render.
   const sum = boardSum(state.tiles);
   const perDiscipleBonusPct = sum * BONUS_PER_BOARD_SUM;
   const producerMult = 1 + perDiscipleBonusPct;
-  let tileCount = 0;
-  for (const t of state.tiles) if (t) tileCount++;
+  const tilesNow = tileCount(state.tiles);
+  const nextPlaceCost = placeCost(tilesNow);
+  const next = nextExpansion(state.gridSize);
 
   return {
     state,
-    place, drop, seclude, reset,
+    place, drop, seclude, expand, settle, reset,
     sum,
-    tileCount,
+    tileCount: tilesNow,
     perDiscipleBonusPct,
     producerMult,
+    nextPlaceCost,
+    nextExpansion: next,           // { size, tiles, qiCost, unlockTier } or null
+    highestTier: state.highestTier,
+    gridSize: state.gridSize,
+    MERIT_RATE,                    // exposed so UI can show "+X.X/s" estimate
   };
 }
 
@@ -74,3 +128,6 @@ export function useDiscipleMergeProvider() {
 export default function useDiscipleMerge() {
   return useContext(DiscipleMergeContext);
 }
+
+// Re-export the lazy current-merit helper so SectMerge can compute it for display.
+export { currentMerit };

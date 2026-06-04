@@ -408,6 +408,15 @@ export default function CultivationScreen({
             qi,
             buy: () => handleBuy(minigameId, 10),
           }}
+          // Roster needs qi (display affordability) + spendQi (Expand cost).
+          // qi is the live balance the player sees in the sticky header.
+          qi={qi}
+          spendQi={(amount) => {
+            if (!Number.isFinite(amount) || amount <= 0) return false;
+            const ok = cultivation.spendQi(amount);
+            if (ok) setQi(cultivation.qiRef.current);
+            return ok;
+          }}
           onClose={() => setMinigameId(null)}
         />
       )}

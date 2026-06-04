@@ -528,6 +528,21 @@ function AppInner() {
     } catch {}
   }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Disciple Merit settle-on-change — when the disciple producer count
+  // changes, fold the Merit accumulated SO FAR (using the prior count) into
+  // stored, so the next accrual interval uses the new count. This lazy
+  // settle pattern avoids any 1Hz tick in App.jsx and still keeps offline
+  // (cross-load) catch-up mathematically clean.
+  const lastDiscipleCountRef = useRef(0);
+  useEffect(() => {
+    const current = producers.getOwned?.('p_disciple') ?? 0;
+    if (!discipleMerge?.settle) return;
+    if (current !== lastDiscipleCountRef.current) {
+      discipleMerge.settle(lastDiscipleCountRef.current);
+      lastDiscipleCountRef.current = current;
+    }
+  }, [producers.owned, discipleMerge]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Phoenix Reborn (legendary E2) — useQiSparks dispatches this event when
   // a major realm transition fires while the spark is active. Reset the
   // player's Phoenix count to 0 (the permanent +mult bonus on other producers

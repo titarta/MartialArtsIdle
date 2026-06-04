@@ -1,32 +1,45 @@
 /**
- * discipleMerge.js — state + math for the Disciple Promotion grid.
+ * discipleMerge.js — state + math for the Roster (Disciple Promotion grid).
  *
- * Loop: each "Place" drops a T1 Outer Disciple onto the next empty tile of a
- * 4×4 grid. Drag a disciple onto a same-rank disciple to PROMOTE (merge to
- * T+1). Drag onto a different rank to SWAP, or onto an empty cell to MOVE.
- * Board sum → +X% multiplier on the disciple producer's per-unit qi/s, so
- * every promotion lifts the entire idle loop.
+ * THE ECONOMY (Option D — dual currency, non-destructive Merit):
+ *
+ *   Merit  ← passive income from owned disciples (Sect Merit / 贡献)
+ *           rate = ownedDisciples × MERIT_RATE per second
+ *           spent on: PLACE (drop a new T1 on the board)
+ *
+ *   Qi     ← main game currency
+ *           spent on: EXPAND (grow grid size 3×3 → 4×4 → 5×5 → 6×6 → 7×7)
+ *
+ * Merit is accumulated lazily — we store the balance at the last "settle"
+ * point and the timestamp of that settle, then compute the live balance
+ * on demand: stored + (now - last) × discipleCount × MERIT_RATE. This
+ * gives accurate offline catch-up without a polling loop in App.jsx, and
+ * the React state only mutates on actual spends (or explicit settles).
+ *
+ * Expansion is tier-gated: you can't buy a 4×4 grid until you've
+ * promoted any tile to T3, can't buy 5×5 until T5, and so on. The gate
+ * forces you to USE the smaller grid before scaling up — without it,
+ * a wealthy player would skip straight to 7×7 with T1s everywhere.
+ *
+ * Each merge yields Merit equal to the new tile's value (T2 = 2 Merit,
+ * T10 = 512 Merit). Closes the loop: place → merge → gain Merit → place
+ * again. Late merges fund late placements.
  *
  * Persistence: `mai_disciple_merge` in localStorage. Module is pure (no
  * React); the React seam lives in hooks/useDiscipleMerge.js.
  *
- * Sprite economy: we own four producer sprites (bronze/silver/gold/mythic).
- * T1–T4 each get one. T5–T10 reuse the mythic sprite with a numeric badge
- * (×2…×7) in the corner until bespoke art is generated for the higher ranks.
+ * Sprite economy: T1–T4 each get one of the four producer disciple sprites
+ * (bronze/silver/gold/mythic); T5–T10 reuse the mythic sprite with a
+ * multiplier badge (×2…×7) until bespoke art lands.
  *
  * ALL numeric values here are STARTING VALUES — tune via sim before they
- * leave the prototype. The bonus-per-board-sum constant is the master lever;
- * everything else cascades from grid size and tier doubling.
+ * leave the prototype. The two master levers are MERIT_RATE (sets pacing
+ * of Place beats) and EXPANSION qiCosts (set the milestone cadence).
  */
 
 const KEY = 'mai_disciple_merge';
 
-export const GRID_SIZE = 16;  // 4×4
-
-// Tier ladder. Sprite assignments:
-//   T1 → bronze, T2 → silver, T3 → gold, T4 → mythic (no badge)
-//   T5–T10 → mythic + multiplier badge (so the eye reads ×2 → ×3 → ... as the
-//   "veteran" tier the mythic ascended into) until bespoke art lands.
+// Tier ladder (unchanged). Values double for board-sum arithmetic.
 export const TIERS = [
   null,
   { rank: 'Outer Disciple',  glyph: '徒', value: 1,   sprite: '/sprites/producers/p_disciple_bronze.png',  badge: null  },
@@ -41,23 +54,77 @@ export const TIERS = [
   { rank: 'Ancestor',        glyph: '聖', value: 512, sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×7'  },
 ];
 
-// Each board-sum point lifts disciple per-unit qi/s by this fraction. A full
-// board of T5 elders (sum = 16×16 = 256) → +256% to p_disciple production.
-// STARTING VALUE.
+// ── Economy levers (STARTING VALUES) ─────────────────────────────────────────
+// Each board-sum point = +1% to disciple producer per-unit qi/s.
 export const BONUS_PER_BOARD_SUM = 0.01;
 
+// Per-disciple Merit accrual (per second). 10 disciples → 1 Merit/sec.
+// Test plan: at 50 disciples (early-mid), first Place (10 Merit) should
+// be affordable in ~2 sec; at 1000 disciples (mid-late), Merit shouldn't
+// run away (consider soft cap if it does).
+export const MERIT_RATE = 0.1;
+
+// Place cost — geometric in tile count on board. Pushes the player to
+// merge before refilling. 1st tile = 10, 9th = ~116, 16th = ~524.
+export const PLACE_BASE  = 10;
+export const PLACE_SCALE = 1.35;
+
+// Expansion ladder. Indexed by GRID SIZE (3..7). Each step:
+//   tiles       — total tiles after expansion
+//   qiCost      — Qi to spend to reach this size
+//   unlockTier  — must have ever-reached this tier to expand here
+// 3×3 is the starting size (no cost, no gate).
+export const EXPANSION = {
+  3: { size: 3, tiles: 9,  qiCost: 0,             unlockTier: 0 },
+  4: { size: 4, tiles: 16, qiCost: 5_000,         unlockTier: 3 },
+  5: { size: 5, tiles: 25, qiCost: 500_000,       unlockTier: 5 },
+  6: { size: 6, tiles: 36, qiCost: 50_000_000,    unlockTier: 7 },
+  7: { size: 7, tiles: 49, qiCost: 5_000_000_000, unlockTier: 9 },
+};
+export const MIN_GRID_SIZE = 3;
+export const MAX_GRID_SIZE = 7;
+
 // ── State shape ──────────────────────────────────────────────────────────────
-// { tiles: Array<null | { tier: 1..10, id: number }>, nextId: number }
+// {
+//   tiles:           Array<null | { tier: 1..10, id: number }>  (length = gridSize²)
+//   gridSize:        3..7
+//   nextId:          number (monotonic per-tile id for React keys)
+//   highestTier:    0..10  (highest tile ever produced; the expansion gate)
+//   meritStored:     number (Merit at meritLastUpdate)
+//   meritLastUpdate: number (ms timestamp; used to lazily accrue more Merit)
+// }
 
 export function defaultMerge() {
-  return { tiles: new Array(GRID_SIZE).fill(null), nextId: 1 };
+  return {
+    tiles: new Array(EXPANSION[MIN_GRID_SIZE].tiles).fill(null),
+    gridSize: MIN_GRID_SIZE,
+    nextId: 1,
+    highestTier: 0,
+    meritStored: 0,
+    meritLastUpdate: Date.now(),
+  };
 }
 
 export function loadMerge() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY));
-    if (raw && Array.isArray(raw.tiles) && raw.tiles.length === GRID_SIZE) {
-      return { tiles: raw.tiles, nextId: typeof raw.nextId === 'number' ? raw.nextId : 1 };
+    if (raw && Array.isArray(raw.tiles) && raw.tiles.length > 0) {
+      // Infer gridSize from tile count if not explicitly stored — handles
+      // migration from the pre-economy 4×4-only build.
+      const inferredSize = Math.round(Math.sqrt(raw.tiles.length));
+      const gridSize = (raw.gridSize >= MIN_GRID_SIZE && raw.gridSize <= MAX_GRID_SIZE)
+        ? raw.gridSize
+        : (inferredSize >= MIN_GRID_SIZE && inferredSize <= MAX_GRID_SIZE ? inferredSize : MIN_GRID_SIZE);
+      return {
+        tiles: raw.tiles,
+        gridSize,
+        nextId: typeof raw.nextId === 'number' ? raw.nextId : 1,
+        highestTier: typeof raw.highestTier === 'number'
+          ? raw.highestTier
+          : maxTierOnBoard(raw.tiles),
+        meritStored: typeof raw.meritStored === 'number' ? raw.meritStored : 0,
+        meritLastUpdate: typeof raw.meritLastUpdate === 'number' ? raw.meritLastUpdate : Date.now(),
+      };
     }
   } catch { /* ignore malformed */ }
   return defaultMerge();
@@ -74,9 +141,14 @@ export function boardSum(tiles) {
   return s;
 }
 
-/** Multiplier on the disciple producer's per-unit qi/s. 1 = no bonus. */
 export function discipleProducerMult(tiles) {
   return 1 + boardSum(tiles) * BONUS_PER_BOARD_SUM;
+}
+
+export function tileCount(tiles) {
+  let n = 0;
+  for (const t of tiles) if (t) n++;
+  return n;
 }
 
 export function gridIsFull(tiles) {
@@ -88,60 +160,140 @@ export function findEmptySlot(tiles) {
   return tiles.findIndex(t => t === null);
 }
 
-// ── Pure actions (return new state; do not mutate) ───────────────────────────
+function maxTierOnBoard(tiles) {
+  let h = 0;
+  for (const t of tiles) if (t && t.tier > h) h = t.tier;
+  return h;
+}
 
-/** Place a fresh tile (default T1) in the next empty slot. Idempotent if full. */
-export function spawnTile(state, tier = 1) {
-  const idx = findEmptySlot(state.tiles);
-  if (idx < 0) return { state, idx: -1, placed: false };
-  const tiles = state.tiles.slice();
-  tiles[idx] = { tier, id: state.nextId };
-  return { state: { tiles, nextId: state.nextId + 1 }, idx, placed: true };
+/** Merit cost to place the NEXT tile, given how many sit on the board. */
+export function placeCost(currentTileCount) {
+  return Math.max(1, Math.ceil(PLACE_BASE * Math.pow(PLACE_SCALE, currentTileCount)));
+}
+
+/** Lookup for the next expansion step (or null if at MAX_GRID_SIZE). */
+export function nextExpansion(currentSize) {
+  if (currentSize >= MAX_GRID_SIZE) return null;
+  return EXPANSION[currentSize + 1] ?? null;
 }
 
 /**
- * Resolve a drop of tile at `fromIdx` onto cell at `toIdx`.
- * Returns { state, action, ?newTier }:
- *   action = 'noop'  | invalid (same cell, dragging empty, etc.)
- *          | 'move'  | dropped on empty → move tile there
- *          | 'merge' | same-tier non-max → promote, newTier set
- *          | 'maxed' | same-tier at max  → noop
- *          | 'swap'  | different-tier    → swap positions
+ * Compute current Merit lazily.
+ *   currentMerit = stored + (now − lastUpdate) × discipleCount × MERIT_RATE
+ * Used both for display (every UI tick) and for spend checks.
+ */
+export function currentMerit(state, discipleCount, now = Date.now()) {
+  const elapsedSec = Math.max(0, (now - state.meritLastUpdate) / 1000);
+  return state.meritStored + Math.max(0, discipleCount) * MERIT_RATE * elapsedSec;
+}
+
+/** Fold the accumulated Merit into stored + reset the timestamp. Pure. */
+export function settleMerit(state, discipleCount, now = Date.now()) {
+  return { ...state, meritStored: currentMerit(state, discipleCount, now), meritLastUpdate: now };
+}
+
+// ── Pure actions ─────────────────────────────────────────────────────────────
+
+/**
+ * Place a T1 tile. Settles Merit first, then checks affordability.
+ * Returns { state, placed, idx, cost, reason? }.
+ *   reason: 'merit' (couldn't afford) | 'full' (no slot)
+ */
+export function tryPlace(state, discipleCount, now = Date.now()) {
+  const settled = settleMerit(state, discipleCount, now);
+  const tilesNow = tileCount(settled.tiles);
+  const cost = placeCost(tilesNow);
+  if (settled.meritStored < cost) {
+    return { state: settled, placed: false, idx: -1, cost, reason: 'merit' };
+  }
+  const idx = findEmptySlot(settled.tiles);
+  if (idx < 0) {
+    return { state: settled, placed: false, idx: -1, cost, reason: 'full' };
+  }
+  const tiles = settled.tiles.slice();
+  tiles[idx] = { tier: 1, id: settled.nextId };
+  return {
+    state: {
+      ...settled,
+      tiles,
+      nextId: settled.nextId + 1,
+      meritStored: settled.meritStored - cost,
+    },
+    placed: true,
+    idx,
+    cost,
+  };
+}
+
+/**
+ * Resolve a drag-drop. Merges yield Merit equal to the new tile's value.
+ * Returns { state, action, newTier?, meritYield }:
+ *   action: 'noop' | 'move' | 'swap' | 'merge' | 'maxed'
  */
 export function resolveDrop(state, fromIdx, toIdx) {
-  if (fromIdx === toIdx) return { state, action: 'noop' };
+  if (fromIdx === toIdx) return { state, action: 'noop', meritYield: 0 };
   const src = state.tiles[fromIdx];
   const dst = state.tiles[toIdx];
-  if (!src) return { state, action: 'noop' };
+  if (!src) return { state, action: 'noop', meritYield: 0 };
 
   // Empty target → move
   if (!dst) {
     const tiles = state.tiles.slice();
     tiles[toIdx] = src;
     tiles[fromIdx] = null;
-    return { state: { ...state, tiles }, action: 'move' };
+    return { state: { ...state, tiles }, action: 'move', meritYield: 0 };
   }
-  // Same tier + not at top → promote
+  // Same tier + room to ascend → promote
   if (src.tier === dst.tier && src.tier < TIERS.length - 1) {
+    const newTier = src.tier + 1;
     const tiles = state.tiles.slice();
-    tiles[toIdx] = { tier: src.tier + 1, id: state.nextId };
+    tiles[toIdx] = { tier: newTier, id: state.nextId };
     tiles[fromIdx] = null;
-    return { state: { tiles, nextId: state.nextId + 1 }, action: 'merge', newTier: src.tier + 1 };
+    const meritYield = TIERS[newTier].value;
+    const next = {
+      ...state,
+      tiles,
+      nextId: state.nextId + 1,
+      highestTier: Math.max(state.highestTier, newTier),
+      meritStored: state.meritStored + meritYield,
+    };
+    return { state: next, action: 'merge', newTier, meritYield };
   }
-  // Same tier already at top → can't promote
-  if (src.tier === dst.tier) return { state, action: 'maxed' };
+  // Same tier at top → nothing to do
+  if (src.tier === dst.tier) return { state, action: 'maxed', meritYield: 0 };
   // Different tier → swap
   const tiles = state.tiles.slice();
   tiles[toIdx] = src;
   tiles[fromIdx] = dst;
-  return { state: { ...state, tiles }, action: 'swap' };
+  return { state: { ...state, tiles }, action: 'swap', meritYield: 0 };
 }
 
-/** Remove a tile entirely. Used as the stuck-board escape valve. */
+/** Remove a tile entirely. The stuck-board escape valve. */
 export function secludeTile(state, idx) {
   const tile = state.tiles[idx];
   if (!tile) return { state, removed: null };
   const tiles = state.tiles.slice();
   tiles[idx] = null;
   return { state: { ...state, tiles }, removed: tile };
+}
+
+/**
+ * Attempt to expand the grid. Caller MUST have already spent Qi externally
+ * (this module doesn't touch the qi balance). Returns:
+ *   { state, expanded, reason?, next? }
+ *     reason: 'maxed' | 'tier' (need: number)
+ */
+export function expandGrid(state) {
+  const next = nextExpansion(state.gridSize);
+  if (!next) return { state, expanded: false, reason: 'maxed' };
+  if (state.highestTier < next.unlockTier) {
+    return { state, expanded: false, reason: 'tier', need: next.unlockTier };
+  }
+  const tiles = state.tiles.slice();
+  while (tiles.length < next.tiles) tiles.push(null);
+  return {
+    state: { ...state, tiles, gridSize: next.size },
+    expanded: true,
+    next,
+  };
 }
