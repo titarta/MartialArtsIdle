@@ -40,6 +40,13 @@ export default function ProducerDetailModal({
   owned,
   unlocked,
   upgradeMult,         // multiplier from producer-doubling upgrades for this id
+  // Any extra producer-id-specific multiplier that should be reflected in
+  // the displayed per-unit qi/s. For the disciple producer this is the
+  // Roster (merge grid) bonus (× 1 + boardSum / 100). Defaults to 1 so
+  // every other producer's stats are unaffected. The same value must
+  // already be folded into baseGameRate by the caller so the share-of-
+  // production line is consistent with reality.
+  extraMult = 1,
   baseGameRate,        // base production qi/s = BASE_RATE + sum(producer raw outputs)
   onEnterMinigame,     // (producerId) => void — opens the Mythic-tier minigame
   onClose,
@@ -50,7 +57,9 @@ export default function ProducerDetailModal({
   const minigame  = getMinigame(producer.id);
   const isMythic  = tier?.name === 'mythic';
 
-  const perUnitRate   = producer.startQiPerSec * (upgradeMult ?? 1);
+  const upMult        = upgradeMult ?? 1;
+  const xMult         = extraMult   ?? 1;
+  const perUnitRate   = producer.startQiPerSec * upMult * xMult;
   const totalFromHere = owned * perUnitRate;
   // Share is computed against BASE production (sum of all producer raw
   // outputs + the BASE_RATE baseline), not the live qi/s. Percent
@@ -109,8 +118,11 @@ export default function ProducerDetailModal({
                 <span className="pdm-stat-label">Per unit</span>
                 <span className="pdm-stat-value">
                   {fmtRate(perUnitRate)} Qi/s
-                  {upgradeMult > 1 && (
-                    <span className="pdm-stat-mult"> (×{upgradeMult} upgrades)</span>
+                  {upMult > 1 && (
+                    <span className="pdm-stat-mult"> (×{upMult} upgrades)</span>
+                  )}
+                  {xMult > 1 && (
+                    <span className="pdm-stat-mult pdm-stat-mult-roster"> (×{xMult.toFixed(2)} roster)</span>
                   )}
                 </span>
               </div>

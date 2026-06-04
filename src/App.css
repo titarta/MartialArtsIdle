@@ -19469,6 +19469,12 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   font-size: 11px;
   margin-left: 4px;
 }
+/* Roster (merge grid) mult — uses the Merit cyan instead of upgrade gold
+   so the two contributions are distinguishable at a glance. */
+.pdm-stat-mult-roster {
+  color: #6bcaf6;
+  text-shadow: 0 0 6px rgba(107, 202, 246, 0.35);
+}
 .pdm-stat-row-emph {
   background: rgba(255, 215, 130, 0.08);
 }

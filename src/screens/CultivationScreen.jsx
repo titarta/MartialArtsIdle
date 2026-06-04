@@ -3,6 +3,7 @@ import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
 import PavilionPlaque from '../components/PavilionPlaque';
 import ProducerDetailModal from '../components/ProducerDetailModal';
 import MiniGameMode from '../components/minigames/MiniGameMode';
+import useDiscipleMerge from '../hooks/useDiscipleMerge';
 import InscribedTablet, { OwnedUpgradeChip } from '../components/UpgradeCard';
 import SparksTab from '../components/SparksTab';
 import { fmt, fmtRate } from '../utils/format';
@@ -54,6 +55,11 @@ export default function CultivationScreen({
   // Producer minigame ("Hidden Art") — full-screen overlay opened from the
   // detail modal's Mythic CTA. Holds the producer id whose game is active.
   const [minigameId, setMinigameId] = useState(null);
+  // Disciple Roster bonus — read here so we can fold it into both the
+  // per-unit qi/s shown in ProducerDetailModal AND into the share-of-
+  // production denominator (otherwise the percentages would be off when
+  // the Roster is contributing).
+  const discipleMerge = useDiscipleMerge();
 
   // Poll the cultivation refs ~10×/sec for the sticky header.
   // useCultivation deliberately never re-renders on qi/rate change, so we
@@ -369,7 +375,16 @@ export default function CultivationScreen({
         // meaningful "contribution" reading is share of base — not share
         // of live total qi/s. That way the percentages across all
         // producers actually add up to ~100%.
-        const perProducerMult = (pid) => upgrades?.getProducerMult?.(pid) ?? 1;
+        // The Roster (merge grid) bonus IS per-producer-specific — it only
+        // applies to p_disciple. Fold it into the perProducer callback so
+        // BOTH the producerSum (denominator of share-of-production) and
+        // the per-unit display use the same mult chain. Otherwise the
+        // detail modal underreports the disciple per-unit qi/s and the
+        // share percentages drift apart from reality.
+        const rosterMult = discipleMerge?.producerMult ?? 1;
+        const perProducerMult = (pid) =>
+          (upgrades?.getProducerMult?.(pid) ?? 1)
+          * (pid === 'p_disciple' ? rosterMult : 1);
         const producerSum     = producers.getRate(perProducerMult);
         const baseProductionRate = 1 /* BASE_RATE */ + producerSum;
         return (
@@ -378,6 +393,7 @@ export default function CultivationScreen({
             owned={producers.getOwned(detailProducer.id)}
             unlocked={producers.isUnlocked(detailProducer.id, realmIndex)}
             upgradeMult={upgrades?.getProducerMult?.(detailProducer.id) ?? 1}
+            extraMult={detailProducer.id === 'p_disciple' ? rosterMult : 1}
             baseGameRate={baseProductionRate}
             onEnterMinigame={(pid) => { setDetailProducer(null); setMinigameId(pid); }}
             onClose={() => setDetailProducer(null)}
