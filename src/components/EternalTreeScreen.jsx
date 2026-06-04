@@ -1,11 +1,15 @@
 // Eternal Tree screen — the between-lives prestige graph.
-// Header was simplified to a single Karma Coin (the 業 medallion) — the
-// anchored count is already visible on the tree itself (gold-ringed nodes)
-// and the lives count belongs on the home topbar, not here.
+// Header uses the same karma + eternal_tree sprites as the rest of the
+// game (public/ui/karma.png is the canonical karma icon, used in the home
+// topbar; public/sprites/nav/eternal_tree.png is the nav icon for this
+// very screen). Reusing them keeps the prestige flow visually tied to
+// the rest of the game instead of feeling like a separate sub-app.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
 import './eternalTree.css';
+
+const BASE = import.meta.env.BASE_URL;
 
 // ── Layout ───────────────────────────────────────────────────────────────────
 const NODE_R  = 30;
@@ -332,17 +336,32 @@ export default function EternalTreeScreen({
 
       <header className="et-bar et-bar-top">
         <div className="et-bar-titles">
-          <div className="et-eyebrow">Between Lives</div>
-          <h1 className="et-title">Eternal Tree</h1>
-        </div>
-        {/* Karma Coin — the one stat that matters on this screen. The 業
-            (yè, "karma") sigil + a Cinzel display readout. Anchored count is
-            already visible in the tree itself (gold-ringed nodes); lives are
-            already in the home screen header. Both were noise here. */}
-        <div className="et-karma" role="status" aria-label={`${karma} karma`}>
-          <div className="et-karma-seal" aria-hidden="true">
-            <span className="et-karma-seal-glyph">業</span>
+          {/* Eternal Tree letterhead — same nav icon used in the home topbar's
+              reincarnation button, so opening the screen reads as "the icon
+              you tapped, now writ large." */}
+          <img
+            className="et-title-icon"
+            src={`${BASE}sprites/nav/eternal_tree.png`}
+            alt=""
+            draggable="false"
+            aria-hidden="true"
+          />
+          <div className="et-title-text">
+            <div className="et-eyebrow">Between Lives</div>
+            <h1 className="et-title">Eternal Tree</h1>
           </div>
+        </div>
+        {/* Karma readout. Uses the game's canonical karma sprite (ui/karma.png,
+            the same one in the home topbar) instead of a CSS-drawn medallion
+            with a Chinese character — the prestige currency now LOOKS the
+            same here as it does everywhere else in the game. */}
+        <div className="et-karma" role="status" aria-label={`${karma} karma`}>
+          <img
+            className="et-karma-icon"
+            src={`${BASE}ui/karma.png`}
+            alt=""
+            draggable="false"
+          />
           <div className="et-karma-readout">
             <span className="et-karma-count">{fmt(karma)}</span>
             <span className="et-karma-label">karma</span>

@@ -39,6 +39,8 @@ import { createPortal } from 'react-dom';
 import { AudioManager } from '../audio';
 import './dissolutionRite.css';
 
+const BASE = import.meta.env.BASE_URL;
+
 const TOTAL_MS  = 3400;
 const CHIME_MS  = 1400;
 const DAWN_MS   = 2800;
@@ -126,10 +128,19 @@ export default function DissolutionRite({ onComplete, realmName }) {
       {/* Quiet whisper — the realm’s name returns to the wheel */}
       <div className="dr-whisper">{whisper}</div>
 
-      {/* The Seed — what carries to the next life */}
+      {/* The Seed — what carries to the next life. This is literally karma:
+          the sect's ledger of merit that survives the wheel. Use the same
+          ui/karma.png sprite as the Eternal Tree header + the home topbar,
+          so the player recognises "oh, that's karma" without being told. */}
       <div className="dr-seed">
         <span className="dr-seed-glow" />
-        <span className="dr-seed-core" />
+        <img
+          className="dr-seed-icon"
+          src={`${BASE}ui/karma.png`}
+          alt=""
+          draggable="false"
+          aria-hidden="true"
+        />
       </div>
 
       {/* Dawn light blooms outward, covers the screen at unmount */}
