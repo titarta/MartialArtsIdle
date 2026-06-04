@@ -15,6 +15,7 @@ import { useDailyBonus } from './hooks/useDailyBonus';
 import EternalTreeScreen from './components/EternalTreeScreen';
 import ReincarnationConfirmModal from './components/ReincarnationConfirmModal';
 import SeveringRite from './components/SeveringRite';
+import DissolutionRite from './components/DissolutionRite';
 import { initAds } from './rewards/rewardService';
 import { restoreResolution } from './systems/desktopResolution';
 import {
@@ -2037,7 +2038,17 @@ function AppInner() {
           tree={tree}
           lives={karma.lives}
           realmIndex={cultivation.realmIndex}
-          onReincarnate={handleReincarnate}
+          // Defer the actual wipe until the Dissolution cinematic finishes —
+          // the wheel turns, the orb beats out, the dawn blooms, THEN the
+          // world is reset. The dissolution rite owns the visual+emotional
+          // moment; handleReincarnate owns the destructive act.
+          onReincarnate={() => setReincarnationStage('dissolution')}
+        />
+      )}
+      {reincarnationStage === 'dissolution' && (
+        <DissolutionRite
+          realmName={cultivation.realmMajor}
+          onComplete={handleReincarnate}
         />
       )}
     </div>
