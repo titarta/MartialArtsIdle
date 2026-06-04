@@ -32,10 +32,21 @@
     rgba(220, 178, 112, 0.96) 100%);
   opacity: 0;
   pointer-events: none;
-  z-index: 20;  /* above everything inside the overlay */
+  z-index: 20;
   transition: opacity 600ms ease-out;
 }
-.dr-finishing::after { opacity: 1; }
+.dr-finishing::after {
+  opacity: 1;
+  /* Slow breath so the held state never feels frozen during the browser
+     reload pause. Eye reads slow change as "still alive", stillness as
+     "stuck". The breath subtly brightens + warms then settles back —
+     reads as the dawn maturing into day. */
+  animation: dr-dawn-breath 2.6s ease-in-out 600ms infinite;
+}
+@keyframes dr-dawn-breath {
+  0%, 100% { filter: brightness(1)    saturate(1); }
+  50%      { filter: brightness(1.08) saturate(0.94); }
+}
 
 /* ── 1. Void fades in over the Eternal Tree ─────────────────────────────── */
 .dr-void {
