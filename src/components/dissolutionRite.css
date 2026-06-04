@@ -14,6 +14,29 @@
   overflow: hidden;
 }
 
+/* Warm white-out — the very last beat. Fades in over 600ms starting at
+   FINISH_MS (3000ms in the JSX) and HOLDS at opacity 1 through the
+   browser's unavoidable reload pause (~100-1500ms). Without it, the
+   page would sit frozen on a static "dawn end-state" frame during the
+   reload, which reads as "the cinematic broke and now I'm stuck." With
+   it, the dawn matures INTO pure light, the light holds, and the new
+   home screen materialises underneath. The radial gradient is brighter
+   in the centre so the white-out feels like the dawn becoming the sun. */
+.dr-overlay::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(75% 75% at 50% 55%,
+    rgba(255, 250, 232, 1)  0%,
+    rgba(255, 238, 200, 1) 40%,
+    rgba(248, 222, 168, 1) 72%,
+    rgba(220, 178, 112, 0.96) 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;  /* above everything inside the overlay */
+  transition: opacity 600ms ease-out;
+}
+.dr-finishing::after { opacity: 1; }
+
 /* ── 1. Void fades in over the Eternal Tree ─────────────────────────────── */
 .dr-void {
   position: absolute; inset: 0;
@@ -199,4 +222,5 @@
     animation: none !important;
   }
   .dr-soul, .dr-seed { opacity: 0; }
+  .dr-overlay::after { transition: none; }
 }

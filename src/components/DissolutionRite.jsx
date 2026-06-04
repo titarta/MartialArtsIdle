@@ -34,14 +34,20 @@
  * the dawn. Both are reused until bespoke samples are recorded; pattern
  * mirrors the SeveringRite + merge tier-up.
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AudioManager } from '../audio';
 import './dissolutionRite.css';
 
-const TOTAL_MS = 3400;
-const CHIME_MS = 1400;
-const DAWN_MS  = 2800;
+const TOTAL_MS  = 3400;
+const CHIME_MS  = 1400;
+const DAWN_MS   = 2800;
+// Whiteout begins 400ms before onComplete fires so the warm wash is
+// already at ~70% by the time window.location.reload() is invoked. The
+// whiteout HOLDS through the browser's unavoidable reload delay
+// (~100-1500ms depending on device + dev server), masking the otherwise
+// frozen "dawn end state" the player would be stuck staring at.
+const FINISH_MS = 3000;
 
 // Deterministic mote scatter — same positions every play, no per-render
 // randomness so the visual is identical across reincarnations.
@@ -53,6 +59,7 @@ const MOTES = Array.from({ length: 28 }, (_, i) => ({
 }));
 
 export default function DissolutionRite({ onComplete, realmName }) {
+  const [finishing, setFinishing] = useState(false);
   const whisper = useMemo(() => (
     realmName ? `${realmName} returns to the wheel` : 'All that was, returns'
   ), [realmName]);
@@ -76,18 +83,23 @@ export default function DissolutionRite({ onComplete, realmName }) {
       try { AudioManager.playSfx('crystal_tap_max'); } catch {}
     }, DAWN_MS);
 
+    // Start the warm whiteout 400ms before onComplete so the page reload
+    // happens under a clean wash, not a frozen dawn frame.
+    const finishTimer = setTimeout(() => setFinishing(true), FINISH_MS);
+
     // Auto-advance to the actual wipe + reload.
     const endTimer = setTimeout(() => onComplete?.(), TOTAL_MS);
 
     return () => {
       clearTimeout(chimeTimer);
       clearTimeout(dawnTimer);
+      clearTimeout(finishTimer);
       clearTimeout(endTimer);
     };
   }, [onComplete]);
 
   return createPortal(
-    <div className="dr-overlay" role="presentation" aria-hidden="true">
+    <div className={`dr-overlay${finishing ? ' dr-finishing' : ''}`} role="presentation" aria-hidden="true">
       <div className="dr-void" />
 
       {/* The Soul — central life-essence orb */}
