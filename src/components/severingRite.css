@@ -146,7 +146,7 @@
   stroke: #d4baff;
   stroke-width: 4;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 10px rgba(212, 186, 255, 0.4));
+  filter: drop-shadow(0 0 10px rgba(245, 215, 150, 0.4));
   stroke-dasharray: 320;
   stroke-dashoffset: 320;
   animation: sr-draw 460ms cubic-bezier(0.5, 0, 0.4, 1) 1420ms forwards;
@@ -156,10 +156,10 @@
 /* Branches unfurl after the trunk lands */
 .sr-tree-crown path {
   fill: none;
-  stroke: rgba(212, 186, 255, 0.85);
+  stroke: rgba(245, 215, 150, 0.85);
   stroke-width: 2.4;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(212, 186, 255, 0.32));
+  filter: drop-shadow(0 0 6px rgba(245, 215, 150, 0.32));
   stroke-dasharray: 240;
   stroke-dashoffset: 240;
   animation: sr-draw 520ms cubic-bezier(0.45, 0.05, 0.4, 1) 1880ms forwards;
@@ -174,7 +174,7 @@
 /* Roots descend last + slowest */
 .sr-tree-root {
   fill: none;
-  stroke: rgba(212, 186, 255, 0.7);
+  stroke: rgba(245, 215, 150, 0.7);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-dasharray: 220;
