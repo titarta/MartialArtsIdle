@@ -237,6 +237,27 @@
   50%      { opacity: 0.9; transform: scale(1.06); }
 }
 
+/* Selection corona — outer rotating dashed ring that ONLY lights up on the
+   currently-selected node. The dash-flow animation is the same visual
+   vocabulary as .et-edge-lit (golden flowing dashes), so a focused node
+   reads as "this is the cursor" without overlapping the can-buy halo's
+   pulse signal or the owned ring's static gold. */
+.et-node-corona {
+  fill: none;
+  stroke: var(--et-gold-bri);
+  stroke-width: 1.3;
+  stroke-dasharray: 3 6;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s;
+  filter: drop-shadow(0 0 6px rgba(255, 216, 102, 0.65));
+}
+.et-node-selected .et-node-corona {
+  opacity: 0.95;
+  animation: et-corona-flow 5.4s linear infinite;
+}
+@keyframes et-corona-flow { to { stroke-dashoffset: -80; } }
+
 /* Node discs sit ON the cosmic void but read as warm bronze ledger tiles —
    matches the PavilionPlaque material. Locked discs are deepest brown,
    available + can-buy warm to a faint amber, owned are bronze-on-gold. */
@@ -292,14 +313,31 @@
 }
 .et-node-placeholder .et-node-badge-icon { opacity: 0.65; }
 
+/* Node label sits below the cost badge, on top of the cosmic starfield.
+   SVG <text> doesn't respect CSS text-shadow — the way to give SVG text
+   an outline that pops against any background is paint-order: stroke fill
+   with a dark stroke. Without it the silvery 10px text dissolved into
+   nebula gradients and the warm halos of neighbouring nodes. */
 .et-node-label {
-  font-size: 10px; letter-spacing: 0.06em;
-  fill: var(--et-silver-soft);
+  font-size: 12px; letter-spacing: 0.08em;
+  font-weight: 600;
+  fill: var(--et-silver);
+  paint-order: stroke fill;
+  stroke: rgba(6, 5, 26, 0.92);
+  stroke-width: 3.2;
+  stroke-linejoin: round;
   user-select: none; pointer-events: none;
   text-transform: uppercase;
+  transition: fill 0.18s;
 }
-.et-node-owned .et-node-label { fill: var(--et-silver); }
-.et-node-placeholder .et-node-label { fill: rgba(236, 233, 247, 0.35); }
+.et-node-avail .et-node-label,
+.et-node-can   .et-node-label { fill: var(--et-violet-bri); }
+.et-node-owned .et-node-label { fill: var(--et-gold-bri); }
+.et-node-placeholder .et-node-label {
+  fill: rgba(220, 190, 130, 0.55);
+  stroke: rgba(6, 5, 26, 0.72);
+  stroke-width: 2.4;
+}
 
 /* ── Edges ───────────────────────────────────────────────────────────────── */
 .et-edge { fill: none; stroke-linecap: round; transition: stroke 0.3s, opacity 0.3s, stroke-width 0.3s; }
@@ -329,15 +367,42 @@
 }
 @keyframes et-edge-flow { to { stroke-dashoffset: -14; } }
 
-/* ── Selected node ──────────────────────────────────────────────────────── */
+/* ── Selected node ──────────────────────────────────────────────────────────
+   Three stacked signals so the focused node is unmistakable:
+     1. .et-node-corona above — rotating dashed outer ring (the cursor).
+     2. The disc fill warms inwardly (lit-up amber bronze, not just a
+        coloured rim), so the node itself reads as "spotlit".
+     3. Triple-layer drop-shadow (tight gold core -> mid amber -> wide
+        warm bloom) plus a near-white stroke owns the screen at any zoom.
+   Without these the selected state was a 1px stroke-color shift over
+   the can-buy state and the eye couldn't track which node was active. */
 .et-node-selected .et-node-disc {
-  stroke: var(--et-violet-bri); stroke-width: 2.5;
-  filter: drop-shadow(0 0 18px rgba(245, 215, 150, 0.55));
+  fill: #4a2e10;
+  stroke: #fff4c8; stroke-width: 3;
+  filter:
+    drop-shadow(0 0 4px var(--et-gold-bri))
+    drop-shadow(0 0 14px var(--et-gold))
+    drop-shadow(0 0 28px rgba(245, 200, 66, 0.7));
 }
 .et-node-selected .et-node-halo {
-  stroke: var(--et-violet-bri); opacity: 0.85;
+  stroke: var(--et-gold-bri); stroke-width: 2.2;
+  opacity: 1;
+  /* Override the .et-node-can pulse with a slightly faster, tighter beat
+     so a can-buy node that's selected still reads as the focused one. */
+  animation: et-selected-halo 1.4s ease-in-out infinite;
 }
-.et-node-selected .et-node-glyph { fill: var(--et-violet-bri); }
+@keyframes et-selected-halo {
+  0%, 100% { opacity: 0.75; transform: scale(1);    }
+  50%      { opacity: 1;    transform: scale(1.12); }
+}
+.et-node-selected .et-node-glyph {
+  fill: #fff4c8;
+  filter: drop-shadow(0 0 8px rgba(255, 220, 140, 0.95));
+}
+.et-node-selected .et-node-label {
+  fill: #fff4c8;
+  font-weight: 700;
+}
 
 /* ── Bottom detail card (tap a node to inspect, tap Anchor to confirm) ──── */
 .et-detail {

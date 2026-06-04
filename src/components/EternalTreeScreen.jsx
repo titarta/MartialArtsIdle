@@ -165,6 +165,10 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
       onClick={(e) => { e.stopPropagation(); onSelect(node.id); }}
       style={{ cursor: 'pointer' }}
     >
+      {/* Outermost rotating dashed ring — only visible when this node is
+          the currently-selected one (CSS hides it otherwise). Drawing it
+          always means we don't have to remount on selection change. */}
+      <circle className="et-node-corona" r={NODE_R + 12} />
       <circle className="et-node-halo" r={NODE_R + 7} />
       <circle className="et-node-disc" r={NODE_R} />
       <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">{glyph}</text>
