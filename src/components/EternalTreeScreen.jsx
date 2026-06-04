@@ -170,7 +170,10 @@ export default function EternalTreeScreen({
   const stars = useMemo(() => makeStars(140), []);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
 
-  const { purchased, isAvailable, buyNode } = tree;
+  // useReincarnationTree exposes `buy`, not `buyNode` — the old name in this
+  // screen quietly broke every Anchor click with a "buyNode is not a function"
+  // throw, so karma never moved and nothing was ever purchased.
+  const { purchased, isAvailable, buy: buyNode } = tree;
 
   const nodeStates = useMemo(() => {
     const out = {};
