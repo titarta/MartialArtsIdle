@@ -416,48 +416,135 @@
   { animation: none; transition: none; }
 }
 
-/* ── Disciple Merge (Promotion grid) ─────────────────────────────────────── */
-.dmg { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px 0; }
+/* ── The Roster (Disciple Promotion grid) ─────────────────────────────────────
+   Aesthetic — Hall of Names: an imperial sect's register board where each
+   disciple hangs as a recessed bronze name-plaque. Cinnabar wax for Merit
+   (the sect's vow-currency), gold for Qi (the player's main wealth), jade
+   for the promised reward. Bronze hairlines, Cinzel + Ma Shan Zheng, deep
+   inked-brown panels. Matches the warmth of the PavilionPlaque + Spirit
+   Garden minigame chrome rather than the cosmic-ledger palette the
+   Eternal Tree prototype borrowed from. */
 
-.dmg-stats {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-  padding: 9px 10px;
-  background: rgba(14, 11, 32, 0.55);
-  border: 1px solid var(--mg-line);
-  border-radius: 10px;
+.dmg {
+  display: flex; flex-direction: column;
+  gap: 11px;
+  padding: 2px 0 0;
 }
-.dmg-stat { text-align: center; }
-.dmg-stat-k { font-size: 8.5px; letter-spacing: 0.16em; opacity: 0.55; text-transform: uppercase; }
-.dmg-stat-v { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 17px; margin-top: 2px; color: var(--mg-cream); font-variant-numeric: tabular-nums; }
-.dmg-stat-violet { color: #b794f6; }
-.dmg-stat-gold { color: var(--mg-amber-bright); }
-.dmg-stat-cyan { color: #6bcaf6; }
-.dmg-stat-merit { color: #6bcaf6; text-shadow: 0 0 6px rgba(107, 202, 246, 0.4); }
+
+/* ── Stats panel: three engraved cartouches with bronze hairline dividers ── */
+.dmg-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  padding: 12px 6px 13px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(220, 175, 110, 0.10), transparent 60%),
+    linear-gradient(180deg, #1c1610 0%, #110c08 100%);
+  border: 1px solid var(--mg-line-strong);
+  border-radius: 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 170, 0.07),
+    inset 0 0 14px rgba(0, 0, 0, 0.55);
+}
+.dmg-stat {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 2px 6px;
+  min-height: 62px;
+  position: relative;
+}
+/* Vertical bronze hairline between adjacent stat plinths */
+.dmg-stat + .dmg-stat::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 14%; bottom: 14%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--mg-line) 30%, var(--mg-line) 70%, transparent);
+}
+.dmg-stat-k {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mg-cream-soft);
+  opacity: 0.72;
+}
+.dmg-stat-v {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700; font-size: 19px;
+  margin-top: 4px;
+  color: var(--mg-cream);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.65);
+  line-height: 1.05;
+}
+.dmg-stat-violet,
+.dmg-stat-cyan  { color: var(--mg-cream); }    /* legacy classes, kept harmless */
+.dmg-stat-gold  {
+  color: var(--mg-amber-bright);
+  text-shadow: 0 0 14px rgba(242, 205, 131, 0.45), 0 1px 0 rgba(0, 0, 0, 0.65);
+}
+.dmg-stat-merit {
+  color: var(--mg-crimson);
+  text-shadow: 0 0 14px rgba(233, 69, 96, 0.45), 0 1px 0 rgba(0, 0, 0, 0.65);
+}
 .dmg-stat-sub {
-  font-size: 9px; letter-spacing: 0.08em;
-  opacity: 0.55; margin-top: 1px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 10px; letter-spacing: 0.1em;
+  margin-top: 3px;
   font-variant-numeric: tabular-nums;
 }
+/* Sub-line tint matches the value above (Merit → cinnabar, Per-disciple → jade) */
+.dmg-stat:first-child .dmg-stat-sub { color: var(--mg-crimson); opacity: 0.78; }
+.dmg-stat:last-child  .dmg-stat-sub { color: var(--mg-jade);    opacity: 0.85; }
 
+/* ── Grid: the "board" — bronze-rimmed deep panel with corner brackets ──── */
 .dmg-grid {
   display: grid;
   /* Dynamic columns driven by inline --dmg-cols (3..7) so 3×3 → 7×7 share
-     the same styles. Defaults to 4 in case a stale state has no var. */
+     the same chassis. Defaults to 4 if a stale state has no var. */
   grid-template-columns: repeat(var(--dmg-cols, 4), 1fr);
   gap: 7px;
-  padding: 8px;
-  background: rgba(14, 11, 32, 0.55);
-  border: 1px solid var(--mg-line);
+  padding: 12px;
+  background:
+    radial-gradient(140% 100% at 50% 0%, rgba(220, 175, 110, 0.06), transparent 65%),
+    linear-gradient(180deg, #1c1610 0%, #110c08 100%);
+  border: 1px solid var(--mg-line-strong);
   border-radius: 12px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 170, 0.06),
+    inset 0 0 20px rgba(0, 0, 0, 0.55);
   touch-action: none;  /* prevent scroll while dragging on touch */
+  position: relative;
+}
+/* Subtle Eastern corner brackets — engraved bronze L-marks */
+.dmg-grid::before,
+.dmg-grid::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  pointer-events: none;
+  opacity: 0.55;
+}
+.dmg-grid::before {
+  top: 4px; left: 4px;
+  border-top: 1.5px solid var(--mg-amber);
+  border-left: 1.5px solid var(--mg-amber);
+  border-top-left-radius: 4px;
+}
+.dmg-grid::after {
+  bottom: 4px; right: 4px;
+  border-bottom: 1.5px solid var(--mg-amber);
+  border-right: 1.5px solid var(--mg-amber);
+  border-bottom-right-radius: 4px;
 }
 
+/* ── Cell: empty slot (dashed bronze) → recessed name-plaque (solid) ─────── */
 .dmg-cell {
   aspect-ratio: 1;
-  border-radius: 9px;
-  background: rgba(8, 6, 22, 0.6);
-  border: 1.5px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.34);
+  border: 1px dashed var(--mg-line);
   position: relative;
   cursor: pointer;
   transition: transform 0.16s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
@@ -467,14 +554,23 @@
   -webkit-user-select: none;
 }
 .dmg-has-tile {
-  background: linear-gradient(180deg, #1a1640, #0c0a26);
-  border-style: solid;
-  border-color: rgba(183, 148, 246, 0.32);
+  /* Recessed name-plaque: warm brown gradient + bronze rim + inset shadow */
+  background:
+    radial-gradient(circle at 50% 35%, #3a2a14 0%, #1f1609 65%, #14100a 100%);
+  border: 1px solid var(--mg-line-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 170, 0.08),
+    inset 0 0 10px rgba(0, 0, 0, 0.55);
 }
-.dmg-empty:hover { border-color: rgba(255, 255, 255, 0.22); }
+.dmg-empty:hover {
+  border-color: var(--mg-line-strong);
+  background: rgba(220, 175, 110, 0.05);
+}
 .dmg-selected {
-  border-color: #b794f6 !important;
-  box-shadow: 0 0 16px rgba(183, 148, 246, 0.6), inset 0 0 12px rgba(183, 148, 246, 0.16);
+  border: 1.5px solid var(--mg-amber-bright) !important;
+  box-shadow:
+    0 0 18px rgba(242, 205, 131, 0.55),
+    inset 0 0 14px rgba(242, 205, 131, 0.18) !important;
   transform: translateY(-3px);
   z-index: 2;
 }
@@ -483,34 +579,37 @@
   filter: grayscale(0.7);
 }
 
-/* Drop-target visual cues */
+/* Drop hints — gold pulse (promote), jade hairline (swap), cream dash
+   (move to empty), cinnabar (same-tier-at-max) */
 .dmg-drop-merge {
   border-color: var(--mg-amber-bright) !important;
-  box-shadow: 0 0 18px rgba(245, 200, 66, 0.7), inset 0 0 12px rgba(245, 200, 66, 0.18);
-  animation: dmg-merge-pulse 0.8s ease-in-out infinite;
+  box-shadow:
+    0 0 20px rgba(242, 205, 131, 0.7),
+    inset 0 0 14px rgba(242, 205, 131, 0.22) !important;
+  animation: dmg-merge-pulse 0.9s ease-in-out infinite;
 }
 @keyframes dmg-merge-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(245, 200, 66, 0.5); }
-  50%      { box-shadow: 0 0 22px rgba(245, 200, 66, 0.9); }
+  0%, 100% { box-shadow: 0 0 10px rgba(242, 205, 131, 0.5),  inset 0 0 12px rgba(242, 205, 131, 0.15); }
+  50%      { box-shadow: 0 0 26px rgba(242, 205, 131, 0.95), inset 0 0 18px rgba(242, 205, 131, 0.30); }
 }
 .dmg-drop-swap {
-  border-color: #6bcaf6 !important;
-  box-shadow: 0 0 12px rgba(107, 202, 246, 0.5);
+  border-color: var(--mg-jade) !important;
+  box-shadow: 0 0 14px rgba(110, 200, 150, 0.5), inset 0 0 10px rgba(110, 200, 150, 0.16) !important;
 }
 .dmg-drop-move {
-  border-color: rgba(183, 148, 246, 0.7) !important;
-  background: rgba(107, 70, 193, 0.12);
+  border: 1px dashed var(--mg-cream-soft) !important;
+  background: rgba(245, 230, 200, 0.06) !important;
 }
 .dmg-drop-maxed {
-  border-color: rgba(255, 100, 100, 0.5) !important;
-  box-shadow: 0 0 10px rgba(255, 100, 100, 0.35);
+  border-color: var(--mg-crimson) !important;
+  box-shadow: 0 0 14px rgba(233, 69, 96, 0.55), inset 0 0 10px rgba(233, 69, 96, 0.18) !important;
 }
 
 /* Animation hooks (set then cleared by SectMerge) */
 .dmg-anim-merge { animation: dmg-tier-up 0.72s ease-out; }
 @keyframes dmg-tier-up {
-  0%   { transform: scale(0.85); box-shadow: 0 0 0 rgba(245, 200, 66, 1); }
-  35%  { transform: scale(1.18); box-shadow: 0 0 32px rgba(245, 200, 66, 0.95); }
+  0%   { transform: scale(0.85); box-shadow: 0 0 0 rgba(242, 205, 131, 1); }
+  35%  { transform: scale(1.18); box-shadow: 0 0 40px rgba(242, 205, 131, 0.95); }
   100% { transform: scale(1); }
 }
 .dmg-anim-spawn { animation: dmg-spawn-pop 0.42s ease-out; }
@@ -520,7 +619,7 @@
   100% { transform: scale(1); }
 }
 
-/* Tile interior */
+/* ── Tile interior ───────────────────────────────────────────────────────── */
 .dmg-tile {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center;
@@ -532,42 +631,57 @@
   image-rendering: crisp-edges;
   object-fit: contain;
   pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
+/* Bronze coin badge for tier-overflow (×2…×7) — top-right */
 .dmg-tile-badge {
   position: absolute;
-  top: 2px; right: 4px;
+  top: 3px; right: 4px;
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 10px; font-weight: 700;
-  color: var(--mg-amber-bright);
+  font-size: 9.5px; font-weight: 700;
+  color: #2a1c08;
+  background: linear-gradient(180deg, var(--mg-amber-bright), var(--mg-amber));
+  border: 1px solid rgba(80, 50, 20, 0.6);
+  border-radius: 999px;
+  min-width: 19px; height: 15px;
+  padding: 0 5px;
+  display: flex; align-items: center; justify-content: center;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 230, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
   pointer-events: none;
 }
+/* Tier cartouche — bottom-left, small bronze inscription */
 .dmg-tile-tier {
   position: absolute;
-  bottom: 1px; left: 4px;
+  bottom: 2px; left: 4px;
   font-family: 'Cinzel', Georgia, serif;
   font-size: 8.5px; font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--mg-amber);
   letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.75);
   pointer-events: none;
+  opacity: 0.78;
 }
 
 .dmg-empty-plus {
-  font-size: 22px;
-  color: rgba(255, 255, 255, 0.22);
-  font-weight: 300;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 22px; font-weight: 300;
+  color: rgba(220, 190, 130, 0.28);
   pointer-events: none;
 }
 
-/* Drag ghost (follows pointer) */
+/* ── Drag ghost — floating bronze plaque following the pointer ───────────── */
 .dmg-ghost {
   position: fixed;
   width: 72px; height: 72px;
-  border-radius: 9px;
-  background: linear-gradient(180deg, #1a1640, #0c0a26);
-  border: 2px solid #b794f6;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 18px rgba(183, 148, 246, 0.55);
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 35%, #3a2a14 0%, #1f1609 65%, #14100a 100%);
+  border: 1.5px solid var(--mg-amber-bright);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.7),
+    0 0 22px rgba(242, 205, 131, 0.55),
+    inset 0 1px 0 rgba(255, 230, 170, 0.16);
   transform: translate(-50%, -50%) scale(1.08);
   z-index: 1000;
   pointer-events: none;
@@ -575,39 +689,61 @@
 }
 .dmg-ghost .dmg-tile-sprite { width: 78%; height: 78%; }
 
-/* Selection / inspect bar */
+/* ── Selection / inspect bar — engraved scroll strip ─────────────────────── */
 .dmg-sel {
-  padding: 9px 12px;
-  background: rgba(14, 11, 32, 0.55);
-  border: 1px solid var(--mg-line);
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #221a0e 0%, #14100a 100%);
+  border: 1px solid var(--mg-line-strong);
   border-radius: 9px;
-  min-height: 44px;
+  min-height: 46px;
   display: flex; justify-content: space-between; align-items: center; gap: 10px;
   font-size: 11.5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 230, 170, 0.06),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 .dmg-sel-info { flex: 1; min-width: 0; }
 .dmg-sel-name {
   font-family: 'Cinzel', Georgia, serif; font-weight: 700;
-  letter-spacing: 0.05em; font-size: 12.5px;
+  letter-spacing: 0.06em; font-size: 13px;
   color: var(--mg-cream);
 }
-.dmg-sel-tier { color: #b794f6; margin-right: 6px; }
-.dmg-sel-sub { font-size: 10.5px; opacity: 0.62; margin-top: 2px; }
-.dmg-sel-empty {
-  opacity: 0.55; font-style: italic; font-size: 11px;
-  text-align: center; flex: 1; line-height: 1.4;
+.dmg-sel-tier {
+  color: var(--mg-amber-bright);
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
 }
+.dmg-sel-sub {
+  font-size: 10.5px;
+  opacity: 0.66;
+  margin-top: 3px;
+  color: var(--mg-cream-soft);
+}
+.dmg-sel-empty {
+  opacity: 0.6;
+  font-style: italic;
+  font-size: 11.5px;
+  text-align: center;
+  flex: 1; line-height: 1.4;
+  color: var(--mg-cream-soft);
+  font-family: 'Cinzel', Georgia, serif;
+}
+/* Seclude button — cinnabar wax-stamp accent */
 .dmg-seclude {
   font-family: 'Cinzel', Georgia, serif; font-weight: 700;
   padding: 7px 12px; border-radius: 7px;
-  font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
-  border: 1px solid rgba(255, 100, 100, 0.4);
-  background: rgba(80, 20, 20, 0.4); color: #ffb59a;
-  cursor: pointer; flex-shrink: 0;
+  font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid rgba(233, 69, 96, 0.5);
+  background: linear-gradient(180deg, rgba(150, 30, 40, 0.5), rgba(80, 20, 25, 0.55));
+  color: #ffd6c8;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 200, 0.18);
 }
-.dmg-seclude:hover { background: rgba(100, 30, 30, 0.55); }
+.dmg-seclude:hover { background: linear-gradient(180deg, rgba(180, 40, 50, 0.65), rgba(100, 25, 30, 0.6)); }
 
-/* Actions — two-button row: Place (Merit cost, primary) + Expand (Qi cost, ghost) */
+/* ── Actions: Place (cinnabar wax-stamp) + Expand (bronze coin) ──────────── */
 .dmg-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -616,75 +752,124 @@
 .dmg-act {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 2px;
-  padding: 10px 8px;
-  border-radius: 9px;
+  gap: 3px;
+  padding: 11px 8px;
+  border-radius: 10px;
   font-family: 'Cinzel', Georgia, serif;
   font-weight: 700;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   line-height: 1.1;
+  border: 1px solid;
+  transition: filter 120ms, transform 80ms, opacity 120ms;
 }
-.dmg-act-label {
-  font-size: 11.5px;
-  text-align: center;
-}
-.dmg-act-cost {
-  font-size: 10px;
-  letter-spacing: 0.05em;
-  opacity: 0.88;
+.dmg-act:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+.dmg-act:active:not(:disabled) { transform: translateY(0); }
+.dmg-act:disabled { cursor: not-allowed; opacity: 0.5; }
+.dmg-act-label  { font-size: 11.5px; text-align: center; }
+.dmg-act-cost   {
+  font-size: 9.5px; letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
   display: inline-block;
-  padding: 1px 7px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.22);
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.32);
+  text-transform: none;
+  font-weight: 600;
 }
-.dmg-act-place { /* inherits mg-btn-primary base styling for gold/dark */ }
-.dmg-act-place .dmg-act-cost { color: #6bcaf6; background: rgba(20, 50, 80, 0.55); }
-.dmg-act-place:disabled .dmg-act-cost { opacity: 0.55; }
-.dmg-act-expand { /* ghost button */ }
-.dmg-act-expand .dmg-act-cost { color: var(--mg-amber-bright); }
-.dmg-act-expand .dmg-act-cost.dmg-act-locked { color: #ff9966; }
+
+/* Place — cinnabar wax-stamp. Merit is the sect's vow-currency. */
+.dmg-act-place {
+  background: linear-gradient(180deg, #c93748, #8c1f2c);
+  border-color: rgba(255, 180, 180, 0.55);
+  color: #fff1ec;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 4px 14px rgba(150, 30, 50, 0.35),
+    inset 0 1px 0 rgba(255, 220, 200, 0.32);
+}
+.dmg-act-place .dmg-act-cost {
+  color: #ffc8b4;
+  background: rgba(60, 10, 15, 0.5);
+  border: 1px solid rgba(255, 180, 180, 0.22);
+}
+
+/* Expand — bronze coin. Qi is the player's main wealth. */
+.dmg-act-expand {
+  background: linear-gradient(180deg, var(--mg-amber-bright), var(--mg-amber));
+  border-color: rgba(255, 230, 170, 0.6);
+  color: #2a1c08;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.4);
+  box-shadow:
+    0 4px 14px rgba(220, 160, 80, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.dmg-act-expand .dmg-act-cost {
+  color: var(--mg-amber-bright);
+  background: rgba(40, 25, 8, 0.55);
+  border: 1px solid rgba(255, 230, 170, 0.32);
+}
+.dmg-act-expand .dmg-act-cost.dmg-act-locked {
+  color: var(--mg-crimson);
+  background: rgba(50, 8, 12, 0.55);
+  border-color: rgba(233, 69, 96, 0.45);
+}
+
+/* Grid maxed — engraved bronze plate, no action */
 .dmg-act-maxed {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 2px;
-  padding: 10px 8px;
-  border-radius: 9px;
+  gap: 3px;
+  padding: 11px 8px;
+  border-radius: 10px;
   font-family: 'Cinzel', Georgia, serif;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  background: rgba(245, 200, 66, 0.08);
-  border: 1px dashed rgba(245, 200, 66, 0.4);
+  letter-spacing: 0.1em;
+  background: linear-gradient(180deg, rgba(220, 175, 110, 0.12), rgba(180, 130, 70, 0.06));
+  border: 1px dashed rgba(220, 175, 110, 0.5);
   color: var(--mg-amber-bright);
   text-transform: uppercase;
   font-size: 11.5px;
   text-align: center;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.35);
 }
-.dmg-act-maxed .dmg-act-cost { font-size: 10px; opacity: 0.7; }
+.dmg-act-maxed .dmg-act-cost {
+  font-size: 9.5px; letter-spacing: 0.06em;
+  opacity: 0.72; font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 2px 9px; border-radius: 999px;
+}
 
+/* ── Hint line — italic parchment inscription ────────────────────────────── */
 .dmg-hint {
-  font-size: 10.5px; line-height: 1.5;
-  opacity: 0.55; text-align: center;
-  padding: 6px 12px 4px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-style: italic;
+  font-size: 10.5px; line-height: 1.55;
+  color: var(--mg-cream-soft);
+  opacity: 0.62;
+  text-align: center;
+  padding: 6px 14px 4px;
+  letter-spacing: 0.02em;
 }
 
-/* Dev-only — wiped from production by import.meta.env.DEV gate in the
-   component. Tiny ghost button so testing migrations / fresh-board
-   states doesn't require fiddling with DevTools. */
+/* ── Dev-only reset (wiped from production by import.meta.env.DEV gate) ──── */
 .dmg-dev-reset {
   align-self: center;
   margin-top: 2px;
   font: inherit; font-family: 'Cinzel', Georgia, serif;
   font-weight: 600; font-size: 10px;
-  letter-spacing: 0.1em; text-transform: uppercase;
+  letter-spacing: 0.12em; text-transform: uppercase;
   padding: 5px 14px; border-radius: 12px;
-  background: transparent; color: rgba(255, 255, 255, 0.42);
-  border: 1px dashed rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: var(--mg-cream-soft); opacity: 0.55;
+  border: 1px dashed rgba(220, 190, 130, 0.32);
   cursor: pointer;
+  transition: color 120ms, border-color 120ms, opacity 120ms, background 120ms;
 }
 .dmg-dev-reset:hover {
-  color: #ff9966; border-color: rgba(255, 150, 102, 0.5);
-  background: rgba(80, 30, 20, 0.22);
+  color: var(--mg-crimson);
+  border-color: rgba(233, 69, 96, 0.5);
+  background: rgba(80, 20, 25, 0.18);
+  opacity: 1;
 }
