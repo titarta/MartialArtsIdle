@@ -64,7 +64,7 @@
 }
 .sr-seal-glyph {
   position: relative;
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
+  font-family: var(--font-glyph);
   font-size: clamp(120px, 26vmin, 280px);
   line-height: 1;
   color: #ff4a5e;

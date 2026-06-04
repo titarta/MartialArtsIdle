@@ -282,7 +282,7 @@
 }
 
 .et-node-glyph {
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-family: var(--font-glyph);
   font-size: 28px;
   fill: var(--et-silver-mute);
   user-select: none; pointer-events: none;
@@ -292,28 +292,13 @@
 .et-node-owned .et-node-glyph { fill: var(--et-gold-bri); filter: drop-shadow(0 0 6px var(--et-gold-soft)); }
 .et-node-placeholder .et-node-glyph { fill: rgba(220, 190, 130, 0.32); }
 
-.et-node-badge {
-  font-family: 'Cinzel', Georgia, serif;
-  font-size: 11px; letter-spacing: 0.08em;
-  fill: var(--et-silver-mute);
-  user-select: none; pointer-events: none;
-}
-.et-node-can   .et-node-badge { fill: var(--et-gold); }
-.et-node-owned .et-node-badge { fill: var(--et-jade); }
-.et-node-soon  .et-node-badge { fill: var(--et-violet); }
-.et-node-placeholder .et-node-badge { fill: rgba(220, 190, 130, 0.42); }
-/* Karma sprite next to the cost number on every buyable node. Pixel art
-   stays crisp; a soft gold drop-shadow lifts it off the cosmic backdrop. */
-.et-node-badge-icon {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  filter: drop-shadow(0 0 4px rgba(245, 200, 66, 0.45));
-  pointer-events: none;
-  user-select: none;
-}
-.et-node-placeholder .et-node-badge-icon { opacity: 0.65; }
+/* Cost badge styles removed 2026-06-04 — the cost number + karma sprite
+   under each node was visual noise. The bottom detail card shows the
+   cost the moment the player taps a node, so the badge was redundant
+   with one extra tap of cognitive overhead. Disc state (warm/owned/
+   locked) + glyph colour now carry the entire at-a-glance read. */
 
-/* Node label sits below the cost badge, on top of the cosmic starfield.
+/* Node label sits below the disc, on top of the cosmic starfield.
    SVG <text> doesn't respect CSS text-shadow — the way to give SVG text
    an outline that pops against any background is paint-order: stroke fill
    with a dark stroke. Without it the silvery 10px text dissolved into
@@ -424,7 +409,7 @@
 .et-detail-glyph {
   flex: 0 0 auto; width: 44px; height: 44px;
   display: grid; place-items: center;
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-family: var(--font-glyph);
   font-size: 28px; line-height: 1;
   color: var(--et-violet-bri);
   border-radius: 10px;
@@ -560,7 +545,7 @@
 .et-reincarnate:not(:disabled):hover  { filter: brightness(1.06); }
 .et-reincarnate:not(:disabled):active { transform: translateY(1px); }
 .et-reincarnate-glyph {
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
+  font-family: var(--font-glyph);
   font-size: 18px; line-height: 1; letter-spacing: 0; text-transform: none;
 }
 .et-reincarnate-locked {

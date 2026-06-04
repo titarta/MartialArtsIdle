@@ -171,6 +171,38 @@
      sans for instant legibility. See the typography audit at
      _design/typography-audit.md for the full rationale. */
   --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
+
+  /* ── Glyph font for CHINESE CALLIGRAPHY characters ────────────────────
+     Ma Shan Zheng brush (bundled subset at
+     src/assets/fonts/ma-shan-zheng-common.woff2), used wherever a Chinese
+     glyph appears as a watermark, seal, node sigil, or chapter marker.
+
+     CRITICAL RULE — read before adding a new Chinese glyph anywhere:
+       1. Every Chinese character rendered with this stack MUST be in
+          CHARS in scripts/build_msz_font.py. Otherwise the bundled
+          subset misses it, the browser falls back through the chain
+          below, and you get the "some characters look rounder than
+          others" inconsistency — Windows machines pull SimSun for some
+          glyphs and YaHei for others, character by character, when
+          nothing in the fallback chain is installed.
+       2. After adding a glyph to CHARS, run
+            python scripts/build_msz_font.py
+          which regenerates BOTH the woff2 and the JSON manifest the
+          runtime check reads.
+       3. Components that render Chinese glyphs should call
+            assertGlyphsCovered([...glyphs], 'ComponentName')
+          from src/utils/glyphCoverage.js in a useEffect, so dev console
+          screams immediately if a new glyph slips in without a rebuild.
+
+     FALLBACK STACK rationale — every fallback is itself a SAME-STYLE
+     handwritten / brush-leaning font, never Ming serif. If Ma Shan
+     Zheng's subset misses a glyph, we want it to render in a font that
+     LOOKS RELATED (KaiTi / STKaiti = regular-script kai shu, the closest
+     printed cousin to brush) before degrading further. Songti SC and
+     STSong come last because they're Ming serifs — a totally different
+     visual style, fine as a "better than nothing" tail but never as
+     primary fallback. */
+  --font-glyph: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
 }
 
 * {

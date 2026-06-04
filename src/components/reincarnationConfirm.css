@@ -206,7 +206,7 @@
 .rc-sigil-seal {
   position: absolute;
   right: -8px; bottom: -2px;
-  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif;
+  font-family: var(--font-glyph);
   font-size: 19px;
   line-height: 1;
   color: #ff5566;
@@ -380,7 +380,7 @@
 }
 .rc-confirm:hover  { filter: brightness(1.08) saturate(1.05); }
 .rc-confirm:active { transform: translateY(1px); }
-.rc-confirm-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', serif; font-size: 17px; }
+.rc-confirm-glyph { font-family: var(--font-glyph); font-size: 17px; }
 /* A slow gold light sweeping across the commit button, drawing the eye to the
    weighty choice without nagging. */
 .rc-confirm::after {

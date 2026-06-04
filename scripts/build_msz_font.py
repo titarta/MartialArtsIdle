@@ -68,6 +68,15 @@ CHARS = sorted(set(
     + "山"                          # notification glyph (useNotifications)
     + "修境无止行收时"             # About screen + Offline-earnings modal glyphs
     + "丹兵兽盾矛祖苗虛香鳳昇壁憩戰徵火練群銳閉風鼓"  # producer minigames + disciple army
+    # 2026-06-04 coverage fix: Eternal Tree real nodes + placeholders +
+    # reincarnate button glyph. Without these, 21 of the 25 tree nodes
+    # fell through to system serif, producing the "some characters look
+    # rounder than others" artefact (Windows OS pulls SimSun for some,
+    # YaHei for others, char by char, when nothing in the fallback stack
+    # is installed).
+    + "星晶眼儉響長"               # real tree node glyphs (n_2..n_7; n_1=道 already covered)
+    + "筋岩瞳勇靜魂雙雷霧辰永冕"   # tree placeholder preview glyphs
+    + "輪"                          # reincarnate footer button glyph (wheel of rebirth)
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.
@@ -79,6 +88,12 @@ MSZ_TTF_URL = (
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 OUT_PATH = PROJECT_ROOT / "src" / "assets" / "fonts" / "ma-shan-zheng-common.woff2"
+# Manifest sibling so JS code can detect at render time whether a given
+# glyph is in the bundled subset. The build script is the SINGLE source
+# of truth: regenerating the woff2 also regenerates the manifest, so the
+# runtime check can never drift from the bundle. Consumed by
+# src/utils/glyphCoverage.js.
+MANIFEST_PATH = PROJECT_ROOT / "src" / "assets" / "fonts" / "ma-shan-zheng-subset.generated.json"
 CACHE_TTF = Path(tempfile.gettempdir()) / "ma-shan-zheng-full.ttf"
 
 
@@ -122,6 +137,16 @@ def main() -> int:
     font.flavor = "woff2"
     font.save(str(OUT_PATH))
     print(f"Wrote {OUT_PATH.relative_to(PROJECT_ROOT)} ({OUT_PATH.stat().st_size} bytes)")
+
+    # Emit the JSON manifest the runtime glyph-coverage check reads. UTF-8
+    # without BOM (global file-encoding rule). Sorted for stable diffs.
+    import json
+    manifest = {"glyphs": sorted(CHARS), "count": len(CHARS)}
+    MANIFEST_PATH.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Wrote {MANIFEST_PATH.relative_to(PROJECT_ROOT)} ({len(CHARS)} glyphs)")
     return 0
 
 

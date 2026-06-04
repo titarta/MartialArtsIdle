@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
+import { assertGlyphsCovered } from '../utils/glyphCoverage';
 import './eternalTree.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -172,33 +173,12 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
       <circle className="et-node-halo" r={NODE_R + 7} />
       <circle className="et-node-disc" r={NODE_R} />
       <text className="et-node-glyph" x={0} y={2} textAnchor="middle" dominantBaseline="middle">{glyph}</text>
-      {(() => {
-        // Cost badge below the disc. Owned shows ✓, coming-soon and
-        // null-cost show ✦, otherwise the karma cost number with the
-        // ui/karma.png sprite next to it so the cost reads the same way
-        // the topbar + the Eternal Tree header already do.
-        if (isPurchased) {
-          return <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">✓</text>;
-        }
-        if (isComingSoon || node.cost == null) {
-          return <text className="et-node-badge" x={0} y={NODE_R + 16} textAnchor="middle">✦</text>;
-        }
-        return (
-          <g>
-            <text className="et-node-badge" x={-3} y={NODE_R + 16} textAnchor="end">
-              {node.cost}
-            </text>
-            <image
-              className="et-node-badge-icon"
-              href={`${BASE}ui/karma.png`}
-              x="1" y={NODE_R + 7}
-              width="12" height="12"
-              preserveAspectRatio="xMidYMid meet"
-            />
-          </g>
-        );
-      })()}
-      <text className="et-node-label" x={0} y={NODE_R + 31} textAnchor="middle">
+      {/* Cost lives in the detail panel only — the badge under each node
+          was visual noise once every node already broadcasts its state
+          via disc fill + glyph colour + halo. Owned reads as gold,
+          can-buy reads as warm bronze, locked reads as dim. The number
+          appears in the bottom card the moment the player taps. */}
+      <text className="et-node-label" x={0} y={NODE_R + 17} textAnchor="middle">
         {node.label.toUpperCase()}
       </text>
     </g>
@@ -229,6 +209,22 @@ export default function EternalTreeScreen({
   const stageRef = useRef(null);
   const stars = useMemo(() => makeStars(140), []);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+
+  // Dev-time glyph-coverage assertion. Catches the "some characters look
+  // rounder than others" bug at first render instead of waiting for user
+  // feedback. Lists every Chinese character the tree might render: the
+  // real-node glyphs, every placeholder glyph, and the reincarnate-wheel
+  // glyph. If any aren't in the bundled Ma Shan Zheng subset, the dev
+  // console will tell you exactly which to add to CHARS in
+  // scripts/build_msz_font.py.
+  useEffect(() => {
+    const treeGlyphs = [
+      ...Object.values(NODE_GLYPH),
+      ...PLACEHOLDER_NODES.map(n => n.glyph),
+      '輪',  // reincarnate footer button
+    ];
+    assertGlyphsCovered(treeGlyphs, 'EternalTreeScreen');
+  }, []);
 
   // useReincarnationTree exposes `buy`, not `buyNode` — the old name in this
   // screen quietly broke every Anchor click with a "buyNode is not a function"
