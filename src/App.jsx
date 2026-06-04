@@ -2042,13 +2042,33 @@ function AppInner() {
           // the wheel turns, the orb beats out, the dawn blooms, THEN the
           // world is reset. The dissolution rite owns the visual+emotional
           // moment; handleReincarnate owns the destructive act.
-          onReincarnate={() => setReincarnationStage('dissolution')}
+          //
+          // Mirror handleReincarnate's Saint-realm gate here so we don't
+          // play the cinematic for a wipe that would silently no-op (which
+          // would strand the user staring at the dawn end-state forever).
+          onReincarnate={() => {
+            if (cultivation.realmIndex < 24) return;
+            setReincarnationStage('dissolution');
+          }}
         />
       )}
       {reincarnationStage === 'dissolution' && (
         <DissolutionRite
           realmName={cultivation.realmMajor}
-          onComplete={handleReincarnate}
+          onComplete={() => {
+            handleReincarnate();
+            // Safety net: handleReincarnate gates on realm >= Saint and
+            // ALSO defers its wipe+reload behind a 50ms setTimeout. If
+            // either the gate returns early OR the localStorage write
+            // throws, no reload fires and the dissolution overlay would
+            // stay stranded at its dawn end-state. Clear the stage after
+            // 1.2s so the player at least returns to the Tree. On the
+            // happy path, window.location.reload() unloads the page well
+            // before this timer would trigger, so it harmlessly cancels.
+            setTimeout(() => {
+              setReincarnationStage((prev) => prev === 'dissolution' ? null : prev);
+            }, 1200);
+          }}
         />
       )}
     </div>
