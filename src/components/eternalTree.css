@@ -269,6 +269,18 @@
 .et-detail-desc {
   font-size: 11.5px; line-height: 1.4;
   color: var(--et-silver-soft); margin-top: 2px;
+  /* Reserve exactly 2 lines so a 1-line description and a 2-line one
+     produce the same card height. Empty space below short copy is
+     invisible because the cluster sits at the top of the reserved area. */
+  min-height: calc(1.4em * 2);
+  /* Cap at 2 lines so a future longer string can't spill either —
+     ellipsis on the third line would otherwise re-introduce the
+     inconsistency this pinning is meant to fix. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .et-detail-close {
   flex: 0 0 auto; width: 28px; height: 28px;
