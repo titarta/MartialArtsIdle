@@ -68,12 +68,12 @@ export function spendBloodLotus(amount) {
 // across all tiers, so a Heaven's Fortune wasn't actually a better deal
 // than a Handful).
 export const BLOOD_LOTUS_PACKAGES = [
-  { id: 'blood_lotus_60',   amount: 300,    price: '$0.99',  label: 'Handful of Blood Lotus'  },
-  { id: 'blood_lotus_330',  amount: 1750,   price: '$4.99',  label: 'Pouch of Blood Lotus'    },
-  { id: 'blood_lotus_980',  amount: 5500,   price: '$14.99', label: 'Chest of Blood Lotus'    },
-  { id: 'blood_lotus_1980', amount: 11700,  price: '$29.99', label: 'Vault of Blood Lotus'    },
-  { id: 'blood_lotus_3280', amount: 21000,  price: '$49.99', label: 'Treasury of Blood Lotus' },
-  { id: 'blood_lotus_6480', amount: 45500,  price: '$99.99', label: 'Heaven\'s Fortune'       },
+  { id: 'blood_lotus_1', amount: 300,    price: '$0.99',  label: 'Handful of Blood Lotus'  },
+  { id: 'blood_lotus_2', amount: 1750,   price: '$4.99',  label: 'Pouch of Blood Lotus'    },
+  { id: 'blood_lotus_3', amount: 5500,   price: '$14.99', label: 'Chest of Blood Lotus'    },
+  { id: 'blood_lotus_4', amount: 11700,  price: '$29.99', label: 'Vault of Blood Lotus'    },
+  { id: 'blood_lotus_5', amount: 21000,  price: '$49.99', label: 'Treasury of Blood Lotus' },
+  { id: 'blood_lotus_6', amount: 45500,  price: '$99.99', label: 'Heaven\'s Fortune'       },
 ];
 
 export async function purchaseBloodLotus(packageId) {

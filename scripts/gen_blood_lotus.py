@@ -13,18 +13,18 @@ WORKFLOW (per pack):
   2. Finalize chosen candidate:
        python scripts/gen_blood_lotus.py finalize <pack_id> <cand_n>
        → crops transparent edges, saves to public/sprites/items/<pack_id>.png
-       → for blood_lotus_60 also writes blood_lotus.png (currency icon)
+       → for blood_lotus_1 also writes blood_lotus.png (currency icon)
 
   Batch-generate all 6:
        python scripts/gen_blood_lotus.py generate-all
 
 PACK TIERS (must match BLOOD_LOTUS_PACKAGES in src/systems/bloodLotus.js):
-  blood_lotus_60     $0.99   Handful           1 lotus  (== default currency icon)
-  blood_lotus_330    $4.99   Pouch             2 lotuses
-  blood_lotus_980    $14.99  Chest             3 lotuses
-  blood_lotus_1980   $29.99  Vault             5 lotuses
-  blood_lotus_3280   $49.99  Treasury          7 lotuses + faint gold halo
-  blood_lotus_6480   $99.99  Heaven's Fortune  9+ lotuses + bright radiant halo
+  blood_lotus_1     $0.99   Handful           1 lotus  (== default currency icon)
+  blood_lotus_2    $4.99   Pouch             2 lotuses
+  blood_lotus_3    $14.99  Chest             3 lotuses
+  blood_lotus_4   $29.99  Vault             5 lotuses
+  blood_lotus_5   $49.99  Treasury          7 lotuses + faint gold halo
+  blood_lotus_6   $99.99  Heaven's Fortune  9+ lotuses + bright radiant halo
 
 PALETTE IDENTITY:
   Deep crimson petals (the same blood reds as the current icon) layered with
@@ -125,7 +125,7 @@ S = (
 PACKS = {
 
     # ── Tier 1 — Handful (1 lotus, also the currency icon) ───────────────────
-    "blood_lotus_60": {
+    "blood_lotus_1": {
         "size": (128, 128),
         "desc": (
             "A single Blood Lotus bloom, centered, filling the frame at icon scale. "
@@ -138,7 +138,7 @@ PACKS = {
     },
 
     # ── Tier 2 — Pouch (2 lotuses) ──────────────────────────────────────────
-    "blood_lotus_330": {
+    "blood_lotus_2": {
         "size": (128, 128),
         "desc": (
             "EXACTLY TWO Blood Lotus blooms — only 2 flowers visible in this icon, never 3, never 1. "
@@ -152,7 +152,7 @@ PACKS = {
     },
 
     # ── Tier 3 — Chest (3 lotuses, triangle) ────────────────────────────────
-    "blood_lotus_980": {
+    "blood_lotus_3": {
         "size": (128, 128),
         "desc": (
             "Three Blood Lotus blooms arranged in a triangle: one on top center, two on the bottom corners. "
@@ -163,7 +163,7 @@ PACKS = {
     },
 
     # ── Tier 4 — Vault (5 lotuses, pentagon) ────────────────────────────────
-    "blood_lotus_1980": {
+    "blood_lotus_4": {
         "size": (128, 128),
         "desc": (
             "Five Blood Lotus blooms arranged in a pentagon — one on top, two upper sides, two lower sides. "
@@ -175,7 +175,7 @@ PACKS = {
     },
 
     # ── Tier 5 — Treasury (7 lotuses + halo) ────────────────────────────────
-    "blood_lotus_3280": {
+    "blood_lotus_5": {
         "size": (128, 128),
         "desc": (
             "Seven Blood Lotus blooms — one slightly-larger centerpiece surrounded by six smaller ones in a hexagonal ring. "
@@ -187,7 +187,7 @@ PACKS = {
     },
 
     # ── Tier 6 — Heaven's Fortune (9+ lotuses + radiant halo) ───────────────
-    "blood_lotus_6480": {
+    "blood_lotus_6": {
         "size": (128, 128),
         "desc": (
             "Nine Blood Lotus blooms — one prominent centerpiece bloom slightly larger than the others, "
@@ -303,7 +303,7 @@ def run_finalize(pack_id, cand_n):
     print(f"  Saved {img.size[0]}x{img.size[1]} RGBA → {out_path}")
 
     # Tier 1 is ALSO the canonical currency icon — mirror to blood_lotus.png
-    if pack_id == "blood_lotus_60":
+    if pack_id == "blood_lotus_1":
         mirror = OUT_DIR / "blood_lotus.png"
         img.save(str(mirror))
         print(f"  Also wrote currency icon → {mirror}")

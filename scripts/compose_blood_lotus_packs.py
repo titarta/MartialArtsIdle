@@ -3,7 +3,7 @@ compose_blood_lotus_packs.py — Build pack icons from copies of the ORIGINAL
 blood lotus instead of letting the AI redesign each one.
 
 Reads: public/sprites/items/blood_lotus.png
-Writes: public/sprites/items/blood_lotus_{60,330,980,1980,3280,6480}.png
+Writes: public/sprites/items/blood_lotus_{1,2,3,4,5,6}.png
 
 Each tier composites N scaled copies of the original lotus onto a transparent
 canvas, with slight rotation and back-to-front layering so the cluster reads
@@ -46,14 +46,14 @@ CANVAS = 144
 #   glow_alpha:   peak alpha of the glow (0-255)
 #   glow_blur:    Gaussian blur radius applied to soften the glow edges
 TIERS = {
-    "blood_lotus_60": dict(
+    "blood_lotus_1": dict(
         scale=1.00,
         placements=[
             (0, 0, 0),
         ],
         glow_color=None,
     ),
-    "blood_lotus_330": dict(
+    "blood_lotus_2": dict(
         scale=0.78,
         placements=[
             (-20, -2, -8),   # left, slightly back
@@ -61,7 +61,7 @@ TIERS = {
         ],
         glow_color=None,  # count alone is enough
     ),
-    "blood_lotus_980": dict(
+    "blood_lotus_3": dict(
         scale=0.62,
         placements=[
             (-26,  14, -6),  # bottom-left
@@ -70,7 +70,7 @@ TIERS = {
         ],
         glow_color=None,  # count alone is enough
     ),
-    "blood_lotus_1980": dict(
+    "blood_lotus_4": dict(
         scale=0.55,
         placements=[
             (  0, -28, -4),  # top
@@ -83,7 +83,7 @@ TIERS = {
         glow_alpha=80,
         glow_blur=10,
     ),
-    "blood_lotus_3280": dict(
+    "blood_lotus_5": dict(
         scale=0.48,
         placements=[
             (-28, -28, -10), # back-left
@@ -97,7 +97,7 @@ TIERS = {
         glow_alpha=100,
         glow_blur=12,
     ),
-    "blood_lotus_6480": dict(
+    "blood_lotus_6": dict(
         scale=0.42,
         placements=[
             # Hex ring around centre (6 around + 1 centre)

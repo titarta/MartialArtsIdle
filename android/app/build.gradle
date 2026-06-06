@@ -13,8 +13,8 @@ android {
         applicationId "com.martialartsidle.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.0.7"
+        versionCode 10
+        versionName "1.0.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // Native ABIs included in the AAB. Google Play distributes only the
         // matching ABI to each device, so total user download stays small.
@@ -37,6 +37,16 @@ android {
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
                 keyPassword keystoreProperties['keyPassword']
+                // 2026-06-04: APK Signature Scheme v1 (JAR signing) was off
+                // by default in newer AGP. BlueStacks + several Android
+                // emulators fall back to v1 verification and refuse to
+                // install a v2-only APK with a generic "could not be
+                // installed" error. Turning v1 + v2 + v3 all on makes the
+                // APK installable on every host from Android 7 onward.
+                // (Play Store doesn't care — it accepts v2+ for AAB upload.)
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
             }
         }
     }

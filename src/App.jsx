@@ -160,7 +160,7 @@ function AppInner() {
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { initAnalytics(); }, []);
-  useEffect(() => { initIAP(); }, []);        // RevenueCat IAP — no-op on non-native / empty key
+  useEffect(() => { initIAP(); }, []);        // RevenueCat IAP: no-op on non-native / empty key
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
   useEffect(() => { applyGraphics(loadGraphics()); }, []);
 

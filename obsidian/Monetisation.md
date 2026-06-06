@@ -19,6 +19,15 @@ Ad network: **AdMob** (`@capacitor-community/admob`) — native Android/iOS only
 
 ---
 
+## Blood Lotus IAP (premium currency)
+
+Six consumable Blood Lotus packs ($0.99 → $99.99) sold via **RevenueCat** (`@revenuecat/purchases-capacitor`) on native Android/iOS. Code path is wired and live; going live needs the RevenueCat project + Play Console products + a signed testing build.
+
+- Browser/Steam/Electron currently grant Blood Lotus **for free** (simulated purchase). This is intentional debug/demo behaviour for now.
+- Full setup steps, product IDs, and gotchas: [[IAP-Setup]].
+
+---
+
 ## Future (post-launch, after D7 retention verified)
 
 - Reveal Fortune: re-roll law (ad)

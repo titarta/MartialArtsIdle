@@ -24,12 +24,12 @@ const BASE = import.meta.env.BASE_URL;
  *              hero   → full-width premium card with shimmer (T6 only)
  */
 const TIER_META = {
-  blood_lotus_60:   { rank: 1, badge: null,         tone: 'bronze',  layout: 'small'  },
-  blood_lotus_330:  { rank: 2, badge: 'Popular',    tone: 'bronze',  layout: 'small'  },
-  blood_lotus_980:  { rank: 3, badge: null,         tone: 'silver',  layout: 'small'  },
-  blood_lotus_1980: { rank: 4, badge: 'Big Saver',  tone: 'silver',  layout: 'small'  },
-  blood_lotus_3280: { rank: 5, badge: 'Mega Value', tone: 'gold',    layout: 'banner' },
-  blood_lotus_6480: { rank: 6, badge: 'Best Value', tone: 'radiant', layout: 'hero'   },
+  blood_lotus_1: { rank: 1, badge: null,         tone: 'bronze',  layout: 'small'  },
+  blood_lotus_2: { rank: 2, badge: 'Popular',    tone: 'bronze',  layout: 'small'  },
+  blood_lotus_3: { rank: 3, badge: null,         tone: 'silver',  layout: 'small'  },
+  blood_lotus_4: { rank: 4, badge: 'Big Saver',  tone: 'silver',  layout: 'small'  },
+  blood_lotus_5: { rank: 5, badge: 'Mega Value', tone: 'gold',    layout: 'banner' },
+  blood_lotus_6: { rank: 6, badge: 'Best Value', tone: 'radiant', layout: 'hero'   },
 };
 
 /** $4.99 → 4.99 */

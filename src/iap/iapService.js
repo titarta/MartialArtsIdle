@@ -1,5 +1,5 @@
 // SKU IDs must match exactly what you create in Google Play Console / App Store Connect:
-//   blood_lotus_60, blood_lotus_330, blood_lotus_980, blood_lotus_1980, blood_lotus_3280, blood_lotus_6480
+//   blood_lotus_1, blood_lotus_2, blood_lotus_3, blood_lotus_4, blood_lotus_5, blood_lotus_6
 
 import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
@@ -32,10 +32,22 @@ export async function getProducts(productIds) {
 
 export async function purchaseProduct(productId) {
   if (!Capacitor.isNativePlatform()) {
-    // Web/dev fallback — simulate success so you can test the UI flow
-    console.warn('IAP: not on native platform, simulating purchase of', productId);
+    // Non-native targets (browser deployment, Electron/Steam): no real billing
+    // is wired. We INTENTIONALLY simulate success so the shop fully works for
+    // debug / demo. The caller then grants the Blood Lotus for free. Real
+    // money only ever flows through the native Android/iOS path below
+    // (RevenueCat). Do NOT gate this behind DEV: the deployed web build is
+    // meant to allow free unlocks for now.
+    console.warn('IAP: non-native platform, simulating free purchase of', productId);
     return { simulated: true, productId };
   }
+
+  // Guarantee RevenueCat is configured before any store call. initIAP() is
+  // idempotent (no-ops once configured), so this covers the case where the
+  // boot-time init has not finished yet or the user tapped Buy very early.
+  // Without it, an early tap surfaces RevenueCat's "Purchases must be
+  // configured before calling" error.
+  await initIAP();
 
   const { products } = await Purchases.getProducts({ productIdentifiers: [productId] });
   if (!products.length) throw new Error(`Product not found: ${productId}`);
