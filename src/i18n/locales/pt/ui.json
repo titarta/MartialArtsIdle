@@ -14,15 +14,32 @@
   },
 
   "nav": {
-    "home":        "Início",
-    "cultivation": "Seita",
-    "journey":     "Jornada",
-    "worlds":      "Mundos",
-    "equip":       "Equipar",
-    "items":       "Itens",
-    "craft":       "Criar",
-    "stats":       "Atributos",
-    "config":      "Config"
+    "home":          "Início",
+    "cultivation":   "Seita",
+    "journey":       "Jornada",
+    "worlds":        "Mundos",
+    "character":     "Personagem",
+    "collection":    "Coleção",
+    "craft":         "Criar",
+    "reincarnation": "Renascimento",
+    "config":        "Config"
+  },
+
+  "character": {
+    "title":           "Personagem",
+    "tabEquip":        "Equipar",
+    "tabStats":        "Atributos",
+    "tabPerks":        "Vantagens",
+    "perksEmptyTitle": "Sem Vantagens Ainda",
+    "perksEmptyDesc":  "Vantagens são recompensas obtidas a cada avanço de nível e avanço de reino. Elas aparecerão aqui assim que você ganhar algumas."
+  },
+
+  "collection": {
+    "title":          "Coleção",
+    "upgradeLevel":   "Melhorar",
+    "upgradeCost":    "Custo do próximo nível",
+    "upgradeBtn":     "Melhorar +1",
+    "upgradeMaxed":   "Totalmente melhorado"
   },
 
   "home": {
@@ -38,10 +55,16 @@
   },
 
   "offlineModal": {
-    "title":         "Bem-vindo de Volta",
-    "message":       "Enquanto você estava fora, os céus continuaram a nutrir sua fundação.",
-    "collect":       "Coletar",
-    "collectDouble": "✦ Ver Anúncio — Coletar ×2"
+    "eyebrow":        "Retornou da Reclusão",
+    "title":          "Bem-vindo de Volta, Cultivador",
+    "message":        "Enquanto você estava fora, os céus continuaram a nutrir sua fundação.",
+    "durationSuffix": "de Prática Silenciosa",
+    "qiLabel":        "Qi Acumulado",
+    "qiUnit":         "Qi",
+    "collect":        "Coletar",
+    "watch":          "Assistir",
+    "collectDouble":  "Ver Anúncio — Coletar ×2",
+    "footerNote":     "Sua seita cultivou em silêncio enquanto você descansava."
   },
 
   "settings": {
@@ -275,17 +298,19 @@
   },
 
   "statNames": {
-    "physical_damage":  "Dano Físico",
-    "elemental_damage": "Dano Elemental",
-    "defense":          "Defesa",
-    "elemental_defense":"Defesa Elemental",
-    "health":           "Vida",
-    "essence":          "Essência",
-    "soul":             "Alma",
-    "body":             "Corpo",
-    "exploit_chance":   "Chance de Exploração",
-    "exploit_mult":     "Multiplicador de Exploração",
-    "cultivation_speed":"Velocidade de Cultivo",
+    "physical_damage":           "Dano Físico",
+    "elemental_damage":          "Dano Elemental",
+    "defense":                   "Defesa",
+    "elemental_defense":         "Defesa Elemental",
+    "health":                    "Vida",
+    "essence":                   "Essência",
+    "soul":                      "Alma",
+    "body":                      "Corpo",
+    "exploit_chance":            "Chance de Exploração",
+    "exploit_mult":              "Multiplicador de Exploração",
+    "defense_penetration":       "Penetração de Defesa",
+    "incoming_damage_reduction": "Redução de Dano Recebido",
+    "cultivation_speed":         "Velocidade de Cultivo",
     "essence_mult":     "Multiplicador de Essência",
     "soul_mult":        "Multiplicador de Alma",
     "body_mult":        "Multiplicador de Corpo",
@@ -298,17 +323,19 @@
   },
 
   "statNamesShort": {
-    "physical_damage":  "Dano Físico",
-    "elemental_damage": "Dano Elemental",
-    "defense":          "Defesa",
-    "elemental_defense":"Defesa Elemental",
-    "health":           "Vida",
-    "essence":          "Essência",
-    "soul":             "Alma",
-    "body":             "Corpo",
-    "exploit_chance":   "Chance de Exploração",
-    "exploit_mult":     "Multiplicador de Exploração",
-    "cultivation_speed":"Velocidade de Cultivo",
+    "physical_damage":           "Dano Físico",
+    "elemental_damage":          "Dano Elemental",
+    "defense":                   "Defesa",
+    "elemental_defense":         "Defesa Elemental",
+    "health":                    "Vida",
+    "essence":                   "Essência",
+    "soul":                      "Alma",
+    "body":                      "Corpo",
+    "exploit_chance":            "Chance de Exploração",
+    "exploit_mult":              "Mult. Exploração",
+    "defense_penetration":       "Pen. Defesa",
+    "incoming_damage_reduction": "Red. Dano",
+    "cultivation_speed":         "Velocidade de Cultivo",
     "essence_mult":     "Multiplicador de Essência",
     "soul_mult":        "Multiplicador de Alma",
     "body_mult":        "Multiplicador de Corpo",

@@ -1,1 +1,689 @@
-{}
+{
+  "realms": {
+    "Tempered Body": "Cuerpo Templado",
+    "Qi Transformation": "Transformación del Qi",
+    "True Element": "Elemento Verdadero",
+    "Separation & Reunion": "Separación y Reunión",
+    "Immortal Ascension": "Ascensión Inmortal",
+    "Saint": "Santo",
+    "Saint King": "Rey Santo",
+    "Origin Returning": "Retorno al Origen",
+    "Origin King": "Rey del Origen",
+    "Void King": "Rey del Vacío",
+    "Dao Source": "Fuente del Dao",
+    "Emperor Realm": "Reino del Emperador",
+    "Open Heaven": "Cielo Abierto"
+  },
+  "stages": {
+    "Layer 1": "Capa 1",
+    "Layer 2": "Capa 2",
+    "Layer 3": "Capa 3",
+    "Layer 4": "Capa 4",
+    "Layer 5": "Capa 5",
+    "Layer 6": "Capa 6",
+    "Layer 7": "Capa 7",
+    "Layer 8": "Capa 8",
+    "Layer 9": "Capa 9",
+    "Layer 10": "Capa 10",
+    "Early Stage": "Etapa Temprana",
+    "Middle Stage": "Etapa Media",
+    "Late Stage": "Etapa Tardía",
+    "Peak Stage": "Etapa Cumbre",
+    "1st Stage": "1.ª Etapa",
+    "2nd Stage": "2.ª Etapa",
+    "3rd Stage": "3.ª Etapa"
+  },
+  "worlds": {
+    "1": {
+      "name": "Las Tierras Mortales",
+      "realms": "Cuerpo Templado → Elemento Verdadero",
+      "description": "Un recinto de secta neblinoso enmarcado por una ceremoniosa puerta roja y dorada, pilares de piedra inscritos y desgastadas estatuas guardianas. Bosquecillos de bambú se elevan más allá de los campos de entrenamiento y pálidas montañas se disuelven en niebla perpetua. El aire lleva el olor a polvo de tiza y Qi residual de años de práctica de discípulos."
+    },
+    "2": {
+      "name": "La Frontera Ancestral",
+      "realms": "Separación y Reunión → Ascensión Inmortal",
+      "description": "Un vasto páramo de tierra anaranjada agrietada, cocida hasta adquirir la textura de cerámica antigua. Arcos de piedra derrumbados y estructuras de portales en ruinas sobresalen del suelo desértico junto a enormes restos óseos blanqueados. Un enorme caldero corroído descansa en el corazón de las ruinas, la única estructura que permanece intacta en un paisaje por lo demás muerto."
+    },
+    "3": {
+      "name": "Las Tierras Prohibidas",
+      "realms": "Santo → Rey Santo",
+      "description": "Un corredor de piedra prohibido flanqueado por antiguas estatuas guardianas, cuyos ojos arden con fría llama espiritual verde. Más allá de las filas de centinelas, un oscuro palacio se cierne con antorchas de luz verde ardiendo en su umbral sellado. El aire está inmóvil y pesado con el Qi de los que murieron hace mucho, el silencio roto únicamente por la lejana resonancia de antiguos sellos de guerra."
+    },
+    "4": {
+      "name": "Las Profundidades del Origen",
+      "realms": "Retorno al Origen → Rey del Origen",
+      "description": "Una vasta caverna subterránea iluminada por dos pilares de piedra con cabezas de dragón que flanquean una cascada que cae en un resplandeciente estanque de Qi del origen. Formaciones de cristal verde azulado se agrupan por las paredes de la cueva, proyectando luz fresca en la oscuridad. Antiguas raíces retorcidas descienden del techo muy por encima, y el aire está saturado de la abrumadora presión de la energía primordial de la tierra."
+    },
+    "5": {
+      "name": "El Mar del Vacío",
+      "realms": "Rey del Vacío → Reino del Emperador",
+      "description": "Una extensión fracturada del vacío bajo un cielo de magenta profundo, hendido por grietas de energía irregulares y tabletas flotantes de inscripciones del Dao. Una solitaria puerta de piedra se alza sobre un suelo que se desmorona en el horizonte, y un símbolo yin-yang flota sobre todo en un silencio cargado. El suelo está agrietado como arcilla vieja, la única superficie sólida en un espacio que se deshace constantemente por sus bordes."
+    },
+    "6": {
+      "name": "El Cielo Abierto",
+      "realms": "Cielo Abierto Capa 1 → Cielo Abierto Capa 6",
+      "description": "Un reino ilimitado de Cielo Abierto de cegador oro y blanco, donde enormes pilares cubiertos de inscripciones se elevan desde un suelo celestial sin costuras hacia bancos de nubes que se extienden hasta el infinito. Grullas se deslizan silenciosamente a través de la neblina radiante entre los pilares. La presión ambiental por sí sola es suficiente para obliterar cualquier cosa que no haya alcanzado el umbral del Cielo Abierto."
+    }
+  },
+  "regions": {
+    "Outer Sect Training Grounds": "Campos de Entrenamiento de la Secta Exterior",
+    "Borderland Wilds": "Tierras Fronterizas Salvajes",
+    "Bandit's Crossing": "Cruce de los Bandidos",
+    "Qi-Vein Ravines": "Barrancos de Venas de Qi",
+    "Misty Spirit Forest": "Bosque Espiritual Neblinoso",
+    "Shattered Sky Desert": "Desierto del Cielo Roto",
+    "Demon Beast Plains": "Llanuras de las Bestias Demoníacas",
+    "Sunken Immortal City": "Ciudad Inmortal Hundida",
+    "Blood Sea Wastes": "Páramos del Mar de Sangre",
+    "Saint Burial Grounds": "Tierras de Sepultura de los Santos",
+    "Void Rift Expanse": "Extensión de Grietas del Vacío",
+    "Nine-Death Mountain Range": "Cordillera de las Nueve Muertes",
+    "Sealed War Altar": "Altar de Guerra Sellado",
+    "Origin Qi Spring Depths": "Profundidades del Manantial de Qi del Origen",
+    "World Root Caverns": "Cavernas de la Raíz del Mundo",
+    "Ancient Root Grotto": "Gruta de la Raíz Ancestral",
+    "Primordial Forest Core": "Núcleo del Bosque Primordial",
+    "Ancient Origin Altar": "Altar del Origen Ancestral",
+    "Fractured Space Corridors": "Corredores del Espacio Fracturado",
+    "Void Sea Shores": "Orillas del Mar del Vacío",
+    "Dao Inscription Ruins": "Ruinas de Inscripciones del Dao",
+    "Ancient Emperor Tomb": "Tumba del Emperador Ancestral",
+    "Heaven Sword Ridge": "Cresta de la Espada Celestial",
+    "Heaven Pillar Ascent": "Ascenso al Pilar Celestial",
+    "Star Sea Approaches": "Aproximaciones al Mar Estelar",
+    "Celestial Rift Expanse": "Extensión de la Grieta Celestial",
+    "Heaven's Core": "Núcleo del Cielo"
+  },
+  "enemies": {
+    "outer_sect_disciple": {
+      "name": "Discípulo de la Secta Exterior",
+      "description": "Un joven cultivador con una sencilla túnica blanca de entrenamiento, empuñando una básica espada de madera con posturas torpes pero entusiastas."
+    },
+    "training_golem": {
+      "name": "Gólem de Entrenamiento",
+      "description": "Un autómata rechoncho de arcilla y hierro estampado con sellos de la secta, construido para la durabilidad más que el daño: sus puños son esferas de hierro sin filo."
+    },
+    "wolf": {
+      "name": "Lobo de Manada",
+      "description": "Un lobo delgado de pelaje gris con ojos débilmente luminosos, lo que sugiere una menor absorción de Qi tras años de deambular por una naturaleza rica en espíritu."
+    },
+    "bandit_scout": {
+      "name": "Explorador Bandido",
+      "description": "Un luchador fibroso con armadura de patchwork tosco, portando una hoja corta y moviéndose con el sigilo practicado de alguien que sobrevive por emboscada."
+    },
+    "wandering_beast": {
+      "name": "Bestia Errante",
+      "description": "Una gran bestia peluda de cuatro extremidades sin territorio fijo, su pelaje marcado por cicatrices de años de deambular por peligrosas tierras salvajes."
+    },
+    "rogue_disciple": {
+      "name": "Discípulo Renegado",
+      "description": "Un antiguo miembro de la secta con una túnica de cultivación andrajosa y manchada, portando las cicatrices de técnicas de Qi prohibidas y el aspecto de alguien que no tiene nada que perder."
+    },
+    "iron_fang_wolf": {
+      "name": "Lobo de Colmillo de Hierro",
+      "description": "Un lobo enorme con colmillos de densidad férrea y un pelaje endurecido por años de absorción de Qi mineral al vagar por las antiguas llanuras."
+    },
+    "iron_spine_boar": {
+      "name": "Jabalí de Espina de Hierro",
+      "description": "Un jabalí rechoncho y agresivo cuyas púas dorsales se han calcificado en espinas duras como el hierro tras pacer en tierras planas ricas en minerales. Carga de cabeza con fuerza imprudente."
+    },
+    "sand_dragon": {
+      "name": "Dragón de Arena",
+      "description": "Un dragón serpentino con escamas blanqueadas por el sol y afiladas como cuchillas que fluye por las arenas del desierto como el agua. Embosca a sus presas brotando desde abajo, arrastrando una lluvia de arena."
+    },
+    "bone_construct": {
+      "name": "Constructo de Huesos",
+      "description": "Una máquina de guerra animada ensamblada a partir de los huesos fusionados de inmortales caídos, unidos por Qi de batalla residual y sellos de array oxidados. Se encuentra dondequiera que los muertos antiguos pueblan la tierra."
+    },
+    "city_guardian": {
+      "name": "Constructo Guardián de la Ciudad",
+      "description": "Un imponente constructo humanoide de hierro negro y jade que lleva el escudo de la Ciudad Inmortal Hundida, aún patrullando fielmente los pasillos inundados de su cargo hace mucho tiempo muerto."
+    },
+    "immortal_shade": {
+      "name": "Sombra Inmortal Atrapada",
+      "description": "El remanente espectral de un cultivador inmortal atrapado cuando la ciudad se hundió bajo la tierra. Su forma parpadea entre sólida y fantasmal, ligada eternamente por un voto inacabado."
+    },
+    "corrupted_cultivator": {
+      "name": "Cultivador Corrompido",
+      "description": "Un antiguo discípulo de la secta cuya cultivación del Qi devoró su cordura. Su túnica está destrozada, sus meridianos visiblemente ennegrecidos bajo la piel, sus ojos vacíos de locura por el Qi."
+    },
+    "blood_leviathan": {
+      "name": "Leviatán del Mar de Sangre",
+      "description": "Una bestia marina colosal cuyas escamas se han vuelto carmesí profundo tras siglos alimentándose en el Mar de Sangre. Arrastra vapores rojos cáusticos al moverse y golpea con toda su masa."
+    },
+    "burial_guardian": {
+      "name": "Guardián de la Sepultura",
+      "description": "Un enorme soldado acorazado cuya alma fue ligada a las tierras de sepultura como centinela eterno. Su antigua armadura es ornamentada pero corroída, y se mueve con la inmovilidad antinatural de algo que no ha descansado en siglos."
+    },
+    "saint_corpse_soldier": {
+      "name": "Soldado-Cadáver Santo",
+      "description": "El cadáver perfectamente conservado de un guerrero del reino Santo, aún con armadura de batalla y aferrando su arma en una presa de muerte. Los sellos de juramento brillan en su pecho, impulsándolo hacia adelante sin importar el daño recibido."
+    },
+    "void_rift_predator": {
+      "name": "Depredador de Grieta del Vacío",
+      "description": "Una criatura nacida dentro de las grietas del vacío, cuyo cuerpo está parcialmente desfasado entre dimensiones. Golpea desde ángulos inesperados al deslizarse entre el espacio sólido y el vacío."
+    },
+    "rift_stalker": {
+      "name": "Acechador de la Grieta",
+      "description": "Un depredador más esbelto y rápido del ecosistema de la grieta. Caza rastreando firmas de Qi a través de los límites dimensionales y tiende emboscadas desde dentro de la grieta misma."
+    },
+    "saint_bone_sovereign": {
+      "name": "Soberano de Hueso Santo",
+      "description": "El esqueleto reanimado de un soberano del reino Santo, con autoridad absoluta sobre el Qi de la muerte. Reclama la cordillera como territorio y comanda a los no-muertos menores desde lo alto de los pasos."
+    },
+    "void_shade": {
+      "name": "Sombra del Vacío",
+      "description": "Una entidad de sombra del vacío que se aferra a los malditos pasos de montaña. No tiene forma física, solo una silueta de energía del vacío concentrada que drena el Qi al contacto."
+    },
+    "forbidden_construct": {
+      "name": "Constructo Prohibido",
+      "description": "Un imponente autómata de guerra sellado dentro del altar durante siglos, manteniendo vigilia sobre las inscripciones selladas. Su activación estaba prohibida, hasta que cruzaste el umbral."
+    },
+    "ancient_war_spirit": {
+      "name": "Espíritu de Guerra Ancestral",
+      "description": "El espíritu ligado de un guerrero sellado en el altar durante una guerra ancestral. Aún aferrando la causa por la que murió, su furia no ha sido apagada por los siglos."
+    },
+    "origin_guardian": {
+      "name": "Guardián del Origen",
+      "description": "Un enorme humanoide formado a partir de Qi del origen comprimido, permanentemente apostado en la entrada de las profundidades. Su cuerpo irradia aplastante presión primordial con cada paso."
+    },
+    "origin_crystal_golem": {
+      "name": "Gólem de Cristal del Origen",
+      "description": "Un gólem construido a partir de formaciones de cristal que crecieron dentro del manantial de Qi del origen. Sus golpes liberan ráfagas de energía primordial cruda de los cristales incrustados en sus puños."
+    },
+    "primordial_serpent": {
+      "name": "Serpiente Primordial",
+      "description": "Una enorme serpiente que ha cazado en las Cavernas de la Raíz del Mundo desde la era anterior a los registros. Sus escamas se han endurecido hasta la densidad de piedra del mundo a lo largo de milenios de absorción mineral."
+    },
+    "cavern_elder_demon": {
+      "name": "Demonio Anciano de la Caverna",
+      "description": "Un demonio que se ha fusionado con la caverna a lo largo de incontables siglos, cuyo cuerpo está parcialmente hecho de piedra y raíces. Apenas se distingue de las paredes de la cueva hasta que se mueve."
+    },
+    "forest_spirit": {
+      "name": "Espíritu del Bosque",
+      "description": "Un espíritu luminoso que se desplaza por los huecos de las raíces, atraído por la concentrada energía del mundo en las raíces ancestrales. Normalmente pasivo, peligroso cuando se le perturba."
+    },
+    "root_sovereign": {
+      "name": "Soberano de las Raíces",
+      "description": "La fuerza dominante de la red de raíces, una entidad masiva cuyo cuerpo está tejido con las raíces más gruesas del árbol del mundo. Territorial en extremo, considera a todos los intrusos como parásitos."
+    },
+    "ancient_beast": {
+      "name": "Bestia Ancestral",
+      "description": "Una bestia tan antigua que precede a la era actual de la cultivación. Sus instintos están afilados a la perfección y su cuerpo lleva el peso de cien mil años de supervivencia."
+    },
+    "world_root_wraith": {
+      "name": "Espectro de la Raíz del Mundo",
+      "description": "Un guardián etéreo manifestado desde la fuerza vital de las raíces del árbol del mundo. Se faza a través de la red de raíces para interceptar cualquier cosa que amenace el núcleo del bosque."
+    },
+    "deep_earth_titan": {
+      "name": "Titán de la Tierra Profunda",
+      "description": "El único guardián del Altar del Origen Ancestral, una entidad de tal masa que sus pisadas agrietan el lecho de roca. Ninguna otra criatura sobrevive dentro del alcance de su campo de presión."
+    },
+    "spatial_fissure_beast": {
+      "name": "Bestia de Fisura Espacial",
+      "description": "Una criatura nativa de los corredores del espacio fracturado, cuyo cuerpo está adaptado para existir en dimensiones parcialmente colapsadas. Usa las fisuras como terreno de caza."
+    },
+    "qi_beast": {
+      "name": "Bestia Sensora de Qi",
+      "description": "Un depredador adaptado al vacío que caza exclusivamente por firma de Qi. Ciego al camuflaje físico, puede rastrear a un cultivador a través de los límites dimensionales."
+    },
+    "void_elemental": {
+      "name": "Elemental del Vacío",
+      "description": "Una manifestación pura de energía del vacío que se coagulóen los corredores fracturados. No tiene cuerpo, solo una masa concentrada de fuerza negadora."
+    },
+    "void_sea_leviathan": {
+      "name": "Leviatán del Mar del Vacío",
+      "description": "Una bestia marina titánica que se ha adaptado a la ausencia de agua del mar del vacío, nadando a través de energía espacial pura. Su masa es tan grande que empuja los límites dimensionales a un lado."
+    },
+    "dao_inscription_guardian": {
+      "name": "Guardián de Inscripciones del Dao",
+      "description": "Un constructo ligado a las ruinas por arrays de inscripción, manteniendo eternamente las tabletas del Dao que fue construido para proteger. Ataca a cualquier cosa que interfiera con las inscripciones."
+    },
+    "dao_inscription_revenant": {
+      "name": "Espectro de Inscripciones del Dao",
+      "description": "El remanente de un estudioso que murió intentando descifrar las tabletas del Dao. Su conciencia fue absorbida en los arrays de inscripción y ahora sirve como guardián agresivo."
+    },
+    "emperor_will_fragment": {
+      "name": "Fragmento de Voluntad Imperial",
+      "description": "Un fragmento de la voluntad moribunda de un antiguo emperador, que aún lleva suficiente autoridad para manifestarse como una fuerza semi-física. Ataca a los intrusos reflexivamente, protegiendo la tumba por instinto."
+    },
+    "petrified_dao_lord": {
+      "name": "Señor del Dao Petrificado",
+      "description": "Un Señor del Dao sellado dentro de la tumba del emperador como última línea de defensa. Su cuerpo se ha vuelto piedra pero su comprensión del Dao permanece intacta; lucha con principio puro."
+    },
+    "star_sea_drifter": {
+      "name": "Errante del Mar Estelar",
+      "description": "Una entidad arrastrada desde el mar estelar por la catastrófica convergencia del Dao en la Cresta de la Espada Celestial. Caza solo, desorientado y agresivo, lejos de su vacío natal."
+    },
+    "heaven_pillar_guardian": {
+      "name": "Guardián del Pilar Celestial",
+      "description": "Un centinela celestial ligado a los pilares de inscripción del reino del Cielo Abierto, manteniendo el límite entre reinos. No negocia el paso."
+    },
+    "boundary_wraith": {
+      "name": "Espectro del Límite",
+      "description": "Un espectro formado de la presión espiritual residual de los límites del reino. Se desplaza en el umbral del Cielo Abierto, acechando a los cultivadores que se demoran en el ascenso."
+    },
+    "open_heaven_beast": {
+      "name": "Bestia del Cielo Abierto",
+      "description": "Una bestia nativa del reino del Cielo Abierto, cuyo cuerpo está saturado desde el nacimiento con Qi de grado celestial. Incluso su estado de reposo ejerce una presión comparable a la de un cultivador en el Pico del Reino del Emperador."
+    },
+    "star_sea_leviathan": {
+      "name": "Leviatán del Mar Estelar",
+      "description": "Un leviatán del mar estelar que ha entrado en el reino del Cielo Abierto a través de un límite colapsado. Su escala empequeñece todo lo del mundo mortal."
+    },
+    "celestial_sovereign": {
+      "name": "Soberano Celestial",
+      "description": "Un soberano del reino del Cielo Abierto, que gobierna un dominio de la Grieta Celestial. Su autoridad sobre la energía espacial es absoluta dentro de su territorio."
+    },
+    "eternal_storm_titan": {
+      "name": "Titán de la Tormenta Eterna",
+      "description": "Una fuerza natural dotada de forma por las tormentas perpetuas de la grieta. No tiene conciencia, solo la interminable energía violenta del clima celestial hecho manifiesto."
+    },
+    "open_heaven_sovereign": {
+      "name": "Soberano del Cielo Abierto",
+      "description": "El soberano supremo del reino del Cielo Abierto, con una comprensión del Dao más allá de todo lo alcanzable en el mundo mortal. Encontrarlo es la prueba final de la ascensión."
+    },
+    "void_apex_predator": {
+      "name": "Depredador Supremo del Vacío",
+      "description": "El depredador último del vacío, habiendo sobrevivido al colapso de múltiples reinos. Caza soberanos celestiales por deporte y considera a los cultivadores ascendentes como presa."
+    }
+  },
+  "items": {
+    "iron_herb_1": {
+      "name": "Hierba de los Terrenos de la Secta",
+      "desc": "Una mala hierba que crece dondequiera que los cultivadores mortales entrenan, absorbiendo el Qi residual de los terrenos de la secta."
+    },
+    "iron_herb_2": {
+      "name": "Raíz Fronteriza",
+      "desc": "Una raíz retorcida encontrada en la naturaleza fronteriza, atraída por la débil energía espiritual del suelo."
+    },
+    "bronze_herb_1": {
+      "name": "Enredadera de Venas de Qi",
+      "desc": "Una enredadera trepadora que crece a lo largo de las venas de Qi subterráneas, sus hojas débilmente luminiscentes."
+    },
+    "bronze_herb_2": {
+      "name": "Flor del Bosque Espiritual",
+      "desc": "Una pálida flor que florece únicamente en el Bosque Espiritual Neblinoso, polinizada por espíritus del bosque."
+    },
+    "silver_herb_1": {
+      "name": "Loto del Cielo Roto",
+      "desc": "Un loto plateado que sobrevive en las ruinas del Desierto del Cielo Roto, extrayendo agua de profundas líneas ley."
+    },
+    "silver_herb_2": {
+      "name": "Caña del Mar de Sangre",
+      "desc": "Una caña rojo sangre que crece en los bordes del mar de sangre, cuya savia es espesa con vitalidad corrompida."
+    },
+    "gold_herb_1": {
+      "name": "Loto de Sepultura Santo",
+      "desc": "Un loto oscuro que florece únicamente sobre lugares de sepultura de grado santo, alimentándose de siglos de Qi de muerte."
+    },
+    "gold_herb_2": {
+      "name": "Enredadera de Espinas del Vacío",
+      "desc": "Una enredadera espinosa que crece a través de grietas del vacío, cuyas púas son lo suficientemente afiladas como para atravesar defensas de grado santo."
+    },
+    "transcendent_herb_1": {
+      "name": "Pétalo del Manantial del Origen",
+      "desc": "Un pétalo desprendido de flores que crecen en los manantiales de Qi del origen del mundo, saturado de energía primordial."
+    },
+    "transcendent_herb_2": {
+      "name": "Enredadera del Cielo Abierto",
+      "desc": "Una legendaria enredadera cuyas raíces se extienden hasta el propio reino del Cielo Abierto, canalizando energía de grado celestial."
+    },
+    "iron_mineral_1": {
+      "name": "Fragmento de Hierro de la Secta",
+      "desc": "Un fragmento de material de grado hierro desprendido de constructos de la secta, equipo de entrenamiento y el hierro de los cultivadores mortales."
+    },
+    "iron_mineral_2": {
+      "name": "Fragmento de Vena de Hierro",
+      "desc": "Un denso fragmento de mineral de hierro extraído de venas poco profundas, usado en transmutación básica."
+    },
+    "bronze_mineral_1": {
+      "name": "Colmillo de Qi",
+      "desc": "Un colmillo o fragmento de espina de una bestia que se volvió densa en minerales tras años de absorber Qi de la tierra."
+    },
+    "bronze_mineral_2": {
+      "name": "Núcleo de Madera Espiritual",
+      "desc": "El núcleo endurecido de una entidad espiritual o árbol ancestral, impregnado con Qi forestal concentrado."
+    },
+    "silver_mineral_1": {
+      "name": "Escama de Espina de Hierro",
+      "desc": "Una escama o segmento de espina de depredadores de calibre férreo de la antigua frontera, suficientemente densa como para desviar ataques de grado plata."
+    },
+    "silver_mineral_2": {
+      "name": "Jade de Array Inmortal",
+      "desc": "Jade infundido con arrays de formación de ruinas inmortales hundidas, que aún contienen trazas de sus inscripciones originales."
+    },
+    "gold_mineral_1": {
+      "name": "Astilla de Hueso Santo",
+      "desc": "Una astilla de hueso de cadáveres del reino santo, que irradia un frío Qi de muerte que resiste el refinamiento."
+    },
+    "gold_mineral_2": {
+      "name": "Fragmento de Sello Prohibido",
+      "desc": "Un fragmento de los sellos del vacío que una vez contuvieron las Tierras Prohibidas, crepitando con poder contenido."
+    },
+    "transcendent_mineral_1": {
+      "name": "Cristal del Vacío",
+      "desc": "Un cristal cultivado dentro de las grietas del vacío, cuya estructura está formada enteramente por energía del vacío comprimida."
+    },
+    "transcendent_mineral_2": {
+      "name": "Núcleo de Piedra del Mundo",
+      "desc": "Un núcleo de piedra imposiblemente denso formado en los estratos más profundos del mundo o desprendido por titanes del cielo superior, usado únicamente en la transmutación más avanzada."
+    },
+    "iron_cultivation_1": {
+      "name": "Piedra de Qi de Hierro 1",
+      "desc": "Una piedra formada naturalmente que acumula Qi ambiental con el tiempo en los campos de entrenamiento del reino mortal."
+    },
+    "iron_cultivation_2": {
+      "name": "Piedra de Qi de Hierro 2",
+      "desc": "Qi residual que se coagula sobre un cultivador mortal o bestia derrotado, brevemente visible antes de dispersarse."
+    },
+    "bronze_cultivation_1": {
+      "name": "Piedra de Qi de Bronce 1",
+      "desc": "El denso núcleo de Qi encontrado en el centro de una bestia que se ha alimentado de energía espiritual durante años, aún pulsando débilmente tras la muerte."
+    },
+    "bronze_cultivation_2": {
+      "name": "Piedra de Qi de Bronce 2",
+      "desc": "Un fragmento cristalizado de Qi arrancado de un cultivador caído o constructo cuyos canales de energía habían sido corrompidos o destrozados."
+    },
+    "silver_cultivation_1": {
+      "name": "Piedra de Qi de Plata 1",
+      "desc": "El condensado de Qi similar a la médula encontrado en lo profundo de criaturas ancestrales de la frontera, saturado tras siglos de absorción de Qi."
+    },
+    "silver_cultivation_2": {
+      "name": "Piedra de Qi de Plata 2",
+      "desc": "Un fragmento de fuerza del alma que persiste tras la muerte de una entidad de grado inmortal, que aún lleva ecos de su cultivación."
+    },
+    "gold_cultivation_1": {
+      "name": "Piedra de Qi de Oro 1",
+      "desc": "Una reliquia calcificada de Qi del reino santo, recuperada de tierras de sepultura y altares de guerra."
+    },
+    "gold_cultivation_2": {
+      "name": "Piedra de Qi de Oro 2",
+      "desc": "Una pequeña perla formada dentro de depredadores y sombras tocadas por el vacío, que contiene energía de atributo vacío comprimida."
+    },
+    "transcendent_cultivation_1": {
+      "name": "Piedra de Qi Trascendente 1",
+      "desc": "El núcleo de Qi cristalizado de una entidad primordial, condensado a partir de millones de años de cultivación ininterrumpida."
+    },
+    "transcendent_cultivation_2": {
+      "name": "Piedra de Qi Trascendente 2",
+      "desc": "Un cristal de Qi puro de grado celestial extraído de entidades que han ascendido más allá de las limitaciones mortales."
+    },
+    "iron_essence_pill":          { "name": "Píldora de Esencia de Hierro",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_soul_pill":             { "name": "Píldora de Alma de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_body_pill":             { "name": "Píldora de Cuerpo de Hierro",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_fist_pill":             { "name": "Píldora de Puño de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_ember_pill":            { "name": "Píldora de Ascua de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_mind_pill":             { "name": "Píldora de Mente de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_skin_pill":             { "name": "Píldora de Piel de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_ward_pill":             { "name": "Píldora de Guardián de Hierro",         "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_anchor_pill":           { "name": "Píldora de Ancla de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "iron_vigor_pill":            { "name": "Píldora de Vigor de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_essence_pill":        { "name": "Píldora de Esencia de Bronce",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_soul_pill":           { "name": "Píldora de Alma de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_body_pill":           { "name": "Píldora de Cuerpo de Bronce",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_fist_pill":           { "name": "Píldora de Puño de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_ember_pill":          { "name": "Píldora de Ascua de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_mind_pill":           { "name": "Píldora de Mente de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_skin_pill":           { "name": "Píldora de Piel de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_ward_pill":           { "name": "Píldora de Guardián de Bronce",         "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_anchor_pill":         { "name": "Píldora de Ancla de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "bronze_vigor_pill":          { "name": "Píldora de Vigor de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_essence_pill":        { "name": "Píldora de Esencia de Plata",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_soul_pill":           { "name": "Píldora de Alma de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_body_pill":           { "name": "Píldora de Cuerpo de Plata",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_fist_pill":           { "name": "Píldora de Puño de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_ember_pill":          { "name": "Píldora de Ascua de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_mind_pill":           { "name": "Píldora de Mente de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_skin_pill":           { "name": "Píldora de Piel de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_ward_pill":           { "name": "Píldora de Guardián de Plata",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_anchor_pill":         { "name": "Píldora de Ancla de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "silver_vigor_pill":          { "name": "Píldora de Vigor de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_essence_pill":          { "name": "Píldora de Esencia de Oro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_soul_pill":             { "name": "Píldora de Alma de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_body_pill":             { "name": "Píldora de Cuerpo de Oro",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_fist_pill":             { "name": "Píldora de Puño de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_ember_pill":            { "name": "Píldora de Ascua de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_mind_pill":             { "name": "Píldora de Mente de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_skin_pill":             { "name": "Píldora de Piel de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_ward_pill":             { "name": "Píldora de Guardián de Oro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_anchor_pill":           { "name": "Píldora de Ancla de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "gold_vigor_pill":            { "name": "Píldora de Vigor de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
+    "transcendent_essence_pill":  { "name": "Píldora de Esencia Trascendente",       "desc": "Una píldora cultivada que mejora permanentemente las tres estadísticas primarias." },
+    "exploit_mastery_pill":       { "name": "Píldora de Maestría en Explotación",    "desc": "Una píldora cultivada que mejora permanentemente la probabilidad y el daño de explotación." },
+    "world_harvest_pill":         { "name": "Píldora de Cosecha del Mundo",          "desc": "Una píldora cultivada que mejora permanentemente la velocidad y suerte de recolección y minería." },
+    "cataclysm_pill":             { "name": "Píldora del Cataclismo",                "desc": "Una píldora cultivada que mejora permanentemente todos los tipos de daño." },
+    "dao_bulwark_pill":           { "name": "Píldora del Bastión del Dao",           "desc": "Una píldora cultivada que mejora permanentemente todos los tipos de defensa." },
+    "eternal_vigor_pill":         { "name": "Píldora de Vigor Eterno",               "desc": "Una píldora cultivada que otorga permanentemente una cantidad masiva de salud." },
+    "iron_blood_core_1": {
+      "name": "Núcleo de Sangre de Hierro 1",
+      "desc": "Marcador — un denso núcleo de sangre de grado hierro extraído de un enemigo caído."
+    },
+    "iron_blood_core_2": {
+      "name": "Núcleo de Sangre de Hierro 2",
+      "desc": "Marcador — una esencia de sangre cristalizada de grado hierro condensada de cultivadores mortales."
+    },
+    "bronze_blood_core_1": {
+      "name": "Núcleo de Sangre de Bronce 1",
+      "desc": "Marcador — un núcleo de sangre de grado bronce que pulsa con vitalidad bestial."
+    },
+    "bronze_blood_core_2": {
+      "name": "Núcleo de Sangre de Bronce 2",
+      "desc": "Marcador — un fragmento de Qi de sangre de grado bronce condensado de entidades corrompidas."
+    },
+    "silver_blood_core_1": {
+      "name": "Núcleo de Sangre de Plata 1",
+      "desc": "Marcador — un núcleo de sangre de grado plata saturado de vitalidad de la antigua frontera."
+    },
+    "silver_blood_core_2": {
+      "name": "Núcleo de Sangre de Plata 2",
+      "desc": "Marcador — un cristal de sangre remanente de una entidad del reino inmortal."
+    },
+    "gold_blood_core_1": {
+      "name": "Núcleo de Sangre de Oro 1",
+      "desc": "Marcador — un núcleo de sangre de grado santo que irradia frío Qi de muerte."
+    },
+    "gold_blood_core_2": {
+      "name": "Núcleo de Sangre de Oro 2",
+      "desc": "Marcador — una perla de sangre de atributo vacío de un depredador de grado oro."
+    },
+    "transcendent_blood_core_1": {
+      "name": "Núcleo de Sangre Trascendente 1",
+      "desc": "Marcador — un núcleo de sangre primordial condensado de una entidad más allá de las limitaciones mortales."
+    },
+    "transcendent_blood_core_2": {
+      "name": "Núcleo de Sangre Trascendente 2",
+      "desc": "Marcador — un cristal de sangre de grado celestial que irradia presión abrumadora."
+    }
+  },
+  "artefacts": {
+    "iron_sword": {
+      "name": "Espada de Hierro",
+      "desc": "Una sencilla espada de hierro forjada para los discípulos de la secta exterior. Fiable pero sin nada especial."
+    },
+    "spirit_edge_sword": {
+      "name": "Espada de Filo Espiritual",
+      "desc": "Una espada afilada con energía espiritual; la hoja zumba débilmente cuando el Qi fluye a través de ella."
+    },
+    "void_cleaver": {
+      "name": "Cuchilla del Vacío",
+      "desc": "Forjada de piedra del vacío; cada golpe desgarra una minúscula grieta en el tejido espacial local."
+    },
+    "dragon_fang_sword": {
+      "name": "Espada de Colmillo de Dragón",
+      "desc": "Elaborada a partir de un colmillo de bestia dragón; canaliza presión dracónica pura en cada golpe."
+    },
+    "heaven_slaying_sword": {
+      "name": "Espada Destructora del Cielo",
+      "desc": "Una hoja legendaria que se dice ha cortado la barrera entre reinos. El filo nunca se desafila."
+    },
+    "iron_polearm": {
+      "name": "Arma de Asta de Hierro",
+      "desc": "Una pesada arma de asta de hierro preferida por los cultivadores de cuerpo por su alcance y poder de detención."
+    },
+    "serpent_spear": {
+      "name": "Lanza Serpiente",
+      "desc": "Una lanza flexible con punta de diente de serpiente que inyecta un leve veneno espiritual al penetrar."
+    },
+    "mountain_breaker": {
+      "name": "Rompemontañas",
+      "desc": "Una alabarda de cabeza ancha que se dice ha derribado una pequeña montaña espiritual. Pulveriza la defensa física."
+    },
+    "thunder_lance": {
+      "name": "Lanza del Trueno",
+      "desc": "Una lanza recubierta con mineral de rayo comprimido; los golpes detonan con un trueno."
+    },
+    "divine_pillar_spear": {
+      "name": "Lanza del Pilar Divino",
+      "desc": "Antes fue el pilar de un palacio celestial, reformado en lanza. Un empuje a plena potencia desgarra el espacio."
+    },
+    "spirit_headband": {
+      "name": "Banda Espiritual",
+      "desc": "Una sencilla banda de tela imbuida con energía espiritual básica, que ayuda a la concentración durante la cultivación."
+    },
+    "jade_cultivation_crown": {
+      "name": "Corona de Cultivación de Jade",
+      "desc": "Un aro de jade tallado que estabiliza el mar espiritual y reduce la turbulencia del avance."
+    },
+    "ghost_kings_circlet": {
+      "name": "Diadema del Rey Fantasma",
+      "desc": "Forjada de hierro fantasma; atenúa los ataques espirituales y suprime los efectos negativos basados en el alma."
+    },
+    "heaven_forged_war_crown": {
+      "name": "Corona de Guerra Forjada en el Cielo",
+      "desc": "Una corona de batalla fundida en fuego celestial; aumenta enormemente la resistencia al daño elemental."
+    },
+    "crown_of_the_undying": {
+      "name": "Corona del Inmortal",
+      "desc": "Se dice que fue usada por un cultivador del Cielo Abierto; protege el espíritu de ataques letales del alma."
+    },
+    "cotton_spirit_robe": {
+      "name": "Túnica Espiritual de Algodón",
+      "desc": "Túnica ligera tejida con hilo espiritual, proporcionando una circulación de Qi mínima pero constante."
+    },
+    "cloud_silk_battle_vest": {
+      "name": "Chaleco de Batalla de Seda de Nube",
+      "desc": "Un chaleco hilado de seda de nube de gran altitud que desvía golpes físicos y elementales menores."
+    },
+    "dragon_scale_armour": {
+      "name": "Armadura de Escamas de Dragón",
+      "desc": "Escamas desprendidas de una bestia dragón menor; duras como el hierro y resistentes al fuego y los rayos."
+    },
+    "phoenix_feather_war_robe": {
+      "name": "Túnica de Guerra de Plumas de Fénix",
+      "desc": "Tejida con plumón de fénix; regenera el daño menor con el tiempo y resiste el calor extremo."
+    },
+    "heaven_piercing_divine_robe": {
+      "name": "Túnica Divina Perforadora del Cielo",
+      "desc": "Una túnica de grado supremo que alterna entre suavidad y acero; anula los golpes por debajo de un umbral de poder."
+    },
+    "iron_bracers": {
+      "name": "Brazales de Hierro",
+      "desc": "Brazales básicos de hierro que refuerzan los antebrazos y mejoran la estabilidad al bloquear."
+    },
+    "tiger_claw_gauntlets": {
+      "name": "Guanteletes de Garra de Tigre",
+      "desc": "Guanteletes con estilo de garras de tigre; aumenta ligeramente el daño de los golpes desarmados y con arma de asta."
+    },
+    "mithril_bracers": {
+      "name": "Brazales de Mithril",
+      "desc": "Brazales ligeros de mithril que conducen energía elemental a través de cada golpe."
+    },
+    "dragon_vein_gauntlets": {
+      "name": "Guanteletes de Venas de Dragón",
+      "desc": "Guanteletes atravesados con mineral de venas de dragón; canalizan el Qi a través de los brazos a un ritmo notablemente más rápido."
+    },
+    "heaven_palm_guards": {
+      "name": "Guardas de Palma Celestial",
+      "desc": "Antiguas guardas usadas por un gran maestro de técnicas de palma; amplifican dramáticamente las técnicas secretas de palma abierta."
+    },
+    "leather_cultivation_belt": {
+      "name": "Cinturón de Cultivación de Cuero",
+      "desc": "Un resistente cinturón que estabiliza el Dantian y reduce la dispersión del Qi durante el combate."
+    },
+    "spirit_jade_sash": {
+      "name": "Faja de Jade Espiritual",
+      "desc": "Una faja de seda incrustada con cuentas de jade espiritual; mejora la circulación del Qi entre la parte superior e inferior del cuerpo."
+    },
+    "serpent_skin_belt": {
+      "name": "Cinturón de Piel de Serpiente",
+      "desc": "Elaborado con la piel mudada de una serpiente espiritual; aumenta la agilidad y la resistencia al veneno."
+    },
+    "golden_dragon_belt": {
+      "name": "Cinturón del Dragón Dorado",
+      "desc": "Un amplio cinturón en relieve con un dragón enroscado; aumenta enormemente la conversión del atributo Cuerpo."
+    },
+    "void_emperors_sash": {
+      "name": "Faja del Emperador del Vacío",
+      "desc": "Una faja tejida con hilo espacial; absorbe una porción del daño entrante en un bolsillo del vacío."
+    },
+    "wind_step_boots": {
+      "name": "Botas del Paso del Viento",
+      "desc": "Botas ligeras encantadas para un paso veloz; aumenta marginalmente la tasa de esquiva."
+    },
+    "swiftcloud_sandals": {
+      "name": "Sandalias de Nube Veloz",
+      "desc": "Sandalias que llevan una traza de energía de nube; permiten breves ráfagas de movimiento acelerado."
+    },
+    "thunderstep_boots": {
+      "name": "Botas del Paso del Trueno",
+      "desc": "Botas que crepitan con rayos almacenados; cada paso libera una descarga de bajo poder al contacto."
+    },
+    "dragon_treading_boots": {
+      "name": "Botas del Paso del Dragón",
+      "desc": "Forjadas con huesos de bestia dragón; mejora dramáticamente la estabilidad en el suelo y los ataques de pisotón."
+    },
+    "heaven_soaring_sandals": {
+      "name": "Sandalias Voladoras del Cielo",
+      "desc": "Sandalias que se dice permiten al portador caminar sobre el aire; aumentan masivamente la esquiva y las técnicas basadas en el movimiento."
+    },
+    "jade_spirit_pendant": {
+      "name": "Colgante Espiritual de Jade",
+      "desc": "Una pieza de jade pulida usada cerca del corazón; fortalece suavemente el mar espiritual."
+    },
+    "soul_calming_necklace": {
+      "name": "Collar Calmador del Alma",
+      "desc": "Una sarta de cuentas espirituales que suprime las fluctuaciones del alma y los efectos negativos mentales en combate."
+    },
+    "blood_dragon_talisman": {
+      "name": "Talismán del Dragón de Sangre",
+      "desc": "Un talismán de hueso tallado empapado en sangre de bestia dragón; aumenta la resistencia física bruta."
+    },
+    "elemental_core_pendant": {
+      "name": "Colgante de Núcleo Elemental",
+      "desc": "Contiene un núcleo elemental comprimido; amplifica el bono de afinidad elemental."
+    },
+    "heavens_eye_amulet": {
+      "name": "Amuleto del Ojo del Cielo",
+      "desc": "Un talismán que alberga el ojo petrificado de una bestia divina; otorga breve precognición en combate."
+    },
+    "copper_spirit_ring": {
+      "name": "Anillo Espiritual de Cobre",
+      "desc": "Un sencillo anillo de cobre que canaliza una débil corriente de Qi a través de los meridianos."
+    },
+    "jade_focus_ring": {
+      "name": "Anillo de Enfoque de Jade",
+      "desc": "Un anillo de jade tallado que agudiza el control de las técnicas elementales, reduciendo el desperdicio de energía."
+    },
+    "void_stone_ring": {
+      "name": "Anillo de Piedra del Vacío",
+      "desc": "Engastado con un fragmento de piedra del vacío; tiene un pequeño espacio de almacenamiento y potencia el daño de las técnicas espaciales."
+    },
+    "dragon_blood_ring": {
+      "name": "Anillo de Sangre de Dragón",
+      "desc": "Un anillo forjado con aleación de sangre de dragón; acelera significativamente la circulación del Qi del portador."
+    },
+    "immortal_soul_ring": {
+      "name": "Anillo del Alma Inmortal",
+      "desc": "Un anillo que se dice contiene una astilla del alma de un inmortal; amplifica dramáticamente la velocidad del Qi en el portador."
+    }
+  },
+  "techniques": {},
+  "laws": {
+    "three_harmony_manual": {
+      "name": "Manual de las Tres Armonías",
+      "flavour": "El antiguo texto no habla de fuego, ni de tormenta, ni de montaña, solo del aliento equitativo entre todas las cosas.",
+      "realmRequirementLabel": "Cuerpo Templado"
+    }
+  }
+}

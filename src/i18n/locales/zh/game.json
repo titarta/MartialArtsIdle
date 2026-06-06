@@ -1,1 +1,689 @@
-{}
+{
+  "realms": {
+    "Tempered Body": "淬体境",
+    "Qi Transformation": "化气境",
+    "True Element": "真元境",
+    "Separation & Reunion": "离合境",
+    "Immortal Ascension": "飞升境",
+    "Saint": "圣人境",
+    "Saint King": "圣王境",
+    "Origin Returning": "归元境",
+    "Origin King": "元王境",
+    "Void King": "虚王境",
+    "Dao Source": "道源境",
+    "Emperor Realm": "帝主境",
+    "Open Heaven": "开天境"
+  },
+  "stages": {
+    "Layer 1": "第一重",
+    "Layer 2": "第二重",
+    "Layer 3": "第三重",
+    "Layer 4": "第四重",
+    "Layer 5": "第五重",
+    "Layer 6": "第六重",
+    "Layer 7": "第七重",
+    "Layer 8": "第八重",
+    "Layer 9": "第九重",
+    "Layer 10": "第十重",
+    "Early Stage": "初期",
+    "Middle Stage": "中期",
+    "Late Stage": "后期",
+    "Peak Stage": "巅峰",
+    "1st Stage": "第一阶",
+    "2nd Stage": "第二阶",
+    "3rd Stage": "第三阶"
+  },
+  "worlds": {
+    "1": {
+      "name": "凡人之地",
+      "realms": "淬体境 → 真元境",
+      "description": "薄雾笼罩的宗门大院，前方耸立着朱金两色的礼仪大门，石刻铭文柱与风化守护石像林立两侧。竹林在演武场后方苍翠挺立，苍白的远山没入永恒的云雾之中。空气中弥漫着粉笔灰尘与多年弟子修炼所留残余灵气的气息。"
+    },
+    "2": {
+      "name": "远古边疆",
+      "realms": "离合境 → 飞升境",
+      "description": "一片广袤的荒地，橙红色的大地干裂，纹理如同古老陶器。坍塌的石拱门与残破的关隘结构从沙漠地表突兀而出，旁边散落着巨大的漂白骨骸。一座巨型锈蚀炼丹炉矗立于废墟核心——四周一片死寂，唯有它巍然屹立。"
+    },
+    "3": {
+      "name": "禁忌之地",
+      "realms": "圣人境 → 圣王境",
+      "description": "一条禁忌的石质走廊，两侧排列着古老守护石像，其眼中燃烧着冰冷的绿色灵火。在哨兵的行列之后，一座黑暗宫殿矗立其中，封印门槛上绿色火炬长明。空气凝滞而沉重，弥漫着久逝者的灵气，寂静中唯有远处古战封印的共鸣声若隐若现。"
+    },
+    "4": {
+      "name": "元源深渊",
+      "realms": "归元境 → 元王境",
+      "description": "一处广阔的地下洞窟，由一对龙首石柱照亮，瀑布从柱间倾泻而下，汇入一片发光的元气之池。青绿色晶体群簇生于洞壁之上，将幽冷的光芒投入黑暗之中。古老盘根错节的巨根从头顶高不可及的天花板垂下，空气中充盈着远古大地之力的磅礴压迫。"
+    },
+    "5": {
+      "name": "虚空之海",
+      "realms": "虚王境 → 帝主境",
+      "description": "一片破碎的虚空，深品红色的天空被参差的能量裂缝撕裂，浮悬着道文刻碑。一座孤零零的石门矗立于地平线上崩碎的土地之上，一个阴阳符号在带电的寂静中从头顶缓缓飘过。地面裂如旧陶——这是一片不断在边缘碎裂消解的空间中唯一坚实的地表。"
+    },
+    "6": {
+      "name": "开天境域",
+      "realms": "开天境第一层 → 开天境第六层",
+      "description": "一片无垠的开天境域，金光与白光令人目眩，刻满铭文的巨柱从无缝的天界地面升入延伸至无穷的云层之中。仙鹤在柱间辉煌的雾霭中无声滑翔。单是环境压力便足以将任何尚未跨越开天门槛的存在彻底湮灭。"
+    }
+  },
+  "regions": {
+    "Outer Sect Training Grounds": "外门演武场",
+    "Borderland Wilds": "边荒野地",
+    "Bandit's Crossing": "山匪渡口",
+    "Qi-Vein Ravines": "气脉峡谷",
+    "Misty Spirit Forest": "迷雾灵林",
+    "Shattered Sky Desert": "破天沙漠",
+    "Demon Beast Plains": "妖兽平原",
+    "Sunken Immortal City": "沉没仙城",
+    "Blood Sea Wastes": "血海荒原",
+    "Saint Burial Grounds": "圣人墓地",
+    "Void Rift Expanse": "虚空裂缝荒原",
+    "Nine-Death Mountain Range": "九死山脉",
+    "Sealed War Altar": "封印战祭坛",
+    "Origin Qi Spring Depths": "元气泉源深处",
+    "World Root Caverns": "世界根脉洞窟",
+    "Ancient Root Grotto": "古根石窟",
+    "Primordial Forest Core": "洪荒林核",
+    "Ancient Origin Altar": "远古元源祭坛",
+    "Fractured Space Corridors": "破碎空间走廊",
+    "Void Sea Shores": "虚空海岸",
+    "Dao Inscription Ruins": "道文铭文废墟",
+    "Ancient Emperor Tomb": "远古帝陵",
+    "Heaven Sword Ridge": "天剑山脊",
+    "Heaven Pillar Ascent": "天柱登升处",
+    "Star Sea Approaches": "星海入口",
+    "Celestial Rift Expanse": "天界裂缝荒原",
+    "Heaven's Core": "天界核心"
+  },
+  "enemies": {
+    "outer_sect_disciple": {
+      "name": "外门弟子",
+      "description": "一位身着朴素白色训练道袍的年轻修士，手持一柄基础木制练习剑，摆出笨拙却充满热忱的架势。"
+    },
+    "training_golem": {
+      "name": "训练傀儡",
+      "description": "一尊矮壮的泥土与铁质自动机，身上印有宗门封印，以耐久著称而非伤害——其双拳为钝铁球体。"
+    },
+    "wolf": {
+      "name": "群狼",
+      "description": "一头精瘦的灰毛狼，双眼隐隐发光，显示其多年游弋于灵气丰沛的荒野中略有所得。"
+    },
+    "bandit_scout": {
+      "name": "山匪斥候",
+      "description": "一名精干的战士，身着粗劣的拼凑甲胄，携带一把短刃，以靠埋伏求生者特有的老练身手潜行而动。"
+    },
+    "wandering_beast": {
+      "name": "游荡妖兽",
+      "description": "一头庞大、蓬毛的四肢巨兽，没有固定领地，皮毛上布满多年游荡危险荒野所留下的伤疤。"
+    },
+    "rogue_disciple": {
+      "name": "叛道弟子",
+      "description": "一名前宗门成员，身着褴褛污迹斑斑的修炼道袍，身上留着禁忌气功技法的伤疤，眼神中透露出一无所有者的决绝。"
+    },
+    "iron_fang_wolf": {
+      "name": "铁牙狼",
+      "description": "一头体型巨大的狼，长年在远古平原游荡、吸收矿物灵气，牙齿密度堪比铁，皮毛也已硬化。"
+    },
+    "iron_spine_boar": {
+      "name": "铁脊野猪",
+      "description": "一头矮壮而凶猛的野猪，其背脊上的毛刺因在富含矿物的平地上觅食而钙化为坚如铁质的长刺。俯首以蛮力猛冲。"
+    },
+    "sand_dragon": {
+      "name": "沙漠蛟龙",
+      "description": "一条蜿蜒的蛟龙，鳞片经阳光漂白，边缘锋利如刀，在沙漠中如水般穿行。从地下突然跃起袭击猎物，拖曳一片飞沙。"
+    },
+    "bone_construct": {
+      "name": "骸骨傀儡",
+      "description": "一台由陨落仙人的骸骨融合拼装而成的活动战争机器，以残余战气和锈蚀阵法封印束缚在一起。凡古代亡者遍布之地皆可见其踪影。"
+    },
+    "city_guardian": {
+      "name": "城池守护傀儡",
+      "description": "一尊高大的黑铁与玉石人形傀儡，胸前刻有沉没仙城的徽纹，依旧忠诚地在其主人已死去已久的水淹殿堂中巡逻。"
+    },
+    "immortal_shade": {
+      "name": "困缚仙魂",
+      "description": "一位仙人修士的幽灵残影，在城市沉入地下时被困于此。其形态在实体与虚魂之间闪烁，被一个未竟的誓言永恒束缚。"
+    },
+    "corrupted_cultivator": {
+      "name": "腐化修士",
+      "description": "一名前宗门弟子，修炼灵气已吞噬其神志。道袍碎裂，皮下经脉明显发黑，双眼因气乱而一片空洞。"
+    },
+    "blood_leviathan": {
+      "name": "血海巨兽",
+      "description": "一头庞大的海兽，数百年来以血海为食，鳞片已变为深红。它移动时拖曳着腐蚀性的红色蒸汽，以其整个躯体为武器猛扑而来。"
+    },
+    "burial_guardian": {
+      "name": "墓地守卫",
+      "description": "一名魁梧的铠甲战士，其魂魄被永久封缚于墓地作为永恒哨兵。古老铠甲华丽却已锈蚀，行动间带着数百年未曾休憩之物特有的诡异静默。"
+    },
+    "saint_corpse_soldier": {
+      "name": "圣人尸兵",
+      "description": "一具保存完好的圣人境武者遗骸，仍身着战甲，以死握之力紧握武器。誓约封印的符文在其胸口发光，无论遭受多少伤害都驱使其前进。"
+    },
+    "void_rift_predator": {
+      "name": "虚空裂缝掠夺者",
+      "description": "一种诞生于裂缝撕裂处的生物，其身体部分地相位于两个维度之间。当它在实体空间与虚空之间穿梭时，会从意料之外的角度发动攻击。"
+    },
+    "rift_stalker": {
+      "name": "裂缝潜行者",
+      "description": "裂缝生态系统中一种更精瘦、更快速的掠夺者。通过跨越维度边界追踪灵气特征来猎杀，从裂缝内部发动伏击。"
+    },
+    "saint_bone_sovereign": {
+      "name": "圣人骸骨君主",
+      "description": "一具圣人境君主的复生骸骨，对死亡灵气的掌控绝对无上。它以山脉为领地，从山口之巅统率低阶亡灵。"
+    },
+    "void_shade": {
+      "name": "虚空幽影",
+      "description": "一个来自虚空、寄居于诅咒山道的阴影实体。它没有实体形态，只有集中虚空能量的轮廓，接触时会吸取灵气。"
+    },
+    "forbidden_construct": {
+      "name": "禁制傀儡",
+      "description": "一台被封印在祭坛内数百年的高大战争自动机，一直守护着封印铭文。其启动本属禁忌——直到你跨越了门槛。"
+    },
+    "ancient_war_spirit": {
+      "name": "远古战争灵魂",
+      "description": "一名战士的束缚灵魂，在一场远古战争期间被封印入祭坛。依旧紧握着它殉道的信念，其怒火未因岁月而丝毫消减。"
+    },
+    "origin_guardian": {
+      "name": "元源守护者",
+      "description": "一尊由压缩元气凝聚而成的巨型人形，永久驻守于深渊入口。其躯体每迈出一步都散发出令人窒息的洪荒压迫。"
+    },
+    "origin_crystal_golem": {
+      "name": "元源晶石傀儡",
+      "description": "一具由元气泉中生长的晶体构造而成的傀儡。其攻击会从嵌入拳中的晶体中迸发出原始洪荒能量。"
+    },
+    "primordial_serpent": {
+      "name": "洪荒巨蟒",
+      "description": "一条自上古时代便在世界根脉洞窟中捕猎的巨蟒。数千年的矿物吸收使其鳞片已硬化至世界岩石的密度。"
+    },
+    "cavern_elder_demon": {
+      "name": "洞穴元老恶魔",
+      "description": "一头与洞穴融合了无数世纪的恶魔，其躯体部分由石头与根系构成。在移动之前，它几乎与洞壁融为一体。"
+    },
+    "forest_spirit": {
+      "name": "林间幽灵",
+      "description": "一个在根脉洞穴中飘荡的发光灵体，被古老根系中凝聚的世界能量所吸引。平时温顺——受到打扰时则极为危险。"
+    },
+    "root_sovereign": {
+      "name": "根脉君主",
+      "description": "根脉网络的主宰力量，一个庞大的实体，其躯体由世界树最粗壮的根系交织而成。极度具有领地意识，将所有入侵者视为寄生虫。"
+    },
+    "ancient_beast": {
+      "name": "远古巨兽",
+      "description": "一头古老到早于当今修炼时代的巨兽。其本能已磨砺至极致，其躯体承载着十万年生存岁月的分量。"
+    },
+    "world_root_wraith": {
+      "name": "世界根脉幽魂",
+      "description": "一个从世界树根脉的生命力中具现而出的幽灵守护者。它穿行于根脉网络中，拦截一切威胁林核之物。"
+    },
+    "deep_earth_titan": {
+      "name": "深地巨神",
+      "description": "远古元源祭坛的唯一守护者——一个质量如此之大以至于其脚步能震裂基岩的实体。没有任何生物能在其压力场的范围内存活。"
+    },
+    "spatial_fissure_beast": {
+      "name": "空间裂缝巨兽",
+      "description": "一种原生于破碎空间走廊的生物，其躯体已适应在部分坍塌的维度中生存。它将裂缝用作猎场。"
+    },
+    "qi_beast": {
+      "name": "感气妖兽",
+      "description": "一种完全依靠灵气特征进行捕猎的虚空适应型掠夺者。对物理伪装视而不见，能够跨越维度边界追踪修士。"
+    },
+    "void_elemental": {
+      "name": "虚空元素体",
+      "description": "一种在破碎走廊中凝聚而成的纯粹虚空能量显现。它没有躯体，只有一团集中的否定之力。"
+    },
+    "void_sea_leviathan": {
+      "name": "虚空海巨兽",
+      "description": "一头已适应虚空之海无水环境的巨型海兽，游弋于纯粹的空间能量之中。其质量之大足以将维度边界推开。"
+    },
+    "dao_inscription_guardian": {
+      "name": "道文铭文守护者",
+      "description": "一具被铭文阵法束缚于废墟中、无休止地守护其奉命保护的道文碑的傀儡。任何干扰铭文者皆遭其攻击。"
+    },
+    "dao_inscription_revenant": {
+      "name": "道文铭文复生者",
+      "description": "一名试图破译道文碑而亡者的残影。其意识被吸收入铭文阵法，如今化身为凶猛的守护者。"
+    },
+    "emperor_will_fragment": {
+      "name": "帝主意志残片",
+      "description": "一块远古帝主临终意志的碎片，仍携带着足以显现为半实体力量的威权。它本能地攻击闯入者，以本能守护陵寝。"
+    },
+    "petrified_dao_lord": {
+      "name": "石化道主",
+      "description": "一位被封印在帝陵内作为最后防线的道主。其肉身已化为石头，但道的领悟依然完整——以纯粹的道理作战。"
+    },
+    "star_sea_drifter": {
+      "name": "星海漂泊者",
+      "description": "一个被天剑山脊灾难性道之汇聚从星海拉来的实体。它孤独地捕猎，迷失方向、充满攻击性，远离其本土虚空。"
+    },
+    "heaven_pillar_guardian": {
+      "name": "天柱守护者",
+      "description": "一个被束缚于开天境铭文石柱的天界哨兵，维护着境界之间的边界。它不给任何人通行谈判的机会。"
+    },
+    "boundary_wraith": {
+      "name": "边界幽魂",
+      "description": "一个由境界边界残余灵压所形成的幽魂。它在开天境的门槛处飘荡，猎食逗留于登升之路的修士。"
+    },
+    "open_heaven_beast": {
+      "name": "开天境妖兽",
+      "description": "一头原生于开天境的妖兽，自出生起躯体便已饱含天阶灵气。即便是其休憩状态也会散发出堪比巅峰帝主境修士的压迫。"
+    },
+    "star_sea_leviathan": {
+      "name": "星海巨兽",
+      "description": "一头从星海穿越坍塌边界进入开天境的巨兽。其体形使凡人世界的一切都相形见绌。"
+    },
+    "celestial_sovereign": {
+      "name": "天界君主",
+      "description": "一位开天境君主，统辖天界裂缝的一个领域。在其领地内，对空间能量的掌控绝对无上。"
+    },
+    "eternal_storm_titan": {
+      "name": "永恒风暴巨神",
+      "description": "一股由裂缝永恒风暴赋予形态的自然之力。它没有意识——只有天界天气所显现的无尽狂暴能量。"
+    },
+    "open_heaven_sovereign": {
+      "name": "开天境至尊",
+      "description": "开天境的最高统治者，其道的领悟已超越凡人世界所能达到的一切。与它相遇是飞升的最终考验。"
+    },
+    "void_apex_predator": {
+      "name": "虚空顶级掠夺者",
+      "description": "虚空中的终极掠夺者，曾历经多个境界的崩塌而存活。将天界君主视为猎物取乐，并将飞升中的修士当作猎物。"
+    }
+  },
+  "items": {
+    "iron_herb_1": {
+      "name": "宗门地草",
+      "desc": "一种生长于凡人修士训练之处的野草，吸收宗门地气中的残余灵气。"
+    },
+    "iron_herb_2": {
+      "name": "边荒草根",
+      "desc": "在边荒野地中发现的一种盘根错节的草根，受土壤中微弱灵气所吸引。"
+    },
+    "bronze_herb_1": {
+      "name": "气脉藤",
+      "desc": "一种沿地下气脉生长的攀援藤蔓，其叶片隐隐散发着微光。"
+    },
+    "bronze_herb_2": {
+      "name": "灵林花",
+      "desc": "一种只在迷雾灵林中绽放的淡色花朵，由林间灵体授粉。"
+    },
+    "silver_herb_1": {
+      "name": "破天银莲",
+      "desc": "一种在破天沙漠废墟中存活的银色莲花，从深层地脉中汲取水分。"
+    },
+    "silver_herb_2": {
+      "name": "血海苇草",
+      "desc": "一种生长在血海边缘的血红色苇草，其汁液中含有浓厚的腐化生命之力。"
+    },
+    "gold_herb_1": {
+      "name": "圣葬幽莲",
+      "desc": "一种只在圣人级墓地上方绽放的暗色莲花，以数百年的死亡灵气为食。"
+    },
+    "gold_herb_2": {
+      "name": "虚空荆藤",
+      "desc": "一种穿裂缝生长的带刺藤蔓，其倒钩之锋利足以刺穿圣人级防御。"
+    },
+    "transcendent_herb_1": {
+      "name": "元源花瓣",
+      "desc": "由世界元气泉源处生长的花朵所脱落的花瓣，充盈着洪荒之力。"
+    },
+    "transcendent_herb_2": {
+      "name": "开天灵藤",
+      "desc": "一种传奇藤蔓，其根系延伸至开天境本身，引导天阶能量。"
+    },
+    "iron_mineral_1": {
+      "name": "宗门铁片",
+      "desc": "从宗门傀儡、训练器材以及凡人修士铁质物品上脱落的铁阶材料碎片。"
+    },
+    "iron_mineral_2": {
+      "name": "铁脉矿片",
+      "desc": "从浅层矿脉中提取的致密铁矿碎片，用于基础炼化。"
+    },
+    "bronze_mineral_1": {
+      "name": "气牙",
+      "desc": "来自长年吸收地脉灵气而矿物密度极高的妖兽的獠牙或骨刺碎片。"
+    },
+    "bronze_mineral_2": {
+      "name": "灵木核心",
+      "desc": "来自灵体或古树的硬化核心，渗透着浓缩的林间灵气。"
+    },
+    "silver_mineral_1": {
+      "name": "铁脊鳞片",
+      "desc": "来自远古边疆铁阶掠夺者的鳞片或脊骨段，致密度足以偏转银阶攻击。"
+    },
+    "silver_mineral_2": {
+      "name": "仙阵玉石",
+      "desc": "注入了沉没仙人废墟阵法的玉石，仍含有其原始铭文的残余痕迹。"
+    },
+    "gold_mineral_1": {
+      "name": "圣人骨片",
+      "desc": "从圣人境遗骸中取得的骨骼碎片，散发着难以炼化的冰冷死亡灵气。"
+    },
+    "gold_mineral_2": {
+      "name": "禁印碎片",
+      "desc": "曾封印禁忌之地的虚空封印碎片，隐隐散发着被压制的力量。"
+    },
+    "transcendent_mineral_1": {
+      "name": "虚空晶石",
+      "desc": "在裂缝撕裂处中生长的晶体，其结构完全由压缩虚空能量形成。"
+    },
+    "transcendent_mineral_2": {
+      "name": "世界石核",
+      "desc": "在世界最深层地层中形成或由上天巨神脱落的极致致密石核，仅用于最高阶的炼化。"
+    },
+    "iron_cultivation_1": {
+      "name": "铁阶灵气石 一",
+      "desc": "一块自然形成的石头，在凡人境修炼场中随时间积累环境灵气。"
+    },
+    "iron_cultivation_2": {
+      "name": "铁阶灵气石 二",
+      "desc": "残留灵气在被击败的凡人修士或妖兽上方聚结，短暂可见后消散。"
+    },
+    "bronze_cultivation_1": {
+      "name": "铜阶灵气石 一",
+      "desc": "在多年以灵能为食的妖兽核心处发现的致密灵气核，死后依然微微跳动。"
+    },
+    "bronze_cultivation_2": {
+      "name": "铜阶灵气石 二",
+      "desc": "从能量通道被腐化或粉碎的陨落修士或傀儡身上撕扯下来的结晶灵气碎片。"
+    },
+    "silver_cultivation_1": {
+      "name": "银阶灵气石 一",
+      "desc": "在远古边疆生物深处发现的类骨髓灵气凝结物，历经数百年灵气吸收而饱和。"
+    },
+    "silver_cultivation_2": {
+      "name": "银阶灵气石 二",
+      "desc": "一个在仙人级实体死亡后残留的魂力碎片，仍携带着其修炼的回声。"
+    },
+    "gold_cultivation_1": {
+      "name": "金阶灵气石 一",
+      "desc": "一块从墓地和战祭坛中取得的圣人境灵气钙化遗物。"
+    },
+    "gold_cultivation_2": {
+      "name": "金阶灵气石 二",
+      "desc": "在被虚空侵染的掠夺者和幽影体内形成的小型珍珠，含有压缩的虚空属性能量。"
+    },
+    "transcendent_cultivation_1": {
+      "name": "超凡灵气石 一",
+      "desc": "一个洪荒实体的结晶灵气核——由数百万年不间断的修炼凝缩而成。"
+    },
+    "transcendent_cultivation_2": {
+      "name": "超凡灵气石 二",
+      "desc": "从已超越凡人极限的实体中提取的纯天阶灵气晶体。"
+    },
+    "iron_essence_pill":          { "name": "铁阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_soul_pill":             { "name": "铁阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_body_pill":             { "name": "铁阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_fist_pill":             { "name": "铁阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_ember_pill":            { "name": "铁阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_mind_pill":             { "name": "铁阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_skin_pill":             { "name": "铁阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_ward_pill":             { "name": "铁阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_anchor_pill":           { "name": "铁阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "iron_vigor_pill":            { "name": "铁阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_essence_pill":        { "name": "铜阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_soul_pill":           { "name": "铜阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_body_pill":           { "name": "铜阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_fist_pill":           { "name": "铜阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_ember_pill":          { "name": "铜阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_mind_pill":           { "name": "铜阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_skin_pill":           { "name": "铜阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_ward_pill":           { "name": "铜阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_anchor_pill":         { "name": "铜阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "bronze_vigor_pill":          { "name": "铜阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_essence_pill":        { "name": "银阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_soul_pill":           { "name": "银阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_body_pill":           { "name": "银阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_fist_pill":           { "name": "银阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_ember_pill":          { "name": "银阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_mind_pill":           { "name": "银阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_skin_pill":           { "name": "银阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_ward_pill":           { "name": "银阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_anchor_pill":         { "name": "银阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "silver_vigor_pill":          { "name": "银阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_essence_pill":          { "name": "金阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_soul_pill":             { "name": "金阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_body_pill":             { "name": "金阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_fist_pill":             { "name": "金阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_ember_pill":            { "name": "金阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_mind_pill":             { "name": "金阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_skin_pill":             { "name": "金阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_ward_pill":             { "name": "金阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_anchor_pill":           { "name": "金阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "gold_vigor_pill":            { "name": "金阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
+    "transcendent_essence_pill":  { "name": "超凡精华丹",          "desc": "一颗炼制的丹药，永久提升三项主要属性。" },
+    "exploit_mastery_pill":       { "name": "破绽精通丹",          "desc": "一颗炼制的丹药，永久提升破绽几率与伤害。" },
+    "world_harvest_pill":         { "name": "世界收获丹",          "desc": "一颗炼制的丹药，永久提升采集与采矿速度及幸运。" },
+    "cataclysm_pill":             { "name": "灾变丹",              "desc": "一颗炼制的丹药，永久提升所有伤害类型。" },
+    "dao_bulwark_pill":           { "name": "道之壁垒丹",          "desc": "一颗炼制的丹药，永久提升所有防御类型。" },
+    "eternal_vigor_pill":         { "name": "永恒活力丹",          "desc": "一颗炼制的丹药，永久大幅提升气血上限。" },
+    "iron_blood_core_1": {
+      "name": "铁阶血核 一",
+      "desc": "占位——从陨落敌人身上提取的致密铁阶血核。"
+    },
+    "iron_blood_core_2": {
+      "name": "铁阶血核 二",
+      "desc": "占位——从凡人修士身上凝结而成的结晶铁阶血精。"
+    },
+    "bronze_blood_core_1": {
+      "name": "铜阶血核 一",
+      "desc": "占位——一颗脉动着妖兽生命力的铜阶血核。"
+    },
+    "bronze_blood_core_2": {
+      "name": "铜阶血核 二",
+      "desc": "占位——来自腐化实体的凝结铜阶血气碎片。"
+    },
+    "silver_blood_core_1": {
+      "name": "银阶血核 一",
+      "desc": "占位——充满远古边疆生命力的银阶血核。"
+    },
+    "silver_blood_core_2": {
+      "name": "银阶血核 二",
+      "desc": "占位——来自仙人境实体的残余血晶。"
+    },
+    "gold_blood_core_1": {
+      "name": "金阶血核 一",
+      "desc": "占位——散发着冰冷死亡灵气的圣人级血核。"
+    },
+    "gold_blood_core_2": {
+      "name": "金阶血核 二",
+      "desc": "占位——来自金阶掠夺者的虚空属性血珠。"
+    },
+    "transcendent_blood_core_1": {
+      "name": "超凡血核 一",
+      "desc": "占位——凝缩自超越凡人极限的实体的洪荒血核。"
+    },
+    "transcendent_blood_core_2": {
+      "name": "超凡血核 二",
+      "desc": "占位——散发着压倒性压迫的天阶血晶。"
+    }
+  },
+  "artefacts": {
+    "iron_sword": {
+      "name": "铁剑",
+      "desc": "一柄为外门弟子锻造的普通铁剑。可靠却平淡无奇。"
+    },
+    "spirit_edge_sword": {
+      "name": "灵刃剑",
+      "desc": "一柄以灵能磨砺的剑；当灵气流过时，剑身会发出微弱的嗡鸣。"
+    },
+    "void_cleaver": {
+      "name": "虚空裂刀",
+      "desc": "以虚空石锻造；每一击都会在周围空间织物上撕裂出一道微小的裂缝。"
+    },
+    "dragon_fang_sword": {
+      "name": "龙牙剑",
+      "desc": "以龙兽獠牙铸造；将原始的龙之压力灌入每一击之中。"
+    },
+    "heaven_slaying_sword": {
+      "name": "斩天剑",
+      "desc": "一柄传说中曾斩破境界壁障的神剑。其锋刃永不钝化。"
+    },
+    "iron_polearm": {
+      "name": "铁长枪",
+      "desc": "一柄沉重的铁质长杆兵器，因其攻击距离与制停力而受到体修的青睐。"
+    },
+    "serpent_spear": {
+      "name": "蛇牙枪",
+      "desc": "一柄柔韧的长枪，矛尖形如蛇牙，穿透时注入温和的灵毒。"
+    },
+    "mountain_breaker": {
+      "name": "碎山戟",
+      "desc": "一柄宽刃戟，据说曾击倒一座小型灵山。能粉碎物理防御。"
+    },
+    "thunder_lance": {
+      "name": "雷霆战矛",
+      "desc": "一柄涂覆压缩雷矿的长矛；攻击时以雷霆般的爆音引爆。"
+    },
+    "divine_pillar_spear": {
+      "name": "天柱神矛",
+      "desc": "曾是一座天宫的柱石，被重塑为长矛。全力一刺可撕裂空间。"
+    },
+    "spirit_headband": {
+      "name": "灵气头带",
+      "desc": "一条注入基础灵能的简单布带，有助于修炼时集中心神。"
+    },
+    "jade_cultivation_crown": {
+      "name": "玉修冠",
+      "desc": "一顶雕刻玉石冠冕，可稳固神海，减少突破时的动荡。"
+    },
+    "ghost_kings_circlet": {
+      "name": "鬼王箍",
+      "desc": "以鬼铁锻造；削弱灵魂攻击并压制基于神魂的负面效果。"
+    },
+    "heaven_forged_war_crown": {
+      "name": "天锻战冠",
+      "desc": "一顶以天火冶炼的战冠；大幅提升对元素伤害的抗性。"
+    },
+    "crown_of_the_undying": {
+      "name": "不死之冠",
+      "desc": "据说曾被一位开天境修士佩戴；保护灵魂免遭致命的神魂攻击。"
+    },
+    "cotton_spirit_robe": {
+      "name": "棉质灵气道袍",
+      "desc": "以灵线织成的轻便道袍，提供微弱却稳定的气息流通。"
+    },
+    "cloud_silk_battle_vest": {
+      "name": "云绡战甲背心",
+      "desc": "以高空云绡纺织的背心，可偏转轻微的物理与元素攻击。"
+    },
+    "dragon_scale_armour": {
+      "name": "龙鳞铠甲",
+      "desc": "一头较弱的龙兽脱落的鳞片；坚如铁石，能抵御火焰与雷电。"
+    },
+    "phoenix_feather_war_robe": {
+      "name": "凤羽战袍",
+      "desc": "以凤凰绒毛织就；随时间恢复轻微伤害，并能抵御极度高温。"
+    },
+    "heaven_piercing_divine_robe": {
+      "name": "穿天神袍",
+      "desc": "一件顶级道袍，在柔软与钢铁之间转换；抵消低于力量阈值的攻击。"
+    },
+    "iron_bracers": {
+      "name": "铁护腕",
+      "desc": "强化前臂并提升格挡稳定性的基础铁护腕。"
+    },
+    "tiger_claw_gauntlets": {
+      "name": "虎爪拳套",
+      "desc": "仿虎爪造型的拳套；略微提升徒手和长柄武器攻击的伤害。"
+    },
+    "mithril_bracers": {
+      "name": "秘银护腕",
+      "desc": "轻便的秘银护腕，在每次攻击中传导元素能量。"
+    },
+    "dragon_vein_gauntlets": {
+      "name": "龙脉拳套",
+      "desc": "以龙脉矿石穿制的拳套；以明显更快的节奏通过双臂引导灵气。"
+    },
+    "heaven_palm_guards": {
+      "name": "天掌护",
+      "desc": "一位掌法宗师曾穿戴的远古护手；大幅增强开掌秘术。"
+    },
+    "leather_cultivation_belt": {
+      "name": "皮质修炼腰带",
+      "desc": "一条稳固丹田、减少战斗中灵气散逸的结实腰带。"
+    },
+    "spirit_jade_sash": {
+      "name": "灵玉腰带",
+      "desc": "嵌有灵玉珠的丝质腰带；改善上下体之间的气息流通。"
+    },
+    "serpent_skin_belt": {
+      "name": "蛇皮腰带",
+      "desc": "以灵蛇脱皮制成；提升敏捷并增强对毒素的抗性。"
+    },
+    "golden_dragon_belt": {
+      "name": "金龙腰带",
+      "desc": "一条压印盘龙纹样的宽腰带；大幅提升体魄属性转化。"
+    },
+    "void_emperors_sash": {
+      "name": "虚帝腰带",
+      "desc": "以空间线编织的腰带；将一部分受到的伤害吸收进虚空囊袋。"
+    },
+    "wind_step_boots": {
+      "name": "风步靴",
+      "desc": "为迅捷步伐附魔的轻便靴子；略微提升闪避率。"
+    },
+    "swiftcloud_sandals": {
+      "name": "疾云鞋",
+      "desc": "携带微量云能的鞋履；可进行短暂的加速移动。"
+    },
+    "thunderstep_boots": {
+      "name": "雷步战靴",
+      "desc": "蓄积雷电的战靴；每一步接触时释放低功率电击。"
+    },
+    "dragon_treading_boots": {
+      "name": "踏龙战靴",
+      "desc": "以龙兽骨骼锻造；大幅提升地面稳定性与踏地攻击。"
+    },
+    "heaven_soaring_sandals": {
+      "name": "凌天鞋",
+      "desc": "据说能让穿者踏空而行的鞋履；大幅提升闪避与移动系秘术。"
+    },
+    "jade_spirit_pendant": {
+      "name": "灵玉坠",
+      "desc": "一块佩戴于心口附近的磨光玉石；温和地强化神海。"
+    },
+    "soul_calming_necklace": {
+      "name": "定魂项链",
+      "desc": "一串压制神魂波动与战斗中精神负面效果的灵珠。"
+    },
+    "blood_dragon_talisman": {
+      "name": "血龙符",
+      "desc": "一块浸泡过龙兽之血的雕刻骨符；提升原始物理抗性。"
+    },
+    "elemental_core_pendant": {
+      "name": "元素核心吊坠",
+      "desc": "内含一颗压缩元素核；增强元素亲和力加成。"
+    },
+    "heavens_eye_amulet": {
+      "name": "天眼护符",
+      "desc": "一件收容神兽石化眼珠的护符；在战斗中赋予短暂的预知能力。"
+    },
+    "copper_spirit_ring": {
+      "name": "铜灵戒",
+      "desc": "一枚通过经脉引导微弱灵气流的普通铜戒指。"
+    },
+    "jade_focus_ring": {
+      "name": "玉聚焦戒",
+      "desc": "一枚雕刻玉石戒指，锐化元素秘术控制，减少能量浪费。"
+    },
+    "void_stone_ring": {
+      "name": "虚空石戒",
+      "desc": "镶嵌一块虚空石碎片；拥有小型储物空间并提升空间秘术伤害。"
+    },
+    "dragon_blood_ring": {
+      "name": "龙血戒",
+      "desc": "以龙血合金锻造的戒指；大幅加速佩戴者的灵气运行。"
+    },
+    "immortal_soul_ring": {
+      "name": "仙魂戒",
+      "desc": "据说含有一缕仙人灵魂的戒指；大幅增强佩戴者的气速。"
+    }
+  },
+  "techniques": {},
+  "laws": {
+    "three_harmony_manual": {
+      "name": "三和心经",
+      "flavour": "古籍所言，无火、无暴风、无山岳——唯有万物之间均匀的呼吸。",
+      "realmRequirementLabel": "淬体境"
+    }
+  }
+}

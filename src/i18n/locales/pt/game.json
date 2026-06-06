@@ -372,7 +372,18 @@
     "world_harvest_pill":         { "name": "Pílula da Colheita do Mundo",          "desc": "Uma pílula cultivada que melhora permanentemente a velocidade e sorte de coleta e mineração." },
     "cataclysm_pill":             { "name": "Pílula do Cataclismo",                 "desc": "Uma pílula cultivada que melhora permanentemente todos os tipos de dano." },
     "dao_bulwark_pill":           { "name": "Pílula do Baluarte do Dao",            "desc": "Uma pílula cultivada que melhora permanentemente todos os tipos de defesa." },
-    "eternal_vigor_pill":         { "name": "Pílula do Vigor Eterno",               "desc": "Uma pílula cultivada que concede permanentemente uma quantidade massiva de vida." }
+    "eternal_vigor_pill":         { "name": "Pílula do Vigor Eterno",               "desc": "Uma pílula cultivada que concede permanentemente uma quantidade massiva de vida." },
+
+    "iron_blood_core_1":          { "name": "Núcleo de Sangue de Ferro 1",          "desc": "Um denso núcleo de sangue de grau ferro extraído de um inimigo abatido." },
+    "iron_blood_core_2":          { "name": "Núcleo de Sangue de Ferro 2",          "desc": "Uma essência de sangue de grau ferro cristalizada, condensada de cultivadores mortais." },
+    "bronze_blood_core_1":        { "name": "Núcleo de Sangue de Bronze 1",         "desc": "Um núcleo de sangue de grau bronze pulsando com vitalidade de besta." },
+    "bronze_blood_core_2":        { "name": "Núcleo de Sangue de Bronze 2",         "desc": "Um estilhaço de qi de sangue de grau bronze condensado de entidades corrompidas." },
+    "silver_blood_core_1":        { "name": "Núcleo de Sangue de Prata 1",          "desc": "Um núcleo de sangue de grau prata saturado com vitalidade da fronteira ancestral." },
+    "silver_blood_core_2":        { "name": "Núcleo de Sangue de Prata 2",          "desc": "Um cristal de sangue remanescente de uma entidade do reino imortal." },
+    "gold_blood_core_1":          { "name": "Núcleo de Sangue de Ouro 1",           "desc": "Um núcleo de sangue de grau santo irradiando qi de morte frio." },
+    "gold_blood_core_2":          { "name": "Núcleo de Sangue de Ouro 2",           "desc": "Uma pérola de sangue de atributo vazio de um predador de grau ouro." },
+    "transcendent_blood_core_1":  { "name": "Núcleo de Sangue Transcendente 1",     "desc": "Um núcleo de sangue primordial condensado de uma entidade além das limitações mortais." },
+    "transcendent_blood_core_2":  { "name": "Núcleo de Sangue Transcendente 2",     "desc": "Um cristal de sangue de grau celestial irradiando uma pressão avassaladora." }
   },
 
   "artefacts": {

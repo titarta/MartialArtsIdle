@@ -1,1 +1,689 @@
-{}
+{
+  "realms": {
+    "Tempered Body": "단체경 (鍛體境)",
+    "Qi Transformation": "화기경 (化氣境)",
+    "True Element": "진원경 (眞元境)",
+    "Separation & Reunion": "분합경 (分合境)",
+    "Immortal Ascension": "승선경 (昇仙境)",
+    "Saint": "성인 (聖人)",
+    "Saint King": "성왕 (聖王)",
+    "Origin Returning": "귀원경 (歸源境)",
+    "Origin King": "원왕 (源王)",
+    "Void King": "허왕 (虛王)",
+    "Dao Source": "도원 (道源)",
+    "Emperor Realm": "제자경 (帝者境)",
+    "Open Heaven": "개천 (開天)"
+  },
+  "stages": {
+    "Layer 1": "1층",
+    "Layer 2": "2층",
+    "Layer 3": "3층",
+    "Layer 4": "4층",
+    "Layer 5": "5층",
+    "Layer 6": "6층",
+    "Layer 7": "7층",
+    "Layer 8": "8층",
+    "Layer 9": "9층",
+    "Layer 10": "10층",
+    "Early Stage": "초기",
+    "Middle Stage": "중기",
+    "Late Stage": "후기",
+    "Peak Stage": "절정",
+    "1st Stage": "1단계",
+    "2nd Stage": "2단계",
+    "3rd Stage": "3단계"
+  },
+  "worlds": {
+    "1": {
+      "name": "속계 (俗界)",
+      "realms": "단체경 → 진원경",
+      "description": "의식용 붉은 금빛 문과 석각 기둥, 풍화된 수호 석상으로 둘러싸인 안개 자욱한 문파 수련장. 수련장 너머로 대나무 숲이 솟아있고 창백한 산들이 영원한 안개 속으로 사라진다. 공기 속에는 분필 먼지 냄새와 수년간 제자들이 수련하며 남긴 잔류 기의 향기가 배어있다."
+    },
+    "2": {
+      "name": "고대 변방 (古代邊境)",
+      "realms": "분합경 → 승선경",
+      "description": "오래된 도자기 같은 질감으로 구워진 갈라진 주황빛 대지의 광대한 황무지. 무너진 석조 아치와 폐허가 된 관문 구조물이 거대한 표백된 뼈 잔해와 함께 사막 바닥에서 솟아있다. 부식된 거대한 가마솥이 폐허의 중심에 자리잡고 있으며, 그 외에 죽은 풍경 속에서 온전히 서 있는 유일한 구조물이다."
+    },
+    "3": {
+      "name": "금지 구역 (禁地)",
+      "realms": "성인 → 성왕",
+      "description": "차가운 녹색 영적 불꽃이 눈에서 빛나는 고대 수호 석상이 늘어선 금지된 석조 복도. 보초들의 열 너머로 봉인된 문지방에 녹색 횃불이 타오르는 어두운 궁전이 우뚝 솟아있다. 공기는 고요하고 오랫동안 죽은 자들의 기로 무겁게 가득 차 있으며, 그 침묵은 멀리서 울려오는 고대 전쟁 봉인의 공명음만이 깨뜨린다."
+    },
+    "4": {
+      "name": "근원의 심연 (源之深淵)",
+      "realms": "귀원경 → 원왕",
+      "description": "쌍 용두 석기둥이 폭포를 양쪽에서 받치고, 그 폭포가 빛나는 원기 연못으로 떨어지는 광대한 지하 동굴. 청록색 수정 군락이 동굴 벽 전체에 모여 어둠 속으로 서늘한 빛을 드리운다. 고대의 뒤틀린 뿌리들이 저 멀리 위의 천장에서 내려오고, 공기는 태고의 지기(地氣) 압력으로 두껍게 차있다."
+    },
+    "5": {
+      "name": "허공의 바다 (虛空之海)",
+      "realms": "허왕 → 제자경",
+      "description": "깊은 자홍빛 하늘 아래 들쭉날쭉한 에너지 균열과 떠다니는 도 각문 석판으로 갈라진 파편화된 허공의 광야. 지평선의 허물어지는 땅 위에 홀로 선 석문이 있고, 충전된 고요 속에서 음양 기호가 머리 위에 떠 있다. 바닥은 오래된 점토처럼 갈라져 있으며—끝없이 무너지는 공간에서 유일한 단단한 표면이다."
+    },
+    "6": {
+      "name": "개천 (開天)",
+      "realms": "개천 1층 → 개천 6층",
+      "description": "거대한 각문 기둥들이 끝없이 뻗은 구름층 속으로 솟아있는, 눈부신 금빛과 흰빛의 무한한 개천 경계. 두루미들이 기둥 사이의 빛나는 안개 속을 조용히 날아다닌다. 주변 압력만으로도 개천의 문턱에 달하지 못한 모든 것을 소멸시킬 수 있다."
+    }
+  },
+  "regions": {
+    "Outer Sect Training Grounds": "외문 수련장",
+    "Borderland Wilds": "변방 황야",
+    "Bandit's Crossing": "비적 관문",
+    "Qi-Vein Ravines": "기맥 협곡",
+    "Misty Spirit Forest": "안개 영림",
+    "Shattered Sky Desert": "파천 사막",
+    "Demon Beast Plains": "마수 평원",
+    "Sunken Immortal City": "침몰 선인 도시",
+    "Blood Sea Wastes": "혈해 황무지",
+    "Saint Burial Grounds": "성인 매장지",
+    "Void Rift Expanse": "허공 균열 광야",
+    "Nine-Death Mountain Range": "구사 산맥",
+    "Sealed War Altar": "봉인된 전쟁 제단",
+    "Origin Qi Spring Depths": "원기 샘 심층",
+    "World Root Caverns": "세계 뿌리 동굴",
+    "Ancient Root Grotto": "고대 뿌리 동굴",
+    "Primordial Forest Core": "태고 숲의 핵심",
+    "Ancient Origin Altar": "고대 기원 제단",
+    "Fractured Space Corridors": "파쇄 공간 복도",
+    "Void Sea Shores": "허공 바다 해변",
+    "Dao Inscription Ruins": "도 각문 유적",
+    "Ancient Emperor Tomb": "고대 황제릉",
+    "Heaven Sword Ridge": "천검 능선",
+    "Heaven Pillar Ascent": "천주 등정",
+    "Star Sea Approaches": "성해 입구",
+    "Celestial Rift Expanse": "천공 균열 광야",
+    "Heaven's Core": "하늘의 핵심"
+  },
+  "enemies": {
+    "outer_sect_disciple": {
+      "name": "외문 제자",
+      "description": "서툴지만 열정적인 자세로 기본 목검을 휘두르는, 평범한 흰 수련복 차림의 젊은 수련자."
+    },
+    "training_golem": {
+      "name": "수련용 골렘",
+      "description": "내구성을 위해 만들어진, 문파 봉인이 찍힌 땅딸막한 점토와 철 자동인형 — 주먹은 뭉툭한 철구 형태."
+    },
+    "wolf": {
+      "name": "무리 늑대",
+      "description": "기가 풍부한 황야를 오랫동안 떠돌며 소량의 기를 흡수했음을 암시하는 희미하게 빛나는 눈을 가진 날씬한 회색 늑대."
+    },
+    "bandit_scout": {
+      "name": "비적 척후",
+      "description": "짧은 칼을 들고 기습으로 살아남는 자의 숙련된 은신술로 움직이는, 거친 조각보 갑옷을 입은 가냘픈 전사."
+    },
+    "wandering_beast": {
+      "name": "방랑 마수",
+      "description": "고정된 영역 없이 위험한 황야를 떠돌며 수년간의 방랑으로 가죽에 상처가 남은 크고 덥수룩한 사지 짐승."
+    },
+    "rogue_disciple": {
+      "name": "불량 제자",
+      "description": "금기 기 수련의 흔적이 새겨진, 찢기고 얼룩진 수련복 차림의 전직 문파 일원. 잃을 것이 없는 사람의 눈빛을 지니고 있다."
+    },
+    "iron_fang_wolf": {
+      "name": "철아 늑대",
+      "description": "고대 평원을 떠돌며 광물 기를 흡수해 몇 년에 걸쳐 철 밀도의 송곳니와 단단해진 가죽을 가진 거대한 늑대."
+    },
+    "iron_spine_boar": {
+      "name": "철등 멧돼지",
+      "description": "광물이 풍부한 평지에서 먹이를 먹어 등의 가시가 철처럼 굳은, 공격적인 땅딸막한 멧돼지. 무모한 힘으로 머리를 숙이고 돌진한다."
+    },
+    "sand_dragon": {
+      "name": "사막 용",
+      "description": "모래 속을 물처럼 흐르듯 움직이는, 햇볕에 탈색된 면도날 같은 비늘을 가진 뱀 형태의 용. 아래에서 솟구치며 모래를 뿌리면서 먹이를 기습한다."
+    },
+    "bone_construct": {
+      "name": "뼈 구조물",
+      "description": "잔류 전투 기와 녹슨 진법 봉인으로 결합된, 쓰러진 선인들의 뼈로 조립된 움직이는 전쟁 기계. 고대의 죽은 자가 땅에 널린 곳에서 발견된다."
+    },
+    "city_guardian": {
+      "name": "도시 수호 구조물",
+      "description": "침몰 선인 도시의 문장을 달고 오래전 죽은 주인의 물에 잠긴 홀을 충실히 순찰하는 흑철과 옥으로 만든 거대한 인형 구조물."
+    },
+    "immortal_shade": {
+      "name": "갇힌 선인 영혼",
+      "description": "도시가 땅 아래로 가라앉을 때 갇힌 선인 수련자의 잔영. 미완성된 서약에 영원히 묶여 고체와 유령 사이를 오가는 형태."
+    },
+    "corrupted_cultivator": {
+      "name": "타락한 수련자",
+      "description": "기 수련이 정신을 잡아먹은 전직 문파 제자. 도복은 찢겨있고, 경맥은 피부 아래서 검게 변해 보이며, 눈은 기 광증으로 공허하다."
+    },
+    "blood_leviathan": {
+      "name": "혈해 레비아탄",
+      "description": "혈해에서 수백 년간 먹이를 먹어 비늘이 짙은 적색으로 변한 거대한 바다 짐승. 움직일 때 부식성 붉은 증기를 흘리며 전체 몸으로 타격한다."
+    },
+    "burial_guardian": {
+      "name": "매장지 수호자",
+      "description": "영혼이 영원한 보초로서 매장지에 묶인 거대한 갑옷 병사. 고대 갑옷은 화려하지만 부식되어 있고, 수백 년간 쉬지 않은 것의 비자연적인 고요함으로 움직인다."
+    },
+    "saint_corpse_soldier": {
+      "name": "성인 시체 병사",
+      "description": "전투 갑옷을 입고 죽음의 악력으로 무기를 쥔 채 완벽하게 보존된 성인 경지 전사의 시신. 가슴의 서약 봉인이 빛나며 입은 피해에 관계없이 앞으로 나아가도록 강제한다."
+    },
+    "void_rift_predator": {
+      "name": "허공 균열 포식자",
+      "description": "균열 틈새에서 태어난 생물로, 몸이 차원 사이에 부분적으로 위상이 이동되어 있다. 고체와 허공 공간 사이를 미끄러지며 예상치 못한 각도로 공격한다."
+    },
+    "rift_stalker": {
+      "name": "균열 추적자",
+      "description": "균열 생태계의 더 날렵하고 빠른 포식자. 차원 경계를 통해 기 신호를 추적하고 균열 내부에서 기습 공격을 가한다."
+    },
+    "saint_bone_sovereign": {
+      "name": "성인 뼈 군주",
+      "description": "성인 경지 군주의 되살아난 해골로, 사기(死氣)에 대한 권위가 절대적이다. 산맥을 영토로 삼고 고갯길 위에서 하급 언데드를 지휘한다."
+    },
+    "void_shade": {
+      "name": "허공 그림자",
+      "description": "저주받은 산길에 달라붙는 허공의 그림자 존재. 물리적 형태가 없고 접촉 시 기를 소진시키는 집중된 허공 에너지의 실루엣만 있다."
+    },
+    "forbidden_construct": {
+      "name": "금지된 구조물",
+      "description": "수세기 동안 제단 안에 봉인되어 봉인된 각문을 지켜온 거대한 전쟁 자동인형. 활성화는 금지되어 있었다 — 당신이 문지방을 넘을 때까지는."
+    },
+    "ancient_war_spirit": {
+      "name": "고대 전쟁 영혼",
+      "description": "고대 전쟁 중에 제단에 봉인된 전사의 묶인 영혼. 목숨을 바친 대의를 여전히 붙들고 있으며, 수백 년이 지나도 분노는 사그라들지 않았다."
+    },
+    "origin_guardian": {
+      "name": "근원의 수호자",
+      "description": "압축된 원기로 형성된 거대한 인형으로, 심층의 입구에 영구적으로 배치되어 있다. 몸에서 매 걸음마다 압도적인 태고의 압력이 방사된다."
+    },
+    "origin_crystal_golem": {
+      "name": "근원 수정 골렘",
+      "description": "원기 샘 내부에서 자란 수정 구조물로 만들어진 골렘. 타격 시 주먹에 박힌 수정에서 원초 에너지의 폭발을 방출한다."
+    },
+    "primordial_serpent": {
+      "name": "태고 뱀",
+      "description": "기록 이전의 시대부터 세계 뿌리 동굴을 사냥한 거대한 뱀. 수천 년에 걸친 광물 흡수로 비늘이 세계석 밀도로 굳어졌다."
+    },
+    "cavern_elder_demon": {
+      "name": "동굴 장로 악마",
+      "description": "수없이 많은 세기에 걸쳐 동굴과 융합된 악마로, 몸이 부분적으로 돌과 뿌리로 이루어져 있다. 움직이기 전까지는 동굴 벽과 거의 구별이 되지 않는다."
+    },
+    "forest_spirit": {
+      "name": "숲의 정령",
+      "description": "고대 뿌리에 집중된 세계 에너지에 이끌려 뿌리 공간을 표류하는 발광 정령. 평소에는 수동적이나 방해받으면 위험하다."
+    },
+    "root_sovereign": {
+      "name": "뿌리 군주",
+      "description": "뿌리 네트워크의 지배 세력으로, 세계수의 가장 굵은 뿌리들로 몸이 짜인 거대한 존재. 극단적으로 영역을 지키며, 모든 침입자를 기생충으로 여긴다."
+    },
+    "ancient_beast": {
+      "name": "고대 짐승",
+      "description": "현재의 수련 시대보다 오래된 짐승. 본능은 완벽하게 갈고닦여 있고 몸에는 십만 년의 생존의 무게가 담겨있다."
+    },
+    "world_root_wraith": {
+      "name": "세계 뿌리 망령",
+      "description": "세계수 뿌리의 생명력에서 나타난 에테르적 수호자. 뿌리 네트워크를 통해 위상 이동하여 숲의 핵심을 위협하는 모든 것을 차단한다."
+    },
+    "deep_earth_titan": {
+      "name": "대지 심층 타이탄",
+      "description": "고대 기원 제단의 유일한 수호자 — 발걸음이 기반암을 갈라트리는 질량의 존재. 그 압력장 범위 내에서는 어떤 생명체도 살아남지 못한다."
+    },
+    "spatial_fissure_beast": {
+      "name": "공간 균열 짐승",
+      "description": "파쇄 공간 복도가 고향인 생물로, 부분적으로 붕괴된 차원에 존재하도록 몸이 적응되어 있다. 균열을 사냥터로 이용한다."
+    },
+    "qi_beast": {
+      "name": "기 감지 짐승",
+      "description": "순전히 기 신호로 사냥하는 허공 적응 포식자. 물리적 위장에 눈이 멀어도, 차원 경계를 넘어 수련자를 추적할 수 있다."
+    },
+    "void_elemental": {
+      "name": "허공 정령",
+      "description": "파쇄된 복도에 응집된 허공 에너지의 순수한 현현. 몸이 없고 오직 집중된 무효화 힘의 덩어리만 있다."
+    },
+    "void_sea_leviathan": {
+      "name": "허공 바다 레비아탄",
+      "description": "물이 없는 허공 바다에 적응하여 순수 공간 에너지 속을 헤엄치는 거대한 바다 짐승. 질량이 너무 커서 차원 경계를 옆으로 밀어낸다."
+    },
+    "dao_inscription_guardian": {
+      "name": "도 각문 수호자",
+      "description": "각문 진법에 의해 유적에 묶인 구조물로, 보호하도록 만들어진 도 석판을 끝없이 유지관리한다. 각문에 간섭하는 모든 것을 공격한다."
+    },
+    "dao_inscription_revenant": {
+      "name": "도 각문 레버넌트",
+      "description": "도 석판을 해독하려다 죽은 학자의 잔영. 그들의 의식이 각문 진법에 흡수되어 이제 공격적인 수호자 역할을 한다."
+    },
+    "emperor_will_fragment": {
+      "name": "황제 의지 파편",
+      "description": "고대 황제의 죽어가는 의지의 파편으로, 반물리적인 힘으로 현현할 충분한 권위를 여전히 담고 있다. 본능적으로 무덤을 보호하며 반사적으로 침입자를 공격한다."
+    },
+    "petrified_dao_lord": {
+      "name": "석화된 도주",
+      "description": "황제의 무덤에 최후의 방어선으로 봉인된 도주. 몸은 돌로 변했지만 도의 이해는 온전히 남아있어 — 순수한 원리로 싸운다."
+    },
+    "star_sea_drifter": {
+      "name": "성해 방랑자",
+      "description": "천검 능선의 격변적인 도의 수렴에 의해 성해에서 끌려온 존재. 고향 허공에서 멀리 떠나 방향을 잃고 공격적으로 홀로 사냥한다."
+    },
+    "heaven_pillar_guardian": {
+      "name": "천주 수호자",
+      "description": "경계를 유지하는 개천 경계의 각문 기둥에 묶인 천계 보초. 통행을 협상하지 않는다."
+    },
+    "boundary_wraith": {
+      "name": "경계 망령",
+      "description": "경지 경계의 잔류 영적 압력에서 형성된 망령. 개천의 문턱에서 표류하며, 등정에서 머뭇거리는 수련자를 먹잇감으로 삼는다."
+    },
+    "open_heaven_beast": {
+      "name": "개천 짐승",
+      "description": "개천 경계가 고향인 짐승으로, 태어날 때부터 천급 기로 몸이 포화되어 있다. 쉬는 상태에서도 절정 황제 경지 수련자에 비견되는 압력을 가한다."
+    },
+    "star_sea_leviathan": {
+      "name": "성해 레비아탄",
+      "description": "붕괴된 경계를 통해 개천 경계로 들어온 성해의 레비아탄. 그 규모는 속계의 어떤 것도 왜소하게 만든다."
+    },
+    "celestial_sovereign": {
+      "name": "천공 군주",
+      "description": "천공 균열의 영역을 지배하는 개천 경계의 군주. 영토 내에서 공간 에너지에 대한 권위가 절대적이다."
+    },
+    "eternal_storm_titan": {
+      "name": "영원한 폭풍 타이탄",
+      "description": "균열의 영속적인 폭풍으로 형태를 얻은 자연의 힘. 의식이 없고 — 천계 날씨의 끝없이 폭력적인 에너지만이 현현한 것이다."
+    },
+    "open_heaven_sovereign": {
+      "name": "개천 군주",
+      "description": "개천 경계의 절정 지배자로, 도의 이해가 속세에서 달성 가능한 모든 것을 초월한다. 마주치는 것은 승천의 최후 시험이다."
+    },
+    "void_apex_predator": {
+      "name": "허공 정점 포식자",
+      "description": "여러 경계의 붕괴에서 살아남은 허공의 궁극 포식자. 스포츠로 천공 군주를 사냥하며 승천한 수련자를 먹잇감으로 여긴다."
+    }
+  },
+  "items": {
+    "iron_herb_1": {
+      "name": "문파 잡초",
+      "desc": "수련자들이 수련하는 곳에 자라나 문파 수련장의 잔류 기를 흡수하는 잡초."
+    },
+    "iron_herb_2": {
+      "name": "변방 뿌리",
+      "desc": "흙 속의 희미한 영적 에너지에 이끌려 변방 황야에서 발견되는 뒤틀린 뿌리."
+    },
+    "bronze_herb_1": {
+      "name": "기맥 덩굴",
+      "desc": "지하 기맥을 따라 자라는 덩굴로, 잎이 희미하게 빛난다."
+    },
+    "bronze_herb_2": {
+      "name": "영림 꽃",
+      "desc": "안개 영림에서만 피는 창백한 꽃으로, 숲의 정령이 꽃가루를 옮긴다."
+    },
+    "silver_herb_1": {
+      "name": "파천 연꽃",
+      "desc": "파천 사막 폐허에서 살아남는 은빛 연꽃으로, 깊은 지맥에서 물을 끌어온다."
+    },
+    "silver_herb_2": {
+      "name": "혈해 갈대",
+      "desc": "혈해 가장자리에서 자라는 핏빛 갈대로, 수액이 부패한 생명력으로 진하다."
+    },
+    "gold_herb_1": {
+      "name": "성인 매장지 연꽃",
+      "desc": "성인급 매장지 위에서만 피는 어두운 연꽃으로, 수백 년의 사기(死氣)를 먹고 산다."
+    },
+    "gold_herb_2": {
+      "name": "허공 가시 덩굴",
+      "desc": "균열 틈새를 통해 자라는 가시 달린 덩굴로, 가시가 성인급 방어를 관통할 만큼 날카롭다."
+    },
+    "transcendent_herb_1": {
+      "name": "근원 샘 꽃잎",
+      "desc": "세계 원기 샘에서 자라는 꽃이 흘린 꽃잎으로, 태고의 에너지로 포화되어 있다."
+    },
+    "transcendent_herb_2": {
+      "name": "개천 덩굴",
+      "desc": "뿌리가 개천 경계 자체에까지 뻗어 천급 에너지를 채널링하는 전설의 덩굴."
+    },
+    "iron_mineral_1": {
+      "name": "문파 철편",
+      "desc": "문파 구조물, 수련 장비, 속세 수련자의 철에서 떨어진 철급 재료의 파편."
+    },
+    "iron_mineral_2": {
+      "name": "철광 파편",
+      "desc": "얕은 광맥에서 채굴한 고밀도 철광석 파편으로, 기본 연금술에 사용된다."
+    },
+    "bronze_mineral_1": {
+      "name": "기 이빨",
+      "desc": "수년간 땅에서 기를 흡수하여 광물 밀도가 높아진 짐승의 이빨이나 가시 파편."
+    },
+    "bronze_mineral_2": {
+      "name": "영목 핵",
+      "desc": "정령 존재나 고대 나무에서 나온 굳은 핵으로, 집중된 숲 기가 스며있다."
+    },
+    "silver_mineral_1": {
+      "name": "철척 비늘",
+      "desc": "고대 변방의 철급 포식자 비늘이나 척추 부분으로, 은급 공격을 막을 만큼 밀도가 높다."
+    },
+    "silver_mineral_2": {
+      "name": "선인 진법 옥",
+      "desc": "침몰 선인 유적의 진법으로 주입된 옥으로, 아직 원래 각문의 흔적을 담고 있다."
+    },
+    "gold_mineral_1": {
+      "name": "성인 뼈 조각",
+      "desc": "성인 경지 시신에서 나온 뼈 조각으로, 정제를 거부하는 차가운 사기(死氣)를 발산한다."
+    },
+    "gold_mineral_2": {
+      "name": "금지 봉인 파편",
+      "desc": "한때 금지 구역을 봉쇄했던 허공 봉인의 파편으로, 억제된 힘이 지글거린다."
+    },
+    "transcendent_mineral_1": {
+      "name": "허공 수정",
+      "desc": "균열 틈새에서 자란 수정으로, 구조가 압축된 허공 에너지로만 형성되어 있다."
+    },
+    "transcendent_mineral_2": {
+      "name": "세계석 핵",
+      "desc": "세계 가장 깊은 지층에서 형성되거나 상위 천계의 타이탄이 흘린 믿을 수 없이 밀도 높은 돌 핵으로, 가장 고급 연금술에만 사용된다."
+    },
+    "iron_cultivation_1": {
+      "name": "철 기석 1",
+      "desc": "속세 수련장의 주변 기를 시간이 지나면서 자연적으로 축적하는 자연 형성 돌."
+    },
+    "iron_cultivation_2": {
+      "name": "철 기석 2",
+      "desc": "쓰러진 속세 수련자나 짐승 위에 잠시 응결되었다가 흩어지기 전에 잠깐 보이는 잔류 기."
+    },
+    "bronze_cultivation_1": {
+      "name": "동 기석 1",
+      "desc": "수년간 영적 에너지를 먹은 짐승의 중심에서 발견되는 밀도 높은 기 핵 — 죽은 후에도 희미하게 맥박 친다."
+    },
+    "bronze_cultivation_2": {
+      "name": "동 기석 2",
+      "desc": "에너지 경로가 부패하거나 산산이 부서진 쓰러진 수련자나 구조물에서 뜯겨진 결정화된 기 파편."
+    },
+    "silver_cultivation_1": {
+      "name": "은 기석 1",
+      "desc": "수백 년의 기 흡수 후 포화된, 고대 변방 생물 깊은 곳에서 발견되는 골수 같은 기 응결물."
+    },
+    "silver_cultivation_2": {
+      "name": "은 기석 2",
+      "desc": "선인급 존재가 죽은 후에도 지속되는 혼력의 파편으로, 아직 그것의 수련의 메아리를 담고 있다."
+    },
+    "gold_cultivation_1": {
+      "name": "금 기석 1",
+      "desc": "매장지와 전쟁 제단에서 회수된, 성인 경지 기의 석회화된 유물."
+    },
+    "gold_cultivation_2": {
+      "name": "금 기석 2",
+      "desc": "허공에 물든 포식자와 그림자 내부에서 형성된 작은 구슬로, 압축된 허공 속성 에너지를 담고 있다."
+    },
+    "transcendent_cultivation_1": {
+      "name": "초월 기석 1",
+      "desc": "태고 존재의 결정화된 기 핵 — 수백만 년에 걸친 끊임없는 수련에서 응축된 것."
+    },
+    "transcendent_cultivation_2": {
+      "name": "초월 기석 2",
+      "desc": "속세의 한계를 초월한 존재들에서 추출한 순수 천급 기의 수정."
+    },
+    "iron_essence_pill":          { "name": "철 정수 단약",          "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_soul_pill":             { "name": "철 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_body_pill":             { "name": "철 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_fist_pill":             { "name": "철 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_ember_pill":            { "name": "철 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_mind_pill":             { "name": "철 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_skin_pill":             { "name": "철 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_ward_pill":             { "name": "철 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_anchor_pill":           { "name": "철 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "iron_vigor_pill":            { "name": "철 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_essence_pill":        { "name": "동 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_soul_pill":           { "name": "동 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_body_pill":           { "name": "동 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_fist_pill":           { "name": "동 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_ember_pill":          { "name": "동 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_mind_pill":           { "name": "동 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_skin_pill":           { "name": "동 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_ward_pill":           { "name": "동 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_anchor_pill":         { "name": "동 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "bronze_vigor_pill":          { "name": "동 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_essence_pill":        { "name": "은 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_soul_pill":           { "name": "은 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_body_pill":           { "name": "은 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_fist_pill":           { "name": "은 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_ember_pill":          { "name": "은 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_mind_pill":           { "name": "은 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_skin_pill":           { "name": "은 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_ward_pill":           { "name": "은 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_anchor_pill":         { "name": "은 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "silver_vigor_pill":          { "name": "은 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_essence_pill":          { "name": "금 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_soul_pill":             { "name": "금 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_body_pill":             { "name": "금 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_fist_pill":             { "name": "금 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_ember_pill":            { "name": "금 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_mind_pill":             { "name": "금 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_skin_pill":             { "name": "금 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_ward_pill":             { "name": "금 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_anchor_pill":           { "name": "금 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "gold_vigor_pill":            { "name": "금 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
+    "transcendent_essence_pill":  { "name": "초월 정수 단약",         "desc": "세 가지 주요 능력치를 모두 영구적으로 향상시키는 단약." },
+    "exploit_mastery_pill":       { "name": "약점 통달 단약",         "desc": "약점 공략 확률과 피해를 영구적으로 향상시키는 단약." },
+    "world_harvest_pill":         { "name": "세계 수확 단약",         "desc": "채집 및 채굴 속도와 행운을 영구적으로 향상시키는 단약." },
+    "cataclysm_pill":             { "name": "대재앙 단약",            "desc": "모든 피해 유형을 영구적으로 향상시키는 단약." },
+    "dao_bulwark_pill":           { "name": "도 방루 단약",           "desc": "모든 방어 유형을 영구적으로 향상시키는 단약." },
+    "eternal_vigor_pill":         { "name": "영원한 활력 단약",       "desc": "대량의 체력을 영구적으로 부여하는 단약." },
+    "iron_blood_core_1": {
+      "name": "철 혈핵 1",
+      "desc": "쓰러진 적에서 추출한 밀도 높은 철급 혈핵."
+    },
+    "iron_blood_core_2": {
+      "name": "철 혈핵 2",
+      "desc": "속세 수련자들에게서 응결된 결정화된 철급 혈기."
+    },
+    "bronze_blood_core_1": {
+      "name": "동 혈핵 1",
+      "desc": "짐승 생명력이 맥박 치는 동급 혈핵."
+    },
+    "bronze_blood_core_2": {
+      "name": "동 혈핵 2",
+      "desc": "타락한 존재의 응결된 동급 혈기 파편."
+    },
+    "silver_blood_core_1": {
+      "name": "은 혈핵 1",
+      "desc": "고대 변방 생명력으로 포화된 은급 혈핵."
+    },
+    "silver_blood_core_2": {
+      "name": "은 혈핵 2",
+      "desc": "선인 경지 존재의 잔류 혈기 수정."
+    },
+    "gold_blood_core_1": {
+      "name": "금 혈핵 1",
+      "desc": "차가운 사기(死氣)를 발산하는 성인급 혈핵."
+    },
+    "gold_blood_core_2": {
+      "name": "금 혈핵 2",
+      "desc": "금급 포식자의 허공 속성 혈구."
+    },
+    "transcendent_blood_core_1": {
+      "name": "초월 혈핵 1",
+      "desc": "속세의 한계를 초월한 존재에서 응결된 태고의 혈핵."
+    },
+    "transcendent_blood_core_2": {
+      "name": "초월 혈핵 2",
+      "desc": "압도적인 압력을 발산하는 천급 혈기 수정."
+    }
+  },
+  "artefacts": {
+    "iron_sword": {
+      "name": "철검",
+      "desc": "외문 제자를 위해 단조된 평범한 철검. 믿을 만하지만 평범하다."
+    },
+    "spirit_edge_sword": {
+      "name": "영기 도검",
+      "desc": "영적 에너지로 단련된 검; 기가 흐를 때 날이 희미하게 울린다."
+    },
+    "void_cleaver": {
+      "name": "허공 대도",
+      "desc": "허공석으로 단조되었으며; 매 타격이 국소 공간 구조에 실오라기 균열을 남긴다."
+    },
+    "dragon_fang_sword": {
+      "name": "용아 도검",
+      "desc": "용 짐승 이빨로 제작되었으며; 매 타격에 원초적인 용의 압력을 채널링한다."
+    },
+    "heaven_slaying_sword": {
+      "name": "참천검",
+      "desc": "경지 사이의 장벽을 베었다는 전설의 도검. 날이 절대 무뎌지지 않는다."
+    },
+    "iron_polearm": {
+      "name": "철 장병기",
+      "desc": "사거리와 저지력으로 체 수련자들이 선호하는 무거운 철 장병기."
+    },
+    "serpent_spear": {
+      "name": "뱀 창",
+      "desc": "관통 시 가벼운 영적 독을 주입하는 뱀 이빨 끝이 달린 유연한 창."
+    },
+    "mountain_breaker": {
+      "name": "파산",
+      "desc": "작은 영산을 쓰러뜨렸다는 넓은 날의 극. 물리 방어를 분쇄한다."
+    },
+    "thunder_lance": {
+      "name": "뇌전 창",
+      "desc": "압축된 번개 광석으로 코팅된 창; 타격이 천둥 소리와 함께 폭발한다."
+    },
+    "divine_pillar_spear": {
+      "name": "신주 창",
+      "desc": "한때 천상 궁전의 기둥이었다가 창으로 재형성되었다. 전력 돌진은 공간을 가른다."
+    },
+    "spirit_headband": {
+      "name": "영적 머리띠",
+      "desc": "기본 영적 에너지가 주입된 단순한 천 띠로, 수련 중 집중을 돕는다."
+    },
+    "jade_cultivation_crown": {
+      "name": "옥 수련 왕관",
+      "desc": "영적 바다를 안정시키고 돌파 시 난류를 줄이는 조각된 옥 두환."
+    },
+    "ghost_kings_circlet": {
+      "name": "귀왕의 두환",
+      "desc": "귀신 철로 단조되었으며; 영적 공격을 약화시키고 혼 기반 디버프를 억제한다."
+    },
+    "heaven_forged_war_crown": {
+      "name": "천단 전쟁 왕관",
+      "desc": "천상의 불로 제련된 전투 왕관; 원소 피해에 대한 저항을 크게 증가시킨다."
+    },
+    "crown_of_the_undying": {
+      "name": "불사의 왕관",
+      "desc": "개천 수련자가 착용했다는 왕관; 치명적인 혼 공격으로부터 영혼을 보호한다."
+    },
+    "cotton_spirit_robe": {
+      "name": "면 영적 도복",
+      "desc": "영적 실로 짜인 가벼운 도복으로, 최소하지만 꾸준한 기 순환을 제공한다."
+    },
+    "cloud_silk_battle_vest": {
+      "name": "운사 전투복",
+      "desc": "경미한 물리 및 원소 타격을 막는 고고도 운사로 짜인 전투복."
+    },
+    "dragon_scale_armour": {
+      "name": "용린 갑옷",
+      "desc": "하급 용 짐승이 흘린 비늘; 철만큼 단단하고 불과 번개에 저항력이 있다."
+    },
+    "phoenix_feather_war_robe": {
+      "name": "봉황 깃털 전투 도복",
+      "desc": "봉황 솜털로 짜여; 시간이 지남에 따라 경미한 피해를 재생하고 극한의 열에 저항한다."
+    },
+    "heaven_piercing_divine_robe": {
+      "name": "파천 신성 도복",
+      "desc": "부드러움과 철 사이를 전환하는 최상급 도복; 특정 위력 이하의 타격을 무효화한다."
+    },
+    "iron_bracers": {
+      "name": "철 완갑",
+      "desc": "전완을 강화하고 막기 안정성을 향상시키는 기본 철 완갑."
+    },
+    "tiger_claw_gauntlets": {
+      "name": "호조 장갑",
+      "desc": "호랑이 발톱을 본뜬 장갑; 맨손 및 장병기 타격 피해를 약간 증가시킨다."
+    },
+    "mithril_bracers": {
+      "name": "미스릴 완갑",
+      "desc": "매 타격에 원소 에너지를 전달하는 가벼운 미스릴 완갑."
+    },
+    "dragon_vein_gauntlets": {
+      "name": "용맥 장갑",
+      "desc": "용맥 광석이 실처럼 엮인 장갑; 눈에 띄게 빠른 리듬으로 팔을 통해 기를 채널링한다."
+    },
+    "heaven_palm_guards": {
+      "name": "천장 장갑",
+      "desc": "장법 고수가 착용했던 고대 장갑; 개방형 장법 비전 무공을 극적으로 증폭시킨다."
+    },
+    "leather_cultivation_belt": {
+      "name": "가죽 수련 띠",
+      "desc": "단전을 안정시키고 전투 중 기 분산을 줄이는 튼튼한 띠."
+    },
+    "spirit_jade_sash": {
+      "name": "영옥 사시",
+      "desc": "영옥 구슬이 박힌 실크 사시; 상체와 하체 사이의 기 순환을 개선한다."
+    },
+    "serpent_skin_belt": {
+      "name": "뱀 가죽 띠",
+      "desc": "영적 뱀이 벗은 가죽으로 제작되었으며; 민첩성과 독 저항을 증가시킨다."
+    },
+    "golden_dragon_belt": {
+      "name": "황금 용 띠",
+      "desc": "또아리 용이 양각된 넓은 띠; 체 능력치 전환을 크게 증가시킨다."
+    },
+    "void_emperors_sash": {
+      "name": "허공 황제의 사시",
+      "desc": "공간 실로 짜인 사시; 들어오는 피해의 일부를 허공 주머니로 흡수한다."
+    },
+    "wind_step_boots": {
+      "name": "풍보 부츠",
+      "desc": "빠른 발놀림을 위해 마법이 걸린 가벼운 부츠; 회피율을 약간 증가시킨다."
+    },
+    "swiftcloud_sandals": {
+      "name": "속운 신발",
+      "desc": "구름 에너지의 흔적을 담은 신발; 잠깐의 가속된 이동을 허용한다."
+    },
+    "thunderstep_boots": {
+      "name": "뇌보 부츠",
+      "desc": "저장된 번개가 지글거리는 부츠; 매 걸음이 접촉 시 저출력 충격을 방출한다."
+    },
+    "dragon_treading_boots": {
+      "name": "용답 부츠",
+      "desc": "용 짐승 뼈로 단조되었으며; 지면 안정성과 짓밟기 공격을 극적으로 향상시킨다."
+    },
+    "heaven_soaring_sandals": {
+      "name": "승천 신발",
+      "desc": "착용자가 공중을 걸을 수 있다는 신발; 회피와 이동 기반 무공을 대폭 강화한다."
+    },
+    "jade_spirit_pendant": {
+      "name": "옥 영적 목걸이",
+      "desc": "심장 가까이 착용하는 매끈한 옥 조각; 영적 바다를 부드럽게 강화한다."
+    },
+    "soul_calming_necklace": {
+      "name": "진혼 목걸이",
+      "desc": "전투 중 혼의 동요와 정신 디버프를 억제하는 영적 구슬 줄."
+    },
+    "blood_dragon_talisman": {
+      "name": "혈룡 부적",
+      "desc": "용 짐승 피에 흠뻑 젖은 조각된 뼈 부적; 원초적 물리 저항을 증가시킨다."
+    },
+    "elemental_core_pendant": {
+      "name": "원소 핵 목걸이",
+      "desc": "압축된 원소 핵을 담고 있으며; 원소 친화 보너스를 증폭시킨다."
+    },
+    "heavens_eye_amulet": {
+      "name": "천안 부적",
+      "desc": "신성한 짐승의 석화된 눈을 담은 부적; 전투 중 잠깐의 예지력을 부여한다."
+    },
+    "copper_spirit_ring": {
+      "name": "동 영적 반지",
+      "desc": "경맥을 통해 희미한 기 흐름을 채널링하는 평범한 동 반지."
+    },
+    "jade_focus_ring": {
+      "name": "옥 집중 반지",
+      "desc": "원소 무공 제어를 날카롭게 하여 낭비되는 에너지를 줄이는 조각된 옥 반지."
+    },
+    "void_stone_ring": {
+      "name": "허공석 반지",
+      "desc": "허공석 파편이 박혀 있으며; 작은 수납 공간이 있고 공간 무공 피해를 증폭시킨다."
+    },
+    "dragon_blood_ring": {
+      "name": "용혈 반지",
+      "desc": "용혈 합금으로 단조되었으며; 착용자의 기 순환을 크게 가속시킨다."
+    },
+    "immortal_soul_ring": {
+      "name": "선인 혼 반지",
+      "desc": "선인의 혼 조각을 담고 있다는 반지; 착용자의 기 속도를 극적으로 증폭시킨다."
+    }
+  },
+  "techniques": {},
+  "laws": {
+    "three_harmony_manual": {
+      "name": "삼화결",
+      "flavour": "고대 문서는 불도, 폭풍도, 산도 없이 — 오직 만물 사이의 고른 호흡만을 말한다.",
+      "realmRequirementLabel": "단체경"
+    }
+  }
+}
