@@ -1,1 +1,689 @@
-{}
+{
+  "realms": {
+    "Tempered Body": "Gestählter Körper",
+    "Qi Transformation": "Qi-Wandlung",
+    "True Element": "Wahres Element",
+    "Separation & Reunion": "Trennung & Vereinigung",
+    "Immortal Ascension": "Unsterblicher Aufstieg",
+    "Saint": "Heiliger",
+    "Saint King": "Heiliger König",
+    "Origin Returning": "Rückkehr zum Ursprung",
+    "Origin King": "Ursprungskönig",
+    "Void King": "König der Leere",
+    "Dao Source": "Dao-Quelle",
+    "Emperor Realm": "Kaisersphäre",
+    "Open Heaven": "Offener Himmel"
+  },
+  "stages": {
+    "Layer 1": "Schicht 1",
+    "Layer 2": "Schicht 2",
+    "Layer 3": "Schicht 3",
+    "Layer 4": "Schicht 4",
+    "Layer 5": "Schicht 5",
+    "Layer 6": "Schicht 6",
+    "Layer 7": "Schicht 7",
+    "Layer 8": "Schicht 8",
+    "Layer 9": "Schicht 9",
+    "Layer 10": "Schicht 10",
+    "Early Stage": "Frühes Stadium",
+    "Middle Stage": "Mittleres Stadium",
+    "Late Stage": "Spätes Stadium",
+    "Peak Stage": "Gipfelstadium",
+    "1st Stage": "1. Stadium",
+    "2nd Stage": "2. Stadium",
+    "3rd Stage": "3. Stadium"
+  },
+  "worlds": {
+    "1": {
+      "name": "Die Sterblichen Lande",
+      "realms": "Gestählter Körper → Wahres Element",
+      "description": "Eine nebelumhüllte Sektenanlage, gerahmt von einem zeremoniellen rot-goldenen Tor, steinernen Inschriftpfeilern und verwitterten Wächterstatuen. Bambuswälder erheben sich jenseits der Übungsplätze, und blasse Berge lösen sich in ewigen Nebel auf. Die Luft trägt den Geruch von Kreidestaub und dem Restqi aus Jahren der Schülerpraktiken."
+    },
+    "2": {
+      "name": "Die Uralte Grenzmark",
+      "realms": "Trennung & Vereinigung → Unsterblicher Aufstieg",
+      "description": "Eine weite Ödnis aus gerissenem, orangefarbenem Erdreich, gebrannt zur Textur uralter Töpferwaren. Eingestürzte Steinbögen und Ruinen ragen aus dem Wüstenboden auf, neben riesigen gebleichten Knochenüberresten. Ein massiver, angerosteter Kessel thront im Herzen der Ruinen — die einzige Struktur, die in einer sonst toten Landschaft noch intakt steht."
+    },
+    "3": {
+      "name": "Die Verbotenen Lande",
+      "realms": "Heiliger → Heiliger König",
+      "description": "Ein verbotener Steinkorridor, gesäumt von alten Wächterstatuen, deren Augen mit kaltem grünem Geistesfeuer leuchten. Jenseits der Reihen von Wächtern ragt ein finsterer Palast empor, an dessen versiegelter Schwelle grüne Fackeln brennen. Die Luft ist still und schwer vom Qi der längst Verstorbenen, die Stille nur durchbrochen vom fernen Nachklang uralter Kriegssiegel."
+    },
+    "4": {
+      "name": "Die Ursprungstiefe",
+      "realms": "Rückkehr zum Ursprung → Ursprungskönig",
+      "description": "Eine weite unterirdische Höhle, erhellt von zwei Steinpfeilern mit Drachenköpfen, die einen Wasserfall flankieren, der in einen leuchtenden Ursprungs-Qi-Pool fließt. Blaugrüne Kristallformationen häufen sich an den Höhlenwänden und werfen kühles Licht in die Dunkelheit. Uralte, knorrige Wurzeln senken sich von der fernen Decke herab, und die Luft ist schwer vom überwältigenden Druck urzeitlicher Erdenergie."
+    },
+    "5": {
+      "name": "Das Leere Meer",
+      "realms": "König der Leere → Kaisersphäre",
+      "description": "Eine zersplitterte Leerenweite unter einem Himmel aus tiefem Magenta, durchzogen von gezackten Energierissen und schwebenden Dao-Inschrifttafeln. Ein einsames Steintor steht auf bröckeligem Boden am Horizont, und ein Yin-Yang-Symbol treibt im aufgeladenen Schweigen darüber. Der Boden ist gerissen wie altes Lehm — die einzige feste Oberfläche in einem Raum, der an den Rändern beständig zerfällt."
+    },
+    "6": {
+      "name": "Der Offene Himmel",
+      "realms": "Offener Himmel Schicht 1 → Offener Himmel Schicht 6",
+      "description": "Ein grenzenloser Offener-Himmel-Bereich aus blendendem Gold und Weiß, wo massive, inschriftbedeckte Pfeiler aus einem nahtlosen himmlischen Boden in Wolkenbänke aufsteigen, die sich bis ins Unendliche erstrecken. Kraniche gleiten lautlos durch den strahlenden Dunst zwischen den Pfeilern. Der bloße Umgebungsdruck genügt, um alles zu vernichten, das die Schwelle des Offenen Himmels nicht erreicht hat."
+    }
+  },
+  "regions": {
+    "Outer Sect Training Grounds": "Übungsgelände der Äußeren Sekte",
+    "Borderland Wilds": "Grenzlandwildnis",
+    "Bandit's Crossing": "Räuberfurt",
+    "Qi-Vein Ravines": "Qi-Ader-Schluchten",
+    "Misty Spirit Forest": "Nebelgeistwald",
+    "Shattered Sky Desert": "Zersplitterter-Himmel-Wüste",
+    "Demon Beast Plains": "Dämonenbest-Ebenen",
+    "Sunken Immortal City": "Versunkene Unsterblichenstadt",
+    "Blood Sea Wastes": "Blutmeer-Ödnis",
+    "Saint Burial Grounds": "Heilige Begräbnisstätte",
+    "Void Rift Expanse": "Leerenriss-Weite",
+    "Nine-Death Mountain Range": "Neun-Tod-Gebirge",
+    "Sealed War Altar": "Versiegelter Kriegsaltar",
+    "Origin Qi Spring Depths": "Ursprungs-Qi-Quelltiefe",
+    "World Root Caverns": "Weltwurzel-Höhlen",
+    "Ancient Root Grotto": "Uralte Wurzelgrotte",
+    "Primordial Forest Core": "Urzeitlicher Waldkern",
+    "Ancient Origin Altar": "Urälter Ursprungsaltar",
+    "Fractured Space Corridors": "Zerrissene Raumkorridore",
+    "Void Sea Shores": "Leere-Meer-Ufer",
+    "Dao Inscription Ruins": "Dao-Inschrift-Ruinen",
+    "Ancient Emperor Tomb": "Uraltes Kaisergrab",
+    "Heaven Sword Ridge": "Himmelsschwert-Grat",
+    "Heaven Pillar Ascent": "Himmelspfeiler-Aufstieg",
+    "Star Sea Approaches": "Sternen-Meer-Vorfeld",
+    "Celestial Rift Expanse": "Himmlische Riss-Weite",
+    "Heaven's Core": "Himmelskern"
+  },
+  "enemies": {
+    "outer_sect_disciple": {
+      "name": "Schüler der Äußeren Sekte",
+      "description": "Ein junger Kultivierer in einer schlichten weißen Übungsrobe, der ein einfaches Holzübungsschwert mit unbeholfenen, aber eifrigen Stellungen schwingt."
+    },
+    "training_golem": {
+      "name": "Trainingsgolem",
+      "description": "Ein gedrungener Lehm-und-Eisen-Automat, gestempelt mit Sektensiegel, für Beständigkeit über Schaden gebaut — seine Fäuste sind stumpfe Eisenkugeln."
+    },
+    "wolf": {
+      "name": "Ruderwolf",
+      "description": "Ein schlanker, grau felliger Wolf mit schwach leuchtenden Augen, was auf minimale Qi-Aufnahme durch jahrelanges Streifen in geistereicher Wildnis hindeutet."
+    },
+    "bandit_scout": {
+      "name": "Räuberspäher",
+      "description": "Ein sehniger Kämpfer in grober Flickenrüstung, der eine kurze Klinge trägt und sich mit der geübten Heimlichkeit eines Menschen bewegt, der durch Hinterhalte überlebt."
+    },
+    "wandering_beast": {
+      "name": "Streifendes Ungetüm",
+      "description": "Ein großes, zottiges viergliedriges Ungetüm ohne festes Revier, dessen Fell von Jahren des Streifens durch gefährliche Wildnis vernarbt ist."
+    },
+    "rogue_disciple": {
+      "name": "Abtrünniger Schüler",
+      "description": "Ein ehemaliges Sektenmitglied in einer zerschlissenen und befleckten Kultivierungsrobe, das die Narben verbotener Qi-Techniken trägt und den Blick eines Menschen hat, dem nichts mehr zu verlieren ist."
+    },
+    "iron_fang_wolf": {
+      "name": "Eisenzahnwolf",
+      "description": "Ein massiver Wolf mit eisendichten Reißzähnen und einem durch jahrelange Mineral-Qi-Aufnahme beim Streifen durch die uralten Ebenen verhärteten Fell."
+    },
+    "iron_spine_boar": {
+      "name": "Eisenrückenschwein",
+      "description": "Ein stämmiges, aggressives Schwein, dessen Rückenborsten durch das Weiden auf mineralreichen Flachländern zu eisenharten Stacheln verkalkt sind. Stürmt Kopf voraus mit rücksichtsloser Kraft."
+    },
+    "sand_dragon": {
+      "name": "Sanddrache",
+      "description": "Ein schlangenartiger Drache mit sonnengebleichten, messerscharfen Schuppen, der durch Wüstensande wie Wasser gleitet. Überfällt Beute, indem er von unten ausbricht und eine Sandwolke hinterlässt."
+    },
+    "bone_construct": {
+      "name": "Knochenkonstrukt",
+      "description": "Eine belebte Kriegsmaschine, zusammengesetzt aus den verschmolzenen Knochen gefallener Unsterblicher, zusammengehalten durch Rest-Kampf-Qi und verrostete Arrayysiegel. Überall dort zu finden, wo uralte Tote das Land übersäen."
+    },
+    "city_guardian": {
+      "name": "Stadtwächter-Konstrukt",
+      "description": "Ein turmhohes menschenähnliches Konstrukt aus schwarzem Eisen und Jade, das das Wappen der Versunkenen Unsterblichenstadt trägt und noch immer treu die wassergetränkten Hallen seines längst toten Schutzbefohlenen patrouilliert."
+    },
+    "immortal_shade": {
+      "name": "Gefangener Unsterblichen-Schatten",
+      "description": "Das gespenstische Überbleibsel eines unsterblichen Kultivierers, gefangen als die Stadt unter die Erde sank. Seine Form flackert zwischen Fest und Geisterhaft, auf ewig gebunden durch ein unvollendetes Gelübde."
+    },
+    "corrupted_cultivator": {
+      "name": "Korrumpierter Kultivierer",
+      "description": "Ein ehemaliger Sektenschüler, dessen Qi-Kultivierung seinen Verstand verschluckte. Seine Robe ist zerrissen, seine Meridiane sichtbar unter der Haut geschwärzt, seine Augen blind vor Qi-Wahnsinn."
+    },
+    "blood_leviathan": {
+      "name": "Blutmeer-Leviathan",
+      "description": "Ein kolossales Meeresungetüm, dessen Schuppen sich durch jahrhundertelanges Fressen im Blutmeer tiefrot gefärbt haben. Es hinterlässt ätzende rote Dämpfe beim Bewegen und schlägt mit seiner gesamten Masse zu."
+    },
+    "burial_guardian": {
+      "name": "Begräbniswächter",
+      "description": "Ein massiver gepanzerter Soldat, dessen Seele als ewiger Wächter an die Begräbnisstätte gebunden wurde. Seine alte Rüstung ist kunstvoll, aber verrostet, und er bewegt sich mit der unnatürlichen Stille von etwas, das sich seit Jahrhunderten nicht ausgeruht hat."
+    },
+    "saint_corpse_soldier": {
+      "name": "Heiliger Leichensoldat",
+      "description": "Die makellos erhaltene Leiche eines Heiligen-Sphären-Kriegers, noch in Kampfrüstung und seine Waffe mit Todesgriff haltend. Schwursiegel leuchten auf seiner Brust und zwingen ihn vorwärts, ungeachtet des erlittenen Schadens."
+    },
+    "void_rift_predator": {
+      "name": "Leerenriss-Räuber",
+      "description": "Ein im Inneren von Rissrissen geborenes Wesen, dessen Körper teilweise zwischen Dimensionen phasenverschoben ist. Greift aus unerwarteten Winkeln an, während es zwischen festem Raum und Leere gleitet."
+    },
+    "rift_stalker": {
+      "name": "Rissanschleicher",
+      "description": "Ein schlankerer, schnellerer Räuber des Riss-Ökosystems. Jagt, indem er Qi-Signaturen durch Dimensionsgrenzen verfolgt, und lauert aus dem Inneren des Risses heraus auf."
+    },
+    "saint_bone_sovereign": {
+      "name": "Heiliger Knochensouverän",
+      "description": "Das wiederbelebte Skelett eines Heiligen-Sphären-Souveräns, dessen Autorität über das Todes-Qi absolut ist. Er beansprucht die Gebirgskette als Territorium und befehligt mindere Untote von den Pässen aus."
+    },
+    "void_shade": {
+      "name": "Leerenschatten",
+      "description": "Eine Schattenentität aus der Leere, die an verfluchten Gebirgspässen haftet. Sie besitzt keine physische Form, nur eine Silhouette konzentrierter Leerenenergie, die beim Berühren Qi entzieht."
+    },
+    "forbidden_construct": {
+      "name": "Verbotenes Konstrukt",
+      "description": "Ein turmhohes Kriegsautomat, jahrhundertelang im Altar versiegelt, hält Wache über die versiegelten Inschriften. Seine Aktivierung war verboten — bis du die Schwelle überschrittest."
+    },
+    "ancient_war_spirit": {
+      "name": "Uralter Kriegsgeist",
+      "description": "Der gebundene Geist eines Kriegers, der während eines uralten Krieges in den Altar versiegelt wurde. Noch immer an die Sache gebunden, für die er starb, bleibt seine Wut durch die Jahrhunderte ungemindert."
+    },
+    "origin_guardian": {
+      "name": "Ursprungswächter",
+      "description": "Eine kolossale humanoide Gestalt aus verdichtetem Ursprungs-Qi, dauerhaft am Eingang zur Tiefe stationiert. Sein Körper strahlt mit jedem Schritt erdrückenden urzeitlichen Druck aus."
+    },
+    "origin_crystal_golem": {
+      "name": "Ursprungskristallgolem",
+      "description": "Ein Golem aus Kristallformationen, die im Ursprungs-Qi-Frühling gewachsen sind. Seine Schläge entladen Ausbrüche roher urzeitlicher Energie aus den in seinen Fäusten eingebetteten Kristallen."
+    },
+    "primordial_serpent": {
+      "name": "Urzeitliche Schlange",
+      "description": "Eine riesige Schlange, die die Weltwurzel-Höhlen seit dem Zeitalter vor jeglichen Aufzeichnungen durchstreift. Ihre Schuppen haben sich durch Jahrtausende von Mineralaufnahme zur Dichte von Weltstein verhärtet."
+    },
+    "cavern_elder_demon": {
+      "name": "Höhlenältester-Dämon",
+      "description": "Ein Dämon, der sich über unzählige Jahrhunderte mit der Höhle verschmolzen hat, sein Körper teilweise aus Stein und Wurzel. Er unterscheidet sich kaum von den Höhlenwänden, bis er sich bewegt."
+    },
+    "forest_spirit": {
+      "name": "Waldgeist",
+      "description": "Ein leuchtender Geist, der durch die Wurzelhöhlen treibt, angelockt von der konzentrierten Weltenergie in den uralten Wurzeln. Normalerweise passiv — gefährlich, wenn gestört."
+    },
+    "root_sovereign": {
+      "name": "Wurzelsouverän",
+      "description": "Die dominierende Kraft des Wurzelnetzes, eine massive Entität, deren Körper aus den dicksten Wurzeln des Weltbaums gewoben ist. Extrem territorial, betrachtet es alle Eindringlinge als Parasiten."
+    },
+    "ancient_beast": {
+      "name": "Uraltes Ungetüm",
+      "description": "Ein Ungetüm, das so alt ist, dass es das aktuelle Kultivierungszeitalter überdauert. Seine Instinkte sind auf Perfektion geschärft, und sein Körper trägt das Gewicht von hunderttausend Jahren des Überlebens."
+    },
+    "world_root_wraith": {
+      "name": "Weltwurzel-Geist",
+      "description": "Ein ätherischer Wächter, manifestiert aus der Lebenskraft der Wurzeln des Weltbaums. Er phasiert durch das Wurzelnetz, um alles abzufangen, das den Waldkern bedroht."
+    },
+    "deep_earth_titan": {
+      "name": "Tiefer-Erde-Titan",
+      "description": "Der einzige Wächter des Uralten Ursprungsaltars — eine Entität von solcher Masse, dass seine Schritte Felsboden sprengen. Kein anderes Wesen überlebt in Reichweite seines Druckfeldes."
+    },
+    "spatial_fissure_beast": {
+      "name": "Raumriss-Ungetüm",
+      "description": "Ein in den zerrissenen Raumkorridoren beheimatetes Wesen, dessen Körper an das Existieren in teilweise kollabierten Dimensionen angepasst ist. Es nutzt die Risse als Jagdgründe."
+    },
+    "qi_beast": {
+      "name": "Qi-Spürendes Ungetüm",
+      "description": "Ein an die Leere angepasster Räuber, der ausschließlich durch Qi-Signaturen jagt. Blind gegenüber physischer Tarnung, kann es einen Kultivierer über Dimensionsgrenzen hinweg verfolgen."
+    },
+    "void_elemental": {
+      "name": "Leerenelementar",
+      "description": "Eine reine Manifestation von Leerenenergie, die sich in den zerrissenen Korridoren gebildet hat. Sie besitzt keinen Körper, nur eine konzentrierte Masse vernichtender Kraft."
+    },
+    "void_sea_leviathan": {
+      "name": "Leere-Meer-Leviathan",
+      "description": "Ein titanisches Meeresungetüm, das sich an das Fehlen von Wasser im Leere-Meer angepasst hat und durch reine Raumenergie schwimmt. Seine Masse ist so gewaltig, dass sie Dimensionsgrenzen beiseite schiebt."
+    },
+    "dao_inscription_guardian": {
+      "name": "Dao-Inschrift-Wächter",
+      "description": "Ein durch Inschrift-Arrays an die Ruinen gebundenes Konstrukt, das endlos die Dao-Tafeln pflegt, zu deren Schutz es gebaut wurde. Es greift alles an, das die Inschriften stört."
+    },
+    "dao_inscription_revenant": {
+      "name": "Dao-Inschrift-Revenante",
+      "description": "Das Überbleibsel eines Gelehrten, der beim Versuch starb, die Dao-Tafeln zu entschlüsseln. Sein Bewusstsein wurde in die Inschrift-Arrays aufgesaugt und dient nun als aggressiver Wächter."
+    },
+    "emperor_will_fragment": {
+      "name": "Kaiserwillen-Fragment",
+      "description": "Eine Scherbe des sterbenden Willens eines uralten Kaisers, der noch genug Autorität trägt, um sich als halb-physische Kraft zu manifestieren. Es greift Eindringlinge reflexartig an und schützt das Grab instinktiv."
+    },
+    "petrified_dao_lord": {
+      "name": "Versteinerter Dao-Herr",
+      "description": "Ein Dao-Herr, als letzte Verteidigungslinie im Kaisergrab versiegelt. Sein Körper ist zu Stein geworden, doch sein Dao-Verständnis ist intakt geblieben — er kämpft mit reinem Prinzip."
+    },
+    "star_sea_drifter": {
+      "name": "Sternen-Meer-Treiber",
+      "description": "Eine Entität, die durch die katastrophale Dao-Konvergenz am Himmelsschwert-Grat aus dem Sternen-Meer gezogen wurde. Jagt allein, desorientiert und aggressiv, weit von seiner heimatlichen Leere entfernt."
+    },
+    "heaven_pillar_guardian": {
+      "name": "Himmelspfeiler-Wächter",
+      "description": "Ein himmlischer Wächter, gebunden an die Inschrift-Pfeiler des Offenen-Himmel-Reichs, der die Grenze zwischen den Sphären aufrecht erhält. Er verhandelt keine Durchgänge."
+    },
+    "boundary_wraith": {
+      "name": "Grenzgeist",
+      "description": "Ein Geist, geformt aus dem Restdruck der Sphärengrenzen. Er treibt an der Schwelle des Offenen Himmels und macht Jagd auf Kultivierer, die beim Aufstieg verweilen."
+    },
+    "open_heaven_beast": {
+      "name": "Offener-Himmel-Ungetüm",
+      "description": "Ein im Offenen-Himmel-Reich beheimatetes Ungetüm, dessen Körper von Geburt an mit himmelsgradigem Qi gesättigt ist. Selbst sein Ruhezustand übt einen Druck aus, der mit dem eines Kultivierers auf dem Gipfel der Kaisersphäre vergleichbar ist."
+    },
+    "star_sea_leviathan": {
+      "name": "Sternen-Meer-Leviathan",
+      "description": "Ein Leviathan aus dem Sternen-Meer, der durch eine kollabierte Grenze in das Offene-Himmel-Reich eingedrungen ist. Sein Ausmaß überragt alles aus der Sterblichen Welt."
+    },
+    "celestial_sovereign": {
+      "name": "Himmlischer Souverän",
+      "description": "Ein Souverän des Offenen-Himmel-Reichs, der eine Domäne des Himmlischen Risses beherrscht. Seine Autorität über Raumenergie ist innerhalb seines Territoriums absolut."
+    },
+    "eternal_storm_titan": {
+      "name": "Ewiger-Sturm-Titan",
+      "description": "Eine Naturkraft, der durch die ewigen Stürme des Risses Form gegeben wurde. Er besitzt kein Bewusstsein — nur die endlose gewaltsame Energie von himmmlischem Wetter in manifestierter Form."
+    },
+    "open_heaven_sovereign": {
+      "name": "Offener-Himmel-Souverän",
+      "description": "Der oberste Herrscher des Offenen-Himmel-Reichs, dessen Dao-Verständnis jenseits alles in der Sterblichen Welt Erreichbaren liegt. Ihm zu begegnen ist die letzte Prüfung des Aufstiegs."
+    },
+    "void_apex_predator": {
+      "name": "Leerenspitzen-Räuber",
+      "description": "Der ultimative Räuber der Leere, der den Kollaps mehrerer Reiche überlebt hat. Er jagt himmlische Souveräne zum Zeitvertreib und betrachtet aufsteigende Kultivierer als Beute."
+    }
+  },
+  "items": {
+    "iron_herb_1": {
+      "name": "Sektengras",
+      "desc": "Ein Unkraut, das überall dort wächst, wo sterbliche Kultivierer trainieren, und Restqi vom Sektengelände aufsaugt."
+    },
+    "iron_herb_2": {
+      "name": "Grenzlandwurzel",
+      "desc": "Eine knorrige Wurzel aus der Grenzland-Wildnis, angezogen von schwacher spiritueller Energie im Boden."
+    },
+    "bronze_herb_1": {
+      "name": "Qi-Ader-Ranke",
+      "desc": "Eine kriechende Ranke, die entlang unterirdischer Qi-Adern wächst, mit schwach leuchtenden Blättern."
+    },
+    "bronze_herb_2": {
+      "name": "Geisterwaldblüte",
+      "desc": "Eine blasse Blume, die nur im Nebelgeistwald blüht, bestäubt von Waldgeistern."
+    },
+    "silver_herb_1": {
+      "name": "Zersplitterter-Himmel-Lotos",
+      "desc": "Ein silberner Lotos, der in den Ruinen der Zersplitterter-Himmel-Wüste überlebt und Wasser aus tiefen Kraftlinien zieht."
+    },
+    "silver_herb_2": {
+      "name": "Blutmeer-Schilf",
+      "desc": "Ein blutroter Schilf, der an den Rändern des Blutmeers wächst, sein Saft dick mit korrumpierter Lebenskraft."
+    },
+    "gold_herb_1": {
+      "name": "Heiliger-Begräbnis-Lotos",
+      "desc": "Ein dunkler Lotos, der nur über Begräbnisstätten heiliger Güte blüht und sich von jahrhundertelangem Todes-Qi ernährt."
+    },
+    "gold_herb_2": {
+      "name": "Leerendorn-Ranke",
+      "desc": "Eine Dornenranke, die durch Rissrisse wächst, ihre Widerhaken scharf genug, um Verteidigungen heiliger Güte zu durchdringen."
+    },
+    "transcendent_herb_1": {
+      "name": "Ursprungsfrühlings-Blütenblatt",
+      "desc": "Ein Blütenblatt von Blumen, die an den Ursprungs-Qi-Quellen der Welt wachsen, gesättigt mit urzeitlicher Energie."
+    },
+    "transcendent_herb_2": {
+      "name": "Offener-Himmel-Ranke",
+      "desc": "Eine legendäre Ranke, deren Wurzeln hinauf in das Offene-Himmel-Reich selbst reichen und himmelsgradig Energie kanalisieren."
+    },
+    "iron_mineral_1": {
+      "name": "Sekten-Eisensplitter",
+      "desc": "Ein Fragment eisengradigen Materials, abgeworfen von Sektenkonstrukten, Trainingsausrüstung und dem Eisen sterblicher Kultivierer."
+    },
+    "iron_mineral_2": {
+      "name": "Eisenader-Splitter",
+      "desc": "Ein dichter Splitter Eisenerz, aus flachen Adern extrahiert, verwendet in der einfachen Transmutation."
+    },
+    "bronze_mineral_1": {
+      "name": "Qi-Reißzahn",
+      "desc": "Ein Reißzahn- oder Stachelsplitter von einem Tier, das durch jahrelanges Aufsaugen von Qi aus der Erde mineraldicht wurde."
+    },
+    "bronze_mineral_2": {
+      "name": "Geistholzkern",
+      "desc": "Der verhärtete Kern einer Geistentität oder eines uralten Baumes, durchdrungen von konzentriertem Wald-Qi."
+    },
+    "silver_mineral_1": {
+      "name": "Eisenrücken-Schuppe",
+      "desc": "Eine Schuppe oder ein Stachelsegment von eisenkalibrigen Raubtieren der uralten Grenzmark, dicht genug, um Angriffe silberner Güte abzulenken."
+    },
+    "silver_mineral_2": {
+      "name": "Unsterblichen-Array-Jade",
+      "desc": "Jade, durchdrungen von Formationsarrays aus versunkenen unsterblichen Ruinen, noch immer Spuren ihrer ursprünglichen Inschriften enthaltend."
+    },
+    "gold_mineral_1": {
+      "name": "Heiligen-Knochensplitter",
+      "desc": "Ein Splitter Knochen von Heiligen-Sphären-Leichen, der ein kaltes Todes-Qi ausstrahlt, das sich der Verfeinerung widersetzt."
+    },
+    "gold_mineral_2": {
+      "name": "Verbotenes-Siegel-Scherbe",
+      "desc": "Ein Fragment der Leerensiegel, die einst die Verbotenen Lande einschlossen, knisternd vor zurückgehaltener Macht."
+    },
+    "transcendent_mineral_1": {
+      "name": "Leerenkristall",
+      "desc": "Ein Kristall, der in Rissrissen gewachsen ist, seine Struktur vollständig aus komprimierter Leerenenergie geformt."
+    },
+    "transcendent_mineral_2": {
+      "name": "Weltsteinern",
+      "desc": "Ein unmöglich dichter Steinkern, geformt in den tiefsten Schichten der Welt oder von Titanen des oberen Himmels abgeworfen, nur in der fortschrittlichsten Transmutation verwendet."
+    },
+    "iron_cultivation_1": {
+      "name": "Eisen-Qi-Stein 1",
+      "desc": "Ein natürlich geformter Stein, der im Laufe der Zeit Umgebungs-Qi auf sterblichen Trainingsgeländen ansammelt."
+    },
+    "iron_cultivation_2": {
+      "name": "Eisen-Qi-Stein 2",
+      "desc": "Restliches Qi, das sich über einem besiegten sterblichen Kultivierer oder Tier verdichtet, kurz sichtbar bevor es sich verteilt."
+    },
+    "bronze_cultivation_1": {
+      "name": "Bronze-Qi-Stein 1",
+      "desc": "Der dichte Qi-Kern im Zentrum eines Tieres, das sich jahrelang von spiritueller Energie ernährt hat — noch schwach pulsierend nach dem Tod."
+    },
+    "bronze_cultivation_2": {
+      "name": "Bronze-Qi-Stein 2",
+      "desc": "Ein kristallisierter Qi-Splitter, herausgerissen aus einem gefallenen Kultivierer oder Konstrukt, dessen Energiepfade korrumpiert oder zersplittert worden waren."
+    },
+    "silver_cultivation_1": {
+      "name": "Silber-Qi-Stein 1",
+      "desc": "Das markartige Qi-Kondensat, das tief in Wesen der uralten Grenzmark gefunden wird, nach Jahrhunderten der Qi-Aufnahme gesättigt."
+    },
+    "silver_cultivation_2": {
+      "name": "Silber-Qi-Stein 2",
+      "desc": "Ein Splitter Seelenkraft, der nach dem Tod einer unsterblichgradigen Entität weiterbesteht und noch Echos ihrer Kultivierung trägt."
+    },
+    "gold_cultivation_1": {
+      "name": "Gold-Qi-Stein 1",
+      "desc": "Ein versteinertes Relikt heiligen-sphärischen Qi, aus Begräbnisstätten und Kriegsaltären geborgen."
+    },
+    "gold_cultivation_2": {
+      "name": "Gold-Qi-Stein 2",
+      "desc": "Eine kleine Perle, geformt in leerenbeeinflussten Raubtieren und Schatten, komprimierte leerenattributische Energie enthaltend."
+    },
+    "transcendent_cultivation_1": {
+      "name": "Transzendenter Qi-Stein 1",
+      "desc": "Der kristallisierte Qi-Kern einer urzeitlichen Entität — kondensiert aus Millionen von Jahren ununterbrochener Kultivierung."
+    },
+    "transcendent_cultivation_2": {
+      "name": "Transzendenter Qi-Stein 2",
+      "desc": "Ein Kristall aus reinem himmelsgradigem Qi, extrahiert aus Entitäten, die jenseits sterblicher Grenzen aufgestiegen sind."
+    },
+    "iron_essence_pill":          { "name": "Eisen-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_soul_pill":             { "name": "Eisen-Seelen-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_body_pill":             { "name": "Eisen-Körper-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_fist_pill":             { "name": "Eisen-Faust-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_ember_pill":            { "name": "Eisen-Glut-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_mind_pill":             { "name": "Eisen-Geist-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_skin_pill":             { "name": "Eisen-Haut-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_ward_pill":             { "name": "Eisen-Schutz-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_anchor_pill":           { "name": "Eisen-Anker-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "iron_vigor_pill":            { "name": "Eisen-Vitalitäts-Pille",       "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_essence_pill":        { "name": "Bronze-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_soul_pill":           { "name": "Bronze-Seelen-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_body_pill":           { "name": "Bronze-Körper-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_fist_pill":           { "name": "Bronze-Faust-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_ember_pill":          { "name": "Bronze-Glut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_mind_pill":           { "name": "Bronze-Geist-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_skin_pill":           { "name": "Bronze-Haut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_ward_pill":           { "name": "Bronze-Schutz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_anchor_pill":         { "name": "Bronze-Anker-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "bronze_vigor_pill":          { "name": "Bronze-Vitalitäts-Pille",      "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_essence_pill":        { "name": "Silber-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_soul_pill":           { "name": "Silber-Seelen-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_body_pill":           { "name": "Silber-Körper-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_fist_pill":           { "name": "Silber-Faust-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_ember_pill":          { "name": "Silber-Glut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_mind_pill":           { "name": "Silber-Geist-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_skin_pill":           { "name": "Silber-Haut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_ward_pill":           { "name": "Silber-Schutz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_anchor_pill":         { "name": "Silber-Anker-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "silver_vigor_pill":          { "name": "Silber-Vitalitäts-Pille",      "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_essence_pill":          { "name": "Gold-Essenz-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_soul_pill":             { "name": "Gold-Seelen-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_body_pill":             { "name": "Gold-Körper-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_fist_pill":             { "name": "Gold-Faust-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_ember_pill":            { "name": "Gold-Glut-Pille",              "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_mind_pill":             { "name": "Gold-Geist-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_skin_pill":             { "name": "Gold-Haut-Pille",              "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_ward_pill":             { "name": "Gold-Schutz-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_anchor_pill":           { "name": "Gold-Anker-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "gold_vigor_pill":            { "name": "Gold-Vitalitäts-Pille",        "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
+    "transcendent_essence_pill":  { "name": "Transzendente Essenz-Pille",   "desc": "Eine kultivierte Pille, die alle drei primären Grundwerte dauerhaft verbessert." },
+    "exploit_mastery_pill":       { "name": "Ausnutz-Meisterschafts-Pille", "desc": "Eine kultivierte Pille, die Ausnutzchance und Schaden dauerhaft verbessert." },
+    "world_harvest_pill":         { "name": "Welternte-Pille",              "desc": "Eine kultivierte Pille, die Sammel- und Bergbaugeschwindigkeit sowie Glück dauerhaft verbessert." },
+    "cataclysm_pill":             { "name": "Katastrophen-Pille",           "desc": "Eine kultivierte Pille, die alle Schadensarten dauerhaft verbessert." },
+    "dao_bulwark_pill":           { "name": "Dao-Bollwerk-Pille",           "desc": "Eine kultivierte Pille, die alle Verteidigungsarten dauerhaft verbessert." },
+    "eternal_vigor_pill":         { "name": "Ewige-Vitalitäts-Pille",       "desc": "Eine kultivierte Pille, die dauerhaft eine enorme Menge Trefferpunkte gewährt." },
+    "iron_blood_core_1": {
+      "name": "Eisen-Blutkern 1",
+      "desc": "Platzhalter — ein dichter eisengradiger Blutkern, extrahiert aus einem gefallenen Feind."
+    },
+    "iron_blood_core_2": {
+      "name": "Eisen-Blutkern 2",
+      "desc": "Platzhalter — eine kristallisierte eisengradige Blutessenz, kondensiert aus sterblichen Kultivierern."
+    },
+    "bronze_blood_core_1": {
+      "name": "Bronze-Blutkern 1",
+      "desc": "Platzhalter — ein bronzegradiger Blutkern, der mit tierischer Lebenskraft pulsiert."
+    },
+    "bronze_blood_core_2": {
+      "name": "Bronze-Blutkern 2",
+      "desc": "Platzhalter — ein Splitter kondensierter bronzegradiger Blut-Qi aus korrumpierten Entitäten."
+    },
+    "silver_blood_core_1": {
+      "name": "Silber-Blutkern 1",
+      "desc": "Platzhalter — ein silbergradiger Blutkern, gesättigt mit uralter Grenzland-Lebenskraft."
+    },
+    "silver_blood_core_2": {
+      "name": "Silber-Blutkern 2",
+      "desc": "Platzhalter — ein Restblutkristall von einer unsterblichgradigen Entität."
+    },
+    "gold_blood_core_1": {
+      "name": "Gold-Blutkern 1",
+      "desc": "Platzhalter — ein heiliggradiger Blutkern, der kaltes Todes-Qi ausstrahlt."
+    },
+    "gold_blood_core_2": {
+      "name": "Gold-Blutkern 2",
+      "desc": "Platzhalter — eine leerenattributische Blutperle von einem goldgradigen Raubtier."
+    },
+    "transcendent_blood_core_1": {
+      "name": "Transzendenter Blutkern 1",
+      "desc": "Platzhalter — ein urzeitlicher Blutkern, kondensiert aus einer Entität jenseits sterblicher Grenzen."
+    },
+    "transcendent_blood_core_2": {
+      "name": "Transzendenter Blutkern 2",
+      "desc": "Platzhalter — ein himmlischer Blut-Kristall, der überwältigenden Druck ausstrahlt."
+    }
+  },
+  "artefacts": {
+    "iron_sword": {
+      "name": "Eisenschwert",
+      "desc": "Ein schlichtes Eisenschwert, geschmiedet für Schüler der äußeren Sekte. Zuverlässig, aber unremarkabel."
+    },
+    "spirit_edge_sword": {
+      "name": "Geisterklingen-Schwert",
+      "desc": "Ein mit Geisterenergie geschärftes Schwert; die Klinge summt schwach, wenn Qi durch sie fließt."
+    },
+    "void_cleaver": {
+      "name": "Leerenhackbeil",
+      "desc": "Aus Leerenstein geschmiedet; jeder Schlag reißt einen haarfeinen Riss in das lokale Raumgefüge."
+    },
+    "dragon_fang_sword": {
+      "name": "Drachenzahn-Schwert",
+      "desc": "Aus einem Drachenungetüm-Reißzahn gefertigt; kanalisiert rohen drachenartigen Druck in jeden Schlag."
+    },
+    "heaven_slaying_sword": {
+      "name": "Himmelsbezwinger-Schwert",
+      "desc": "Eine legendäre Klinge, die die Barriere zwischen den Sphären durchschnitten haben soll. Die Schneide wird nie stumpf."
+    },
+    "iron_polearm": {
+      "name": "Eisenschaftwaffe",
+      "desc": "Eine schwere Eisenschaftwaffe, bevorzugt von Körper-Kultivierern für ihre Reichweite und Stoppkraft."
+    },
+    "serpent_spear": {
+      "name": "Schlangenspeer",
+      "desc": "Ein flexibler Speer mit einer Schlangenreißzahn-Spitze, der beim Eindringen ein schwaches spirituelles Gift injiziert."
+    },
+    "mountain_breaker": {
+      "name": "Bergbrecher",
+      "desc": "Eine breitkopfige Hellebarde, die einen kleinen Geisterberg gefällt haben soll. Zertrümmert physische Verteidigung."
+    },
+    "thunder_lance": {
+      "name": "Donnerlanze",
+      "desc": "Eine mit komprimiertem Blitzerz beschichtete Lanze; Schläge detonieren mit einem Donnerschlag."
+    },
+    "divine_pillar_spear": {
+      "name": "Göttlicher Pfeiler-Speer",
+      "desc": "Einst ein Pfeiler eines himmlischen Palastes, umgeformt zu einem Speer. Ein Vollkraftstoß zerreißt den Raum."
+    },
+    "spirit_headband": {
+      "name": "Geisterstirnband",
+      "desc": "Ein einfaches Stoffband, durchdrungen von grundlegender spiritueller Energie, das die Konzentration während der Kultivierung fördert."
+    },
+    "jade_cultivation_crown": {
+      "name": "Jade-Kultivierungs-Krone",
+      "desc": "Ein geschnitzter Jade-Reif, der das spirituelle Meer stabilisiert und die Turbulenzen beim Durchbruch reduziert."
+    },
+    "ghost_kings_circlet": {
+      "name": "Geisterkönig-Stirnreif",
+      "desc": "Aus Geistereisen geschmiedet; dämpft spirituelle Angriffe und unterdrückt seelbasierte Debuffs."
+    },
+    "heaven_forged_war_crown": {
+      "name": "Himmelsgeschmiedete Kriegskrone",
+      "desc": "Eine im Himmelsfeuer geschmolzene Kampfkrone; erhöht den Widerstand gegen Elementarschaden erheblich."
+    },
+    "crown_of_the_undying": {
+      "name": "Krone der Unsterblichen",
+      "desc": "Soll von einem Offenen-Himmel-Kultivierer getragen worden sein; schützt den Geist vor tödlichen Seelenangriffen."
+    },
+    "cotton_spirit_robe": {
+      "name": "Baumwoll-Geister-Robe",
+      "desc": "Leichte Robe, gewoben mit Geisterfaden, die minimale, aber beständige Qi-Zirkulation bietet."
+    },
+    "cloud_silk_battle_vest": {
+      "name": "Wolkenseide-Kampfweste",
+      "desc": "Eine aus hochgelegener Wolkenseide gesponnene Weste, die leichte physische und elementare Schläge ablenkt."
+    },
+    "dragon_scale_armour": {
+      "name": "Drachenschuppen-Rüstung",
+      "desc": "Von einem minderwertigen Drachenungetüm abgeworfene Schuppen; hart wie Eisen und widerstandsfähig gegen Feuer und Blitz."
+    },
+    "phoenix_feather_war_robe": {
+      "name": "Phönixfeder-Kriegsrobe",
+      "desc": "Aus Phönixdaunen gewoben; regeneriert im Laufe der Zeit leichten Schaden und widersteht extremer Hitze."
+    },
+    "heaven_piercing_divine_robe": {
+      "name": "Himmelsdurchbohrender Göttlicher Umhang",
+      "desc": "Ein Umhang höchster Güte, der zwischen Weichheit und Stahl wechselt; annulliert Schläge unterhalb einer Kraftschwelle."
+    },
+    "iron_bracers": {
+      "name": "Eisenarmschützer",
+      "desc": "Grundlegende Eisenarmschützer, die die Unterarme verstärken und die Blockstabilität verbessern."
+    },
+    "tiger_claw_gauntlets": {
+      "name": "Tigerklauen-Handschuhe",
+      "desc": "Nach Tigerklauen gestylte Handschuhe; erhöht leicht den Schaden von waffenloser und Schaftwaffenkampf."
+    },
+    "mithril_bracers": {
+      "name": "Mithril-Armschützer",
+      "desc": "Leichte Mithril-Armschützer, die elementare Energie durch jeden Schlag leiten."
+    },
+    "dragon_vein_gauntlets": {
+      "name": "Drachenader-Handschuhe",
+      "desc": "Mit Drachenader-Erz durchflochtene Handschuhe; kanalisieren Qi durch die Arme in einem merklich schnelleren Rhythmus."
+    },
+    "heaven_palm_guards": {
+      "name": "Himmelspalmen-Schutzhandschuhe",
+      "desc": "Uralte Schutzhandschuhe eines Handflächentechnik-Großmeisters; verstärken offene-Palmen-Geheimtechniken dramatisch."
+    },
+    "leather_cultivation_belt": {
+      "name": "Leder-Kultivierungs-Gürtel",
+      "desc": "Ein robuster Gürtel, der das Dantian stabilisiert und die Qi-Zerstreuung im Kampf reduziert."
+    },
+    "spirit_jade_sash": {
+      "name": "Geister-Jade-Schärpe",
+      "desc": "Eine Seidenschärpe, eingelegt mit Geister-Jade-Perlen; verbessert die Qi-Zirkulation zwischen Ober- und Unterkörper."
+    },
+    "serpent_skin_belt": {
+      "name": "Schlangenhaut-Gürtel",
+      "desc": "Aus der abgeworfenen Haut einer spirituellen Schlange gefertigt; erhöht Beweglichkeit und Giftresistenz."
+    },
+    "golden_dragon_belt": {
+      "name": "Goldener-Drachen-Gürtel",
+      "desc": "Ein breiter Gürtel, geprägt mit einem sich windenden Drachen; erhöht die Körperwert-Konversion erheblich."
+    },
+    "void_emperors_sash": {
+      "name": "Leere-Kaiser-Schärpe",
+      "desc": "Eine aus Raumfaden gewebte Schärpe; absorbiert einen Teil des eingehenden Schadens in eine Leere-Tasche."
+    },
+    "wind_step_boots": {
+      "name": "Windschritt-Stiefel",
+      "desc": "Leichte Stiefel, verzaubert für flinkes Fußwerk; erhöht die Ausweichrate geringfügig."
+    },
+    "swiftcloud_sandals": {
+      "name": "Schnellwolken-Sandalen",
+      "desc": "Sandalen, die eine Spur Wolkenenergie tragen; ermöglichen kurze Ausbrüche beschleunigter Bewegung."
+    },
+    "thunderstep_boots": {
+      "name": "Donnerschritt-Stiefel",
+      "desc": "Stiefel, knisternd vor gespeichertem Blitz; jeder Schritt gibt beim Kontakt einen schwachen Schlag ab."
+    },
+    "dragon_treading_boots": {
+      "name": "Drachentritt-Stiefel",
+      "desc": "Aus Drachenungetüm-Knochen geschmiedet; verbessert Bodenstabilität und Stampfattacken dramatisch."
+    },
+    "heaven_soaring_sandals": {
+      "name": "Himmelsoarende Sandalen",
+      "desc": "Sandalen, die dem Träger das Gehen auf Luft ermöglichen sollen; erhöhen Ausweichen und bewegungsbasierte Techniken massiv."
+    },
+    "jade_spirit_pendant": {
+      "name": "Jade-Geister-Anhänger",
+      "desc": "Ein geschliffenes Jadestück, nahe am Herzen getragen; stärkt das spirituelle Meer sanft."
+    },
+    "soul_calming_necklace": {
+      "name": "Seelenberuhigungs-Halskette",
+      "desc": "Eine Kette aus Geisterperlen, die Seelenfluktuationen und mentale Debuffs im Kampf unterdrückt."
+    },
+    "blood_dragon_talisman": {
+      "name": "Blutdrachen-Talisman",
+      "desc": "Ein geschnitzter Knochentalisman, in Drachenungetüm-Blut getränkt; erhöht den rohen physischen Widerstand."
+    },
+    "elemental_core_pendant": {
+      "name": "Elementarkern-Anhänger",
+      "desc": "Enthält einen komprimierten Elementarkern; verstärkt den Elementar-Affinitätsbonus."
+    },
+    "heavens_eye_amulet": {
+      "name": "Himmels-Auge-Amulett",
+      "desc": "Ein Talisman, der das versteinerte Auge eines göttlichen Tieres beherbergt; verleiht im Kampf kurze Vorahnung."
+    },
+    "copper_spirit_ring": {
+      "name": "Kupfer-Geister-Ring",
+      "desc": "Ein schlichter Kupferring, der einen schwachen Qi-Strom durch die Meridiane leitet."
+    },
+    "jade_focus_ring": {
+      "name": "Jade-Fokus-Ring",
+      "desc": "Ein geschnitzter Jade-Ring, der die elementare Technikkontrolle schärft und verschwendete Energie reduziert."
+    },
+    "void_stone_ring": {
+      "name": "Leerenstein-Ring",
+      "desc": "Mit einem Leerestein-Fragment besetzt; hat einen kleinen Lagerraum und verstärkt den Schaden von Raumtechniken."
+    },
+    "dragon_blood_ring": {
+      "name": "Drachenblut-Ring",
+      "desc": "Ein mit Drachenblut-Legierung geschmiedeter Ring; beschleunigt die Qi-Zirkulation des Trägers erheblich."
+    },
+    "immortal_soul_ring": {
+      "name": "Unsterblichen-Seelen-Ring",
+      "desc": "Ein Ring, der einen Splitter der Seele eines Unsterblichen enthalten soll; verstärkt die Qi-Geschwindigkeit des Trägers dramatisch."
+    }
+  },
+  "techniques": {},
+  "laws": {
+    "three_harmony_manual": {
+      "name": "Dreifaches-Harmonie-Handbuch",
+      "flavour": "Der uralte Text spricht von keinem Feuer, keinem Sturm, keinem Berg — nur dem gleichmäßigen Atem zwischen allen Dingen.",
+      "realmRequirementLabel": "Gestählter Körper"
+    }
+  }
+}
