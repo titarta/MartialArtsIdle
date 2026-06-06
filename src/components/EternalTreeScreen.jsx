@@ -18,37 +18,8 @@ const COL_W   = 132;
 const ROW_H   = 116;
 const PADDING = 70;
 
-/** Preview nodes for visualisation. NOT part of the real save data — they
- *  render like locked real nodes (sigil + cost) so you can see how the full
- *  tree would shape up. The player cannot purchase them. */
-const PLACEHOLDER_NODES = [
-  // Row 0
-  { id: 'p_a', label: 'Iron Tendons',    glyph: '筋', col: 2, row: 0, cost: 2, placeholder: true, description: 'Body tempered first. +permanent vitality.' },
-  { id: 'p_b', label: 'Stone Skin',      glyph: '岩', col: 3, row: 0, cost: 2, placeholder: true, description: 'Skin like a quiet mountain. Lessens combat damage.' },
-  { id: 'p_c', label: 'Sky-Eye',         glyph: '瞳', col: 4, row: 0, cost: 3, placeholder: true, description: 'See further than this life. Reveals hidden drops.' },
-  // Row 1
-  { id: 'p_d', label: 'Untamed Heart',   glyph: '勇', col: 2, row: 1, cost: 3, placeholder: true, description: 'Courage fuelled by past lives. +breakthrough chance.' },
-  { id: 'p_e', label: 'Quiet Mind',      glyph: '靜', col: 3, row: 1, cost: 3, placeholder: true, description: 'A still pond reflects the moon. +focus duration.' },
-  { id: 'p_f', label: 'Soul Anchor',     glyph: '魂', col: 4, row: 1, cost: 4, placeholder: true, description: 'Soul roots deepen. Reduces reincarnation cost.' },
-  // Row 2
-  { id: 'p_g', label: 'Twin Stars',      glyph: '雙', col: 1, row: 2, cost: 3, placeholder: true, description: 'Pair the daos. +1 active law slot.' },
-  { id: 'p_h', label: 'Thunder Stride',  glyph: '雷', col: 2, row: 2, cost: 4, placeholder: true, description: 'Travel between cells of the heavens. +realm speed.' },
-  { id: 'p_i', label: 'Wind Whisper',    glyph: '風', col: 3, row: 2, cost: 4, placeholder: true, description: 'Hear the dao on the breeze. +qi spark rate.' },
-  { id: 'p_j', label: 'Mist Veil',       glyph: '霧', col: 4, row: 2, cost: 5, placeholder: true, description: 'Step beyond ambushes. Combat enemies hit softer first.' },
-  // Row 3
-  { id: 'p_k', label: 'Lotus Bloom',     glyph: '蓮', col: 1, row: 3, cost: 4, placeholder: true, description: 'The lotus rises from mud. +pill effect.' },
-  { id: 'p_l', label: 'Threads of Fate', glyph: '命', col: 2, row: 3, cost: 5, placeholder: true, description: 'Read the weave. +rare drop chance.' },
-  { id: 'p_m', label: 'Auspicious Star', glyph: '辰', col: 3, row: 3, cost: 5, placeholder: true, description: 'Born under a kind sign. +artefact roll quality.' },
-  { id: 'p_n', label: 'Three Treasures', glyph: '三', col: 4, row: 3, cost: 5, placeholder: true, description: 'Jing, qi, shen aligned. +cultivation speed.' },
-  // Row 4 — deeper / keystones
-  { id: 'p_o', label: 'Eternal Anchor',  glyph: '永', col: 1, row: 4, cost: 6, placeholder: true, description: 'A pillar across lives. Preserves a small qi reserve through reincarnation.' },
-  { id: 'p_p', label: 'Heavenward',      glyph: '昇', col: 2, row: 4, cost: 6, placeholder: true, description: 'Climb past the ninth heaven. Unlocks higher realms sooner.' },
-  { id: 'p_q', label: 'Beyond Form',     glyph: '玄', col: 3, row: 4, cost: 7, placeholder: true, description: 'The dao without name. +karma earned per life.' },
-  { id: 'p_r', label: 'Crown of Lives',  glyph: '冕', col: 4, row: 4, cost: 8, placeholder: true, description: 'The crown of one thousand lives. All gains amplified.' },
-];
-
-const ALL_NODES = [...NODES, ...PLACEHOLDER_NODES];
-const ALL_NODES_BY_ID = Object.fromEntries(ALL_NODES.map(n => [n.id, n]));
+const ALL_NODES = NODES;
+const ALL_NODES_BY_ID = NODES_BY_ID;
 
 const NUM_COLS = Math.max(...ALL_NODES.map(n => n.col)) + 1;
 const NUM_ROWS = Math.max(...ALL_NODES.map(n => n.row)) + 1;
@@ -107,22 +78,8 @@ const EDGES = (() => {
   for (const n of NODES) {
     for (const pid of (n.prereqs || [])) push(pid, n.id, 'real');
   }
-  // Placeholder preview lattice — cardinal adjacency only, between placeholders.
-  for (let i = 0; i < PLACEHOLDER_NODES.length; i++) {
-    for (let j = i + 1; j < PLACEHOLDER_NODES.length; j++) {
-      const a = PLACEHOLDER_NODES[i], b = PLACEHOLDER_NODES[j];
-      const dr = Math.abs(a.row - b.row), dc = Math.abs(a.col - b.col);
-      if (dr + dc === 1) push(a.id, b.id, 'ghost');
-    }
-  }
   return out;
 })();
-
-// Per-node calligraphy sigil (real nodes only; placeholders carry their own).
-const NODE_GLYPH = {
-  n_1: '道', n_2: '星', n_3: '晶', n_4: '眼',
-  n_5: '儉', n_6: '響', n_7: '長',
-};
 
 function makeStars(count) {
   let seed = 7;
@@ -148,7 +105,7 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
   const isPlaceholder = !!node.placeholder;
   const isPurchased   = state === 'purchased';
   const isAvailable   = state === 'available';
-  const isComingSoon  = node.id === 'n_2';
+  const isComingSoon  = !!node.comingSoon;
   const canBuy = !isPlaceholder && isAvailable && !isComingSoon && karma >= node.cost;
 
   const variant = isPlaceholder ? 'placeholder'
@@ -157,7 +114,7 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
                 : isAvailable   ? 'avail'
                 :                  'locked';
   const cls = `et-node et-node-${variant}${isComingSoon ? ' et-node-soon' : ''}${isSelected ? ' et-node-selected' : ''}`;
-  const glyph = NODE_GLYPH[node.id] ?? node.glyph ?? '◇';
+  const glyph = node.glyph ?? '◇';
 
   return (
     <g
@@ -190,7 +147,7 @@ function detailAction(node, state, karma) {
   if (!node) return null;
   if (node.placeholder)         return { text: 'Preview only',                disabled: true,  variant: 'soft' };
   if (state === 'purchased')    return { text: '✓ Anchored',                  disabled: true,  variant: 'owned' };
-  if (node.id === 'n_2')        return { text: '✦ Coming soon',               disabled: true,  variant: 'soft' };
+  if (node.comingSoon)          return { text: '✦ Coming soon',               disabled: true,  variant: 'soft' };
   if (state !== 'available')    return { text: 'Prerequisites still bound',   disabled: true,  variant: 'soft' };
   // The 'karma' suffix is rendered as the ui/karma.png sprite by the
   // button JSX below, so detailAction returns just the leading text + the
@@ -219,8 +176,7 @@ export default function EternalTreeScreen({
   // scripts/build_msz_font.py.
   useEffect(() => {
     const treeGlyphs = [
-      ...Object.values(NODE_GLYPH),
-      ...PLACEHOLDER_NODES.map(n => n.glyph),
+      ...NODES.map(n => n.glyph),
       '輪',  // reincarnate footer button
     ];
     assertGlyphsCovered(treeGlyphs, 'EternalTreeScreen');
@@ -337,7 +293,7 @@ export default function EternalTreeScreen({
     const node = selectedNodeId ? ALL_NODES_BY_ID[selectedNodeId] : null;
     if (!node || node.placeholder) return;
     const st = nodeStates[node.id];
-    if (st !== 'available' || node.id === 'n_2') return;
+    if (st !== 'available' || node.comingSoon) return;
     if (karma < node.cost) return;
     buyNode(node.id);
   };
@@ -441,8 +397,8 @@ export default function EternalTreeScreen({
               // owned + child available), dim (neither end is owned yet).
               const aOwn   = nodeStates[a.id] === 'purchased';
               const bOwn   = nodeStates[b.id] === 'purchased';
-              const aAvail = nodeStates[a.id] === 'available' && a.id !== 'n_2';
-              const bAvail = nodeStates[b.id] === 'available' && b.id !== 'n_2';
+              const aAvail = nodeStates[a.id] === 'available' && !ALL_NODES_BY_ID[a.id]?.comingSoon;
+              const bAvail = nodeStates[b.id] === 'available' && !ALL_NODES_BY_ID[b.id]?.comingSoon;
               const lit    = aOwn && bOwn;
               const pulse  = !lit && ((aOwn && bAvail) || (bOwn && aAvail));
               const cls = `et-edge ${lit ? 'et-edge-lit' : pulse ? 'et-edge-pulse' : 'et-edge-dim'}`;
@@ -467,7 +423,7 @@ export default function EternalTreeScreen({
           <div className="et-detail" onClick={(e) => e.stopPropagation()}>
             <div className="et-detail-row">
               <div className="et-detail-glyph" aria-hidden="true">
-                {NODE_GLYPH[selectedNode.id] ?? selectedNode.glyph ?? '◇'}
+                {selectedNode.glyph ?? '◇'}
               </div>
               <div className="et-detail-body">
                 <div className="et-detail-name">{selectedNode.label}</div>

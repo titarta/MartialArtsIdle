@@ -20,7 +20,7 @@ import { TUTORIAL_IDS } from '../data/tutorialCards';
  * triggering useCultivation re-renders).
  */
 export default function CultivationScreen({
-  cultivation, producers, upgrades, crystal, qiSparks, initialTab, legendaryPoolInfo,
+  cultivation, producers, upgrades, crystal, qiSparks, unlockedHiddenArts, initialTab, legendaryPoolInfo,
   // Blood Lotus Shop — "Disciple's Diligence" wiring. `autoBuyOwned` is
   // the QoL ownership flag (hides the chip when false); `autoBuyEnabled`
   // is the player's toggle state; `onToggleAutoBuy` flips it.
@@ -396,6 +396,7 @@ export default function CultivationScreen({
             extraMult={detailProducer.id === 'p_disciple' ? rosterMult : 1}
             baseGameRate={baseProductionRate}
             onEnterMinigame={(pid) => { setDetailProducer(null); setMinigameId(pid); }}
+            minigameUnlocked={unlockedHiddenArts?.has?.(detailProducer.id)}
             onClose={() => setDetailProducer(null)}
           />
         );

@@ -49,6 +49,7 @@ export default function ProducerDetailModal({
   extraMult = 1,
   baseGameRate,        // base production qi/s = BASE_RATE + sum(producer raw outputs)
   onEnterMinigame,     // (producerId) => void — opens the Mythic-tier minigame
+  minigameUnlocked,    // Eternal Tree keeps this Hidden Art open across lives
   onClose,
 }) {
   const tier      = unlocked ? getSpriteTier(owned) : null;
@@ -56,6 +57,8 @@ export default function ProducerDetailModal({
   const sprite    = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
   const minigame  = getMinigame(producer.id);
   const isMythic  = tier?.name === 'mythic';
+  // Mythic tier OR an Eternal Tree node (roster/garden/furnace) opens the art.
+  const canEnterMinigame = isMythic || !!minigameUnlocked;
 
   const upMult        = upgradeMult ?? 1;
   const xMult         = extraMult   ?? 1;
@@ -148,25 +151,25 @@ export default function ProducerDetailModal({
               )}
             </div>
 
-            {minigame && (isMythic || import.meta.env.DEV) && (
+            {minigame && (canEnterMinigame || import.meta.env.DEV) && (
               <div className="pdm-minigame">
                 <button
                   type="button"
-                  className={`pdm-mg-enter${isMythic ? '' : ' pdm-mg-enter-dev'}`}
+                  className={`pdm-mg-enter${canEnterMinigame ? '' : ' pdm-mg-enter-dev'}`}
                   onClick={() => onEnterMinigame?.(producer.id)}
                 >
                   <span className="pdm-mg-glyph" aria-hidden="true">{minigame.glyph}</span>
                   <span className="pdm-mg-text">
                     <span className="pdm-mg-kicker">
-                      {isMythic
-                        ? (minigame.ready ? 'Mythic art unlocked' : 'Mythic · coming soon')
+                      {canEnterMinigame
+                        ? (minigame.ready ? 'Hidden Art unlocked' : 'Unlocked · coming soon')
                         : 'Preview · dev'}
                     </span>
                     <span className="pdm-mg-name">{minigame.name}</span>
                   </span>
                   <span className="pdm-mg-arrow" aria-hidden="true">▶</span>
                 </button>
-                {!isMythic && (
+                {!canEnterMinigame && (
                   <div className="pdm-mg-locknote">Unlocks at Mythic tier · 50 owned.</div>
                 )}
               </div>

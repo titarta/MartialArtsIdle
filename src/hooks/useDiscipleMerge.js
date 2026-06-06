@@ -23,7 +23,7 @@
  *                            uses the correct count for each interval)
  *   reset()                → wipe to default (3×3, 0 Merit)
  */
-import { useState, useEffect, useCallback, useContext, createContext } from 'react';
+import { useState, useEffect, useCallback, useContext, createContext, useRef } from 'react';
 import {
   defaultMerge, loadMerge, saveMerge,
   tryPlace, resolveDrop, secludeTile, expandGrid, settleMerit,
@@ -42,10 +42,13 @@ export function useDiscipleMergeProvider() {
   // every animation frame — so this is cheap.
   useEffect(() => { saveMerge(state); }, [state]);
 
+  // Eternal Tree 'Open Hand' — App.jsx writes tree.modifiers.disciplePlaceCostMult here.
+  const placeCostMultRef = useRef(1);
+
   const place = useCallback((discipleCount) => {
     let out;
     setState(prev => {
-      out = tryPlace(prev, discipleCount);
+      out = tryPlace(prev, discipleCount, undefined, placeCostMultRef.current);
       return out.state;
     });
     return out;  // { state, placed, idx, cost, reason? }
@@ -106,12 +109,13 @@ export function useDiscipleMergeProvider() {
   const perDiscipleBonusPct = sum * BONUS_PER_BOARD_SUM;
   const producerMult = 1 + perDiscipleBonusPct;
   const tilesNow = tileCount(state.tiles);
-  const nextPlaceCost = placeCost(tilesNow);
+  const nextPlaceCost = Math.max(1, Math.ceil(placeCost(tilesNow) * (placeCostMultRef.current > 0 ? placeCostMultRef.current : 1)));
   const next = nextExpansion(state.gridSize);
 
   return {
     state,
     place, drop, seclude, expand, settle, reset,
+    placeCostMultRef,
     sum,
     tileCount: tilesNow,
     perDiscipleBonusPct,

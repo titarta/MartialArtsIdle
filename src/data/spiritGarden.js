@@ -121,7 +121,9 @@ function migrate(data) {
   const raw = Array.isArray(data.plots) ? data.plots.slice(0, g.plotCount) : [];
   while (raw.length < g.plotCount) raw.push(null);
   g.plots = raw.map((p) =>
-    p && SEEDS_BY_ID[p.seed] && Number.isFinite(p.at) ? { seed: p.seed, at: p.at } : null
+    p && SEEDS_BY_ID[p.seed] && Number.isFinite(p.at)
+      ? { seed: p.seed, at: p.at, ...(Number.isFinite(p.growMs) ? { growMs: p.growMs } : {}) }
+      : null
   );
 
   if (g.buff && !(g.buff.expiresAt > 0)) g.buff = null;
@@ -152,9 +154,10 @@ export function stageOf(plot, now = Date.now()) {
   if (!plot) return 'empty';
   const seed = SEEDS_BY_ID[plot.seed];
   if (!seed) return 'empty';
+  const grow = Number.isFinite(plot.growMs) ? plot.growMs : seed.growMs;
   const age = now - plot.at;
-  if (age >= seed.growMs) return 'bloom';
-  if (age >= seed.growMs * 0.5) return 'sprout';
+  if (age >= grow) return 'bloom';
+  if (age >= grow * 0.5) return 'sprout';
   return 'seed';
 }
 
@@ -163,7 +166,8 @@ export function growthProgress(plot, now = Date.now()) {
   if (!plot) return 0;
   const seed = SEEDS_BY_ID[plot.seed];
   if (!seed) return 0;
-  return Math.max(0, Math.min(1, (now - plot.at) / seed.growMs));
+  const grow = Number.isFinite(plot.growMs) ? plot.growMs : seed.growMs;
+  return Math.max(0, Math.min(1, (now - plot.at) / grow));
 }
 
 /** Count of ripe (harvestable) plots. */
@@ -178,14 +182,14 @@ export function nextRipeAt(g, now = Date.now()) {
     if (!p) continue;
     const seed = SEEDS_BY_ID[p.seed];
     if (!seed) continue;
-    const at = p.at + seed.growMs;
+    const at = p.at + (Number.isFinite(p.growMs) ? p.growMs : seed.growMs);
     if (at > now && at < soonest) soonest = at;
   }
   return soonest === Infinity ? null : soonest;
 }
 
 // ── Plot actions (pure: return a fresh garden, never mutate) ─────────────────────
-export function plantSeed(g, plotIndex, seedId, now = Date.now()) {
+export function plantSeed(g, plotIndex, seedId, now = Date.now(), growMult = 1) {
   const seed = SEEDS_BY_ID[seedId];
   if (!seed) return { ok: false, reason: 'no-seed', garden: g };
   if (plotIndex < 0 || plotIndex >= g.plotCount) return { ok: false, reason: 'bad-plot', garden: g };
@@ -194,7 +198,9 @@ export function plantSeed(g, plotIndex, seedId, now = Date.now()) {
   if (cost > g.dew) return { ok: false, reason: 'dew', garden: g };
 
   const plots = g.plots.slice();
-  plots[plotIndex] = { seed: seedId, at: now };
+  // Eternal Tree 'Fertile Soil' (soil) bakes a faster grow time into the plot
+  // at sow time (growMult < 1), so the speed-up survives reloads via growMs.
+  plots[plotIndex] = { seed: seedId, at: now, growMs: Math.max(1, Math.round(seed.growMs * (growMult > 0 ? growMult : 1))) };
   return {
     ok: true,
     garden: { ...g, dew: g.dew - cost, plots, stats: { ...g.stats, planted: g.stats.planted + 1 } },
@@ -281,7 +287,7 @@ export function canBrew(g, recipeId) {
   return Object.entries(r.inputs).every(([id, n]) => (g.basket[id] || 0) >= n);
 }
 
-export function brew(g, recipeId, now = Date.now()) {
+export function brew(g, recipeId, now = Date.now(), durationMult = 1) {
   const r = RECIPES_BY_ID[recipeId];
   if (!r) return { ok: false, reason: 'no-recipe', garden: g };
   if (!canBrew(g, recipeId)) return { ok: false, reason: 'inputs', garden: g };
@@ -291,7 +297,8 @@ export function brew(g, recipeId, now = Date.now()) {
     basket[id] = (basket[id] || 0) - n;
     if (basket[id] <= 0) delete basket[id];
   }
-  const buff = { recipeId, mult: r.mult, expiresAt: now + r.durationMs };
+  // Eternal Tree 'Lingering Brew' (linger) extends the buff duration (mult > 1).
+  const buff = { recipeId, mult: r.mult, expiresAt: now + r.durationMs * (durationMult > 0 ? durationMult : 1) };
   return { ok: true, garden: { ...g, basket, buff, stats: { ...g.stats, brewed: g.stats.brewed + 1 } } };
 }
 

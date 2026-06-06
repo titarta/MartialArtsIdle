@@ -77,6 +77,10 @@ CHARS = sorted(set(
     + "星晶眼儉響長"               # real tree node glyphs (n_2..n_7; n_1=道 already covered)
     + "筋岩瞳勇靜魂雙雷霧辰永冕"   # tree placeholder preview glyphs
     + "輪"                          # reincarnate footer button glyph (wheel of rebirth)
+    # 2026-06-05 Eternal Tree redesign (28-node single-root tree): node glyphs
+    # introduced by the reincarnation respec. (The placeholder glyphs above are
+    # now unused but harmless to keep bundled.)
+    + "升育超施萬露留沃藝紋髓承庫韻守福基"  # new Eternal Tree node glyphs
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.

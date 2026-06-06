@@ -37,6 +37,8 @@
  * of Place beats) and EXPANSION qiCosts (set the milestone cadence).
  */
 
+// Persistence key for the Roster state (single key — grid, gridSize,
+// nextId, highestTier, meritStored, meritLastUpdate live together).
 const KEY = 'mai_disciple_merge';
 
 // Tier ladder (unchanged). Values double for board-sum arithmetic.
@@ -199,10 +201,11 @@ export function settleMerit(state, discipleCount, now = Date.now()) {
  * Returns { state, placed, idx, cost, reason? }.
  *   reason: 'merit' (couldn't afford) | 'full' (no slot)
  */
-export function tryPlace(state, discipleCount, now = Date.now()) {
+export function tryPlace(state, discipleCount, now = Date.now(), costMult = 1) {
   const settled = settleMerit(state, discipleCount, now);
   const tilesNow = tileCount(settled.tiles);
-  const cost = placeCost(tilesNow);
+  // Eternal Tree 'Open Hand' (hand) discounts the Merit place cost (costMult<1).
+  const cost = Math.max(1, Math.ceil(placeCost(tilesNow) * (costMult > 0 ? costMult : 1)));
   if (settled.meritStored < cost) {
     return { state: settled, placed: false, idx: -1, cost, reason: 'merit' };
   }

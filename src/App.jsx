@@ -17,6 +17,7 @@ import ReincarnationConfirmModal from './components/ReincarnationConfirmModal';
 import SeveringRite from './components/SeveringRite';
 import DissolutionRite from './components/DissolutionRite';
 import { initAds } from './rewards/rewardService';
+import { initIAP } from './iap/iapService';
 import { restoreResolution } from './systems/desktopResolution';
 import {
   initAnalytics,
@@ -69,7 +70,7 @@ import { FEATURES } from './data/featureFlags';
 import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
 import { PRODUCERS_BY_ID } from './data/producers';
-import { loadGarden, gardenActiveQiMult } from './data/spiritGarden';
+import { loadGarden, saveGarden, gardenActiveQiMult } from './data/spiritGarden';
 import { fireTutorialOnce } from './systems/fireTutorial';
 import { hasSeenTutorial, markTutorialSeen } from './systems/tutorialSeen';
 import { TUTORIAL_IDS } from './data/tutorialCards';
@@ -159,6 +160,7 @@ function AppInner() {
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { initAnalytics(); }, []);
+  useEffect(() => { initIAP(); }, []);        // RevenueCat IAP — no-op on non-native / empty key
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
   useEffect(() => { applyGraphics(loadGraphics()); }, []);
 
@@ -411,18 +413,22 @@ function AppInner() {
   // n_1 Devoted Path: treeQiMult = 1 + 0.001 × karmaSpentOnTree.
   useEffect(() => {
     cultivation.treeQiMultRef.current       = tree.modifiers.treeQiMult ?? 1;
-    cultivation.treeHeavenlyMultRef.current = 1; // no tree node drives heavenly mult
+    cultivation.treeHeavenlyMultRef.current = tree.modifiers.heavenlyMult ?? 1; // heaven Heaven-Touched (applies while a boost is active)
     // qiOnRealmFrac — no tree node; stays at 0 (Yin Reservoir was yy_2).
     if (cultivation.qiOnRealmFracRef) {
       cultivation.qiOnRealmFracRef.current  = 0;
     }
-    // treeProducerOutputMultRef — no new node; stays at 1.
+    // coffers Boundless Coffers — global producer output multiplier (+15%).
     if (cultivation.treeProducerOutputMultRef) {
-      cultivation.treeProducerOutputMultRef.current = 1;
+      cultivation.treeProducerOutputMultRef.current = tree.modifiers.producerOutputMult ?? 1;
     }
     // n_5 Frugal Cultivation — write producer cost discount ref.
     if (producers.costMultRef) {
       producers.costMultRef.current = tree.modifiers.producerCostMult ?? 1;
+    }
+    // hand Open Hand — disciple placement Merit cost discount.
+    if (discipleMerge?.placeCostMultRef) {
+      discipleMerge.placeCostMultRef.current = tree.modifiers.disciplePlaceCostMult ?? 1;
     }
   }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef, cultivation.qiOnRealmFracRef, cultivation.treeProducerOutputMultRef, producers.costMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -512,12 +518,15 @@ function AppInner() {
     // Disciple Promotion grid (merge minigame) → +X% to p_disciple per-unit
     // qi/s. Folded into perProducer so it composes with upgrade doubling,
     // spark synergies, and shop buffs in the same multiplicative chain.
-    const discipleMergeMult = discipleMerge?.producerMult ?? 1;
+    // Disciple Roster board bonus, amplified by the Eternal Tree 'Star
+    // Disciples' node (x1.5 on the board-sum BONUS) when owned.
+    const dmRaw = discipleMerge?.producerMult ?? 1;
+    const discipleMergeMult = 1 + (dmRaw - 1) * (tree.modifiers.discipleBoardSumMult ?? 1);
     const perProducer = (pid) =>
       upgrades.getProducerMult(pid)
         * qiSparks.getProducerSparkMult(pid, ownedMap)
         * shopProducerMult
-        * (pid === 'p_disciple' ? discipleMergeMult : 1);
+        * (pid === 'p_disciple' ? discipleMergeMult * (tree.modifiers.discipleOutputMult ?? 1) * (tree.modifiers.discipleBaseMult ?? 1) : 1);
     // 2026-05-21 Dial-9 — Sect Discipline (common timed spark) adds +N to
     // every producer's per-unit qi/s while active. Read from the spark ref
     // (default 0). The bonus flows through per-producer mults and all
@@ -649,13 +658,17 @@ function AppInner() {
   useEffect(() => {
     const apply = () => {
       if (cultivation.gardenBuffQiMultRef) {
-        cultivation.gardenBuffQiMultRef.current = gardenActiveQiMult(loadGarden());
+        // potency Verdant Potency — amplify the elixir BONUS (x1.2), not the
+        // neutral 1. So +12% becomes +14.4% when the node is owned.
+        const m = gardenActiveQiMult(loadGarden());
+        const pot = tree.modifiers.gardenElixirMagnitudeMult ?? 1;
+        cultivation.gardenBuffQiMultRef.current = m > 1 ? 1 + (m - 1) * pot : 1;
       }
     };
     apply();
     const id = setInterval(apply, 1000);
     return () => clearInterval(id);
-  }, [cultivation.gardenBuffQiMultRef]);
+  }, [cultivation.gardenBuffQiMultRef, tree.modifiers.gardenElixirMagnitudeMult]);
 
   // Mirror Qi Sparks multipliers + flags into cultivation refs each render.
   // Cheap; runs only when activeSparks identity changes (the hook returns
@@ -1715,6 +1728,11 @@ function AppInner() {
     // Safety net — the button is already disabled below Saint, but we
     // refuse here too so any future callsite can't bypass the gate.
     if (cultivation.realmIndex < 24) return;
+    // Commit the Eternal Tree session NOW — this is the confirmed
+    // reincarnation. Pays the staged karma and folds the provisional anchors
+    // into the persisted set. Until this point anchoring is in-memory only, so
+    // a page refresh without reincarnating resets the anchors and karma spent.
+    tree.commit();
     try {
       trackReincarnation(cultivation.realmIndex, (karma.lives ?? 0) + 1);
       trackFirstTime('Reincarnation', cultivation.realmIndex);
@@ -1730,6 +1748,12 @@ function AppInner() {
     }
     karma.reincarnate();
 
+    // Snapshot producer counts + crystal level BEFORE the wipe so the Eternal
+    // Tree rebirth-carry nodes can restore a fraction into the new life.
+    let prodSnapshot = null, crystalSnapshot = null;
+    try { prodSnapshot = JSON.parse(localStorage.getItem('mai_producers') || 'null'); } catch {}
+    try { crystalSnapshot = JSON.parse(localStorage.getItem('mai_qi_crystal') || 'null'); } catch {}
+
     // Give React a tick to flush the karma state to localStorage before we
     // wipe the rest of the save + remount the tree.
     setTimeout(() => {
@@ -1738,6 +1762,32 @@ function AppInner() {
       // (including the +1 livesLived just fired by karma.reincarnate()).
       try { stats.resetRun(); } catch {}
       wipeReincarnation();
+      // ── Eternal Tree rebirth carries ──────────────────────────────────────
+      // tree.commit() above persisted the owned set; re-seed the just-wiped
+      // keys before the remount re-reads them.
+      try {
+        const ownedTree = new Set(JSON.parse(localStorage.getItem('mai_reincarnation_tree') || '[]'));
+        // foundation Eternal Foundation — keep 20% of each producer's count.
+        if (ownedTree.has('foundation') && prodSnapshot && typeof prodSnapshot === 'object') {
+          const kept = {};
+          for (const [pid, n] of Object.entries(prodSnapshot)) {
+            const c = Math.floor((Number(n) || 0) * 0.20);
+            if (c > 0) kept[pid] = c;
+          }
+          if (Object.keys(kept).length) localStorage.setItem('mai_producers', JSON.stringify(kept));
+        }
+        // core Unbroken Core — keep 25% of crystal level.
+        if (ownedTree.has('core') && crystalSnapshot && (crystalSnapshot.level ?? 0) > 0) {
+          const lvl = Math.floor(crystalSnapshot.level * 0.25);
+          if (lvl > 0) localStorage.setItem('mai_qi_crystal', JSON.stringify({ level: lvl, refinedQi: 0 }));
+        }
+        // bloom Spirit Bloom — begin each life with +50 Spirit Dew.
+        if (ownedTree.has('bloom')) {
+          const g = loadGarden();
+          g.dew = (Number(g.dew) || 0) + 50;
+          saveGarden(g);
+        }
+      } catch {}
       // Continuous-experience reincarnation: dispatch a reset event
       // instead of window.location.reload(). The outer App wrapper
       // catches this, mounts a cream-wash overlay, bumps the key on
@@ -1749,7 +1799,7 @@ function AppInner() {
       // since reincarnation is a NEW life, not a NEW player).
       window.dispatchEvent(new CustomEvent('mai:full-reset'));
     }, 50);
-  }, [karma, cultivation.realmIndex, stats]);
+  }, [karma, cultivation.realmIndex, stats, tree.commit]);
 
   const goBack = () => {
     navigate('worlds', {
@@ -1796,7 +1846,7 @@ function AppInner() {
       ? <ProductionScreen inventory={inventory} pills={pills} tree={tree} />
       : null,
     // The qi-investment shop — main loop of v1, always visible.
-    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
+    cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} unlockedHiddenArts={tree.modifiers.unlockedHiddenArts} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} />,
     journey:    <JourneyScreen cultivation={cultivation} />,
     'spirit-bazaar': <SpiritBazaarScreen
                        inventory={shopInventory}
@@ -2046,7 +2096,7 @@ function AppInner() {
       )}
       {(reincarnationStage === 'rising' || reincarnationStage === 'tree') && (
         <EternalTreeScreen
-          karma={karma.karma}
+          karma={tree.availableKarma}
           karmaEarnedThisLife={karma.karmaEarnedThisLife}
           cumulativeQi={karma.cumulativeQi}
           qiForNextKarma={karma.qiForNextKarma}

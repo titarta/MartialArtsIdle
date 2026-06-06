@@ -290,8 +290,15 @@ export default function useCultivation() {
     // a fully-upgraded player hits 0.40, in the Idle-Slayer band). Players
     // who sink upgrades into idle progression are rewarded with real-time
     // pacing closer to the always-on sim ceiling.
+    // Eternal Tree 'Unbroken Vigil' (vigil) — +30% offline qi. Read the
+    // committed tree set directly (this calc runs before React mounts).
+    let treeOfflineMult = 1;
+    try {
+      const rawTree = localStorage.getItem('mai_reincarnation_tree');
+      if (rawTree && JSON.parse(rawTree).includes('vigil')) treeOfflineMult = 1.30;
+    } catch {}
     const OFFLINE_QI_MULTIPLIER = 0.20 + offlineRateBonus;
-    const baseRate = (BASE_RATE + producerOfflineRate) * crystalMult * lawMult * offlineQiMult * artefactOfflineMult * sparkOfflineMult * (1 + pillQiSpeedBonus) * OFFLINE_QI_MULTIPLIER;
+    const baseRate = (BASE_RATE + producerOfflineRate) * crystalMult * lawMult * offlineQiMult * artefactOfflineMult * sparkOfflineMult * treeOfflineMult * (1 + pillQiSpeedBonus) * OFFLINE_QI_MULTIPLIER;
     const total = baseRate * awaySeconds;
 
     // Crystal Click offline reservoir fill — silently updates localStorage so
@@ -349,6 +356,10 @@ export default function useCultivation() {
   //  producers.getRate() — no separate ref needed here.)
   const shopBuffQiMultRef         = useRef(1);
   const shopBuffCrystalTapMultRef = useRef(1);
+  // Spirit Garden elixir buff — written by App.jsx from
+  // spiritGarden.gardenActiveQiMult(loadGarden()). A timed qi/s multiplier from
+  // the garden minigame's brewed elixirs. 1 = no active elixir.
+  const gardenBuffQiMultRef       = useRef(1);
   // Upgrade-driven focus-mult adder (percentage points, 0..N). Added to the
   // stat-driven focus mult inside App.jsx's focusMult-write interval. Phase D.
   const upgradeFocusMultAddRef = useRef(0);
@@ -649,6 +660,7 @@ export default function useCultivation() {
         treeQiMultRef.current * rebirthCultBuffRef.current *
         sparkLegendaryGlobalMultRef.current *
         shopBuffQiMultRef.current *
+        gardenBuffQiMultRef.current *
         debugQiMultRef.current;
       const transientMult =
         boostMult * consecutiveMult *
@@ -1320,6 +1332,8 @@ export default function useCultivation() {
     // Blood Lotus Shop buff mults — updated by App.jsx from useShopInventory
     shopBuffQiMultRef,
     shopBuffCrystalTapMultRef,
+    // Spirit Garden elixir qi/s mult — updated by App.jsx from spiritGarden
+    gardenBuffQiMultRef,
     upgradeFocusMultAddRef,
     // Artefact qi_speed aggregate ref — updated by App.jsx each second
     artefactQiMultRef,
