@@ -20135,17 +20135,47 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* Heavenly aura — 120% size so the flames extend past the cultivator's
    silhouette, anchored to center. Pulses opacity gently for an alive feel
    on top of the 4-frame loop. */
-.home-cultivator-aura {
-  position: absolute !important;
-  left: 50%;
-  top:  50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
+/* ── Heavenly Qi halo ──────────────────────────────────────────────────
+   A single static formation-circle PNG behind the cultivator while the
+   Heavenly Qi (rewarded-ad) boost is active. The wrapper spins slowly; the
+   inner image "breathes" (gentle scale + glow). position / inset:0 / z-index:1
+   come from the `.home-fighter-stage > .home-cultivator-halo` stacking rule,
+   so here we only own the centring, spin, and interaction.
+   Graphics-aware: hidden when the player turns VFX off (`.vfx-disabled` below),
+   paused under prefers-reduced-motion, and the img inherits the global
+   Settings → Rendering toggle via `.rendering-pixelated img` (so no per-element
+   image-rendering here). Sized to 96% so the spin/breathe never reaches the
+   fighter-stage's overflow:hidden edge. */
+.home-cultivator-halo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  animation: home-aura-pulse 2.4s ease-in-out infinite;
-  /* image-rendering follows the global Settings → Rendering toggle.
-     .sprite-animator is already covered by the .rendering-pixelated rule. */
+  animation: home-cultivator-halo-spin 40s linear infinite;
 }
+.home-cultivator-halo-img {
+  width: 96%;
+  height: 96%;
+  object-fit: contain;
+  animation: home-cultivator-halo-breathe 5.5s ease-in-out infinite;
+}
+@keyframes home-cultivator-halo-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes home-cultivator-halo-breathe {
+  0%, 100% { transform: scale(1);     opacity: 0.9; }
+  50%      { transform: scale(1.045); opacity: 1;   }
+}
+
+/* Player's graphics choice: drop the halo entirely when VFX are off. */
+.vfx-disabled .home-cultivator-halo { display: none; }
+
+/* Reduced motion: keep the halo visible but stop the spin/breathe. */
+@media (prefers-reduced-motion: reduce) {
+  .home-cultivator-halo,
+  .home-cultivator-halo-img { animation: none; }
+}
+
 @keyframes home-aura-pulse {
   0%, 100% { opacity: 0.92; }
   50%      { opacity: 1.00; }
@@ -20411,7 +20441,7 @@ body.body-crimson-aura-active .home-fighter-stage::before {
    layer is hidden alongside so qi-tick "+N" floaters don't pop into empty
    space behind the cinematic. The qi accumulation itself keeps running. */
 .home-fighter-stage-lifted .home-cultivator-sprite,
-.home-fighter-stage-lifted .home-cultivator-aura {
+.home-fighter-stage-lifted .home-cultivator-halo {
   opacity: 0;
   animation-play-state: paused;
 }
@@ -25854,7 +25884,7 @@ img.pp-emblem-locked { font-size: 0; }
 }
 /* Ensure the cultivator sprites + aura sit above the mandala layer. */
 .home-fighter-stage > .home-cultivator-sprite,
-.home-fighter-stage > .home-cultivator-aura,
+.home-fighter-stage > .home-cultivator-halo,
 .home-fighter-stage > .home-cultivator-qi-flow-layer {
   /* MUST stay absolute + inset:0 so the layer fills the fighter-stage
      and gives the spawner non-zero clientWidth/Height to spawn into.

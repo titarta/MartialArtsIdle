@@ -1,7 +1,6 @@
 // @refresh reset
 import { useCallback, useState, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import SpriteAnimator from '../components/SpriteAnimator';
 import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
@@ -53,7 +52,8 @@ const HOME_BG_H = 768;
 // 13 character tiers (T0..T12), one per major realm name. Each tier has two
 // static 256×256 sprites: `<tier>_normal.png` (idle cultivation) and
 // `<tier>_focused.png` (Avatar-mode glow). When the rewarded-ad boost is
-// active, a 4-frame `heavenly_aura.png` underlay renders behind the sprite.
+// active, a static `heavenly_halo.png` formation circle renders behind the
+// sprite (slowly rotating + breathing via CSS).
 // As more tiers are generated, add the tier index to CULTIVATOR_DONE_TIERS —
 // players on a not-yet-generated tier fall back to the highest done tier
 // below their realm (no missing-file 404s).
@@ -2849,14 +2849,14 @@ function HomeScreen({
     : null;
 
   // Cultivator: static 256×256 PNG per (tier, pose). Tier from realmIndex,
-  // pose from `boosting`. CSS does the gentle breathing pulse. The aura
-  // overlay underneath uses SpriteAnimator (4-frame loop) and is only
-  // mounted when the rewarded-ad boost is active.
+  // pose from `boosting`. CSS does the gentle breathing pulse. The Heavenly
+  // Qi halo underneath is a single static formation-circle PNG (CSS spins +
+  // breathes it); only mounted while the rewarded-ad boost is active.
   const cultivatorTier = getCultivatorTier(cultivation.realmIndex);
   const cultivatorTierName = CULTIVATOR_TIER_NAMES[cultivatorTier];
   const cultivatorPose = boosting ? 'focused' : 'normal';
   const spriteSrc = `${BASE}sprites/cultivator/${cultivatorTierName}_${cultivatorPose}.png`;
-  const auraSrc   = `${BASE}sprites/cultivator/heavenly_aura.png`;
+  const haloSrc   = `${BASE}sprites/cultivator/heavenly_halo.png`;
   const fps       = boosting ? 14 : 5; // kept for any remaining animated consumers
 
   return (
@@ -3095,20 +3095,22 @@ function HomeScreen({
                 className="home-cultivator-qi-flow-layer"
                 aria-hidden="true"
               />
-              {/* Heavenly aura — only rendered when the rewarded-ad boost is
-                  active. 4-frame loop at 6 fps. Sits BEHIND the cultivator
-                  via z-index; alpha-zero center lets the character show
-                  through cleanly. */}
+              {/* Heavenly Qi halo — only rendered while the rewarded-ad boost
+                  is active. A single static formation-circle PNG: the wrapper
+                  spins slowly, the inner image "breathes" (gentle scale + glow).
+                  Sits BEHIND the cultivator via z-index; the alpha-zero centre
+                  lets the character show through. Both animations pause when the
+                  player disables VFX or requests reduced motion (CSS), and the
+                  image inherits the global Settings → Rendering toggle. */}
               {adBoostActive && (
-                <SpriteAnimator
-                  src={auraSrc}
-                  frameWidth={256}
-                  frameHeight={256}
-                  frameCount={4}
-                  fps={6}
-                  className="home-cultivator-aura"
-                  style={{ width: '120%', height: '120%' }}
-                />
+                <div className="home-cultivator-halo" aria-hidden="true">
+                  <img
+                    src={haloSrc}
+                    alt=""
+                    className="home-cultivator-halo-img"
+                    draggable="false"
+                  />
+                </div>
               )}
               {/* Cultivator — static 256×256 PNG. CSS breathing pulse adds
                   life without API-side animation. We render BOTH poses
