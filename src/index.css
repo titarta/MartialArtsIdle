@@ -281,9 +281,16 @@ body {
   padding: 0;
 }
 
-/* Universal: kill iOS long-press loupe + callout menu everywhere.
+/* Universal: kill the native mobile tap artifacts everywhere — the grey/blue
+   tap-highlight flash, the iOS long-press loupe, and the callout/selection
+   menu. Without the tap-highlight line, any interactive element that lacks its
+   own `-webkit-tap-highlight-color: transparent` (e.g. the Qi Crystal, its
+   refine button, the home chips) flashes a translucent box on tap that reads
+   as a clumsy "selection". Setting it on `*` covers every current and future
+   tap target in one place, so this no longer has to be remembered per-element.
    Class-scoped overrides (.import-input, .stg-import-input) still win on specificity. */
 *, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
