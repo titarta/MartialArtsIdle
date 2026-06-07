@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * AchievementPlaque — the "trophy plaque" detail surface for an achievement.
@@ -26,11 +27,6 @@ import { createPortal } from 'react-dom';
  *   - Pop-in animation gives unlocks a small ceremonial moment
  */
 
-const LOCKED_ICON  = '?';
-const LOCKED_TITLE = '???';
-const LOCKED_DESC  = 'Keep cultivating to reveal this achievement.';
-const HIDDEN_DESC_OBSCURED = 'The triggering deed is yet hidden from sight.';
-
 /**
  * Pick a calligraphic glyph for the watermark behind the copy. Derived
  * from the achievement id prefix so categories of unlocks share a glyph
@@ -55,15 +51,17 @@ function pickGlyph(achievementId, unlocked) {
   return '道'; // default: the Way
 }
 
-/** Brass-caps eyebrow above the title. Different word per state. */
-function kickerFor(unlocked, hidden, secretDesc) {
-  if (unlocked) return 'Achievement Earned';
-  if (hidden)   return 'Mystery Achievement';
-  if (secretDesc) return 'Hidden Path';
-  return 'Locked';
+/** Brass-caps eyebrow above the title. Different key per state. */
+function kickerKey(unlocked, hidden, secretDesc) {
+  if (unlocked)   return 'achievement.kicker.earned';
+  if (hidden)     return 'achievement.kicker.mystery';
+  if (secretDesc) return 'achievement.kicker.hidden';
+  return 'achievement.kicker.locked';
 }
 
 export default function AchievementPlaque({ achievement, unlocked, onClose }) {
+  const { t } = useTranslation('ui');
+
   // Esc closes
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
@@ -91,14 +89,14 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
     bodyText   = achievement.desc;
     medalGlyph = achievement.icon;
   } else if (isHidden) {
-    titleText  = LOCKED_TITLE;
-    bodyText   = LOCKED_DESC;
+    titleText  = t('common.unknown');
+    bodyText   = t('achievement.lockedDesc');
     bodyItalic = true;
     medalIsSeal = true;
     kickerClass = 'ach-plaque-kicker-locked';
   } else if (isSecretDesc) {
     titleText  = achievement.title;
-    bodyText   = HIDDEN_DESC_OBSCURED;
+    bodyText   = t('achievement.secretDesc');
     bodyItalic = true;
     medalIsSeal = true;
     kickerClass = 'ach-plaque-kicker-secret';
@@ -112,7 +110,7 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
   }
 
   const glyph  = pickGlyph(achievement.id, unlocked);
-  const kicker = kickerFor(unlocked, isHidden, isSecretDesc);
+  const kicker = t(kickerKey(unlocked, isHidden, isSecretDesc));
 
   const plaqueClass = [
     'ach-plaque',
@@ -135,7 +133,7 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
       className="modal-overlay ach-plaque-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={unlocked ? `Achievement: ${achievement.title}` : 'Locked achievement'}
+      aria-label={unlocked ? `Achievement: ${achievement.title}` : t('achievement.lockedAriaLabel')}
       onClick={onClose}
     >
       <div
@@ -150,7 +148,7 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
           type="button"
           className="modal-close ach-plaque-close"
           onClick={onClose}
-          aria-label="Close achievement detail"
+          aria-label={t('achievement.closeAriaLabel')}
         >
           ✕
         </button>

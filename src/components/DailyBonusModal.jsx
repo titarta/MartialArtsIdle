@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DAILY_REWARDS, noteDailyBonusSkipped } from '../systems/dailyBonus';
 
 const BASE = import.meta.env.BASE_URL;
 
 export default function DailyBonusModal({ streak, todayReward, isAvailable, onCollect, onClose }) {
+  const { t } = useTranslation('ui');
+
   const [collected, setCollected] = useState(false);
   const [awarded,   setAwarded]   = useState(0);
 
@@ -29,12 +32,12 @@ export default function DailyBonusModal({ streak, todayReward, isAvailable, onCo
     <div className="daily-modal-overlay" onClick={handleDismiss}>
       <div className="daily-modal" onClick={e => e.stopPropagation()}>
 
-        <button className="modal-close" onClick={handleDismiss} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={handleDismiss} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <div className="daily-modal-header">
           <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-modal-icon" alt="" draggable="false" />
-          <div className="daily-modal-title">Daily Gift</div>
-          <div className="daily-modal-sub">Return each day to grow your streak</div>
+          <div className="daily-modal-title">{t('daily.title')}</div>
+          <div className="daily-modal-sub">{t('daily.subtitle')}</div>
         </div>
 
         {/* 7-day grid */}
@@ -50,7 +53,7 @@ export default function DailyBonusModal({ streak, todayReward, isAvailable, onCo
                 key={day}
                 className={`daily-day${isToday ? ' daily-day-today' : ''}${isDone ? ' daily-day-done' : ''}${isFuture ? ' daily-day-future' : ''}`}
               >
-                <span className="daily-day-label">Day {day}</span>
+                <span className="daily-day-label">{t('daily.day', { n: day })}</span>
                 <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-day-icon" alt="" draggable="false" />
                 <span className="daily-day-reward">{reward}</span>
                 {isDone && <span className="daily-day-check">✓</span>}
@@ -64,15 +67,15 @@ export default function DailyBonusModal({ streak, todayReward, isAvailable, onCo
           <div className="daily-modal-success">
             <span className="daily-modal-success-amount">+{awarded}</span>
             <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-modal-success-icon" alt="" draggable="false" />
-            <span className="daily-modal-success-label">Blood Lotus collected!</span>
+            <span className="daily-modal-success-label">{t('daily.successLabel')}</span>
           </div>
         ) : isAvailable ? (
           <button className="daily-modal-collect" onClick={handleCollect}>
-            Collect {todayReward}
+            {t('daily.collectBtn', { n: todayReward })}
             <img src={`${BASE}sprites/items/blood_lotus.png`} className="daily-modal-btn-icon" alt="" draggable="false" />
           </button>
         ) : (
-          <div className="daily-modal-done">Come back tomorrow for Day {streak < 7 ? streak + 1 : 1}</div>
+          <div className="daily-modal-done">{t('daily.comeTomorrow', { n: streak < 7 ? streak + 1 : 1 })}</div>
         )}
 
       </div>

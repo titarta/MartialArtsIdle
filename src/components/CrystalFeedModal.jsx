@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CULTIVATION_ITEMS, RARITY, getRefinedQi } from '../data/materials';
 import { getRequiredRefinedQi } from '../hooks/useQiCrystal';
 import { FEATURES } from '../data/featureFlags';
@@ -96,6 +97,8 @@ function ReserveChip({ rarity, qty, rqi, dim }) {
 }
 
 function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }) {
+  const { t } = useTranslation('ui');
+
   // Cookie-Clicker pivot (v1) — under !FEATURES.combat the crystal levels via
   // qi spend instead of stone feeding. Branch to a dedicated component so the
   // existing stone-flow code stays untouched for v2.
@@ -213,14 +216,14 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
         <div className="cfm-header">
           <img src={crystalSrc} className="cfm-crystal-img" alt="" draggable="false" />
           <div className="cfm-header-text">
-            <div className="cfm-title">Qi Crystal</div>
-            <div className="cfm-subtitle">Level {level}</div>
+            <div className="cfm-title">{t('crystalFeed.title')}</div>
+            <div className="cfm-subtitle">{t('crystalFeed.levelSubtitle', { n: level })}</div>
           </div>
           <div className="cfm-bonus-block">
             {/* Current Qi/s — rendered at level 0 too (as "+0 Qi/s") so the
                 bonus-block height doesn't change when the crystal is unleveled. */}
             <div className={`cfm-bonus-current${level === 0 ? ' cfm-bonus-current-zero' : ''}`}>
-              <span className="cfm-bonus-gem">◆</span> ×{(crystalQiMult ?? 1).toFixed(2)} Qi gain
+              <span className="cfm-bonus-gem">◆</span> {t('crystalFeed.qiGain', { n: (crystalQiMult ?? 1).toFixed(2) })}
             </div>
             {/* Always rendered so its space is reserved; invisible when not
                 leveling up. Prevents the header from growing and shifting the
@@ -228,11 +231,11 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
             <div className={`cfm-bonus-next${willLevelUp ? '' : ' cfm-bonus-next-hidden'}`}>
               <span className="cfm-bonus-arrow">▲</span>
               <span>
-                Lv.{preview.level} → ×{(1 + preview.level * 0.01).toFixed(2)} Qi gain
+                {`Lv.${preview.level} → `}{t('crystalFeed.qiGain', { n: (1 + preview.level * 0.01).toFixed(2) })}
               </span>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
         </div>
 
         <div className="cfm-modal-body">
@@ -249,15 +252,15 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
           </div>
           <div className="cfm-progress-labels">
             <span>{fmtRqi(refinedQi)} / {fmtRqi(requiredForNext)} RQI</span>
-            <span className="cfm-progress-next">Level {level + 1}</span>
+            <span className="cfm-progress-next">{t('crystalFeed.levelSubtitle', { n: level + 1 })}</span>
           </div>
         </div>
 
         {/* ── Stone Reserves ── */}
         <div className="cfm-section-label">
-          Stone Reserves
+          {t('crystalFeed.stoneReserves')}
           <span className="cfm-section-meta">
-            Total: <strong>{fmtRqi(totalAvailableRqi)} RQI</strong>
+            {t('crystalFeed.total')} <strong>{fmtRqi(totalAvailableRqi)} RQI</strong>
           </span>
         </div>
 
@@ -272,9 +275,9 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
 
         {/* ── Refinement amount ── */}
         <div className="cfm-section-label">
-          Refinement Amount
+          {t('crystalFeed.refinementAmount')}
           <span className={`cfm-section-meta cfm-level-preview${willLevelUp ? '' : ' cfm-level-preview-idle'}`}>
-            Level {level} <span className="cfm-level-arrow">→</span> <strong>{preview.level}</strong>
+            {t('crystalFeed.levelPreview', { from: level, to: preview.level })}
             <span className={`cfm-level-delta${willLevelUp ? '' : ' cfm-level-delta-hidden'}`}>
               +{levelsGained}
             </span>
@@ -315,19 +318,19 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
           </div>
 
           <div className="cfm-quick-row">
-            <button className="cfm-quick-btn" onClick={applyZero} disabled={!hasAnyStones}>Clear</button>
+            <button className="cfm-quick-btn" onClick={applyZero} disabled={!hasAnyStones}>{t('common.clear')}</button>
             <button className="cfm-quick-btn" onClick={() => applyTarget(1)}  disabled={!hasAnyStones}>+1 Lv</button>
             <button className="cfm-quick-btn" onClick={() => applyTarget(5)}  disabled={!hasAnyStones}>+5 Lv</button>
             <button className="cfm-quick-btn" onClick={() => applyTarget(10)} disabled={!hasAnyStones}>+10 Lv</button>
             <button className="cfm-quick-btn cfm-quick-max" onClick={applyMax} disabled={!hasAnyStones}>
-              Max{maxLevelsGained > 0 ? ` (+${maxLevelsGained})` : ''}
+              {t('common.max')}{maxLevelsGained > 0 ? ` (+${maxLevelsGained})` : ''}
             </button>
           </div>
 
           {/* Consumption preview — always rendered with a placeholder when
               nothing is selected, so the container height stays fixed. */}
           <div className="cfm-consumption">
-            <span className="cfm-consumption-label">Will consume:</span>
+            <span className="cfm-consumption-label">{t('crystalFeed.willConsume')}</span>
             {plan.length > 0 ? (
               consumptionByRarity.map(c => (
                 <span
@@ -340,7 +343,7 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
               ))
             ) : (
               <span className="cfm-consumption-empty">
-                {hasAnyStones ? 'nothing selected' : 'gather QI stones first'}
+                {hasAnyStones ? t('crystalFeed.nothingSelected') : t('crystalFeed.gatherStones')}
               </span>
             )}
           </div>
@@ -353,12 +356,12 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
           disabled={plan.length === 0 || actualRqi <= 0 || !hasAnyStones}
         >
           {!hasAnyStones
-            ? '🪨 No stones to refine'
+            ? t('crystalFeed.noStones')
             : willLevelUp
-              ? `⚡ Refine → Level ${preview.level}`
+              ? t('crystalFeed.refineLevelUp', { n: preview.level })
               : plan.length === 0
-                ? '⚡ Refine'
-                : `⚡ Refine +${fmtRqi(actualRqi)} RQI`}
+                ? t('crystalFeed.refine')
+                : t('crystalFeed.refineRqi', { n: fmtRqi(actualRqi) })}
         </button>
       </div>
     </div>
@@ -375,6 +378,8 @@ function CrystalFeedModal({ crystal, inventory, cultivation, onClose, onEvolve }
  * it), nothing changes.
  * ─────────────────────────────────────────────────────────────────────── */
 function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
+  const { t } = useTranslation('ui');
+
   const { level, refinedQi, requiredForNext, crystalQiMult, feedQi } = crystal;
 
   // Live qi balance — same poll cadence as CultivationScreen's sticky header.
@@ -444,21 +449,21 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
         <div className="cfm-header">
           <img src={crystalSrc} className="cfm-crystal-img" alt="" draggable="false" />
           <div className="cfm-header-text">
-            <div className="cfm-title">Qi Crystal</div>
-            <div className="cfm-subtitle">Level {level}</div>
+            <div className="cfm-title">{t('crystalFeed.title')}</div>
+            <div className="cfm-subtitle">{t('crystalFeed.levelSubtitle', { n: level })}</div>
           </div>
           <div className="cfm-bonus-block">
             <div className={`cfm-bonus-current${level === 0 ? ' cfm-bonus-current-zero' : ''}`}>
-              <span className="cfm-bonus-gem">◆</span> ×{(crystalQiMult ?? 1).toFixed(2)} Qi gain
+              <span className="cfm-bonus-gem">◆</span> {t('crystalFeed.qiGain', { n: (crystalQiMult ?? 1).toFixed(2) })}
             </div>
             <div className={`cfm-bonus-next${willLevelUp ? '' : ' cfm-bonus-next-hidden'}`}>
               <span className="cfm-bonus-arrow">▲</span>
               <span>
-                Lv.{preview.level} → ×{(1 + preview.level * 0.01).toFixed(2)} Qi gain
+                {`Lv.${preview.level} → `}{t('crystalFeed.qiGain', { n: (1 + preview.level * 0.01).toFixed(2) })}
               </span>
             </div>
           </div>
-          <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
         </div>
 
         <div className="cfm-modal-body">
@@ -473,23 +478,23 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
             </div>
             <div className="cfm-progress-labels">
               <span>{fmtRqi(refinedQi)} / {fmtRqi(requiredForNext)} RQI</span>
-              <span className="cfm-progress-next">Level {level + 1}</span>
+              <span className="cfm-progress-next">{t('crystalFeed.levelSubtitle', { n: level + 1 })}</span>
             </div>
           </div>
 
           {/* Balance — replaces "Stone Reserves" in the stone variant. */}
           <div className="cfm-section-label">
-            Qi Balance
+            {t('crystalFeed.qiBalance')}
             <span className="cfm-section-meta">
-              Available: <strong>{fmtQi(balanceFloor)} Qi</strong>
+              {t('crystalFeed.available')} <strong>{fmtQi(balanceFloor)} Qi</strong>
             </span>
           </div>
 
           {/* Amount control. */}
           <div className="cfm-section-label">
-            Refinement Amount
+            {t('crystalFeed.refinementAmount')}
             <span className={`cfm-section-meta cfm-level-preview${willLevelUp ? '' : ' cfm-level-preview-idle'}`}>
-              Level {level} <span className="cfm-level-arrow">→</span> <strong>{preview.level}</strong>
+              {t('crystalFeed.levelPreview', { from: level, to: preview.level })}
               <span className={`cfm-level-delta${willLevelUp ? '' : ' cfm-level-delta-hidden'}`}>
                 +{levelsGained}
               </span>
@@ -530,12 +535,12 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
             </div>
 
             <div className="cfm-quick-row">
-              <button className="cfm-quick-btn" onClick={applyZero} disabled={balanceFloor <= 0}>Clear</button>
+              <button className="cfm-quick-btn" onClick={applyZero} disabled={balanceFloor <= 0}>{t('common.clear')}</button>
               <button className="cfm-quick-btn" onClick={() => applyTarget(1)}  disabled={balanceFloor <= 0}>+1 Lv</button>
               <button className="cfm-quick-btn" onClick={() => applyTarget(5)}  disabled={balanceFloor <= 0}>+5 Lv</button>
               <button className="cfm-quick-btn" onClick={() => applyTarget(10)} disabled={balanceFloor <= 0}>+10 Lv</button>
               <button className="cfm-quick-btn cfm-quick-max" onClick={applyMax} disabled={balanceFloor <= 0}>
-                Max{maxLevelsGained > 0 ? ` (+${maxLevelsGained})` : ''}
+                {t('common.max')}{maxLevelsGained > 0 ? ` (+${maxLevelsGained})` : ''}
               </button>
             </div>
           </div>
@@ -547,12 +552,12 @@ function CrystalQiFeedModal({ crystal, cultivation, onClose, onEvolve }) {
           disabled={!canAfford}
         >
           {balanceFloor <= 0
-            ? '🪨 Not enough Qi'
+            ? t('crystalFeed.notEnoughQi')
             : willLevelUp
-              ? `⚡ Refine → Level ${preview.level}`
+              ? t('crystalFeed.refineLevelUp', { n: preview.level })
               : clamped <= 0
-                ? '⚡ Refine'
-                : `⚡ Refine (-${fmtQi(clamped)} Qi)`}
+                ? t('crystalFeed.refine')
+                : t('crystalFeed.refineQiCost', { n: fmtQi(clamped) })}
         </button>
       </div>
     </div>

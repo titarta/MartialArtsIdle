@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ARTEFACTS_BY_ID, QUALITY } from '../data/artefacts';
 import { formatArtefactName } from '../data/artefactNames';
 import { ALL_MATERIALS, mineralForRarity } from '../data/materials';
@@ -35,6 +36,8 @@ function isValuableSacrifice(item) {
 }
 
 function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
+  const { t } = useTranslation('ui');
+
   // Queued sacrifice uids (non-destructive until commit).
   const [queue, setQueue] = useState([]);
   const [confirmingUpgrade, setConfirmingUpgrade] = useState(false);
@@ -134,19 +137,19 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
   }
 
   const upgradeLabel = atCap
-    ? 'MAX'
+    ? t('common.max')
     : !canAfford
-      ? 'Not enough materials'
+      ? t('artefactUpgrade.notEnough')
       : queuedItems.length > 0
-        ? `Upgrade → +${nextLevel} · sacrifice ${queuedItems.length}`
-        : `Upgrade → +${nextLevel}`;
+        ? t('artefactUpgrade.upgradeWithSacrifice', { level: nextLevel, n: queuedItems.length })
+        : t('artefactUpgrade.upgrade', { level: nextLevel });
 
   return (
     <div
       className="modal-overlay artefact-upgrade-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Upgrade artefact"
+      aria-label={t('common.upgrade')}
       onClick={onClose}
     >
       <div className="artefact-upgrade-panel" onClick={e => e.stopPropagation()}>
@@ -161,21 +164,21 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
               {q.label ?? rarity}{slotLabel && ` · ${slotLabel}`}
             </div>
           </div>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+          <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
         </header>
 
         <div className="artefact-upgrade-body">
           {/* ── Preview: level + per-affix value delta ─────────────────── */}
           <section className="artefact-upgrade-preview">
             <div className="artefact-upgrade-level-row">
-              <span className="artefact-upgrade-level-label">Level</span>
+              <span className="artefact-upgrade-level-label">{t('artefactUpgrade.levelLabel')}</span>
               <span className="artefact-upgrade-level-current">+{level}</span>
               <span className="artefact-upgrade-level-arrow">→</span>
               <span
                 className="artefact-upgrade-level-next"
                 style={{ color: atCap ? '#9ca3af' : q.color }}
               >
-                {atCap ? 'MAX' : `+${nextLevel}`}
+                {atCap ? t('common.max') : `+${nextLevel}`}
               </span>
               <span className="artefact-upgrade-level-cap">/ +{cap}</span>
             </div>
@@ -204,19 +207,19 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
 
             {milestone && (
               <div className="artefact-upgrade-milestone">
-                ✦ Bonus roll on one affix at +{nextLevel}
+                {t('artefactUpgrade.milestoneHint', { level: nextLevel })}
               </div>
             )}
 
             {atCap && (
-              <div className="artefact-upgrade-maxed">Fully upgraded</div>
+              <div className="artefact-upgrade-maxed">{t('artefactUpgrade.fullyUpgraded')}</div>
             )}
           </section>
 
           {/* ── Cost gate ── progress bars with live queue preview ────── */}
           {!atCap && cost && (
             <section className="artefact-upgrade-cost">
-              <div className="artefact-upgrade-section-title">Cost</div>
+              <div className="artefact-upgrade-section-title">{t('artefactUpgrade.costSection')}</div>
               <ul className="artefact-upgrade-cost-list">
                 {cost.map((c, i) => {
                   const have      = inventory.getQuantity(c.itemId);
@@ -237,7 +240,7 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
                         <span className="artefact-upgrade-cost-name">{matName}</span>
                         <span
                           className={`artefact-upgrade-cost-have ${met ? 'is-met' : 'is-short'}`}
-                          title={queued > 0 ? `${have} owned + ${queued} from sacrifice queue` : `${have} owned`}
+                          title={queued > 0 ? t('artefactUpgrade.ownedQueued', { have, queued }) : t('artefactUpgrade.ownedCount', { have })}
                         >
                           {have + queued} / {need} {met ? '✓' : ''}
                         </span>
@@ -263,13 +266,13 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
           {!atCap && (
             <section className="artefact-upgrade-feed">
               <div className="artefact-upgrade-section-title">
-                Sacrifice artefacts
-                <span className="artefact-upgrade-section-hint"> · tap to queue</span>
+                {t('artefactUpgrade.sacrificeSection')}
+                <span className="artefact-upgrade-section-hint"> {t('artefactUpgrade.tapToQueue')}</span>
               </div>
 
               {sacrificeable.length === 0 ? (
                 <div className="artefact-upgrade-empty">
-                  No sacrificeable artefacts yield this level&rsquo;s materials.
+                  {t('artefactUpgrade.noSacrifice')}
                 </div>
               ) : (
                 <div className="artefact-upgrade-feed-grid">
@@ -285,7 +288,7 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
                         className={`artefact-upgrade-feed-tile${isQueued ? ' is-queued' : ''}`}
                         style={{ borderColor: `${itemQ.color}88` }}
                         onClick={() => toggleQueue(item)}
-                        title={isQueued ? 'Remove from queue' : `Queue: → 1× ${yieldName}`}
+                        title={isQueued ? t('artefactUpgrade.removeFromQueue') : `Queue: → 1× ${yieldName}`}
                       >
                         {isQueued && (
                           <span className="artefact-upgrade-feed-check" aria-hidden="true">✓</span>
@@ -308,8 +311,7 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
             {confirmingUpgrade ? (
               <div className="artefact-upgrade-confirm">
                 <span className="artefact-upgrade-confirm-msg">
-                  Upgrade and sacrifice {queuedItems.length}{' '}
-                  artefact{queuedItems.length === 1 ? '' : 's'}? This cannot be undone.
+                  {t('artefactUpgrade.confirmMsg', { n: queuedItems.length })}
                 </span>
                 <div className="artefact-upgrade-confirm-btns">
                   <button
@@ -317,14 +319,14 @@ function ArtefactUpgradeModal({ artefact, artefacts, inventory, onClose }) {
                     className="save-btn save-btn-danger"
                     onClick={commitUpgrade}
                   >
-                    Confirm
+                    {t('common.confirm')}
                   </button>
                   <button
                     type="button"
                     className="save-btn"
                     onClick={() => setConfirmingUpgrade(false)}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
