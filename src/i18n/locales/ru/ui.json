@@ -1,6 +1,7 @@
 {
   "common": {
     "cancel": "Отмена",
+    "confirm": "Подтвердить",
     "none": "Нет",
     "equipped": "Надето",
     "locked": "Заблокировано",
@@ -10,7 +11,20 @@
     "unequip": "Снять",
     "back": "← Назад",
     "active": "Активно",
-    "inSlot": "В слоте {{slot}}"
+    "inSlot": "В слоте {{slot}}",
+    "closeAriaLabel": "Закрыть",
+    "dismissAriaLabel": "Закрыть",
+    "max": "МАКС",
+    "free": "Бесплатно",
+    "skip": "Пропустить",
+    "collect": "Забрать",
+    "clear": "Очистить",
+    "unknown": "???",
+    "justNow": "только что",
+    "minutesAgo": "{{n}} мин назад",
+    "hoursAgo": "{{n}} ч назад",
+    "daysAgo": "{{n}} д назад",
+    "genericError": "Что-то пошло не так."
   },
   "nav": {
     "home": "Главная",
@@ -29,14 +43,19 @@
     "tabStats": "Характеристики",
     "tabPerks": "Перки",
     "perksEmptyTitle": "Перков пока нет",
-    "perksEmptyDesc": "Перки — это награды, получаемые при каждом повышении уровня и прорыве в новый рубеж. Они появятся здесь, как только вы их заработаете."
+    "perksEmptyDesc": "Перки — это награды, получаемые при каждом повышении уровня и прорыве в новый рубеж. Они появятся здесь, как только вы их заработаете.",
+    "gearCount": "· {{n}}/9 снаряжение",
+    "techniqueCount": "· {{n}} техники"
   },
   "collection": {
     "title": "Коллекция",
     "upgradeLevel": "Улучшение",
     "upgradeCost": "Стоимость следующего уровня",
     "upgradeBtn": "Улучшить +1",
-    "upgradeMaxed": "Максимально улучшено"
+    "upgradeMaxed": "Максимально улучшено",
+    "dismantle": "Разобрать",
+    "dismantleConfirm": "Разобрать этот предмет {{rarity}} за 1× {{mineralName}}?",
+    "dismantleBtn": "{{label}} · +1 {{mineralName}}"
   },
   "home": {
     "peakQi": "Пик Ци",
@@ -47,7 +66,26 @@
     "channeling": "Канализация",
     "channelTitle": "Канализировать Небесную Ци — ×2 на 30 мин",
     "pills": "Пилюли",
-    "breakthroughKicker": "Прорыв"
+    "breakthroughKicker": "Прорыв",
+    "bypassGate": "Пройти ворота",
+    "heavensPardon": "Небесное помилование · ×{{n}}",
+    "breakthrough": "ПРОРЫВ",
+    "tapToContinue": "Нажмите, чтобы продолжить",
+    "finalAscension": "Финальное Вознесение",
+    "sparksAwait_one": "{{n}} искра ждёт",
+    "sparksAwait_other": "{{n}} искры ждут",
+    "rewardsChip_one": "{{n}} награда!",
+    "rewardsChip_other": "{{n}} награды!",
+    "noLawEquipped": "Закон не надет",
+    "pillsChip": "{{n}} пилюли",
+    "deepMeditation": "Глубокая Медитация",
+    "cfNextBonus": "следующий +{{n}}% · {{n}}с",
+    "cultivationLabel": "Культивация",
+    "crystalTag": "Кристалл Ци",
+    "refineVerb": "Очистить → Ур {{n}}",
+    "traceMeridians": "Прочертить Меридианы",
+    "mechanicUnlocked": "✦ Механика разблокирована — {{name}}",
+    "mechanicsUnlocked": "✦ {{n}} механики разблокированы"
   },
   "offlineModal": {
     "eyebrow": "Возвращение из уединения",
@@ -91,7 +129,9 @@
   },
   "combat": {
     "title": "Боевая арена",
-    "back": "← Назад"
+    "back": "← Назад",
+    "dodged": "УКЛОНЕНИЕ",
+    "exploit": "СЛАБОСТЬ!"
   },
   "gathering": {
     "activity": "Сбор",
@@ -353,5 +393,421 @@
     "Rare": "Редкое",
     "Epic": "Эпическое",
     "Legendary": "Легендарное"
+  },
+
+  "achievement": {
+    "kicker": {
+      "earned":  "Достижение получено",
+      "mystery": "Тайное достижение",
+      "hidden":  "Скрытый путь",
+      "locked":  "Заблокировано"
+    },
+    "lockedDesc":      "Продолжайте совершенствоваться, чтобы открыть это достижение.",
+    "secretDesc":      "Условие получения пока скрыто от глаз.",
+    "lockedAriaLabel": "Заблокированное достижение",
+    "closeAriaLabel":  "Закрыть детали достижения"
+  },
+
+  "artefactUpgrade": {
+    "levelLabel":           "Уровень",
+    "fullyUpgraded":        "Максимально улучшено",
+    "milestoneHint":        "✦ Бонусный бросок на один аффикс при +{{level}}",
+    "costSection":          "Стоимость",
+    "ownedQueued":          "{{have}} в наличии + {{queued}} из очереди жертвоприношений",
+    "ownedCount":           "{{have}} в наличии",
+    "sacrificeSection":     "Принести артефакты в жертву",
+    "tapToQueue":           "· нажмите для добавления в очередь",
+    "noSacrifice":          "Нет жертвенных артефактов, дающих материалы для этого уровня.",
+    "removeFromQueue":      "Убрать из очереди",
+    "notEnough":            "Недостаточно материалов",
+    "upgradeWithSacrifice": "Улучшить → +{{level}} · пожертвовать {{n}}",
+    "upgrade":              "Улучшить → +{{level}}",
+    "confirmMsg":           "Улучшить и пожертвовать {{n}} артефакт(ами)? Это действие нельзя отменить."
+  },
+
+  "shop": {
+    "eyebrow":          "Алый Базар",
+    "title":            "Пополнить Кровавый Лотос",
+    "balanceAriaLabel": "Текущий баланс Кровавого Лотоса",
+    "balanceCurrent":   "Текущий",
+    "purchaseSuccess":  "+{{amount}} добавлено",
+    "toastKicker":      "Кровавый Лотос",
+    "purchaseFailed":   "Покупка не удалась",
+    "restoreFailed":    "Восстановление не удалось",
+    "finePrint":        "Все покупки разблокируются мгновенно. Цены в USD.",
+    "restoring":        "Восстановление…",
+    "restorePurchases": "Восстановить покупки",
+    "processing":       "Обработка…",
+    "save":             "Сэкономьте ${{dollars}}",
+    "badge": {
+      "popular":   "Популярное",
+      "bigSaver":  "Большая экономия",
+      "megaValue": "Мегавыгода",
+      "bestValue": "Лучшая цена"
+    }
+  },
+
+  "codex": {
+    "tabWardrobe":     "Гардероб",
+    "tabAchievements": "Достижения",
+    "tabStats":        "Статистика"
+  },
+
+  "crystalDetail": {
+    "name":             "Кристалл Ци",
+    "levelLabel":       "Уровень",
+    "cultivationBonus": "Бонус культивации",
+    "perLevel":         "За уровень кристалла",
+    "nextEvolution":    "Следующая Эволюция",
+    "reachesAt":        "Достигает на уровне {{n}}",
+    "levelsAway":       "{{n}} уровень(-ней) осталось",
+    "bonusAt":          "Бонус на Т{{n}}:",
+    "fullyEvolved":     "Полностью Эволюционировал",
+    "fullyEvolvedDesc": "Кристалл достиг своей высшей формы. Каждая грань вашей культивации теперь черпает из него силу."
+  },
+
+  "crystalTierNames": {
+    "1":  "Сырой Осколок",
+    "2":  "Мутный Осколок",
+    "3":  "Духовный Осколок",
+    "4":  "Нефритовый Фрагмент",
+    "5":  "Пустотный Слиток",
+    "6":  "Лазурный Кристалл",
+    "7":  "Небесная Призма",
+    "8":  "Камень Дао",
+    "9":  "Бессмертное Ядро",
+    "10": "Реликвия Солнечной Вспышки"
+  },
+
+  "crystalFeed": {
+    "title":            "Кристалл Ци",
+    "levelSubtitle":    "Уровень {{n}}",
+    "qiGain":           "×{{n}} прирост Ци",
+    "nextLevelGain":    "Ур.{{n}} → ×{{n}} прирост Ци",
+    "stoneReserves":    "Запасы камней",
+    "total":            "Итого:",
+    "refinementAmount": "Количество очищения",
+    "levelPreview":     "Уровень {{from}} → {{to}}",
+    "willConsume":      "Будет потрачено:",
+    "nothingSelected":  "ничего не выбрано",
+    "gatherStones":     "сначала соберите камни Ци",
+    "refineLevelUp":    "⚡ Очистить → Уровень {{n}}",
+    "refine":           "⚡ Очистить",
+    "refineRqi":        "⚡ Очистить +{{n}} RQI",
+    "noStones":         "Нет камней для очищения",
+    "qiBalance":        "Баланс Ци",
+    "available":        "Доступно:",
+    "notEnoughQi":      "Недостаточно Ци",
+    "refineQiCost":     "⚡ Очистить (-{{n}} Ци)"
+  },
+
+  "daily": {
+    "title":        "Ежедневный подарок",
+    "subtitle":     "Возвращайтесь каждый день, чтобы увеличить серию",
+    "day":          "День {{n}}",
+    "successLabel": "Кровавый Лотос получен!",
+    "collectBtn":   "Забрать {{n}}",
+    "comeTomorrow": "Возвращайтесь завтра за Днём {{n}}"
+  },
+
+  "producerDetail": {
+    "lockedAriaLabel":   "Заблокированный производитель",
+    "unlocksAt":         "Открывается на рубеже {{n}}.",
+    "owned":             "В наличии",
+    "perUnit":           "За единицу",
+    "upgrades":          "(×{{n}} улучшений)",
+    "roster":            "(×{{n}} состав)",
+    "baseContribution":  "Базовый вклад",
+    "shareOfProduction": "Доля базового производства",
+    "nextTier":          "Следующий уровень ({{label}})",
+    "moreToNextTier":    "ещё {{n}}",
+    "hiddenArtUnlocked": "Скрытое искусство разблокировано",
+    "comingSoon":        "Разблокировано · скоро",
+    "mythicLockNote":    "Открывается на уровне Мифическое · 50 в наличии."
+  },
+
+  "sparkChoice": {
+    "reviewLater":        "Посмотреть позже",
+    "title":              "Искра Ци",
+    "sub":                "предложение {{rarity}}, выберите одно",
+    "queueBadge_one":     "ещё {{n}} искра ждёт после этой",
+    "queueBadge_other":   "ещё {{n}} искры ждут после этой",
+    "realmLabel":         "Рубеж {{n}}",
+    "legendaryUnlockHint":"Легендарные открываются с {{producer}}",
+    "legendaryChance":    "легендарная",
+    "pityGuaranteed":     "Следующая: гарантированная легендарная",
+    "pityIn_one":         "Гарантия через {{n}} рубеж",
+    "pityIn_other":       "Гарантия через {{n}} рубежа",
+    "poolOf":             "в {{n}} из {{total}}",
+    "fullPool":           "полный пул",
+    "guaranteed":         "гарантировано",
+    "pityShort":          "гарантия через {{n}}",
+    "rerollBtn":          "Перебросить пару",
+    "rerollFree":         "бесплатно",
+    "rerollCost":         "· {{n}} КЛ",
+    "rerollFreeTitle":    "Перебросить обе карты, бесплатно",
+    "rerollCostTitle":    "Нужно {{n}} Кровавого Лотоса для переброса",
+    "rerollBLTitle":      "Перебросить обе карты, {{n}} Кровавого Лотоса",
+    "sparkAwaits_one":    "{{n}} искра ждёт",
+    "sparkAwaits_other":  "{{n}} искры ждут"
+  },
+
+  "selection": {
+    "firstLawTitle": "Выберите свой первый Закон культивации",
+    "newLawTitle":   "Новый Закон культивации",
+    "libraryFull":   "Ваша библиотека полна ({{n}}). Разберите один, чтобы освободить место:",
+    "onlyActiveLaw": "Остался только ваш активный закон — сначала наденьте другой в разделе Персонаж.",
+    "rerollFree":    "Перебросить — бесплатно!",
+    "rerollNeedBL":  "Нужно {{n}} Кровавого Лотоса",
+    "rerollCostBL":  "Перебросить — стоит {{n}} Кровавого Лотоса",
+    "generalType":   "общий"
+  },
+
+  "sparks": {
+    "emptyTitle":          "Постоянных искр пока нет",
+    "emptyText":           "Искра Ци предлагается при каждом прорыве слоя. Ваши постоянные, легендарные искры и искры механик будут жить здесь. Временные бонусы отображаются на чипе вверху слева, пока они активны.",
+    "trinityLabel":        "Конвергенция Троицы",
+    "globalQiBonus":       "+{{n}}% глобальный Ци/с",
+    "sectionLegendary":    "Легендарные",
+    "sectionLegendarySub": "синергии производителей",
+    "sectionPermanent":    "Постоянные",
+    "sectionPermanentSub": "действуют в этом забеге",
+    "sectionMechanics":    "Механики",
+    "sectionMechanicsSub": "от эволюции кристалла",
+    "detailEffect":        "Эффект",
+    "detailCurrently":     "Сейчас",
+    "detailExample":       "Пример",
+    "detailLore":          "Лор",
+    "trinityActive":       "✦ Конвергенция Троицы активна · +{{n}}% глобальный Ци/с",
+    "charmFooter":         "Амулет {{label}}",
+    "mechanicLabel":       "Механика",
+    "tapForDetails":       "нажмите для подробностей",
+    "bargainSpent":        "Сделка совершена",
+    "waitingNextRealm":    "Ожидание следующего главного рубежа"
+  },
+
+  "statsPanel": {
+    "currentRun":           "Текущий забег",
+    "lifetime":             "За всё время",
+    "currentQi":            "Текущая Ци",
+    "currentQiRate":        "Текущий Ци/с",
+    "runStarted":           "Забег начат",
+    "achievementsUnlocked": "Достижений разблокировано",
+    "footer":               "Отслеживание с {{date}} · v{{version}}"
+  },
+
+  "toast": {
+    "viewBtn":         "Просмотр",
+    "dismissAriaLabel":"Закрыть",
+    "overflow":        "+{{n}} ещё"
+  },
+
+  "tutorial": {
+    "gotIt":  "Понял",
+    "kicker": "Разблокировано"
+  },
+
+  "upgrade": {
+    "locked": "Заблокировано"
+  },
+
+  "wardrobe": {
+    "slotCharacter":       "Культиватор",
+    "slotCrystal":         "Кристалл",
+    "slotParticles":       "Частицы",
+    "slotBackdrop":        "Фон",
+    "defaultCharName":     "Бело-золотые одеяния",
+    "defaultCrystalName":  "Духовный кристалл",
+    "defaultParticlesName":"Бело-золотые моты",
+    "defaultBackdropName": "Горная Тропа",
+    "noneOwned":           "ничего нет",
+    "owned":               "{{n}} в наличии",
+    "ribbonEquipped":      "НАДЕТО",
+    "unequip":             "Снять",
+    "ribbonDefault":       "ПО УМОЛЧ.",
+    "active":              "Активно",
+    "equip":               "Надеть",
+    "noneOwnedSlot":       "В этом слоте нет косметики.",
+    "browseBazaar":        "Открыть Базар →",
+    "footerSummary":       "{{cosmeticsOwned}} косметики в наличии · {{cosmeticsEquipped}} надето",
+    "bazaarLink":          "Базар →"
+  },
+
+  "minigame": {
+    "leaveAriaLabel":  "Выйти из мини-игры",
+    "comingSoon":      "Скрытое искусство ещё не записано.",
+    "again":           "Ещё раз",
+    "minOfProduction": "≈ {{n}} мин производства"
+  },
+
+  "pillRefine": {
+    "prompt":         "Добавьте до {{n}} реагентов в котёл.",
+    "likelyYield":    "Вероятный выход:",
+    "lightFurnace":   "Зажечь печь",
+    "flameLabel":     "Пламя",
+    "flameTrue":      "Истинное",
+    "flameCold":      "Холодное",
+    "flameWild":      "Дикое",
+    "tip":            "Держите пламя в полосе, пока пилюля не затвердеет.",
+    "stoke":          "Раздуть 火",
+    "resultFlawless": "Безупречное очищение",
+    "resultStable":   "Стабильная пилюля",
+    "resultCracked":  "Треснувшая пилюля",
+    "newBrew":        "Новая варка"
+  },
+
+  "garden": {
+    "spiritDew":       "Духовная Роса",
+    "tabGarden":       "Сад",
+    "tabBrewhouse":    "Пивоварня",
+    "harvestAll":      "Собрать всё · {{n}}",
+    "plotsRipe_one":   "{{n}} грядка созрела. Нажмите для сбора.",
+    "plotsRipe_other": "{{n}} грядки созрели. Нажмите для сбора.",
+    "nextRipens":      "Следующая трава созреет через {{time}}.",
+    "pickSeed":        "Выберите семя ниже, затем нажмите на грядку для посева.",
+    "dewCost":         "{{n}} Росы",
+    "deeperRealms":    "Более глубокие рубежи",
+    "basketEmpty":     "Ваша корзина пуста. Вырастите и соберите травы в Саду, затем вернитесь сюда, чтобы продать, сварить или направить их.",
+    "basket":          "Корзина",
+    "basketMeta":      "{{herbs}} трав · {{dew}} ценность в Росе",
+    "sellAll":         "Продать всё · {{n}} Росы",
+    "channel":         "Направить → Ци",
+    "channelNote":     "Для направления нужна корзина стоимостью {{required}} Росы (сейчас {{current}}).",
+    "elixirs":         "Эликсиры",
+    "elixirSub":       "варка заменяет ваш активный эликсир",
+    "brew":            "Варить",
+    "backToGarden":    "Вернуться в сад",
+    "channelledLabel": "Направлено {{n}} духовных трав",
+    "sellHerb":        "Продать · {{n}}",
+    "expandCost":      "{{n}} Росы",
+    "discovered":      "Обнаружено {{herb}}. +{{n}} Росы",
+    "gathered":        "Собрано {{n}}× {{herb}}"
+  },
+
+  "cultivation": {
+    "reservoirLabel":       "Резервуар",
+    "flowingLabel":         "Поток",
+    "navAriaLabel":         "Разделы секты",
+    "tabProducers":         "Производители",
+    "tabUpgrades":          "Улучшения",
+    "tabSparks":            "Искры",
+    "buyModeLabel":         "Режим покупки",
+    "autoBuyOn":            "Авто-покупка ВКЛ. Нажмите для отключения.",
+    "autoBuyOff":           "Авто-покупка ВЫКЛ. Нажмите для включения.",
+    "autoLabel":            "Авто",
+    "noUpgradesTitle":      "Улучшений пока нет",
+    "noUpgradesSub":        "Покупайте производителей и поднимайтесь по рубежам, чтобы открыть улучшения.",
+    "upgradesAvailable":    "Доступно",
+    "upgradesAvailableTag": "Начертанные таблички · единовременная дань",
+    "upgradesOwned":        "Начертаны",
+    "upgradesOwnedTag":     "Постоянная дань получена"
+  },
+
+  "journey": {
+    "stage":               "стадия",
+    "stages":              "стадии",
+    "sparkRewardTitle":    "Прорыв на эту стадию награждает Искрой Ци",
+    "sparkRewardAriaLabel":"Награда Искра Ци",
+    "currentRealm":        "Текущий рубеж",
+    "nextBreakthrough":    "Следующий прорыв",
+    "gate":                "Ворота",
+    "gateRequired":        "требуется {{rate}} Ци/с",
+    "gateNone":            "Нет",
+    "current":             "Текущий",
+    "currentRate":         "{{rate}} Ци/с"
+  },
+
+  "reincarnation": {
+    "title":             "Перерождение",
+    "subtitle":          "Сбросьте культивацию, чтобы получить Карму — тратьте её в Вечном Древе на постоянные бонусы.",
+    "karmaLabel":        "Карма",
+    "livesLabel":        "Жизни",
+    "peakProgressLabel": "Пиковый прогресс",
+    "peakYieldLabel":    "Пиковый выход",
+    "karmaUnit":         "{{n}} кармы",
+    "confirmText":       "Перерождение сотрёт Ци, рубежи, пилюли, инвентарь, артефакты, техники и другие законы. Ваш активный закон, Карма и Вечное Древо сохранятся. Продолжить?",
+    "confirmBtn":        "Да, переродиться",
+    "reincarnateBtn":    "Переродиться",
+    "lockedTitle":       "Достигните рубежа Святого в этой жизни, чтобы переродиться",
+    "lockedHint":        "Достигните рубежа Святого для перерождения",
+    "treeLabel":         "Вечное Древо — Общая стоимость",
+    "nodeOwned":         "✓ Получено"
+  },
+
+  "bazaar": {
+    "back":               "‹ Назад",
+    "eyebrow":            "Дух",
+    "title":              "Базар",
+    "topUp":              "+ Пополнить",
+    "navAriaLabel":       "Разделы базара",
+    "tabBuffs":           "Бонусы",
+    "tabConsumables":     "Расходники",
+    "tabQol":             "Удобство",
+    "tabCosmetics":       "Косметика",
+    "sectionBuffs":       "Бонусы",
+    "buffsTag":           "Усиления · суммируются со всем",
+    "sectionConsumables": "Расходники",
+    "consumablesTag":     "Одноразовые талисманы · хранятся до использования",
+    "sectionQol":         "Качество жизни",
+    "qolTag":             "Постоянные разблокировки · меньше хлопот, больше культивации",
+    "sectionCosmetics":   "Косметика",
+    "cosmeticsTag":       "Скины · тематические пакеты · эволюционирует вместе с вами",
+    "themePacks":         "Тематические пакеты",
+    "comingSoon":         "Новые реликвии скоро появятся на полках…",
+    "allOwned":           "Вы владеете всеми доступными скинами. Найдите их в Кодексе › Гардероб",
+    "codexWardrobeLink":  "Кодекс › Гардероб",
+    "todaysPick":         "Выбор дня",
+    "limitedOffering":    "Ограниченное предложение",
+    "resetsIn":           "Сброс через {{time}}",
+    "purchasedFlash":     "Приобретено: {{name}}",
+    "purchaseFailed":     "Покупка не удалась",
+    "themePack":          "Тематический пакет",
+    "savePack":           "Сэкономьте {{n}}",
+    "claimPack":          "Получить пакет",
+    "blPrice":            "{{n}} КЛ",
+    "active":             "АКТИВНО",
+    "timeLeft":           "осталось {{n}}",
+    "owned":              "В наличии",
+    "maxed":              "Максимум ({{n}}/{{max}})",
+    "particleKicker":     "Заменяет поток вашего шара Ци",
+    "evolvesThrough":     "Эволюционирует через {{n}} уровней",
+    "stagesRevealed":     "{{n}} из {{total}} уровней открыто"
+  },
+
+  "eternalTree": {
+    "eyebrow":           "Между жизнями",
+    "title":             "Вечное Древо",
+    "karmaLabel":        "карма",
+    "closeDetails":      "Закрыть детали",
+    "futurePathDefault": "Будущий путь кармы.",
+    "previewOnly":       "Только предпросмотр",
+    "anchored":          "✓ Закреплено",
+    "comingSoon":        "✦ Скоро",
+    "prereqsBound":      "Предпосылки ещё не выполнены",
+    "needMore":          "Нужно ещё {{n}}",
+    "anchorFor":         "Закрепить за {{n}}",
+    "nextKarma":         "Следующая карма при {{n}} Ци",
+    "toGo":              "осталось {{n}}",
+    "reincarnate":       "Переродиться",
+    "reachSaint":        "Достичь Святого",
+    "zoomIn":            "Приблизить",
+    "fitView":           "По размеру экрана",
+    "zoomOut":           "Отдалить"
+  },
+
+  "reincarnationModal": {
+    "eyebrow":       "Обряд Разрыва",
+    "titleOpen":     "Прервать эту жизнь?",
+    "bodyOpen":      "Повернуть колесо — значит завершить это воплощение…",
+    "loseRow":       "Это воплощение: пройденные рубежи, накопленная Ци, обеты каждого ученика.",
+    "keepRow":       "Привитое к Древу: заработанная карма, вырезанные знаки, семя следующего рассвета.",
+    "karmaCarried":  "Карма переносится",
+    "warn":          "За этим обрядом нет пути назад",
+    "cancelBtn":     "Удержать колесо",
+    "confirmBtn":    "Повернуть колесо",
+    "titleLocked":   "Порог запечатан",
+    "bodyLocked":    "Колесо жизней вращается лишь для тех, кто прошёл рубеж Святого…",
+    "youStandAt":    "Вы находитесь на",
+    "understoodBtn": "Понял"
   }
 }

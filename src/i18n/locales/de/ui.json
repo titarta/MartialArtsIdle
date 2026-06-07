@@ -1,6 +1,7 @@
 {
   "common": {
     "cancel": "Abbrechen",
+    "confirm":          "Bestätigen",
     "none": "Keine",
     "equipped": "Ausgerüstet",
     "locked": "Gesperrt",
@@ -10,7 +11,20 @@
     "unequip": "Ablegen",
     "back": "← Zurück",
     "active": "Aktiv",
-    "inSlot": "In {{slot}}"
+    "inSlot": "In {{slot}}",
+    "closeAriaLabel":   "Schließen",
+    "dismissAriaLabel": "Verwerfen",
+    "max":              "MAX",
+    "free":             "Kostenlos",
+    "skip":             "Überspringen",
+    "collect":          "Einsammeln",
+    "clear":            "Löschen",
+    "unknown":          "???",
+    "justNow":          "gerade eben",
+    "minutesAgo":       "vor {{n}}m",
+    "hoursAgo":         "vor {{n}}h",
+    "daysAgo":          "vor {{n}}d",
+    "genericError":     "Ein Fehler ist aufgetreten."
   },
   "nav": {
     "home": "Hauptseite",
@@ -29,14 +43,19 @@
     "tabStats": "Werte",
     "tabPerks": "Vorteile",
     "perksEmptyTitle": "Noch keine Vorteile",
-    "perksEmptyDesc": "Vorteile sind Belohnungen, die bei jedem Sphären-Aufstieg und Durchbruch verdient werden. Sie erscheinen hier, sobald du einige erlangt hast."
+    "perksEmptyDesc": "Vorteile sind Belohnungen, die bei jedem Sphären-Aufstieg und Durchbruch verdient werden. Sie erscheinen hier, sobald du einige erlangt hast.",
+    "gearCount":       "· {{n}}/9 Ausrüstungsgegenstände",
+    "techniqueCount":  "· {{n}} Techniken"
   },
   "collection": {
     "title": "Sammlung",
     "upgradeLevel": "Aufwerten",
     "upgradeCost": "Kosten nächste Stufe",
     "upgradeBtn": "Aufwerten +1",
-    "upgradeMaxed": "Vollständig aufgewertet"
+    "upgradeMaxed": "Vollständig aufgewertet",
+    "dismantle":        "Zerlegen",
+    "dismantleConfirm": "Diesen {{rarity}}-Gegenstand für 1× {{mineralName}} zerlegen?",
+    "dismantleBtn":     "{{label}} · +1 {{mineralName}}"
   },
   "home": {
     "peakQi": "Qi-Gipfel",
@@ -47,7 +66,26 @@
     "channeling": "Kanalisierung",
     "channelTitle": "Himmlisches Qi kanalisieren — 2× für 30 Min.",
     "pills": "Pillen",
-    "breakthroughKicker": "Durchbruch"
+    "breakthroughKicker": "Durchbruch",
+    "bypassGate":         "Tor umgehen",
+    "heavensPardon":      "Himmlische Begnadigung · ×{{n}}",
+    "breakthrough":       "DURCHBRUCH",
+    "tapToContinue":      "Antippen zum Fortfahren",
+    "finalAscension":     "Endgültige Himmelfahrt",
+    "sparksAwait_one":    "{{n}} Funke wartet",
+    "sparksAwait_other":  "{{n}} Funken warten",
+    "rewardsChip_one":    "{{n}} Belohnung!",
+    "rewardsChip_other":  "{{n}} Belohnungen!",
+    "noLawEquipped":      "Kein Gesetz ausgerüstet",
+    "pillsChip":          "{{n}} Pillen",
+    "deepMeditation":     "Tiefe Meditation",
+    "cfNextBonus":        "nächster +{{n}}% · {{n}}s",
+    "cultivationLabel":   "Kultivierung",
+    "crystalTag":         "Qi-Kristall",
+    "refineVerb":         "Verfeinern → Stufe {{n}}",
+    "traceMeridians":     "Meridiane nachverfolgen",
+    "mechanicUnlocked":   "✦ Mechanik Freigeschaltet — {{name}}",
+    "mechanicsUnlocked":  "✦ {{n}} Mechaniken Freigeschaltet"
   },
   "offlineModal": {
     "eyebrow": "Aus der Abgeschiedenheit zurückgekehrt",
@@ -91,7 +129,9 @@
   },
   "combat": {
     "title": "Kampfarena",
-    "back": "← Zurück"
+    "back": "← Zurück",
+    "dodged":  "AUSGEWICHEN",
+    "exploit": "AUSNUTZEN!"
   },
   "gathering": {
     "activity": "Sammeln",
@@ -353,5 +393,421 @@
     "Rare": "Selten",
     "Epic": "Episch",
     "Legendary": "Legendär"
+  },
+
+  "achievement": {
+    "kicker": {
+      "earned":  "Erfolg Erreicht",
+      "mystery": "Geheimer Erfolg",
+      "hidden":  "Verborgener Pfad",
+      "locked":  "Gesperrt"
+    },
+    "lockedDesc":      "Kultiviere weiter, um diesen Erfolg zu enthüllen.",
+    "secretDesc":      "Die auslösende Tat ist noch vor den Augen verborgen.",
+    "lockedAriaLabel": "Gesperrter Erfolg",
+    "closeAriaLabel":  "Erfolgsdetail schließen"
+  },
+
+  "artefactUpgrade": {
+    "levelLabel":           "Stufe",
+    "fullyUpgraded":        "Vollständig aufgewertet",
+    "milestoneHint":        "✦ Bonuswurf auf ein Affix bei +{{level}}",
+    "costSection":          "Kosten",
+    "ownedQueued":          "{{have}} im Besitz + {{queued}} aus der Opferwarteschlange",
+    "ownedCount":           "{{have}} im Besitz",
+    "sacrificeSection":     "Artefakte opfern",
+    "tapToQueue":           "· antippen zum Einreihen",
+    "noSacrifice":          "Keine opferbaren Artefakte liefern Materialien dieser Stufe.",
+    "removeFromQueue":      "Aus Warteschlange entfernen",
+    "notEnough":            "Nicht genug Materialien",
+    "upgradeWithSacrifice": "Aufwerten → +{{level}} · {{n}} opfern",
+    "upgrade":              "Aufwerten → +{{level}}",
+    "confirmMsg":           "Aufwerten und {{n}} Artefakt(e) opfern? Dies kann nicht rückgängig gemacht werden."
+  },
+
+  "shop": {
+    "eyebrow":          "Zinnober-Basar",
+    "title":            "Blutlotus Aufladen",
+    "balanceAriaLabel": "Aktuelles Blutlotus-Guthaben",
+    "balanceCurrent":   "Aktuell",
+    "purchaseSuccess":  "+{{amount}} hinzugefügt",
+    "toastKicker":      "Blutlotus",
+    "purchaseFailed":   "Kauf fehlgeschlagen",
+    "restoreFailed":    "Wiederherstellung fehlgeschlagen",
+    "finePrint":        "Alle Käufe werden sofort freigeschaltet. Preise in USD.",
+    "restoring":        "Wiederherstellung…",
+    "restorePurchases": "Käufe Wiederherstellen",
+    "processing":       "Verarbeitung…",
+    "save":             "Spare ${{dollars}}",
+    "badge": {
+      "popular":   "Beliebt",
+      "bigSaver":  "Großes Ersparnis",
+      "megaValue": "Mega-Wert",
+      "bestValue": "Bestes Preis-Leistungs-Verhältnis"
+    }
+  },
+
+  "codex": {
+    "tabWardrobe":     "Garderobe",
+    "tabAchievements": "Erfolge",
+    "tabStats":        "Werte"
+  },
+
+  "crystalDetail": {
+    "name":             "Qi-Kristall",
+    "levelLabel":       "Stufe",
+    "cultivationBonus": "Kultivierungsbonus",
+    "perLevel":         "Pro Kristallstufe",
+    "nextEvolution":    "Nächste Evolution",
+    "reachesAt":        "Erreicht bei Stufe {{n}}",
+    "levelsAway":       "{{n}} Stufe(n) entfernt",
+    "bonusAt":          "Bonus bei T{{n}}:",
+    "fullyEvolved":     "Vollständig Evolviert",
+    "fullyEvolvedDesc": "Der Kristall hat seine Höchstform erreicht. Jede Facette deiner Kultivierung schöpft nun daraus."
+  },
+
+  "crystalTierNames": {
+    "1":  "Rohsplitter",
+    "2":  "Getrübter Splitter",
+    "3":  "Geistsplitter",
+    "4":  "Jade-Fragment",
+    "5":  "Leere-Splitter",
+    "6":  "Azurkristall",
+    "7":  "Himmelsprisma",
+    "8":  "Dao-Edelstein",
+    "9":  "Unsterblichkeitskern",
+    "10": "Sonnenflammen-Relikt"
+  },
+
+  "crystalFeed": {
+    "title":            "Qi-Kristall",
+    "levelSubtitle":    "Stufe {{n}}",
+    "qiGain":           "×{{n}} Qi-Gewinn",
+    "nextLevelGain":    "Stufe {{n}} → ×{{n}} Qi-Gewinn",
+    "stoneReserves":    "Steinreserven",
+    "total":            "Gesamt:",
+    "refinementAmount": "Verfeinerungsmenge",
+    "levelPreview":     "Stufe {{from}} → {{to}}",
+    "willConsume":      "Wird verbrauchen:",
+    "nothingSelected":  "nichts ausgewählt",
+    "gatherStones":     "zuerst Qi-Steine sammeln",
+    "refineLevelUp":    "⚡ Verfeinern → Stufe {{n}}",
+    "refine":           "⚡ Verfeinern",
+    "refineRqi":        "⚡ Verfeinern +{{n}} RQI",
+    "noStones":         "Keine Steine zum Verfeinern",
+    "qiBalance":        "Qi-Guthaben",
+    "available":        "Verfügbar:",
+    "notEnoughQi":      "Nicht genug Qi",
+    "refineQiCost":     "⚡ Verfeinern (-{{n}} Qi)"
+  },
+
+  "daily": {
+    "title":        "Tagesgeschenk",
+    "subtitle":     "Komm jeden Tag zurück, um deine Serie zu steigern",
+    "day":          "Tag {{n}}",
+    "successLabel": "Blutlotus eingesammelt!",
+    "collectBtn":   "{{n}} Einsammeln",
+    "comeTomorrow": "Komm morgen für Tag {{n}} zurück"
+  },
+
+  "producerDetail": {
+    "lockedAriaLabel":   "Gesperrter Produzent",
+    "unlocksAt":         "Wird bei Sphäre {{n}} freigeschaltet.",
+    "owned":             "Im Besitz",
+    "perUnit":           "Pro Einheit",
+    "upgrades":          "(×{{n}} Aufwertungen)",
+    "roster":            "(×{{n}} Aufgebot)",
+    "baseContribution":  "Grundbeitrag",
+    "shareOfProduction": "Anteil an der Basisproduktion",
+    "nextTier":          "Nächste Stufe ({{label}})",
+    "moreToNextTier":    "{{n}} mehr",
+    "hiddenArtUnlocked": "Verborgene Kunst freigeschaltet",
+    "comingSoon":        "Freigeschaltet · demnächst verfügbar",
+    "mythicLockNote":    "Wird auf mythischer Stufe freigeschaltet · 50 im Besitz."
+  },
+
+  "sparkChoice": {
+    "reviewLater":        "Später ansehen",
+    "title":              "Qi-Funke",
+    "sub":                "ein {{rarity}}-Angebot, wähle eines",
+    "queueBadge_one":     "{{n}} weiterer Funke wartet danach",
+    "queueBadge_other":   "{{n}} weitere Funken warten danach",
+    "realmLabel":         "Sphäre {{n}}",
+    "legendaryUnlockHint":"Legendäre werden mit {{producer}} freigeschaltet",
+    "legendaryChance":    "legendär",
+    "pityGuaranteed":     "Nächster: legendär garantiert",
+    "pityIn_one":         "Mitleid in {{n}} Sphäre",
+    "pityIn_other":       "Mitleid in {{n}} Sphären",
+    "poolOf":             "in {{n}} von {{total}}",
+    "fullPool":           "voller Pool",
+    "guaranteed":         "garantiert",
+    "pityShort":          "Mitleid in {{n}}",
+    "rerollBtn":          "Paar neu würfeln",
+    "rerollFree":         "kostenlos",
+    "rerollCost":         "· {{n}} BL",
+    "rerollFreeTitle":    "Beide Karten neu würfeln, kostenlos",
+    "rerollCostTitle":    "{{n}} Blutlotus zum Neu-Würfeln benötigt",
+    "rerollBLTitle":      "Beide Karten neu würfeln, {{n}} Blutlotus",
+    "sparkAwaits_one":    "{{n}} Funke wartet",
+    "sparkAwaits_other":  "{{n}} Funken warten"
+  },
+
+  "selection": {
+    "firstLawTitle": "Wähle dein erstes Kultivierungsgesetz",
+    "newLawTitle":   "Neues Kultivierungsgesetz",
+    "libraryFull":   "Deine Bibliothek ist voll ({{n}}). Zerlege eines, um Platz zu machen:",
+    "onlyActiveLaw": "Nur dein aktives Gesetz verbleibt — rüste zuerst ein anderes im Charakter-Menü aus.",
+    "rerollFree":    "Neu würfeln — kostenlos!",
+    "rerollNeedBL":  "{{n}} Blutlotus benötigt",
+    "rerollCostBL":  "Neu würfeln — kostet {{n}} Blutlotus",
+    "generalType":   "allgemein"
+  },
+
+  "sparks": {
+    "emptyTitle":          "Noch keine dauerhaften Funken",
+    "emptyText":           "Bei jedem Schicht-Durchbruch wird ein Qi-Funke angeboten. Deine dauerhaften, legendären und mechanischen Funken leben hier. Temporäre Buffs erscheinen auf dem Chip oben links, während sie aktiv sind.",
+    "trinityLabel":        "Trinität-Konvergenz",
+    "globalQiBonus":       "+{{n}}% globales Qi/s",
+    "sectionLegendary":    "Legendär",
+    "sectionLegendarySub": "Produzenten-Synergien",
+    "sectionPermanent":    "Dauerhaft",
+    "sectionPermanentSub": "hält diesen Durchlauf",
+    "sectionMechanics":    "Mechaniken",
+    "sectionMechanicsSub": "aus Kristall-Evolution",
+    "detailEffect":        "Effekt",
+    "detailCurrently":     "Aktuell",
+    "detailExample":       "Beispiel",
+    "detailLore":          "Überlieferung",
+    "trinityActive":       "✦ Trinität-Konvergenz aktiv · +{{n}}% globales Qi/s",
+    "charmFooter":         "{{label}}-Amulett",
+    "mechanicLabel":       "Mechanik",
+    "tapForDetails":       "antippen für Details",
+    "bargainSpent":        "Pakt aufgebraucht",
+    "waitingNextRealm":    "Wartet auf nächste Hauptsphäre"
+  },
+
+  "statsPanel": {
+    "currentRun":           "Aktueller Durchlauf",
+    "lifetime":             "Gesamt",
+    "currentQi":            "Aktuelles Qi",
+    "currentQiRate":        "Aktuelles Qi/s",
+    "runStarted":           "Durchlauf gestartet",
+    "achievementsUnlocked": "Erfolge freigeschaltet",
+    "footer":               "Verfolgt seit {{date}} · v{{version}}"
+  },
+
+  "toast": {
+    "viewBtn":         "Ansehen",
+    "dismissAriaLabel":"Verwerfen",
+    "overflow":        "+{{n}} mehr"
+  },
+
+  "tutorial": {
+    "gotIt":  "Verstanden",
+    "kicker": "Freigeschaltet"
+  },
+
+  "upgrade": {
+    "locked": "Gesperrt"
+  },
+
+  "wardrobe": {
+    "slotCharacter":       "Kultivierer",
+    "slotCrystal":         "Kristall",
+    "slotParticles":       "Partikel",
+    "slotBackdrop":        "Hintergrund",
+    "defaultCharName":     "Weiß-goldene Roben",
+    "defaultCrystalName":  "Geist-Kristall",
+    "defaultParticlesName":"Weiß-goldene Moten",
+    "defaultBackdropName": "Bergpfad",
+    "noneOwned":           "keiner im Besitz",
+    "owned":               "{{n}} im Besitz",
+    "ribbonEquipped":      "AUSGERÜSTET",
+    "unequip":             "Ablegen",
+    "ribbonDefault":       "STANDARD",
+    "active":              "Aktiv",
+    "equip":               "Ausrüsten",
+    "noneOwnedSlot":       "Keine Kosmetika in diesem Slot im Besitz.",
+    "browseBazaar":        "Basar durchsuchen →",
+    "footerSummary":       "{{cosmeticsOwned}} Kosmetika im Besitz · {{cosmeticsEquipped}} ausgerüstet",
+    "bazaarLink":          "Basar →"
+  },
+
+  "minigame": {
+    "leaveAriaLabel":  "Minispiel verlassen",
+    "comingSoon":      "Verborgene Kunst noch nicht eingeschrieben.",
+    "again":           "Nochmal",
+    "minOfProduction": "≈ {{n}} Min. Produktion"
+  },
+
+  "pillRefine": {
+    "prompt":         "Falte bis zu {{n}} Reagenzien in den Kessel.",
+    "likelyYield":    "Voraussichtlicher Ertrag:",
+    "lightFurnace":   "Ofen anzünden",
+    "flameLabel":     "Flamme",
+    "flameTrue":      "Echt",
+    "flameCold":      "Kalt",
+    "flameWild":      "Wild",
+    "tip":            "Halte die Flamme im Band, bis die Pille fest wird.",
+    "stoke":          "Schüren 火",
+    "resultFlawless": "Makellose Verfeinerung",
+    "resultStable":   "Stabile Pille",
+    "resultCracked":  "Gerissene Pille",
+    "newBrew":        "Neues Gebräu"
+  },
+
+  "garden": {
+    "spiritDew":       "Geisttau",
+    "tabGarden":       "Garten",
+    "tabBrewhouse":    "Brauhaus",
+    "harvestAll":      "Alles ernten · {{n}}",
+    "plotsRipe_one":   "{{n}} Parzelle reif. Antippen zum Ernten.",
+    "plotsRipe_other": "{{n}} Parzellen reif. Antippen zum Ernten.",
+    "nextRipens":      "Das nächste Kraut reift in {{time}}.",
+    "pickSeed":        "Wähle unten einen Samen aus, dann tippe auf eine Parzelle zum Säen.",
+    "dewCost":         "{{n}} Tau",
+    "deeperRealms":    "Tiefere Sphären",
+    "basketEmpty":     "Dein Korb ist leer. Baue Kräuter im Garten an und ernte sie, dann komm zurück zum Verkaufen, Brauen oder Kanalisieren.",
+    "basket":          "Korb",
+    "basketMeta":      "{{herbs}} Kräuter · {{dew}} Tau-Wert",
+    "sellAll":         "Alles verkaufen · {{n}} Tau",
+    "channel":         "Kanalisieren → Qi",
+    "channelNote":     "Kanalisierung benötigt einen Korb im Wert von {{required}} Tau (jetzt {{current}}).",
+    "elixirs":         "Elixiere",
+    "elixirSub":       "ein Gebräu ersetzt dein aktives Elixier",
+    "brew":            "Brauen",
+    "backToGarden":    "Zurück zum Garten",
+    "channelledLabel": "{{n}} Geistkraut/-kräuter kanalisiert",
+    "sellHerb":        "Verkaufen · {{n}}",
+    "expandCost":      "{{n}} Tau",
+    "discovered":      "{{herb}} entdeckt. +{{n}} Tau",
+    "gathered":        "{{n}}× {{herb}} geerntet"
+  },
+
+  "cultivation": {
+    "reservoirLabel":       "Reservoir",
+    "flowingLabel":         "Fließend",
+    "navAriaLabel":         "Sekten-Bereiche",
+    "tabProducers":         "Produzenten",
+    "tabUpgrades":          "Aufwertungen",
+    "tabSparks":            "Funken",
+    "buyModeLabel":         "Kaufmodus",
+    "autoBuyOn":            "Auto-Kauf AN. Antippen zum Deaktivieren.",
+    "autoBuyOff":           "Auto-Kauf AUS. Antippen zum Aktivieren.",
+    "autoLabel":            "Auto",
+    "noUpgradesTitle":      "Noch keine Aufwertungen",
+    "noUpgradesSub":        "Kaufe Produzenten und steige in Sphären auf, um Aufwertungen freizuschalten.",
+    "upgradesAvailable":    "Verfügbar",
+    "upgradesAvailableTag": "Eingeschriebene Tafeln · einmaliger Tribut",
+    "upgradesOwned":        "Eingeschrieben",
+    "upgradesOwnedTag":     "Dauerhafter Tribut erhalten"
+  },
+
+  "journey": {
+    "stage":                "Etappe",
+    "stages":               "Etappen",
+    "sparkRewardTitle":     "Das Erreichen dieser Etappe belohnt einen Qi-Funken",
+    "sparkRewardAriaLabel": "Qi-Funken-Belohnung",
+    "currentRealm":         "Aktuelle Sphäre",
+    "nextBreakthrough":     "Nächster Durchbruch",
+    "gate":                 "Tor",
+    "gateRequired":         "{{rate}} Qi/s benötigt",
+    "gateNone":             "Kein",
+    "current":              "Aktuell",
+    "currentRate":          "{{rate}} Qi/s"
+  },
+
+  "reincarnation": {
+    "title":             "Wiedergeburt",
+    "subtitle":          "Kultivierung zurücksetzen, um Karma zu beanspruchen — gib es im Ewigen Baum aus, um dauerhafte Boni zu erhalten.",
+    "karmaLabel":        "Karma",
+    "livesLabel":        "Leben",
+    "peakProgressLabel": "Höchster Fortschritt",
+    "peakYieldLabel":    "Höchster Ertrag",
+    "karmaUnit":         "{{n}} Karma",
+    "confirmText":       "Die Wiedergeburt löscht Qi, Sphären, Pillen, Inventar, Artefakte, Techniken und andere Gesetze. Dein aktives Gesetz, Karma und der Ewige Baum überleben. Fortfahren?",
+    "confirmBtn":        "Ja, reinkarnieren",
+    "reincarnateBtn":    "Reinkarnieren",
+    "lockedTitle":       "Erreiche die Heilige Sphäre in diesem Leben, um zu reinkarnieren",
+    "lockedHint":        "Erreiche die Heilige Sphäre, um zu reinkarnieren",
+    "treeLabel":         "Ewiger Baum — Gesamtkosten",
+    "nodeOwned":         "✓ Im Besitz"
+  },
+
+  "bazaar": {
+    "back":               "‹ Zurück",
+    "eyebrow":            "Der Geist",
+    "title":              "Basar",
+    "topUp":              "+ Aufladen",
+    "navAriaLabel":       "Basar-Bereiche",
+    "tabBuffs":           "Buffs",
+    "tabConsumables":     "Verbrauchsgüter",
+    "tabQol":             "Komfort",
+    "tabCosmetics":       "Kosmetika",
+    "sectionBuffs":       "Buffs",
+    "buffsTag":           "Power-Ups · stapeln mit allem",
+    "sectionConsumables": "Verbrauchsgüter",
+    "consumablesTag":     "Einmal-Talismane · aufbewahren bis zur Nutzung",
+    "sectionQol":         "Lebensqualität",
+    "qolTag":             "Dauerhafte Freischaltungen · weniger Aufwand, mehr Kultivierung",
+    "sectionCosmetics":   "Kosmetika",
+    "cosmeticsTag":       "Skins · Themenpakete · entwickelt sich mit dir",
+    "themePacks":         "Themenpakete",
+    "comingSoon":         "Weitere Relikte kommen bald…",
+    "allOwned":           "Du besitzt alle verfügbaren Skins. Finde sie in Kodex › Garderobe",
+    "codexWardrobeLink":  "Kodex › Garderobe",
+    "todaysPick":         "Tagesauswahl",
+    "limitedOffering":    "Begrenztes Angebot",
+    "resetsIn":           "Setzt zurück in {{time}}",
+    "purchasedFlash":     "Gekauft: {{name}}",
+    "purchaseFailed":     "Kauf fehlgeschlagen",
+    "themePack":          "Themenpaket",
+    "savePack":           "Spare {{n}}",
+    "claimPack":          "Paket Beanspruchen",
+    "blPrice":            "{{n}} BL",
+    "active":             "AKTIV",
+    "timeLeft":           "{{n}} übrig",
+    "owned":              "Im Besitz",
+    "maxed":              "Maximal ({{n}}/{{max}})",
+    "particleKicker":     "Ersetzt deinen Qi-Orb-Fluss",
+    "evolvesThrough":     "Entwickelt sich durch {{n}} Stufen",
+    "stagesRevealed":     "{{n}} von {{total}} Stufen enthüllt"
+  },
+
+  "eternalTree": {
+    "eyebrow":           "Zwischen den Leben",
+    "title":             "Ewiger Baum",
+    "karmaLabel":        "Karma",
+    "closeDetails":      "Details schließen",
+    "futurePathDefault": "Ein zukünftiger Karma-Pfad.",
+    "previewOnly":       "Nur Vorschau",
+    "anchored":          "✓ Verankert",
+    "comingSoon":        "✦ Demnächst verfügbar",
+    "prereqsBound":      "Voraussetzungen noch gebunden",
+    "needMore":          "{{n}} mehr benötigt",
+    "anchorFor":         "Verankern für {{n}}",
+    "nextKarma":         "Nächstes Karma bei {{n}} Qi",
+    "toGo":              "{{n}} übrig",
+    "reincarnate":       "Reinkarnieren",
+    "reachSaint":        "Heilige Sphäre erreichen",
+    "zoomIn":            "Heranzoomen",
+    "fitView":           "An Ansicht anpassen",
+    "zoomOut":           "Herauszoomen"
+  },
+
+  "reincarnationModal": {
+    "eyebrow":       "Das Trennungsritual",
+    "titleOpen":     "Dieses Leben trennen?",
+    "bodyOpen":      "Das Rad zu drehen bedeutet, diese Inkarnation zu beenden…",
+    "loseRow":       "Diese Inkarnation: erklommene Sphären, gesammeltes Qi, jeder Jünger-Schwur.",
+    "keepRow":       "Am Baum gepfropft: verdientes Karma, eingravierte Siegel, der Samen des nächsten Morgengrauens.",
+    "karmaCarried":  "Übergetragenes Karma",
+    "warn":          "Jenseits dieses Rituals führt kein Weg zurück",
+    "cancelBtn":     "Rad halten",
+    "confirmBtn":    "Das Rad Drehen",
+    "titleLocked":   "Die Schwelle ist versiegelt",
+    "bodyLocked":    "Das Rad der Leben dreht sich nur für jene, die die Heilige Sphäre durchwandert haben…",
+    "youStandAt":    "Du stehst bei",
+    "understoodBtn": "Verstanden"
   }
 }

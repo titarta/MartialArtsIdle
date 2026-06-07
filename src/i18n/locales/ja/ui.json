@@ -1,6 +1,7 @@
 {
   "common": {
     "cancel": "キャンセル",
+    "confirm": "確認",
     "none": "なし",
     "equipped": "装備中",
     "locked": "ロック済",
@@ -10,7 +11,20 @@
     "unequip": "外す",
     "back": "← 戻る",
     "active": "発動中",
-    "inSlot": "{{slot}}スロット装備中"
+    "inSlot": "{{slot}}スロット装備中",
+    "closeAriaLabel": "閉じる",
+    "dismissAriaLabel": "閉じる",
+    "max": "最大",
+    "free": "無料",
+    "skip": "スキップ",
+    "collect": "受け取る",
+    "clear": "クリア",
+    "unknown": "???",
+    "justNow": "たった今",
+    "minutesAgo": "{{n}}分前",
+    "hoursAgo": "{{n}}時間前",
+    "daysAgo": "{{n}}日前",
+    "genericError": "エラーが発生しました。"
   },
   "nav": {
     "home": "ホーム",
@@ -29,14 +43,19 @@
     "tabStats": "ステータス",
     "tabPerks": "特典",
     "perksEmptyTitle": "まだ特典なし",
-    "perksEmptyDesc": "特典は各境界の昇級・突破時に得られる報酬です。獲得後にここへ表示されます。"
+    "perksEmptyDesc": "特典は各境界の昇級・突破時に得られる報酬です。獲得後にここへ表示されます。",
+    "gearCount": "· {{n}}/9 装備",
+    "techniqueCount": "· {{n}} 秘術"
   },
   "collection": {
     "title": "収集",
     "upgradeLevel": "強化",
     "upgradeCost": "次レベルの費用",
     "upgradeBtn": "強化 +1",
-    "upgradeMaxed": "最大強化済"
+    "upgradeMaxed": "最大強化済",
+    "dismantle": "分解",
+    "dismantleConfirm": "この{{rarity}}アイテムを分解して 1× {{mineralName}} を得ますか？",
+    "dismantleBtn": "{{label}} · +1 {{mineralName}}"
   },
   "home": {
     "peakQi": "極限霊気",
@@ -47,7 +66,26 @@
     "channeling": "引気中",
     "channelTitle": "天地霊気を引く — 30分間2倍速",
     "pills": "丹薬",
-    "breakthroughKicker": "突破"
+    "breakthroughKicker": "突破",
+    "bypassGate": "関門を突破",
+    "heavensPardon": "天の恩赦 · ×{{n}}",
+    "breakthrough": "突破",
+    "tapToContinue": "タップして続ける",
+    "finalAscension": "最終昇仙",
+    "sparksAwait_one": "{{n}} 道の霊火が待機中",
+    "sparksAwait_other": "{{n}} 道の霊火が待機中",
+    "rewardsChip_one": "{{n}} 件の報酬！",
+    "rewardsChip_other": "{{n}} 件の報酬！",
+    "noLawEquipped": "功法未装備",
+    "pillsChip": "丹薬 {{n}} 個",
+    "deepMeditation": "深層瞑想",
+    "cfNextBonus": "次 +{{n}}% · {{n}}秒",
+    "cultivationLabel": "修炼",
+    "crystalTag": "気晶",
+    "refineVerb": "精錬 → Lv {{n}}",
+    "traceMeridians": "経脈を辿る",
+    "mechanicUnlocked": "✦ メカニック解放 — {{name}}",
+    "mechanicsUnlocked": "✦ {{n}} 個のメカニック解放"
   },
   "offlineModal": {
     "eyebrow": "閉関より帰還",
@@ -91,7 +129,9 @@
   },
   "combat": {
     "title": "戦闘闘技場",
-    "back": "← 戻る"
+    "back": "← 戻る",
+    "dodged": "回避",
+    "exploit": "弱点！"
   },
   "gathering": {
     "activity": "採集",
@@ -353,5 +393,421 @@
     "Rare": "希少",
     "Epic": "史詩",
     "Legendary": "伝説"
+  },
+
+  "achievement": {
+    "kicker": {
+      "earned":  "実績達成",
+      "mystery": "謎の実績",
+      "hidden":  "隠された道",
+      "locked":  "ロック済"
+    },
+    "lockedDesc":      "修炼を続けてこの実績を解放せよ。",
+    "secretDesc":      "発動条件はまだ隠されている。",
+    "lockedAriaLabel": "ロック済実績",
+    "closeAriaLabel":  "実績詳細を閉じる"
+  },
+
+  "artefactUpgrade": {
+    "levelLabel":           "レベル",
+    "fullyUpgraded":        "最大強化済",
+    "milestoneHint":        "✦ +{{level}}でアフィックスにボーナスロール",
+    "costSection":          "費用",
+    "ownedQueued":          "所持 {{have}} + 生贄キュー {{queued}}",
+    "ownedCount":           "所持 {{have}}",
+    "sacrificeSection":     "法宝を生贄に",
+    "tapToQueue":           "· タップでキューに追加",
+    "noSacrifice":          "このレベルの素材を提供できる生贄法宝がありません。",
+    "removeFromQueue":      "キューから削除",
+    "notEnough":            "素材不足",
+    "upgradeWithSacrifice": "強化 → +{{level}} · {{n}} 件生贄",
+    "upgrade":              "強化 → +{{level}}",
+    "confirmMsg":           "強化して {{n}} 件の法宝を生贄にしますか？この操作は取り消せません。"
+  },
+
+  "shop": {
+    "eyebrow":          "朱雀市場",
+    "title":            "血蓮をチャージ",
+    "balanceAriaLabel": "現在の血蓮残高",
+    "balanceCurrent":   "現在",
+    "purchaseSuccess":  "+{{amount}} 追加",
+    "toastKicker":      "血蓮",
+    "purchaseFailed":   "購入失敗",
+    "restoreFailed":    "復元失敗",
+    "finePrint":        "すべての購入は即時反映されます。価格はUSD。",
+    "restoring":        "復元中…",
+    "restorePurchases": "購入を復元",
+    "processing":       "処理中…",
+    "save":             "${{dollars}} お得",
+    "badge": {
+      "popular":   "人気",
+      "bigSaver":  "お得",
+      "megaValue": "超お得",
+      "bestValue": "最高コスパ"
+    }
+  },
+
+  "codex": {
+    "tabWardrobe":     "衣装",
+    "tabAchievements": "実績",
+    "tabStats":        "統計"
+  },
+
+  "crystalDetail": {
+    "name":             "気晶",
+    "levelLabel":       "レベル",
+    "cultivationBonus": "修炼ボーナス",
+    "perLevel":         "気晶レベルごと",
+    "nextEvolution":    "次の進化",
+    "reachesAt":        "レベル {{n}} で達成",
+    "levelsAway":       "あと {{n}} レベル",
+    "bonusAt":          "T{{n}} のボーナス：",
+    "fullyEvolved":     "完全進化済",
+    "fullyEvolvedDesc": "気晶は最高形態に達した。修炼のあらゆる面がそこから力を汲み取っている。"
+  },
+
+  "crystalTierNames": {
+    "1":  "粗削り晶片",
+    "2":  "霞がかった晶片",
+    "3":  "霊晶の欠片",
+    "4":  "翡翠の断片",
+    "5":  "虚空の晶片",
+    "6":  "蒼天の晶石",
+    "7":  "天宮の棱晶",
+    "8":  "道源の宝玉",
+    "9":  "仙元の晶核",
+    "10": "太陽の聖遺物"
+  },
+
+  "crystalFeed": {
+    "title":            "気晶",
+    "levelSubtitle":    "レベル {{n}}",
+    "qiGain":           "×{{n}} 気量増加",
+    "nextLevelGain":    "Lv.{{n}} → ×{{n}} 気量増加",
+    "stoneReserves":    "霊石の備蓄",
+    "total":            "合計：",
+    "refinementAmount": "精錬数",
+    "levelPreview":     "{{from}} → {{to}} レベル",
+    "willConsume":      "消費予定：",
+    "nothingSelected":  "未選択",
+    "gatherStones":     "先に気石を集めてください",
+    "refineLevelUp":    "⚡ 精錬 → レベル {{n}}",
+    "refine":           "⚡ 精錬",
+    "refineRqi":        "⚡ 精錬 +{{n}} RQI",
+    "noStones":         "精錬できる石がありません",
+    "qiBalance":        "気の残高",
+    "available":        "利用可能：",
+    "notEnoughQi":      "気が不足しています",
+    "refineQiCost":     "⚡ 精錬（-{{n}} 気）"
+  },
+
+  "daily": {
+    "title":        "デイリーギフト",
+    "subtitle":     "毎日ログインしてストリークを伸ばそう",
+    "day":          "{{n}} 日目",
+    "successLabel": "血蓮を受け取りました！",
+    "collectBtn":   "{{n}} 受け取る",
+    "comeTomorrow": "{{n}} 日目は明日また来てください"
+  },
+
+  "producerDetail": {
+    "lockedAriaLabel":   "ロック済生産者",
+    "unlocksAt":         "境界 {{n}} で解放。",
+    "owned":             "所持",
+    "perUnit":           "ユニットごと",
+    "upgrades":          "（×{{n}} 強化）",
+    "roster":            "（×{{n}} 名簿）",
+    "baseContribution":  "基本貢献",
+    "shareOfProduction": "基本生産の割合",
+    "nextTier":          "次のティア（{{label}}）",
+    "moreToNextTier":    "あと {{n}}",
+    "hiddenArtUnlocked": "隠し奥義解放",
+    "comingSoon":        "解放済 · 近日公開",
+    "mythicLockNote":    "神話ティアで50体所持後に解放。"
+  },
+
+  "sparkChoice": {
+    "reviewLater":        "後で確認",
+    "title":              "霊火",
+    "sub":                "{{rarity}}の縁、一つ選べ",
+    "queueBadge_one":     "この後さらに {{n}} 道の霊火",
+    "queueBadge_other":   "この後さらに {{n}} 道の霊火",
+    "realmLabel":         "境界 {{n}}",
+    "legendaryUnlockHint":"伝説は {{producer}} で解放",
+    "legendaryChance":    "伝説",
+    "pityGuaranteed":     "次回：伝説確定",
+    "pityIn_one":         "{{n}} 境界後に天井",
+    "pityIn_other":       "{{n}} 境界後に天井",
+    "poolOf":             "{{total}} 中 {{n}}",
+    "fullPool":           "フルプール",
+    "guaranteed":         "確定",
+    "pityShort":          "{{n}} 後天井",
+    "rerollBtn":          "ペアを引き直す",
+    "rerollFree":         "無料",
+    "rerollCost":         "· {{n}} 血蓮",
+    "rerollFreeTitle":    "両カードを無料で引き直す",
+    "rerollCostTitle":    "引き直しには {{n}} 血蓮が必要",
+    "rerollBLTitle":      "{{n}} 血蓮で両カードを引き直す",
+    "sparkAwaits_one":    "{{n}} 道の霊火が待機中",
+    "sparkAwaits_other":  "{{n}} 道の霊火が待機中"
+  },
+
+  "selection": {
+    "firstLawTitle": "最初の修炼功法を選べ",
+    "newLawTitle":   "新しい修炼功法",
+    "libraryFull":   "功法庫が満杯（{{n}}）。一つ分解してスペースを空けよ：",
+    "onlyActiveLaw": "発動中の功法のみ残っています — まずキャラクター画面で別の功法を装備してください。",
+    "rerollFree":    "引き直し — 無料！",
+    "rerollNeedBL":  "{{n}} 血蓮が必要",
+    "rerollCostBL":  "引き直し — {{n}} 血蓮消費",
+    "generalType":   "汎用"
+  },
+
+  "sparks": {
+    "emptyTitle":          "まだ常設霊火なし",
+    "emptyText":           "層の突破ごとに霊火が提供されます。永久・伝説・メカニック霊火はここに表示されます。一時的な強化効果は発動中に左上のチップに表示されます。",
+    "trinityLabel":        "三元収束",
+    "globalQiBonus":       "+{{n}}% 全体気/秒",
+    "sectionLegendary":    "伝説",
+    "sectionLegendarySub": "生産者シナジー",
+    "sectionPermanent":    "永久",
+    "sectionPermanentSub": "今回の周回有効",
+    "sectionMechanics":    "メカニック",
+    "sectionMechanicsSub": "気晶進化から",
+    "detailEffect":        "効果",
+    "detailCurrently":     "現在",
+    "detailExample":       "例",
+    "detailLore":          "伝承",
+    "trinityActive":       "✦ 三元収束発動 · +{{n}}% 全体気/秒",
+    "charmFooter":         "{{label}} 霊符",
+    "mechanicLabel":       "メカニック",
+    "tapForDetails":       "タップして詳細を確認",
+    "bargainSpent":        "契約使用済",
+    "waitingNextRealm":    "次の大境界を待機中"
+  },
+
+  "statsPanel": {
+    "currentRun":           "今回の周回",
+    "lifetime":             "累計",
+    "currentQi":            "現在の気",
+    "currentQiRate":        "現在の気/秒",
+    "runStarted":           "周回開始",
+    "achievementsUnlocked": "解放済実績",
+    "footer":               "{{date}} から記録中 · v{{version}}"
+  },
+
+  "toast": {
+    "viewBtn":          "確認",
+    "dismissAriaLabel": "閉じる",
+    "overflow":         "+{{n}} 件"
+  },
+
+  "tutorial": {
+    "gotIt":  "わかった",
+    "kicker": "解放"
+  },
+
+  "upgrade": {
+    "locked": "ロック済"
+  },
+
+  "wardrobe": {
+    "slotCharacter":       "修士",
+    "slotCrystal":         "気晶",
+    "slotParticles":       "粒子",
+    "slotBackdrop":        "背景",
+    "defaultCharName":     "白金の道袍",
+    "defaultCrystalName":  "霊晶",
+    "defaultParticlesName":"白金の光点",
+    "defaultBackdropName": "山道",
+    "noneOwned":           "所持なし",
+    "owned":               "{{n}} 件所持",
+    "ribbonEquipped":      "装備中",
+    "unequip":             "外す",
+    "ribbonDefault":       "デフォルト",
+    "active":              "発動中",
+    "equip":               "装備",
+    "noneOwnedSlot":       "このスロットにコスメティックがありません。",
+    "browseBazaar":        "市場を見る →",
+    "footerSummary":       "{{cosmeticsOwned}} 件所持 · {{cosmeticsEquipped}} 件装備中",
+    "bazaarLink":          "市場 →"
+  },
+
+  "minigame": {
+    "leaveAriaLabel":  "ミニゲームを終了",
+    "comingSoon":      "隠し奥義はまだ刻まれていない。",
+    "again":           "もう一度",
+    "minOfProduction": "≈ {{n}} 分の生産量"
+  },
+
+  "pillRefine": {
+    "prompt":         "最大 {{n}} 種の薬材を丹炉に投じよ。",
+    "likelyYield":    "予想産出：",
+    "lightFurnace":   "炉に火を点ける",
+    "flameLabel":     "火候",
+    "flameTrue":      "真火",
+    "flameCold":      "寒火",
+    "flameWild":      "狂火",
+    "tip":            "丹が固まるまで炎を帯域内に保て。",
+    "stoke":          "炎を煽る",
+    "resultFlawless": "完璧な錬製",
+    "resultStable":   "安定した丹",
+    "resultCracked":  "亀裂入り丹",
+    "newBrew":        "新たに錬製"
+  },
+
+  "garden": {
+    "spiritDew":       "霊露",
+    "tabGarden":       "霊園",
+    "tabBrewhouse":    "醸造室",
+    "harvestAll":      "全て収穫 · {{n}}",
+    "plotsRipe_one":   "{{n}} 区画が熟した。タップして収穫。",
+    "plotsRipe_other": "{{n}} 区画が熟した。タップして収穫。",
+    "nextRipens":      "次の霊草は {{time}} 後に熟します。",
+    "pickSeed":        "下の種を選び、区画をタップして播種。",
+    "dewCost":         "{{n}} 霊露",
+    "deeperRealms":    "より深い境界",
+    "basketEmpty":     "籠が空です。霊園で霊草を育て収穫し、売却・錬製・引化しに来てください。",
+    "basket":          "籠",
+    "basketMeta":      "{{herbs}} 本の霊草 · {{dew}} 霊露相当",
+    "sellAll":         "全て売却 · {{n}} 霊露",
+    "channel":         "引化 → 気",
+    "channelNote":     "引化には {{required}} 霊露相当の籠が必要（現在 {{current}}）。",
+    "elixirs":         "仙酒",
+    "elixirSub":       "醸造すると現在の仙酒と置き換わる",
+    "brew":            "醸造",
+    "backToGarden":    "霊園へ戻る",
+    "channelledLabel": "{{n}} 本の霊草を引化した",
+    "sellHerb":        "売却 · {{n}}",
+    "expandCost":      "{{n}} 霊露",
+    "discovered":      "{{herb}} を発見。+{{n}} 霊露",
+    "gathered":        "{{n}}× {{herb}} 収穫"
+  },
+
+  "cultivation": {
+    "reservoirLabel":       "気海",
+    "flowingLabel":         "流動中",
+    "navAriaLabel":         "宗門セクション",
+    "tabProducers":         "弟子",
+    "tabUpgrades":          "強化",
+    "tabSparks":            "霊火",
+    "buyModeLabel":         "購入モード",
+    "autoBuyOn":            "自動購入ON。タップで無効化。",
+    "autoBuyOff":           "自動購入OFF。タップで有効化。",
+    "autoLabel":            "自動",
+    "noUpgradesTitle":      "まだ強化なし",
+    "noUpgradesSub":        "弟子を買い境界を上げて強化を解放。",
+    "upgradesAvailable":    "利用可能",
+    "upgradesAvailableTag": "刻まれた石碑 · 一度限りの奉献",
+    "upgradesOwned":        "刻印済",
+    "upgradesOwnedTag":     "永続的な奉献受理済"
+  },
+
+  "journey": {
+    "stage":                "層",
+    "stages":               "層",
+    "sparkRewardTitle":     "この層の突破で霊火を獲得",
+    "sparkRewardAriaLabel": "霊火報酬",
+    "currentRealm":         "現在の境界",
+    "nextBreakthrough":     "次の突破",
+    "gate":                 "関門",
+    "gateRequired":         "{{rate}} 気/秒 必要",
+    "gateNone":             "なし",
+    "current":              "現在",
+    "currentRate":          "{{rate}} 気/秒"
+  },
+
+  "reincarnation": {
+    "title":             "転生",
+    "subtitle":          "修炼をリセットして業を得る — 永恒の樹で消費して永続強化を得よ。",
+    "karmaLabel":        "業",
+    "livesLabel":        "輪廻",
+    "peakProgressLabel": "最高進度",
+    "peakYieldLabel":    "最高産出",
+    "karmaUnit":         "{{n}} 業",
+    "confirmText":       "転生すると気・境界・丹薬・所持品・法宝・秘術・その他功法が失われます。発動中の功法・業・永恒の樹は残ります。続けますか？",
+    "confirmBtn":        "転生する",
+    "reincarnateBtn":    "転生",
+    "lockedTitle":       "この生で聖人境に達して転生せよ",
+    "lockedHint":        "聖人境に達すると転生できる",
+    "treeLabel":         "永恒の樹 — 合計費用",
+    "nodeOwned":         "✓ 所持済"
+  },
+
+  "bazaar": {
+    "back":               "‹ 戻る",
+    "eyebrow":            "霊",
+    "title":              "市場",
+    "topUp":              "+ チャージ",
+    "navAriaLabel":       "市場セクション",
+    "tabBuffs":           "強化",
+    "tabConsumables":     "消耗品",
+    "tabQol":             "QoL",
+    "tabCosmetics":       "外見",
+    "sectionBuffs":       "強化",
+    "buffsTag":           "パワーアップ · 全てと重複",
+    "sectionConsumables": "消耗品",
+    "consumablesTag":     "一発護符 · 使用まで保持",
+    "sectionQol":         "クオリティオブライフ",
+    "qolTag":             "永続解放 · 摩擦を減らし修炼に集中",
+    "sectionCosmetics":   "外見",
+    "cosmeticsTag":       "スキン · テーマパック · 共に進化",
+    "themePacks":         "テーマパック",
+    "comingSoon":         "さらなる法宝が棚に並ぶ…",
+    "allOwned":           "現在利用可能な全スキンを所持しています。典籍 › 衣装で確認。",
+    "codexWardrobeLink":  "典籍 › 衣装",
+    "todaysPick":         "今日のおすすめ",
+    "limitedOffering":    "期間限定",
+    "resetsIn":           "{{time}} 後リセット",
+    "purchasedFlash":     "購入：{{name}}",
+    "purchaseFailed":     "購入失敗",
+    "themePack":          "テーマパック",
+    "savePack":           "{{n}} お得",
+    "claimPack":          "パックを受け取る",
+    "blPrice":            "{{n}} 血蓮",
+    "active":             "発動中",
+    "timeLeft":           "残り {{n}}",
+    "owned":              "所持済",
+    "maxed":              "最大（{{n}}/{{max}}）",
+    "particleKicker":     "気球の流れを変える",
+    "evolvesThrough":     "{{n}} ティアを通じて進化",
+    "stagesRevealed":     "{{total}} 中 {{n}} ティア公開済"
+  },
+
+  "eternalTree": {
+    "eyebrow":           "生と死の間",
+    "title":             "永恒の樹",
+    "karmaLabel":        "業",
+    "closeDetails":      "詳細を閉じる",
+    "futurePathDefault": "業の未来の道。",
+    "previewOnly":       "プレビューのみ",
+    "anchored":          "✓ 錨定済",
+    "comingSoon":        "✦ 近日公開",
+    "prereqsBound":      "前提条件がまだ満たされていない",
+    "needMore":          "あと {{n}} 必要",
+    "anchorFor":         "{{n}} で錨定",
+    "nextKarma":         "次の業は {{n}} 気で獲得",
+    "toGo":              "あと {{n}}",
+    "reincarnate":       "転生",
+    "reachSaint":        "聖人境に到達",
+    "zoomIn":            "拡大",
+    "fitView":           "全体表示",
+    "zoomOut":           "縮小"
+  },
+
+  "reincarnationModal": {
+    "eyebrow":       "断縁の儀",
+    "titleOpen":     "この生を断ち切るか？",
+    "bodyOpen":      "輪廻を回すとは、この世を終わらせること…",
+    "loseRow":       "この世：登った境界、溜めた気、全弟子の誓い。",
+    "keepRow":       "樹に刻まれるもの：積んだ業、彫った法印、次の夜明けの種。",
+    "karmaCarried":  "継承される業",
+    "warn":          "この儀を越えれば、戻る道はない",
+    "cancelBtn":     "輪廻を押さえる",
+    "confirmBtn":    "輪廻を回す",
+    "titleLocked":   "門は封印されている",
+    "bodyLocked":    "輪廻の輪は聖人境を歩んだ者のためにのみ回る…",
+    "youStandAt":    "あなたが立っているのは",
+    "understoodBtn": "了解"
   }
 }

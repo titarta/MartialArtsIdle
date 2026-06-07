@@ -1,6 +1,7 @@
 {
   "common": {
     "cancel": "Annulla",
+    "confirm": "Conferma",
     "none": "Nessuno",
     "equipped": "Equipaggiato",
     "locked": "Bloccato",
@@ -10,7 +11,20 @@
     "unequip": "Rimuovi",
     "back": "← Indietro",
     "active": "Attivo",
-    "inSlot": "In {{slot}}"
+    "inSlot": "In {{slot}}",
+    "closeAriaLabel": "Chiudi",
+    "dismissAriaLabel": "Ignora",
+    "max": "MAX",
+    "free": "Gratis",
+    "skip": "Salta",
+    "collect": "Raccogli",
+    "clear": "Cancella",
+    "unknown": "???",
+    "justNow": "adesso",
+    "minutesAgo": "{{n}} min fa",
+    "hoursAgo": "{{n}} h fa",
+    "daysAgo": "{{n}} g fa",
+    "genericError": "Qualcosa è andato storto."
   },
   "nav": {
     "home": "Home",
@@ -29,14 +43,19 @@
     "tabStats": "Statistiche",
     "tabPerks": "Vantaggi",
     "perksEmptyTitle": "Nessun Vantaggio Ancora",
-    "perksEmptyDesc": "I vantaggi sono ricompense ottenute ad ogni avanzamento di sfera e ogni svolta. Appariranno qui una volta guadagnati."
+    "perksEmptyDesc": "I vantaggi sono ricompense ottenute ad ogni avanzamento di sfera e ogni svolta. Appariranno qui una volta guadagnati.",
+    "gearCount": "· {{n}}/9 equipaggiamento",
+    "techniqueCount": "· {{n}} tecniche"
   },
   "collection": {
     "title": "Collezione",
     "upgradeLevel": "Potenzia",
     "upgradeCost": "Costo prossimo livello",
     "upgradeBtn": "Potenzia +1",
-    "upgradeMaxed": "Completamente potenziato"
+    "upgradeMaxed": "Completamente potenziato",
+    "dismantle": "Smantella",
+    "dismantleConfirm": "Smantellare questo oggetto {{rarity}} per 1× {{mineralName}}?",
+    "dismantleBtn": "{{label}} · +1 {{mineralName}}"
   },
   "home": {
     "peakQi": "Qi di Vetta",
@@ -47,7 +66,26 @@
     "channeling": "Canalizzazione",
     "channelTitle": "Canalizza il Qi Celeste — 2× per 30 min",
     "pills": "Pillole",
-    "breakthroughKicker": "Svolta"
+    "breakthroughKicker": "Svolta",
+    "bypassGate": "Supera il Portale",
+    "heavensPardon": "Grazia Celeste · ×{{n}}",
+    "breakthrough": "SVOLTA",
+    "tapToContinue": "Tocca per continuare",
+    "finalAscension": "Ascensione Finale",
+    "sparksAwait_one": "{{n}} Scintilla ti attende",
+    "sparksAwait_other": "{{n}} Scintille ti attendono",
+    "rewardsChip_one": "{{n}} Ricompensa!",
+    "rewardsChip_other": "{{n}} Ricompense!",
+    "noLawEquipped": "Nessuna legge equipaggiata",
+    "pillsChip": "{{n}} Pillole",
+    "deepMeditation": "Meditazione Profonda",
+    "cfNextBonus": "prossimo +{{n}}% · {{n}}s",
+    "cultivationLabel": "Coltivazione",
+    "crystalTag": "Cristallo di Qi",
+    "refineVerb": "Raffina → Lv {{n}}",
+    "traceMeridians": "Traccia i Meridiani",
+    "mechanicUnlocked": "✦ Meccanica Sbloccata — {{name}}",
+    "mechanicsUnlocked": "✦ {{n}} Meccaniche Sbloccate"
   },
   "offlineModal": {
     "eyebrow": "Ritornato dal Ritiro",
@@ -91,7 +129,9 @@
   },
   "combat": {
     "title": "Arena di Combattimento",
-    "back": "← Indietro"
+    "back": "← Indietro",
+    "dodged": "SCHIVATO",
+    "exploit": "SFRUTTAMENTO!"
   },
   "gathering": {
     "activity": "Raccolta",
@@ -353,5 +393,421 @@
     "Rare": "Raro",
     "Epic": "Epico",
     "Legendary": "Leggendario"
+  },
+
+  "achievement": {
+    "kicker": {
+      "earned":  "Risultato Ottenuto",
+      "mystery": "Risultato Misterioso",
+      "hidden":  "Sentiero Nascosto",
+      "locked":  "Bloccato"
+    },
+    "lockedDesc":      "Continua a coltivare per sbloccare questo risultato.",
+    "secretDesc":      "L'azione scatenante è ancora nascosta alla vista.",
+    "lockedAriaLabel": "Risultato bloccato",
+    "closeAriaLabel":  "Chiudi dettaglio risultato"
+  },
+
+  "artefactUpgrade": {
+    "levelLabel":           "Livello",
+    "fullyUpgraded":        "Completamente potenziato",
+    "milestoneHint":        "✦ Tiro bonus su un affix a +{{level}}",
+    "costSection":          "Costo",
+    "ownedQueued":          "{{have}} posseduti + {{queued}} dalla coda di sacrificio",
+    "ownedCount":           "{{have}} posseduti",
+    "sacrificeSection":     "Sacrifica artefatti",
+    "tapToQueue":           "· tocca per accodare",
+    "noSacrifice":          "Nessun artefatto sacrificabile produce i materiali per questo livello.",
+    "removeFromQueue":      "Rimuovi dalla coda",
+    "notEnough":            "Materiali insufficienti",
+    "upgradeWithSacrifice": "Potenzia → +{{level}} · sacrifica {{n}}",
+    "upgrade":              "Potenzia → +{{level}}",
+    "confirmMsg":           "Potenziare e sacrificare {{n}} artefatto/i? Questa azione non può essere annullata."
+  },
+
+  "shop": {
+    "eyebrow":          "Bazar Vermiglio",
+    "title":            "Ricarica Loto di Sangue",
+    "balanceAriaLabel": "Saldo attuale Loto di Sangue",
+    "balanceCurrent":   "Attuale",
+    "purchaseSuccess":  "+{{amount}} aggiunti",
+    "toastKicker":      "Loto di Sangue",
+    "purchaseFailed":   "Acquisto fallito",
+    "restoreFailed":    "Ripristino fallito",
+    "finePrint":        "Tutti gli acquisti si sbloccano immediatamente. Prezzi in USD.",
+    "restoring":        "Ripristino…",
+    "restorePurchases": "Ripristina Acquisti",
+    "processing":       "Elaborazione…",
+    "save":             "Risparmia ${{dollars}}",
+    "badge": {
+      "popular":   "Popolare",
+      "bigSaver":  "Grande Risparmio",
+      "megaValue": "Mega Convenienza",
+      "bestValue": "Miglior Offerta"
+    }
+  },
+
+  "codex": {
+    "tabWardrobe":     "Guardaroba",
+    "tabAchievements": "Risultati",
+    "tabStats":        "Statistiche"
+  },
+
+  "crystalDetail": {
+    "name":             "Cristallo di Qi",
+    "levelLabel":       "Livello",
+    "cultivationBonus": "Bonus coltivazione",
+    "perLevel":         "Per livello cristallo",
+    "nextEvolution":    "Prossima Evoluzione",
+    "reachesAt":        "Raggiunge al livello {{n}}",
+    "levelsAway":       "{{n}} livello/i mancante/i",
+    "bonusAt":          "Bonus al T{{n}}:",
+    "fullyEvolved":     "Completamente Evoluto",
+    "fullyEvolvedDesc": "Il cristallo ha raggiunto la sua forma suprema. Ogni sfaccettatura della tua coltivazione ne attinge ora."
+  },
+
+  "crystalTierNames": {
+    "1":  "Scheggia Grezza",
+    "2":  "Scheggia Opaca",
+    "3":  "Scheggia Spirituale",
+    "4":  "Frammento di Giada",
+    "5":  "Scheggia del Vuoto",
+    "6":  "Cristallo Azzurro",
+    "7":  "Prisma Celeste",
+    "8":  "Gemma del Dao",
+    "9":  "Nucleo Immortale",
+    "10": "Reliquia Solare"
+  },
+
+  "crystalFeed": {
+    "title":            "Cristallo di Qi",
+    "levelSubtitle":    "Livello {{n}}",
+    "qiGain":           "×{{n}} guadagno Qi",
+    "nextLevelGain":    "Lv.{{n}} → ×{{n}} guadagno Qi",
+    "stoneReserves":    "Riserve di Pietre",
+    "total":            "Totale:",
+    "refinementAmount": "Quantità di Raffinamento",
+    "levelPreview":     "Livello {{from}} → {{to}}",
+    "willConsume":      "Consumerà:",
+    "nothingSelected":  "nulla selezionato",
+    "gatherStones":     "raccogli prima le pietre di Qi",
+    "refineLevelUp":    "⚡ Raffina → Livello {{n}}",
+    "refine":           "⚡ Raffina",
+    "refineRqi":        "⚡ Raffina +{{n}} RQI",
+    "noStones":         "Nessuna pietra da raffinare",
+    "qiBalance":        "Saldo Qi",
+    "available":        "Disponibile:",
+    "notEnoughQi":      "Qi insufficiente",
+    "refineQiCost":     "⚡ Raffina (-{{n}} Qi)"
+  },
+
+  "daily": {
+    "title":        "Regalo Giornaliero",
+    "subtitle":     "Torna ogni giorno per aumentare la serie",
+    "day":          "Giorno {{n}}",
+    "successLabel": "Loto di Sangue raccolto!",
+    "collectBtn":   "Raccogli {{n}}",
+    "comeTomorrow": "Torna domani per il Giorno {{n}}"
+  },
+
+  "producerDetail": {
+    "lockedAriaLabel":   "Produttore bloccato",
+    "unlocksAt":         "Si sblocca al regno {{n}}.",
+    "owned":             "Posseduti",
+    "perUnit":           "Per unità",
+    "upgrades":          "(×{{n}} potenziamenti)",
+    "roster":            "(×{{n}} formazione)",
+    "baseContribution":  "Contributo base",
+    "shareOfProduction": "Quota della produzione base",
+    "nextTier":          "Livello successivo ({{label}})",
+    "moreToNextTier":    "ancora {{n}}",
+    "hiddenArtUnlocked": "Arte Nascosta sbloccata",
+    "comingSoon":        "Sbloccato · prossimamente",
+    "mythicLockNote":    "Si sblocca al livello Mitico · 50 posseduti."
+  },
+
+  "sparkChoice": {
+    "reviewLater":        "Rivedi più tardi",
+    "title":              "Scintilla di Qi",
+    "sub":                "un'offerta {{rarity}}, scegline una",
+    "queueBadge_one":     "ancora {{n}} scintilla in attesa dopo questa",
+    "queueBadge_other":   "ancora {{n}} scintille in attesa dopo questa",
+    "realmLabel":         "Regno {{n}}",
+    "legendaryUnlockHint":"Le leggendarie si sbloccano con {{producer}}",
+    "legendaryChance":    "leggendaria",
+    "pityGuaranteed":     "Prossima: leggendaria garantita",
+    "pityIn_one":         "Pietà in {{n}} regno",
+    "pityIn_other":       "Pietà in {{n}} regni",
+    "poolOf":             "in {{n}} su {{total}}",
+    "fullPool":           "pool completo",
+    "guaranteed":         "garantita",
+    "pityShort":          "pietà in {{n}}",
+    "rerollBtn":          "Rilancia coppia",
+    "rerollFree":         "gratis",
+    "rerollCost":         "· {{n}} BL",
+    "rerollFreeTitle":    "Rilancia entrambe le carte, gratis",
+    "rerollCostTitle":    "Servono {{n}} Loto di Sangue per rilanciare",
+    "rerollBLTitle":      "Rilancia entrambe le carte, {{n}} Loto di Sangue",
+    "sparkAwaits_one":    "{{n}} scintilla in attesa",
+    "sparkAwaits_other":  "{{n}} scintille in attesa"
+  },
+
+  "selection": {
+    "firstLawTitle": "Scegli la tua prima Legge di Coltivazione",
+    "newLawTitle":   "Nuova Legge di Coltivazione",
+    "libraryFull":   "La tua biblioteca è piena ({{n}}). Smantella una per fare spazio:",
+    "onlyActiveLaw": "Rimane solo la tua legge attiva — equip una diversa dal Personaggio prima.",
+    "rerollFree":    "Rilancia — gratis!",
+    "rerollNeedBL":  "Servono {{n}} Loto di Sangue",
+    "rerollCostBL":  "Rilancia — costa {{n}} Loto di Sangue",
+    "generalType":   "generale"
+  },
+
+  "sparks": {
+    "emptyTitle":          "Nessuna scintilla persistente ancora",
+    "emptyText":           "Una Scintilla di Qi viene offerta ad ogni svolta di strato. Le tue scintille permanenti, leggendarie e di meccanica vivranno qui. I buff temporanei appaiono sul chip in alto a sinistra mentre sono attivi.",
+    "trinityLabel":        "Convergenza della Trinità",
+    "globalQiBonus":       "+{{n}}% qi/s globale",
+    "sectionLegendary":    "Leggendarie",
+    "sectionLegendarySub": "sinergie produttore",
+    "sectionPermanent":    "Permanenti",
+    "sectionPermanentSub": "durano questa run",
+    "sectionMechanics":    "Meccaniche",
+    "sectionMechanicsSub": "dall'evoluzione del cristallo",
+    "detailEffect":        "Effetto",
+    "detailCurrently":     "Attualmente",
+    "detailExample":       "Esempio",
+    "detailLore":          "Lore",
+    "trinityActive":       "✦ Convergenza della Trinità attiva · +{{n}}% qi/s globale",
+    "charmFooter":         "Amuleto {{label}}",
+    "mechanicLabel":       "Meccanica",
+    "tapForDetails":       "tocca per i dettagli",
+    "bargainSpent":        "Patto consumato",
+    "waitingNextRealm":    "In attesa del prossimo regno principale"
+  },
+
+  "statsPanel": {
+    "currentRun":           "Run Attuale",
+    "lifetime":             "In tutto",
+    "currentQi":            "Qi Attuale",
+    "currentQiRate":        "Qi/s Attuale",
+    "runStarted":           "Run iniziata",
+    "achievementsUnlocked": "Risultati sbloccati",
+    "footer":               "Registrazione dal {{date}} · v{{version}}"
+  },
+
+  "toast": {
+    "viewBtn":         "Vedi",
+    "dismissAriaLabel":"Ignora",
+    "overflow":        "+{{n}} altri"
+  },
+
+  "tutorial": {
+    "gotIt":  "Capito",
+    "kicker": "Sbloccato"
+  },
+
+  "upgrade": {
+    "locked": "Bloccato"
+  },
+
+  "wardrobe": {
+    "slotCharacter":       "Coltivatore",
+    "slotCrystal":         "Cristallo",
+    "slotParticles":       "Particelle",
+    "slotBackdrop":        "Sfondo",
+    "defaultCharName":     "Vesti bianco-oro",
+    "defaultCrystalName":  "Cristallo Spirituale",
+    "defaultParticlesName":"Mote bianco-oro",
+    "defaultBackdropName": "Sentiero di Montagna",
+    "noneOwned":           "nessuno posseduto",
+    "owned":               "{{n}} posseduti",
+    "ribbonEquipped":      "EQUIPAGGIATO",
+    "unequip":             "Rimuovi",
+    "ribbonDefault":       "PREDEFINITO",
+    "active":              "Attivo",
+    "equip":               "Equip",
+    "noneOwnedSlot":       "Nessun cosmetico posseduto in questo slot.",
+    "browseBazaar":        "Sfoglia il Bazar →",
+    "footerSummary":       "{{cosmeticsOwned}} cosmetico/i posseduto/i · {{cosmeticsEquipped}} equipaggiato/i",
+    "bazaarLink":          "Bazar →"
+  },
+
+  "minigame": {
+    "leaveAriaLabel":  "Esci dal minigioco",
+    "comingSoon":      "Arte nascosta non ancora iscritta.",
+    "again":           "Ancora",
+    "minOfProduction": "≈ {{n}} min di produzione"
+  },
+
+  "pillRefine": {
+    "prompt":         "Aggiungi fino a {{n}} reagenti nel calderone.",
+    "likelyYield":    "Resa probabile:",
+    "lightFurnace":   "Accendi la fornace",
+    "flameLabel":     "Fiamma",
+    "flameTrue":      "Vera",
+    "flameCold":      "Fredda",
+    "flameWild":      "Selvaggia",
+    "tip":            "Mantieni la fiamma nella banda finché la pillola non si solidifica.",
+    "stoke":          "Alimenta 火",
+    "resultFlawless": "Raffinamento impeccabile",
+    "resultStable":   "Pillola stabile",
+    "resultCracked":  "Pillola incrinata",
+    "newBrew":        "Nuova preparazione"
+  },
+
+  "garden": {
+    "spiritDew":       "Rugiada Spirituale",
+    "tabGarden":       "Giardino",
+    "tabBrewhouse":    "Birreria",
+    "harvestAll":      "Raccogli tutto · {{n}}",
+    "plotsRipe_one":   "{{n}} appezzamento maturo. Tocca per raccogliere.",
+    "plotsRipe_other": "{{n}} appezzamenti maturi. Tocca per raccogliere.",
+    "nextRipens":      "La prossima erba matura tra {{time}}.",
+    "pickSeed":        "Scegli un seme qui sotto, poi tocca un appezzamento per seminare.",
+    "dewCost":         "{{n}} Rugiada",
+    "deeperRealms":    "Regni più profondi",
+    "basketEmpty":     "Il tuo cesto è vuoto. Coltiva e raccogli erbe nel Giardino, poi torna qui per vendere, preparare o canalizzarle.",
+    "basket":          "Cesto",
+    "basketMeta":      "{{herbs}} erbe · {{dew}} valore in Rugiada",
+    "sellAll":         "Vendi tutto · {{n}} Rugiada",
+    "channel":         "Canalizza → Qi",
+    "channelNote":     "La canalizzazione richiede un cesto da {{required}} Rugiada (ora {{current}}).",
+    "elixirs":         "Elisir",
+    "elixirSub":       "una preparazione sostituisce il tuo elisir attivo",
+    "brew":            "Prepara",
+    "backToGarden":    "Torna al giardino",
+    "channelledLabel": "Canalizzate {{n}} erba/e spirituale/i",
+    "sellHerb":        "Vendi · {{n}}",
+    "expandCost":      "{{n}} Rugiada",
+    "discovered":      "Scoperto {{herb}}. +{{n}} Rugiada",
+    "gathered":        "Raccolti {{n}}× {{herb}}"
+  },
+
+  "cultivation": {
+    "reservoirLabel":       "Serbatoio",
+    "flowingLabel":         "Fluente",
+    "navAriaLabel":         "Sezioni della Setta",
+    "tabProducers":         "Produttori",
+    "tabUpgrades":          "Potenziamenti",
+    "tabSparks":            "Scintille",
+    "buyModeLabel":         "Modalità Acquisto",
+    "autoBuyOn":            "Acquisto automatico ATTIVO. Tocca per disattivare.",
+    "autoBuyOff":           "Acquisto automatico DISATTIVO. Tocca per attivare.",
+    "autoLabel":            "Auto",
+    "noUpgradesTitle":      "Nessun potenziamento ancora",
+    "noUpgradesSub":        "Acquista produttori e sali di regno per sbloccare i potenziamenti.",
+    "upgradesAvailable":    "Disponibili",
+    "upgradesAvailableTag": "Tavolette iscritte · tributo una tantum",
+    "upgradesOwned":        "Iscritte",
+    "upgradesOwnedTag":     "Tributo permanente ricevuto"
+  },
+
+  "journey": {
+    "stage":               "stadio",
+    "stages":              "stadi",
+    "sparkRewardTitle":    "Superare questo stadio premia una Scintilla di Qi",
+    "sparkRewardAriaLabel":"Ricompensa Scintilla di Qi",
+    "currentRealm":        "Regno Attuale",
+    "nextBreakthrough":    "Prossima Svolta",
+    "gate":                "Portale",
+    "gateRequired":        "{{rate}} qi/s richiesti",
+    "gateNone":            "Nessuno",
+    "current":             "Attuale",
+    "currentRate":         "{{rate}} qi/s"
+  },
+
+  "reincarnation": {
+    "title":             "Reincarnazione",
+    "subtitle":          "Reimposta la coltivazione per ottenere Karma — spendilo nell'Albero Eterno per bonus permanenti.",
+    "karmaLabel":        "Karma",
+    "livesLabel":        "Vite",
+    "peakProgressLabel": "Progresso Massimo",
+    "peakYieldLabel":    "Resa Massima",
+    "karmaUnit":         "{{n}} karma",
+    "confirmText":       "La rinascita azzera Qi, regni, pillole, inventario, artefatti, tecniche e altre leggi. La tua legge attiva, il Karma e l'Albero Eterno sopravvivono. Continuare?",
+    "confirmBtn":        "Sì, reincarnati",
+    "reincarnateBtn":    "Reincarnati",
+    "lockedTitle":       "Raggiungi il regno del Santo in questa vita per reincarnarti",
+    "lockedHint":        "Raggiungi il regno del Santo per reincarnarti",
+    "treeLabel":         "Albero Eterno — Costo Totale",
+    "nodeOwned":         "✓ Posseduto"
+  },
+
+  "bazaar": {
+    "back":               "‹ Indietro",
+    "eyebrow":            "Lo Spirito",
+    "title":              "Bazar",
+    "topUp":              "+ Ricarica",
+    "navAriaLabel":       "Sezioni del Bazar",
+    "tabBuffs":           "Potenziamenti",
+    "tabConsumables":     "Consumabili",
+    "tabQol":             "QdV",
+    "tabCosmetics":       "Cosmetici",
+    "sectionBuffs":       "Potenziamenti",
+    "buffsTag":           "Power-up · si sommano a tutto",
+    "sectionConsumables": "Consumabili",
+    "consumablesTag":     "Talismani monouso · conservali fino all'uso",
+    "sectionQol":         "Qualità della Vita",
+    "qolTag":             "Sblocchi permanenti · meno attrito, più coltivazione",
+    "sectionCosmetics":   "Cosmetici",
+    "cosmeticsTag":       "Skin · pacchetti tema · evolve con te",
+    "themePacks":         "Pacchetti Tema",
+    "comingSoon":         "Altri oggetti in arrivo sugli scaffali…",
+    "allOwned":           "Possiedi tutte le skin disponibili al momento. Trovale in Codice › Guardaroba",
+    "codexWardrobeLink":  "Codice › Guardaroba",
+    "todaysPick":         "Scelta del Giorno",
+    "limitedOffering":    "Offerta Limitata",
+    "resetsIn":           "Si azzera tra {{time}}",
+    "purchasedFlash":     "Acquistato: {{name}}",
+    "purchaseFailed":     "Acquisto fallito",
+    "themePack":          "Pacchetto Tema",
+    "savePack":           "Risparmia {{n}}",
+    "claimPack":          "Riscatta Pacchetto",
+    "blPrice":            "{{n}} BL",
+    "active":             "ATTIVO",
+    "timeLeft":           "{{n}} rimasto/i",
+    "owned":              "Posseduto",
+    "maxed":              "Massimo ({{n}}/{{max}})",
+    "particleKicker":     "Sostituisce il flusso del tuo orbe di qi",
+    "evolvesThrough":     "Si evolve attraverso {{n}} livelli",
+    "stagesRevealed":     "{{n}} su {{total}} livelli rivelati"
+  },
+
+  "eternalTree": {
+    "eyebrow":           "Tra le Vite",
+    "title":             "Albero Eterno",
+    "karmaLabel":        "karma",
+    "closeDetails":      "Chiudi dettagli",
+    "futurePathDefault": "Un futuro sentiero di karma.",
+    "previewOnly":       "Solo anteprima",
+    "anchored":          "✓ Ancorato",
+    "comingSoon":        "✦ Prossimamente",
+    "prereqsBound":      "Prerequisiti ancora vincolati",
+    "needMore":          "Servono ancora {{n}}",
+    "anchorFor":         "Ancora per {{n}}",
+    "nextKarma":         "Prossimo karma a {{n}} Qi",
+    "toGo":              "{{n}} mancanti",
+    "reincarnate":       "Reincarnati",
+    "reachSaint":        "Raggiungi il Santo",
+    "zoomIn":            "Ingrandisci",
+    "fitView":           "Adatta alla vista",
+    "zoomOut":           "Riduci"
+  },
+
+  "reincarnationModal": {
+    "eyebrow":       "Il Rito della Recisione",
+    "titleOpen":     "Recidere questa vita?",
+    "bodyOpen":      "Girare la ruota significa porre fine a questa incarnazione…",
+    "loseRow":       "Questa incarnazione: regni scalati, qi accumulato, i voti di ogni discepolo.",
+    "keepRow":       "Innestato sull'Albero: karma guadagnato, sigilli incisi, il seme dell'alba successiva.",
+    "karmaCarried":  "Karma portato con sé",
+    "warn":          "Oltre questo rito, nessun sentiero conduce indietro",
+    "cancelBtn":     "Ferma la ruota",
+    "confirmBtn":    "Gira la Ruota",
+    "titleLocked":   "La soglia è sigillata",
+    "bodyLocked":    "La Ruota delle Vite gira solo per chi ha percorso il regno del Santo…",
+    "youStandAt":    "Ti trovi a",
+    "understoodBtn": "Capito"
   }
 }
