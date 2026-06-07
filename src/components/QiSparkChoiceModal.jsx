@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { QI_SPARK_BY_ID, SPARK_RARITY, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
@@ -8,16 +9,16 @@ const BASE = import.meta.env.BASE_URL;
  * choice they're looking at is fresh (this session) or queued from an
  * earlier offline run.
  */
-function formatTimeAgo(ms) {
-  if (!Number.isFinite(ms) || ms <= 0) return 'just now';
+function formatTimeAgo(ms, t) {
+  if (!Number.isFinite(ms) || ms <= 0) return t('common.justNow');
   const sec = Math.floor(ms / 1000);
-  if (sec < 60)  return 'just now';
+  if (sec < 60)  return t('common.justNow');
   const min = Math.floor(sec / 60);
-  if (min < 60)  return `${min}m ago`;
+  if (min < 60)  return t('common.minutesAgo', { n: min });
   const hr = Math.floor(min / 60);
-  if (hr  < 24)  return `${hr}h ago`;
+  if (hr  < 24)  return t('common.hoursAgo', { n: hr });
   const day = Math.floor(hr / 24);
-  return `${day}d ago`;
+  return t('common.daysAgo', { n: day });
 }
 
 /** Bold-aware mini-renderer: `**foo**` becomes <strong>foo</strong>. */
@@ -184,6 +185,7 @@ function QiSparkChoiceModal({
   legendaryChance = 0.06,
   legendaryPoolInfo = null,
 }) {
+  const { t } = useTranslation('ui');
   const rerollFn  = onRerollOffer ?? onRerollCard;
   const dismissFn = onDismiss ?? onSkip;
 
@@ -227,38 +229,38 @@ function QiSparkChoiceModal({
     if (eligible === 0 && next) {
       return (
         <div className="spk-meta spk-meta-locked">
-          <span>🔒 Legendaries unlock with <strong>{next.producerName}</strong></span>
+          <span>🔒 {t('sparkChoice.legendaryUnlockHint', { producer: next.producerName })}</span>
         </div>
       );
     }
     if (eligible === 0) {
       return (
         <div className={`spk-meta${pityImminent ? ' spk-meta-pity-soon' : ''}${pityGuaranteed ? ' spk-meta-pity-now' : ''}`}>
-          <span>✦ <strong>{chancePct}%</strong> legendary</span>
+          <span>✦ <strong>{chancePct}%</strong> {t('sparkChoice.legendaryChance')}</span>
           <span className="spk-meta-sep">·</span>
           <span>
             {pityGuaranteed
-              ? <>⚡ <strong>Next: guaranteed legendary</strong></>
+              ? <>⚡ <strong>{t('sparkChoice.pityGuaranteed')}</strong></>
               : pityImminent
-                ? <>⚡ Pity in <strong>{pityRemaining}</strong> {pityRemaining === 1 ? 'realm' : 'realms'}</>
-                : <>pity in <strong>{pityRemaining}</strong> realms</>}
+                ? <>⚡ {t('sparkChoice.pityIn', { count: pityRemaining, n: pityRemaining })}</>
+                : <>{t('sparkChoice.pityShort', { n: pityRemaining })}</>}
           </span>
         </div>
       );
     }
     const poolText = (total > 0 && eligible < total)
-      ? <><strong>{eligible} of {total}</strong> in pool</>
-      : <>full pool</>;
+      ? <><strong>{t('sparkChoice.poolOf', { n: eligible, total })}</strong></>
+      : <>{t('sparkChoice.fullPool')}</>;
     return (
       <div className={`spk-meta${pityImminent ? ' spk-meta-pity-soon' : ''}${pityGuaranteed ? ' spk-meta-pity-now' : ''}`}>
-        <span>✦ <strong>{chancePct}%</strong> legendary</span>
+        <span>✦ <strong>{chancePct}%</strong> {t('sparkChoice.legendaryChance')}</span>
         <span className="spk-meta-sep">·</span>
         <span>{poolText}</span>
         <span className="spk-meta-sep">·</span>
         <span>
           {pityGuaranteed
-            ? <>⚡ <strong>guaranteed</strong></>
-            : <>pity in <strong>{pityRemaining}</strong></>}
+            ? <>⚡ <strong>{t('sparkChoice.guaranteed')}</strong></>
+            : <>{t('sparkChoice.pityShort', { n: pityRemaining })}</>}
         </span>
       </div>
     );
@@ -269,8 +271,8 @@ function QiSparkChoiceModal({
   // saves) — we just hide the line in that case.
   const rolledAt    = offer.rolledAt ?? null;
   const ageMs       = rolledAt ? Date.now() - rolledAt : 0;
-  const ageLabel    = rolledAt ? formatTimeAgo(ageMs) : '';
-  const realmLabel  = Number.isFinite(offer.rolledAtRealm) ? `Realm ${offer.rolledAtRealm}` : '';
+  const ageLabel    = rolledAt ? formatTimeAgo(ageMs, t) : '';
+  const realmLabel  = Number.isFinite(offer.rolledAtRealm) ? t('sparkChoice.realmLabel', { n: offer.rolledAtRealm }) : '';
   const hasContext  = realmLabel || ageLabel;
   // Queue depth — 1 means "this is the only one." > 1 means more are waiting.
   const tailCount   = Math.max(0, (queueCount ?? 1) - 1);
@@ -283,20 +285,24 @@ function QiSparkChoiceModal({
           type="button"
           className="modal-close spk-close"
           onClick={handleClose}
-          aria-label="Review later"
-          title="Review later (offer stays in your queue)"
+          aria-label={t('sparkChoice.reviewLater')}
+          title={t('sparkChoice.reviewLater')}
         >
           ✕
         </button>
 
         <div className="spk-head">
-          <h2 className="spk-title">Qi Spark</h2>
+          <h2 className="spk-title">{t('sparkChoice.title')}</h2>
           <p className="spk-sub">
-            a <span className={`spk-tier-pill spk-tier-${offerRarity}`}>{offerRarityLabel}</span> offer, choose one
+            {(() => {
+              const raw = t('sparkChoice.sub', { rarity: '\x00' });
+              const [before, after] = raw.split('\x00');
+              return (<>{before}<span className={`spk-tier-pill spk-tier-${offerRarity}`}>{offerRarityLabel}</span>{after}</>);
+            })()}
           </p>
           {tailCount > 0 && (
-            <div className="spk-queue-badge" aria-label={`${tailCount} more spark moments queued`}>
-              ✦ <strong>{tailCount}</strong> more {tailCount === 1 ? 'spark awaits' : 'sparks await'} after this
+            <div className="spk-queue-badge" aria-label={t('sparkChoice.queueBadge', { count: tailCount, n: tailCount })}>
+              ✦ <strong>{tailCount}</strong> {t('sparkChoice.queueBadge', { count: tailCount, n: tailCount })}
             </div>
           )}
           {hasContext && (
@@ -325,14 +331,14 @@ function QiSparkChoiceModal({
             disabled={!canAffordReroll}
             onClick={handleReroll}
             title={
-              isFreeReroll       ? 'Reroll both cards, free'
-              : !canAffordReroll ? `Need ${rerollCost} Blood Lotus to reroll`
-              :                    `Reroll both cards, ${rerollCost} Blood Lotus`
+              isFreeReroll       ? t('sparkChoice.rerollFreeTitle')
+              : !canAffordReroll ? t('sparkChoice.rerollCostTitle', { n: rerollCost })
+              :                    t('sparkChoice.rerollBLTitle', { n: rerollCost })
             }
           >
-            ↺ Reroll pair{' '}
+            ↺ {t('sparkChoice.rerollBtn')}{' '}
             <span className="spk-reroll-cost">
-              {isFreeReroll ? 'free' : `· ${rerollCost} BL`}
+              {isFreeReroll ? t('sparkChoice.rerollFree') : t('sparkChoice.rerollCost', { n: rerollCost })}
             </span>
           </button>
 

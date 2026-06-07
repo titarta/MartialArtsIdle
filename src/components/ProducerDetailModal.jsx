@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
 import { getSpriteTier, SPRITE_TIERS } from '../data/producers';
@@ -52,6 +53,7 @@ export default function ProducerDetailModal({
   minigameUnlocked,    // Eternal Tree keeps this Hidden Art open across lives
   onClose,
 }) {
+  const { t } = useTranslation('ui');
   const tier      = unlocked ? getSpriteTier(owned) : null;
   const spriteIdx = tier?.idx ?? 0;
   const sprite    = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
@@ -78,12 +80,12 @@ export default function ProducerDetailModal({
   // SPRITE_TIERS is in ascending minOwned order — pick the first one greater
   // than the current count.
   const nextTier = unlocked
-    ? SPRITE_TIERS.find(t => t.minOwned > owned) ?? null
+    ? SPRITE_TIERS.find(tier => tier.minOwned > owned) ?? null
     : null;
 
   return (
-    <DetailModal open onClose={onClose} className="pdm-modal" ariaLabel={unlocked ? `${producer.name} details` : 'Locked producer'}>
-      <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+    <DetailModal open onClose={onClose} className="pdm-modal" ariaLabel={unlocked ? `${producer.name} details` : t('producerDetail.lockedAriaLabel')}>
+      <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <div className="pdm-hero">
           <HeroSprite sprite={sprite} silhouette={!unlocked} />
@@ -98,14 +100,14 @@ export default function ProducerDetailModal({
             keeps the Cookie-Clicker mystery; the unlock-realm hint below
             tells the player when to expect it without revealing what. */}
         <div className={`pdm-name${!unlocked ? ' pdm-name-locked' : ''}`}>
-          {unlocked ? producer.name : '???'}
+          {unlocked ? producer.name : t('common.unknown')}
         </div>
 
         {!unlocked ? (
           <div className="pdm-locked">
             <div className="pdm-locked-icon">🔒</div>
             <div className="pdm-locked-text">
-              Unlocks at realm {producer.unlock?.minRealmIndex ?? '?'}.
+              {t('producerDetail.unlocksAt', { n: producer.unlock?.minRealmIndex ?? '?' })}
             </div>
           </div>
         ) : (
@@ -114,38 +116,38 @@ export default function ProducerDetailModal({
 
             <div className="pdm-stats">
               <div className="pdm-stat-row">
-                <span className="pdm-stat-label">Owned</span>
+                <span className="pdm-stat-label">{t('producerDetail.owned')}</span>
                 <span className="pdm-stat-value">×{owned}</span>
               </div>
               <div className="pdm-stat-row">
-                <span className="pdm-stat-label">Per unit</span>
+                <span className="pdm-stat-label">{t('producerDetail.perUnit')}</span>
                 <span className="pdm-stat-value">
                   {fmtRate(perUnitRate)} Qi/s
                   {upMult > 1 && (
-                    <span className="pdm-stat-mult"> (×{upMult} upgrades)</span>
+                    <span className="pdm-stat-mult"> {t('producerDetail.upgrades', { n: upMult })}</span>
                   )}
                   {xMult > 1 && (
-                    <span className="pdm-stat-mult pdm-stat-mult-roster"> (×{xMult.toFixed(2)} roster)</span>
+                    <span className="pdm-stat-mult pdm-stat-mult-roster"> {t('producerDetail.roster', { n: xMult.toFixed(2) })}</span>
                   )}
                 </span>
               </div>
               <div className="pdm-stat-row pdm-stat-row-emph">
-                <span className="pdm-stat-label">Base contribution</span>
+                <span className="pdm-stat-label">{t('producerDetail.baseContribution')}</span>
                 <span className="pdm-stat-value">
                   {fmtRate(totalFromHere)} Qi/s
                 </span>
               </div>
               <div className="pdm-stat-row">
-                <span className="pdm-stat-label">Share of base production</span>
+                <span className="pdm-stat-label">{t('producerDetail.shareOfProduction')}</span>
                 <span className="pdm-stat-value">
                   {sharePct < 0.05 && totalFromHere > 0 ? '<0.1' : sharePct.toFixed(1)}%
                 </span>
               </div>
               {nextTier && (
                 <div className="pdm-stat-row">
-                  <span className="pdm-stat-label">Next tier ({nextTier.label})</span>
+                  <span className="pdm-stat-label">{t('producerDetail.nextTier', { label: nextTier.label })}</span>
                   <span className="pdm-stat-value">
-                    {nextTier.minOwned - owned} more
+                    {t('producerDetail.moreToNextTier', { n: nextTier.minOwned - owned })}
                   </span>
                 </div>
               )}
@@ -162,7 +164,7 @@ export default function ProducerDetailModal({
                   <span className="pdm-mg-text">
                     <span className="pdm-mg-kicker">
                       {canEnterMinigame
-                        ? (minigame.ready ? 'Hidden Art unlocked' : 'Unlocked · coming soon')
+                        ? (minigame.ready ? t('producerDetail.hiddenArtUnlocked') : t('producerDetail.comingSoon'))
                         : 'Preview · dev'}
                     </span>
                     <span className="pdm-mg-name">{minigame.name}</span>
@@ -170,7 +172,7 @@ export default function ProducerDetailModal({
                   <span className="pdm-mg-arrow" aria-hidden="true">▶</span>
                 </button>
                 {!canEnterMinigame && (
-                  <div className="pdm-mg-locknote">Unlocks at Mythic tier · 50 owned.</div>
+                  <div className="pdm-mg-locknote">{t('producerDetail.mythicLockNote')}</div>
                 )}
               </div>
             )}

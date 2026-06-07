@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AchievementsBody  from './AchievementsBody';
 import StatsBody         from './StatsBody';
 import WardrobeTab       from './WardrobeTab';
@@ -19,11 +20,7 @@ import WardrobeTab       from './WardrobeTab';
  * tutorial card to explain the rename. That card has been removed -
  * see the comment in src/data/tutorialCards.js TUTORIAL_IDS block.)
  */
-const TABS = [
-  { id: 'wardrobe',     label: 'Wardrobe'     },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'stats',        label: 'Stats'        },
-];
+const TAB_IDS = ['wardrobe', 'achievements', 'stats'];
 
 function CodexModal({
   achievements,
@@ -34,21 +31,28 @@ function CodexModal({
   onNavigateBazaar,
   onClose,
 }) {
+  const { t } = useTranslation('ui');
   const [tab, setTab] = useState('wardrobe');
+
+  const TAB_LABELS = {
+    wardrobe:     t('codex.tabWardrobe'),
+    achievements: t('codex.tabAchievements'),
+    stats:        t('codex.tabStats'),
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="progress-hub-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <div className="ach-tabs progress-hub-tabs">
-          {TABS.map(t => (
+          {TAB_IDS.map(id => (
             <button
-              key={t.id}
-              className={`ach-tab${tab === t.id ? ' ach-tab-active' : ''}`}
-              onClick={() => setTab(t.id)}
+              key={id}
+              className={`ach-tab${tab === id ? ' ach-tab-active' : ''}`}
+              onClick={() => setTab(id)}
             >
-              {t.label}
+              {TAB_LABELS[id]}
             </button>
           ))}
         </div>

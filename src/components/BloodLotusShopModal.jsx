@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   BLOOD_LOTUS_PACKAGES,
   purchaseBloodLotus,
@@ -62,6 +63,7 @@ function ratePerDollar(pkg) {
 }
 
 export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast }) {
+  const { t } = useTranslation('ui');
   const [pending, setPending] = useState(null);
   const [balance, setBalance] = useState(() => getBloodLotusBalance());
 
@@ -89,9 +91,9 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     if (result.ok) {
       fire({
         type:    'success',
-        kicker:  'Blood Lotus',
+        kicker:  t('shop.toastKicker'),
         glyph:   '蓮',  // lotus
-        message: `+${pkg.amount.toLocaleString()} added`,
+        message: t('shop.purchaseSuccess', { amount: pkg.amount.toLocaleString() }),
         duration: 4500,
       });
       setBalance(getBloodLotusBalance());
@@ -99,9 +101,9 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     } else if (!result.cancelled) {
       fire({
         type:    'error',
-        kicker:  'Purchase failed',
+        kicker:  t('shop.purchaseFailed'),
         glyph:   '失',  // loss / fail
-        message: result.error ?? 'Something went wrong.',
+        message: result.error ?? t('common.genericError'),
         duration: 5500,
       });
     }
@@ -114,9 +116,9 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     } catch (e) {
       fire({
         type:    'error',
-        kicker:  'Restore failed',
+        kicker:  t('shop.restoreFailed'),
         glyph:   '失',
-        message: e?.message ?? 'Restore failed',
+        message: e?.message ?? t('shop.restoreFailed'),
         duration: 5500,
       });
     } finally {
@@ -129,14 +131,14 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="blood-lotus-shop-card" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <header className="blshop-header">
           <div className="blshop-title-block">
-            <span className="blshop-eyebrow">Vermillion Bazaar</span>
-            <h2 className="blshop-title">Top Up Blood Lotus</h2>
+            <span className="blshop-eyebrow">{t('shop.eyebrow')}</span>
+            <h2 className="blshop-title">{t('shop.title')}</h2>
           </div>
-          <div className="blshop-balance" aria-label="Current Blood Lotus balance">
+          <div className="blshop-balance" aria-label={t('shop.balanceAriaLabel')}>
             <img
               src={`${BASE}sprites/items/blood_lotus.png`}
               className="blshop-balance-icon"
@@ -144,7 +146,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
               draggable="false"
             />
             <div className="blshop-balance-stack">
-              <span className="blshop-balance-label">Current</span>
+              <span className="blshop-balance-label">{t('shop.balanceCurrent')}</span>
               <span className="blshop-balance-amount">{balance.toLocaleString()}</span>
             </div>
           </div>
@@ -174,6 +176,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
                 pending={pending === pkg.id}
                 disabled={pending !== null}
                 onBuy={() => buy(pkg)}
+                t={t}
               />
             );
           })}
@@ -181,7 +184,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
 
         <footer className="blshop-footer">
           <span className="blshop-fineprint">
-            All purchases unlock instantly. Prices in USD.
+            {t('shop.finePrint')}
           </span>
           <button
             className="blshop-restore"
@@ -189,7 +192,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
             disabled={pending !== null}
             type="button"
           >
-            {pending === 'restore' ? 'Restoring…' : 'Restore Purchases'}
+            {pending === 'restore' ? t('shop.restoring') : t('shop.restorePurchases')}
           </button>
         </footer>
       </div>
@@ -202,7 +205,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
    meta.layout. The hero card adds an animated gold-shimmer sweep + a
    stronger "SAVE $X" callout below the strikethrough.
    ──────────────────────────────────────────────────────────────────────── */
-function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) {
+function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy, t }) {
   const isHero   = meta.layout === 'hero';
   const isBanner = meta.layout === 'banner';
   const savedDollars = strike != null ? (strike - parseUsd(pkg.price)).toFixed(0) : null;
@@ -227,7 +230,7 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) 
       {meta.badge && (
         <span className={`blshop-pack-badge blshop-pack-badge--${meta.tone}`}>
           {isHero && <span className="blshop-pack-badge-flare" aria-hidden="true">✦</span>}
-          {meta.badge}
+          {t(`shop.badge.${meta.badge === 'Popular' ? 'popular' : meta.badge === 'Big Saver' ? 'bigSaver' : meta.badge === 'Mega Value' ? 'megaValue' : 'bestValue'}`)}
           {isHero && <span className="blshop-pack-badge-flare" aria-hidden="true">✦</span>}
         </span>
       )}
@@ -256,7 +259,7 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) 
 
       <div className="blshop-pack-buy">
         {pending ? (
-          <span className="blshop-pack-price-pending">Processing…</span>
+          <span className="blshop-pack-price-pending">{t('shop.processing')}</span>
         ) : (
           <>
             <div className="blshop-pack-price-row">
@@ -276,7 +279,7 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy }) 
                   </span>
                 )}
                 {(isHero || isBanner) && savedDollars > 0 && (
-                  <span className="blshop-pack-save">Save ${savedDollars}</span>
+                  <span className="blshop-pack-save">{t('shop.save', { dollars: savedDollars })}</span>
                 )}
               </div>
             )}

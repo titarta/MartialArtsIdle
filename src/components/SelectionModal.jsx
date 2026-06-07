@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { BLOOD_LOTUS_COSTS } from '../systems/bloodLotus';
 import { LAW_RARITY } from '../data/laws';
 import { formatUniqueDescription } from '../data/lawUniques';
@@ -5,7 +6,7 @@ import { MAX_LAWS } from '../hooks/useCultivation';
 
 // ── Law card ─────────────────────────────────────────────────────────────────
 
-function LawCard({ law, onPick, disabled }) {
+function LawCard({ law, onPick, disabled, t }) {
   const rarity = LAW_RARITY[law.rarity] ?? { color: '#9ca3af', label: law.rarity };
   const types = (law.types ?? []).join(' · ');
   const topUnique = law.uniques && Object.entries(law.uniques)[0];
@@ -23,7 +24,7 @@ function LawCard({ law, onPick, disabled }) {
       <div className="augment-body">
         <p className="augment-name" style={{ color: rarity.color }}>{law.name}</p>
         <p className="augment-desc">
-          <strong>{types || 'general'}</strong>
+          <strong>{types || t('selection.generalType')}</strong>
         </p>
         <p className="augment-desc">
           ×{(law.cultivationSpeedMult ?? 1).toFixed(2)} cultivation
@@ -41,6 +42,7 @@ function LawCard({ law, onPick, disabled }) {
 // ── Modal body ───────────────────────────────────────────────────────────────
 
 function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, onRerollLawOne, ownedLaws, activeLawId, onDismantleLaw }) {
+  const { t } = useTranslation('ui');
   const { id, lawOptions, freeRerolls, rerollsUsed, isFirst } = selection;
   const hasFreeReroll = rerollsUsed < freeRerolls;
   const rerollCost = hasFreeReroll ? 0 : BLOOD_LOTUS_COSTS.reroll_law_extra;
@@ -55,17 +57,17 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
   return (
     <>
       <div className="sel-header">
-        <h2 className="sel-title">{isFirst ? 'Choose your first Cultivation Law' : 'New Cultivation Law'}</h2>
+        <h2 className="sel-title">{isFirst ? t('selection.firstLawTitle') : t('selection.newLawTitle')}</h2>
       </div>
 
       {libraryFull && (
         <div className="wipe-confirm" style={{ marginBottom: '12px' }}>
           <span className="wipe-confirm-label">
-            Your library is full ({MAX_LAWS}). Dismantle one to make room:
+            {t('selection.libraryFull', { n: MAX_LAWS })}
           </span>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }}>
             {dismantleable.length === 0 ? (
-              <span className="sel-realm">Only your active law remains — equip a different one from Character first.</span>
+              <span className="sel-realm">{t('selection.onlyActiveLaw')}</span>
             ) : dismantleable.map(l => (
               <button
                 key={l.id}
@@ -87,6 +89,7 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
               law={law}
               disabled={libraryFull}
               onPick={() => !libraryFull && onPickLaw?.(id, i)}
+              t={t}
             />
             <div className="augment-reroll-cell">
               <button
@@ -98,9 +101,9 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
                 disabled={!canAffordReroll}
                 onClick={() => canAffordReroll && onRerollLawOne?.(id, i)}
                 title={
-                  hasFreeReroll    ? 'Reroll — free!'
-                  : !canAffordReroll ? `Need ${rerollCost} Blood Lotus`
-                  :                   `Reroll — costs ${rerollCost} Blood Lotus`
+                  hasFreeReroll    ? t('selection.rerollFree')
+                  : !canAffordReroll ? t('selection.rerollNeedBL', { n: rerollCost })
+                  :                   t('selection.rerollCostBL', { n: rerollCost })
                 }
               >
                 {!canAffordReroll ? '⊘' : '↺'}
@@ -110,7 +113,7 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
                 hasFreeReroll    ? 'augment-reroll-cost-free'  : '',
                 !canAffordReroll ? 'augment-reroll-cost-short' : '',
               ].filter(Boolean).join(' ')}>
-                {hasFreeReroll ? 'Free' : `${rerollCost} BL`}
+                {hasFreeReroll ? t('common.free') : `${rerollCost} BL`}
               </span>
             </div>
           </div>
@@ -120,7 +123,7 @@ function LawSelectionBody({ selection, bloodLotusBalance, onPickLaw, onSkipLaw, 
       {!isFirst && (
         <div className="sel-footer">
           <button className="sel-skip-btn" onClick={() => onSkipLaw?.(id)}>
-            Skip
+            {t('common.skip')}
           </button>
         </div>
       )}
