@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MiniGameResult } from './MiniGameMode';
 import { fmt } from '../../utils/format';
 import { HERBS } from '../../data/materials';
@@ -31,6 +32,7 @@ function fmtCountdown(ms) {
 }
 
 export default function SpiritGarden({ ratePerSec, onAward }) {
+  const { t } = useTranslation('ui');
   const [garden, setGarden] = useState(loadGarden);
   // Eternal Tree garden nodes (linger / soil) — read the committed set once.
   const [treeMods] = useState(() => {
@@ -73,13 +75,13 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
       const seed = SEEDS_BY_ID[selSeed];
       const r = plantSeed(garden, i, selSeed, undefined, treeMods.growMult);
       if (r.ok) commit(r.garden);
-      else if (r.reason === 'dew') flash(`Need ${seed.dewCost} Dew to sow ${seed.name}`);
+      else if (r.reason === 'dew') flash(`Need ${t('garden.dewCost', { n: seed.dewCost })} to sow ${seed.name}`);
     } else if (st === 'bloom') {
       const r = harvestPlot(garden, i);
       if (r.ok) {
         commit(r.garden);
         const nm = SEEDS_BY_ID[r.gained.herbId]?.name ?? 'herb';
-        flash(r.firstTime ? `Discovered ${nm}. +${DISCOVERY_BONUS} Dew` : `Gathered ${r.gained.amount}x ${nm}`);
+        flash(r.firstTime ? t('garden.discovered', { herb: nm, n: DISCOVERY_BONUS }) : t('garden.gathered', { n: r.gained.amount, herb: nm }));
       }
     }
   };
@@ -88,7 +90,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
     const { garden: g2, total, firsts } = harvestAll(garden);
     if (total <= 0) return;
     commit(g2);
-    flash(firsts.length ? `Gathered ${total} herbs. ${firsts.length} newly discovered` : `Gathered ${total} herbs`);
+    flash(firsts.length ? t('garden.gathered', { n: total, herb: 'herbs' }) + `. ${firsts.length} newly discovered` : t('garden.gathered', { n: total, herb: 'herbs' }));
   };
 
   const doSellHerb = (id) => {
@@ -101,12 +103,12 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   };
   const doBrew = (rid) => {
     const r = brew(garden, rid, undefined, treeMods.durationMult);
-    if (r.ok) { commit(r.garden); flash(`Brewed ${RECIPES_BY_ID[rid].name}`); setTab('garden'); }
+    if (r.ok) { commit(r.garden); flash(t('garden.brew') + ` ${RECIPES_BY_ID[rid].name}`); setTab('garden'); }
   };
   const doExpand = () => {
     const r = expandPlot(garden);
     if (r.ok) { commit(r.garden); flash('New plot cleared'); }
-    else if (r.reason === 'dew') flash(`Need ${nextPlotCost(garden.plotCount)} Dew to clear a plot`);
+    else if (r.reason === 'dew') flash(`Need ${t('garden.expandCost', { n: nextPlotCost(garden.plotCount) })} to clear a plot`);
   };
 
   // ── Derived ────────────────────────────────────────────────────────────────
@@ -129,10 +131,10 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
         <MiniGameResult
           ratePerSec={ratePerSec}
           performance01={channelPerformance(garden)}
-          label={`Channelled ${bCount} spirit herb${bCount === 1 ? '' : 's'}`}
+          label={t('garden.channelledLabel', { n: bCount })}
           onCollect={(qi) => { onAward?.(qi); commit(clearBasket(garden)); setCash(false); }}
           onAgain={() => setCash(false)}
-          againLabel="Back to the garden"
+          againLabel={t('garden.backToGarden')}
         />
       </div>
     );
@@ -145,7 +147,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
         <div className="gd-dew" title="Spirit Dew — the garden's own currency">
           <span className="gd-dew-drop" aria-hidden="true" />
           <span className="gd-dew-val">{fmt(dew)}</span>
-          <span className="gd-dew-label">Spirit Dew</span>
+          <span className="gd-dew-label">{t('garden.spiritDew')}</span>
         </div>
         <div className="gd-almanac" title="Distinct spirit herbs discovered">
           <span className="gd-almanac-glyph" aria-hidden="true">苗</span>
@@ -174,12 +176,12 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
       <div className="gd-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={tab === 'garden'}
           className={`gd-tab ${tab === 'garden' ? 'gd-tab-on' : ''}`} onClick={() => setTab('garden')}>
-          <span className="gd-tab-glyph">田</span> Garden
+          <span className="gd-tab-glyph">田</span> {t('garden.tabGarden')}
           {ripe > 0 && <span className="gd-tab-dot" aria-hidden="true" />}
         </button>
         <button type="button" role="tab" aria-selected={tab === 'brew'}
           className={`gd-tab ${tab === 'brew' ? 'gd-tab-on' : ''}`} onClick={() => setTab('brew')}>
-          <span className="gd-tab-glyph">丹</span> Brewhouse
+          <span className="gd-tab-glyph">丹</span> {t('garden.tabBrewhouse')}
           {bCount > 0 && <span className="gd-tab-badge">{bCount}</span>}
         </button>
       </div>
@@ -217,23 +219,23 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               <button type="button" className={`gd-plot gd-plot-expand ${dew < expandCost ? 'gd-plot-poor' : ''}`} onClick={doExpand}
                 aria-label={`Clear a new plot for ${expandCost} Spirit Dew`}>
                 <span className="gd-expand-plus" aria-hidden="true">+</span>
-                <span className="gd-expand-cost">{expandCost} Dew</span>
+                <span className="gd-expand-cost">{t('garden.expandCost', { n: expandCost })}</span>
               </button>
             )}
           </div>
 
           {ripe > 0 && (
             <button type="button" className="mg-btn mg-btn-primary gd-harvest-all" onClick={doHarvestAll}>
-              Harvest all · {ripe}
+              {t('garden.harvestAll', { n: ripe })}
             </button>
           )}
 
           <div className="gd-hint">
             {ripe > 0
-              ? `${ripe} plot${ripe === 1 ? '' : 's'} ripe. Tap to gather.`
+              ? t('garden.plotsRipe', { count: ripe, n: ripe })
               : nextAt
-                ? `Next herb ripens in ${fmtCountdown(nextAt - now)}.`
-                : 'Pick a seed below, then tap a plot to sow.'}
+                ? t('garden.nextRipens', { time: fmtCountdown(nextAt - now) })
+                : t('garden.pickSeed')}
           </div>
 
           {/* Seed selector */}
@@ -248,7 +250,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                   <span className="gd-chip-rarity" style={{ background: s.color }} aria-hidden="true" />
                   <img className="gd-chip-sprite" src={spriteFor(s.id)} alt="" draggable={false} />
                   <span className="gd-chip-name">{s.name}</span>
-                  <span className="gd-chip-cost">{s.dewCost === 0 ? 'Free' : `${s.dewCost} Dew`}</span>
+                  <span className="gd-chip-cost">{s.dewCost === 0 ? t('common.free') : t('garden.dewCost', { n: s.dewCost })}</span>
                   <span className="gd-chip-time">{growLabel(s.growMs)}</span>
                 </button>
               );
@@ -257,7 +259,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               <div key={id} className="gd-chip gd-chip-locked" aria-hidden="true">
                 <img className="gd-chip-sprite" src={spriteFor(id)} alt="" draggable={false} />
                 <span className="gd-chip-name">{HERBS[id]?.name ?? '???'}</span>
-                <span className="gd-chip-lock">Deeper realms</span>
+                <span className="gd-chip-lock">{t('garden.deeperRealms')}</span>
               </div>
             ))}
           </div>
@@ -267,13 +269,13 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
           {/* Basket */}
           {bCount === 0 ? (
             <div className="gd-basket-empty">
-              Your basket is empty. Grow and harvest herbs in the Garden, then return here to sell, brew, or channel them.
+              {t('garden.basketEmpty')}
             </div>
           ) : (
             <div className="gd-basket">
               <div className="gd-basket-head">
-                <span className="gd-basket-title">Basket</span>
-                <span className="gd-basket-meta">{bCount} herbs · {bVal} Dew value</span>
+                <span className="gd-basket-title">{t('garden.basket')}</span>
+                <span className="gd-basket-meta">{t('garden.basketMeta', { herbs: bCount, dew: bVal })}</span>
               </div>
               <div className="gd-basket-grid">
                 {Object.entries(garden.basket).map(([id, n]) => {
@@ -285,19 +287,19 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                       <span className="gd-bk-rarity" style={{ background: s.color }} aria-hidden="true" />
                       <img className="gd-bk-sprite" src={spriteFor(id)} alt="" draggable={false} />
                       <span className="gd-bk-count">×{n}</span>
-                      <span className="gd-bk-sell">Sell · {s.sell * n}</span>
+                      <span className="gd-bk-sell">{t('garden.sellHerb', { n: s.sell * n })}</span>
                     </button>
                   );
                 })}
               </div>
               <div className="gd-basket-actions">
-                <button type="button" className="mg-btn mg-btn-ghost" onClick={doSellAll}>Sell all · {bVal} Dew</button>
+                <button type="button" className="mg-btn mg-btn-ghost" onClick={doSellAll}>{t('garden.sellAll', { n: bVal })}</button>
                 <button type="button" className="mg-btn mg-btn-primary" disabled={!channelOK} onClick={() => setCash(true)}>
-                  Channel → Qi
+                  {t('garden.channel')}
                 </button>
               </div>
               {!channelOK && (
-                <div className="gd-channel-note">Channelling needs a basket worth {CHANNEL_MIN_VALUE} Dew (now {bVal}).</div>
+                <div className="gd-channel-note">{t('garden.channelNote', { required: CHANNEL_MIN_VALUE, current: bVal })}</div>
               )}
             </div>
           )}
@@ -305,7 +307,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
           {/* Elixir recipes */}
           <div className="gd-recipes">
             <div className="gd-recipes-head">
-              Elixirs <span className="gd-recipes-sub">a brew replaces your active elixir</span>
+              {t('garden.elixirs')} <span className="gd-recipes-sub">{t('garden.elixirSub')}</span>
             </div>
             {RECIPES.map((r) => {
               const ready = canBrew(garden, r.id);
@@ -328,7 +330,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                     </div>
                   </div>
                   <button type="button" className="mg-btn mg-btn-primary gd-recipe-brew" disabled={!ready} onClick={() => doBrew(r.id)}>
-                    Brew
+                    {t('garden.brew')}
                   </button>
                 </div>
               );

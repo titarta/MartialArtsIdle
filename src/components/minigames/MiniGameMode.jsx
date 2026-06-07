@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { getMinigame, computeReward } from '../../data/minigames';
 import { fmt } from '../../utils/format';
 import SectMerge from './SectMerge';
@@ -18,29 +19,31 @@ const GAMES = { merge: SectMerge, garden: SpiritGarden, refine: PillRefinement }
  * through here so payouts read identically: a qi burst + the "minutes of
  * production" it represents.
  */
-export function MiniGameResult({ ratePerSec, performance01, label, onCollect, onAgain, againLabel = 'Again' }) {
+export function MiniGameResult({ ratePerSec, performance01, label, onCollect, onAgain, againLabel }) {
+  const { t } = useTranslation('ui');
   const { qi, minutes } = computeReward(ratePerSec, performance01);
   return (
     <div className="mg-result" role="status">
       <div className="mg-result-label">{label}</div>
       <div className="mg-result-qi">+{fmt(Math.round(qi))}<span className="mg-result-qi-unit"> Qi</span></div>
-      <div className="mg-result-min">≈ {minutes.toFixed(1)} min of production</div>
+      <div className="mg-result-min">{t('minigame.minOfProduction', { n: minutes.toFixed(1) })}</div>
       <div className="mg-result-actions">
-        <button type="button" className="mg-btn mg-btn-primary" onClick={() => onCollect?.(qi)}>Collect</button>
-        {onAgain && <button type="button" className="mg-btn mg-btn-ghost" onClick={onAgain}>{againLabel}</button>}
+        <button type="button" className="mg-btn mg-btn-primary" onClick={() => onCollect?.(qi)}>{t('common.collect')}</button>
+        {onAgain && <button type="button" className="mg-btn mg-btn-ghost" onClick={onAgain}>{againLabel ?? t('minigame.again')}</button>}
       </div>
     </div>
   );
 }
 
 function ComingSoon({ meta }) {
+  const { t } = useTranslation('ui');
   return (
     <div className="mg-soon">
       <div className="mg-soon-glyph" aria-hidden="true">{meta.glyph}</div>
       <div className="mg-soon-name">{meta.name}</div>
       <p className="mg-soon-tag">{meta.tagline}</p>
       <div className="mg-soon-badge">{meta.mode}</div>
-      <div className="mg-soon-note">Hidden art not yet inscribed.</div>
+      <div className="mg-soon-note">{t('minigame.comingSoon')}</div>
     </div>
   );
 }
@@ -51,6 +54,7 @@ function ComingSoon({ meta }) {
  * bespoke game, or a coming-soon teaser.
  */
 export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAward, recruit, qi, spendQi, onClose }) {
+  const { t } = useTranslation('ui');
   const meta = producer ? getMinigame(producer.id) : null;
 
   useEffect(() => {
@@ -81,7 +85,7 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
             <h2 className="mg-title">{meta.name}</h2>
           </div>
           <div className="mg-glyph" aria-hidden="true">{meta.glyph}</div>
-          <button type="button" className="mg-close" onClick={onClose} aria-label="Leave minigame">✕</button>
+          <button type="button" className="mg-close" onClick={onClose} aria-label={t('minigame.leaveAriaLabel')}>✕</button>
         </header>
 
         <div className="mg-stage">

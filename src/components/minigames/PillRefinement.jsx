@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MiniGameResult } from './MiniGameMode';
 
 const BASE = import.meta.env.BASE_URL;
@@ -30,6 +31,7 @@ const resolvePill = (picks) => {
 };
 
 export default function PillRefinement({ ratePerSec, onAward }) {
+  const { t } = useTranslation('ui');
   const [picks, setPicks]   = useState([]);
   const [phase, setPhase]   = useState('select');     // select | brew | result
   const [heat, setHeat]     = useState(0.3);
@@ -77,7 +79,7 @@ export default function PillRefinement({ ratePerSec, onAward }) {
     <div className="rf">
       {phase === 'select' && (
         <>
-          <div className="rf-prompt">Fold up to {MAX_PICKS} reagents into the cauldron.</div>
+          <div className="rf-prompt">{t('pillRefine.prompt', { n: MAX_PICKS })}</div>
           <div className="rf-tray">
             {REAGENTS.map((r) => {
               const on = picks.includes(r.id);
@@ -89,10 +91,10 @@ export default function PillRefinement({ ratePerSec, onAward }) {
               );
             })}
           </div>
-          <div className="rf-foretell">Likely yield: <strong>{pill.pill}</strong></div>
+          <div className="rf-foretell">{t('pillRefine.likelyYield')} <strong>{pill.pill}</strong></div>
           <div className="rf-actionbar">
             <button type="button" className="mg-btn mg-btn-primary" disabled={picks.length === 0} onClick={light}>
-              Light the furnace
+              {t('pillRefine.lightFurnace')}
             </button>
           </div>
         </>
@@ -107,12 +109,12 @@ export default function PillRefinement({ ratePerSec, onAward }) {
           </div>
           <div className="rf-brew-side">
             <div className="rf-readout">
-              <span className="rf-readout-label">Flame</span>
-              <span className={`rf-readout-state${inBand ? ' rf-readout-true' : ''}`}>{inBand ? 'True' : heat < ZONE[0] ? 'Cold' : 'Wild'}</span>
+              <span className="rf-readout-label">{t('pillRefine.flameLabel')}</span>
+              <span className={`rf-readout-state${inBand ? ' rf-readout-true' : ''}`}>{inBand ? t('pillRefine.flameTrue') : heat < ZONE[0] ? t('pillRefine.flameCold') : t('pillRefine.flameWild')}</span>
             </div>
             <div className="rf-progress"><div className="rf-progress-fill" style={{ width: `${(elapsed / (BREW_MS / 1000)) * 100}%` }} /></div>
-            <button type="button" className="mg-btn mg-btn-primary rf-stoke" onClick={stoke}>Stoke 火</button>
-            <div className="rf-tip">Keep the flame in the band until the pill sets.</div>
+            <button type="button" className="mg-btn mg-btn-primary rf-stoke" onClick={stoke}>{t('pillRefine.stoke')}</button>
+            <div className="rf-tip">{t('pillRefine.tip')}</div>
           </div>
         </div>
       )}
@@ -127,10 +129,10 @@ export default function PillRefinement({ ratePerSec, onAward }) {
           <MiniGameResult
             ratePerSec={ratePerSec}
             performance01={performance}
-            label={performance >= 0.66 ? 'Flawless refinement' : performance >= 0.4 ? 'Stable pill' : 'Cracked pill'}
+            label={performance >= 0.66 ? t('pillRefine.resultFlawless') : performance >= 0.4 ? t('pillRefine.resultStable') : t('pillRefine.resultCracked')}
             onCollect={(qi) => { onAward?.(qi); reset(); }}
             onAgain={reset}
-            againLabel="New brew"
+            againLabel={t('pillRefine.newBrew')}
           />
         </div>
       )}
