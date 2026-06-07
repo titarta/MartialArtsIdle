@@ -86,6 +86,13 @@ if (DESIGNER_ENABLED && params.has('designer')) {
   import('./designer/mount.jsx').then(({ mountDesigner }) => {
     mountDesigner(rootEl)
   })
+} else if (DESIGNER_ENABLED && params.has('balance')) {
+  // Dev-only: progression-curve balancing dashboard — access via /?balance.
+  // Separate from the designer; tree-shaken out of every ship build because
+  // DESIGNER_ENABLED folds to false there.
+  import('./balance/mount.jsx').then(({ mountBalance }) => {
+    mountBalance(rootEl)
+  })
 } else if (LOCALIZER_ENABLED && params.has('locale')) {
   import('./localizer/mount.jsx').then(({ mountLocalizer }) => {
     mountLocalizer(rootEl)

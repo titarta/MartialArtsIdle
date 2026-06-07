@@ -8,7 +8,7 @@
  */
 import { mergeArrayByIndex } from './config/loader';
 
-const REALMS_RAW = [
+export const REALMS_RAW = [
   // 2026-05-21 rebalance — Dial-3 v4 progressive steepening from Saint Early
   // (realm 24) onward. Designed to create natural rebirth-loop walls every
   // ~7 realms so players cycle through 4-5 reincarnations before entering
