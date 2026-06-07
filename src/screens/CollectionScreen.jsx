@@ -53,16 +53,18 @@ function needsDismantleConfirm(rarity, invested) {
   return rank >= 3 || invested;
 }
 
-function DismantleButton({ label = 'Dismantle', rarity, invested = false, disabled, disabledReason, onDismantle }) {
+function DismantleButton({ label, rarity, invested = false, disabled, disabledReason, onDismantle }) {
+  const { t } = useTranslation('ui');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const mineralId = rarity ? mineralForRarity(rarity) : null;
   const mineralName = mineralId ? (ALL_MATERIALS[mineralId]?.name ?? mineralId) : '';
   const needsConfirm = needsDismantleConfirm(rarity, invested);
+  const dismantleLabel = label ?? t('collection.dismantle');
 
   if (disabled) {
     return (
       <button className="save-btn save-btn-danger" disabled title={disabledReason}>
-        {label}
+        {dismantleLabel}
       </button>
     );
   }
@@ -71,10 +73,10 @@ function DismantleButton({ label = 'Dismantle', rarity, invested = false, disabl
     return (
       <div className="wipe-confirm" style={{ marginTop: '8px' }}>
         <span className="wipe-confirm-label">
-          Dismantle this <strong>{rarity}</strong> item for 1× {mineralName}?
+          {t('collection.dismantleConfirm', { rarity, mineralName })}
         </span>
-        <button className="save-btn save-btn-danger" onClick={() => { setConfirmOpen(false); onDismantle(); }}>Confirm</button>
-        <button className="save-btn" onClick={() => setConfirmOpen(false)}>Cancel</button>
+        <button className="save-btn save-btn-danger" onClick={() => { setConfirmOpen(false); onDismantle(); }}>{t('common.confirm')}</button>
+        <button className="save-btn" onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</button>
       </div>
     );
   }
@@ -83,9 +85,9 @@ function DismantleButton({ label = 'Dismantle', rarity, invested = false, disabl
     <button
       className="save-btn save-btn-danger"
       onClick={() => (needsConfirm ? setConfirmOpen(true) : onDismantle())}
-      title={`Dismantle for 1× ${mineralName}`}
+      title={t('collection.dismantleBtn', { label: dismantleLabel, mineralName })}
     >
-      {label} · +1 {mineralName}
+      {t('collection.dismantleBtn', { label: dismantleLabel, mineralName })}
     </button>
   );
 }

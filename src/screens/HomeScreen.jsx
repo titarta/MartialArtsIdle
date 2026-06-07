@@ -184,6 +184,7 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
  * shows/hides without forcing the host into per-frame re-renders.
  */
 function GateBypassButton({ gateRef, tokenCount, onUse }) {
+  const { t } = useTranslation('ui');
   const [gateActive, setGateActive] = useState(false);
   useEffect(() => {
     if (!gateRef) return;
@@ -202,8 +203,8 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
     >
       <span className="home-gate-bypass-icon">☁️</span>
       <span className="home-gate-bypass-body">
-        <span className="home-gate-bypass-cta">Bypass Gate</span>
-        <span className="home-gate-bypass-sub">Heaven&rsquo;s Pardon · ×{tokenCount}</span>
+        <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
+        <span className="home-gate-bypass-sub">{t('home.heavensPardon', { n: tokenCount })}</span>
       </span>
     </button>
   );
@@ -432,10 +433,15 @@ function BreakthroughBanner({ event, onDone }) {
  * Matches the cf-meter-study.html V3 spec verbatim.
  */
 function ConsecutiveFocusMeter({ ladder, boostStartTimeRef }) {
+  const { t } = useTranslation('ui');
   const rootRef    = useRef(null);
   const nowRef     = useRef(null);
   const nextRef    = useRef(null);
   const segsRef    = useRef([]);
+  // Keep translated strings in a ref so the rAF loop always reads the latest
+  // locale without needing to restart or re-create the effect.
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
     let raf;
@@ -455,7 +461,7 @@ function ConsecutiveFocusMeter({ ladder, boostStartTimeRef }) {
       if (nowRef.current) nowRef.current.textContent = `+${Math.round(cumulative * 100)}%`;
       if (nextRef.current) {
         if (isMax) {
-          nextRef.current.textContent = 'Deep Meditation';
+          nextRef.current.textContent = tRef.current('home.deepMeditation');
         } else {
           const next = ladder[rung];
           const remainingS = Math.max(0, (next.holdMs - elapsed) / 1000).toFixed(1);
@@ -561,6 +567,7 @@ const CES_RETURN_MS  = 500;   // tap → shrink back to anchor + unmount
 // Audio Lab) so a riser can be placed ahead of its visual beat.
 
 function CrystalEvolutionOverlay({ event, onDone }) {
+  const { t } = useTranslation('ui');
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   // Phase state — overlay waits at 'settled' for a tap before 'returning'.
@@ -610,8 +617,8 @@ function CrystalEvolutionOverlay({ event, onDone }) {
     .map((id) => QI_SPARK_BY_ID[id]?.name)
     .filter(Boolean);
   let unlockLine = null;
-  if (grantedNames.length === 1) unlockLine = `✦ Mechanic Unlocked — ${grantedNames[0]}`;
-  else if (grantedNames.length > 1) unlockLine = `✦ ${grantedNames.length} Mechanics Unlocked`;
+  if (grantedNames.length === 1) unlockLine = t('home.mechanicUnlocked', { name: grantedNames[0] });
+  else if (grantedNames.length > 1) unlockLine = t('home.mechanicsUnlocked', { n: grantedNames.length });
   const card = (
     <div className="crystal-evolve-card">
       <div className="crystal-evolve-name">{tierName}</div>
@@ -688,7 +695,7 @@ function CrystalEvolutionOverlay({ event, onDone }) {
         </div>
         {card}
         {phase === 'settled' && (
-          <div className="ces-tap-hint">Tap to continue</div>
+          <div className="ces-tap-hint">{t('home.tapToContinue')}</div>
         )}
       </div>
     );
@@ -727,6 +734,7 @@ const CES_CHAR_RETURN_MS  = 500;
 // Per-beat sound trigger times live in data/audioTimeline.js (Audio Lab editable).
 
 function CharacterEvolutionOverlay({ event, onDone }) {
+  const { t } = useTranslation('ui');
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   const [phase, setPhase] = useState('playing');
@@ -779,7 +787,7 @@ function CharacterEvolutionOverlay({ event, onDone }) {
     '--origin-scale': originScale,
   };
 
-  const kicker = event.isFinal ? 'Final Ascension' : 'Breakthrough';
+  const kicker = event.isFinal ? t('home.finalAscension') : t('home.breakthrough');
 
   return (
     <div
@@ -811,7 +819,7 @@ function CharacterEvolutionOverlay({ event, onDone }) {
         {event.tierName && <div className="char-evolve-sub">{event.tierName}</div>}
       </div>
       {phase === 'settled' && (
-        <div className="ces-tap-hint">Tap to continue</div>
+        <div className="ces-tap-hint">{t('home.tapToContinue')}</div>
       )}
     </div>
   );
@@ -1060,6 +1068,7 @@ const CRYSTAL_COLORS = {
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tapable when
  *  Crystal Click mechanic is active). Reservoir fill tracked via rAF. */
 function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
+  const { t } = useTranslation('ui');
   // true only when the Crystal Reservoir (crystal_click) mechanic is actually
   // active — i.e. the player has been granted the spark. Until then the
   // crystal is NOT a tap target: no pointer cursor, no collect handler, no
@@ -1179,7 +1188,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
       <div className="home-crystal-anchor">
         <div className="home-crystal-float home-crystal-float-slow">
           <span className="home-crystal-tag home-crystal-tag-btn home-crystal-tag-locked">
-            Qi Crystal
+            {t('home.crystalTag')}
             <span className="home-crystal-tag-divider">·</span>
             <span className="home-crystal-tag-level" role="img" aria-label="Locked">🔒</span>
           </span>
@@ -1223,7 +1232,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
           }}
           aria-label="Crystal details"
         >
-          Qi Crystal
+          {t('home.crystalTag')}
           <span className="home-crystal-tag-divider">·</span>
           <span className="home-crystal-tag-level">Lv {level}</span>
         </button>
@@ -1271,8 +1280,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
           <span className="home-crystal-refine-icon" aria-hidden="true">▲</span>
           <span className="home-crystal-refine-label">
             <span className="home-crystal-refine-verb">
-              Refine
-              <span className="home-crystal-refine-next">{` → Lv ${level + 1}`}</span>
+              {t('home.refineVerb', { n: level + 1 })}
             </span>
             <span className="home-crystal-refine-cost">{fmtNum(refineCost)} Qi</span>
           </span>
@@ -1336,7 +1344,7 @@ function HomePCLeftPanel({ realmName, realmStage, qiRef, progressRef, costRef, r
   const { t } = useTranslation('ui');
   return (
     <div className="home-pc-left">
-      <div className="home-pc-section-label">Cultivation</div>
+      <div className="home-pc-section-label">{t('home.cultivationLabel')}</div>
       <div className="home-pc-realm-name">{realmName.split(' - ')[0]}</div>
       {realmStage && !ascended && <div className="home-pc-realm-stage">{realmStage}</div>}
       <PCQiProgressText qiRef={qiRef} progressRef={progressRef} costRef={costRef} gateRef={gateRef} rateRef={rateRef} maxed={maxed} ascended={ascended} />
@@ -1477,6 +1485,7 @@ function PatternDot({ dot, isCurrent, isTapped, onClick }) {
  * Tracks tap order internally; calls onComplete(wasFullClear) when done.
  */
 function PatternClickOverlay({ pattern, onComplete, rateRef, spawnVFX }) {
+  const { t } = useTranslation('ui');
   const [nextNum, setNextNum] = useState(1);
   const [tapped, setTapped]   = useState(() => new Set());
   const [phase, setPhase]     = useState('active'); // 'active' | 'success' | 'fail'
@@ -1557,7 +1566,7 @@ function PatternClickOverlay({ pattern, onComplete, rateRef, spawnVFX }) {
           the very top of the overlay so the mechanic identifies itself. */}
       <div className="pc-title-strip" aria-hidden="true">
         <div className="pc-title-cn">气脉</div>
-        <div className="pc-title-en">Trace the Meridians</div>
+        <div className="pc-title-en">{t('home.traceMeridians')}</div>
       </div>
 
       {/* Incense timer — slim dark column with a glowing brass-hot tip that
@@ -2950,7 +2959,7 @@ function HomeScreen({
               >
                 <span className="home-sel-btn-icon">✦</span>
                 <span className="home-sel-btn-label">
-                  {pendingSparkOffers} Spark{pendingSparkOffers !== 1 ? 's' : ''} await
+                  {t('home.sparksAwait', { count: pendingSparkOffers, n: pendingSparkOffers })}
                 </span>
               </button>
             )}
@@ -2958,14 +2967,14 @@ function HomeScreen({
               <button className="home-sel-btn" onClick={onOpenSelections}>
                 <span className="home-sel-btn-icon">📦</span>
                 <span className="home-sel-btn-label">
-                  {selections.pendingCount} Reward{selections.pendingCount !== 1 ? 's' : ''}!
+                  {t('home.rewardsChip', { count: selections.pendingCount, n: selections.pendingCount })}
                 </span>
               </button>
             )}
             {!cultivation.activeLaw && (cultivation.ownedLaws?.length ?? 0) > 0 && (
               <button className="home-sel-btn home-sel-btn-law" onClick={() => onNavigate?.('character')}>
                 <span className="home-sel-btn-icon">☯</span>
-                <span className="home-sel-btn-label">No law equipped</span>
+                <span className="home-sel-btn-label">{t('home.noLawEquipped')}</span>
               </button>
             )}
             {lastIdleAssignment && (() => {
@@ -2983,7 +2992,7 @@ function HomeScreen({
             {totalOwnedPills > 0 && (
               <button className="home-pill-chip" onClick={onOpenPills}>
                 <span className="home-pill-chip-icon">◈</span>
-                <span className="home-pill-chip-label">{totalOwnedPills} Pills</span>
+                <span className="home-pill-chip-label">{t('home.pillsChip', { n: totalOwnedPills })}</span>
               </button>
             )}
           </div>
@@ -3185,7 +3194,7 @@ function HomeScreen({
                 <span className="home-mb-inner">
                   <span className="home-mb-watermark" aria-hidden="true">突</span>
                   <span className="home-mb-dots" aria-hidden="true" />
-                  <span className="home-mb-cta">BREAKTHROUGH</span>
+                  <span className="home-mb-cta">{t('home.breakthrough')}</span>
                   <span className="home-mb-next">
                     {/* Data uses ' - ' as a realm/stage separator
                         (e.g. 'Immortal Ascension - 1st Stage');

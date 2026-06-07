@@ -30,8 +30,8 @@ function CharacterScreen({ cultivation, techniques, artefacts, pills, tree }) {
         <span className="coll-page-subtitle">
           {realmName}
           {` · ${activeLawName ?? t('build.lawUnequipped', { defaultValue: 'No law' })}`}
-          {` · ${equippedGearCount}/9 gear`}
-          {equippedTechCount > 0 ? ` · ${equippedTechCount} techniques` : ''}
+          {t('character.gearCount', { n: equippedGearCount })}
+          {equippedTechCount > 0 ? t('character.techniqueCount', { n: equippedTechCount }) : ''}
         </span>
       </header>
 

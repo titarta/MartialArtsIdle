@@ -5,6 +5,7 @@
 // very screen). Reusing them keeps the prestige flow visually tied to
 // the rest of the game instead of feeling like a separate sub-app.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
 import { assertGlyphsCovered } from '../utils/glyphCoverage';
@@ -142,19 +143,20 @@ function TreeNode({ node, state, karma, isSelected, onSelect }) {
   );
 }
 
-/** Compute the action button state for the bottom detail card. */
+/** Compute the action button state for the bottom detail card.
+ *  Returns a `key` instead of a baked string so the caller can call t() with it. */
 function detailAction(node, state, karma) {
   if (!node) return null;
-  if (node.placeholder)         return { text: 'Preview only',                disabled: true,  variant: 'soft' };
-  if (state === 'purchased')    return { text: '✓ Anchored',                  disabled: true,  variant: 'owned' };
-  if (node.comingSoon)          return { text: '✦ Coming soon',               disabled: true,  variant: 'soft' };
-  if (state !== 'available')    return { text: 'Prerequisites still bound',   disabled: true,  variant: 'soft' };
+  if (node.placeholder)         return { key: 'previewOnly',       disabled: true,  variant: 'soft' };
+  if (state === 'purchased')    return { key: 'anchored',          disabled: true,  variant: 'owned' };
+  if (node.comingSoon)          return { key: 'comingSoon',        disabled: true,  variant: 'soft' };
+  if (state !== 'available')    return { key: 'prereqsBound',      disabled: true,  variant: 'soft' };
   // The 'karma' suffix is rendered as the ui/karma.png sprite by the
   // button JSX below, so detailAction returns just the leading text + the
   // cost number — the icon is appended in JSX instead of being baked into
   // the string. costAmount = null means "no karma icon, this isn't a buy".
-  if (karma < node.cost)        return { text: `Need ${node.cost - karma} more`, costAmount: node.cost - karma, disabled: true, variant: 'poor' };
-  return { text: `Anchor for ${node.cost}`, costAmount: node.cost, disabled: false, variant: 'go' };
+  if (karma < node.cost)        return { key: 'needMore',    n: node.cost - karma, costAmount: node.cost - karma, disabled: true,  variant: 'poor' };
+  return                               { key: 'anchorFor',   n: node.cost,         costAmount: node.cost,         disabled: false, variant: 'go' };
 }
 
 // ── Screen ───────────────────────────────────────────────────────────────────
@@ -163,6 +165,7 @@ export default function EternalTreeScreen({
   tree, lives, realmIndex,
   onReincarnate, onClose,
 }) {
+  const { t } = useTranslation('ui');
   const stageRef = useRef(null);
   const stars = useMemo(() => makeStars(140), []);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -307,7 +310,7 @@ export default function EternalTreeScreen({
     : 0;
 
   return (
-    <div className="et-screen" role="dialog" aria-modal="true" aria-label="Eternal Tree">
+    <div className="et-screen" role="dialog" aria-modal="true" aria-label={t('eternalTree.title')}>
       <div className="et-stars" aria-hidden="true">
         {stars.map((s, i) => (
           <span key={i}
@@ -330,8 +333,8 @@ export default function EternalTreeScreen({
             aria-hidden="true"
           />
           <div className="et-title-text">
-            <div className="et-eyebrow">Between Lives</div>
-            <h1 className="et-title">Eternal Tree</h1>
+            <div className="et-eyebrow">{t('eternalTree.eyebrow')}</div>
+            <h1 className="et-title">{t('eternalTree.title')}</h1>
           </div>
         </div>
         {/* Karma readout. Uses the game's canonical karma sprite (ui/karma.png,
@@ -347,14 +350,14 @@ export default function EternalTreeScreen({
           />
           <div className="et-karma-readout">
             <span className="et-karma-count">{fmt(karma)}</span>
-            <span className="et-karma-label">karma</span>
+            <span className="et-karma-label">{t('eternalTree.karmaLabel')}</span>
           </div>
         </div>
         {/* Close ✕ only when a cancel path is allowed. In the committed
             reincarnation flow no onClose is passed, so there is no way out but
             to turn the wheel. */}
         {onClose && (
-          <button className="et-close" onClick={onClose} aria-label="Close">✕</button>
+          <button className="et-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
         )}
       </header>
 
@@ -373,9 +376,9 @@ export default function EternalTreeScreen({
         }}
       >
         <div className="et-zoom">
-          <button type="button" onClick={zoomIn}    aria-label="Zoom in">+</button>
-          <button type="button" onClick={zoomReset} aria-label="Fit to view">⤢</button>
-          <button type="button" onClick={zoomOut}   aria-label="Zoom out">−</button>
+          <button type="button" onClick={zoomIn}    aria-label={t('eternalTree.zoomIn')}>+</button>
+          <button type="button" onClick={zoomReset} aria-label={t('eternalTree.fitView')}>⤢</button>
+          <button type="button" onClick={zoomOut}   aria-label={t('eternalTree.zoomOut')}>−</button>
         </div>
         <div
           className="et-content"
@@ -428,14 +431,14 @@ export default function EternalTreeScreen({
               <div className="et-detail-body">
                 <div className="et-detail-name">{selectedNode.label}</div>
                 <div className="et-detail-desc">
-                  {selectedNode.description ?? 'A future path of karma.'}
+                  {selectedNode.description ?? t('eternalTree.futurePathDefault')}
                 </div>
               </div>
               <button
                 type="button"
                 className="et-detail-close"
                 onClick={(e) => { e.stopPropagation(); setSelectedNodeId(null); }}
-                aria-label="Close details"
+                aria-label={t('eternalTree.closeDetails')}
               >✕</button>
             </div>
             {action && (
@@ -445,7 +448,7 @@ export default function EternalTreeScreen({
                 disabled={action.disabled}
                 onClick={(e) => { e.stopPropagation(); if (!action.disabled) handleAnchor(); }}
               >
-                <span>{action.text}</span>
+                <span>{t(`eternalTree.${action.key}`, action.n != null ? { n: action.n } : undefined)}</span>
                 {/* Render the karma sprite next to the cost number for buy /
                     can't-afford actions. Same sprite as the header readout. */}
                 {action.costAmount != null && (
@@ -466,8 +469,8 @@ export default function EternalTreeScreen({
       <footer className="et-bar et-bar-bot">
         <div className="et-progress">
           <div className="et-progress-meta">
-            <span>Next karma at {fmt(qiForNextKarma)} Qi</span>
-            <span>{fmt(qiToNext)} to go</span>
+            <span>{t('eternalTree.nextKarma', { n: fmt(qiForNextKarma) })}</span>
+            <span>{t('eternalTree.toGo', { n: fmt(qiToNext) })}</span>
           </div>
           <div className="et-progress-bar">
             <div className="et-progress-fill" style={{ width: `${progress * 100}%` }} />
@@ -480,7 +483,7 @@ export default function EternalTreeScreen({
           disabled={!canReincarnate}
         >
           <span className="et-reincarnate-glyph" aria-hidden="true">輪</span>
-          <span>{canReincarnate ? 'Reincarnate' : 'Reach Saint'}</span>
+          <span>{canReincarnate ? t('eternalTree.reincarnate') : t('eternalTree.reachSaint')}</span>
         </button>
       </footer>
     </div>

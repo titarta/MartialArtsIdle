@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 const SUFFIXES = [
   [1_000_000_000_000_000, 'Q'],
   [1_000_000_000_000,     'T'],
@@ -31,6 +33,8 @@ function format(value) {
  * previously only logged.
  */
 export default function DamageNumber({ value, color = 'gold', fontSize = 14, exploit = false, dodge = false, style }) {
+  const { t } = useTranslation('ui');
+
   if (dodge) {
     return (
       <div
@@ -43,7 +47,7 @@ export default function DamageNumber({ value, color = 'gold', fontSize = 14, exp
           color: '#facc15',
         }}
       >
-        DODGED
+        {t('combat.dodged')}
       </div>
     );
   }
@@ -68,7 +72,7 @@ export default function DamageNumber({ value, color = 'gold', fontSize = 14, exp
           className="damage-number-exploit-tag"
           style={{ fontSize: Math.max(8, Math.round(fontSize * 0.4)) }}
         >
-          EXPLOIT!
+          {t('combat.exploit')}
         </span>
       )}
       {format(value)}
