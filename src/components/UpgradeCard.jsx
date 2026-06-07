@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { fmt } from '../utils/format';
 import { upgradeIconSrc } from '../utils/upgradeIcons';
 
@@ -43,6 +44,7 @@ function identityFor(upgrade) {
  *   - onBuy:      (id) => void — caller spends qi atomically
  */
 export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
+  const { t } = useTranslation('ui');
   const affordable = unlocked && qi >= upgrade.cost;
   const ident = identityFor(upgrade);
 
@@ -63,7 +65,7 @@ export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
         onClick={() => onBuy(upgrade.id)}
         disabled={!affordable}
       >
-        {unlocked ? `${fmt(upgrade.cost)} Qi` : 'Locked'}
+        {unlocked ? `${fmt(upgrade.cost)} Qi` : t('upgrade.locked')}
       </button>
     </div>
   );

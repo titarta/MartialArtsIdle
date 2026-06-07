@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 /**
  * TutorialModal — Sanctum-styled "inscribed scroll" tutorial card.
  *
@@ -27,14 +29,18 @@
 function TutorialModal({
   title,
   body,
-  ctaText = 'Got it',
+  ctaText,
   iconSrc,
-  kicker = 'Unlocked',
+  kicker,
   glyph  = '道',  // default Dao / Way
   glowA,
   glowB,
   onDone,
 }) {
+  const { t } = useTranslation('ui');
+  const resolvedCtaText = ctaText !== undefined ? ctaText : t('tutorial.gotIt');
+  const resolvedKicker  = kicker  !== undefined ? kicker  : t('tutorial.kicker');
+
   // Tier-tinted accent. When the modal is triggered by a crystal evolution,
   // the caller passes the tier's palette so the inner glow matches the
   // celebration that just played.
@@ -52,7 +58,7 @@ function TutorialModal({
         <button
           type="button"
           className="modal-close tutorial-close"
-          aria-label="Dismiss"
+          aria-label={t('common.dismissAriaLabel')}
           onClick={onDone}
         >✕</button>
 
@@ -66,12 +72,12 @@ function TutorialModal({
           </div>
         )}
 
-        <div className="tutorial-kicker">{kicker}</div>
+        <div className="tutorial-kicker">{resolvedKicker}</div>
         <h2 className="tutorial-title">{title}</h2>
         <p  className="tutorial-body">{body}</p>
 
         <button className="tutorial-cta" onClick={onDone} autoFocus>
-          <span className="tutorial-cta-label">{ctaText}</span>
+          <span className="tutorial-cta-label">{resolvedCtaText}</span>
           <span className="tutorial-cta-arrow" aria-hidden="true">→</span>
         </button>
       </div>

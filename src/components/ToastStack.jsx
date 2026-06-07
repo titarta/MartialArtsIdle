@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const MAX_VISIBLE      = 3;
 const DEFAULT_DURATION = 4000;
@@ -23,6 +24,7 @@ const DEFAULT_DURATION = 4000;
  *   - duration      ms before auto-dismiss (default 4000)
  */
 function ToastCard({ toast, isPeek, depth = 0, onDismiss, onNavigate }) {
+  const { t } = useTranslation('ui');
   const glyph  = toast.glyph  ?? '印';
   const kicker = toast.kicker ?? null;
   const type   = toast.type   ?? 'info';
@@ -61,14 +63,14 @@ function ToastCard({ toast, isPeek, depth = 0, onDismiss, onNavigate }) {
         <div className="toast-actions">
           {toast.targetScreen && (
             <button className="toast-go" onClick={handleNavigate}>
-              <span className="toast-go-label">View</span>
+              <span className="toast-go-label">{t('toast.viewBtn')}</span>
               <span className="toast-go-arrow" aria-hidden="true">→</span>
             </button>
           )}
           <button
             className="modal-close toast-dismiss"
             onClick={() => onDismiss(toast.id)}
-            aria-label="Dismiss"
+            aria-label={t('toast.dismissAriaLabel')}
           >✕</button>
         </div>
       )}
@@ -77,6 +79,7 @@ function ToastCard({ toast, isPeek, depth = 0, onDismiss, onNavigate }) {
 }
 
 function ToastStack({ toasts, onDismiss, onNavigate }) {
+  const { t } = useTranslation('ui');
   if (!toasts.length) return null;
 
   const visible  = toasts.slice(0, MAX_VISIBLE);
@@ -116,7 +119,7 @@ function ToastStack({ toasts, onDismiss, onNavigate }) {
         />
 
         {overflow > 0 && (
-          <div className="toast-overflow">+{overflow} more</div>
+          <div className="toast-overflow">{t('toast.overflow', { n: overflow })}</div>
         )}
       </div>
     </div>

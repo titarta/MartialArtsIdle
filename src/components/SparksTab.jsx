@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import {
   QI_SPARK_BY_ID,
   SPARK_RARITY,
@@ -89,7 +90,7 @@ function renderRich(text) {
  * the strings here are tuned to read on one line. The detail modal renders
  * the same value but can wrap freely.
  */
-function describeContribution(spark, card, ctx) {
+function describeContribution(spark, card, ctx, t) {
   const eff = card?.effect;
   if (!eff) return null;
   const { ownedMap, rate } = ctx;
@@ -157,7 +158,7 @@ function describeContribution(spark, card, ctx) {
       const phStacks = spark.phoenixRebornStacks ?? 0;
       return phStacks > 0
         ? `${phStacks} rebirth${phStacks > 1 ? 's' : ''} → others ×${Math.pow(2, phStacks)}`
-        : `Waiting on next major realm`;
+        : t ? t('sparks.waitingNextRealm') : 'Waiting on next major realm';
     }
     // ── Dial-9 additions ────────────────────────────────────────────
     case 'producer_flat_per_unit':
@@ -177,7 +178,7 @@ function describeContribution(spark, card, ctx) {
       const pct = Math.round((eff.fraction ?? 0) * 100);
       return charges > 0
         ? `−${pct}% producer cost · ${charges} buy${charges > 1 ? 's' : ''} left`
-        : `Bargain spent`;
+        : t ? t('sparks.bargainSpent') : 'Bargain spent';
     }
     default:
       return null;
@@ -189,6 +190,7 @@ function describeContribution(spark, card, ctx) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Charm({ spark, ctx, isTrinityActive, onOpen }) {
+  const { t } = useTranslation('ui');
   const card = QI_SPARK_BY_ID[spark.sparkId];
   if (!card) return null;
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
@@ -197,7 +199,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
   const isLegendary = card.rarity === 'legendary';
   const isTrinityPiece = card.trinityPiece === true;
 
-  const contribution = describeContribution(spark, card, ctx);
+  const contribution = describeContribution(spark, card, ctx, t);
   const stacks = spark.stacks ?? 1;
   const showStackBadge = card.kind === 'permanent' && stacks > 1;
 
@@ -217,7 +219,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
       className={`charm ${rarityClass}${isLegendary ? ' charm-legendary' : ''}${trinityActive ? ' charm-trinity-active' : ''}`}
       style={{ '--r': rarityToken }}
       onClick={() => onOpen(spark)}
-      aria-label={`${card.name} — tap for details`}
+      aria-label={`${card.name} — ${t('sparks.tapForDetails')}`}
     >
       <span className="charm-rarity-mark" aria-hidden="true" />
       {isTrinityPiece && <span className="charm-trinity" aria-hidden="true">✦</span>}
@@ -236,6 +238,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
+  const { t } = useTranslation('ui');
   const card = QI_SPARK_BY_ID[spark?.sparkId];
   if (!card) return null;
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
@@ -245,11 +248,11 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
   const effectText = copy?.effectText ?? card.description ?? '';
   const exampleHtml = copy?.exampleText ?? null;
   const loreHtml = copy?.loreText ?? null;
-  const contribution = describeContribution(spark, card, ctx);
+  const contribution = describeContribution(spark, card, ctx, t);
 
   const isMechanic = card.kind === 'mechanic';
   const rarityToken = isMechanic ? 'var(--r-mechanic)' : rarity.color;
-  const rarityLabel = isMechanic ? 'Mechanic' : rarity.label;
+  const rarityLabel = isMechanic ? t('sparks.mechanicLabel') : rarity.label;
   const rarityClass = isMechanic ? 'charm-detail-r-mechanic' : `charm-detail-r-${card.rarity}`;
 
   // Portal to <body> so the fixed overlay escapes .screen-container's
@@ -269,7 +272,7 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
         aria-modal="true"
         aria-label={card.name}
       >
-        <button type="button" className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <header className="charm-detail-hero" data-glyph={glyph}>
           <div className="charm-detail-hero-mount">
@@ -281,40 +284,40 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
 
         <div className="charm-detail-body">
           <section className="charm-detail-section">
-            <div className="charm-detail-label">Effect</div>
+            <div className="charm-detail-label">{t('sparks.detailEffect')}</div>
             <div className="charm-detail-text">{renderRich(effectText)}</div>
           </section>
 
           {contribution && (
             <section className="charm-detail-section">
-              <div className="charm-detail-label">Currently</div>
+              <div className="charm-detail-label">{t('sparks.detailCurrently')}</div>
               <div className="charm-detail-currently">{contribution}</div>
             </section>
           )}
 
           {exampleHtml && (
             <section className="charm-detail-section">
-              <div className="charm-detail-label">Example</div>
+              <div className="charm-detail-label">{t('sparks.detailExample')}</div>
               <div className="charm-detail-text" dangerouslySetInnerHTML={{ __html: exampleHtml }} />
             </section>
           )}
 
           {loreHtml && (
             <section className="charm-detail-section">
-              <div className="charm-detail-label">Lore</div>
+              <div className="charm-detail-label">{t('sparks.detailLore')}</div>
               <div className="charm-detail-lore">{loreHtml}</div>
             </section>
           )}
 
           {isTrinityActive && card.trinityPiece && (
             <div className="charm-detail-trinity-note">
-              ✦ Trinity Convergence active · +{Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100)}% global qi/s
+              {t('sparks.trinityActive', { n: Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100) })}
             </div>
           )}
 
           <footer className="charm-detail-footer">
             <span className="charm-detail-stamp">印</span>
-            <span>{rarityLabel} Charm</span>
+            <span>{t('sparks.charmFooter', { label: rarityLabel })}</span>
           </footer>
         </div>
       </div>
@@ -346,6 +349,7 @@ function CharmSection({ label, sublabel, count, sectionColor, children }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SparksTab({ qiSparks, producers, cultivation }) {
+  const { t } = useTranslation('ui');
   const [now, setNow] = useState(Date.now());
   const [rate, setRate] = useState(() => cultivation?.rateRef?.current ?? 0);
   const [openSpark, setOpenSpark] = useState(null);
@@ -398,10 +402,8 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
   if (live.length === 0) {
     return (
       <div className="st-empty">
-        <div className="st-empty-title">No persistent sparks yet</div>
-        <div className="st-empty-text">
-          A Qi Spark is offered on every layer breakthrough. Your permanent, legendary, and mechanic sparks will live here. Temporary buffs surface on the top-left chip while they're running.
-        </div>
+        <div className="st-empty-title">{t('sparks.emptyTitle')}</div>
+        <div className="st-empty-text">{t('sparks.emptyText')}</div>
       </div>
     );
   }
@@ -417,15 +419,15 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
       {isTrinityActive && (
         <div className="st-trinity-banner">
           <span className="stb-mark">✦</span>
-          <span className="stb-label">Trinity Convergence</span>
-          <span className="stb-bonus">+{Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100)}% global qi/s</span>
+          <span className="stb-label">{t('sparks.trinityLabel')}</span>
+          <span className="stb-bonus">{t('sparks.globalQiBonus', { n: Math.round((TRINITY_CONVERGENCE_MULT - 1) * 100) })}</span>
           <span className="stb-mark">✦</span>
         </div>
       )}
 
       <CharmSection
-        label="Legendary"
-        sublabel="producer synergies"
+        label={t('sparks.sectionLegendary')}
+        sublabel={t('sparks.sectionLegendarySub')}
         count={groups.legendary.length}
         sectionColor="var(--r-legendary)"
       >
@@ -435,8 +437,8 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
       </CharmSection>
 
       <CharmSection
-        label="Permanent"
-        sublabel="lasts this run"
+        label={t('sparks.sectionPermanent')}
+        sublabel={t('sparks.sectionPermanentSub')}
         count={groups.uncommon.length}
         sectionColor="var(--r-uncommon)"
       >
@@ -446,8 +448,8 @@ export default function SparksTab({ qiSparks, producers, cultivation }) {
       </CharmSection>
 
       <CharmSection
-        label="Mechanics"
-        sublabel="from crystal evolution"
+        label={t('sparks.sectionMechanics')}
+        sublabel={t('sparks.sectionMechanicsSub')}
         count={groups.mechanic.length}
         sectionColor="var(--r-mechanic)"
       >

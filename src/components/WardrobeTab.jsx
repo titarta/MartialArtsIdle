@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   SHOP_ITEMS,
   SHOP_ITEMS_BY_ID,
@@ -31,22 +32,14 @@ const SLOT_ORDER = [
   COSMETIC_SLOTS.BACKGROUND,
 ];
 
-const SLOT_LABELS = {
-  [COSMETIC_SLOTS.CHARACTER]:  'Cultivator',
-  [COSMETIC_SLOTS.CRYSTAL]:    'Crystal',
-  [COSMETIC_SLOTS.PARTICLES]:  'Particles',
-  [COSMETIC_SLOTS.BACKGROUND]: 'Backdrop',
-};
-
-// Default "what's worn when no skin is equipped" tile per slot. Mirrors
-// the mockup's "DEFAULT" pill so the player understands an empty slot
-// still shows something on the cultivator. Kept terse — the tile is
-// inspectational, not interactive.
-const SLOT_DEFAULTS = {
-  [COSMETIC_SLOTS.CHARACTER]:  { icon: '🧘',  name: 'White-gold robes',  desc: 'The default cultivator look that ships with your path.' },
-  [COSMETIC_SLOTS.CRYSTAL]:    { icon: '◆',   name: 'Spirit Crystal',    desc: 'The default qi crystal, white-gold across all tiers.' },
-  [COSMETIC_SLOTS.PARTICLES]:  { icon: '✨',  name: 'White-gold motes',  desc: 'The default qi particle flow that comes with your path.' },
-  [COSMETIC_SLOTS.BACKGROUND]: { icon: '🏔',  name: 'Mountain Path',     desc: 'The default lacquered backdrop of your meditation hall.' },
+// Slot labels and defaults are resolved inside the component via t() so
+// they update when the language changes. The icon field is a non-text
+// decorative glyph/emoji and is not translated.
+const SLOT_DEFAULT_ICONS = {
+  [COSMETIC_SLOTS.CHARACTER]:  '🧘',
+  [COSMETIC_SLOTS.CRYSTAL]:    '◆',
+  [COSMETIC_SLOTS.PARTICLES]:  '✨',
+  [COSMETIC_SLOTS.BACKGROUND]: '🏔',
 };
 
 function CosmeticPreview({ item }) {
@@ -110,6 +103,22 @@ function CosmeticPreview({ item }) {
  * inventory.unequip(slot). Both come from useShopInventory.
  */
 function WardrobeTab({ inventory, onBrowseBazaar }) {
+  const { t } = useTranslation('ui');
+
+  const SLOT_LABELS = {
+    [COSMETIC_SLOTS.CHARACTER]:  t('wardrobe.slotCharacter'),
+    [COSMETIC_SLOTS.CRYSTAL]:    t('wardrobe.slotCrystal'),
+    [COSMETIC_SLOTS.PARTICLES]:  t('wardrobe.slotParticles'),
+    [COSMETIC_SLOTS.BACKGROUND]: t('wardrobe.slotBackdrop'),
+  };
+
+  const SLOT_DEFAULTS = {
+    [COSMETIC_SLOTS.CHARACTER]:  { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.CHARACTER],  name: t('wardrobe.defaultCharName'),      desc: 'The default cultivator look that ships with your path.' },
+    [COSMETIC_SLOTS.CRYSTAL]:    { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.CRYSTAL],    name: t('wardrobe.defaultCrystalName'),   desc: 'The default qi crystal, white-gold across all tiers.' },
+    [COSMETIC_SLOTS.PARTICLES]:  { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.PARTICLES],  name: t('wardrobe.defaultParticlesName'), desc: 'The default qi particle flow that comes with your path.' },
+    [COSMETIC_SLOTS.BACKGROUND]: { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.BACKGROUND], name: t('wardrobe.defaultBackdropName'),  desc: 'The default lacquered backdrop of your meditation hall.' },
+  };
+
   // Group every owned cosmetic by slot so we render each section in
   // SLOT_ORDER below regardless of declaration order in shopItems.js.
   const ownedBySlot = useMemo(() => {
@@ -150,14 +159,14 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                 <span className="wdb-slot-rule" aria-hidden="true" />
                 <span className="wdb-slot-count">
                   {items.length === 0
-                    ? 'none owned'
-                    : `${equippedItem ? '1 equipped · ' : ''}${items.length} owned`}
+                    ? t('wardrobe.noneOwned')
+                    : `${equippedItem ? '1 equipped · ' : ''}${t('wardrobe.owned', { n: items.length })}`}
                 </span>
               </div>
 
               {equippedItem ? (
                 <div className="wdb-eq-tile">
-                  <span className="wdb-eq-ribbon">EQUIPPED</span>
+                  <span className="wdb-eq-ribbon">{t('wardrobe.ribbonEquipped')}</span>
                   <div className="wdb-eq-preview">
                     <CosmeticPreview item={equippedItem} />
                   </div>
@@ -171,13 +180,13 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                       className="wdb-eq-btn"
                       onClick={() => inventory.unequip(slot)}
                     >
-                      Unequip
+                      {t('wardrobe.unequip')}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="wdb-eq-tile wdb-eq-tile-default">
-                  <span className="wdb-eq-ribbon">DEFAULT</span>
+                  <span className="wdb-eq-ribbon">{t('wardrobe.ribbonDefault')}</span>
                   <div className="wdb-eq-preview">
                     <span className="wdb-tile-preview-icon">{SLOT_DEFAULTS[slot].icon}</span>
                   </div>
@@ -186,7 +195,7 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                     <div className="wdb-eq-desc">{SLOT_DEFAULTS[slot].desc}</div>
                   </div>
                   <div className="wdb-eq-actions">
-                    <span className="wdb-eq-active-label">Active</span>
+                    <span className="wdb-eq-active-label">{t('wardrobe.active')}</span>
                   </div>
                 </div>
               )}
@@ -204,7 +213,7 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                         <CosmeticPreview item={item} />
                       </div>
                       <div className="wdb-tile-name">{item.name}</div>
-                      <div className="wdb-tile-cta">Equip</div>
+                      <div className="wdb-tile-cta">{t('wardrobe.equip')}</div>
                     </button>
                   ))}
                 </div>
@@ -217,9 +226,9 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                   onClick={onBrowseBazaar}
                 >
                   <span className="wdb-bazaar-nudge-text">
-                    No cosmetics owned in this slot.
+                    {t('wardrobe.noneOwnedSlot')}
                   </span>
-                  <span className="wdb-bazaar-nudge-link">Browse Bazaar →</span>
+                  <span className="wdb-bazaar-nudge-link">{t('wardrobe.browseBazaar')}</span>
                 </button>
               )}
             </section>
@@ -229,10 +238,10 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
 
       <div className="wdb-footer">
         <span>
-          <b>{totalOwned}</b> cosmetic{totalOwned === 1 ? '' : 's'} owned · <b>{totalEquipped}</b> equipped
+          {t('wardrobe.footerSummary', { cosmeticsOwned: totalOwned, cosmeticsEquipped: totalEquipped })}
         </span>
         <button type="button" className="wdb-footer-link" onClick={onBrowseBazaar}>
-          Bazaar →
+          {t('wardrobe.bazaarLink')}
         </button>
       </div>
     </div>

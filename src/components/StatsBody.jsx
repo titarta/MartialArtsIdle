@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fmt, fmtRate } from '../utils/format';
 import { STATS_KEYS, STAT_CATEGORIES } from '../data/statsKeys';
 
@@ -73,6 +74,7 @@ function formatValue(value, format) {
 const APP_VERSION = (typeof __MAI_VERSION__ !== 'undefined') ? __MAI_VERSION__ : 'dev';
 
 function StatsBody({ stats, qiRef, rateRef, achievements }) {
+  const { t } = useTranslation('ui');
   const [mode, setMode] = useState('lifetime'); // 'run' | 'lifetime'
 
   // Snapshot rows (Current Qi, Current Qi/s, Run started X ago) tick at
@@ -124,13 +126,13 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
           className={`stg-segment-btn${mode === 'run' ? ' stg-segment-active' : ''}`}
           onClick={() => setMode('run')}
         >
-          Current Run
+          {t('statsPanel.currentRun')}
         </button>
         <button
           className={`stg-segment-btn${mode === 'lifetime' ? ' stg-segment-active' : ''}`}
           onClick={() => setMode('lifetime')}
         >
-          Lifetime
+          {t('statsPanel.lifetime')}
         </button>
       </div>
 
@@ -157,15 +159,15 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
                 {cat.id === 'cultivation' && (
                   <>
                     <div className="pdm-stat-row">
-                      <span className="pdm-stat-label">Current Qi</span>
+                      <span className="pdm-stat-label">{t('statsPanel.currentQi')}</span>
                       <span className="pdm-stat-value">{fmt(live.qi)}</span>
                     </div>
                     <div className="pdm-stat-row">
-                      <span className="pdm-stat-label">Current Qi/s</span>
+                      <span className="pdm-stat-label">{t('statsPanel.currentQiRate')}</span>
                       <span className="pdm-stat-value">{fmtRate(live.rate)}/s</span>
                     </div>
                     <div className="pdm-stat-row">
-                      <span className="pdm-stat-label">Run started</span>
+                      <span className="pdm-stat-label">{t('statsPanel.runStarted')}</span>
                       <span className="pdm-stat-value">{formatTimeAgo(stats.runStartedTs)}</span>
                     </div>
                   </>
@@ -188,7 +190,7 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
                     spans both grid columns. */}
                 {cat.id === 'meta' && achTotal > 0 && (
                   <div className="pdm-stat-row pdm-stat-row-emph">
-                    <span className="pdm-stat-label">Achievements unlocked</span>
+                    <span className="pdm-stat-label">{t('statsPanel.achievementsUnlocked')}</span>
                     <span className="pdm-stat-value">
                       {achUnlocked} / {achTotal} ({achPct}%)
                     </span>
@@ -200,7 +202,7 @@ function StatsBody({ stats, qiRef, rateRef, achievements }) {
         })}
 
         <div className="stats-footer">
-          Tracking since {formatSinceDate(stats.sinceTs)} · v{APP_VERSION}
+          {t('statsPanel.footer', { date: formatSinceDate(stats.sinceTs), version: APP_VERSION })}
         </div>
       </div>
     </>
