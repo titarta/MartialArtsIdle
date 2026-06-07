@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   QI_SPARK_BY_ID,
   SPARK_RARITY,
@@ -251,7 +252,12 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
   const rarityLabel = isMechanic ? 'Mechanic' : rarity.label;
   const rarityClass = isMechanic ? 'charm-detail-r-mechanic' : `charm-detail-r-${card.rarity}`;
 
-  return (
+  // Portal to <body> so the fixed overlay escapes .screen-container's
+  // `transform: translateZ(0)` stacking trap. Rendered inline, the overlay
+  // is confined to that transformed ancestor and the positioned .cs-qi-strip
+  // header pokes through on top of it. Matches the app's modal convention
+  // (DetailModal, ActiveBuffsChip, tooltips all portal to document.body).
+  return createPortal(
     <div
       className="charm-detail-overlay"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
@@ -312,7 +318,8 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
           </footer>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -24820,14 +24820,20 @@ img.pp-emblem-locked { font-size: 0; }
    ════════════════════════════════════════════════════════════════════ */
 
 /* Rarity tokens (extends the canonical SPARK_RARITY colors with a soft
-   cyan for the mechanic kind). */
-.charm-root {
+   cyan for the mechanic kind). Declared on BOTH the grid root and the detail
+   overlay: the overlay is portaled to <body> (outside .charm-root), so without
+   it here var(--r-mechanic)/etc. resolve to nothing and the rarity border,
+   halo and name colour fall back to white. */
+.charm-root,
+.charm-detail-overlay {
   --r-common:    #9ca3af;
   --r-uncommon:  #4ade80;
   --r-rare:      #a78bfa;
   --r-legendary: #ffd66b;
   --r-mechanic:  #7ec3c8;
+}
 
+.charm-root {
   display: flex;
   flex-direction: column;
   gap: 22px;
