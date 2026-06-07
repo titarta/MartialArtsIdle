@@ -36,13 +36,11 @@
         </provider>
 
         <!-- AdMob App ID (required by @capacitor-community/admob).
-             Currently using Google's TEST app ID — replace with your real
-             AdMob App ID before going to production:
-                 ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX
+             Real production AdMob App ID for The Long Road to Heaven (Android).
              See: https://googlemobileadssdk.page.link/admob-android-update-manifest -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-2334336722369393~5720626344"/>
     </application>
 
     <!-- Permissions -->

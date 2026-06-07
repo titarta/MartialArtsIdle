@@ -15,7 +15,9 @@ No interstitials at launch. Two placements:
 
 Ad network: **AdMob** (`@capacitor-community/admob`) — native Android/iOS only. No ads on browser/PWA/Steam.
 
-> Replace test Ad Unit IDs before store submission. Real IDs from https://admob.google.com
+> **Android live ad IDs are wired** (real App ID in the manifest + real rewarded unit in `src/rewards/providers/admob.js`). Dev builds (`dev:native`) use Google test ads; production builds use the real units. Add your device to `VITE_ADMOB_TEST_DEVICES` in `.env.local` to force test ads on your own phone even in a prod build, which avoids invalid-traffic / self-click bans. iOS still uses test IDs until an iOS AdMob app is created.
+>
+> **Best-revenue roadmap:** AdMob alone now. Once there is real traffic, enable AdMob mediation with bidding (add AppLovin MAX, Meta, Unity, Mintegral as bidding sources in the AdMob dashboard) for higher eCPM with no SDK swap. Consider a full AppLovin MAX integration only if ad revenue grows enough to justify the Capacitor native work.
 
 ---
 
