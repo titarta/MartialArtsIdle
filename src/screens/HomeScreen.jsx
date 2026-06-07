@@ -9,7 +9,6 @@ import ActiveBuffsChip from '../components/ActiveBuffsChip';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
-import { FEATURE_GATES } from '../data/featureGates';
 import { useEventQueue } from '../contexts/EventQueueContext';
 import { QI_SPARK_BY_ID } from '../data/qiSparks';
 import { sparksToGrantOnEvolution } from '../data/crystalMechanicGrants';
@@ -1060,10 +1059,13 @@ const CRYSTAL_COLORS = {
 
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tapable when
  *  Crystal Click mechanic is active). Reservoir fill tracked via rAF. */
-function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
-  const unlockHint = FEATURE_GATES.qi_crystal?.hint ?? 'Reach a higher realm';
-  // true only when the Crystal Click spark is active AND the crystal is unlocked
-  const mechanicOn = !!(crystalClickCapMinRef && onCollect && isUnlocked);
+function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
+  // true only when the Crystal Reservoir (crystal_click) mechanic is actually
+  // active — i.e. the player has been granted the spark. Until then the
+  // crystal is NOT a tap target: no pointer cursor, no collect handler, no
+  // reservoir VFX. (Was previously keyed off the ref OBJECT existing, which is
+  // always truthy, so the crystal read as tappable the moment it unlocked.)
+  const mechanicOn = !!(tapMechanicActive && onCollect && isUnlocked);
 
   // Refine button affordability — polled at 5 Hz from cultivation.qiRef.
   // The button sits absolutely positioned beneath the crystal sprite (see
@@ -1168,21 +1170,27 @@ function KeyCrystal({ crystal, isUnlocked, particleColors, hidden, cfRung, reser
   }, [mechanicOn, reservoirRef, crystalClickCapMinRef, rateRef, hidden]);
 
   if (!isUnlocked) {
+    // Mirror the unlocked crystal's layout (corner badge + img-wrap) so the
+    // locked state reads as the same object, just dormant. No hover tooltip
+    // and no tap target — there's nothing to collect or open until it awakens.
+    // The badge reuses the unlocked corner-chip skin, swapping the "Lv N" slot
+    // for a lock so it pins to the exact same spot.
     return (
       <div className="home-crystal-anchor">
         <div className="home-crystal-float home-crystal-float-slow">
-          <span className="home-crystal-tag home-crystal-tag-locked">🔒 Qi Crystal</span>
-          <img
-            src={`${BASE}crystals/crystal_locked.png`}
-            className="home-crystal-img home-crystal-locked"
-            alt="Qi Crystal"
-            draggable="false"
-          />
-        </div>
-        <div className="crystal-tooltip crystal-tooltip-locked">
-          <div className="ctt-title">🔒 Qi Crystal</div>
-          <div className="ctt-desc">A crystallised vessel of refined Qi. Permanently boosts your cultivation speed.</div>
-          <div className="ctt-unlock">Unlocks: {unlockHint}</div>
+          <span className="home-crystal-tag home-crystal-tag-btn home-crystal-tag-locked">
+            Qi Crystal
+            <span className="home-crystal-tag-divider">·</span>
+            <span className="home-crystal-tag-level" role="img" aria-label="Locked">🔒</span>
+          </span>
+          <div className="home-crystal-img-wrap">
+            <img
+              src={`${BASE}crystals/crystal_locked.png`}
+              className="home-crystal-img home-crystal-locked"
+              alt="Qi Crystal (locked)"
+              draggable="false"
+            />
+          </div>
         </div>
       </div>
     );
@@ -2337,6 +2345,15 @@ function HomeScreen({
 }) {
   const { t } = useTranslation('ui');
 
+  // The crystal becomes a tap target only once the Crystal Reservoir
+  // (crystal_click) mechanic is actually active — granted via crystal-tier
+  // evolution, it lives in activeSparks. Derived reactively so the crystal
+  // flips to tappable the moment the spark lands (and not before).
+  const crystalTapActive = useMemo(
+    () => (activeSparks ?? []).some(s => QI_SPARK_BY_ID[s.sparkId]?.mechanicId === 'crystal_click'),
+    [activeSparks],
+  );
+
   // Keep the module-level spawn-path in sync with whatever particle the
   // player has equipped. Pattern: cos_particles_c9_N → qi_orb_c9_N.
   // Falls back to C1 when nothing is equipped or the ID doesn't match.
@@ -3028,6 +3045,7 @@ function HomeScreen({
           <KeyCrystal
             crystal={crystal}
             isUnlocked={isCrystalUnlocked}
+            tapMechanicActive={crystalTapActive}
             particleColors={isCrystalUnlocked && crystal ? CRYSTAL_COLORS[getCrystalTier(crystal.level)] : CRYSTAL_COLORS[1]}
             hidden={currentEvent?.kind === 'crystal-evolution'}
             cfRung={cfRung}

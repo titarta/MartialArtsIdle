@@ -6248,7 +6248,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
+  /* No cursor here — the click affordance belongs to the Crystal Reservoir
+     tap mechanic only. `.home-crystal-tappable` (added when that mechanic is
+     active) supplies cursor: pointer. Before then, and while locked, the
+     crystal is inert. */
   /* Stacks above .home-fighter-stage (sibling, no z-index) so the refine
      chip and crystal stay on top of qi-flow particles that drift up from
      the cultivator. Without this, document order put .home-fighter-stage's
@@ -26102,6 +26105,29 @@ img.pp-emblem-locked { font-size: 0; }
 .home-crystal-tag-btn .home-crystal-tag-level {
   font-size: 10px !important;
   color: var(--ui-purple-gold-hot, #ffcf83) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+/* Locked Qi Crystal badge — reuses the corner-chip geometry above but reads
+   as dormant: muted chrome, no hover/press feedback, not a tap target. The
+   lock sits in the same slot the live crystal uses for "Lv N", so it pins to
+   the identical bottom-right corner. */
+.home-crystal-tag-locked.home-crystal-tag-btn {
+  cursor: default !important;
+  border-color: rgba(220, 225, 240, 0.22) !important;
+  background: linear-gradient(180deg, rgba(20, 20, 28, 0.94) 0%, rgba(12, 12, 18, 0.96) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(245, 245, 255, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.55) !important;
+}
+.home-crystal-tag-locked.home-crystal-tag-btn:hover {
+  transform: none !important;
+}
+.home-crystal-tag-locked.home-crystal-tag-btn .home-crystal-tag-level {
+  font-size: 11px !important;
+  color: rgba(220, 222, 235, 0.78) !important;
+  /* Tone the lock glyph down so it doesn't out-shout the greyed sprite. */
+  filter: grayscale(0.5) brightness(0.95);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 
