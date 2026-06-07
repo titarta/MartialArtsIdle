@@ -137,14 +137,14 @@ export default function ReincarnationConfirmModal({
   onConfirm,
   onCancel,
 }) {
-  const { t } = useTranslation(‘ui’);
+  const { t } = useTranslation('ui');
 
   // Esc backs out (same as "Hold the wheel"). Confirm is never key-bound:
   // turning the wheel must be a deliberate tap.
   useEffect(() => {
-    const onKey = (e) => { if (e.key === ‘Escape’) onCancel?.(); };
-    window.addEventListener(‘keydown’, onKey);
-    return () => window.removeEventListener(‘keydown’, onKey);
+    const onKey = (e) => { if (e.key === 'Escape') onCancel?.(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [onCancel]);
 
   return (
@@ -155,7 +155,7 @@ export default function ReincarnationConfirmModal({
       aria-label="Reincarnation"
       onClick={onCancel}
     >
-      <div className={`rc-card${canReincarnate ? ‘’ : ‘ rc-card-closed’}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`rc-card${canReincarnate ? '' : ' rc-card-closed'}`} onClick={(e) => e.stopPropagation()}>
         <EternalTreeBackdrop stilled={!canReincarnate} />
         <div className="rc-embers" aria-hidden="true">
           {EMBERS.map((e, i) => (
@@ -169,52 +169,52 @@ export default function ReincarnationConfirmModal({
 
         <div className="rc-content">
           <WheelSigil stilled={!canReincarnate} />
-          <div className="rc-eyebrow">{t(‘reincarnationModal.eyebrow’)}</div>
+          <div className="rc-eyebrow">{t('reincarnationModal.eyebrow')}</div>
 
           {canReincarnate ? (
             <>
-              <h2 className="rc-title">{t(‘reincarnationModal.titleOpen’)}</h2>
-              <p className="rc-body">{t(‘reincarnationModal.bodyOpen’)}</p>
+              <h2 className="rc-title">{t('reincarnationModal.titleOpen')}</h2>
+              <p className="rc-body">{t('reincarnationModal.bodyOpen')}</p>
               <div className="rc-ledger">
                 <div className="rc-ledger-row rc-lose">
                   <span className="rc-ledger-mark" aria-hidden="true">✕</span>
-                  <span>{t(‘reincarnationModal.loseRow’)}</span>
+                  <span>{t('reincarnationModal.loseRow')}</span>
                 </div>
                 <div className="rc-ledger-row rc-keep">
                   <span className="rc-ledger-mark" aria-hidden="true">◈</span>
-                  <span>{t(‘reincarnationModal.keepRow’)}</span>
+                  <span>{t('reincarnationModal.keepRow')}</span>
                 </div>
               </div>
               {karma > 0 && (
                 <div className="rc-karma-cartouche">
-                  <span className="rc-karma-label">{t(‘reincarnationModal.karmaCarried’)}</span>
+                  <span className="rc-karma-label">{t('reincarnationModal.karmaCarried')}</span>
                   <span className="rc-karma-value">{fmt(karma)}</span>
                 </div>
               )}
-              <div className="rc-warn"><span>{t(‘reincarnationModal.warn’)}</span></div>
+              <div className="rc-warn"><span>{t('reincarnationModal.warn')}</span></div>
               <div className="rc-actions">
                 <button type="button" className="rc-btn rc-cancel" onClick={onCancel}>
-                  {t(‘reincarnationModal.cancelBtn’)}
+                  {t('reincarnationModal.cancelBtn')}
                 </button>
                 <button type="button" className="rc-btn rc-confirm" onClick={onConfirm}>
                   <span className="rc-confirm-glyph" aria-hidden="true">輪</span>
-                  {t(‘reincarnationModal.confirmBtn’)}
+                  {t('reincarnationModal.confirmBtn')}
                 </button>
               </div>
             </>
           ) : (
             <>
-              <h2 className="rc-title">{t(‘reincarnationModal.titleLocked’)}</h2>
-              <p className="rc-body">{t(‘reincarnationModal.bodyLocked’)}</p>
+              <h2 className="rc-title">{t('reincarnationModal.titleLocked')}</h2>
+              <p className="rc-body">{t('reincarnationModal.bodyLocked')}</p>
               {realmName && (
                 <div className="rc-karma-cartouche rc-karma-cartouche-realm">
-                  <span className="rc-karma-label">{t(‘reincarnationModal.youStandAt’)}</span>
+                  <span className="rc-karma-label">{t('reincarnationModal.youStandAt')}</span>
                   <span className="rc-karma-value">{realmName}</span>
                 </div>
               )}
               <div className="rc-actions rc-actions-single">
                 <button type="button" className="rc-btn rc-cancel" onClick={onCancel}>
-                  {t(‘reincarnationModal.understoodBtn’)}
+                  {t('reincarnationModal.understoodBtn')}
                 </button>
               </div>
             </>
