@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import REALMS, {
   stageHasSpark,
   CHAPTERS,
@@ -84,6 +85,7 @@ const GROUPS = groupRealms(REALMS);
  * the screen reads as a "lore arc" instead of a flat ladder.
  */
 function JourneyBody({ realmIndex }) {
+  const { t } = useTranslation('ui');
   const currentRef = useRef(null);
 
   // Scroll behavior on mount:
@@ -243,10 +245,10 @@ function JourneyBody({ realmIndex }) {
                     <span className="jc-realm-name">{group.name}</span>
                     <span className="jc-realm-tag">
                       {groupPast
-                        ? `${totalCount} ${totalCount === 1 ? 'stage' : 'stages'}`
+                        ? `${totalCount} ${totalCount === 1 ? t('journey.stage') : t('journey.stages')}`
                         : groupCurrent
                           ? `${completedCount + 1} / ${totalCount}`
-                          : `${totalCount} ${totalCount === 1 ? 'stage' : 'stages'}`}
+                          : `${totalCount} ${totalCount === 1 ? t('journey.stage') : t('journey.stages')}`}
                     </span>
                     {groupPast && <span className="jc-realm-check" aria-hidden="true">✓</span>}
                   </div>
@@ -281,8 +283,8 @@ function JourneyBody({ realmIndex }) {
                               {hasSpark ? (
                                 <span
                                   className="jc-stage-spark-mark"
-                                  title="Breaking through to this stage rewards a Qi Spark"
-                                  aria-label="Qi Spark reward"
+                                  title={t('journey.sparkRewardTitle')}
+                                  aria-label={t('journey.sparkRewardAriaLabel')}
                                 >✦</span>
                               ) : (
                                 <span className="jc-stage-spark-mark jc-stage-spark-empty" aria-hidden="true" />

@@ -1,5 +1,6 @@
 // @refresh reset
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_INDEX } from '../data/reincarnationTree';
 
 /**
@@ -7,6 +8,7 @@ import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_IND
  * Reincarnate button. Unlocks at Saint Early Stage.
  */
 function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTotal, realmIndex = 0, onReincarnate }) {
+  const { t } = useTranslation('ui');
   const [confirm, setConfirm] = useState(false);
   const [hover,   setHover]   = useState(null);
 
@@ -26,29 +28,29 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
   return (
     <div className="screen reinc-screen">
       <header className="coll-page-header">
-        <h1>Reincarnation</h1>
+        <h1>{t('reincarnation.title')}</h1>
         <span className="coll-page-subtitle">
-          Reset cultivation to claim Karma — spend it in the Eternal Tree for permanent buffs.
+          {t('reincarnation.subtitle')}
         </span>
       </header>
 
       {/* ── Stats row ─────────────────────────────────────────────────────── */}
       <div className="reinc-info-stats">
         <div className="reinc-stat">
-          <span className="reinc-stat-label">Karma</span>
+          <span className="reinc-stat-label">{t('reincarnation.karmaLabel')}</span>
           <span className="reinc-stat-value">{karma}</span>
         </div>
         <div className="reinc-stat">
-          <span className="reinc-stat-label">Lives</span>
+          <span className="reinc-stat-label">{t('reincarnation.livesLabel')}</span>
           <span className="reinc-stat-value">{lives}</span>
         </div>
         <div className="reinc-stat">
-          <span className="reinc-stat-label">Peak Progress</span>
+          <span className="reinc-stat-label">{t('reincarnation.peakProgressLabel')}</span>
           <span className="reinc-stat-value">{highestReached} / {PEAK_INDEX}</span>
         </div>
         <div className="reinc-stat">
-          <span className="reinc-stat-label">Peak Yield</span>
-          <span className="reinc-stat-value">{peakKarmaTotal} karma</span>
+          <span className="reinc-stat-label">{t('reincarnation.peakYieldLabel')}</span>
+          <span className="reinc-stat-value">{t('reincarnation.karmaUnit', { n: peakKarmaTotal })}</span>
         </div>
       </div>
 
@@ -56,11 +58,10 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
       {confirm ? (
         <div className="reinc-actions reinc-actions-confirm">
           <span className="reinc-locked-hint">
-            Rebirth wipes QI, realms, pills, inventory, artefacts, techniques and other
-            laws. Your active law, Karma and the Eternal Tree survive. Continue?
+            {t('reincarnation.confirmText')}
           </span>
-          <button className="reinc-btn-danger" onClick={doReincarnate}>Yes, reincarnate</button>
-          <button className="reinc-btn-secondary" onClick={() => setConfirm(false)}>Cancel</button>
+          <button className="reinc-btn-danger" onClick={doReincarnate}>{t('reincarnation.confirmBtn')}</button>
+          <button className="reinc-btn-secondary" onClick={() => setConfirm(false)}>{t('common.cancel')}</button>
         </div>
       ) : (
         <div className="reinc-actions">
@@ -68,12 +69,12 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
             className="reinc-btn-danger"
             onClick={() => setConfirm(true)}
             disabled={!canReincarnateNow}
-            title={canReincarnateNow ? undefined : 'Reach Saint realm in this life to reincarnate'}
+            title={canReincarnateNow ? undefined : t('reincarnation.lockedTitle')}
           >
-            Reincarnate
+            {t('reincarnation.reincarnateBtn')}
           </button>
           {!canReincarnateNow && (
-            <span className="reinc-locked-hint">Reach Saint realm to reincarnate</span>
+            <span className="reinc-locked-hint">{t('reincarnation.lockedHint')}</span>
           )}
         </div>
       )}
@@ -81,8 +82,8 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
       {/* ── Eternal Tree ──────────────────────────────────────────────────── */}
       <div className="reinc-tree-phase">
         <div className="reinc-tree-karma-bar">
-          <span className="reinc-tree-karma-label">Eternal Tree — Total Cost</span>
-          <span className="reinc-tree-karma-val">{TREE_TOTAL_COST} karma</span>
+          <span className="reinc-tree-karma-label">{t('reincarnation.treeLabel')}</span>
+          <span className="reinc-tree-karma-val">{t('reincarnation.karmaUnit', { n: TREE_TOTAL_COST })}</span>
         </div>
 
         <div className="reinc-tree-grid">
@@ -109,7 +110,7 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
                       {state === 'locked-prereq' ? '🔒 ' : ''}{node.label}
                     </span>
                     <span className="reinc-node-cost">
-                      {purchased ? '✓ Owned' : `${node.cost} karma`}
+                      {purchased ? t('reincarnation.nodeOwned') : t('reincarnation.karmaUnit', { n: node.cost })}
                     </span>
                     {hover === node.id && (
                       <div className="reinc-node-tooltip">{NODE_DESCRIPTIONS[node.id]}</div>

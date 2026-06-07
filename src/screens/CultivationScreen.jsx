@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
 import PavilionPlaque from '../components/PavilionPlaque';
 import ProducerDetailModal from '../components/ProducerDetailModal';
@@ -60,6 +61,7 @@ export default function CultivationScreen({
   // production denominator (otherwise the percentages would be off when
   // the Roster is contributing).
   const discipleMerge = useDiscipleMerge();
+  const { t } = useTranslation('ui');
 
   // Poll the cultivation refs ~10×/sec for the sticky header.
   // useCultivation deliberately never re-renders on qi/rate change, so we
@@ -275,11 +277,11 @@ export default function CultivationScreen({
           so the player recognises "this is a tablet of mine" on land. */}
       <header className="cs-qi-strip">
         <div className="cs-qi-strip-l">
-          <div className="cs-qi-strip-eyebrow">Reservoir</div>
+          <div className="cs-qi-strip-eyebrow">{t('cultivation.reservoirLabel')}</div>
           <div className="cs-qi-strip-amount">{fmt(qi)} Qi</div>
         </div>
         <div className="cs-qi-strip-r">
-          <div className="cs-qi-strip-rate-label">Flowing</div>
+          <div className="cs-qi-strip-rate-label">{t('cultivation.flowingLabel')}</div>
           <div className="cs-qi-strip-rate">+{fmtRate(rate)} / sec</div>
         </div>
       </header>
@@ -287,14 +289,14 @@ export default function CultivationScreen({
       {/* Sub-tab rail — shared .tab-rail primitive (same one the
           Spirit Bazaar uses). Non-sticky here because each sub-tab
           is its own scroll container, not a single long aisle. */}
-      <nav className="tab-rail" ref={railRef} aria-label="Sect sections">
+      <nav className="tab-rail" ref={railRef} aria-label={t('cultivation.navAriaLabel')}>
         <button
           type="button"
           data-tab="producers"
           className={`tab-rail-tab${tab === 'producers' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('producers')}
         >
-          Producers <span className="tab-rail-count">{producerCount || '—'}</span>
+          {t('cultivation.tabProducers')} <span className="tab-rail-count">{producerCount || '—'}</span>
         </button>
         <button
           type="button"
@@ -302,7 +304,7 @@ export default function CultivationScreen({
           className={`tab-rail-tab${tab === 'upgrades' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('upgrades')}
         >
-          Upgrades <span className="tab-rail-count">{upgradeCount || '—'}</span>
+          {t('cultivation.tabUpgrades')} <span className="tab-rail-count">{upgradeCount || '—'}</span>
         </button>
         <button
           type="button"
@@ -310,7 +312,7 @@ export default function CultivationScreen({
           className={`tab-rail-tab${tab === 'sparks' ? ' tab-rail-tab-active' : ''}`}
           onClick={() => setTab('sparks')}
         >
-          Sparks <span className="tab-rail-count">{sparkCount || '—'}</span>
+          {t('cultivation.tabSparks')} <span className="tab-rail-count">{sparkCount || '—'}</span>
         </button>
         <span className="tab-rail-indicator" ref={indicatorRef} aria-hidden="true" />
       </nav>
@@ -321,7 +323,7 @@ export default function CultivationScreen({
               Auto chip (Disciple's Diligence QoL). Lacquer chip
               treatment to match the Bazaar's category vocabulary. */}
           <div className="cs-buy-mode-row">
-            <span className="cs-buy-mode-label">Buy Mode</span>
+            <span className="cs-buy-mode-label">{t('cultivation.buyModeLabel')}</span>
             <button
               className={`cs-buy-chip${buyMode === 1 ? ' cs-buy-chip-on' : ''}`}
               onClick={() => setBuyMode(1)}
@@ -341,10 +343,10 @@ export default function CultivationScreen({
                 className={`cs-autobuy-chip${autoBuyEnabled ? ' cs-autobuy-chip-on' : ''}`}
                 onClick={onToggleAutoBuy}
                 aria-pressed={autoBuyEnabled}
-                aria-label={autoBuyEnabled ? 'Auto-buy is ON. Tap to disable.' : 'Auto-buy is OFF. Tap to enable.'}
+                aria-label={autoBuyEnabled ? t('cultivation.autoBuyOn') : t('cultivation.autoBuyOff')}
               >
                 <span className="cs-autobuy-dot" aria-hidden="true" />
-                Auto
+                {t('cultivation.autoLabel')}
               </button>
             )}
           </div>
@@ -441,9 +443,9 @@ export default function CultivationScreen({
       {tab === 'upgrades' && (
         visibleUpgrades.length === 0 ? (
           <div className="cs-upgrades-empty">
-            <div className="cs-upgrades-empty-title">No upgrades yet</div>
+            <div className="cs-upgrades-empty-title">{t('cultivation.noUpgradesTitle')}</div>
             <div className="cs-upgrades-empty-sub">
-              Buy producers and climb realms to unlock upgrades.
+              {t('cultivation.noUpgradesSub')}
             </div>
           </div>
         ) : (
@@ -452,8 +454,8 @@ export default function CultivationScreen({
               <section className="cs-up-section">
                 <header className="cs-up-section-head">
                   <span className="cs-up-section-lantern" />
-                  <span className="cs-up-section-title">Available</span>
-                  <span className="cs-up-section-tag">Inscribed tablets · one-time tribute</span>
+                  <span className="cs-up-section-title">{t('cultivation.upgradesAvailable')}</span>
+                  <span className="cs-up-section-tag">{t('cultivation.upgradesAvailableTag')}</span>
                   <span className="cs-up-section-count">{availableUpgrades.length}</span>
                 </header>
                 <div className="cs-up-grid">
@@ -473,8 +475,8 @@ export default function CultivationScreen({
               <section className="cs-up-section">
                 <header className="cs-up-section-head">
                   <span className="cs-up-section-lantern" />
-                  <span className="cs-up-section-title">Inscribed</span>
-                  <span className="cs-up-section-tag">Permanent tribute received</span>
+                  <span className="cs-up-section-title">{t('cultivation.upgradesOwned')}</span>
+                  <span className="cs-up-section-tag">{t('cultivation.upgradesOwnedTag')}</span>
                   <span className="cs-up-section-count">{ownedUpgrades.length}</span>
                 </header>
                 <div className="cs-up-chips">

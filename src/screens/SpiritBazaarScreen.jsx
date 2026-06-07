@@ -1,4 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   SHOP_ITEMS,
   SHOP_BUNDLES,
@@ -48,7 +49,8 @@ function BuffCountdown({ expiresAtMs }) {
     h > 0 ? `${h}h ${String(m).padStart(2, '0')}m`
   : m > 0 ? `${m}m ${String(s).padStart(2, '0')}s`
   :         `${s}s`;
-  return <span className="bls-buff-countdown">{label} left</span>;
+  const { t } = useTranslation('ui');
+  return <span className="bls-buff-countdown">{t('bazaar.timeLeft', { n: label })}</span>;
 }
 
 function getSkinSprites(item) {
@@ -136,6 +138,7 @@ function ParticleShowcase({ variant = '1' }) {
 }
 
 function SkinCard({ item, balance, onBuy, busy }) {
+  const { t } = useTranslation('ui');
   const sprites    = getSkinSprites(item);
   const revealed   = 3;
   const totalCount = sprites.length;
@@ -151,8 +154,8 @@ function SkinCard({ item, balance, onBuy, busy }) {
           <div className="bls-skin-card-name">{item.name}</div>
           <div className="bls-skin-card-kicker">
             {isParticles
-              ? 'Replaces your qi orb flow'
-              : `Evolves through ${totalCount} ${item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'forms'}`}
+              ? t('bazaar.particleKicker')
+              : t('bazaar.evolvesThrough', { n: totalCount })}
           </div>
         </div>
         <span className="bls-skin-card-slot">{slotLabel(item.cosmeticSlot)}</span>
@@ -187,7 +190,7 @@ function SkinCard({ item, balance, onBuy, busy }) {
         <span className="bls-skin-foot-label">
           {isParticles
             ? <>Live preview of the new <b>qi flow</b></>
-            : <><b>{revealed} of {totalCount}</b> {item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL ? 'tiers' : 'stances'} revealed</>}
+            : t('bazaar.stagesRevealed', { n: revealed, total: totalCount })}
         </span>
         <button
           type="button"
@@ -213,14 +216,15 @@ function SkinCard({ item, balance, onBuy, busy }) {
  * + bundle price + a single "Claim Pack" CTA.
  */
 function BundleCard({ bundle, balance, onBuy, busy }) {
+  const { t } = useTranslation('ui');
   const disabled = balance < bundle.cost || busy;
   const components = (bundle.components ?? [])
     .map(id => SHOP_ITEMS_BY_ID[id])
     .filter(Boolean);
   return (
     <div className="bls-bundle">
-      <span className="bls-bundle-ribbon">Theme Pack</span>
-      <span className="bls-bundle-save-ribbon">Save {bundle.saveAmount?.toLocaleString() ?? ''}</span>
+      <span className="bls-bundle-ribbon">{t('bazaar.themePack')}</span>
+      <span className="bls-bundle-save-ribbon">{t('bazaar.savePack', { n: bundle.saveAmount?.toLocaleString() ?? '' })}</span>
 
       <div className="bls-bundle-head">
         <div className="bls-bundle-name">{bundle.name}</div>
@@ -275,7 +279,7 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
 
       <div className="bls-bundle-foot">
         <div className="bls-bundle-price-stack">
-          <span className="bls-bundle-price-strike">{bundle.originalCost?.toLocaleString()} BL</span>
+          <span className="bls-bundle-price-strike">{t('bazaar.blPrice', { n: bundle.originalCost?.toLocaleString() })}</span>
           <span className="bls-bundle-price">
             <span className="bls-skin-buy-lotus" aria-hidden="true" />
             {bundle.cost.toLocaleString()}
@@ -287,7 +291,7 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
           onClick={() => onBuy(bundle.id)}
           disabled={disabled}
         >
-          Claim Pack
+          {t('bazaar.claimPack')}
         </button>
       </div>
     </div>
@@ -307,6 +311,7 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
  * is stripped here, because the duration chip carries that information.
  */
 function BuffCard({ item, ownership, balance, onBuy, busy }) {
+  const { t } = useTranslation('ui');
   const activeBuff = ownership.activeBuffs.find(b => b.id === item.id);
   const headline   = (() => {
     const e = item.effect;
@@ -333,7 +338,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
 
   return (
     <div className={`bls-buff-tile${activeBuff ? ' bls-buff-tile-active' : ''}`}>
-      {activeBuff && <span className="bls-buff-tile-ribbon">ACTIVE</span>}
+      {activeBuff && <span className="bls-buff-tile-ribbon">{t('bazaar.active')}</span>}
       <div className="bls-buff-tile-icon">{item.icon}</div>
       <div className="bls-buff-tile-headline">{headline}</div>
       <div className="bls-buff-tile-name">{cleanName}</div>
@@ -347,29 +352,30 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
         onClick={() => onBuy(item.id)}
         disabled={disabled}
       >
-        {item.cost} BL
+        {t('bazaar.blPrice', { n: item.cost })}
       </button>
     </div>
   );
 }
 
 function CompactRow({ item, ownership, balance, onBuy, busy }) {
+  const { t } = useTranslation('ui');
   const { state, label, disabled } = (() => {
     if (item.ownership === 'permanent' && ownership.hasQol(item.id)) {
-      return { state: 'owned', label: 'Owned', disabled: true };
+      return { state: 'owned', label: t('bazaar.owned'), disabled: true };
     }
     if (item.ownership === 'stackable') {
       const cur = ownership.getStack(item.id);
       const cap = item.maxStack ?? Infinity;
-      if (cur >= cap) return { state: 'maxed', label: `Maxed (${cur}/${cap})`, disabled: true };
+      if (cur >= cap) return { state: 'maxed', label: t('bazaar.maxed', { n: cur, max: cap }), disabled: true };
     }
     if (item.ownership === 'oneshot') {
       const cur = ownership.getConsumable(item.id);
       if (cur > 0) {
-        return { state: 'owned-some', label: `${item.cost} BL`, disabled: balance < item.cost || busy };
+        return { state: 'owned-some', label: t('bazaar.blPrice', { n: item.cost }), disabled: balance < item.cost || busy };
       }
     }
-    return { state: 'buyable', label: `${item.cost} BL`, disabled: balance < item.cost || busy };
+    return { state: 'buyable', label: t('bazaar.blPrice', { n: item.cost }), disabled: balance < item.cost || busy };
   })();
 
   const stackCount   = item.ownership === 'stackable' ? ownership.getStack(item.id) : 0;
@@ -406,13 +412,14 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
  * layer; this component is dumb.
  */
 function FeaturedHero({ featured, balance, busy, onBuy }) {
+  const { t } = useTranslation('ui');
   if (!featured) return null;
   const { item, originalCost, discountedCost, endsAtMs } = featured;
   const disabled = balance < discountedCost || busy;
   const isSkin = item.ownership === 'cosmetic';
   return (
     <div className="sbz-featured" aria-label="Today's pick">
-      <span className="sbz-featured-ribbon">Today's Pick</span>
+      <span className="sbz-featured-ribbon">{t('bazaar.todaysPick')}</span>
 
       <div className="sbz-featured-preview">
         <span className="sbz-featured-halo" aria-hidden="true" />
@@ -444,7 +451,7 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
       </div>
 
       <div className="sbz-featured-body">
-        <span className="sbz-featured-eyebrow">Limited Offering</span>
+        <span className="sbz-featured-eyebrow">{t('bazaar.limitedOffering')}</span>
         <span className="sbz-featured-name">{item.name}</span>
         <span className="sbz-featured-desc">{item.desc}</span>
 
@@ -469,6 +476,7 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
 }
 
 function FeaturedCountdown({ endsAtMs }) {
+  const { t } = useTranslation('ui');
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 60_000);
@@ -479,7 +487,7 @@ function FeaturedCountdown({ endsAtMs }) {
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const label = h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
-  return <span className="sbz-featured-timer">Resets in {label}</span>;
+  return <span className="sbz-featured-timer">{t('bazaar.resetsIn', { time: label })}</span>;
 }
 
 /**
@@ -499,6 +507,7 @@ export default function SpiritBazaarScreen({
   onOpenTopUp,
   onOpenCodex,
 }) {
+  const { t } = useTranslation('ui');
   const [busy, setBusy]   = useState(false);
   const [flash, setFlash] = useState(null);
   const [activeCat, setActiveCat] = useState('buff');
@@ -555,9 +564,9 @@ export default function SpiritBazaarScreen({
     setBusy(false);
     if (result.ok) {
       const item = SHOP_ITEMS_BY_ID[itemId];
-      setFlash({ msg: `Purchased: ${item?.name ?? itemId}`, kind: 'ok' });
+      setFlash({ msg: t('bazaar.purchasedFlash', { name: item?.name ?? itemId }), kind: 'ok' });
     } else {
-      setFlash({ msg: result.error ?? 'Purchase failed', kind: 'err' });
+      setFlash({ msg: result.error ?? t('bazaar.purchaseFailed'), kind: 'err' });
     }
   };
 
@@ -639,13 +648,13 @@ export default function SpiritBazaarScreen({
 
       <header className="sbz-screen-head sbz-screen-head-compact">
         <div className="sbz-head-row">
-          <button className="sbz-back-chip" onClick={onBack} aria-label="Back">
-            <span className="sbz-back-arrow">‹</span> Back
+          <button className="sbz-back-chip" onClick={onBack} aria-label={t('common.back')}>
+            <span className="sbz-back-arrow">‹</span> {t('bazaar.back')}
           </button>
 
           <div className="sbz-title-block sbz-title-block-compact">
-            <div className="sbz-eyebrow">The Spirit</div>
-            <div className="sbz-title">Bazaar</div>
+            <div className="sbz-eyebrow">{t('bazaar.eyebrow')}</div>
+            <div className="sbz-title">{t('bazaar.title')}</div>
           </div>
 
           <div className="sbz-balance sbz-balance-compact">
@@ -657,7 +666,7 @@ export default function SpiritBazaarScreen({
             />
             <span className="sbz-balance-amount">{balance.toLocaleString()}</span>
             <button type="button" className="sbz-topup-chip" onClick={onOpenTopUp}>
-              + Top Up
+              {t('bazaar.topUp')}
             </button>
           </div>
         </div>
@@ -678,14 +687,14 @@ export default function SpiritBazaarScreen({
           />
         </div>
 
-        <nav className="tab-rail tab-rail-sticky" ref={railRef} aria-label="Bazaar sections">
+        <nav className="tab-rail tab-rail-sticky" ref={railRef} aria-label={t('bazaar.navAriaLabel')}>
           <button
             type="button"
             data-cat="buff"
             className={`tab-rail-tab${activeCat === 'buff' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-buff', 'buff')}
           >
-            Buffs <span className="tab-rail-count">{buffs.length || '—'}</span>
+            {t('bazaar.tabBuffs')} <span className="tab-rail-count">{buffs.length || '—'}</span>
           </button>
           <button
             type="button"
@@ -693,7 +702,7 @@ export default function SpiritBazaarScreen({
             className={`tab-rail-tab${activeCat === 'consumable' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-consumable', 'consumable')}
           >
-            Consumables <span className="tab-rail-count">{consumables.length || '—'}</span>
+            {t('bazaar.tabConsumables')} <span className="tab-rail-count">{consumables.length || '—'}</span>
           </button>
           <button
             type="button"
@@ -701,7 +710,7 @@ export default function SpiritBazaarScreen({
             className={`tab-rail-tab${activeCat === 'qol' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-qol', 'qol')}
           >
-            QoL <span className="tab-rail-count">{qol.length || '—'}</span>
+            {t('bazaar.tabQol')} <span className="tab-rail-count">{qol.length || '—'}</span>
           </button>
           <button
             type="button"
@@ -709,15 +718,15 @@ export default function SpiritBazaarScreen({
             className={`tab-rail-tab${activeCat === 'cosmetic' ? ' tab-rail-tab-active' : ''}`}
             onClick={() => jumpTo('sec-cosmetic', 'cosmetic')}
           >
-            Cosmetics <span className="tab-rail-count">{cosmeticsCount || '—'}</span>
+            {t('bazaar.tabCosmetics')} <span className="tab-rail-count">{cosmeticsCount || '—'}</span>
           </button>
           <span className="tab-rail-indicator" ref={indicatorRef} aria-hidden="true" />
         </nav>
 
         <section id="sec-buff" className="bls-section">
           <header className="bls-section-header">
-            <h3 className="bls-section-title">Buffs</h3>
-            <span className="bls-section-tag">Power-ups · stack with everything</span>
+            <h3 className="bls-section-title">{t('bazaar.sectionBuffs')}</h3>
+            <span className="bls-section-tag">{t('bazaar.buffsTag')}</span>
             <span className="bls-section-count">{buffs.length}</span>
           </header>
           <div className="bls-buff-grid">
@@ -736,12 +745,12 @@ export default function SpiritBazaarScreen({
 
         <section id="sec-consumable" className="bls-section">
           <header className="bls-section-header">
-            <h3 className="bls-section-title">Consumables</h3>
-            <span className="bls-section-tag">One-shot talismans · keep until used</span>
+            <h3 className="bls-section-title">{t('bazaar.sectionConsumables')}</h3>
+            <span className="bls-section-tag">{t('bazaar.consumablesTag')}</span>
             <span className="bls-section-count">{consumables.length}</span>
           </header>
           {consumables.length === 0 ? (
-            <div className="bls-empty">More relics coming to the shelves…</div>
+            <div className="bls-empty">{t('bazaar.comingSoon')}</div>
           ) : (
             consumables.map(item => (
               <CompactRow
@@ -758,12 +767,12 @@ export default function SpiritBazaarScreen({
 
         <section id="sec-qol" className="bls-section">
           <header className="bls-section-header">
-            <h3 className="bls-section-title">Quality of Life</h3>
-            <span className="bls-section-tag">Permanent unlocks · less friction, more cultivation</span>
+            <h3 className="bls-section-title">{t('bazaar.sectionQol')}</h3>
+            <span className="bls-section-tag">{t('bazaar.qolTag')}</span>
             <span className="bls-section-count">{qol.length}</span>
           </header>
           {qol.length === 0 ? (
-            <div className="bls-empty">More relics coming to the shelves…</div>
+            <div className="bls-empty">{t('bazaar.comingSoon')}</div>
           ) : (
             qol.map(item => (
               <CompactRow
@@ -783,15 +792,15 @@ export default function SpiritBazaarScreen({
             move to Codex > Wardrobe. */}
         <section id="sec-cosmetic" className="bls-section">
           <header className="bls-section-header">
-            <h3 className="bls-section-title">Cosmetics</h3>
-            <span className="bls-section-tag">Skins · theme packs · evolves with you</span>
+            <h3 className="bls-section-title">{t('bazaar.sectionCosmetics')}</h3>
+            <span className="bls-section-tag">{t('bazaar.cosmeticsTag')}</span>
             <span className="bls-section-count">{cosmeticsCount}</span>
           </header>
 
           {availableBundles.length > 0 && (
             <div className="bls-cosmetic-section">
               <div className="bls-cosmetic-section-label bls-cosmetic-section-label-bundles">
-                Theme Packs
+                {t('bazaar.themePacks')}
                 <span className="bls-cosmetic-section-count">{availableBundles.length}</span>
               </div>
               {availableBundles.map(b => (
@@ -829,7 +838,7 @@ export default function SpiritBazaarScreen({
 
           {availableBundles.length === 0 && cosmeticsCount === 0 && (
             <div className="bls-empty">
-              You own every skin available right now. Find them in <button type="button" className="bls-inline-link" onClick={onOpenCodex}>Codex › Wardrobe</button>.
+              {t('bazaar.allOwned')} <button type="button" className="bls-inline-link" onClick={onOpenCodex}>{t('bazaar.codexWardrobeLink')}</button>
             </div>
           )}
         </section>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import JourneyBody from '../components/JourneyBody';
 import REALMS, {
   CHAPTERS,
@@ -61,6 +62,7 @@ function fmtRate(n) {
  * the icon frame.
  */
 function HeroHeader({ cultivation, vfxEnabled }) {
+  const { t } = useTranslation('ui');
   const [, force] = useState(0);
   useEffect(() => {
     const id = setInterval(() => force(t => (t + 1) % 1000), 250);
@@ -130,7 +132,7 @@ function HeroHeader({ cultivation, vfxEnabled }) {
             : <span className="jc-hero-icon-fallback">{chapterGlyph}</span>}
         </div>
         <div className="jc-hero-text">
-          <span className="jc-hero-eyebrow">Current Realm</span>
+          <span className="jc-hero-eyebrow">{t('journey.currentRealm')}</span>
           <span className="jc-hero-name">{realmMajor}</span>
           {realmStage && <span className="jc-hero-stage">{realmStage}</span>}
           <span className="jc-hero-chapter">
@@ -142,7 +144,7 @@ function HeroHeader({ cultivation, vfxEnabled }) {
       {qiCost > 0 && (
         <div className="jc-hero-meter">
           <div className="jc-hero-meter-head">
-            <span>Next Breakthrough</span>
+            <span>{t('journey.nextBreakthrough')}</span>
             <span><b>{fmtQi(qiProgress)}</b> / {fmtQi(qiCost)} Qi</span>
           </div>
           <div className="jc-hero-bar">
@@ -165,20 +167,20 @@ function HeroHeader({ cultivation, vfxEnabled }) {
               player's current rate hasn't cleared it yet. */}
           <dl className="jc-hero-foot jc-hero-foot-stacked">
             <div className="jc-hero-foot-row">
-              <dt className="jc-hero-foot-label">Gate</dt>
+              <dt className="jc-hero-foot-label">{t('journey.gate')}</dt>
               {gateRate > 0 ? (
                 <dd
                   className={`jc-hero-foot-value jc-hero-gate${qiRate < gateRate ? ' jc-hero-gate-warn' : ''}`}
                 >
-                  {fmtRate(gateRate)} qi/s required
+                  {t('journey.gateRequired', { rate: fmtRate(gateRate) })}
                 </dd>
               ) : (
-                <dd className="jc-hero-foot-value jc-hero-gate-none">None</dd>
+                <dd className="jc-hero-foot-value jc-hero-gate-none">{t('journey.gateNone')}</dd>
               )}
             </div>
             <div className="jc-hero-foot-row">
-              <dt className="jc-hero-foot-label">Current</dt>
-              <dd className="jc-hero-foot-value">{fmtRate(qiRate)} qi/s</dd>
+              <dt className="jc-hero-foot-label">{t('journey.current')}</dt>
+              <dd className="jc-hero-foot-value">{t('journey.currentRate', { rate: fmtRate(qiRate) })}</dd>
             </div>
           </dl>
         </div>
