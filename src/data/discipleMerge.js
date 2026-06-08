@@ -28,9 +28,14 @@
  * Persistence: `mai_disciple_merge` in localStorage. Module is pure (no
  * React); the React seam lives in hooks/useDiscipleMerge.js.
  *
- * Sprite economy: T1–T4 each get one of the four producer disciple sprites
- * (bronze/silver/gold/mythic); T5–T10 reuse the mythic sprite with a
- * multiplier badge (×2…×7) until bespoke art lands.
+ * Sprite economy: T1-T5 each get a unique producer disciple sprite
+ * (bronze / silver / gold / mythic / transcended); T6-T10 reuse the
+ * transcended sprite with a multiplier badge (×2..×6) until each top
+ * rank gets bespoke art. T5 Elder is the first appearance of the new
+ * Transcended art on the roster — previously the entire upper half of
+ * the ladder rendered the Mythic sprite, which made the visual climb
+ * stall at T4 and never feel like it landed the Transcended tier the
+ * disciple producer ladder now exposes.
  *
  * ALL numeric values here are STARTING VALUES — tune via sim before they
  * leave the prototype. The two master levers are MERIT_RATE (sets pacing
@@ -44,16 +49,16 @@ const KEY = 'mai_disciple_merge';
 // Tier ladder (unchanged). Values double for board-sum arithmetic.
 export const TIERS = [
   null,
-  { rank: 'Outer Disciple',  glyph: '徒', value: 1,   sprite: '/sprites/producers/p_disciple_bronze.png',  badge: null  },
-  { rank: 'Inner Disciple',  glyph: '弟', value: 2,   sprite: '/sprites/producers/p_disciple_silver.png',  badge: null  },
-  { rank: 'Core Disciple',   glyph: '核', value: 4,   sprite: '/sprites/producers/p_disciple_gold.png',    badge: null  },
-  { rank: 'Sword Disciple',  glyph: '劍', value: 8,   sprite: '/sprites/producers/p_disciple_mythic.png',  badge: null  },
-  { rank: 'Elder',           glyph: '長', value: 16,  sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×2'  },
-  { rank: 'Senior Elder',    glyph: '尊', value: 32,  sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×3'  },
-  { rank: 'Hall Master',     glyph: '主', value: 64,  sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×4'  },
-  { rank: 'Sect Master',     glyph: '宗', value: 128, sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×5'  },
-  { rank: 'Patriarch',       glyph: '祖', value: 256, sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×6'  },
-  { rank: 'Ancestor',        glyph: '聖', value: 512, sprite: '/sprites/producers/p_disciple_mythic.png',  badge: '×7'  },
+  { rank: 'Outer Disciple',  glyph: '徒', value: 1,   sprite: '/sprites/producers/p_disciple_bronze.png',      badge: null  },
+  { rank: 'Inner Disciple',  glyph: '弟', value: 2,   sprite: '/sprites/producers/p_disciple_silver.png',      badge: null  },
+  { rank: 'Core Disciple',   glyph: '核', value: 4,   sprite: '/sprites/producers/p_disciple_gold.png',        badge: null  },
+  { rank: 'Sword Disciple',  glyph: '劍', value: 8,   sprite: '/sprites/producers/p_disciple_mythic.png',      badge: null  },
+  { rank: 'Elder',           glyph: '長', value: 16,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: null  },
+  { rank: 'Senior Elder',    glyph: '尊', value: 32,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×2'  },
+  { rank: 'Hall Master',     glyph: '主', value: 64,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×3'  },
+  { rank: 'Sect Master',     glyph: '宗', value: 128, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×4'  },
+  { rank: 'Patriarch',       glyph: '祖', value: 256, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×5'  },
+  { rank: 'Ancestor',        glyph: '聖', value: 512, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×6'  },
 ];
 
 // ── Economy levers (STARTING VALUES) ─────────────────────────────────────────
