@@ -164,7 +164,9 @@ const _SFX_BASE = {
   combat_defeat:       { src: sfx('combat_defeat',       'ogg', 'mp3') },
 
   // ── Qi Crystal ────────────────────────────────────────────────────────────
-  crystal_tap:         { src: sfx('crystal_tap',         'ogg', 'mp3') },
+  // Tapped constantly to collect the reservoir, so a 4-sample random pool
+  // avoids the machine-gun repeat feel (same model as divine_qi_collect).
+  crystal_tap:         { variations: sfxVariants('crystal_tap', 4, 'ogg', 'mp3') },
   crystal_tap_max:     { src: sfx('crystal_tap_max',     'ogg', 'mp3') },
   crystal_level_up:    { src: sfx('crystal_level_up',    'ogg', 'mp3') },
   // Crystal evolution, split into four beats (see CrystalEvolutionOverlay):

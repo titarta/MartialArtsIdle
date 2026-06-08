@@ -47,7 +47,7 @@ const SFX_GROUPS = [
   {
     label: 'Qi Crystal',
     items: [
-      { id: 'crystal_tap',        label: 'Crystal Tap',        desc: 'Tap the crystal to collect its reservoir'                    },
+      { id: 'crystal_tap',        label: 'Crystal Tap',        desc: 'Tap the crystal to collect its reservoir. 4-sample pool (random) to avoid repetition.', variants: 4 },
       { id: 'crystal_tap_max',    label: 'Crystal Tap (Full)', desc: 'Tap when the reservoir is at full cap, for a bigger payoff feel' },
       { id: 'crystal_level_up',   label: 'Crystal Level Up',   desc: 'Crystal gains a level from refining (no visual tier change)'  },
       { id: 'crystal_evolve_start',    label: 'Crystal Evolve: Start',    desc: 'Pickup / lift as the evolution cinematic begins' },
