@@ -5,6 +5,7 @@ import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import ActiveBuffsChip from '../components/ActiveBuffsChip';
+import CrimsonOrbitLayer from '../components/CrimsonOrbitLayer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
@@ -3147,6 +3148,12 @@ function HomeScreen({
                 className={`home-cultivator-sprite${cultivatorPose === 'focused' ? '' : ' home-cultivator-sprite-fade'}`}
                 draggable="false"
               />
+              {/* Crimson Aura orbital VFX — mixed crimson orbs + crystal shards on
+                  two crossed elliptical rings. Self-gates on the body class set in
+                  App.jsx; lives inside the fighter-stage so the bodies cross in
+                  front of (z:3) and behind (z:1) the cultivator sprite (z:2), and
+                  the wider-than-sprite orbits are not clipped (overflow:visible). */}
+              <CrimsonOrbitLayer />
             </div>
           </div>
           </div>{/* end home-crystal-char-stack */}

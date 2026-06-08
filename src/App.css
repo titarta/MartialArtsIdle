@@ -20188,6 +20188,38 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 /* Player's graphics choice: drop the halo entirely when VFX are off. */
 .vfx-disabled .home-cultivator-halo { display: none; }
 
+/* ── Crimson Aura orbital VFX ────────────────────────────────────────────────
+   Mixed crimson orbs + crystal shards orbiting the cultivator on two crossed
+   rings (see CrimsonOrbitLayer.jsx). The wrapper deliberately carries NO
+   z-index so it does NOT form a stacking context: each body's per-frame
+   z-index (1 behind / 3 front) then competes directly with the cultivator
+   sprite (z:2) for real in-front / behind occlusion. */
+.crimson-orbit-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.crimson-orbit-body {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  /* image-rendering intentionally omitted — it follows the global
+     Settings -> Rendering toggle via the `.rendering-pixelated img` rule. */
+  filter: drop-shadow(0 0 3px rgba(226, 59, 84, 0.5));
+}
+/* Player turned VFX off -> drop the orbit entirely. */
+.vfx-disabled .crimson-orbit-layer { display: none; }
+
+/* While Crimson Aura is active, lift the cultivator sprite into a taller
+   z-band (z:10) so the orbiting bodies sort continuously BEHIND it (z 2..9)
+   yet always stay ABOVE the Heavenly Qi halo (z:1). The orbit z formula in
+   CrimsonOrbitLayer.jsx is centred on this value. */
+body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
+  z-index: 10;
+}
+
 /* Reduced motion: keep the halo visible but stop the spin/breathe. */
 @media (prefers-reduced-motion: reduce) {
   .home-cultivator-halo,
