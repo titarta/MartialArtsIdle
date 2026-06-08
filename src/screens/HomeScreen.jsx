@@ -174,7 +174,7 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
     <div className={cls}>
       <span ref={textRef} className="qi-rate-value">—</span>
       {boosting      && <span ref={boostRef} className="qi-rate-badge qi-rate-badge-cf">×3</span>}
-      {adBoostActive && <span className="qi-rate-badge qi-rate-badge-ad">×2</span>}
+      {adBoostActive && <span className="qi-rate-badge qi-rate-badge-ad">×1.5</span>}
     </div>
   );
 }
@@ -264,7 +264,7 @@ function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, 
 // ── Heavenly Qi — Petition Tablet ───────────────────────────────────────────
 /**
  *  Vertical hanging plaque that lives in the top-right of the cultivation
- *  scene like a temple petition tablet. The offer (×2 qi/s · 30 min) is
+ *  scene like a temple petition tablet. The offer (×1.5 qi/s · 30 min) is
  *  *inscribed on the plaque* so first-time players don't have to tap to
  *  discover what it does. Three states share one frame:
  *
@@ -290,7 +290,7 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
       <HQTablet
         state="active"
         kicker={t('home.channeling', { defaultValue: 'Channeling' })}
-        offer="×2 QI/S"
+        offer="×1.5 QI/S"
         cta={adBoostRemaining}
         title={t('home.heavenlyQiActive', { defaultValue: 'Heavenly Qi active' })}
       />
@@ -322,7 +322,7 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     <HQTablet
       state="ready"
       kicker={t('home.heavenlyQi', { defaultValue: 'Heavenly Qi' })}
-      offer="×2 QI/S"
+      offer="×1.5 QI/S"
       offerDur="30 MIN"
       cta={isLoading
         ? t('home.channeling', { defaultValue: 'Channeling…' })
@@ -924,7 +924,7 @@ const QI_FLOW_RING_MIN_PX = 110;
 const QI_FLOW_RING_MAX_PX = 180;
 // Bumped baseline + multiplier coefficient so the stream is clearly
 // VISIBLE at idle and dramatically denser when boosted. Heavenly Qi
-// (×2) and Focus (×3) combined should make the cultivator visibly
+// (×1.5) and Focus (×3) combined should make the cultivator visibly
 // drinking in qi from all directions.
 const QI_FLOW_BASE_RATE   = 3.0;  // particles/sec at effective ×1
 const QI_FLOW_RATE_K      = 5.5;  // sqrt(eff-1) coefficient
