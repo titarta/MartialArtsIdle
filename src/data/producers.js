@@ -68,16 +68,26 @@ export function getSpriteTier(owned, maxIdx = SPRITE_TIERS.length - 1) {
   return resolved;
 }
 
-/** Producer-aware tier resolution. Respects per-producer gating fields:
- *    `transcendedNode`  — caps tier at Mythic (idx 3) until the named
- *                          Eternal Tree node is purchased.
- *  Consumers pass `treeMods` (the tree.modifiers object from
- *  useReincarnationTree) and `producer` so the gate flag is checked. */
+/** Producer-aware tier resolution.
+ *
+ *  Transcended (idx 4) is OPT-IN per producer. Producers must explicitly
+ *  declare a `transcendedNode` field (an Eternal Tree node id) to gain
+ *  access to the 5th tier, AND that node must be purchased. Without the
+ *  field, the producer is capped at Mythic (idx 3) no matter how many
+ *  are owned — so the 9 producers that don't yet have Transcended art
+ *  (everyone except the disciple as of 2026-06-08) never advance past
+ *  Mythic, never show the chrome-rose vertical bar, never fire a phantom
+ *  tier-up animation at 100 owned.
+ *
+ *  Adding Transcended to another producer later is two edits: drop the
+ *  new sprite into the producer's `sprites` array AND set its
+ *  `transcendedNode` to whatever Eternal Tree node should gate it. */
 export function resolveTierFor(producer, owned, treeMods = {}) {
   if (!owned || owned < 1) return null;
-  let maxIdx = SPRITE_TIERS.length - 1;
-  if (producer?.transcendedNode === 'disc_transcend' && !treeMods.discipleTranscendUnlocked) {
-    maxIdx = 3; // cap at Mythic until the Eternal Tree node is purchased
+  // Default cap = Mythic. Transcended is per-producer opt-in.
+  let maxIdx = 3;
+  if (producer?.transcendedNode === 'disc_transcend' && treeMods.discipleTranscendUnlocked) {
+    maxIdx = 4;
   }
   return getSpriteTier(owned, maxIdx);
 }
