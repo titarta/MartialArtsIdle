@@ -110,8 +110,8 @@ const CRYSTAL_TAP = [
 const FOCUS_MULT = [
   { id: 'u_focus_1', name: 'Deeper Breath I',   cost:           5_000, realm:  9, add: 35  },
   { id: 'u_focus_2', name: 'Deeper Breath II',  cost:         100_000, realm: 17, add: 35  },
-  { id: 'u_focus_3', name: 'Deeper Breath III', cost:       2_000_000, realm: 29, add: 35  },
-  { id: 'u_focus_4', name: 'Deeper Breath IV',  cost: 100_000_000_000, realm: 44, add: 75  },
+  { id: 'u_focus_3', name: 'Deeper Breath III', cost:       2_000_000, realm: 32, add: 35  },
+  { id: 'u_focus_4', name: 'Deeper Breath IV',  cost: 100_000_000_000, realm: 52, add: 75  },
 ].map(u => ({
   id:        u.id,
   category:  'focus_mult',
@@ -129,8 +129,8 @@ const FOCUS_MULT = [
 const OFFLINE_RATE = [
   { id: 'u_offline_rate_1', name: 'Idle Cultivation I',   add: 0.05, cost:        50_000, realm:  9 },
   { id: 'u_offline_rate_2', name: 'Idle Cultivation II',  add: 0.05, cost:    50_000_000, realm: 17 },
-  { id: 'u_offline_rate_3', name: 'Idle Cultivation III', add: 0.05, cost: 5_000_000_000, realm: 27 },
-  { id: 'u_offline_rate_4', name: 'Idle Cultivation IV',  add: 0.05, cost: 500_000_000_000, realm: 38 },
+  { id: 'u_offline_rate_3', name: 'Idle Cultivation III', add: 0.05, cost: 5_000_000_000, realm: 30 },
+  { id: 'u_offline_rate_4', name: 'Idle Cultivation IV',  add: 0.05, cost: 500_000_000_000, realm: 44 },
 ].map(u => ({
   id:        u.id,
   category:  'offline_rate',
@@ -148,8 +148,8 @@ const OFFLINE_RATE = [
 const OFFLINE_CAP = [
   { id: 'u_offline_cap_1', name: 'Deeper Slumber I',   addH: 4, cost:        250_000, realm: 13 },
   { id: 'u_offline_cap_2', name: 'Deeper Slumber II',  addH: 4, cost:    250_000_000, realm: 20 },
-  { id: 'u_offline_cap_3', name: 'Deeper Slumber III', addH: 4, cost:  50_000_000_000, realm: 30 },
-  { id: 'u_offline_cap_4', name: 'Deeper Slumber IV',  addH: 4, cost: 5_000_000_000_000, realm: 41 },
+  { id: 'u_offline_cap_3', name: 'Deeper Slumber III', addH: 4, cost:  50_000_000_000, realm: 34 },
+  { id: 'u_offline_cap_4', name: 'Deeper Slumber IV',  addH: 4, cost: 5_000_000_000_000, realm: 48 },
 ].map(u => ({
   id:        u.id,
   category:  'offline_cap',

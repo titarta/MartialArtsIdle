@@ -109,18 +109,21 @@ const _enqueuedBreakthroughIds = new Set();
 
 function getCultivatorTier(realmIndex) {
   let t = 0;
-  if (realmIndex >= 10) t = 1;
-  if (realmIndex >= 14) t = 2;
-  if (realmIndex >= 18) t = 3;
-  if (realmIndex >= 21) t = 4;
-  if (realmIndex >= 24) t = 5;
-  if (realmIndex >= 27) t = 6;
-  if (realmIndex >= 30) t = 7;
-  if (realmIndex >= 33) t = 8;
-  if (realmIndex >= 36) t = 9;
-  if (realmIndex >= 39) t = 10;
-  if (realmIndex >= 42) t = 11;
-  if (realmIndex >= 45) t = 12;
+  // Thresholds = each realm's FIRST stage index. Updated 2026-06-08 for the
+  // uniform 4-stage realm restructure (9 realms gained a Peak stage, shifting
+  // every index from Immortal Ascension onward).
+  if (realmIndex >= 10) t = 1;   // Qi Transformation
+  if (realmIndex >= 14) t = 2;   // True Element
+  if (realmIndex >= 18) t = 3;   // Separation & Reunion
+  if (realmIndex >= 22) t = 4;   // Immortal Ascension
+  if (realmIndex >= 26) t = 5;   // Saint
+  if (realmIndex >= 30) t = 6;   // Saint King
+  if (realmIndex >= 34) t = 7;   // Origin Returning
+  if (realmIndex >= 38) t = 8;   // Origin King
+  if (realmIndex >= 42) t = 9;   // Void King
+  if (realmIndex >= 46) t = 10;  // Dao Source
+  if (realmIndex >= 50) t = 11;  // Emperor Realm
+  if (realmIndex >= 54) t = 12;  // Open Heaven
   // Fall back to the highest done tier ≤ t (avoids 404s for tiers not yet generated)
   for (let i = t; i >= 0; i--) {
     if (CULTIVATOR_DONE_TIERS.has(i)) return i;

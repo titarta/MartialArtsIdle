@@ -126,7 +126,7 @@ function StatsContent({ cultivation, artefacts, pills, tree }) {
 
   const lawCtx = buildContext({
     inCombat: false, realmIndex, lawElement: activeLaw?.element,
-    isAtPeak: realmIndex >= 46,
+    isAtPeak: realmIndex >= 55,
     equippedArtefactCount: artefacts?.owned.filter(o => Object.values(artefacts.equipped ?? {}).includes(o.uid)).length ?? 0,
   });
   const lawBundle = evaluateLawUniques(activeLaw, lawCtx);

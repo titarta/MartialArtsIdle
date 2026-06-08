@@ -303,7 +303,7 @@ export default function EternalTreeScreen({
   const selectedNode  = selectedNodeId ? ALL_NODES_BY_ID[selectedNodeId] : null;
   const selectedState = selectedNode && !selectedNode.placeholder ? nodeStates[selectedNode.id] : null;
   const action        = detailAction(selectedNode, selectedState, karma);
-  const canReincarnate   = realmIndex >= 24;
+  const canReincarnate   = realmIndex >= 26; // Saint Early (post 4-stage realm restructure)
   const qiToNext = Math.max(0, (qiForNextKarma ?? 0) - (cumulativeQi ?? 0));
   const progress = qiForNextKarma > 0
     ? Math.max(0, Math.min(1, (cumulativeQi ?? 0) / qiForNextKarma))

@@ -169,8 +169,8 @@ const PRODUCERS = [
     startCost:     20000000,
     startQiPerSec: 7800,
     costScaling:   1.22,
-    // 2026-05-21 Dial-8: realm 23 → 21 (IA 1st instead of IA 3rd).
-    unlock:        { type: 'realm', minRealmIndex: 21 },
+    // 2026-05-21 Dial-8: IA 1st. 2026-06-08: 21 → 22 (IA Early, 4-stage restructure).
+    unlock:        { type: 'realm', minRealmIndex: 22 },
     sprites:       [
       '/sprites/producers/p_sect_followers_bronze.png',
       '/sprites/producers/p_sect_followers_silver.png',
@@ -185,8 +185,8 @@ const PRODUCERS = [
     startCost:     330000000,
     startQiPerSec: 44000,
     costScaling:   1.22,
-    // 2026-05-21 Dial-8: realm 29 → 27 (SK 1st instead of SK 3rd).
-    unlock:        { type: 'realm', minRealmIndex: 27 },
+    // 2026-05-21 Dial-8: SK 1st. 2026-06-08: 27 → 30 (Saint King Early, 4-stage restructure).
+    unlock:        { type: 'realm', minRealmIndex: 30 },
     sprites:       [
       '/sprites/producers/p_void_bronze.png',
       '/sprites/producers/p_void_silver.png',
@@ -201,8 +201,8 @@ const PRODUCERS = [
     startCost:     5100000000,
     startQiPerSec: 260000,
     costScaling:   1.22,
-    // 2026-05-21 Dial-8: realm 35 → 33 (OK 1st instead of OK 3rd).
-    unlock:        { type: 'realm', minRealmIndex: 33 },
+    // 2026-05-21 Dial-8: OK 1st. 2026-06-08: 33 → 38 (Origin King Early, 4-stage restructure).
+    unlock:        { type: 'realm', minRealmIndex: 38 },
     sprites:       [
       '/sprites/producers/p_dragon_bronze.png',
       '/sprites/producers/p_dragon_silver.png',
@@ -217,8 +217,8 @@ const PRODUCERS = [
     startCost:     75000000000,
     startQiPerSec: 1600000,
     costScaling:   1.22,
-    // 2026-05-21 Dial-8: realm 44 → 42 (Emperor 1st instead of Emperor 3rd).
-    unlock:        { type: 'realm', minRealmIndex: 42 },
+    // 2026-05-21 Dial-8: Emperor 1st. 2026-06-08: 42 → 50 (Emperor Realm Early, 4-stage restructure).
+    unlock:        { type: 'realm', minRealmIndex: 50 },
     sprites:       [
       '/sprites/producers/p_phoenix_bronze.png',
       '/sprites/producers/p_phoenix_silver.png',

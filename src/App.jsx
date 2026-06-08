@@ -819,7 +819,7 @@ function AppInner() {
   // it for the first time. Guard with > 0 prev so a save-load straight
   // into Saint doesn't fire on every render.
   useEffect(() => {
-    if (cultivation.realmIndex >= 24) {
+    if (cultivation.realmIndex >= 26) {
       fireTutorialOnce(TUTORIAL_IDS.FIRST_SAINT, enqueue);
     }
   }, [cultivation.realmIndex, enqueue]);
@@ -940,7 +940,7 @@ function AppInner() {
       inCombat: false,
       realmIndex,
       lawElement: law?.element,
-      isAtPeak: realmIndex >= 46,
+      isAtPeak: realmIndex >= 55,
       equippedArtefactsByElement,
       equippedTechsByType,
     });
@@ -1810,7 +1810,7 @@ function AppInner() {
 
   // Tree screen: accessible once the player reaches Saint realm (so they can
   // spend karma before reincarnating) OR in any subsequent life (lives ≥ 1).
-  const reincarnationUnlocked = cultivation.realmIndex >= 24 || (karma.lives ?? 0) >= 1;
+  const reincarnationUnlocked = cultivation.realmIndex >= 26 || (karma.lives ?? 0) >= 1;
 
   const screens = {
     // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
@@ -2081,7 +2081,7 @@ function AppInner() {
           z-index covers the chrome instead of being trapped beneath it. */}
       {reincarnationStage === 'confirm' && (
         <ReincarnationConfirmModal
-          canReincarnate={cultivation.realmIndex >= 24}
+          canReincarnate={cultivation.realmIndex >= 26}
           karma={karma.karma}
           realmName={cultivation.realmMajor}
           onConfirm={() => setReincarnationStage('severing')}
