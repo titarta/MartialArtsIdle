@@ -2776,14 +2776,23 @@ function HomeScreen({
     } else if (leveledUp) {
       // Gained a level without crossing a visual tier; evolve carries its own sound.
       try { AudioManager.playSfx('crystal_level_up'); } catch {}
-      // Level-up pop: a brief tilt + expand on the crystal, the visual inverse of
-      // the tap squish (tilt + shrink). DOM-direct + reflow re-arm so rapid
-      // refines re-trigger it without a React render (matches the spark pattern).
+      // Level-up pop: a brief tilt + EXPAND on the crystal, the visual inverse of
+      // the tap squish (tilt + shrink). Driven via the Web Animations API, not a
+      // CSS class: the level-up changes React state and re-renders the crystal,
+      // which would instantly strip a manually-added className. A WAAPI animation
+      // runs independently of React's reconciliation and survives the re-render.
       const wrap = document.querySelector('.home-crystal-img-wrap');
-      if (wrap) {
-        wrap.classList.remove('home-crystal-levelup');
-        void wrap.offsetWidth; // force reflow so the animation restarts each level
-        wrap.classList.add('home-crystal-levelup');
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (wrap?.animate && !reduceMotion) {
+        wrap.animate(
+          [
+            { transform: 'scale(1) rotate(0deg)' },
+            { transform: 'scale(1.12) rotate(2.5deg)', offset: 0.4 },
+            { transform: 'scale(0.99) rotate(-0.8deg)', offset: 0.72 },
+            { transform: 'scale(1) rotate(0deg)' },
+          ],
+          { duration: 500, easing: 'ease-out' }
+        );
       }
     }
   }, [crystal, isCrystalUnlocked, cultivation, handleCrystalEvolve]);
