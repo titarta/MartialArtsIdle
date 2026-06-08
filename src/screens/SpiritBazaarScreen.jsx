@@ -312,7 +312,10 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
  */
 function BuffCard({ item, ownership, balance, onBuy, busy }) {
   const { t } = useTranslation('ui');
-  const activeBuff = ownership.activeBuffs.find(b => b.id === item.id);
+  // Match by effect TYPE, not itemId: buffs are one-per-type now, so every
+  // duration product of the same buff reads as active (and shares its timer)
+  // when that buff is running.
+  const activeBuff = ownership.activeBuffs.find(b => b.type === item.effect?.type);
   const headline   = (() => {
     const e = item.effect;
     if (!e) return '';

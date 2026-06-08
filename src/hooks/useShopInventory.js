@@ -39,7 +39,7 @@ function emptyInventory() {
     qol:         {},   // { [itemId]: true }
     stacks:      {},   // { [itemId]: int }
     consumables: {},   // { [itemId]: int }
-    buffs:       {},   // { [itemId]: { expiresAtMs } }
+    buffs:       {},   // { [type]: { expiresAtMs, mult, itemId, vfx } } (one per type)
     cosmetics:   {},   // { [itemId]: true } — owned (purchased)
     equipped:    {},   // { [slotType]: itemId } — currently equipped per slot
   };
@@ -51,16 +51,10 @@ function loadInventory() {
     if (raw) {
       const data = JSON.parse(raw);
       const inv = { ...emptyInventory(), ...data };
-      // Drop expired buffs at load time so the player doesn't see a
-      // dead buff in the UI for a frame.
-      const now = Date.now();
-      const livingBuffs = {};
-      for (const [id, info] of Object.entries(inv.buffs || {})) {
-        if (info?.expiresAtMs && info.expiresAtMs > now) {
-          livingBuffs[id] = info;
-        }
-      }
-      inv.buffs = livingBuffs;
+      // Normalise to the type-keyed buff model + drop expired ones. Also
+      // migrates old itemId-keyed saves and collapses any same-type buffs that
+      // were stacked under the old multiply-on-top bug.
+      inv.buffs = normalizeBuffs(inv.buffs);
       return inv;
     }
   } catch {}
@@ -69,6 +63,44 @@ function loadInventory() {
 
 function persist(inv) {
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(inv)); } catch {}
+}
+
+/**
+ * Normalise the timed-buff map to the TYPE-keyed model and drop expired ones.
+ *
+ * Model: `buffs[type] = { expiresAtMs, mult, itemId, vfx }` — ONE entry per
+ * effect type (qi_mult, producer_mult, crystal_tap_mult). Every duration
+ * product of the same buff shares that single entry: buying another EXTENDS
+ * the timer (durations add up) and NEVER multiplies the effect.
+ *
+ * Migration: older saves keyed buffs by itemId with only `{ expiresAtMs }`,
+ * and getActiveBuffMult multiplied every same-type entry together (the
+ * x2*x2*x2 exploit). Here we collapse all same-type entries into one, keeping
+ * the furthest expiry and the highest single mult — upgrading the save format
+ * and disarming the exploit retroactively.
+ */
+function normalizeBuffs(rawBuffs) {
+  const now = Date.now();
+  const out = {};
+  for (const [key, info] of Object.entries(rawBuffs || {})) {
+    if (!info?.expiresAtMs || info.expiresAtMs <= now) continue;
+    // Resolve type + representative item. New format: key is the type and
+    // info.itemId points at a product. Old format: key IS the itemId.
+    let item = info.itemId ? SHOP_ITEMS_BY_ID[info.itemId] : null;
+    if (!item && SHOP_ITEMS_BY_ID[key]) item = SHOP_ITEMS_BY_ID[key];
+    const type = item?.effect?.type ?? (info.mult !== undefined ? key : null);
+    if (!type) continue;
+    const mult   = Number.isFinite(info.mult) ? info.mult : (item?.effect?.mult ?? 1);
+    const vfx    = info.vfx ?? item?.effect?.vfx ?? null;
+    const itemId = info.itemId ?? (SHOP_ITEMS_BY_ID[key] ? key : null);
+    if (out[type]) {
+      out[type].expiresAtMs = Math.max(out[type].expiresAtMs, info.expiresAtMs);
+      out[type].mult        = Math.max(out[type].mult, mult);
+    } else {
+      out[type] = { expiresAtMs: info.expiresAtMs, mult, itemId, vfx };
+    }
+  }
+  return out;
 }
 
 export default function useShopInventory() {
@@ -144,15 +176,25 @@ export default function useShopInventory() {
       } else if (item.ownership === 'oneshot') {
         next.consumables = { ...next.consumables, [itemId]: (next.consumables[itemId] ?? 0) + 1 };
       } else if (item.ownership === 'timed') {
-        // Buying another of the same timed buff EXTENDS the duration
-        // rather than resetting it. The player's already-paid time
-        // is preserved — they paid for X hours total.
-        const now = Date.now();
-        const cur = next.buffs[itemId];
-        const baseEnd = (cur?.expiresAtMs && cur.expiresAtMs > now) ? cur.expiresAtMs : now;
+        // Timed buffs are keyed by EFFECT TYPE, not itemId, so every duration
+        // product of the same buff (e.g. Crimson Aura 1h / 4h / 12h, all
+        // qi_mult x2) shares ONE entry. Buying another EXTENDS the timer
+        // (durations add up) and never multiplies the effect — the multiplier
+        // is a single value (the max single-product mult), so two x2 buffs are
+        // x2 for longer, never x4. The player keeps every minute they paid for.
+        const now  = Date.now();
+        const type = item.effect.type;
+        const cur  = next.buffs[type];
+        const active  = !!(cur?.expiresAtMs && cur.expiresAtMs > now);
+        const baseEnd = active ? cur.expiresAtMs : now;
         next.buffs = {
           ...next.buffs,
-          [itemId]: { expiresAtMs: baseEnd + item.effect.durationMs },
+          [type]: {
+            expiresAtMs: baseEnd + item.effect.durationMs,
+            mult:        Math.max(active ? (cur.mult ?? 1) : 1, item.effect.mult ?? 1),
+            itemId,
+            vfx:         item.effect.vfx ?? null,
+          },
         };
       } else if (item.ownership === 'cosmetic') {
         // Cosmetics are permanent-owned. Bazaar v2 (2026-05-27) removed
@@ -241,22 +283,16 @@ export default function useShopInventory() {
   const getConsumable  = useCallback((id) => inv.consumables[id]  ?? 0,       [inv]);
 
   /**
-   * Returns the current multiplier from active timed buffs whose effect
-   * matches `type`. Multiplies all active matches together (so two
-   * different qi_mult buffs would stack). When no matching buff is
-   * active, returns 1.
+   * Current multiplier from the active buff of `type`. Buffs are one-per-type,
+   * so this is a single value (e.g. x2), NEVER a product of multiple same-type
+   * purchases — buying more only extends the timer. Returns 1 when inactive.
    */
   const getActiveBuffMult = useCallback((type) => {
-    const now = Date.now();
-    let mult = 1;
-    for (const [bid, info] of Object.entries(inv.buffs || {})) {
-      if (!info?.expiresAtMs || info.expiresAtMs <= now) continue;
-      const item = SHOP_ITEMS_BY_ID[bid];
-      if (item?.effect?.type === type && Number.isFinite(item.effect.mult)) {
-        mult *= item.effect.mult;
-      }
+    const info = inv.buffs?.[type];
+    if (info?.expiresAtMs && info.expiresAtMs > Date.now() && Number.isFinite(info.mult)) {
+      return info.mult;
     }
-    return mult;
+    return 1;
   }, [inv]);
 
   /**
@@ -265,24 +301,23 @@ export default function useShopInventory() {
    * matches the multiplier API shape for future symmetry.
    */
   const getActiveBuffAdd = useCallback((type, prop) => {
-    const now = Date.now();
-    let sum = 0;
-    for (const [bid, info] of Object.entries(inv.buffs || {})) {
-      if (!info?.expiresAtMs || info.expiresAtMs <= now) continue;
-      const item = SHOP_ITEMS_BY_ID[bid];
-      if (item?.effect?.type === type && Number.isFinite(item.effect[prop])) {
-        sum += item.effect[prop];
-      }
+    const info = inv.buffs?.[type];
+    if (info?.expiresAtMs && info.expiresAtMs > Date.now()) {
+      const item = info.itemId ? SHOP_ITEMS_BY_ID[info.itemId] : null;
+      const v = item?.effect?.[prop];
+      return Number.isFinite(v) ? v : 0;
     }
-    return sum;
+    return 0;
   }, [inv]);
 
-  /** Array of active buffs (item + expiresAtMs) for UI surfacing. */
+  /** Array of active buffs (one per type) for UI surfacing. `id` is the most
+   *  recently bought product of that type; `type` lets callers match any
+   *  product of the same buff. */
   const activeBuffs = Object.entries(inv.buffs || {})
-    .map(([id, info]) => {
-      const item = SHOP_ITEMS_BY_ID[id];
+    .map(([type, info]) => {
+      const item = info.itemId ? SHOP_ITEMS_BY_ID[info.itemId] : null;
       if (!item) return null;
-      return { id, item, expiresAtMs: info.expiresAtMs };
+      return { id: info.itemId, type, item, expiresAtMs: info.expiresAtMs, mult: info.mult };
     })
     .filter(Boolean)
     .sort((a, b) => a.expiresAtMs - b.expiresAtMs);
