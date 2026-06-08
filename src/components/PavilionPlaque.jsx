@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { fmt, fmtRate } from '../utils/format';
-import { getSpriteTier, resolveSprite } from '../data/producers';
+import { getSpriteTier, resolveSprite, resolveTierFor, SPRITE_TIERS } from '../data/producers';
 import AudioManager from '../audio/AudioManager';
 
 const BASE = import.meta.env.BASE_URL;
@@ -54,9 +54,15 @@ export default function PavilionPlaque({
   onBuy,
   onShowDetail,
   costDiscount = 0,
+  // tree.modifiers from useReincarnationTree. Used for tier gating —
+  // discipleTranscendUnlocked flips the disciple's Transcended (idx 4)
+  // cap on/off. Defaults to empty so component works in isolation tests.
+  treeMods = {},
 }) {
-  // Resolve current tier + sprite. Tier null when 0 owned.
-  const tier = unlocked ? getSpriteTier(owned) : null;
+  // Resolve current tier + sprite. Tier null when 0 owned. resolveTierFor
+  // respects the producer's transcendedNode gate (disc_transcend for the
+  // disciple) so Transcended doesn't appear before the node is purchased.
+  const tier = unlocked ? resolveTierFor(producer, owned, treeMods) : null;
   const spriteIdx = tier?.idx ?? 0;
   // resolveSprite falls back to the producer's highest available sprite so
   // tiers added later (e.g. transcended) don't drop other producers to Bronze.
@@ -69,7 +75,11 @@ export default function PavilionPlaque({
   useEffect(() => {
     const next = tier?.name ?? null;
     const prev = prevTierNameRef.current;
-    const ranks = ['bronze', 'silver', 'gold', 'mythic'];
+    // Derive the rank order from SPRITE_TIERS so adding a new tier (e.g.
+    // 'transcended' in 2026-06-08) automatically gets the tier-up sound +
+    // celebrate animation. Hardcoded ['bronze','silver','gold','mythic']
+    // returned indexOf=-1 for any new tier and silently no-op'd.
+    const ranks = SPRITE_TIERS.map(t => t.name);
     const prevRank = ranks.indexOf(prev);
     const nextRank = ranks.indexOf(next);
     if (nextRank > prevRank && next != null) {

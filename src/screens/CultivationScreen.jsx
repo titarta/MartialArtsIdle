@@ -26,6 +26,10 @@ export default function CultivationScreen({
   // the QoL ownership flag (hides the chip when false); `autoBuyEnabled`
   // is the player's toggle state; `onToggleAutoBuy` flips it.
   autoBuyOwned = false, autoBuyEnabled = false, onToggleAutoBuy,
+  // tree.modifiers from useReincarnationTree, threaded down to PavilionPlaque
+  // and ProducerDetailModal so tier gating (e.g. disciple's Transcended
+  // requires disc_transcend Eternal Tree node) can be enforced.
+  treeMods = {},
 }) {
   // Default tab is 'producers' unless App.jsx navigated here with a specific
   // target ('sparks' from the home buff-chip's "View all sparks →" link).
@@ -363,6 +367,7 @@ export default function CultivationScreen({
                 onBuy={handleBuy}
                 onShowDetail={setDetailProducer}
                 costDiscount={producerCostDiscountFrac}
+                treeMods={treeMods}
               />
             ))}
           </div>
@@ -399,6 +404,7 @@ export default function CultivationScreen({
             baseGameRate={baseProductionRate}
             onEnterMinigame={(pid) => { setDetailProducer(null); setMinigameId(pid); }}
             minigameUnlocked={unlockedHiddenArts?.has?.(detailProducer.id)}
+            treeMods={treeMods}
             onClose={() => setDetailProducer(null)}
           />
         );
@@ -436,6 +442,7 @@ export default function CultivationScreen({
             if (ok) setQi(cultivation.qiRef.current);
             return ok;
           }}
+          treeMods={treeMods}
           onClose={() => setMinigameId(null)}
         />
       )}

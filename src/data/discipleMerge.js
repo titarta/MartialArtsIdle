@@ -46,20 +46,41 @@
 // nextId, highestTier, meritStored, meritLastUpdate live together).
 const KEY = 'mai_disciple_merge';
 
-// Tier ladder (unchanged). Values double for board-sum arithmetic.
+// Tier ladder. Values double for board-sum arithmetic. Each T5+ entry has
+// both a `sprite` / `badge` (post-gate, after disc_transcend Eternal Tree
+// node is purchased) and a `pregateSprite` / `pregateBadge` (the original
+// pre-Transcended-tier scheme of mythic + escalating badges). Consumers
+// pick via effectiveTier(idx, transcendUnlocked).
 export const TIERS = [
   null,
   { rank: 'Outer Disciple',  glyph: '徒', value: 1,   sprite: '/sprites/producers/p_disciple_bronze.png',      badge: null  },
   { rank: 'Inner Disciple',  glyph: '弟', value: 2,   sprite: '/sprites/producers/p_disciple_silver.png',      badge: null  },
   { rank: 'Core Disciple',   glyph: '核', value: 4,   sprite: '/sprites/producers/p_disciple_gold.png',        badge: null  },
   { rank: 'Sword Disciple',  glyph: '劍', value: 8,   sprite: '/sprites/producers/p_disciple_mythic.png',      badge: null  },
-  { rank: 'Elder',           glyph: '長', value: 16,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: null  },
-  { rank: 'Senior Elder',    glyph: '尊', value: 32,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×2'  },
-  { rank: 'Hall Master',     glyph: '主', value: 64,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×3'  },
-  { rank: 'Sect Master',     glyph: '宗', value: 128, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×4'  },
-  { rank: 'Patriarch',       glyph: '祖', value: 256, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×5'  },
-  { rank: 'Ancestor',        glyph: '聖', value: 512, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×6'  },
+  { rank: 'Elder',           glyph: '長', value: 16,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: null,
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×2' },
+  { rank: 'Senior Elder',    glyph: '尊', value: 32,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×2',
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×3' },
+  { rank: 'Hall Master',     glyph: '主', value: 64,  sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×3',
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×4' },
+  { rank: 'Sect Master',     glyph: '宗', value: 128, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×4',
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×5' },
+  { rank: 'Patriarch',       glyph: '祖', value: 256, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×5',
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×6' },
+  { rank: 'Ancestor',        glyph: '聖', value: 512, sprite: '/sprites/producers/p_disciple_transcended.png', badge: '×6',
+    pregateSprite: '/sprites/producers/p_disciple_mythic.png',      pregateBadge: '×7' },
 ];
+
+/** Returns the tier display descriptor honoring the disc_transcend gate.
+ *  When `transcendUnlocked` is false, T5+ revert to the pregate scheme
+ *  (mythic sprite + escalating ×N badges) so a player who hasn't bought
+ *  the Eternal Tree node never sees the new chrome-rose art. */
+export function effectiveTier(tierIdx, transcendUnlocked) {
+  const t = TIERS[tierIdx];
+  if (!t) return t;
+  if (transcendUnlocked || !t.pregateSprite) return t;
+  return { ...t, sprite: t.pregateSprite, badge: t.pregateBadge };
+}
 
 // ── Economy levers (STARTING VALUES) ─────────────────────────────────────────
 // Each board-sum point = +1% to disciple producer per-unit qi/s.

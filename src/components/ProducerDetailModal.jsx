@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
-import { getSpriteTier, SPRITE_TIERS, resolveSprite } from '../data/producers';
+import { getSpriteTier, SPRITE_TIERS, resolveSprite, resolveTierFor } from '../data/producers';
 import { getMinigame } from '../data/minigames';
 import './minigames/minigames.css';
 
@@ -51,10 +51,15 @@ export default function ProducerDetailModal({
   baseGameRate,        // base production qi/s = BASE_RATE + sum(producer raw outputs)
   onEnterMinigame,     // (producerId) => void — opens the Mythic-tier minigame
   minigameUnlocked,    // Eternal Tree keeps this Hidden Art open across lives
+  // tree.modifiers from useReincarnationTree — gates the disciple's
+  // Transcended tier on the disc_transcend Eternal Tree node.
+  treeMods = {},
   onClose,
 }) {
   const { t } = useTranslation('ui');
-  const tier      = unlocked ? getSpriteTier(owned) : null;
+  // resolveTierFor respects producer.transcendedNode so the disciple's
+  // Transcended tier only appears after disc_transcend is purchased.
+  const tier      = unlocked ? resolveTierFor(producer, owned, treeMods) : null;
   const spriteIdx = tier?.idx ?? 0;
   // resolveSprite falls back to the producer's highest available sprite so
   // tiers added later (e.g. transcended) don't drop other producers to Bronze.

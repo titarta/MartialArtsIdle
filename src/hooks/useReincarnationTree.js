@@ -169,10 +169,16 @@ export default function useReincarnationTree({ karma, spendKarma } = {}) {
       keepProducerLevelsFrac: has('foundation') ? 0.20 : 0,
 
       // ── Disciples / Roster ──────────────────────────────────────────────
-      discipleBoardSumMult:   has('star')      ? 1.5 : 1,
-      discipleBaseMult:       has('disc_base') ? 2.0 : 1,
-      disciplePlaceCostMult:  has('hand')      ? 0.8 : 1,
-      discipleOutputMult:     has('thousand')  ? 2.0 : 1,
+      discipleBoardSumMult:   has('star')           ? 1.5 : 1,
+      discipleBaseMult:       has('disc_base')      ? 2.0 : 1,
+      disciplePlaceCostMult:  has('hand')           ? 0.8 : 1,
+      discipleOutputMult:     has('thousand')       ? 2.0 : 1,
+      // Gate flag: when true the disciple producer unlocks the Transcended
+      // (5th) sprite tier at 100+ owned, and the Sect Roster's T5+ ranks
+      // render the chrome-rose Transcended art instead of repeating Mythic.
+      // When false, both fall back to Mythic as the cap. Read in
+      // producers.js (resolveTierFor) and discipleMerge.js (effectiveTier).
+      discipleTranscendUnlocked: has('disc_transcend'),
 
       // ── Spirit Garden ───────────────────────────────────────────────────
       gardenElixirMagnitudeMult: has('potency') ? 1.2 : 1,

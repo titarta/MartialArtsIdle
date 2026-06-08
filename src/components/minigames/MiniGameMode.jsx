@@ -53,7 +53,7 @@ function ComingSoon({ meta }) {
  * above the nav and every screen z-bucket. Routes the stage to the producer's
  * bespoke game, or a coming-soon teaser.
  */
-export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAward, recruit, qi, spendQi, onClose }) {
+export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAward, recruit, qi, spendQi, treeMods = {}, onClose }) {
   const { t } = useTranslation('ui');
   const meta = producer ? getMinigame(producer.id) : null;
 
@@ -90,7 +90,7 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
 
         <div className="mg-stage">
           {Game
-            ? <Game producer={producer} owned={owned} ratePerSec={ratePerSec} onAward={onAward} recruit={recruit} qi={qi} spendQi={spendQi} />
+            ? <Game producer={producer} owned={owned} ratePerSec={ratePerSec} onAward={onAward} recruit={recruit} qi={qi} spendQi={spendQi} treeMods={treeMods} />
             : <ComingSoon meta={meta} />}
         </div>
       </div>

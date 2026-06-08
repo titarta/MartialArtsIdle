@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { fmt, fmtRate } from '../utils/format';
-import { getSpriteTier, resolveSprite } from '../data/producers';
+import { getSpriteTier, resolveSprite, resolveTierFor, SPRITE_TIERS } from '../data/producers';
 
 /** Visible-unit cap in the sprite stack. Mobile gets fewer via CSS-only path
  *  (the overflow `+N` chip shifts left automatically when stack overflows). */
@@ -54,13 +54,15 @@ export default function ProducerLane({
   // fraction (0..1) so the displayed cost matches what spendQi will actually
   // bill. Defaults to 0 → identity / no discount.
   costDiscount = 0,
+  // tree.modifiers from useReincarnationTree — gates the disciple's
+  // Transcended tier on the disc_transcend Eternal Tree node.
+  treeMods = {},
 }) {
-  // Resolve current tier + sprite. Tier null when 0 owned.
-  // resolveSprite falls back to the producer's highest available sprite
-  // when sprites[tier.idx] is undefined — so producers without transcended
-  // art (everyone except the disciple as of 2026-06-08) render their Mythic
-  // sprite at 100+ owned instead of falling back to Bronze.
-  const tier = unlocked ? getSpriteTier(owned) : null;
+  // Resolve current tier + sprite. Tier null when 0 owned. resolveTierFor
+  // respects the producer's transcendedNode gate; resolveSprite falls back
+  // to the producer's highest available sprite if the tier exceeds the
+  // array length (e.g. other producers at 100+ owned still render Mythic).
+  const tier = unlocked ? resolveTierFor(producer, owned, treeMods) : null;
   const spriteIdx = tier?.idx ?? 0;
   const sprite = resolveSprite(producer, spriteIdx) ?? '◆';
 
@@ -73,7 +75,10 @@ export default function ProducerLane({
     const next = tier?.name ?? null;
     const prev = prevTierNameRef.current;
     // Only fire on upward transitions (null→bronze, bronze→silver, etc.).
-    const ranks = ['bronze', 'silver', 'gold', 'mythic'];
+    // Ranks derived from SPRITE_TIERS so new tiers (e.g. 'transcended' added
+    // 2026-06-08) auto-include in the upward-transition detection. Hardcoded
+    // 4-tier array silently no-op'd at Mythic→Transcended.
+    const ranks = SPRITE_TIERS.map(t => t.name);
     const prevRank = ranks.indexOf(prev);
     const nextRank = ranks.indexOf(next);
     if (nextRank > prevRank && next != null) {

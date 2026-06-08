@@ -54,15 +54,32 @@ export const SPRITE_TIERS = [
   { idx: 4, name: 'transcended', label: 'Transcended', minOwned: 100 },
 ];
 
-/** Resolves an owned count to its tier descriptor, or null if 0/locked. */
-export function getSpriteTier(owned) {
+/** Resolves an owned count to its tier descriptor, or null if 0/locked.
+ *  `maxIdx` caps the highest tier the player can reach — used by
+ *  resolveTierFor() to gate Transcended behind disc_transcend. */
+export function getSpriteTier(owned, maxIdx = SPRITE_TIERS.length - 1) {
   if (!owned || owned < 1) return null;
   let resolved = SPRITE_TIERS[0];
   for (const t of SPRITE_TIERS) {
+    if (t.idx > maxIdx) break;
     if (owned >= t.minOwned) resolved = t;
     else break;
   }
   return resolved;
+}
+
+/** Producer-aware tier resolution. Respects per-producer gating fields:
+ *    `transcendedNode`  — caps tier at Mythic (idx 3) until the named
+ *                          Eternal Tree node is purchased.
+ *  Consumers pass `treeMods` (the tree.modifiers object from
+ *  useReincarnationTree) and `producer` so the gate flag is checked. */
+export function resolveTierFor(producer, owned, treeMods = {}) {
+  if (!owned || owned < 1) return null;
+  let maxIdx = SPRITE_TIERS.length - 1;
+  if (producer?.transcendedNode === 'disc_transcend' && !treeMods.discipleTranscendUnlocked) {
+    maxIdx = 3; // cap at Mythic until the Eternal Tree node is purchased
+  }
+  return getSpriteTier(owned, maxIdx);
 }
 
 /** Safe sprite lookup. Falls back to the HIGHEST available sprite when the
@@ -91,6 +108,10 @@ const PRODUCERS = [
     startQiPerSec: 0.2,
     costScaling:   1.22,
     unlock:        { type: 'always' },
+    // Transcended (5th tier, 100+ owned) only unlocks once the player buys
+    // the disc_transcend Eternal Tree node. Before that, resolveTierFor()
+    // caps the disciple at Mythic regardless of count.
+    transcendedNode: 'disc_transcend',
     sprites:       [
       '/sprites/producers/p_disciple_bronze.png',
       '/sprites/producers/p_disciple_silver.png',

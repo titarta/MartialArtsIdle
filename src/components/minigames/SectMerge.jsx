@@ -18,7 +18,7 @@
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
 import useDiscipleMerge, { currentMerit } from '../../hooks/useDiscipleMerge';
-import { TIERS, BONUS_PER_BOARD_SUM, gridIsFull } from '../../data/discipleMerge';
+import { TIERS, BONUS_PER_BOARD_SUM, gridIsFull, effectiveTier } from '../../data/discipleMerge';
 import { fmt } from '../../utils/format';
 import { AudioManager } from '../../audio';
 
@@ -26,8 +26,10 @@ const BASE = import.meta.env.BASE_URL;
 const spriteUrl = (s) =>
   (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
 
-function Tile({ tile }) {
-  const t = TIERS[tile.tier];
+function Tile({ tile, transcendUnlocked }) {
+  // effectiveTier honors the disc_transcend gate: T5+ render the chrome-rose
+  // Transcended sprite only when the Eternal Tree node is purchased.
+  const t = effectiveTier(tile.tier, transcendUnlocked);
   return (
     <div className="dmg-tile">
       <img
@@ -42,7 +44,11 @@ function Tile({ tile }) {
   );
 }
 
-export default function SectMerge({ owned = 0, qi = 0, spendQi }) {
+export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} }) {
+  // disc_transcend Eternal Tree node gates the Transcended sprite on T5+
+  // ranks. When unpurchased, the roster falls back to mythic + escalating
+  // badges (the pre-2026-06-08 scheme).
+  const transcendUnlocked = !!treeMods.discipleTranscendUnlocked;
   const merge = useDiscipleMerge();
   const [drag, setDrag] = useState(null);          // { fromIdx, x, y, pointerId } | null
   const [overIdx, setOverIdx] = useState(null);
@@ -243,7 +249,7 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi }) {
               onPointerDown={tile ? handlePointerDown(i) : undefined}
               onClick={() => handleCellClick(i)}
             >
-              {tile ? <Tile tile={tile} /> : <span className="dmg-empty-plus">+</span>}
+              {tile ? <Tile tile={tile} transcendUnlocked={transcendUnlocked} /> : <span className="dmg-empty-plus">+</span>}
             </div>
           );
         })}
@@ -252,7 +258,7 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi }) {
       {/* Drag ghost */}
       {drag && draggedTile && (
         <div className="dmg-ghost" style={{ left: `${drag.x}px`, top: `${drag.y}px` }}>
-          <Tile tile={draggedTile} />
+          <Tile tile={draggedTile} transcendUnlocked={transcendUnlocked} />
         </div>
       )}
 
