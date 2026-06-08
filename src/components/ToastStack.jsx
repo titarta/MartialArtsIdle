@@ -80,19 +80,24 @@ function ToastCard({ toast, isPeek, depth = 0, onDismiss, onNavigate }) {
 
 function ToastStack({ toasts, onDismiss, onNavigate }) {
   const { t } = useTranslation('ui');
-  if (!toasts.length) return null;
 
   const visible  = toasts.slice(0, MAX_VISIBLE);
   const overflow = Math.max(0, toasts.length - MAX_VISIBLE);
-  const top      = visible[0];
+  const top      = visible[0] ?? null;
+  const topId    = top?.id ?? null;
 
-  // Auto-dismiss the top toast after its duration. Resets on each new top toast.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Auto-dismiss the top toast after its duration. Resets on each new top
+  // toast. MUST be declared before any early return so the hook count is the
+  // same whether or not there are toasts — otherwise React throws "Rendered
+  // more hooks than during the previous render" the moment a toast appears.
   useEffect(() => {
+    if (!top) return undefined;
     const ms = top.duration ?? DEFAULT_DURATION;
     const timer = setTimeout(() => onDismiss(top.id), ms);
     return () => clearTimeout(timer);
-  }, [top.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [topId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!toasts.length) return null;
 
   return (
     <div className="toast-stack">
