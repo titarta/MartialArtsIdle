@@ -39,12 +39,19 @@
  * lane sprites swap to the new variant simultaneously. CSS adds tier glow.
  */
 
-/** Ownership thresholds → sprite-tier index + tier name + UI accent. */
+/** Ownership thresholds → sprite-tier index + tier name + UI accent.
+ *  2026-06-08: added 'transcended' (idx 4, minOwned 100) above Mythic.
+ *  Currently only `p_disciple` ships a transcended sprite; other producers'
+ *  sprite arrays are still 4 entries long. The renderer falls back to the
+ *  highest available sprite when sprites[tier.idx] is undefined, so a
+ *  player who crosses 100 on a producer without transcended art keeps
+ *  seeing the Mythic sprite until that producer gets its own art. */
 export const SPRITE_TIERS = [
-  { idx: 0, name: 'bronze', label: 'Bronze',   minOwned: 1  },
-  { idx: 1, name: 'silver', label: 'Silver',   minOwned: 10 },
-  { idx: 2, name: 'gold',   label: 'Gold',     minOwned: 25 },
-  { idx: 3, name: 'mythic', label: 'Mythic',   minOwned: 50 },
+  { idx: 0, name: 'bronze',      label: 'Bronze',      minOwned: 1   },
+  { idx: 1, name: 'silver',      label: 'Silver',      minOwned: 10  },
+  { idx: 2, name: 'gold',        label: 'Gold',        minOwned: 25  },
+  { idx: 3, name: 'mythic',      label: 'Mythic',      minOwned: 50  },
+  { idx: 4, name: 'transcended', label: 'Transcended', minOwned: 100 },
 ];
 
 /** Resolves an owned count to its tier descriptor, or null if 0/locked. */
@@ -56,6 +63,17 @@ export function getSpriteTier(owned) {
     else break;
   }
   return resolved;
+}
+
+/** Safe sprite lookup. Falls back to the HIGHEST available sprite when the
+ *  requested tier-idx exceeds the producer's sprites array length — keeps
+ *  producers without transcended art rendering their Mythic sprite at 100+
+ *  owned instead of falling back to Bronze. */
+export function resolveSprite(producer, tierIdx) {
+  const arr = producer?.sprites;
+  if (!arr || !arr.length) return null;
+  if (arr[tierIdx]) return arr[tierIdx];
+  return arr[arr.length - 1];
 }
 
 const PRODUCERS = [
@@ -78,6 +96,7 @@ const PRODUCERS = [
       '/sprites/producers/p_disciple_silver.png',
       '/sprites/producers/p_disciple_gold.png',
       '/sprites/producers/p_disciple_mythic.png',
+      '/sprites/producers/p_disciple_transcended.png',
     ],
   },
   {

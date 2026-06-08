@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
-import { getSpriteTier, SPRITE_TIERS } from '../data/producers';
+import { getSpriteTier, SPRITE_TIERS, resolveSprite } from '../data/producers';
 import { getMinigame } from '../data/minigames';
 import './minigames/minigames.css';
 
@@ -56,7 +56,9 @@ export default function ProducerDetailModal({
   const { t } = useTranslation('ui');
   const tier      = unlocked ? getSpriteTier(owned) : null;
   const spriteIdx = tier?.idx ?? 0;
-  const sprite    = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
+  // resolveSprite falls back to the producer's highest available sprite so
+  // tiers added later (e.g. transcended) don't drop other producers to Bronze.
+  const sprite    = resolveSprite(producer, spriteIdx) ?? '◆';
   const minigame  = getMinigame(producer.id);
   const isMythic  = tier?.name === 'mythic';
   // Mythic tier OR an Eternal Tree node (roster/garden/furnace) opens the art.

@@ -19059,6 +19059,23 @@ body.sheet-open {
   50%      { box-shadow: 0 0 40px rgba(167, 139, 250, 0.55); }
 }
 
+/* Transcended — fifth tier above Mythic. Warm rose-gold + cream glow,
+   shifted from Mythic's cosmic violet to match the chrome-rose Transcended
+   sprite art. Slightly larger pulse so the tier-up feels even more divine. */
+.pl-tier-transcended {
+  border-color: rgba(244, 196, 168, 0.72);
+  box-shadow: 0 0 32px rgba(244, 196, 168, 0.42);
+  animation: pl-transcended-shimmer 3.4s ease-in-out infinite;
+}
+@keyframes pl-transcended-shimmer {
+  0%, 100% { box-shadow: 0 0 32px rgba(244, 196, 168, 0.42); }
+  50%      { box-shadow: 0 0 48px rgba(255, 220, 190, 0.7); }
+}
+.pl-tier-transcended .pl-leader { box-shadow: inset 0 0 30px rgba(244, 196, 168, 0.62); }
+.pl-tier-transcended .pl-unit   { filter: saturate(1.22) brightness(1.18) drop-shadow(0 0 6px rgba(244, 196, 168, 0.62)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)); }
+.pl-tier-transcended .pl-total  { color: #f5d0b8; border-color: rgba(244, 196, 168, 0.7); }
+.pp-tier-transcended { color: #f5d0b8; }
+
 /* Threshold-crossing celebration — fires on rank-up. Brief golden pulse + scale. */
 .pl-celebrate {
   animation: pl-celebrate-burst 1.4s ease-out;

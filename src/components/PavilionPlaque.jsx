@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { fmt, fmtRate } from '../utils/format';
-import { getSpriteTier } from '../data/producers';
+import { getSpriteTier, resolveSprite } from '../data/producers';
 import AudioManager from '../audio/AudioManager';
 
 const BASE = import.meta.env.BASE_URL;
@@ -58,7 +58,9 @@ export default function PavilionPlaque({
   // Resolve current tier + sprite. Tier null when 0 owned.
   const tier = unlocked ? getSpriteTier(owned) : null;
   const spriteIdx = tier?.idx ?? 0;
-  const sprite = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
+  // resolveSprite falls back to the producer's highest available sprite so
+  // tiers added later (e.g. transcended) don't drop other producers to Bronze.
+  const sprite = resolveSprite(producer, spriteIdx) ?? '◆';
 
   // Threshold-crossing celebration. Watch tier transitions; on change,
   // briefly toggle .pp-celebrate so CSS plays the burst animation.

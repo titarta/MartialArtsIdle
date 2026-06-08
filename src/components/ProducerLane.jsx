@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
 import { fmt, fmtRate } from '../utils/format';
-import { getSpriteTier } from '../data/producers';
+import { getSpriteTier, resolveSprite } from '../data/producers';
 
 /** Visible-unit cap in the sprite stack. Mobile gets fewer via CSS-only path
  *  (the overflow `+N` chip shifts left automatically when stack overflows). */
@@ -56,9 +56,13 @@ export default function ProducerLane({
   costDiscount = 0,
 }) {
   // Resolve current tier + sprite. Tier null when 0 owned.
+  // resolveSprite falls back to the producer's highest available sprite
+  // when sprites[tier.idx] is undefined — so producers without transcended
+  // art (everyone except the disciple as of 2026-06-08) render their Mythic
+  // sprite at 100+ owned instead of falling back to Bronze.
   const tier = unlocked ? getSpriteTier(owned) : null;
   const spriteIdx = tier?.idx ?? 0;
-  const sprite = producer.sprites?.[spriteIdx] ?? producer.sprites?.[0] ?? '◆';
+  const sprite = resolveSprite(producer, spriteIdx) ?? '◆';
 
   // Threshold-crossing celebration. Watch tier transitions; on change, briefly
   // toggle the `.pl-celebrate` class so CSS plays the burst animation. The

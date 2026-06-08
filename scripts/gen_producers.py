@@ -156,6 +156,118 @@ PRODUCERS = {
         ),
     },
 
+    # ── 1a. Body Tempering Disciple — CLEAN GOLD (replacement art) ────────────
+    # The current Gold has a bright yellow sun-disc halo behind the head with
+    # radiating beams — too busy and steals the eye from the character. This
+    # prompt KEEPS everything else (jade-and-gold robes, twin swords, floating
+    # pose, hair lifting, glowing eyes, golden aura) and STRIPS the wide
+    # sunburst, leaving a tight halo hugging the silhouette.
+    # Generated with the current p_disciple_gold.png as reference_images +
+    # style_image so the character identity stays locked.
+    "p_disciple_gold_clean": {
+        "size": (96, 96),
+        "desc": (
+            "The same Xianxia cultivator master patriarch from the reference image: identical character "
+            "identity, identical face, dark hair, jade-and-gold sect robes with phoenix embroidery, "
+            "ornate hairpin, twin ceremonial swords at the sides, floating slightly above the ground in "
+            "a sage's cross-legged pose, hair lifting from cultivated qi, eyes glowing with cyan inner "
+            "light. "
+
+            "CRITICAL CHANGE: remove the wide bright yellow sun-disc halo and radiating beams behind "
+            "the head from the reference. The aura is now a TIGHT golden halo hugging the silhouette "
+            "of the cultivator's body, not a wide sunburst behind him. NO sun disc. NO rays. NO wide "
+            "circular aura. NO radiating beams. Just a soft golden glow that follows the figure's "
+            "outline. "
+
+            "A few small cyan qi orbs may orbit close to the body for energy, but the background "
+            "stays clean and transparent. Keep the character, drop the sunburst. "
+
+            f"{S}"
+        ),
+    },
+
+    # ── 1b. Body Tempering Disciple — Soul Manifestation (new middle tier) ────
+    # Bridge between Gold (Master Patriarch, still humanoid mortal) and the
+    # existing top-tier cosmic Sovereign art. The cultivation-novel "Nascent
+    # Soul" / "Soul Manifestation" beat: immortal threshold reached, no longer
+    # mortal, not yet cosmic. SINGLE-TIER PROMPT — PixelLab returns 4 candidates
+    # of the SAME middle-tier character so we can pick the best by hand. Output
+    # files land at tmp/producer_gen/p_disciple_middle_cand_<n>.png.
+    # ── 1c. Body Tempering Disciple — TRANSCENDED (new top tier) ─────────────
+    # Sits ONE LAYER above the current Mythic art. Same character, same
+    # bearing, same general shape. The "step up" is delivered through pose,
+    # color, and clothing — no bigger halos, no extra cosmic mandalas, no
+    # more aura. Power expressed through regalia and palette refinement.
+    # Reference + style: current p_disciple_mythic.png (the Heavenly Sovereign).
+    "p_disciple_transcended": {
+        "size": (96, 96),
+        "desc": (
+            "Xianxia cultivator at TRANSCENDED tier — fifth and final tier of the Body Tempering "
+            "Disciple ladder (Bronze→Silver→Gold→Mythic→Transcended). One level above the Mythic "
+            "Heavenly Sovereign reference, same character ascended. "
+
+            "ORIENTATION LOCKED: same FRAMING and ORIENTATION as Mythic reference. Powerful "
+            "enthroned-style meditation pose, facing forward, same silhouette scale and frame "
+            "placement. NO standing, NO kneeling, NO arms-raised gesture. EVOLUTION of Mythic's "
+            "pose, not a new pose. "
+
+            "CHARACTER: same male identity from the ladder, dark hair lifted from divine qi, "
+            "intense divine gaze (eyes open), commanding masculine presence. Figure DOMINANT in "
+            "frame, not swallowed by robes. "
+
+            "PALETTE (key shift): CHROME ROSE base — polished metallic rose-gold silk with subtle "
+            "SHINE and SHEEN, luminous not flat. Layered with rich GOLDEN trim, golden embroidery "
+            "on sleeves and hem, golden sash, golden crown. Cosmic violet from Mythic gone. NOT "
+            "flat white, NOT flat gold — luminous chrome rose with shine and gold accents. "
+
+            "STEP UP from Mythic (regalia + palette only, NOT bigger halos): same nine-layered silk "
+            "silhouette as Mythic in chrome rose + gold; spirit dragons refined as fine GOLDEN "
+            "embroidery woven INTO the robes (not separate beasts); one ornate golden imperial "
+            "crown; subtle golden constellation embroidery on inner robes; same tight halo as "
+            "Mythic now in warm golden tone. "
+
+            "FORBIDDEN: no standing, no kneeling, no arms raised, no swallowing silk, no bigger "
+            "halo, no separate spirit beasts, no cosmic violet, no flat white silk, no feminine "
+            "softness. "
+
+            f"{S}"
+        ),
+    },
+
+    "p_disciple_middle": {
+        "size": (96, 96),
+        "desc": (
+            "Pixel art Xianxia cultivator at SOUL MANIFESTATION tier — EXACTLY halfway between the "
+            "two reference images. Reference 1 (Gold Master Patriarch) is the silhouette/identity "
+            "anchor. Reference 2 (Heavenly Sovereign) is the upper bound — do NOT cross. "
+
+            "PRESERVE FROM REFERENCE 1 (non-negotiable): same face, same dark hair, same slim youthful "
+            "proportions, same 3/4 side-view orientation, same character placement and framing as "
+            "reference 1, same twin ceremonial swords visible at the sides, same jade-green + cream + "
+            "gold trim palette family, same cross-legged hovering meditation pose. "
+
+            "ADDED ON TOP (this is the step up — ornament and aura, NOT a different pose or palette): "
+            "1) a glowing golden CHEST PENDANT or visible soul orb at the centre of the chest, pulsing. "
+            "2) subtle cyan dao-script embroidery along the sleeves and hem of the existing robes. "
+            "3) an elegant jewelled hairpin in the topknot. "
+            "4) a TIGHT golden HALO directly behind the head (one clean small circle, shoulder-wide max). "
+            "5) three or four floating cyan-and-gold soul-orbs orbiting close to the body. "
+            "6) faint cyan dao-script characters drifting in the air between the orbs. "
+            "7) eyes closed in deeper meditation than Gold. "
+
+            "FORBIDDEN (these belong to reference 2, the upper bound — DO NOT include): no violet or "
+            "lavender colors, no royal blue, no twin spirit dragons, no enthroned or throne posture, "
+            "no nine-layered celestial silk, no constellations, no flowing flame-hair, no blazing white "
+            "eyes, no wide multi-tiered star halo, no cosmic mandala behind the figure, no front-facing "
+            "centered cosmic-god pose. "
+
+            "RESULT MUST LOOK LIKE ref 1 with power markers added — NOT like ref 2 toned down. "
+            "If in doubt, lean toward ref 1's 3/4 angle meditation style. "
+
+            f"{S}"
+        ),
+    },
+
     # ── 2. Spirit Herb Garden ─────────────────────────────────────────────────
     "p_herb_garden": {
         "size": (96, 96),
@@ -510,15 +622,33 @@ def pad_to_square(img, side):
 # Pipeline steps
 # ─────────────────────────────────────────────────────────────────────────────
 
-def run_generate(producer_id):
+def run_generate(producer_id, ref_path=None):
+    """Generate 4 candidates for a producer.
+       Optional `ref_path` attaches one or more PNGs as reference_images.
+       Accepts a single path OR comma-separated paths for multiple refs.
+       The FIRST ref is also used as style_image (palette anchor).
+       Chain pattern from gen_crystals.py."""
     if producer_id not in PRODUCERS:
         raise ValueError(f"Unknown producer '{producer_id}'. Known: {list(PRODUCERS)}")
 
     cfg = PRODUCERS[producer_id]
     w, h = cfg["size"]
 
+    # Parse one-or-many ref paths
+    ref_list = []
+    if ref_path:
+        for p in str(ref_path).split(","):
+            p = p.strip()
+            if not p: continue
+            rp = Path(p)
+            if not rp.exists():
+                raise FileNotFoundError(f"Reference image not found: {rp}")
+            ref_list.append(rp)
+
     print(f"\n{'='*60}")
     print(f"  Generating: {producer_id}  ({w}×{h})")
+    for r in ref_list:
+        print(f"  Reference:  {r.name}")
     print(f"{'='*60}")
 
     body = {
@@ -526,6 +656,18 @@ def run_generate(producer_id):
         "image_size":    {"width": w, "height": h},
         "no_background": True,
     }
+
+    if ref_list:
+        ref_sized_list = []
+        for rp in ref_list:
+            ref_b64  = base64.b64encode(rp.read_bytes()).decode()
+            ref_img  = {"type": "base64", "base64": ref_b64, "format": "png"}
+            rw, rh   = Image.open(rp).size
+            ref_sized_list.append({"image": ref_img, "size": {"width": rw, "height": rh}})
+        body["reference_images"] = ref_sized_list
+        # style_image is single-valued in the API; use the FIRST ref as the
+        # palette anchor. The other refs influence shape via reference_images.
+        body["style_image"]      = ref_sized_list[0]
 
     status, r = api_post("/generate-image-v2", body)
     if status != 202:
@@ -618,7 +760,9 @@ def run_show_prompts():
 
 if __name__ == "__main__":
     args = sys.argv[1:]
-    if len(args) == 2 and args[0] == "generate":
+    if (len(args) == 4 and args[0] == "generate" and args[2] == "--ref"):
+        run_generate(args[1], ref_path=args[3])
+    elif len(args) == 2 and args[0] == "generate":
         run_generate(args[1])
     elif len(args) == 2 and args[0] == "finalize":
         run_finalize(args[1])
