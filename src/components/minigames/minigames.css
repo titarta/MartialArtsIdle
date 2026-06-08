@@ -139,11 +139,46 @@
 .gd-plot:active { transform: scale(0.97); }
 .gd-plot-empty:hover { box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(220, 190, 130, 0.3); }
 .gd-plot-hole { width: 14px; height: 8px; border-radius: 50%; background: rgba(0, 0, 0, 0.45); box-shadow: 0 1px 0 rgba(220, 190, 130, 0.12); }
-.gd-seed { width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle, #b98e4e, #6b4e22); box-shadow: 0 0 6px rgba(220, 175, 110, 0.4); animation: gd-breathe 2s ease-in-out infinite; }
-@keyframes gd-breathe { 0%,100%{transform:scale(1);opacity:0.85} 50%{transform:scale(1.15);opacity:1} }
-.gd-herb { object-fit: contain; }
-.gd-herb-sprout { width: 46%; opacity: 0.9; animation: gd-grow 0.4s ease-out; }
-.gd-herb-bloom { width: 72%; animation: gd-grow 0.4s ease-out; filter: drop-shadow(0 0 8px rgba(150, 230, 160, 0.5)); position: relative; z-index: 1; }
+
+/* ── Plant sprite-sheet rendering ─────────────────────────────────────────
+   Each plant ships as a 128x128 PNG laid out as a 2x2 grid of 64x64 frames
+   (seed / sprout / growing / ripe). The .gd-plant base class sets up the
+   shared properties (size + crisp pixel rendering); each .gd-plant-<stage>
+   subclass shifts background-position to expose the right quadrant.
+
+   Used in three sizes:
+     plot      : 70% of plot tile, scaled via background-size + container size
+     chip      : 38x38 in the seed selector, only the 'bloom' quadrant shown
+     basket    : 32x32 in the basket grid, only the 'bloom' quadrant shown
+
+   background-size scales the FULL 128x128 sheet — so the displayed quadrant
+   ends up half that size (since each quadrant is 64x64 of 128x128 = 50%).
+   For a 70% plot tile (e.g. 84px tall), background-size: 200% 200% means
+   the sheet is 168x168 and each quadrant displays at 84x84.
+*/
+.gd-plant {
+  background-repeat: no-repeat;
+  background-size: 200% 200%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+/* In-plot rendering — the plant fills 70% of the plot tile, stage-shifted
+   via background-position. Seed = top-left, sprout = top-right,
+   growing = bottom-left, bloom = bottom-right. */
+.gd-plot .gd-plant {
+  width: 70%; height: 70%;
+  animation: gd-grow 0.4s ease-out;
+  position: relative; z-index: 1;
+}
+.gd-plot .gd-plant-bloom { filter: drop-shadow(0 0 8px rgba(150, 230, 160, 0.5)); }
+
+/* The four quadrant positions. Same rule applies wherever .gd-plant appears
+   (plot / chip / basket / recipe input). */
+.gd-plant-seed    { background-position:   0%   0%; }
+.gd-plant-sprout  { background-position: 100%   0%; }
+.gd-plant-growing { background-position:   0% 100%; }
+.gd-plant-bloom   { background-position: 100% 100%; }
+
 @keyframes gd-grow { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .gd-plot-bloom { box-shadow: inset 0 0 0 1.5px rgba(150, 230, 160, 0.6), inset 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 18px rgba(110, 200, 150, 0.3); }
 .gd-ripe { position: absolute; inset: 0; border-radius: 14px; box-shadow: inset 0 0 22px rgba(150, 230, 160, 0.45); animation: gd-ripe 1.6s ease-in-out infinite; }
@@ -168,7 +203,7 @@
 .gd-chip { scroll-snap-align: start; position: relative; flex: 0 0 auto; width: 88px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 6px 8px; cursor: pointer; border-radius: 12px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.03); overflow: hidden; transition: border-color 0.12s, background 0.12s, transform 0.08s; }
 .gd-chip:active { transform: scale(0.96); }
 .gd-chip-rarity { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-.gd-chip-sprite { width: 38px; height: 38px; object-fit: contain; margin-top: 2px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); }
+.gd-chip-sprite { width: 38px; height: 38px; margin-top: 2px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5)); display: inline-block; }
 .gd-chip-name { font-size: 10px; line-height: 1.15; text-align: center; color: var(--mg-cream); min-height: 2.3em; display: flex; align-items: center; }
 .gd-chip-cost { font-family: 'Cinzel', Georgia, serif; font-size: 12px; color: #b6f0cf; }
 .gd-chip-time { font-size: 9px; color: var(--mg-cream-soft); opacity: 0.75; }
@@ -190,7 +225,7 @@
 .gd-bk:hover { border-color: var(--mg-line-strong); }
 .gd-bk:active { transform: scale(0.95); }
 .gd-bk-rarity { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
-.gd-bk-sprite { width: 32px; height: 32px; object-fit: contain; margin-top: 2px; }
+.gd-bk-sprite { width: 32px; height: 32px; margin-top: 2px; display: inline-block; }
 .gd-bk-count { font-family: 'Cinzel', Georgia, serif; font-size: 12px; color: var(--mg-cream); }
 .gd-bk-sell { font-size: 8.5px; letter-spacing: 0.02em; color: #b6f0cf; }
 .gd-basket-actions { display: flex; gap: 10px; }
@@ -208,7 +243,7 @@
 .gd-recipe-effect { font-size: 11px; color: var(--mg-jade); }
 .gd-recipe-inputs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .gd-ri { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px 2px 3px; border-radius: 999px; font-size: 10.5px; font-variant-numeric: tabular-nums; border: 1px solid var(--mg-line); background: rgba(0, 0, 0, 0.25); }
-.gd-ri img { width: 18px; height: 18px; object-fit: contain; }
+.gd-ri .gd-plant { width: 18px; height: 18px; display: inline-block; }
 .gd-ri-ok { color: var(--mg-jade); border-color: rgba(110, 200, 150, 0.4); }
 .gd-ri-no { color: #ff8a9b; }
 .gd-recipe-brew { flex: 0 0 auto; padding: 9px 16px; }
@@ -407,8 +442,8 @@
 .da-skip { margin-top: 6px; font-size: 12px; padding: 7px 14px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .mg-frame, .mg-scrim, .mg-result, .gd-herb-sprout, .gd-herb-bloom, .rf-pill img,
-  .gd-seed, .gd-ripe, .rf-heat-true, .da-tab-dot, .da-record, .da-drilling-glyph,
+  .mg-frame, .mg-scrim, .mg-result, .gd-plant, .rf-pill img,
+  .gd-ripe, .rf-heat-true, .da-tab-dot, .da-record, .da-drilling-glyph,
   .da-field-result, .da-field.shake, .da-field.da-pushing, .da-pushing .u-you,
   .da-vigor2-fill, .da-host, .da-unit,
   .gd-dew-drop, .gd-elixir-orb, .gd-elixir-bar-fill, .gd-tab-dot, .gd-plot-bar-fill, .gd-toast,

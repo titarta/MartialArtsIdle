@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MiniGameResult } from './MiniGameMode';
 import { fmt } from '../../utils/format';
-import { HERBS } from '../../data/materials';
 import {
-  SEEDS, SEEDS_BY_ID, RECIPES, RECIPES_BY_ID, LOCKED_SEEDS, ALMANAC_TOTAL,
+  SEEDS, SEEDS_BY_ID, RECIPES, RECIPES_BY_ID,
+  LOCKED_SEEDS, LOCKED_SEEDS_BY_ID, ALMANAC_TOTAL,
   DISCOVERY_BONUS, CHANNEL_MIN_VALUE,
   loadGarden, saveGarden,
   stageOf, growthProgress, ripeCount, nextRipeAt,
@@ -17,7 +17,20 @@ import {
 
 const BASE = import.meta.env.BASE_URL;
 const url = (s) => (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
-const spriteFor = (id) => url(`/sprites/items/${id}.png`);
+// Each plant ships as a 128x128 PNG sprite sheet at /sprites/plants/{id}.png
+// laid out as a 2x2 grid of 64x64 quadrants (seed / sprout / growing / ripe).
+// SpriteFor returns the URL; the consuming JSX sets background-image + a
+// stage-specific .gd-plant-<stage> class to crop the right quadrant via CSS
+// background-position.
+const spriteFor = (id) => url(`/sprites/plants/${id}.png`);
+// Used by chip + basket renderers — defaults to the "ripe" (bottom-right)
+// quadrant since that's the most recognisable view of the plant.
+const STAGE_CLASS = {
+  seed:    'gd-plant-seed',
+  sprout:  'gd-plant-sprout',
+  growing: 'gd-plant-growing',
+  bloom:   'gd-plant-bloom',
+};
 
 /** Compact human countdown: "2h 05m", "12m 30s", "44s". */
 function fmtCountdown(ms) {
@@ -43,7 +56,9 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   });
   const [now, setNow]       = useState(() => Date.now());
   const [tab, setTab]       = useState('garden');           // 'garden' | 'brew'
-  const [selSeed, setSel]   = useState('iron_herb_1');      // free seed selected by default
+  // Default to the free Spirit Mint so a brand-new player can sow immediately
+  // without browsing the seed bar first.
+  const [selSeed, setSel]   = useState('spirit_mint');
   const [cashing, setCash]  = useState(false);
   const [toast, setToast]   = useState(null);               // { text, key }
   const tickRef  = useRef(null);
@@ -195,7 +210,12 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               const seed   = plot ? SEEDS_BY_ID[plot.seed] : null;
               const prog   = growthProgress(plot, now);
               const remain = plot && seed ? plot.at + seed.growMs - now : 0;
-              const growing = st === 'seed' || st === 'sprout';
+              // Pre-bloom stages all show the growth countdown + bar; bloom
+              // gets the ripe glow instead. 'seed' is the first 33% of grow
+              // time, then sprout, then growing — all four render via the
+              // same sprite-sheet element with a different stage class that
+              // shifts background-position to the matching 64x64 quadrant.
+              const growing = st === 'seed' || st === 'sprout' || st === 'growing';
               const label = st === 'empty'
                 ? `Empty plot. Sow ${SEEDS_BY_ID[selSeed].name}`
                 : st === 'bloom'
@@ -203,10 +223,14 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                   : `${seed.name} growing, ${fmtCountdown(remain)} left`;
               return (
                 <button key={i} type="button" className={`gd-plot gd-plot-${st}`} onClick={() => onPlotTap(i)} aria-label={label}>
-                  {st === 'empty'  && <span className="gd-plot-hole" />}
-                  {st === 'seed'   && <span className="gd-seed" />}
-                  {st === 'sprout' && <img className="gd-herb gd-herb-sprout" src={spriteFor(plot.seed)} alt="" draggable={false} />}
-                  {st === 'bloom'  && <img className="gd-herb gd-herb-bloom" src={spriteFor(plot.seed)} alt="" draggable={false} />}
+                  {st === 'empty' && <span className="gd-plot-hole" />}
+                  {st !== 'empty' && (
+                    <span
+                      className={`gd-plant ${STAGE_CLASS[st] || ''}`}
+                      style={{ backgroundImage: `url(${spriteFor(plot.seed)})` }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {st === 'bloom'  && <span className="gd-ripe" aria-hidden="true" />}
                   {growing && <span className="gd-plot-time">{fmtCountdown(remain)}</span>}
                   {growing && (
@@ -248,20 +272,31 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                   className={`gd-chip ${on ? 'gd-chip-on' : ''} ${afford ? '' : 'gd-chip-poor'}`}
                   onClick={() => setSel(s.id)}>
                   <span className="gd-chip-rarity" style={{ background: s.color }} aria-hidden="true" />
-                  <img className="gd-chip-sprite" src={spriteFor(s.id)} alt="" draggable={false} />
+                  <span
+                    className="gd-chip-sprite gd-plant gd-plant-bloom"
+                    style={{ backgroundImage: `url(${spriteFor(s.id)})` }}
+                    aria-hidden="true"
+                  />
                   <span className="gd-chip-name">{s.name}</span>
                   <span className="gd-chip-cost">{s.dewCost === 0 ? t('common.free') : t('garden.dewCost', { n: s.dewCost })}</span>
                   <span className="gd-chip-time">{growLabel(s.growMs)}</span>
                 </button>
               );
             })}
-            {LOCKED_SEEDS.map((id) => (
-              <div key={id} className="gd-chip gd-chip-locked" aria-hidden="true">
-                <img className="gd-chip-sprite" src={spriteFor(id)} alt="" draggable={false} />
-                <span className="gd-chip-name">{HERBS[id]?.name ?? '???'}</span>
-                <span className="gd-chip-lock">{t('garden.deeperRealms')}</span>
-              </div>
-            ))}
+            {LOCKED_SEEDS.map((id) => {
+              const meta = LOCKED_SEEDS_BY_ID[id];
+              return (
+                <div key={id} className="gd-chip gd-chip-locked" aria-hidden="true">
+                  <span
+                    className="gd-chip-sprite gd-plant gd-plant-bloom"
+                    style={{ backgroundImage: `url(${spriteFor(id)})` }}
+                    aria-hidden="true"
+                  />
+                  <span className="gd-chip-name">{meta?.name ?? '???'}</span>
+                  <span className="gd-chip-lock">{t('garden.deeperRealms')}</span>
+                </div>
+              );
+            })}
           </div>
         </>
       ) : (
@@ -285,7 +320,11 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                     <button key={id} type="button" className="gd-bk" onClick={() => doSellHerb(id)}
                       title={`Sell ${n}x ${s.name} for ${s.sell * n} Spirit Dew`}>
                       <span className="gd-bk-rarity" style={{ background: s.color }} aria-hidden="true" />
-                      <img className="gd-bk-sprite" src={spriteFor(id)} alt="" draggable={false} />
+                      <span
+                        className="gd-bk-sprite gd-plant gd-plant-bloom"
+                        style={{ backgroundImage: `url(${spriteFor(id)})` }}
+                        aria-hidden="true"
+                      />
                       <span className="gd-bk-count">×{n}</span>
                       <span className="gd-bk-sell">{t('garden.sellHerb', { n: s.sell * n })}</span>
                     </button>
@@ -322,7 +361,11 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                         return (
                           <span key={id} className={`gd-ri ${have >= need ? 'gd-ri-ok' : 'gd-ri-no'}`}
                             title={SEEDS_BY_ID[id]?.name ?? id}>
-                            <img src={spriteFor(id)} alt="" draggable={false} />
+                            <span
+                              className="gd-plant gd-plant-bloom"
+                              style={{ backgroundImage: `url(${spriteFor(id)})` }}
+                              aria-hidden="true"
+                            />
                             {have}/{need}
                           </span>
                         );
