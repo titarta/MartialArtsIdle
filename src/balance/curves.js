@@ -1,5 +1,5 @@
 /**
- * curves.js — the Balance Dashboard curve registry.
+ * curves.js, the Balance Dashboard curve registry.
  *
  * Each entry describes one scaling curve in the game:
  *   - what it scales over (x), what it produces (y),
@@ -13,8 +13,8 @@
  * Adding coverage = adding one entry here. Nothing else needs to change.
  *
  * IMPORTANT: this module is dev-only (mounted on ?balance). It imports the
- * pure named exports from the game's data/hooks modules — never the hooks
- * themselves — so it has no runtime side effects on the player app.
+ * pure named exports from the game's data/hooks modules, never the hooks
+ * themselves, so it has no runtime side effects on the player app.
  */
 
 import REALMS, {
@@ -33,6 +33,10 @@ import {
 } from '../hooks/useQiCrystal';
 import { qiForKarma, KARMA_QI_SCALE } from '../hooks/useReincarnationKarma';
 import PRODUCERS from '../data/producers';
+import { UPGRADES_BY_ID } from '../data/upgrades';
+import { NODES } from '../data/reincarnationTree';
+import { SHOP_ITEMS } from '../data/shopItems';
+import { QI_SPARK_BY_ID } from '../data/qiSparks';
 
 // ── shared helpers ───────────────────────────────────────────────────────────
 
@@ -56,6 +60,44 @@ for (let i = 0; i < REALMS.length - 1; i++) {
     });
   }
 }
+
+// ── phase-2 data (read live from the imported modules, no drift) ────────────
+
+const MECHANIC_DEFS = [
+  { id: 'crystal_click',     label: 'Crystal Reservoir' },
+  { id: 'consecutive_focus', label: 'Consecutive Focus' },
+  { id: 'divine_qi',         label: 'Divine Qi' },
+  { id: 'pattern_click',     label: 'Tracing Meridians' },
+];
+/** Mechanic-tier upgrade cost table { 2..5 } per mechanic, from UPGRADES. */
+const mechCostTable = (mid) => {
+  const t = {};
+  for (let tier = 2; tier <= 5; tier++) t[tier] = UPGRADES_BY_ID[`u_${mid}_t${tier}`]?.cost ?? 0;
+  return t;
+};
+/** A spark-card field per tier (1..5) for a mechanic, from QI_SPARK_BY_ID. */
+const mechField = (mid, field) => {
+  const t = {};
+  for (let tier = 1; tier <= 5; tier++) t[tier] = QI_SPARK_BY_ID[`${mid}_t${tier}`]?.[field] ?? 0;
+  return t;
+};
+const CRYSTAL_RATE = mechField('crystal_click', 'rate');
+const DIVINE_BURST = mechField('divine_qi', 'burstSeconds');
+/** Consecutive Focus CUMULATIVE qi/s bonus (%) through each tier threshold. */
+const CF_CUMULATIVE = (() => {
+  const t = {}; let sum = 0;
+  for (let tier = 1; tier <= 5; tier++) {
+    sum += QI_SPARK_BY_ID[`consecutive_focus_t${tier}`]?.bonus ?? 0;
+    t[tier] = Math.round(sum * 100);
+  }
+  return t;
+})();
+
+const TREE_NODE_IDS = NODES.map(n => n.id);
+const TREE_COST     = NODES.map(n => n.cost);
+
+// Blood Lotus gameplay items (exclude the flat-priced cosmetic particles).
+const SHOP_GAMEPLAY = SHOP_ITEMS.filter(it => it.category !== 'cosmetic');
 
 // ── the registry ─────────────────────────────────────────────────────────────
 
@@ -198,7 +240,7 @@ export const CURVES = [
     id: 'crystal_tap_cost',
     group: 'Upgrades',
     label: 'Crystal-tap upgrade cost',
-    blurb: 'Refined Tap I–V cost ramp = base × ratio^(tier-1).',
+    blurb: 'Refined Tap I-V cost ramp = base × ratio^(tier-1).',
     x: { label: 'Tap tier', from: 1, to: 5, step: 1 },
     y: { label: 'Qi cost', log: true },
     paramsSpec: [
@@ -214,7 +256,7 @@ export const CURVES = [
     id: 'offline_rate',
     group: 'Offline',
     label: 'Offline qi rate',
-    blurb: 'Fraction of live qi/s accrued while away = base + perTier × upgrades owned (0–4).',
+    blurb: 'Fraction of live qi/s accrued while away = base + perTier × upgrades owned (0-4).',
     x: { label: 'Idle Cultivation tier', from: 0, to: 4, step: 1 },
     y: { label: 'Offline rate', log: false },
     paramsSpec: [
@@ -230,7 +272,7 @@ export const CURVES = [
     id: 'offline_cap',
     group: 'Offline',
     label: 'Offline cap (hours)',
-    blurb: 'Max offline accrual window = base + perTier × Deeper Slumber tiers owned (0–4).',
+    blurb: 'Max offline accrual window = base + perTier × Deeper Slumber tiers owned (0-4).',
     x: { label: 'Deeper Slumber tier', from: 0, to: 4, step: 1 },
     y: { label: 'Hours', log: false },
     paramsSpec: [
@@ -240,6 +282,96 @@ export const CURVES = [
     fn: (t, p) => p.base + p.perTier * t,
     baseline: (t) => 8 + 4 * t,
     apply: { kind: 'snippet', target: 'src/data/upgrades.js (addHours) + src/systems/autoFarm.js (base)' },
+  },
+
+  // ══ Mechanics (hand-tuned tables, point-tune directly) ═══════════════════
+  {
+    id: 'mechanic_cost',
+    group: 'Mechanics',
+    label: 'Mechanic upgrade cost',
+    blurb: 'Qi to buy each mechanic tier (T2-T5; T1 is granted by crystal evolution). ' +
+           'Hand-tuned ~×8 ramp, pick a mechanic and drag a tier to retune.',
+    x: { label: 'Tier', from: 2, to: 5, step: 1 },
+    y: { label: 'Qi cost', log: true },
+    paramsSpec: [],
+    fn: (tier, p) => p.table?.[tier] ?? 0,
+    variants: MECHANIC_DEFS.map(m => ({
+      id: m.id, label: m.label,
+      params: { table: mechCostTable(m.id) },
+      baseline: (t) => mechCostTable(m.id)[t] ?? 0,
+    })),
+    pointLabel: (t) => `Tier ${t}`,
+    apply: { kind: 'snippet', target: 'src/data/upgrades.js (MECHANIC_TIER_CONFIG)' },
+  },
+  {
+    id: 'crystal_reservoir_rate',
+    group: 'Mechanics',
+    label: 'Crystal Reservoir fill rate',
+    blurb: 'Fraction of your qi/s the reservoir stockpiles, per crystal_click tier.',
+    x: { label: 'Tier', from: 1, to: 5, step: 1 },
+    y: { label: 'rate (× qi/s)', log: false },
+    paramsSpec: [],
+    fn: (t) => CRYSTAL_RATE[t] ?? 0,
+    baseline: (t) => CRYSTAL_RATE[t] ?? 0,
+    pointLabel: (t) => `Tier ${t}`,
+    apply: { kind: 'snippet', target: 'src/data/qiSparks.js (crystal_click_t*)' },
+  },
+  {
+    id: 'divine_qi_burst',
+    group: 'Mechanics',
+    label: 'Divine Qi burst',
+    blurb: 'Seconds of qi/s granted by collecting a Divine Qi orb, per tier.',
+    x: { label: 'Tier', from: 1, to: 5, step: 1 },
+    y: { label: 'burst (s of qi/s)', log: false },
+    paramsSpec: [],
+    fn: (t) => DIVINE_BURST[t] ?? 0,
+    baseline: (t) => DIVINE_BURST[t] ?? 0,
+    pointLabel: (t) => `Tier ${t}`,
+    apply: { kind: 'snippet', target: 'src/data/qiSparks.js (divine_qi_t*)' },
+  },
+  {
+    id: 'consecutive_focus_bonus',
+    group: 'Mechanics',
+    label: 'Consecutive Focus bonus',
+    blurb: 'Cumulative qi/s bonus (%) once you hold Focus through each tier threshold.',
+    x: { label: 'Tier', from: 1, to: 5, step: 1 },
+    y: { label: 'cumulative qi/s %', log: false },
+    paramsSpec: [],
+    fn: (t) => CF_CUMULATIVE[t] ?? 0,
+    baseline: (t) => CF_CUMULATIVE[t] ?? 0,
+    pointLabel: (t) => `Tier ${t}`,
+    apply: { kind: 'snippet', target: 'src/data/qiSparks.js (consecutive_focus_t*)' },
+  },
+
+  // ══ Reincarnation, Eternal Tree (override-backed, live on reload) ════════
+  {
+    id: 'tree_node_cost',
+    group: 'Reincarnation',
+    label: 'Eternal Tree node cost',
+    blurb: 'Karma to unlock each Eternal Tree node. Override-backed: drag a node to retune ' +
+           '(live via reincarnationTree.override.json).',
+    x: { label: 'Node index', from: 0, to: Math.max(0, TREE_COST.length - 1), step: 1 },
+    y: { label: 'Karma', log: false },
+    paramsSpec: [],
+    fn: (i) => TREE_COST[i] ?? 0,
+    baseline: (i) => TREE_COST[i] ?? 0,
+    pointLabel: (i) => NODES[i]?.label ?? `#${i}`,
+    apply: { kind: 'override', domain: 'reincarnationTree', keys: TREE_NODE_IDS, field: 'cost', target: 'src/data/reincarnationTree.js' },
+  },
+
+  // ══ Shop ═════════════════════════════════════════════════════════════════
+  {
+    id: 'shop_price',
+    group: 'Shop',
+    label: 'Blood Lotus price',
+    blurb: 'Blood Lotus cost of each gameplay shop item (cosmetics excluded).',
+    x: { label: 'Item', from: 0, to: Math.max(0, SHOP_GAMEPLAY.length - 1), step: 1 },
+    y: { label: 'Blood Lotus', log: false },
+    paramsSpec: [],
+    fn: (i) => SHOP_GAMEPLAY[i]?.cost ?? 0,
+    baseline: (i) => SHOP_GAMEPLAY[i]?.cost ?? 0,
+    pointLabel: (i) => SHOP_GAMEPLAY[i]?.name ?? `#${i}`,
+    apply: { kind: 'snippet', target: 'src/data/shopItems.js' },
   },
 ];
 

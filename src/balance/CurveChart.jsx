@@ -1,10 +1,10 @@
 /**
- * CurveChart — a lightweight SVG line chart for the Balance Dashboard.
+ * CurveChart, a lightweight SVG line chart for the Balance Dashboard.
  *
  * No charting dependency: full control over log/linear axes and, crucially,
- * draggable per-point fine-tuning. Renders two series — the dim BASELINE (the
+ * draggable per-point fine-tuning. Renders two series, the dim BASELINE (the
  * real live-game value) and the bright TUNED curve (formula + point overrides)
- * — plus a hover crosshair readout. Drag any tuned point vertically to override
+ *, plus a hover crosshair readout. Drag any tuned point vertically to override
  * it; overridden points render in amber.
  */
 import { useRef, useState, useCallback } from 'react';

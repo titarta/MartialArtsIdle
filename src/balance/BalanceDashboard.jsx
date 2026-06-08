@@ -1,5 +1,5 @@
 /**
- * BalanceDashboard — a dev-only progression-curve editor (mounted on ?balance).
+ * BalanceDashboard, a dev-only progression-curve editor (mounted on ?balance).
  *
  * Left: grouped curve list. Center: chart (baseline vs tuned, draggable points).
  * Right: blurb, variant picker, formula params (slider + number), point-override
@@ -145,9 +145,11 @@ export default function BalanceDashboard() {
           <section className="bd-sec">
             <div className="bd-sec-row">
               <label className="bd-sec-title">Formula params</label>
-              <button className="bd-mini" onClick={resetParams}>reset</button>
+              {curve.paramsSpec.length > 0 && <button className="bd-mini" onClick={resetParams}>reset</button>}
             </div>
-            {curve.paramsSpec.map(s => {
+            {curve.paramsSpec.length === 0 ? (
+              <p className="bd-hint">Lookup table: no formula. Tune values point-by-point below.</p>
+            ) : curve.paramsSpec.map(s => {
               const val = params[s.key];
               const hasRange = Number.isFinite(s.min) && Number.isFinite(s.max);
               return (
