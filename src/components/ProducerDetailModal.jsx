@@ -65,9 +65,14 @@ export default function ProducerDetailModal({
   // tiers added later (e.g. transcended) don't drop other producers to Bronze.
   const sprite    = resolveSprite(producer, spriteIdx) ?? '◆';
   const minigame  = getMinigame(producer.id);
-  const isMythic  = tier?.name === 'mythic';
-  // Mythic tier OR an Eternal Tree node (roster/garden/furnace) opens the art.
-  const canEnterMinigame = isMythic || !!minigameUnlocked;
+  // Mythic-OR-HIGHER tier OR an Eternal Tree node (roster/garden/furnace)
+  // opens the art. Hardcoding "=== 'mythic'" caused the disciple to lose
+  // minigame access at Transcended — but tier progression is monotone, you
+  // never lose what a lower tier unlocked. Compare by tier-idx so any tier
+  // at or above Mythic keeps the gate open.
+  const mythicIdx        = SPRITE_TIERS.find(t => t.name === 'mythic')?.idx ?? 3;
+  const reachedMythic    = (tier?.idx ?? -1) >= mythicIdx;
+  const canEnterMinigame = reachedMythic || !!minigameUnlocked;
 
   const upMult        = upgradeMult ?? 1;
   const xMult         = extraMult   ?? 1;
