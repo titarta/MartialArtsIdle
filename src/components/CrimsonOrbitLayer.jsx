@@ -30,8 +30,12 @@ const lerp  = (a, b, t) => a + (b - a) * t;
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const rnd   = () => Math.random() * 2 - 1;
 
-const ORB   = [0, 1, 2, 3].map((n) => `${BASE}vfx/crimson_orb_${n}.png`);
-const SHARD = [0, 1, 2, 3].map((n) => `${BASE}vfx/crimson_shard_${n}.png`);
+// v2 picks: a translucent orb + a translucent swirl orb, and a single
+// crimson crystal-fragment cluster (texture-matched to the qi crystal).
+const ORB   = [0, 1].map((n) => `${BASE}vfx/crimson_orb_${n}.png`);
+// 3 separate fragments split out of the cluster (see split_shard.py) so they
+// orbit independently instead of as one rigid clump.
+const SHARD = [0, 1, 2].map((n) => `${BASE}vfx/crimson_shard_${n}.png`);
 
 // ── Tunables (picked in the mockup) ─────────────────────────────────────────
 const LEAN      = 78;    // ring tilt toward viewer (deg); higher = flatter ellipse
@@ -50,9 +54,9 @@ const RINGS = [
     key: 'A', az: 30, speed: 0.60, rFrac: 0.95,
     bodies: [
       { src: ORB[0],   szFrac: 0.12 },
-      { src: SHARD[0], szFrac: 0.14 },
+      { src: SHARD[0], szFrac: 0.13 },
       { src: ORB[1],   szFrac: 0.12 },
-      { src: SHARD[1], szFrac: 0.14 },
+      { src: SHARD[1], szFrac: 0.10 },
     ],
   },
   {
@@ -62,10 +66,10 @@ const RINGS = [
     // head-on. (The back crossing is hidden behind the cultivator.)
     key: 'B', az: -30, speed: -0.60, rFrac: 0.95,
     bodies: [
-      { src: SHARD[2], szFrac: 0.14 },
-      { src: ORB[2],   szFrac: 0.12 },
-      { src: SHARD[3], szFrac: 0.14 },
-      { src: ORB[3],   szFrac: 0.12 },
+      { src: ORB[1],   szFrac: 0.12 },
+      { src: SHARD[2], szFrac: 0.095 },
+      { src: ORB[0],   szFrac: 0.12 },
+      { src: SHARD[1], szFrac: 0.10 },
     ],
   },
 ];

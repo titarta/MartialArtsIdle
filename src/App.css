@@ -20204,6 +20204,7 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   position: absolute;
   left: 0;
   top: 0;
+  object-fit: contain; /* keep each fragment's aspect ratio in its square box */
   will-change: transform;
   /* image-rendering intentionally omitted — it follows the global
      Settings -> Rendering toggle via the `.rendering-pixelated img` rule. */

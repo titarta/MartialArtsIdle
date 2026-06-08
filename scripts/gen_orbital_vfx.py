@@ -117,12 +117,13 @@ ASSETS = {
         "size": (128, 128),
         "desc": (
             "A glowing round orb of condensed crimson qi energy, a single luminous sphere. "
-            "A bright white-hot core at the centre blooms outward through vivid crimson, "
-            "then deepens to dark blood-red at the rim. "
-            "A thin warm gold halo catches the very edge of the sphere. "
-            "A few tiny bright sparks drift just off the surface. "
-            "Soft inner radiance, the orb glows from within with a smooth gradient, glassy and molten. "
-            "Palette: white-hot core (#fff2f0), vivid crimson (#e23b54), deep blood-red (#7a0f1e), warm gold rim (#e8b54a). "
+            "TRANSLUCENT and glassy like coloured glass or a bubble of light -- you can see through it, "
+            "with soft semi-transparent alpha edges that fade into the air instead of a hard solid fill. "
+            "A bright white-hot core glows at the centre, blooming outward through vivid translucent crimson, "
+            "deepening to a faint blood-red rim that fades to nearly transparent at the very edge. "
+            "A thin warm gold sheen catches the edge. A few tiny bright sparks drift just off the surface. "
+            "Ethereal and luminous from within, the same see-through quality as this game's qi particle orbs, but crimson. "
+            "Palette: white-hot core (#fff2f0), translucent crimson (#e23b54), deep blood-red (#7a0f1e), faint gold sheen (#e8b54a). "
             f"{S}"
         ),
     },
@@ -130,14 +131,20 @@ ASSETS = {
     # Sharp faceted blood-crystal fragment -- the orbiting "shard" body.
     "crimson_shard": {
         "size": (128, 128),
+        # style_image only (not reference_images) so we borrow the crystal's
+        # facet/translucent TEXTURE without forcing its cluster shape; the prompt
+        # drives the single-fragment shape and the crimson recolour.
+        "ref": Path(__file__).parent.parent / "public/crystals/crystal_6.png",
         "desc": (
-            "A single sharp shard of blood-crystal, one angular faceted sliver of gem floating alone. "
-            "Jagged and pointed, like a broken piece snapped off a larger crystal. "
-            "Deep crimson body with brighter crimson facet highlights catching the light across its faces. "
-            "Molten gold light glows along the inner fracture lines, as if liquid gold is sealed inside crimson glass. "
-            "A faint warm glow bleeds off the sharpest tips. "
-            "Translucent luminous facets, lit from within, edges defined by light rather than a stroke. "
-            "Palette: deep crimson (#9c1228), bright crimson facet (#e23b54), molten gold inner glow (#e8b54a), white-gold core (#fff0c2). "
+            "A single sharp fragment broken off a crimson qi crystal -- one jagged angular shard, NOT a full cluster. "
+            "It has the SAME faceted translucent crystalline texture as the reference crystal: clean geometric facets, "
+            "a glassy semi-transparent body you can see light through, a bright internal glow along the fracture lines, "
+            "sharp crystalline edges catching highlights. "
+            "But where the reference crystal is cool violet, THIS fragment is deep CRIMSON and blood-red all over -- "
+            "a shard of a crimson version of the same qi stone. Strongly crimson, no blue, no purple. "
+            "Translucent alpha: the thin edges fade to nearly transparent and light passes through the facets. "
+            "A faint warm glow bleeds off the sharpest tip. "
+            "Palette: deep crimson (#9c1228), bright crimson facet highlights (#e23b54), white-hot inner fracture glow (#fff0f0), faint gold edge (#e8b54a). "
             f"{S}"
         ),
     },
@@ -187,6 +194,16 @@ def run_generate(asset_id):
         "image_size":  {"width": w, "height": h},
         "no_background": True,
     }
+
+    # Optional texture reference (style_image only — vibe/facets, not shape).
+    ref = cfg.get("ref")
+    if ref and Path(ref).exists():
+        ref_b64   = base64.b64encode(Path(ref).read_bytes()).decode()
+        rw, rh    = Image.open(ref).size
+        ref_sized = {"image": {"type": "base64", "base64": ref_b64, "format": "png"},
+                     "size":  {"width": rw, "height": rh}}
+        body["style_image"] = ref_sized
+        print(f"  Texture style ref: {Path(ref).name}  ({rw}x{rh})")
 
     status, r = api_post("/generate-image-v2", body)
     if status != 202:
@@ -241,6 +258,17 @@ def run_finalize_all(asset_id):
         print(f"    cand_{n} -> {out_path.name}  ({img.size[0]}x{img.size[1]})")
     print(f"\n  Done. {len(cands)} files in {OUT_DIR}")
 
+
+def run_finalize_as(asset_id, cand_n, out_name):
+    """Crop a specific candidate and save it under an explicit public/vfx name."""
+    src = TMP_DIR / f"{asset_id}_cand_{cand_n}.png"
+    if not src.exists():
+        raise FileNotFoundError(f"Candidate not found: {src}")
+    img = crop_transparent_edges(Image.open(src).convert("RGBA"))
+    out = OUT_DIR / out_name
+    img.save(str(out))
+    print(f"  {src.name} -> {out.name}  ({img.size[0]}x{img.size[1]})")
+
 # -----------------------------------------------------------------------------
 # CLI
 # -----------------------------------------------------------------------------
@@ -252,6 +280,8 @@ if __name__ == "__main__":
         run_finalize(sys.argv[2], sys.argv[3])
     elif len(sys.argv) == 3 and sys.argv[1] == "finalize-all":
         run_finalize_all(sys.argv[2])
+    elif len(sys.argv) == 5 and sys.argv[1] == "finalize-as":
+        run_finalize_as(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         print("Usage:")
         print(f"  python {sys.argv[0]} generate <asset_id>")
