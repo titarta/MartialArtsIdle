@@ -485,17 +485,26 @@ def trim_alpha(img):
     return img.crop((left, top, right + 1, bot + 1))
 
 def fit_into_quadrant(stage_img):
-    """Scale + centre an arbitrary-shape sprite into a 64x64 quadrant."""
-    cropped = trim_alpha(stage_img)
-    cw, ch = cropped.size
-    scale = min(QUAD_SIZE / cw, QUAD_SIZE / ch) if cw > 0 and ch > 0 else 1
-    new_w, new_h = max(1, int(cw * scale)), max(1, int(ch * scale))
-    resized = cropped.resize((new_w, new_h), Image.LANCZOS)
+    """Uniform 50% downscale, no alpha-trim, no re-fit.
 
-    quad = Image.new("RGBA", (QUAD_SIZE, QUAD_SIZE), (0, 0, 0, 0))
-    off = ((QUAD_SIZE - new_w) // 2, (QUAD_SIZE - new_h) // 2)
-    quad.paste(resized, off, resized)
-    return quad
+    The old version trimmed alpha around each candidate then SCALED THE
+    CONTENT to fill 64x64. A tiny 20x30 seedling sprite got upscaled to
+    64x64 — same PPI as a ripe plant whose content already nearly filled
+    128x128 originally, just downscaled instead. Result: the seed looked
+    massively pixelated on screen AND took the same display footprint as
+    the mature plant, robbing the player of visible growth.
+
+    Now we treat the 128x128 candidate as the source of truth and
+    uniformly downscale 50% to 64x64. The plant's content size relative
+    to the canvas is preserved — a tiny seed stays a tiny seed in its
+    quadrant, surrounded by transparent space. The ripe plant fills its
+    quadrant the way PixelLab drew it. Player sees real growth across
+    stages, all stages share the same effective PPI.
+    """
+    if stage_img.size != (QUAD_SIZE * 2, QUAD_SIZE * 2):
+        # Fallback for any non-standard candidate size.
+        return stage_img.resize((QUAD_SIZE, QUAD_SIZE), Image.LANCZOS)
+    return stage_img.resize((QUAD_SIZE, QUAD_SIZE), Image.LANCZOS)
 
 def finalize_2x2(plant_id, order):
     """

@@ -64,6 +64,7 @@ body.event-cinematic .char-evolve-overlay {
 .rendering-pixelated .app-bg,
 .rendering-pixelated .combat-stage,
 .rendering-pixelated .sprite-animator,
+.rendering-pixelated .gd-plant,
 .rendering-pixelated .screen-container:not(.sc-fullbleed)::before {
   image-rendering: pixelated;
 }

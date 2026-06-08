@@ -159,8 +159,10 @@
 .gd-plant {
   background-repeat: no-repeat;
   background-size: 200% 200%;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  /* image-rendering is intentionally NOT set here — the project has a
+     single global rendering rule in App.css that follows the user's
+     Settings -> Rendering toggle (pixelated vs smooth). Hardcoding it
+     per-element would override the player's preference. */
 }
 /* In-plot rendering — the plant fills 70% of the plot tile, stage-shifted
    via background-position. Seed = top-left, sprout = top-right,
