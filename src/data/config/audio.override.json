@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-02T01:47:22.334Z",
+  "updatedAt": "2026-06-08T22:49:39.766Z",
   "records": {
     "ui_click": {
       "src": [
@@ -184,6 +184,35 @@
             "audio/sfx/focus_tick_5.wav"
           ]
         }
+      ]
+    },
+    "crystal_tap": {
+      "variations": [
+        {
+          "src": [
+            "audio/sfx/crystal_tap_1.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/crystal_tap_2.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/crystal_tap_3.wav"
+          ]
+        },
+        {
+          "src": [
+            "audio/sfx/crystal_tap_4.wav"
+          ]
+        }
+      ]
+    },
+    "crystal_level_up": {
+      "src": [
+        "audio/sfx/crystal_level_up.wav"
       ]
     }
   }
