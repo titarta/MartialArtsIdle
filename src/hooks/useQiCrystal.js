@@ -23,7 +23,12 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getRefinedQi } from '../data/materials';
+// getRefinedQi used to look up the refined-qi value of a CULTIVATION_MATERIALS
+// stone. The v1 Cookie-Clicker pivot dropped the inventory + stone-feed flow
+// (the crystal levels purely via the auto-collect tick now), so the feed /
+// feedMultiple paths below are unreachable. The local stub keeps their math
+// honest if a designer build re-enables the feed modal later.
+const getRefinedQi = (_itemId) => 0;
 import { trackCrystalFed } from '../analytics';
 import { recordStat, peakStat } from '../systems/statsRecorder';
 

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Qi Crystal Milestone Ideas, Review</title>
+<style>
+  :root{
+    --bg:#0a0e1f; --bg2:#0e1430; --panel:#121a36; --panel2:#172143;
+    --ink:#e6e9f5; --ink-dim:#a6adcb; --ink-faint:#727aa0;
+    --cyan:#6fd6e0; --cyan-dim:#3f7d8c; --violet:#9b8cff; --line:#27314f;
+    --accept:#5fd6a0; --revise:#e0b54a; --reject:#e0687f; --undecided:#3a4468;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:radial-gradient(1100px 650px at 50% -8%, #18204a 0%, var(--bg) 60%);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 20px 120px}
+  header.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+  .eyebrow{letter-spacing:.22em;text-transform:uppercase;font-size:11px;color:var(--cyan);font-weight:600}
+  h1{margin:.15em 0 0;font-size:27px;font-weight:700}
+  .sub{color:var(--ink-dim);font-size:13.5px;margin-top:4px;max-width:720px}
+  .summary{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:13px;font-weight:600}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .dot.accept{background:var(--accept)} .dot.revise{background:var(--revise)} .dot.reject{background:var(--reject)} .dot.undecided{background:var(--undecided)}
+
+  .milestone{margin:24px 0 8px}
+  .milestone h2{font-size:18px;margin:0 0 2px;display:flex;align-items:center;gap:10px}
+  .lvl{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#04101a;background:linear-gradient(180deg,var(--cyan),#48b5c4);padding:3px 10px;border-radius:7px;font-weight:800}
+  .mdesc{color:var(--ink-faint);font-size:12.5px;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:13px}
+
+  .card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:13px 14px;display:flex;flex-direction:column;gap:9px;transition:.15s}
+  .card.v-accept{border-left-color:var(--accept)}
+  .card.v-revise{border-left-color:var(--revise)}
+  .card.v-reject{border-left-color:var(--reject);opacity:.6}
+  .card.v-undecided{border-left-color:var(--undecided)}
+  .chead{display:flex;gap:10px;align-items:flex-start}
+  .cnum{flex:0 0 auto;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;background:#0c1430;border:1px solid var(--cyan-dim);color:var(--cyan)}
+  .ctitle{flex:1 1 auto;min-width:0}
+  .ctitle .nm{font-weight:700;font-size:15.5px;line-height:1.25}
+  .ctype{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:6px;border:1px solid var(--line);align-self:flex-start;white-space:nowrap}
+  .ctype.mechanic{color:#bfe6ff;border-color:#2f4c6e}
+  .ctype.escalate{color:#cfd0ff;border-color:#3e3e6e}
+  .ctype.passive{color:#bfe6cf;border-color:#2c4a38}
+  .ctype.keystone{color:#ffd9a0;border-color:#5a472a}
+  .ctype.line{color:#e6c9ff;border-color:#4a3a5e}
+  .effect{font-size:14px}
+  .rows{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--ink-dim)}
+  .rows b{color:var(--ink);font-weight:600}
+  .verdict{display:flex;gap:7px;margin-top:2px}
+  .vbtn{flex:1;cursor:pointer;border:1px solid var(--line);background:#0e1733;color:var(--ink-dim);border-radius:8px;padding:7px 4px;font-weight:700;font-size:12.5px;transition:.1s}
+  .vbtn:hover{color:var(--ink);border-color:var(--cyan-dim)}
+  .vbtn.on-accept{background:rgba(95,214,160,.18);border-color:var(--accept);color:#c9f3e0}
+  .vbtn.on-revise{background:rgba(224,181,74,.18);border-color:var(--revise);color:#f3e0ad}
+  .vbtn.on-reject{background:rgba(224,104,127,.18);border-color:var(--reject);color:#f3c4cf}
+  .notes{width:100%;background:#091026;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:7px 9px;font:13px/1.45 inherit;resize:vertical;min-height:34px;display:none}
+  .card.show-notes .notes{display:block}
+  .noteToggle{align-self:flex-start;background:none;border:none;color:var(--cyan);cursor:pointer;font-size:12px;padding:0;font-weight:600}
+
+  .footer-actions{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(10,14,31,0),var(--bg) 38%);padding:16px 20px;display:flex;gap:12px;justify-content:center;align-items:center;z-index:20}
+  .footer-actions .count{color:var(--ink-dim);font-size:13px}
+  .btn{cursor:pointer;border:1px solid var(--cyan-dim);background:linear-gradient(180deg,#15315a,#102043);color:var(--ink);padding:9px 16px;border-radius:9px;font-weight:600;font-size:13.5px}
+  .btn.primary{background:linear-gradient(180deg,var(--cyan),#3f9fb0);color:#04101a;border-color:var(--cyan)}
+  .modal{position:fixed;inset:0;background:rgba(4,6,16,.78);display:none;place-items:center;z-index:30;padding:20px}
+  .modal.open{display:grid}
+  .sheet{background:var(--panel);border:1px solid var(--cyan-dim);border-radius:14px;max-width:760px;width:100%;max-height:86vh;overflow:auto;padding:18px}
+  .sheet h3{margin:0 0 4px} .sheet p{color:var(--ink-dim);font-size:13px;margin:0 0 10px}
+  textarea.exp{width:100%;height:330px;background:#091026;border:1px solid var(--line);border-radius:9px;color:var(--ink);font:12.5px/1.5 ui-monospace,Consolas,monospace;padding:11px}
+  .sheetbar{display:flex;gap:9px;justify-content:flex-end;margin-top:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Qi Crystal · Design Pass</div>
+      <h1>Crystal Milestone Ideas</h1>
+      <div class="sub">Ideas to fill the empty crystal milestones (L50 to L100, which are visual-only today). Mark each <b>Accept</b>, <b>Revise</b>, or <b>Reject</b>, add notes, then Export and paste back to me. Numbers are starting values. Auto-saves in this browser.</div>
+    </div>
+    <div class="summary" id="summary"></div>
+  </header>
+  <div id="milestones"></div>
+</div>
+
+<div class="footer-actions">
+  <span class="count" id="footCount"></span>
+  <button class="btn primary" onclick="openExport()">Export verdicts ▸</button>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3>Your verdicts</h3>
+    <p>Copy and paste back into chat. I keep the Accepts, rework the Revises, drop the Rejects.</p>
+    <textarea class="exp" id="expText" readonly></textarea>
+    <div class="sheetbar">
+      <button class="btn" onclick="closeExport()">Close</button>
+      <button class="btn primary" onclick="copyExport()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MILES = {
+  L50: { lvl:"L50 · T6", desc:"First empty milestone. Saint band, crystal mult ~x1.75." },
+  L60: { lvl:"L60 · T7", desc:"" },
+  L70: { lvl:"L70 · T8", desc:"" },
+  L80: { lvl:"L80 · T9", desc:"" },
+  L90: { lvl:"L90 · NEW", desc:"Not a tier today (T9 L80 jumps to T10 L100). Adding a milestone here is optional." },
+  L100:{ lvl:"L100 · MAX", desc:"Reached over multiple rebirths. The cap should feel like a real payoff." },
+  ALT: { lvl:"ALTERNATIVE", desc:"A different shape for the whole thing: the Eternal Tree 'Crystalline Focus' node unlocks qi-bought crystal upgrades instead of (or alongside) free milestone grants." },
+};
+
+const IDEAS = [
+  {id:1, m:"L50", type:"escalate", title:"Reservoir II",
+   effect:"Crystal Reservoir cap +50%, fill rate +25%.",
+   value:"cap x1.5, fill x1.25 (starting).", note:"Deepens the tap loop learned at L10. Cheapest to ship (reuses the existing mechanic)."},
+  {id:2, m:"L50", type:"mechanic", title:"Qi Lens",
+   effect:"While Focus is held, a crystal tap is worth 2x.",
+   value:"x2 during Focus (starting).", note:"Rewards combining the two active loops. No new screen surface."},
+  {id:3, m:"L50", type:"passive", title:"Faceted Core",
+   effect:"The mult curve steepens past L50 (+0.02/level instead of +0.015).",
+   value:"L50 to L100 worth x3.5 instead of x2.5 (starting).", note:"Gives the late grind real teeth."},
+
+  {id:4, m:"L60", type:"escalate", title:"Divine Qi II",
+   effect:"Divine orbs spawn ~50% more often / bigger burst.",
+   value:"spawn rate x1.5 (starting).", note:"Escalates the orb-tap loop from L30."},
+  {id:5, m:"L60", type:"passive", title:"Crystal Conduit",
+   effect:"The crystal mult also applies 25% of its bonus to producer output.",
+   value:"producer output x(1 + (crystalMult-1)*0.25) (starting).", note:"Crystal investment doubles as producer power; ties the two engines together."},
+
+  {id:6, m:"L70", type:"escalate", title:"Lingering Focus",
+   effect:"After you release Focus, a fraction of the boost lingers a few seconds.",
+   value:"40% of boost for 4s (starting).", note:"Smooths the active loop; a known spark mechanic."},
+  {id:7, m:"L70", type:"mechanic", title:"Resonance Wave",
+   effect:"Every breakthrough instantly refills the Reservoir and fires a short qi/s surge.",
+   value:"full refill + 30% qi/s for 10s (starting).", note:"Ties the crystal to realm progression."},
+
+  {id:8, m:"L80", type:"passive", title:"Tempered Heart",
+   effect:"+25% to ALL active-mechanic rewards (Crystal Click + Divine Qi + Pattern Click).",
+   value:"x1.25 on mechanic payouts (starting).", note:"One amplifier for everything unlocked so far."},
+  {id:9, m:"L80", type:"escalate", title:"Pattern Mastery",
+   effect:"Tracing Meridians runs a longer node sequence for a bigger qi multiplier.",
+   value:"+2 nodes, mult cap +50% (starting).", note:"Escalates the L40 minigame."},
+
+  {id:10, m:"L90", type:"mechanic", title:"Crystal Slumber",
+   effect:"The crystal banks qi while you are away: +20% offline qi, shown as the crystal charging.",
+   value:"+20% offline qi (starting).", note:"A passive that fits the away-game. Needs L90 added as a milestone."},
+  {id:11, m:"L90", type:"passive", title:"Ninth Facet",
+   effect:"Every Focus breakthrough permanently adds +0.05% crystal mult (slow, capped self-growth).",
+   value:"+0.05%/breakthrough, cap +10% (starting).", note:"Rewards long engagement. Needs L90 added."},
+
+  {id:12, m:"L100", type:"keystone", title:"Crystal Ascendant",
+   effect:"Maxing the crystal grants a flat +25% global qi/s, permanently.",
+   value:"+25% global qi/s (starting).", note:"Big, simple, feels like a milestone."},
+  {id:13, m:"L100", type:"keystone", title:"Eternal Facet",
+   effect:"At L100 the crystal keeps 10% of its level through reincarnation by itself.",
+   value:"keep 10% level on rebirth (starting).", note:"A built-in Unbroken Core; the cap-grind compounds across lives."},
+
+  {id:14, m:"ALT", type:"line", title:"Refine Crystal sub-tab",
+   effect:"Crystalline Focus (Eternal Tree) unlocks a qi-bought 'Refine Crystal' sub-tab: small repeatable upgrades (Refine Lattice +5% mult, Expand Reservoir, Polish Facet), with the crystal level gating which tier you can buy.",
+   value:"L50 unlocks tier-2 refinements, etc. (starting).", note:"The literal 'new crystal upgrades bought with qi' you described. Can coexist with the milestone grants above."},
+];
+
+const TYPE_LABEL = {mechanic:"New mechanic", escalate:"Escalate existing", passive:"Passive", keystone:"Keystone", line:"Upgrade line"};
+const STORE_KEY = "mai_crystal_ideas_review_v1";
+let state = (()=>{ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{verdicts:{},notes:{}}}catch{return {verdicts:{},notes:{}}} })();
+const save = ()=>{ try{localStorage.setItem(STORE_KEY, JSON.stringify(state))}catch{} };
+
+function cardHTML(it){
+  const v = state.verdicts[it.id] || "undecided";
+  const note = state.notes[it.id] || "";
+  return `<div class="card v-${v} ${note?'show-notes':''}" id="card-${it.id}">
+    <div class="chead">
+      <div class="cnum">${it.id}</div>
+      <div class="ctitle"><div class="nm">${it.title}</div></div>
+      <span class="ctype ${it.type}">${TYPE_LABEL[it.type]}</span>
+    </div>
+    <div class="effect">${it.effect}</div>
+    <div class="rows">
+      <div><b>Starting value:</b> ${it.value}</div>
+      <div><b>Why:</b> ${it.note}</div>
+    </div>
+    <div class="verdict">
+      <button class="vbtn ${v==='accept'?'on-accept':''}" onclick="setV(${it.id},'accept')">✓ Accept</button>
+      <button class="vbtn ${v==='revise'?'on-revise':''}" onclick="setV(${it.id},'revise')">✎ Revise</button>
+      <button class="vbtn ${v==='reject'?'on-reject':''}" onclick="setV(${it.id},'reject')">✕ Reject</button>
+    </div>
+    <button class="noteToggle" onclick="toggleNote(${it.id})">✎ note</button>
+    <textarea class="notes" placeholder="What to change / why..." oninput="setNote(${it.id},this.value)">${note}</textarea>
+  </div>`;
+}
+function render(){
+  const order = ["L50","L60","L70","L80","L90","L100","ALT"];
+  let html = "";
+  for(const m of order){
+    const meta = MILES[m];
+    const list = IDEAS.filter(i=>i.m===m);
+    html += `<section class="milestone">
+      <h2><span class="lvl">${meta.lvl}</span></h2>
+      ${meta.desc?`<div class="mdesc">${meta.desc}</div>`:""}
+      <div class="grid">${list.map(cardHTML).join("")}</div>
+    </section>`;
+  }
+  document.getElementById("milestones").innerHTML = html;
+  renderCounts();
+}
+function setV(id,v){ if(state.verdicts[id]===v) delete state.verdicts[id]; else state.verdicts[id]=v; save();
+  const it=IDEAS.find(i=>i.id===id); document.getElementById("card-"+id).outerHTML=cardHTML(it); renderCounts(); }
+function setNote(id,val){ state.notes[id]=val; save(); }
+function toggleNote(id){ document.getElementById("card-"+id).classList.toggle("show-notes"); }
+function renderCounts(){
+  const c={accept:0,revise:0,reject:0,undecided:0};
+  for(const i of IDEAS) c[state.verdicts[i.id]||"undecided"]++;
+  document.getElementById("summary").innerHTML =
+    `<span class="pill"><span class="dot accept"></span>${c.accept} accept</span>
+     <span class="pill"><span class="dot revise"></span>${c.revise} revise</span>
+     <span class="pill"><span class="dot reject"></span>${c.reject} reject</span>
+     <span class="pill"><span class="dot undecided"></span>${c.undecided} left</span>`;
+  document.getElementById("footCount").textContent = `${c.accept} accept · ${c.revise} revise · ${c.reject} reject · ${c.undecided} undecided`;
+}
+function exportText(){
+  const c={accept:[],revise:[],reject:[],undecided:[]};
+  for(const i of IDEAS) c[state.verdicts[i.id]||"undecided"].push(i.id+" "+i.title);
+  const L=["QI CRYSTAL MILESTONE IDEAS, VERDICTS",""];
+  for(const v of ["accept","revise","reject","undecided"]) if(c[v].length) L.push(`${v.toUpperCase()}: ${c[v].join(", ")}`);
+  const notes=IDEAS.filter(i=>(state.notes[i.id]||"").trim());
+  if(notes.length){ L.push("","NOTES:"); for(const i of notes) L.push(`- ${i.id} ${i.title}: ${state.notes[i.id].trim()}`); }
+  return L.join("\n");
+}
+function openExport(){ document.getElementById("expText").value=exportText(); document.getElementById("modal").classList.add("open"); }
+function closeExport(){ document.getElementById("modal").classList.remove("open"); }
+function copyExport(){ const t=document.getElementById("expText"); t.select(); try{navigator.clipboard.writeText(t.value)}catch{} document.execCommand&&document.execCommand("copy"); }
+document.getElementById("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeExport(); });
+render();
+</script>
+</body>
+</html>

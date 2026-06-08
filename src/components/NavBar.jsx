@@ -12,14 +12,9 @@ const SCREENS = [
   // Journey — chronicle screen promoted out of the ProgressHubModal during
   // the nav-audit (verdict: place-you-live-in, not a check-on surface).
   { id: 'journey',      tKey: 'nav.journey'                          },
-  { id: 'worlds',       tKey: 'nav.worlds'                            },
-  { id: 'character',    tKey: 'nav.character'                         },
-  // Collection was a 4th tab in the original layout (locked, 封 wax-seal).
-  // Removed from the nav per the v25 home design pass - the item economy
-  // is surfaced elsewhere now (Codex, Spirit Bazaar). Re-add the entry
-  // here if/when Collection becomes a player-facing primary surface again.
-  { id: 'production',   tKey: 'nav.craft'                             },
-  // Settings and Reincarnation moved to the HomeScreen HUD bar.
+  // worlds / character / production tabs were retired with the v1 Cookie-
+  // Clicker pivot. The combat / gear / crafting screens they pointed at
+  // are gone too. Top-bar tree / codex / settings cover everything else.
 ];
 
 function NavBar({ currentScreen, onNavigate, badges = {}, isUnlocked = () => true, isHidden = () => false, getHint = () => null, getDesc = () => null }) {

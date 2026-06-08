@@ -7,7 +7,6 @@ import SpiritBazaarScreen from './screens/SpiritBazaarScreen';
 import { addBloodLotus as addBloodLotusBalance, getBloodLotusBalance } from './systems/bloodLotus';
 import useShopInventory from './hooks/useShopInventory';
 import { SHOP_ITEMS_BY_ID } from './data/shopItems';
-import PillDrawer from './components/PillDrawer';
 import CodexModal from './components/CodexModal';
 import JourneyScreen from './screens/JourneyScreen';
 import DailyBonusModal from './components/DailyBonusModal';
@@ -26,11 +25,6 @@ import {
   trackScreenView,
   trackFirstTime,
 } from './analytics';
-import CombatScreen from './screens/CombatScreen';
-import WorldsScreen from './screens/WorldsScreen';
-import CharacterScreen from './screens/CharacterScreen';
-import CollectionScreen from './screens/CollectionScreen';
-import ProductionScreen from './screens/ProductionScreen';
 import CultivationScreen from './screens/CultivationScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import AboutScreen    from './screens/AboutScreen';
@@ -39,35 +33,21 @@ import useReincarnationTree  from './hooks/useReincarnationTree';
 import { useDiscipleMergeProvider, DiscipleMergeContext } from './hooks/useDiscipleMerge';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
 import useCultivation from './hooks/useCultivation';
-import useInventory   from './hooks/useInventory';
-import useTechniques  from './hooks/useTechniques';
-import useCombat      from './hooks/useCombat';
-import useArtefacts   from './hooks/useArtefacts';
-import usePills       from './hooks/usePills';
 import useQiCrystal  from './hooks/useQiCrystal';
 import useProducers  from './hooks/useProducers';
 import useUpgrades   from './hooks/useUpgrades';
-import useAutoFarm    from './hooks/useAutoFarm';
 import useStats       from './hooks/useStats';
 import { recordStat } from './systems/statsRecorder';
-import WORLDS         from './data/worlds';
-import { mineralForRarity } from './data/materials';
-import { computeAllStats, computeStat, mergeModifiers } from './data/stats';
-import { evaluateLawUniques, buildContext } from './systems/lawEngine';
-import { getSetBonusModifiers } from './data/artefactSets';
 import { initDebug } from './debug/gameDebug';
 import { preloadImages, PLAYER_SPRITE_SRCS } from './utils/preload';
 import { loadGraphics, applyGraphics } from './systems/graphics';
 import useNotifications from './hooks/useNotifications';
-import useLawOffers from './hooks/useLawOffers';
 import useQiSparks  from './hooks/useQiSparks';
-import useClearedRegions from './hooks/useClearedRegions';
 import useFeatureFlags from './hooks/useFeatureFlags';
 import useAchievements from './hooks/useAchievements';
 import achBus from './systems/achievementBus';
 import { isLunarNewYear, isDoubleNinth } from './systems/calendarEvents';
 import { FEATURES } from './data/featureFlags';
-import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
 import { PRODUCERS_BY_ID } from './data/producers';
 import { loadGarden, saveGarden, gardenActiveQiMult } from './data/spiritGarden';
@@ -76,22 +56,17 @@ import { hasSeenTutorial, markTutorialSeen } from './systems/tutorialSeen';
 import { TUTORIAL_IDS } from './data/tutorialCards';
 import TutorialModal from './components/TutorialModal';
 
-// Which screens are hidden by which build-time feature flag. Routes to a
-// blocked screen are silently rewritten to `home` by navigate() below, so
-// stale saves or stray notification deeplinks can't land on a null entry.
-const SCREEN_FLAGS = {
-  worlds:         'combat',
-  'combat-arena': 'combat',
-  character:      'combat',
-  collection:     'combat',
-  production:     'combat',
-};
-const isScreenAllowed = (screenId) => {
-  const flag = SCREEN_FLAGS[screenId];
-  return !flag || FEATURES[flag];
-};
+// The v1 nav routes are home / cultivation / journey + the top-bar surfaces
+// (spirit-bazaar / settings / about). Every combat-adjacent screen
+// (worlds / combat-arena / character / collection / production) was removed
+// when combat shipped behind feature flags. Routes targeting those ids fall
+// back to home via the guard in navigate() below, so stale saves or
+// notification deeplinks can't strand a player on a missing screen.
+const ALLOWED_SCREENS = new Set([
+  'home', 'cultivation', 'journey', 'spirit-bazaar', 'settings', 'about',
+]);
+const isScreenAllowed = (screenId) => ALLOWED_SCREENS.has(screenId);
 import ToastStack from './components/ToastStack';
-import SelectionModal from './components/SelectionModal';
 import QiSparkChoiceModal from './components/QiSparkChoiceModal';
 import { AudioManager } from './audio';
 import { installGlobalClickSfx } from './audio/clickSfx';
@@ -102,7 +77,11 @@ import './App.css';
 function AppInner() {
   const [currentScreen, setCurrentScreen] = useState('home');
   const [screenParam,   setScreenParam]   = useState(null);
-  const [selectionModalOpen, setSelectionModalOpen] = useState(false);
+  // selectionModalOpen used to gate the law-offer SelectionModal. Laws are
+  // hidden in v1 so the flag is dead; the variable is kept so the
+  // useBlockingPresence call below doesn't need a second branch when laws
+  // come back. Always false.
+  const selectionModalOpen = false;
 
   // Single active modal — only one top-bar popup can be open at a time.
   // Toggling the same key closes it; opening a new key replaces the current one.
@@ -134,7 +113,7 @@ function AppInner() {
   // Close any app-level modal when an external modal announces itself.
   // We keep a Set of our own ids so we don't react to our own broadcast.
   useEffect(() => {
-    const ours = new Set(['shop', 'codex', 'pills', 'daily']);
+    const ours = new Set(['shop', 'codex', 'daily']);
     const handler = (e) => {
       if (!ours.has(e.detail?.id)) setActiveModal(null);
     };
@@ -223,15 +202,13 @@ function AppInner() {
   const shopInventory   = useShopInventory();
   const cultivation     = useCultivation();
   const discipleMerge   = useDiscipleMergeProvider();
-  const inventory       = useInventory();
   const karma           = useReincarnationKarma();
   const tree            = useReincarnationTree({ karma: karma.karma, spendKarma: karma.spendKarma, lives: karma.lives });
-  const techniques      = useTechniques({ extraSlots: 0 });
-  const combat          = useCombat();
-  const artefacts       = useArtefacts();
-  const pills           = usePills();
-  const totalOwnedPills = Object.values(pills.ownedPills).reduce((s, n) => s + n, 0);
-  const crystal         = useQiCrystal({ getQuantity: inventory.getQuantity, removeItem: inventory.removeItem });
+  // useQiCrystal originally read herb/stone quantities from the player's
+  // inventory for the v0 stone-fed reactivation flow. The inventory layer
+  // was retired with the v1 Cookie-Clicker pivot; pass stubs so the hook's
+  // optional consumers no-op without throwing.
+  const crystal         = useQiCrystal({ getQuantity: () => 0, removeItem: () => false });
   // Mirror current crystal tier into a body class so the qi-VFX colour
   // bundle (--qi-aura-*, --qi-text-*, --qi-bar-*) cascades from there.
   // App.css `body.crystal-tier-{1..10}` blocks set the palette; aura,
@@ -313,8 +290,6 @@ function AppInner() {
     cultivation.confirmMajorBreakthrough?.();
   }, [cultivation.pendingMajorBreakthrough, shopInventory, cultivation]);
 
-  const { clearedRegions, clearRegion } = useClearedRegions();
-  const selections      = useLawOffers({ cultivation });
   // featureFlags is declared further down — useQiSparks reads its unlock
   // gates via this ref-backed callback to avoid a TDZ on the inline value.
   const featureFlagsRef = useRef(null);
@@ -403,12 +378,6 @@ function AppInner() {
     return () => clearInterval(id);
   }, [karma.noteQiEarned, cultivation.qiEarnedAllTimeRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep pill qi multiplier in sync with cultivation game loop.
-  const pillQiMult = pills.getQiMult();
-  useEffect(() => {
-    cultivation.pillQiMultRef.current = pillQiMult;
-  }, [pillQiMult, cultivation.pillQiMultRef]);
-
   // Push reincarnation-tree cultivation speed bonus into the loop.
   // n_1 Devoted Path: treeQiMult = 1 + 0.001 × karmaSpentOnTree.
   useEffect(() => {
@@ -438,26 +407,9 @@ function AppInner() {
   const majorBreakthroughRef = useRef(null);
   majorBreakthroughRef.current = cultivation.majorBreakthrough;
 
-  // Auto-enqueue selection cards when pendingCount increases mid-session
-  // (i.e. a real level-up just happened). Skip on load so players aren't
-  // greeted by the modal immediately — the notification badge is enough.
-  // Major breakthroughs: BreakthroughBanner.onDone enqueues the cards after
-  // the animation; suppress here so they don't double-fire.
-  const prevPendingRef = useRef(null);
-  useEffect(() => {
-    const prev = prevPendingRef.current;
-    prevPendingRef.current = selections.pendingCount;
-    if (prev === null) return; // first render — treat as load, don't enqueue
-    // Laws are hidden until combat ships. The hook keeps writing pending
-    // offers to localStorage so when FEATURES.laws flips on in v2 the
-    // player picks up where they left off; we just don't surface them now.
-    if (!FEATURES.laws) return;
-    if (selections.pendingCount > prev && currentScreen === 'home') {
-      if (!majorBreakthroughRef.current) {
-        enqueue('selection-cards', null, { dedupe: true });
-      }
-    }
-  }, [selections.pendingCount]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Selection-card law offers were retired with the v1 Cookie-Clicker pivot.
+  // The auto-enqueue effect that watched selections.pendingCount has been
+  // dropped along with useLawOffers. If laws return, restore both here.
 
   // Auto-enqueue offline earnings when they appear. Pinned priority so it
   // stays at the head of the queue even if a crystal/character evolution fires
@@ -468,24 +420,6 @@ function AppInner() {
       enqueue('offline-earnings', null, { priority: 'pinned', dedupe: true });
     }
   }, [cultivation.offlineEarnings]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Mirror the queue's selection-cards event onto the legacy modal flag so
-  // the existing render path stays simple. Player-tap on the rewards chip
-  // also flips this flag directly, bypassing the queue.
-  useEffect(() => {
-    if (!FEATURES.laws) return;
-    if (currentEvent?.kind === 'selection-cards') setSelectionModalOpen(true);
-  }, [currentEvent]);
-
-  // Once all pending selections are resolved, retire the queue event and
-  // collapse the modal flag — covers the "player picked the last reward"
-  // path where SelectionModal unmounts on its own without firing onClose.
-  useEffect(() => {
-    if (selections.pendingCount === 0) {
-      if (selectionModalOpen) setSelectionModalOpen(false);
-      if (currentEvent?.kind === 'selection-cards') dismiss(currentEvent.id);
-    }
-  }, [selections.pendingCount, selectionModalOpen, currentEvent, dismiss]);
 
   // Keep QI crystal bonus in sync with cultivation game loop.
   // n_3 Crystalline Focus multiplies the crystal's qi-rate contribution by 1.20.
@@ -901,323 +835,39 @@ function AppInner() {
   }, []);
 
 
-  // ── Centralised stat getter ─────────────────────────────────────────────
-  // Builds the FULL computeAllStats bundle including modifier contributions
-  // from artefacts, pills, and law uniques. Used by autoFarm (gather/mine
-  // speed + luck), combat (exploit chance/mult), and cultivation (focus mult).
-  // Called per-tick from autoFarm and per-fight from CombatScreen — kept
-  // pure / read-only so it never triggers React renders.
-  // Multiplicatively combine per-tech-type CD scalers from law + set sources.
-  // e.g. law gives Heal ×2 and a set gives Heal ×0.8 → final Heal ×1.6.
-  const mergeCdTypeMults = (a, b) => {
-    const out = { ...(a ?? {}) };
-    for (const [t, m] of Object.entries(b ?? {})) {
-      out[t] = (out[t] ?? 1) * m;
-    }
-    return out;
-  };
-
+  // ── Centralised stat getter (stripped) ──────────────────────────────────
+  // The pre-pivot getFullStats blended modifiers from artefacts, pills, law
+  // uniques, set bonuses, and the cb_*/al_* tree nodes. Combat, gear, pills,
+  // laws, and autoFarm shipped behind feature flags for v1, so the only
+  // consumer that still calls in is the focus-mult mirror below. That
+  // consumer just needs the raw focus modifier from the reincarnation tree.
   const getFullStats = useCallback(() => {
-    const qi         = cultivation.qiRef.current;
-    const law        = cultivation.activeLaw;
-    const realmIndex = cultivation.indexRef.current;
+    // Focus mult — the only field still read downstream. The v1 cultivation
+    // baseline is 1; the reincarnation tree's focus-mult node contributes via
+    // `tree.modifiers.focusMult` (read inside the mirror effect below).
+    return { focusMult: 1 };
+  }, []);
 
-    // Pre-compute light context fields the new element-themed law uniques
-    // need (per-element artefact counts + per-type tech counts). Stat-driven
-    // fields (current dodge chance, damage multiplier, etc.) aren't known
-    // until *after* stats compute below; lawEngine handles their absence
-    // gracefully (resolvers default to 0 → effect contributes nothing).
-    const equippedArtefactsByElement = artefacts?.getEquippedArtefactsByElement?.()
-      ?? { fire: 0, water: 0, earth: 0, wood: 0, metal: 0 };
-    const equippedTechsByType = (() => {
-      const out = { Attack: 0, Heal: 0, Defend: 0, Dodge: 0, Expose: 0 };
-      for (const t of (techniques?.equippedTechniques ?? [])) {
-        if (t?.type && out[t.type] !== undefined) out[t.type] += 1;
-      }
-      return out;
-    })();
-    const lawCtx    = buildContext({
-      inCombat: false,
-      realmIndex,
-      lawElement: law?.element,
-      isAtPeak: realmIndex >= 55,
-      equippedArtefactsByElement,
-      equippedTechsByType,
-    });
-    const lawBundle = evaluateLawUniques(law, lawCtx);
-
-    // hw_4 Soul Crucible — multiply every pill-derived mod value by 1.25.
-    // Multiplies the raw flat / increased / more values themselves so the
-    // scaling shows up as a simple post-roll boost on the existing pill mods.
-    // Artefact uniques (a_alchemist_hands / a_sage_belt / a_alchemy_ring)
-    // stack multiplicatively with the tree bonus.
-    const artefactMods = artefacts?.getStatModifiers?.() ?? {};
-    const artefactPillPct = (artefactMods.pill_effect_mult ?? []).reduce((s, m) => s + (m.value ?? 0), 0);
-    const pillMult = (1 + artefactPillPct);
-    const scalePillBundle = (mods) => {
-      if (!mods || pillMult === 1) return mods ?? {};
-      const out = {};
-      for (const [statId, list] of Object.entries(mods)) {
-        out[statId] = list.map(m =>
-          m.type === 'more'
-            ? { ...m, value: 1 + (m.value - 1) * pillMult }
-            : { ...m, value: m.value * pillMult }
-        );
-      }
-      return out;
-    };
-    const scaledPillMods = scalePillBundle(pills?.getStatModifiers?.() ?? {});
-
-    const artefactMult = 1;
-    const scaleArtefactBundle = (mods) => {
-      if (!mods || artefactMult === 1) return mods ?? {};
-      const out = {};
-      for (const [statId, list] of Object.entries(mods)) {
-        out[statId] = list.map(m =>
-          m.type === 'more'
-            ? { ...m, value: 1 + (m.value - 1) * artefactMult }
-            : { ...m, value: m.value * artefactMult }
-        );
-      }
-      return out;
-    };
-    const scaledArtefactMods = scaleArtefactBundle(artefactMods);
-
-    // ── Set-bonus aggregation (depends on lawBundle's setCountBonus) ──────
-    // Set bonuses can be inflated by law uniques like "<Ember Legacy> counts
-    // as +1". Compute once with the law-side count bonus piped in; the
-    // statMods stack with artefact + law mods below, while flags + triggers
-    // + cdTypeMults attach directly to the combat stats bundle further down.
-    const setBundle = getSetBonusModifiers(
-      artefacts?.equipped ?? {},
-      artefacts?.owned ?? [],
-      { hpPct: 1 }, // out-of-combat placeholder ctx; conditional set effects evaluate inactive
-      lawBundle?.setCountBonus ?? null,
-    );
-    // Push set-bonus statMods into the scaledArtefactMods bundle so they
-    // flow through the usual merge path below.
-    for (const [stat, list] of Object.entries(setBundle.statMods)) {
-      (scaledArtefactMods[stat] ??= []).push(...list);
-    }
-    // Collapse artefact-only qi_speed mods into a single multiplier fed to
-    // the cultivation tick. Law-unique qi_speed is handled inside cultivation
-    // directly, so it is NOT included here (double-count guard).
-    const artefactQiMods = scaledArtefactMods.qi_speed ?? [];
-    const artefactQiMult = artefactQiMods.length > 0
-      ? computeStat(1, artefactQiMods)
-      : 1;
-
-    // typeMults removed in Stage 4 of the Damage & Element Overhaul —
-    // basic-attack damage is scaled purely by realm index now (see
-    // useCombat's placeholder formula). The cb_is reincarnation node
-    // has been retired alongside it.
-    const lawForCompute = law;
-
-    const mergedMods = mergeModifiers(
-      scaledArtefactMods,
-      scaledPillMods,
-      lawBundle.statMods,
-      tree?.getStatModifiers?.(),
-    );
-
-    const bundle = computeAllStats(qi, lawForCompute, realmIndex, mergedMods);
-
-    // Collapse a percentage-style stat into a single scalar via the same
-    // 5-layer formula (so artefacts / law uniques / pills / selections all
-    // contribute the same way they would for a primary stat).
-    const collapsePct = (statId) => {
-      const list = mergedMods[statId];
-      if (!list || !list.length) return 0;
-      return computeStat(0, list);
-    };
-    const collapseFlat = (statId) => {
-      const list = mergedMods[statId];
-      if (!list || !list.length) return 0;
-      return computeStat(0, list);
-    };
-
-    // Per-pool damage flats were read by the 9-pool calcDamage split
-    // (removed in Stage 5). The `dmg_<pool>` affixes and STAT_META entries
-    // still exist and roll harmlessly until the Stage-6 cleanup; they
-    // simply don't feed into damage anymore.
-
-    return {
-      // Primary stats (essence/soul/body) were retired stage 15 and stripped
-      // from the bundle 2026-04-27 alongside the calcDamage cleanup. The
-      // associated lawElement holdover is retained for any law-engine
-      // condition that still keys off it.
-      health:     bundle.combat.health,
-      lawElement: law?.element ?? null,
-      law: lawForCompute,
-      // Flat damage bonuses + source-gated multipliers, all consumed by
-      // calcDamage and useCombat's basic-attack.
-      damageStats: {
-        physical:                bundle.combat.physDmg,
-        elemental:               bundle.combat.elemDmg,
-        damage_all:              collapseFlat('damage_all'),
-        secret_technique_damage: collapsePct('secret_technique_damage'),
-        default_attack_damage:   collapsePct('default_attack_damage'),
-      },
-      // Activity stats — needed by autoFarm + Gathering/Mining screens.
-      // Artefact `loot_luck` (a_lucky_ring) boosts both luck pools equally
-      // so one ring covers gather + mine; `all_loot_bonus` (a_seer_locket)
-      // feeds into qty multipliers downstream via getAllLootBonus below.
-      harvestSpeed: bundle.activity.harvestSpeed,
-      harvestLuck:  bundle.activity.harvestLuck   + collapseFlat('loot_luck'),
-      miningSpeed:  bundle.activity.miningSpeed,
-      miningLuck:   bundle.activity.miningLuck    + collapseFlat('loot_luck'),
-      focusMult:    bundle.activity.focusMult,
-      // Combat-only
-      exploitChance: bundle.combat.exploitChance,
-      exploitMult:   bundle.combat.exploitMult,
-      // Defence stats — useCombat picks the one matching the enemy's damage
-      // type when computing mitigation.
-      defense:          bundle.combat.defense,
-      elementalDefense: bundle.combat.elemDef,
-      // Expose-pipeline stats (added 2026-04-26 secret-tech overhaul).
-      defPen:                   bundle.combat.defPen,
-      incomingDamageReduction:  bundle.combat.incomingDamageReduction,
-      // Scales the attack-count of Defend / Dodge buffs at cast time.
-      buffDurationMult: 1 + collapsePct('buff_duration'),
-      // Scales magnitude (defMult / dodgeChance) at cast time.
-      buffEffectMult:   collapsePct('buff_effect'),
-      // ── Artefact-derived extras ───────────────────────────────────────
-      // crit_chance / crit_damage / crit_twice_chance were consolidated
-      // into exploit_chance / exploit_attack_mult on 2026-04-26.
-      lifestealPct:           collapseFlat('lifesteal'),              // 0–100
-      dodgeChancePct:         collapseFlat('dodge_chance'),           // 0–100
-      dodgeFatalChancePct:    collapseFlat('dodge_fatal_chance'),     // 0–100
-      ignoreDefensePct:       collapseFlat('ignore_defense_pct'),     // 0–100
-      ignoreDefenseChancePct: collapseFlat('ignore_defense_chance'),  // 0–100
-      reflectPct:             collapseFlat('reflect_pct'),            // 0–100
-      healingReceivedPct:     collapsePct('healing_received'),        // 0–1 (30% → 0.30)
-      cooldownReductionPct:   Math.min(0.8, collapsePct('cooldown_reduction_all')
-                                         + collapsePct('technique_cd_reduction')
-                                         + collapsePct('attack_cd_reduction')),
-      freeCastChancePct:      collapseFlat('tech_free_cast_chance'),  // 0–100
-      hpRegenInCombatPct:     collapsePct('hp_regen_in_combat'),      // fraction of maxHP / sec
-      hpRegenOutCombatPct:    collapsePct('hp_regen_out_combat'),     // fraction of maxHP / sec
-      offlineQiMult:          1 + collapsePct('offline_qi_mult'),     // 1 + 0.30 = 1.30
-      pillEffectArtefactMult: 1 + collapsePct('pill_effect_mult'),    // stacked with tree in App
-      craftingCostReduction:  Math.min(0.75, collapsePct('crafting_cost_reduction')),
-      allLootBonusPct:        collapsePct('all_loot_bonus'),          // 0–1
-      lootLuckPct:            collapseFlat('loot_luck'),              // 0–100
-      // Set-bonus flags + triggers (the artefact-uniques flag bag was deleted
-      // in 2026-04-27 alongside the unique system). setBundle is the
-      // law-aware aggregate computed earlier in this same callback.
-      setFlags:               setBundle?.flags ?? {},
-      setTriggers:            setBundle?.triggers ?? [],
-      // Law-unique flags + triggers (sourced from the active law's uniques).
-      // Per-tech-type CD multipliers stack across law + set sources.
-      lawFlags:               lawBundle?.flags ?? {},
-      lawTriggers:            lawBundle?.triggers ?? [],
-      lawCdTypeMults:         mergeCdTypeMults(lawBundle?.cdTypeMults, setBundle?.cdTypeMults),
-      // Per-element artefact counts (drives per-element scaling laws).
-      equippedArtefactsByElement: artefacts?.getEquippedArtefactsByElement?.() ?? { fire: 0, water: 0, earth: 0, wood: 0, metal: 0 },
-      // Heavenly QI multiplier (artefact rings) — only applies during ad boost.
-      heavenlyQiMult:   collapsePct('heavenly_qi_mult'),
-      // Artefact-derived qi_speed aggregate — mirrored to useCultivation so
-      // affix rolls affect the live cultivation rate.
-      artefactQiMult,
-      // Reincarnation tree — combat/autoFarm modifiers (all removed from new tree).
-      maxOfflineHours:          undefined,
-      cooldownMult:             1,
-      undyingResolve:           false,
-      killingStride:            false,
-      hpRegenPerSec:            0,
-      freeCastEvery:            0,
-      qiOnEveryRealmFrac:       0,
-      gatherMineRarityUpChance: 0,
-      regionKillBonus:          false,
-      // cb_ts Veteran's Hunt — pending bump *count*. autoFarm decrements
-      // it explicitly when it consumes a bump (see useAutoFarm tick).
-      huntBumpsPendingRef:    combat.huntBumpsPendingRef,
-      damageMult:             1,
-      // Context useCombat needs to evaluate artefact conditional flags.
-      realmIndex,
-      equippedArtefactCount:  Object.values(artefacts?.equipped ?? {}).filter(Boolean).length,
-    };
-  }, [cultivation, artefacts, pills, selections, tree]);
-
-  // Mirror focusMult into a ref the cultivation tick reads directly so
-  // boost speed reflects equipment / pill modifiers. Same loop also keeps
-  // the artefact-derived heavenly_qi multiplier in sync so cultivation
-  // sees ring rolls without the cultivation hook needing to know about
-  // the artefact layer.
+  // Mirror focusMult into a ref the cultivation tick reads directly. Combat,
+  // gear, pill, and law contributions are gone with the v1 pivot; the only
+  // live channels are the Deeper-Breath upgrade adder and the tree node.
   useEffect(() => {
     if (!cultivation.focusMultRef) return;
     const id = setInterval(() => {
-      const full = getFullStats();
-      // Deeper Breath upgrades add flat percentage points (50/50/50/100) to
-      // the focus mult coming from stats/artefacts/laws. Sourced via a ref so
-      // this interval doesn't need to be re-created on every upgrade change.
+      const base = 1; // pre-pivot getFullStats returned ~1 by default
       const upgradeAdd = cultivation.upgradeFocusMultAddRef?.current ?? 0;
-      cultivation.focusMultRef.current = full.focusMult + upgradeAdd;
-      if (cultivation.heavenlyQiMultRef) {
-        cultivation.heavenlyQiMultRef.current = full.heavenlyQiMult ?? 0;
-      }
-      if (cultivation.artefactQiMultRef) {
-        cultivation.artefactQiMultRef.current = full.artefactQiMult ?? 1;
-      }
-      // Mirror the artefact offline-qi multiplier to localStorage so that
-      // useCultivation's offline bootstrap (runs before React mounts) can
-      // still read it. Small snapshot, written once a second.
-      try {
-        localStorage.setItem('mai_artefact_offline_snapshot',
-          JSON.stringify({ offlineQiMult: full.offlineQiMult ?? 1 }));
-      } catch {}
+      const treeMult   = tree?.modifiers?.focusMult ?? 1;
+      cultivation.focusMultRef.current = base * treeMult + upgradeAdd;
     }, 1000);
     return () => clearInterval(id);
-  }, [cultivation.focusMultRef, cultivation.heavenlyQiMultRef, cultivation.artefactQiMultRef, getFullStats]);
+  }, [cultivation.focusMultRef, cultivation.upgradeFocusMultAddRef, tree?.modifiers?.focusMult]);
 
-  // Auto-farm — stat getter reads live refs so the hook never triggers re-renders
-  const autoFarm = useAutoFarm({
-    worlds: WORLDS,
-    getStats: getFullStats,
-  });
+  const notifications = useNotifications({ cultivation });
 
-  // Derive the single active idle assignment from the config
-  const idleAssignment = useMemo(() => {
-    const cfg = autoFarm.autoFarmConfig;
-    for (const activity of ['combat', 'gathering', 'mining']) {
-      if (cfg[activity]?.enabled) {
-        return {
-          activity,
-          worldIndex:  cfg[activity].worldIndex,
-          regionIndex: cfg[activity].regionIndex,
-        };
-      }
-    }
-    return null;
-  }, [autoFarm.autoFarmConfig]);
-
-  const notifications = useNotifications({ cultivation, inventory });
-
-  // Round 3 — Crystal Discovery. Subscribes to HomeScreen's tier-crossed
-  // window event and grants any mechanic-tier sparks attached to crossed
-  // tiers. `qiSparks.grant` is idempotent for mechanics so re-firing is safe.
-  // A toast lands per successful grant so the player sees the unlock.
-  useEffect(() => {
-    const handler = (e) => {
-      const { previousTier = 0, newTier = 0 } = e.detail ?? {};
-      const ids = sparksToGrantOnEvolution(previousTier, newTier);
-      for (const sparkId of ids) {
-        const ok = qiSparks?.grant?.(sparkId);
-        if (ok) {
-          const card = QI_SPARK_BY_ID[sparkId];
-          notifications.addToast({
-            type: 'unlock',
-            kicker: 'New Spark',
-            glyph: '符', // talisman / mechanism spark
-            message: card?.name ?? sparkId,
-            duration: 6000,
-          });
-        }
-      }
-    };
-    window.addEventListener('mai:crystal-tier-crossed', handler);
-    return () => window.removeEventListener('mai:crystal-tier-crossed', handler);
-  }, [qiSparks, notifications]);
+  // Round 3 — Crystal Discovery (retired). Used to grant mechanic-tier sparks
+  // on crystal tier crossings via crystalMechanicGrants. That table was
+  // deleted with the v1 Cookie-Clicker pivot — mechanic sparks now come from
+  // the regular spark-offer pool, so the tier-cross listener is gone.
 
   // 2026-05-21 bug-fix: surface a toast when the spark modal auto-picks the
   // leftmost card on inactivity timeout. Previously the modal would silently
@@ -1238,38 +888,12 @@ function AppInner() {
     return () => window.removeEventListener('mai:spark-auto-picked', handler);
   }, [notifications]);
 
-  // Round 3 — one-shot backfill for combat-alpha saves whose crystal is
-  // already past a mechanic-grant threshold but who never rolled the rare
-  // spark (now retired). Walks 0→currentTier through CRYSTAL_TIER_GRANTS;
-  // `grant` is idempotent so anything already owned is skipped. Gated by a
-  // localStorage flag so it runs exactly once per device.
-  const backfillRanRef = useRef(false);
-  useEffect(() => {
-    if (backfillRanRef.current) return;
-    if (!qiSparks?.grant) return;
-    let seen = null;
-    try { seen = localStorage.getItem('mai_v1_3_mechanic_backfill_seen'); } catch {}
-    if (seen) { backfillRanRef.current = true; return; }
-    // crystal.level is React state; on first render after load it's the
-    // saved value. Walk tiers 1..currentTier (CRYSTAL_TIER_GRANTS starts at 2).
-    const level = crystal?.level ?? 0;
-    if (level > 0) {
-      // Map level → visual tier using the same thresholds as useQiCrystal.
-      // Inline rather than importing to keep the effect self-contained.
-      const TIERS = [
-        [1000, 10], [750, 9], [500, 8], [350, 7], [200, 6],
-        [100,  5], [ 50, 4], [ 25, 3], [ 10, 2], [  1, 1],
-      ];
-      let currentTier = 0;
-      for (const [thresh, t] of TIERS) {
-        if (level >= thresh) { currentTier = t; break; }
-      }
-      const ids = sparksToGrantOnEvolution(0, currentTier);
-      for (const sparkId of ids) qiSparks.grant(sparkId);
-    }
-    try { localStorage.setItem('mai_v1_3_mechanic_backfill_seen', '1'); } catch {}
-    backfillRanRef.current = true;
-  }, [qiSparks, crystal?.level]);
+  // Round 3 one-shot backfill (retired) — used to walk an existing crystal
+  // tier and grant any mechanic sparks the player would have rolled if the
+  // tier-crossed listener had been live during their earlier sessions. The
+  // crystalMechanicGrants table is gone, so there is nothing to backfill.
+  // The mai_v1_3_mechanic_backfill_seen localStorage flag stays untouched so
+  // any future re-introduction of the system doesn't double-fire.
 
   // (Removed) "Combat returns later" one-time toast. Combat may or may
   // not return; we're not committing to it in copy. If we later ship a
@@ -1365,25 +989,22 @@ function AppInner() {
       // unlockedCountExcludingThis is computed per-entry.
       totalAchievementsCount: achievements.totalCount,
       // Legacy v1 snapshot fields kept so any old condition referencing
-      // them still resolves to 0 / [] without throwing.
-      ownedLawsCount:         cultivation.ownedLaws.length,
-      ownedTechniquesCount:   Object.keys(techniques.ownedTechniques).length,
-      clearedRegionsCount:    clearedRegions.size,
-      ownedArtefactsCount:    artefacts.owned.length,
-      discoveredPillsCount:   Object.keys(pills.discoveredPills).length,
+      // them still resolves to 0 without throwing. The arrays / sets these
+      // used to read from are gone with the dead-system cleanup; surface
+      // zero so the achievement engine sees a stable shape.
+      ownedLawsCount:         0,
+      ownedTechniquesCount:   0,
+      clearedRegionsCount:    0,
+      ownedArtefactsCount:    0,
+      discoveredPillsCount:   0,
     };
   }, [
     stats.lifetime, stats.run,
     cultivation.realmIndex,
-    cultivation.ownedLaws.length,
     karma.lives,
     tree.purchased, tree.nodes,
     producers?.owned,
     achievements.totalCount,
-    techniques.ownedTechniques,
-    clearedRegions.size,
-    artefacts.owned.length,
-    pills.discoveredPills,
   ]);
 
   // Run the snapshot check on every relevant state change (cheap pass)
@@ -1628,16 +1249,17 @@ function AppInner() {
   // pool gating (Crystal Click T1 etc.) can query feature unlocks.
   const featureFlags = useFeatureFlags({
     cultivation,
-    clearedRegions,
-    inventory,
+    // clearedRegions + inventory used to feed the combat/gathering gates;
+    // both surfaces are gone with the v1 pivot. Pass an empty set + a stub
+    // getQuantity so the remaining always/realm gates still resolve cleanly.
+    clearedRegions: new Set(),
+    inventory: { getQuantity: () => 0 },
     onUnlock: (featureId, msg) => {
-      const SCREEN = {
-        worlds: 'worlds', gathering: 'worlds', mining: 'worlds',
-        production: 'production', alchemy: 'production',
-        character: 'character', collection: 'collection',
-        qi_crystal: 'home',
-      };
-      const targetScreen = SCREEN[featureId] ?? null;
+      // qi_crystal is the only feature unlock that still routes to a live
+      // screen — everything else (worlds / production / character / collection)
+      // pointed at screens that no longer exist in the v1 build, so they fall
+      // back to home via the navigate() guard.
+      const targetScreen = featureId === 'qi_crystal' ? 'home' : null;
       const targetParam  = featureId === 'qi_crystal' ? { openCrystal: true } : null;
       notifications.addToast({
         type: 'unlock',
@@ -1651,9 +1273,11 @@ function AppInner() {
   });
   featureFlagsRef.current = featureFlags;
 
-  // Keep a live ref to all hooks so debug commands always see fresh state.
+  // Keep a live ref to the hooks debug commands need. Combat / gear / pill
+  // / autoFarm hooks were retired with the v1 pivot — only the live ones
+  // are surfaced here.
   const hooksRef = useRef({});
-  hooksRef.current = { cultivation, inventory, techniques, combat, artefacts, pills, autoFarm, crystal, qiSparks };
+  hooksRef.current = { cultivation, crystal, qiSparks, producers, upgrades };
   useEffect(() => { initDebug(hooksRef); }, []);
 
   // Audio start-up. BGM is requested immediately; how it actually starts depends
@@ -1712,7 +1336,6 @@ function AppInner() {
     const target = isScreenAllowed(screen) ? screen : 'home';
     setCurrentScreen(target);
     setScreenParam(param);
-    setSelectionModalOpen(false);
     notifications.clearBadge(target);
     try { trackScreenView(target); } catch {}
   };
@@ -1801,56 +1424,26 @@ function AppInner() {
     }, 50);
   }, [karma, cultivation.realmIndex, stats, tree.commit]);
 
-  const goBack = () => {
-    navigate('worlds', {
-      expandWorldId: screenParam?.worldId ?? null,
-      activeTab:     screenParam?.fromTab  ?? null,
-    });
-  };
+  // goBack used to route Combat Arena back to its parent Worlds hub. Both
+  // screens are gone with the v1 pivot; the back-to-Worlds helper goes
+  // with them.
 
   // Tree screen: accessible once the player reaches Saint realm (so they can
   // spend karma before reincarnating) OR in any subsequent life (lives ≥ 1).
   const reincarnationUnlocked = cultivation.realmIndex >= 26 || (karma.lives ?? 0) >= 1;
 
   const screens = {
-    // Under !FEATURES.laws the SelectionModal is suppressed, so we also drop
-    // the Rewards chip on HomeScreen (HomeScreen already null-checks selections).
-    home:   <HomeScreen cultivation={cultivation} inventory={inventory} onOpenPills={() => openModal('pills')} totalOwnedPills={totalOwnedPills} selections={FEATURES.laws ? selections : null} onOpenSelections={() => setSelectionModalOpen(true)} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} lastIdleAssignment={autoFarm.lastIdleAssignment} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
-    // Combat-adjacent screens are mounted only when FEATURES.combat is true.
-    // Otherwise they're null and `navigate` rewrites any attempt to land on
-    // them to `home` (see the SCREEN_FLAGS guard above).
-    worlds: isScreenAllowed('worlds')
-      ? <WorldsScreen cultivation={cultivation} onNavigate={navigate} expandWorldId={screenParam?.expandWorldId ?? null} activeTab={screenParam?.activeTab ?? null} clearedRegions={clearedRegions} idleAssignment={idleAssignment} lastIdleAssignment={autoFarm.lastIdleAssignment} onSetIdle={(act, w, r) => autoFarm.setIdleActivity(act, w, r, false)} pendingGains={autoFarm.pendingGains} hasPendingGains={autoFarm.hasPendingGains} onCollectGains={(applyFn) => autoFarm.collectGains(applyFn)} inventory={inventory} techniques={techniques} getFullStats={getFullStats} />
-      : null,
-    // Sub-screens launched from the Worlds hub
-    'combat-arena': isScreenAllowed('combat-arena')
-      ? <CombatScreen
-          cultivation={cultivation}
-          techniques={techniques}
-          combat={combat}
-          inventory={inventory}
-          artefacts={artefacts}
-          region={screenParam?.region ?? null}
-          onBack={goBack}
-          getFullStats={getFullStats}
-          onRegionCleared={clearRegion}
-        />
-      : null,
-    character:  isScreenAllowed('character')
-      ? <CharacterScreen cultivation={cultivation} techniques={techniques} artefacts={artefacts} pills={pills} tree={tree} />
-      : null,
-    collection: isScreenAllowed('collection')
-      ? <CollectionScreen inventory={inventory} artefacts={artefacts} techniques={techniques} cultivation={cultivation} />
-      : null,
-    production: isScreenAllowed('production')
-      ? <ProductionScreen inventory={inventory} pills={pills} tree={tree} />
-      : null,
+    // Inventory / pills / law-selection / idle-assignment props are gone with
+    // the v1 Cookie-Clicker pivot. The Rewards chip + idle assignment chip
+    // are already null-guarded inside HomeScreen, so omitting the props lets
+    // those branches fall through to render nothing.
+    home:   <HomeScreen cultivation={cultivation} selections={null} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} unlockedHiddenArts={tree.modifiers.unlockedHiddenArts} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} treeMods={tree.modifiers} />,
     journey:    <JourneyScreen cultivation={cultivation} />,
     'spirit-bazaar': <SpiritBazaarScreen
                        inventory={shopInventory}
-                       balance={selections.bloodLotusBalance ?? getBloodLotusBalance()}
+                       balance={getBloodLotusBalance()}
                        onBack={() => navigate('home')}
                        onOpenTopUp={() => openModal('shop')}
                        onOpenCodex={() => openModal('codex')}
@@ -1909,7 +1502,7 @@ function AppInner() {
         </>
       )}
       <TopBar
-        bloodLotusBalance={selections.bloodLotusBalance}
+        bloodLotusBalance={getBloodLotusBalance()}
         /* Top-left has TWO separate buttons now:
              onOpenShop      → IAP modal (Top Up — buy more Blood Lotus)
              onOpenLotusShop → spend shop (buffs / QoL / cosmetics)
@@ -1931,7 +1524,7 @@ function AppInner() {
       <NavBar
         currentScreen={currentScreen}
         onNavigate={(screen) => navigate(screen)}
-        badges={{ ...notifications.badges, home: FEATURES.laws && selections.pendingCount > 0, worlds: notifications.badges.worlds || autoFarm.hasPendingGains }}
+        badges={notifications.badges}
         isUnlocked={featureFlags.isUnlocked}
         isHidden={featureFlags.isHidden}
         getHint={featureFlags.getHint}
@@ -1971,26 +1564,9 @@ function AppInner() {
         onDismiss={notifications.dismissToast}
         onNavigate={navigate}
       />
-      {FEATURES.laws && selectionModalOpen && selections.pending[0] && currentScreen === 'home' &&
-       !(cultivation.majorBreakthrough && selections.pending[0]?.kind === 'law') && (
-        <SelectionModal
-          selection={selections.pending[0]}
-          bloodLotusBalance={selections.bloodLotusBalance}
-          onPickLaw={selections.pickLaw}
-          onSkipLaw={selections.skipLaw}
-          onRerollLawOne={selections.rerollLawOne}
-          ownedLaws={cultivation.ownedLaws}
-          activeLawId={cultivation.activeLaw?.id ?? null}
-          onDismantleLaw={(lawId) => {
-            const r = cultivation.dismantleLaw(lawId);
-            if (r) inventory.addItem(mineralForRarity(r), 1);
-          }}
-          onClose={() => {
-            setSelectionModalOpen(false);
-            if (currentEvent?.kind === 'selection-cards') dismiss(currentEvent.id);
-          }}
-        />
-      )}
+      {/* SelectionModal (law-offer picker) removed with the v1 pivot.
+          Laws / useLawOffers are gone; if they ship again, restore the modal
+          render here behind the FEATURES.laws flag. */}
       {/* Qi Sparks pick-1-of-2 modal — fires on every layer breakthrough.
           Suppressed while higher-priority overlays are showing so it doesn't
           stack with breakthrough banners or law offers.
@@ -2010,7 +1586,6 @@ function AppInner() {
         && currentEvent?.kind !== 'crystal-evolution'
         && currentEvent?.kind !== 'offline-earnings'
         && currentEvent?.kind !== 'tutorial'
-        && !(selectionModalOpen && selections.pending[0]?.kind === 'law')
         && (
         <QiSparkChoiceModal
           offer={qiSparks.pendingOffer}
@@ -2062,7 +1637,9 @@ function AppInner() {
           onClose={() => setActiveModal(null)}
         />
       )}
-      {activeModal === 'pills'        && pills        && <PillDrawer open pills={pills} onClose={() => setActiveModal(null)} />}
+      {/* PillDrawer modal removed with the v1 pivot — the old pill brewing
+          recipes are gone, and the new pill design is TBD. The activeModal
+          'pills' key + openModal('pills') call sites have been pruned too. */}
       {(activeModal === 'daily' || currentEvent?.kind === 'daily-bonus') && (
         <DailyBonusModal
           streak={dailyBonus.streak}

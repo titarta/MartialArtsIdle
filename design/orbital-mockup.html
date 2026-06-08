@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Crimson Aura · Orbital VFX Mockup</title>
+<style>
+  :root{
+    --jade-0:#0a1411; --jade-1:#10201b; --jade-2:#173028;
+    --bronze:#c9923f; --bronze-dim:#8a6328;
+    --crimson:#e23b54; --crimson-deep:#7a0f1e;
+    --gold:#e8b54a;
+    --ink:#e7ded0; --ink-dim:#9fb0a6;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; }
+  body{
+    background:#070d0b;
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    display:flex; min-height:100%;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    display:flex; gap:22px; width:100%; padding:22px;
+    align-items:flex-start; justify-content:center; flex-wrap:wrap;
+  }
+
+  /* ── The in-game scene ─────────────────────────────────────────── */
+  .stage{
+    position:relative; width:440px; height:760px; flex:0 0 auto;
+    border-radius:22px; overflow:hidden;
+    background:#0c1714 url("../public/backgrounds/home.png") center/cover no-repeat;
+    box-shadow:0 24px 60px rgba(0,0,0,.6), inset 0 0 0 1px rgba(201,146,63,.25);
+  }
+  .stage::after{ /* vignette so the sprite reads as seated in a scene */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(120% 80% at 50% 42%, transparent 40%, rgba(4,8,7,.72) 100%);
+    z-index:300;
+  }
+  /* soft meditation mandala beneath the cultivator */
+  .mandala{
+    position:absolute; left:50%; top:54%; width:360px; height:360px;
+    transform:translate(-50%,-50%); z-index:5; pointer-events:none;
+    background:radial-gradient(circle, rgba(226,59,84,.20) 0%, rgba(226,59,84,.07) 38%, transparent 66%);
+    animation:breathe 5.5s ease-in-out infinite;
+  }
+  @keyframes breathe{ 0%,100%{ transform:translate(-50%,-50%) scale(1); opacity:.85; } 50%{ transform:translate(-50%,-50%) scale(1.08); opacity:1; } }
+
+  .cultivator{
+    position:absolute; left:50%; bottom:46px; height:360px; width:auto;
+    transform:translateX(-50%); z-index:100;
+    image-rendering:pixelated; user-select:none; pointer-events:none;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.5));
+  }
+
+  /* NOTE: no z-index here on purpose. A z-index would make this wrapper a
+     stacking context and trap every orb behind the cultivator as a group.
+     With z-index:auto the orbs' own per-frame z-indices (10..190) compete
+     directly with the cultivator (100), so they cross in front and behind. */
+  .orbit-layer{ position:absolute; inset:0; pointer-events:none; }
+  .guides{ position:absolute; inset:0; z-index:40; pointer-events:none; opacity:.0; transition:opacity .25s; }
+  .guides.on{ opacity:.5; }
+
+  /* orbiting bodies — CSS stand-ins for future PixelLab sprites */
+  .body{ position:absolute; left:0; top:0; will-change:transform,opacity,filter; }
+  .body .skin{ position:absolute; inset:0; }
+
+  .orb .skin{
+    border-radius:50%;
+    background:radial-gradient(circle at 34% 30%, #ffe2e5 0%, #ff5a6e 24%, #d31530 56%, var(--crimson-deep) 100%);
+    box-shadow:0 0 12px 3px rgba(226,59,84,.65), inset -2px -3px 6px rgba(90,10,20,.75);
+    animation:pulse 2.6s ease-in-out infinite;
+  }
+  .shard .skin{
+    clip-path:polygon(50% 0%, 68% 34%, 56% 100%, 50% 72%, 44% 100%, 32% 34%);
+    background:linear-gradient(148deg, #ffb3bd 0%, #ef4a62 32%, #a8142b 72%, #5e0a18 100%);
+    box-shadow:0 0 11px 2px rgba(226,59,84,.55);
+    animation:pulse 3.1s ease-in-out infinite;
+  }
+  .shard .skin::before{ /* facet highlight */
+    content:""; position:absolute; left:50%; top:6%; width:2px; height:60%;
+    transform:translateX(-50%); background:linear-gradient(#fff, transparent);
+    opacity:.55;
+  }
+
+  /* gold (Heavenly Qi) variant for the simultaneous-buff preview */
+  .body.gold.orb .skin{
+    background:radial-gradient(circle at 34% 30%, #fff7df 0%, #ffd667 24%, #e0a420 56%, #7a5410 100%);
+    box-shadow:0 0 12px 3px rgba(232,181,74,.65), inset -2px -3px 6px rgba(80,52,12,.75);
+  }
+  .body.gold.shard .skin{
+    background:linear-gradient(148deg, #fff1c9 0%, #ffce5c 32%, #c98c1e 72%, #6e4d10 100%);
+    box-shadow:0 0 11px 2px rgba(232,181,74,.55);
+  }
+
+  @keyframes pulse{ 0%,100%{ box-shadow:0 0 9px 2px rgba(226,59,84,.45); } 50%{ box-shadow:0 0 16px 5px rgba(226,59,84,.8); } }
+
+  /* ── Control panel ─────────────────────────────────────────────── */
+  .panel{
+    width:330px; flex:0 0 auto; border-radius:16px; padding:18px 18px 22px;
+    background:linear-gradient(180deg, rgba(23,48,40,.94), rgba(12,23,20,.96));
+    border:1px solid rgba(201,146,63,.4);
+    box-shadow:0 16px 40px rgba(0,0,0,.5);
+  }
+  .panel h1{ margin:0 0 2px; font-size:17px; letter-spacing:.3px; color:var(--bronze); }
+  .panel .sub{ margin:0 0 14px; font-size:12px; color:var(--ink-dim); line-height:1.45; }
+  .panel .note{
+    margin:14px 0 0; padding:10px 12px; border-radius:9px; font-size:11.5px; line-height:1.5;
+    background:rgba(226,59,84,.10); border:1px solid rgba(226,59,84,.3); color:#f0c9cf;
+  }
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:11px 0; }
+  .row label{ font-size:12.5px; color:var(--ink); }
+  .row .val{ font-size:11.5px; color:var(--bronze); min-width:34px; text-align:right; font-variant-numeric:tabular-nums; }
+  input[type=range]{ width:140px; accent-color:var(--crimson); }
+  select, .seg button{
+    background:var(--jade-1); color:var(--ink); border:1px solid rgba(201,146,63,.4);
+    border-radius:8px; padding:5px 8px; font-size:12px; font-family:inherit;
+  }
+  .seg{ display:flex; gap:4px; }
+  .seg button{ cursor:pointer; }
+  .seg button.on{ background:var(--crimson-deep); border-color:var(--crimson); color:#fff; }
+  .checks{ display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:6px; }
+  .chk{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--ink); }
+  .chk input{ accent-color:var(--crimson); }
+  .divider{ height:1px; background:rgba(201,146,63,.25); margin:14px 0; }
+  .grp-title{ font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--bronze-dim); margin:0 0 2px; }
+  .count-readout{ font-size:11.5px; color:var(--ink-dim); margin-top:10px; }
+  .pillbtn{
+    cursor:pointer; background:var(--crimson-deep); color:#fff; border:1px solid var(--crimson);
+    border-radius:8px; padding:6px 12px; font-size:12.5px; font-family:inherit;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="stage" id="stage">
+    <div class="mandala"></div>
+    <svg class="guides" id="guides" viewBox="0 0 440 760" preserveAspectRatio="none"></svg>
+    <img class="cultivator" id="cultivator" src="../public/sprites/cultivator/t9_void_king_normal.png" alt="cultivator" />
+    <div class="orbit-layer" id="orbitLayer"></div>
+  </div>
+
+  <div class="panel">
+    <h1>Crimson Aura · Orbital VFX</h1>
+    <p class="sub">Two crossed elliptical orbits sweep crimson orbs and crystal shards around the cultivator. They grow as they swing to the front and pass <b>behind</b> the body on the far arc. Depth is carried by scale alone, no transparency. Final art would be PixelLab sprites dropped into these slots.</p>
+
+    <div class="row">
+      <label for="tier">Cultivator</label>
+      <select id="tier"></select>
+    </div>
+
+    <div class="divider"></div>
+    <p class="grp-title">Rings</p>
+    <div class="checks" id="ringChecks">
+      <label class="chk"><input type="checkbox" id="ringA" checked> Orbit A (orbs)</label>
+      <label class="chk"><input type="checkbox" id="ringB" checked> Orbit B (shards)</label>
+    </div>
+
+    <div class="row"><label>Bodies per ring</label><input type="range" id="count" min="1" max="6" step="1" value="3"><span class="val" id="countV">3</span></div>
+    <div class="row"><label>Speed</label><input type="range" id="speed" min="0" max="2" step="0.05" value="1"><span class="val" id="speedV">1.0</span></div>
+    <div class="row"><label>Lean (tilt)</label><input type="range" id="lean" min="50" max="88" step="1" value="78"><span class="val" id="leanV">78</span></div>
+    <div class="row"><label>Spread</label><input type="range" id="spread" min="0.7" max="1.35" step="0.05" value="1"><span class="val" id="spreadV">1.0</span></div>
+    <div class="row"><label>Far scale (back)</label><input type="range" id="far" min="0.2" max="1" step="0.05" value="0.65"><span class="val" id="farV">0.65</span></div>
+    <div class="row"><label>Near scale (front)</label><input type="range" id="near" min="1" max="1.9" step="0.05" value="1.18"><span class="val" id="nearV">1.18</span></div>
+    <div class="row"><label>Deviation</label><input type="range" id="dev" min="0" max="1" step="0.05" value="0.4"><span class="val" id="devV">0.40</span></div>
+
+    <div class="divider"></div>
+    <div class="row"><label>Body style</label>
+      <div class="seg" id="style">
+        <button data-v="orb">Orbs</button>
+        <button data-v="shard">Shards</button>
+        <button data-v="mix" class="on">Mix</button>
+      </div>
+    </div>
+    <div class="row"><label>Aura colour</label>
+      <div class="seg" id="color">
+        <button data-v="crimson" class="on">Crimson</button>
+        <button data-v="gold">Gold</button>
+        <button data-v="both">Both</button>
+      </div>
+    </div>
+    <p class="sub" style="margin:6px 0 0">"Both" = Crimson Aura (crimson) and a Heavenly Qi ad-boost (gold) running at the same time, sharing the orbit instead of fighting over one halo.</p>
+
+    <div class="divider"></div>
+    <p class="grp-title">Demonstrate the cues</p>
+    <div class="checks">
+      <label class="chk"><input type="checkbox" id="occl" checked> Occlusion (pass behind)</label>
+      <label class="chk"><input type="checkbox" id="depth" checked> Depth (scale only)</label>
+      <label class="chk"><input type="checkbox" id="paths"> Show orbit paths</label>
+    </div>
+    <p class="sub" style="margin:8px 0 0">Toggle occlusion or depth off to feel how flat it gets without them. That gap is the whole illusion.</p>
+
+    <div class="row" style="margin-top:14px">
+      <button class="pillbtn" id="pause">Pause</button>
+      <span class="count-readout" id="readout"></span>
+    </div>
+
+    <p class="note"><b>What to look for:</b> a body brightens and grows as it swings to the front (bottom of its arc), then shrinks, dims, and slips behind the cultivator at the top. Counter-rotating rings at different tilts give the "armillary" sense of life.</p>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var TAU = Math.PI*2, D2R = Math.PI/180;
+  var stage = document.getElementById('stage');
+  var cult  = document.getElementById('cultivator');
+  var layer = document.getElementById('orbitLayer');
+  var guides= document.getElementById('guides');
+  var readout = document.getElementById('readout');
+
+  // 13 cultivator tiers for the dropdown
+  var TIERS = [
+    ['t0_novice','Novice'],['t1_qi_transformation','Qi Transformation'],['t2_true_element','True Element'],
+    ['t3_separation','Separation'],['t4_immortal_ascension','Immortal Ascension'],['t5_saint','Saint'],
+    ['t6_saint_king','Saint King'],['t7_origin_returning','Origin Returning'],['t8_origin_king','Origin King'],
+    ['t9_void_king','Void King'],['t10_dao_source','Dao Source'],['t11_emperor_realm','Emperor Realm'],
+    ['t12_open_heaven','Open Heaven']
+  ];
+  var tierSel = document.getElementById('tier');
+  TIERS.forEach(function(t){ var o=document.createElement('option'); o.value=t[0]; o.textContent=t[1]; tierSel.appendChild(o); });
+  tierSel.value = 't9_void_king';
+  tierSel.addEventListener('change', function(){
+    cult.src = '../public/sprites/cultivator/'+tierSel.value+'_normal.png';
+  });
+
+  // ── Ring definitions. Each ring is a real circle in 3D, leaned toward the
+  //    viewer (ax) and rolled on screen (az), counter-rotating for life. ──
+  // Two crossed elliptical orbits: same size + centre, opposite roll (az) and
+  // opposite spin, so they intersect in an X and interweave through the cross.
+  var RING_DEFS = [
+    { key:'A', R:214, az: 30, speed: 0.80, baseType:'orb',   baseCount:3, cyOff:0, size:24, spin:0  },
+    { key:'B', R:214, az:-30, speed:-0.80, baseType:'shard', baseCount:3, cyOff:0, size:28, spin:55 }
+  ];
+  var ZREF = 214 * Math.sin(82*D2R); // normaliser for depth
+
+  // ── Control state ──
+  var S = {
+    count:3, speed:1, lean:78, spread:1,
+    farScale:0.65, nearScale:1.18, deviation:0.4,
+    style:'mix', color:'crimson',
+    occl:true, depth:true, paths:false, paused:false,
+    rings:{A:true,B:true}
+  };
+
+  var bodies = []; // {el, ring, phase, type}
+
+  function typeForRing(def){
+    if (def.baseType==='moon') return 'moon';
+    if (S.style==='mix') return def.baseType;
+    return S.style; // 'orb' or 'shard'
+  }
+  function colorForRing(def){
+    if (S.color==='gold') return 'gold';
+    if (S.color==='crimson') return 'crimson';
+    // both: ring B reads as the gold Heavenly-Qi layer, A+C crimson
+    return def.key==='B' ? 'gold' : 'crimson';
+  }
+
+  function build(){
+    layer.innerHTML=''; bodies=[];
+    RING_DEFS.forEach(function(def){
+      if(!S.rings[def.key]) return;
+      var type = typeForRing(def);
+      var isMoon = def.baseType==='moon';
+      var count = isMoon ? Math.max(1, Math.min(3, S.count-1)) : S.count;
+      var col = colorForRing(def);
+      for(var i=0;i<count;i++){
+        var el=document.createElement('div');
+        el.className='body '+(type==='moon'?'shard':type)+' '+col;
+        if(type==='moon') el.classList.add('moon');
+        var sz = (type==='moon') ? def.size : (type==='shard'? def.size : def.size);
+        el.style.width=sz+'px'; el.style.height=sz+'px';
+        var skin=document.createElement('div'); skin.className='skin';
+        skin.style.animationDelay = (-(i*0.5)).toFixed(2)+'s';
+        el.appendChild(skin);
+        layer.appendChild(el);
+        bodies.push({
+          el:el, def:def, phase:(i/count)*TAU,
+          spinDir:(def.speed>=0?1:-1), spinRate:def.spin,
+          // per-body orbit-offset factors, fixed at build. These put each body
+          // on its OWN near-copy of the orbit (radius / tilt / centre) WITHOUT
+          // touching phase or speed, so relative spacing stays locked.
+          rJit:(Math.random()*2-1), axJit:(Math.random()*2-1), azJit:(Math.random()*2-1),
+          cxJit:(Math.random()*2-1), cyJit:(Math.random()*2-1)
+        });
+      }
+    });
+    readout.textContent = bodies.length + ' bodies · ' + Object.keys(S.rings).filter(function(k){return S.rings[k];}).length + ' rings';
+    drawGuides();
+  }
+
+  // centre of the orbit system, tracked to the actual sprite box
+  var cx=220, cy=410;
+  function recenter(){
+    var sr=stage.getBoundingClientRect(), cr=cult.getBoundingClientRect();
+    cx = (cr.left - sr.left) + cr.width/2;
+    cy = (cr.top  - sr.top ) + cr.height*0.46; // around the chest
+  }
+  cult.addEventListener('load', function(){ recenter(); drawGuides(); });
+  window.addEventListener('resize', function(){ recenter(); drawGuides(); });
+
+  // project a ring point to screen + depth
+  function project(R, theta, axDeg, azDeg){
+    var lx=R*Math.cos(theta), ly=R*Math.sin(theta);
+    var ax=axDeg*D2R;
+    var y1=ly*Math.cos(ax), z1=ly*Math.sin(ax), x1=lx;
+    var az=azDeg*D2R;
+    var x2=x1*Math.cos(az)-y1*Math.sin(az);
+    var y2=x1*Math.sin(az)+y1*Math.cos(az);
+    return { x:x2, y:y2, z:z1 };
+  }
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  function drawGuides(){
+    if(!S.paths){ guides.classList.remove('on'); guides.innerHTML=''; return; }
+    guides.classList.add('on'); guides.innerHTML='';
+    RING_DEFS.forEach(function(def){
+      if(!S.rings[def.key]) return;
+      var ax = clamp(S.lean, 40, 88);
+      var pts=[];
+      for(var a=0;a<=64;a++){
+        var th=(a/64)*TAU;
+        var p=project(def.R*S.spread, th, ax, def.az);
+        pts.push((cx+p.x).toFixed(1)+','+(cy+def.cyOff+p.y).toFixed(1));
+      }
+      var pl=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+      pl.setAttribute('points',pts.join(' '));
+      pl.setAttribute('fill','none');
+      pl.setAttribute('stroke', colorForRing(def)==='gold' ? 'rgba(232,181,74,.6)' : 'rgba(226,59,84,.6)');
+      pl.setAttribute('stroke-width','1');
+      pl.setAttribute('stroke-dasharray','3 4');
+      guides.appendChild(pl);
+    });
+  }
+
+  // ── Animation loop ──
+  var last=0, tsec=0;
+  function frame(ts){
+    if(!last) last=ts;
+    var dt=(ts-last)/1000; last=ts;
+    if(!S.paused) tsec += dt * S.speed;
+
+    for(var i=0;i<bodies.length;i++){
+      var b=bodies[i], def=b.def;
+      // per-body deviation = a slightly OFFSET orbit (its own near-copy of the
+      // curve), NOT a change to spacing or timing. Phase + speed stay locked so
+      // every body keeps the same relative distance; only the geometry shifts.
+      var dev = S.deviation;
+      var prec = Math.sin(tsec*0.25 + def.key.charCodeAt(0))*4;  // shared per-ring wobble
+      var az = def.az + prec + b.azJit*7*dev;                    // slight plane-roll offset
+      var ax = clamp(S.lean + b.axJit*5*dev, 40, 88);            // slight plane-tilt offset
+      var theta = b.phase + tsec*def.speed;                      // EVEN spacing, locked speed
+      var R = def.R * S.spread * (1 + b.rJit*0.08*dev);          // slightly bigger/smaller orbit
+      var p = project(R, theta, ax, az);
+
+      var depthT = clamp((p.z/ZREF + 1)/2, 0, 1);     // 0 far .. 1 near
+      var persp = 1000/(1000 - p.z);                   // subtle perspective
+      var px = cx + p.x*persp + b.cxJit*10*dev;        // small fixed shift of the orbit centre
+      var py = cy + def.cyOff + p.y*persp + b.cyJit*8*dev;
+
+      // depth carried by SCALE only — full opacity, no blur, no fade.
+      // near/far multipliers are user-controlled; perspective is kept OFF the
+      // scale so the two sliders ARE the exact on-screen back + front sizes.
+      var scale = S.depth ? lerp(S.farScale, S.nearScale, depthT) : 1;
+      var spin  = b.spinRate ? (tsec*b.spinRate*b.spinDir) : 0;
+
+      b.el.style.transform = 'translate('+px.toFixed(1)+'px,'+py.toFixed(1)+'px) translate(-50%,-50%) scale('+scale.toFixed(3)+') rotate('+spin.toFixed(1)+'deg)';
+      b.el.style.opacity = '1';
+      b.el.style.filter = '';
+      b.el.style.zIndex = S.occl ? Math.round(100 + (p.z/ZREF)*90) : 200;
+    }
+    if(S.paths) drawGuides();
+    requestAnimationFrame(frame);
+  }
+
+  // ── Wire controls ──
+  function bindRange(id, key, fmt){
+    var el=document.getElementById(id), out=document.getElementById(id+'V');
+    function up(){ S[key]=parseFloat(el.value); if(out) out.textContent=fmt?fmt(S[key]):el.value;
+      if(key==='count'){ build(); } else { drawGuides(); } }
+    el.addEventListener('input',up); up();
+  }
+  bindRange('count','count');
+  bindRange('speed','speed',function(v){return v.toFixed(2);});
+  bindRange('lean','lean',function(v){return v.toFixed(0);});
+  bindRange('spread','spread',function(v){return v.toFixed(2);});
+  bindRange('far','farScale',function(v){return v.toFixed(2);});
+  bindRange('near','nearScale',function(v){return v.toFixed(2);});
+  bindRange('dev','deviation',function(v){return v.toFixed(2);});
+
+  ['A','B'].forEach(function(k){
+    document.getElementById('ring'+k).addEventListener('change',function(e){ S.rings[k]=e.target.checked; build(); });
+  });
+  function seg(id, key, after){
+    var box=document.getElementById(id);
+    box.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        box.querySelectorAll('button').forEach(function(b){b.classList.remove('on');});
+        btn.classList.add('on'); S[key]=btn.dataset.v; build(); if(after)after();
+      });
+    });
+  }
+  seg('style','style'); seg('color','color');
+
+  document.getElementById('occl').addEventListener('change',function(e){ S.occl=e.target.checked; });
+  document.getElementById('depth').addEventListener('change',function(e){ S.depth=e.target.checked; });
+  document.getElementById('paths').addEventListener('change',function(e){ S.paths=e.target.checked; drawGuides(); });
+  document.getElementById('pause').addEventListener('click',function(e){ S.paused=!S.paused; e.target.textContent=S.paused?'Play':'Pause'; });
+
+  // boot
+  recenter(); build(); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

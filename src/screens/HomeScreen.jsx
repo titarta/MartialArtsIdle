@@ -5,19 +5,16 @@ import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import ActiveBuffsChip from '../components/ActiveBuffsChip';
-import CrimsonOrbitLayer from '../components/CrimsonOrbitLayer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
 import { useEventQueue } from '../contexts/EventQueueContext';
 import { QI_SPARK_BY_ID } from '../data/qiSparks';
-import { sparksToGrantOnEvolution } from '../data/crystalMechanicGrants';
 // TutorialModal render lives in App.jsx so onboarding cards work on every
 // screen, not just Home. Trigger sites here just call fireTutorialOnce.
 import { fireTutorialOnce } from '../systems/fireTutorial';
 import { hasSeenTutorial } from '../systems/tutorialSeen';
 import { TUTORIAL_IDS } from '../data/tutorialCards';
-import WORLDS from '../data/worlds';
 import AudioManager from '../audio/AudioManager';
 import { getAudioTimeline } from '../data/audioTimeline';
 import { eventStat } from '../systems/statsRecorder';
@@ -612,17 +609,10 @@ function CrystalEvolutionOverlay({ event, onDone }) {
     : `${BASE}crystals/crystal_locked.png`;
   const newSrc = `${BASE}crystals/crystal_${event.newTier}.png`;
   const tierName = CRYSTAL_TIER_NAMES[event.newTier] ?? `Tier ${event.newTier}`;
-  // If this evolution crosses one or more mechanic-granting thresholds, show
-  // a single-line hint on the celebration card so the player knows a tutorial
-  // is coming next. The actual TutorialModal queues separately and pops after
-  // dismissal. Multiple mechanics collapse to a count to keep the line tight.
-  const grantedSparkIds = sparksToGrantOnEvolution(event.previousTier ?? 0, event.newTier ?? 0);
-  const grantedNames    = grantedSparkIds
-    .map((id) => QI_SPARK_BY_ID[id]?.name)
-    .filter(Boolean);
-  let unlockLine = null;
-  if (grantedNames.length === 1) unlockLine = t('home.mechanicUnlocked', { name: grantedNames[0] });
-  else if (grantedNames.length > 1) unlockLine = t('home.mechanicsUnlocked', { n: grantedNames.length });
+  // The pre-pivot evolution card surfaced "you unlocked X mechanic spark!"
+  // hints when the crossed tier(s) had grants attached. crystalMechanicGrants
+  // is gone in v1, so the unlock line is always null.
+  const unlockLine = null;
   const card = (
     <div className="crystal-evolve-card">
       <div className="crystal-evolve-name">{tierName}</div>
@@ -2322,14 +2312,16 @@ function QiParticles({ colors, rung = 0 }) {
 
 // ── Main screen ──────────────────────────────────────────────────────────────
 function HomeScreen({
-  cultivation, inventory,
-  selections, onOpenSelections,
+  cultivation,
+  // inventory / selections / onOpenSelections / lastIdleAssignment /
+  // onOpenPills / totalOwnedPills were tied to combat, gathering, mining,
+  // alchemy, and law-offer selection — all retired with the v1 Cookie-
+  // Clicker pivot. Kept here as no-op defaults so App.jsx can stop passing
+  // them without the consumer destructuring throwing on undefined access.
+  selections,
   onNavigate,
   crystal, isCrystalUnlocked,
-  lastIdleAssignment,
   openCrystal,
-  onOpenPills,
-  totalOwnedPills,
   activeSparks,
   // Paid shop timed buffs (shopInventory.activeBuffs). Fed into the
   // ActiveBuffsChip alongside activeSparks so the top-left chip
@@ -2677,18 +2669,10 @@ function HomeScreen({
     // it when they encounter it again later). No tier colours passed —
     // TutorialModal's jade-green default accent matches the icon frame
     // and keeps the modal's identity consistent across all mechanics.
-    const newlyGranted = sparksToGrantOnEvolution(info?.previousTier ?? 0, info?.newTier ?? 0);
-    newlyGranted.forEach((sparkId) => {
-      const card = QI_SPARK_BY_ID[sparkId];
-      if (!card) return;
-      enqueue('tutorial', {
-        kicker:  'New Mechanic',
-        title:   card.name,
-        body:    card.description,
-        ctaText: 'Got it',
-        iconSrc: card.mechanicId ? `${BASE}ui/upgrade_${card.mechanicId}.png` : undefined,
-      });
-    });
+    // crystalMechanicGrants.js drove the per-tier mechanic-spark tutorial
+    // pops below. That table was retired with the v1 pivot; mechanic sparks
+    // now come from the regular spark-offer pool, which surfaces its own
+    // tutorial via the FIRST_SPARK_OFFER card in App.jsx.
 
     // Round 3 — Crystal Discovery. Re-broadcast the tier delta as a window
     // event so the App.jsx orchestrator can grant any mechanic-tier sparks
@@ -2967,38 +2951,11 @@ function HomeScreen({
                 </span>
               </button>
             )}
-            {selections?.pendingCount > 0 && !majorBreakthrough && (
-              <button className="home-sel-btn" onClick={onOpenSelections}>
-                <span className="home-sel-btn-icon">📦</span>
-                <span className="home-sel-btn-label">
-                  {t('home.rewardsChip', { count: selections.pendingCount, n: selections.pendingCount })}
-                </span>
-              </button>
-            )}
-            {!cultivation.activeLaw && (cultivation.ownedLaws?.length ?? 0) > 0 && (
-              <button className="home-sel-btn home-sel-btn-law" onClick={() => onNavigate?.('character')}>
-                <span className="home-sel-btn-icon">☯</span>
-                <span className="home-sel-btn-label">{t('home.noLawEquipped')}</span>
-              </button>
-            )}
-            {lastIdleAssignment && (() => {
-              const world  = WORLDS[lastIdleAssignment.worldIndex];
-              const region = world?.regions?.[lastIdleAssignment.regionIndex];
-              if (!region) return null;
-              const icon = lastIdleAssignment.activity === 'gathering' ? '🌿' : '⛏';
-              return (
-                <button className="home-idle-chip" onClick={() => onNavigate?.('worlds', { activeTab: lastIdleAssignment.activity === 'gathering' ? 'gather' : 'mine' })}>
-                  <span className="home-idle-chip-icon">{icon}</span>
-                  <span className="home-idle-chip-label">{region.name}</span>
-                </button>
-              );
-            })()}
-            {totalOwnedPills > 0 && (
-              <button className="home-pill-chip" onClick={onOpenPills}>
-                <span className="home-pill-chip-icon">◈</span>
-                <span className="home-pill-chip-label">{t('home.pillsChip', { n: totalOwnedPills })}</span>
-              </button>
-            )}
+            {/* Law-offer Rewards chip, the "no law equipped" warning chip,
+                the idle gather/mine assignment chip, and the active-pills
+                chip were retired with the v1 Cookie-Clicker pivot — laws,
+                worlds, autoFarm, and pills are all gone. The Sparks-await
+                button above is the only chip still live in this row. */}
           </div>
 
           {/* ── Top-right chip stack — Petition Tablet stands alone ──
@@ -3148,12 +3105,11 @@ function HomeScreen({
                 className={`home-cultivator-sprite${cultivatorPose === 'focused' ? '' : ' home-cultivator-sprite-fade'}`}
                 draggable="false"
               />
-              {/* Crimson Aura orbital VFX — mixed crimson orbs + crystal shards on
-                  two crossed elliptical rings. Self-gates on the body class set in
-                  App.jsx; lives inside the fighter-stage so the bodies cross in
-                  front of (z:3) and behind (z:1) the cultivator sprite (z:2), and
-                  the wider-than-sprite orbits are not clipped (overflow:visible). */}
-              <CrimsonOrbitLayer />
+              {/* CrimsonOrbitLayer was the in-sprite orbital VFX component;
+                  it was deleted in the v1 cleanup pass alongside the other
+                  combat-era components. Crimson Aura cosmetics now live on
+                  the body class set in App.jsx (.body-crimson-aura-active),
+                  which CSS attaches as a pseudo-element halo. */}
             </div>
           </div>
           </div>{/* end home-crystal-char-stack */}

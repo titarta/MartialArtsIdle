@@ -3,22 +3,22 @@
  * accessible. Evaluated by useFeatureFlags against live game state.
  *
  * Gate types:
- *   always            — always unlocked
- *   realm             — realmIndex >= minRealmIndex
- *   region_clear_any  — player has cleared (won combat in) at least one region
- *   item_any          — inventory contains at least one item of any kind
- *   item_category     — inventory contains at least one item in `category`
- *   flag              — build-time `FEATURES[gate.flag]` is truthy
- *   all               — every sub-gate in `gates` must pass
- *   any               — at least one sub-gate in `gates` must pass
+ *   always    — always unlocked
+ *   realm     — realmIndex >= minRealmIndex
+ *   flag      — build-time `FEATURES[gate.flag]` is truthy
+ *   all       — every sub-gate in `gates` must pass
+ *   any       — at least one sub-gate in `gates` must pass
+ *
+ * The pre-pivot `region_clear_any` / `item_any` / `item_category` types and
+ * the herb / ore / blood-core / cultivation / pill item catalogues were
+ * retired with the v1 Cookie-Clicker pivot. The Worlds hub + combat-screen
+ * unlock toasts + isWorldUnlocked / getWorldLockHint helpers were tied to
+ * the now-deleted WORLDS data set, so they are gone too.
  *
  * Designer overrides: src/data/config/featureGates.override.json
  * Records are keyed by feature id; each record is shallow-merged onto the
  * baseline, so you can patch just `gate` without losing `hint` / `unlockMsg`.
  */
-import WORLDS from './worlds';
-import { HERB_ITEMS, ORE_ITEMS, BLOOD_CORE_ITEMS, CULTIVATION_ITEMS } from './materials';
-import { PILLS } from './pills';
 import { mergeRecords } from './config/loader';
 import { FEATURES } from './featureFlags';
 
@@ -29,14 +29,6 @@ const flagged = (baseGate, flag) => ({
   type: 'all',
   gates: [baseGate, { type: 'flag', flag }],
 });
-
-const ITEM_CATEGORIES = {
-  herbs:       HERB_ITEMS,
-  minerals:    ORE_ITEMS,
-  bloodCores:  BLOOD_CORE_ITEMS,
-  cultivation: CULTIVATION_ITEMS,
-  pills:       PILLS,
-};
 
 // ── Baseline ──────────────────────────────────────────────────────────────────
 
@@ -64,12 +56,14 @@ const BASELINE = {
     hint: null,
     unlockMsg: null,
   },
+  // The combat-adjacent gates below stay defined so any stale toast or
+  // notification carrying a legacy feature id resolves to a known shape.
+  // They evaluate to false in v1 because FEATURES.combat is off.
   worlds: {
-    // Wrapped behind FEATURES.combat — hidden in v1.
     gate: flagged({ type: 'realm', minRealmIndex: 2 }, 'combat'),
-    desc: 'Explore regions across multiple worlds, fight enemies in combat, and dispatch idle workers to gather herbs or mine ores.',
-    hint: 'Reach Tempered Body Layer 3',
-    unlockMsg: 'Worlds unlocked.',
+    desc: null,
+    hint: null,
+    unlockMsg: null,
   },
   character: {
     gate: flagged({ type: 'always' }, 'combat'),
@@ -77,39 +71,17 @@ const BASELINE = {
     hint: null,
     unlockMsg: null,
   },
-  gathering: {
-    gate: flagged({ type: 'realm', minRealmIndex: 7 }, 'combat'),
-    desc: 'Dispatch an idle worker to harvest herbs from cleared regions. Materials fuel alchemy and crafting.',
-    hint: 'Reach Tempered Body Layer 8',
-    unlockMsg: 'Gathering unlocked.',
-  },
-  mining: {
-    gate: flagged({ type: 'realm', minRealmIndex: 7 }, 'combat'),
-    desc: 'Dispatch an idle worker to extract ores from cleared regions.',
-    hint: 'Reach Tempered Body Layer 8',
-    unlockMsg: 'Mining unlocked.',
-  },
   collection: {
     gate: flagged({ type: 'always' }, 'combat'),
     desc: null,
     hint: null,
     unlockMsg: null,
   },
-  // Production screen unlocks the first time the player gathers a herb —
-  // alchemy is the only activity here.
   production: {
-    gate: flagged({ type: 'item_category', category: 'herbs' }, 'combat'),
-    desc: 'Brew cultivation pills that grant passive bonuses to combat strength and training speed.',
-    hint: 'Gather a herb to unlock',
-    unlockMsg: 'Production unlocked.',
-  },
-  // alchemy mirrors production for the unlock-toast routing — kept as a
-  // separate id so older saves / toast calls still resolve.
-  alchemy: {
-    gate: flagged({ type: 'item_category', category: 'herbs' }, 'combat'),
-    desc: 'Brew cultivation pills in the furnace that grant passive bonuses to combat strength and training speed.',
-    hint: 'Gather a herb to unlock',
-    unlockMsg: 'Alchemy unlocked.',
+    gate: flagged({ type: 'always' }, 'combat'),
+    desc: null,
+    hint: null,
+    unlockMsg: null,
   },
   // Spirit Bazaar — Blood Lotus spend storefront, promoted to a full screen
   // during the nav-audit. TopBar 🏮 routes here via navigate('spirit-bazaar').
@@ -139,63 +111,25 @@ export const FEATURE_GATES = mergeRecords(BASELINE, 'featureGates');
 
 /**
  * @param {object} gate
- * @param {{ realmIndex: number, clearedRegions: Set, getQuantity: fn }} ctx
+ * @param {{ realmIndex: number }} ctx
  */
 export function evaluateGate(gate, ctx) {
-  const { realmIndex, clearedRegions, getQuantity } = ctx;
+  const { realmIndex } = ctx;
   switch (gate.type) {
     case 'always':
       return true;
     case 'realm':
       return realmIndex >= gate.minRealmIndex;
-    case 'region_clear_any':
-      return clearedRegions.size > 0;
-    case 'item_any':
-      return Object.values(ITEM_CATEGORIES).some(cat => cat.some(item => getQuantity(item.id) > 0));
-    case 'item_category':
-      return (ITEM_CATEGORIES[gate.category] ?? []).some(item => getQuantity(item.id) > 0);
     case 'flag':
       return !!FEATURES[gate.flag];
     case 'all':
       return gate.gates.every(g => evaluateGate(g, ctx));
     case 'any':
       return gate.gates.some(g => evaluateGate(g, ctx));
+    // 'region_clear_any' / 'item_any' / 'item_category' from the pre-pivot
+    // build had no v1 surface; resolve to false so any leftover override
+    // referencing them silently blocks instead of throwing.
     default:
-      return true;
+      return false;
   }
-}
-
-// ── World unlock logic ────────────────────────────────────────────────────────
-
-/**
- * World 1 is always open.
- * World N (N ≥ 2) requires:
- *   - realmIndex ≥ floor (World 2 = 1; later worlds use their own minRealmIndex)
- *   - the final region of the previous world has been cleared in combat
- */
-export function isWorldUnlocked(worldIndex, realmIndex, clearedRegions) {
-  if (worldIndex === 0) return true;
-  const world      = WORLDS[worldIndex];
-  const prevWorld  = WORLDS[worldIndex - 1];
-  const realmFloor = worldIndex === 1 ? 1 : world.minRealmIndex;
-  if (realmIndex < realmFloor) return false;
-  const lastRegion = prevWorld.regions[prevWorld.regions.length - 1];
-  return clearedRegions.has(lastRegion.name);
-}
-
-/** Human-readable lock hint for a world card. */
-export function getWorldLockHint(worldIndex, realmIndex, clearedRegions) {
-  if (worldIndex === 0) return null;
-  const world      = WORLDS[worldIndex];
-  const prevWorld  = WORLDS[worldIndex - 1];
-  const realmFloor = worldIndex === 1 ? 1 : world.minRealmIndex;
-  const prevLast   = prevWorld.regions[prevWorld.regions.length - 1];
-
-  if (!clearedRegions.has(prevLast.name)) {
-    return `Clear "${prevLast.name}" in combat to unlock`;
-  }
-  if (realmIndex < realmFloor) {
-    return `Reach realm level ${realmFloor} to unlock`;
-  }
-  return null;
 }

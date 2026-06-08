@@ -1,40 +1,34 @@
 /**
- * gameDebug.js — development-only console helpers.
+ * gameDebug.js — development-only console helpers (v1 trim).
  *
- * Only active when import.meta.env.DEV is true (Vite dev server).
- * Exposes `window.debug` in the browser console.
+ * The pre-pivot file exposed gd.giveLaws / gd.giveArtefacts / gd.giveTechniques /
+ * gd.giveMaterials / combat debug knobs / drop-distribution audits / etc. — all
+ * of which depended on data tables (enemies, pills, techniques, artefacts,
+ * affixPools, worlds, materials, lawUniques) that were retired with the v1
+ * Cookie-Clicker pivot.
  *
- * Usage: gd.help()
+ * What remains is the small surface that the v1 build actually has hooks
+ * for: cultivation rate / qi / realm jumps, crystal level + evolution
+ * overlays, qi-spark grants, and the playthrough simulation (which has no
+ * external imports of its own).
  */
 
-import ENEMIES from '../data/enemies';
-import { ALL_MATERIALS } from '../data/materials';
-import { PILLS_BY_ID } from '../data/pills';
 import REALMS from '../data/realms';
-import { pickTechnique } from '../data/techniqueDrops';
-import { TECHNIQUES } from '../data/techniques';
-import { generateLaw } from '../data/affixPools';
-import { pickRandomArtefact } from '../data/artefactDrops';
 import { QI_SPARKS, QI_SPARK_BY_ID } from '../data/qiSparks';
-import { runDropDistributionTest } from './dropDistributionTest';
 import { runPlaythroughSim, runCombinedProposalSim } from './playthroughSim';
 import { clearAllTutorialsSeen } from '../systems/tutorialSeen';
-
-const ITEMS_BY_ID = { ...ALL_MATERIALS, ...PILLS_BY_ID };
 
 /**
  * Attach window.debug using a ref that always points to the latest hook values.
  * Called once from App.jsx on mount.
  *
- * @param {React.MutableRefObject} hooksRef  — ref whose .current is
- *   { cultivation, inventory, techniques, combat, artefacts }
+ * @param {React.MutableRefObject} hooksRef — ref whose .current is
+ *   { cultivation, crystal, qiSparks, producers, upgrades }
  */
 export function initDebug(hooksRef) {
-
   const g = () => hooksRef.current; // always-fresh hook bundle
 
   window.gd = {
-
     // ── Cultivation ────────────────────────────────────────────────────────
 
     /** Jump to realm index n (0-based). */
@@ -57,823 +51,85 @@ export function initDebug(hooksRef) {
     /** Fill qi to just below the breakthrough threshold. */
     fillQi() {
       g().cultivation.qiRef.current = g().cultivation.costRef.current - 1;
-      console.log(`[debug] Qi filled — one tick from breakthrough`);
+      console.log('[debug] Qi filled — one tick from breakthrough');
     },
 
-    /**
-     * Multiply the qi/s rate by n. Call with 1 to reset.
-     * @param {number} n  Multiplier (e.g. 10 = ten times faster, 1 = normal)
-     */
-    setQiRate(n = 1) {
-      const mult = Math.max(0, Number(n));
-      g().cultivation.debugQiMultRef.current = mult;
-      if (mult === 1) {
-        console.log('[debug] Qi rate — reset to normal');
-      } else {
-        console.log(`[debug] Qi rate ×${mult} (call gd.setQiRate(1) to reset)`);
-      }
-    },
+    // ── Qi Crystal ─────────────────────────────────────────────────────────
 
-    /**
-     * Wipe the Tier-A tutorial "seen" set so the onboarding cards fire
-     * again on the next eligible trigger. Useful for re-testing the
-     * first-run flow without a full save wipe. Page reload required for
-     * launch-time cards (Welcome) to fire again.
-     */
-    resetTutorials() {
-      clearAllTutorialsSeen();
-      console.log('[debug] Tutorial seen-set cleared. Reload the page to re-fire launch-time cards.');
-    },
-
-    /**
-     * Print every multiplier currently feeding the qi/s rate formula. Use
-     * this to diagnose "why is my starting qi/s not 1.0" — every entry shows
-     * the actual ref value plus how much it contributes to the final rate.
-     * The BASE_RATE constant is always 1; the displayed rate is BASE_RATE
-     * times the running product of every multiplier listed below.
-     */
-    rateBreakdown() {
-      const c = g().cultivation;
-      if (!c) return console.log('[debug] cultivation hook not ready');
-      const law = c.activeLaw;
-      const rows = [
-        ['BASE_RATE',              1],
-        ['+ sparkQiFlat (Steady Cult.)',   c.sparkQiFlatRef?.current  ?? 0],
-        ['+ producerRate × upMult × tree', (c.producerRateRef?.current ?? 0)
-                                           * (c.upgradeProducerMultRef?.current ?? 1)
-                                           * (c.treeProducerOutputMultRef?.current ?? 1)],
-        ['× crystalQiBonus',       c.crystalQiBonusRef?.current ?? 1],
-        ['× law cultivation mult', law?.cultivationSpeedMult ?? 1, law?.name ?? '(none)'],
-        ['× artefactQiMult',       c.artefactQiMultRef?.current ?? 1],
-        ['× adBoost',              c.adBoostActive ? 1.5 : 1],
-        ['× pillQiMult',           c.pillQiMultRef?.current ?? 1],
-        ['× sparkQiMult',          c.sparkQiMultRef?.current ?? 1],
-        ['× treeQiMult',           c.treeQiMultRef?.current ?? 1],
-        ['× rebirthCultBuff',      c.rebirthCultBuffRef?.current ?? 1],
-        ['× sparkLegendaryGlobal', c.sparkLegendaryGlobalMultRef?.current ?? 1],
-        ['× debugQiMult',          c.debugQiMultRef?.current ?? 1],
-      ];
-      console.log('━━━ qi/s rate breakdown ━━━');
-      let running = 0;
-      let didAdditive = false;
-      for (const [label, val, extra] of rows) {
-        if (label.startsWith('+ ') || label === 'BASE_RATE') {
-          running += val;
-          didAdditive = true;
-          console.log(label.padEnd(36), val, ' → running additive =', running);
-        } else {
-          if (didAdditive) { console.log('(additive sum captured — switching to multipliers)'); didAdditive = false; }
-          running *= val;
-          console.log(label.padEnd(36), val, extra ? `(${extra})` : '', ' → running =', running);
-        }
-      }
-      console.log('FINAL baseRate (excludes boost/CF transients):', running);
-      console.log('Live rateRef.current (includes transients):    ', c.rateRef?.current);
-    },
-
-    // ── Combat ─────────────────────────────────────────────────────────────
-
-    /**
-     * Toggle or set player invincibility.
-     * @param {boolean} [on]  Pass true/false to set explicitly; omit to toggle.
-     */
-    godMode(on) {
-      const ref = g().combat.debugRef.current;
-      ref.godMode = on !== undefined ? Boolean(on) : !ref.godMode;
-      console.log(`[debug] God mode ${ref.godMode ? 'ON' : 'OFF'}`);
-    },
-
-    /**
-     * Toggle or set one-shot mode (kills enemy in one hit).
-     * @param {boolean} [on]  Pass true/false to set explicitly; omit to toggle.
-     */
-    oneShot(on) {
-      const ref = g().combat.debugRef.current;
-      ref.oneShot = on !== undefined ? Boolean(on) : !ref.oneShot;
-      console.log(`[debug] One-shot ${ref.oneShot ? 'ON' : 'OFF'}`);
-    },
-
-    /**
-     * Preview mode: force a specific enemy every fight AND make it unkillable
-     * so the full animation loop (idle → attack → hit → repeat) plays forever.
-     * Call gd.clearWatch() to exit.
-     * @param {string} id  Enemy ID from listEnemies().
-     */
-    watch(id) {
-      if (!ENEMIES[id]) {
-        console.warn(`[debug] Unknown enemy: "${id}"\nCall gd.listEnemies() to see valid IDs.`);
-        return;
-      }
-      const ref = g().combat.debugRef.current;
-      ref.nextEnemy  = id;
-      ref.watchMode  = true;
-      console.log(`[debug] Watch mode ON → ${ENEMIES[id].name} (unkillable, loops forever — gd.clearWatch() to stop)`);
-    },
-
-    /** Exit watch mode and return to normal combat. */
-    clearWatch() {
-      const ref = g().combat.debugRef.current;
-      ref.nextEnemy = null;
-      ref.watchMode = false;
-      console.log('[debug] Watch mode OFF — back to normal combat');
-    },
-
-    /**
-     * Force a specific enemy to spawn on every subsequent fight (normal combat, enemy can die).
-     * @param {string} id  Enemy ID from listEnemies().
-     */
-    watchEnemy(id) {
-      if (!ENEMIES[id]) {
-        console.warn(`[debug] Unknown enemy: "${id}"\nCall gd.listEnemies() to see valid IDs.`);
-        return;
-      }
-      g().combat.debugRef.current.nextEnemy = id;
-      console.log(`[debug] Forced enemy → ${ENEMIES[id].name} (use gd.clearEnemy() to stop)`);
-    },
-
-    /** Remove the forced-enemy override and return to random spawns. */
-    clearEnemy() {
-      const ref = g().combat.debugRef.current;
-      ref.nextEnemy = null;
-      ref.watchMode = false;
-      console.log('[debug] Enemy override cleared — back to random');
-    },
-
-    /** Print a table of all enemy IDs and names. */
-    listEnemies() {
-      console.table(
-        Object.values(ENEMIES).map(e => ({
-          id:     e.id,
-          name:   e.name,
-          sprite: e.sprite ?? '(canvas fallback)',
-        }))
-      );
-    },
-
-    // ── Inventory ──────────────────────────────────────────────────────────
-
-    /**
-     * Add items to inventory.
-     * @param {string} id   Material ID from listMaterials().
-     * @param {number} [qty=1]
-     */
-    addItem(id, qty = 1) {
-      if (!ALL_MATERIALS[id]) {
-        console.warn(`[debug] Unknown material: "${id}"\nCall gd.listMaterials() to see valid IDs.`);
-        return;
-      }
-      g().inventory.addItem(id, qty);
-      console.log(`[debug] +${qty}× ${ALL_MATERIALS[id].name}`);
-    },
-
-    /**
-     * Add qty of every material at once.
-     * @param {number} [qty=10]
-     */
-    addAllMaterials(qty = 10) {
-      Object.keys(ALL_MATERIALS).forEach(id => g().inventory.addItem(id, qty));
-      console.log(`[debug] Added ${qty}× of each material (${Object.keys(ALL_MATERIALS).length} types)`);
-    },
-
-    /**
-     * Give 1000 of every material (herbs, minerals, cultivation items).
-     * @param {number} [qty=1000]
-     */
-    giveMaterials(qty = 1000) {
-      const inv = g().inventory;
-      let count = 0;
-      // All materials and pills — combined lookup built at module load.
-      for (const id of Object.keys(ITEMS_BY_ID)) {
-        inv.addItem(id, qty);
-        count++;
-      }
-      console.log(`[debug] +${qty}× of ${count} materials`);
-    },
-
-    /** Print a table of all material IDs, names, and types. */
-    listMaterials() {
-      console.table(
-        Object.entries(ALL_MATERIALS).map(([id, m]) => ({
-          id,
-          name:   m.name,
-          rarity: m.rarity,
-          type:   m.type,
-        }))
-      );
-    },
-
-    // ── Techniques & Laws ──────────────────────────────────────────────────
-
-    /**
-     * Simulate `count` real technique drops one by one. Each draw goes
-     * through the standard `pickTechnique → addOwnedTechnique` path, so
-     * duplicates are caught by the dedupe (same as in combat) and the loop
-     * keeps drawing until `count` NEW techniques have actually entered the
-     * collection — or until an attempt cap is hit (in case the catalogue
-     * subset for this world is exhausted, e.g. you already own every Iron-
-     * quality entry on World 1).
-     *
-     * @param {number} [count=10]   Target number of new owned techniques.
-     * @param {number} [worldId=1]  World tier 1–6 (drives quality bias).
-     */
-    giveTechniques(count = 10, worldId = 1) {
-      const techs = g().techniques;
-      const MAX_ATTEMPTS = count * 20 + 50;  // generous cap for high-coverage saves
-      let added = 0, dupes = 0, attempts = 0;
-      while (added < count && attempts < MAX_ATTEMPTS) {
-        attempts += 1;
-        const tech = pickTechnique(worldId);
-        if (!tech) continue;
-        const res = techs.addOwnedTechnique(tech);
-        if (res?.added)         added += 1;
-        else if (res?.duplicate) dupes += 1;
-      }
-      const exhausted = added < count;
-      const tail = exhausted
-        ? ` (catalogue exhausted at ${attempts} attempts — only ${added} new entries left in pool)`
-        : '';
-      console.log(`[debug] +${added} unique techniques, ${dupes} duplicates auto-dismantled${tail}`);
-    },
-
-    /**
-     * Grant the first Expose technique of a given quality. Useful for testing
-     * the new buff plumbing in isolation. Goes through the standard add path
-     * so the dedupe applies (re-running silently no-ops if you already own it).
-     * @param {string} [quality='Iron']
-     */
-    giveExpose(quality = 'Iron') {
-      const base = TECHNIQUES.find(t => t.type === 'Expose' && t.quality === quality);
-      if (!base) {
-        console.warn(`[debug] No Expose at quality ${quality}`);
-        return;
-      }
-      const drop = {
-        ...base,
-        id: `${base.id}__${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
-      };
-      const res = g().techniques.addOwnedTechnique(drop);
-      if (res?.added) console.log(`[debug] +1 ${quality} Expose (${base.id})`);
-      else            console.log(`[debug] ${quality} Expose already owned (${base.id})`);
-    },
-
-    /**
-     * Generate and add random artefacts. Rarity rolls off the world-tier
-     * bias (same weights as combat drops) — each one goes through the full
-     * useArtefacts.addArtefact flow so element, setIds, upgradeLevel,
-     * affixBonuses, and rolled affixes are all populated.
-     * @param {number} [count=10]
-     * @param {number} [worldId=1]  World tier 1–6
-     */
-    giveArtefacts(count = 10, worldId = 1) {
-      const arts = g().artefacts;
-      let added = 0;
-      for (let i = 0; i < count; i++) {
-        const catId = pickRandomArtefact(worldId);
-        if (!catId) continue;
-        arts.addArtefact(catId);
-        added += 1;
-      }
-      console.log(`[debug] +${added} random artefacts (world ${worldId})`);
-    },
-
-    /**
-     * Generate and add random laws.
-     * @param {number} [count=10]
-     */
-    giveLaws(count = 10) {
-      const cult = g().cultivation;
-      const realmIndex = cult.indexRef?.current ?? cult.realmIndex ?? 0;
-      for (let i = 0; i < count; i++) {
-        cult.addOwnedLaw(generateLaw(undefined, realmIndex));
-      }
-      console.log(`[debug] +${count} random laws (realm ${realmIndex})`);
-    },
-
-    /**
-     * Grant + activate a synthetic Trans-tier water law whose Trans slot
-     * carries `l_water_sanctuary`. Used to verify "no damage after heal"
-     * end-to-end: equip a Heal tech, start a fight, fire the heal, watch
-     * the next enemy hit get nullified.
-     */
-    giveSanctuaryLaw() {
-      const cult = g().cultivation;
-      const law = {
-        id: `dbg_sanctuary_${Date.now()}`,
-        name: 'Debug — Sanctuary',
-        element: 'water',
-        types: ['water'],
-        rarity: 'Transcendent',
-        realmRequirement: 0,
-        realmRequirementLabel: 'Tempered Body',
-        flavour: 'Debug-only law for verifying water_sanctuary trigger.',
-        cultivationSpeedMult: 1,
-        uniques: { Transcendent: { id: 'l_water_sanctuary', value: 1 } },
-      };
-      cult.addOwnedLaw(law);
-      cult.setActiveLaw?.(law.id);
-      console.log(`[debug] Granted + activated Sanctuary law (id ${law.id})`);
-      console.log('[debug] Now equip a Heal tech, start a fight, fire heal — next enemy hit should be nullified');
-    },
-
-    // ── Qi Crystal ────────────────────────────────────────────────────────
-
-    /** Set the crystal to a specific level. */
+    /** Set crystal directly to level n. */
     setCrystalLevel(n) {
-      g().crystal._setLevel(n);
-      console.log(`[debug] Crystal → level ${n}`);
+      const target = Math.max(0, Math.floor(n));
+      const cur    = g().crystal?.level ?? 0;
+      const delta  = target - cur;
+      if (delta === 0) return;
+      g().crystal?.adminAddLevels?.(delta);
+      console.log(`[debug] Crystal level → ${target}`);
     },
 
-    /** Jump directly to a visual tier (1–10). */
-    setCrystalTier(t) {
-      const TIER_LEVELS = { 1:1, 2:10, 3:25, 4:50, 5:100, 6:200, 7:350, 8:500, 9:750, 10:1000 };
-      const lvl = TIER_LEVELS[t];
-      if (!lvl) { console.warn(`[debug] Invalid tier ${t} — use 1–10`); return; }
-      g().crystal._setLevel(lvl);
-      console.log(`[debug] Crystal → tier ${t} (level ${lvl})`);
-    },
-
-    /** Increment crystal level by n (default 1). */
+    /** Increment crystal level by n. */
     crystalLevelUp(n = 1) {
-      const cur = g().crystal.level;
-      g().crystal._setLevel(cur + n);
-      console.log(`[debug] Crystal ${cur} → ${cur + n}`);
+      g().crystal?.adminAddLevels?.(n);
+      console.log(`[debug] Crystal +${n} levels (now ${g().crystal?.level})`);
     },
 
-    /**
-     * Tune the crystal evolution background flash intensity at runtime.
-     * Multiplies the keyframed flash opacity — 0 disables the flash entirely,
-     * 1 is the default, values > 1 have no visual effect (filter clamps).
-     * @param {number} [intensity=1]  0 → 1 recommended; persists until reset.
-     */
-    crystalFx(intensity = 1) {
-      const clamped = Math.max(0, Number(intensity) || 0);
-      document.documentElement.style.setProperty('--ce-flash-intensity', clamped);
-      console.log(`[debug] Crystal flash intensity → ${clamped} (call gd.crystalFx(1) to reset)`);
-    },
+    // ── Qi Sparks ──────────────────────────────────────────────────────────
 
-    /**
-     * Fire the crystal evolution overlay directly (for animation iteration).
-     * Must be on the Home screen for the overlay to render.
-     * @param {number} newTier       Target visual tier (1–10).
-     * @param {number} [previousTier=newTier-1]  Previous tier (defaults to newTier − 1).
-     * @param {number} [newLevel]    Displayed level on the overlay card.
-     * @param {string} [variant]     Animation variant: 'shatter' (default) | 'current'.
-     */
-    // ── Qi Sparks ─────────────────────────────────────────────────────────
-
-    /** List every active spark with its key state for quick inspection. */
     listQiSparks() {
-      const sparks = g().qiSparks?.activeSparks ?? [];
-      if (sparks.length === 0) {
-        console.log('[debug] No active qi sparks.');
-        return sparks;
-      }
-      console.table(sparks.map(s => {
-        const card = QI_SPARK_BY_ID[s.sparkId];
-        return {
-          id:       s.sparkId,
-          rarity:   card?.rarity,
-          kind:     card?.kind,
-          stacks:   s.stacks ?? '-',
-          tier:     card?.tier ?? '-',
-          mechanic: card?.mechanicId ?? '-',
-          expires:  s.expiresAt ? `${Math.max(0, Math.round((s.expiresAt - Date.now()) / 1000))}s` : '-',
-          breakthroughs: s.breakthroughsRemaining ?? s.breakthroughsAccrued ?? '-',
-        };
-      }));
-      return sparks;
+      console.table(g().qiSparks?.activeSparks ?? []);
     },
 
-    /**
-     * Grant a qi spark by id, bypassing the offer modal. Use the literal
-     * card id from data/qiSparks.js (e.g. 'consecutive_focus_t1', 'painless_ascension').
-     * Run `gd.listQiSparkIds()` to see all available ids.
-     */
-    giveQiSpark(sparkId) {
-      const card = QI_SPARK_BY_ID[sparkId];
-      if (!card) {
-        console.warn(`[debug] Unknown qi spark id: ${sparkId}. Try gd.listQiSparkIds().`);
-        return;
-      }
-      g().qiSparks.applySpark(sparkId);
-      console.log(`[debug] Granted qi spark: ${card.name} (${card.rarity}, kind=${card.kind})`);
-    },
-
-    /** Print every qi spark id grouped by rarity. */
     listQiSparkIds() {
-      const groups = { common: [], uncommon: [], rare: [] };
-      for (const c of QI_SPARKS) (groups[c.rarity] ?? (groups[c.rarity] = [])).push(c.id);
-      for (const [rarity, ids] of Object.entries(groups)) {
-        console.log(`[${rarity}]`, ids.join(', '));
-      }
+      const byRarity = { common: [], uncommon: [], rare: [], legendary: [] };
+      for (const s of QI_SPARKS) (byRarity[s.rarity] ?? (byRarity[s.rarity] = [])).push(s.id);
+      console.table(byRarity);
     },
 
-    /**
-     * Bump a mechanic spark up by `n` tiers (default 1). If the mechanic
-     * isn't yet active, starts at T1 then upgrades to T(1+n−1).
-     * Mechanic ids: 'consecutive_focus' | 'crystal_click' | 'divine_qi' | 'pattern_click'
-     */
-    upgradeMechanic(mechanicId, n = 1) {
-      const tiers = QI_SPARKS
-        .filter(c => c.kind === 'mechanic' && c.mechanicId === mechanicId)
-        .sort((a, b) => a.tier - b.tier);
-      if (tiers.length === 0) {
-        console.warn(`[debug] Unknown mechanic: ${mechanicId}`);
-        return;
-      }
-      const active = (g().qiSparks?.activeSparks ?? [])
-        .map(s => QI_SPARK_BY_ID[s.sparkId])
-        .find(c => c?.kind === 'mechanic' && c.mechanicId === mechanicId);
-      const startTier = active ? active.tier : 0;
-      const targetTier = Math.min(5, startTier + Math.max(1, n));
-      for (let t = startTier + 1; t <= targetTier; t++) {
-        const card = tiers.find(c => c.tier === t);
-        if (card) g().qiSparks.applySpark(card.id);
-      }
-      console.log(`[debug] ${mechanicId}: T${startTier} → T${targetTier}`);
+    giveQiSpark(sparkId) {
+      const ok = g().qiSparks?.grant?.(sparkId);
+      const card = QI_SPARK_BY_ID[sparkId];
+      console.log(ok
+        ? `[debug] +Spark ${card?.name ?? sparkId}`
+        : `[debug] Spark grant failed for ${sparkId}`);
     },
 
-    /** Wipe every active qi spark + pending offer + pity counter. */
     clearQiSparks() {
-      g().qiSparks.clearAll();
-      console.log('[debug] Qi sparks cleared.');
+      g().qiSparks?.clearAll?.();
+      console.log('[debug] All qi sparks cleared');
     },
 
-    /**
-     * Open the Tracing Meridians minigame overlay RIGHT NOW with the given
-     * tier's config (default T5 = 7 dots / 18s window / 90s qi + ×1.5 buff).
-     * Bypasses the 15s spawn timer and the spark-attention coordinator -
-     * the player doesn't even need the pattern_click spark active. Pure
-     * debug/preview path; production code never dispatches this event.
-     *
-     * Examples:
-     *   gd.openMeridians()      → T5 (7 dots)
-     *   gd.openMeridians(1)     → T1 (3 dots, 10s)
-     *   gd.openMeridians(3)     → T3 (5 dots, 14s)
-     */
-    openMeridians(tier = 5) {
-      const id  = `pattern_click_t${tier}`;
-      const cfg = QI_SPARK_BY_ID[id];
-      if (!cfg) {
-        console.warn(`[debug] No pattern_click T${tier} (valid: 1-5)`);
-        return;
-      }
-      window.dispatchEvent(new CustomEvent('mai:debug-open-meridian', {
-        detail: {
-          dotCount:          cfg.dotCount,
-          windowMs:          cfg.windowMs,
-          burstSeconds:      cfg.burstSeconds,
-          doubleOnFullClear: cfg.doubleOnFullClear ?? false,
-          rateMult:          cfg.rateMult,
-          rateBuffMs:        cfg.rateBuffMs,
-        },
-      }));
-      console.log(`[debug] Opened Tracing Meridians T${tier} - ${cfg.dotCount} dots / ${cfg.windowMs}ms window / ${cfg.burstSeconds}s burst.`);
+    // ── Tutorials / tour ───────────────────────────────────────────────────
+
+    clearTutorials() {
+      clearAllTutorialsSeen();
+      console.log('[debug] All tutorial-seen flags cleared');
     },
 
-    /**
-     * Force the next breakthrough's card-pick offer to roll right now.
-     * Useful for testing offer-modal flow without waiting on cultivation.
-     */
-    rollQiSparkOffer() {
-      g().cultivation.qiRef.current = g().cultivation.costRef.current - 1;
-      console.log('[debug] Qi filled — next tick will breakthrough and roll an offer.');
-    },
+    // ── Sim / balance ──────────────────────────────────────────────────────
 
-    /**
-     * Preview the spark picker modal. Skips the breakthrough flow
-     * entirely; useful for inspecting the card design across rarity
-     * combinations without grinding a real breakthrough.
-     *
-     * Overloaded arg shape (rarities and spark ids never overlap, so
-     * a single argument disambiguates):
-     *
-     *   gd.previewSparkOffer()
-     *     Random pair, any rarity, uniform across the full pool.
-     *
-     *   gd.previewSparkOffer('legendary')
-     *     Random pair from the specified rarity. Valid rarities:
-     *     'common', 'uncommon', 'rare', 'legendary'.
-     *
-     *   gd.previewSparkOffer('quick_burst')
-     *     That spark plus a random partner from the same rarity.
-     *
-     *   gd.previewSparkOffer('quick_burst', 'phoenix_reborn')
-     *     Explicit pair, exactly as written.
-     *
-     * Run gd.listQiSparkIds() to see every available id grouped by
-     * rarity. The preview offer is treated like a real offer, so
-     * picking applies the card to your live run.
-     */
-    previewSparkOffer(a, b) {
-      const setOffer = g().qiSparks?._debugSetOffer;
-      if (typeof setOffer !== 'function') {
-        console.warn('[debug] _debugSetOffer not exposed.');
-        return;
-      }
-      const RARITIES = new Set(['common', 'uncommon', 'rare', 'legendary']);
-      const pickTwoDistinct = (pool) => {
-        if (pool.length === 0) return [];
-        if (pool.length === 1) return [pool[0].id, pool[0].id];
-        const i = Math.floor(Math.random() * pool.length);
-        let j = Math.floor(Math.random() * (pool.length - 1));
-        if (j >= i) j += 1;
-        return [pool[i].id, pool[j].id];
-      };
-      const randomPartner = (sparkId) => {
-        const seed = QI_SPARK_BY_ID[sparkId];
-        if (!seed) return null;
-        const same = QI_SPARKS.filter(c => c.rarity === seed.rarity && c.id !== sparkId);
-        if (same.length === 0) return sparkId;
-        return same[Math.floor(Math.random() * same.length)].id;
-      };
-
-      let cards;
-      let mode;
-      if (!a && !b) {
-        cards = pickTwoDistinct(QI_SPARKS);
-        mode  = 'random / any rarity';
-      } else if (a && !b && RARITIES.has(a)) {
-        const pool = QI_SPARKS.filter(c => c.rarity === a);
-        if (pool.length === 0) {
-          console.warn(`[debug] No sparks defined for rarity '${a}'.`);
-          return;
-        }
-        cards = pickTwoDistinct(pool);
-        mode  = `random / ${a}`;
-      } else if (a && !b && QI_SPARK_BY_ID[a]) {
-        const partner = randomPartner(a);
-        cards = [a, partner];
-        mode  = `${a} + random partner`;
-      } else if (a && b) {
-        cards = [a, b];
-        mode  = 'explicit pair';
-      } else {
-        console.warn(`[debug] Unknown spark id or rarity: '${a}'. Try gd.listQiSparkIds().`);
-        return;
-      }
-
-      const unknown = cards.filter(id => !QI_SPARK_BY_ID[id]);
-      if (unknown.length > 0) {
-        console.warn(`[debug] Unknown spark id(s): ${unknown.join(', ')}`);
-      }
-      const ok = setOffer(cards);
-      if (ok) {
-        const labels = cards.map(id => {
-          const c = QI_SPARK_BY_ID[id];
-          return c ? `${c.name} (${c.rarity})` : `?${id}?`;
-        });
-        console.log(`[debug] Preview offer (${mode}): ${labels.join(' vs ')}`);
-      } else {
-        console.warn('[debug] No valid cards in the preview request.');
-      }
-    },
-
-    /**
-     * Consecutive Focus tester — toggles a bypass that makes the bonus
-     * fire the instant Focus is held, ignoring the tier's hold-duration
-     * threshold. Call again with `false` to restore normal behaviour.
-     *
-     *   gd.bypassConsecutiveFocus()       → ON  (any tier triggers instantly)
-     *   gd.bypassConsecutiveFocus(false)  → OFF (back to normal threshold)
-     *
-     * The card itself must still be active — pair with gd.giveQiSpark.
-     */
-    bypassConsecutiveFocus(on = true) {
-      const ref = g().cultivation.debugConsecutiveBypassRef;
-      if (!ref) {
-        console.warn('[debug] debugConsecutiveBypassRef not exposed.');
-        return;
-      }
-      ref.current = !!on;
-      console.log(`[debug] Consecutive Focus threshold bypass: ${on ? 'ON' : 'OFF'}`);
-    },
-
-    crystalEvolve(newTier, previousTier, newLevel, variant) {
-      // 2026-05-21 Dial-5: crystal capped at L100 → 6 visual tiers.
-      const TIER_LEVELS = { 1: 1, 2: 10, 3: 25, 4: 50, 5: 75, 6: 100 };
-      if (!TIER_LEVELS[newTier]) {
-        console.warn(`[debug] Invalid tier ${newTier} — use 1–6`);
-        return;
-      }
-      const prev = previousTier ?? Math.max(0, newTier - 1);
-      const lvl  = newLevel      ?? TIER_LEVELS[newTier];
-      window.dispatchEvent(new CustomEvent('mai:crystal-evolve', {
-        detail: { previousTier: prev, newTier, newLevel: lvl, variant },
-      }));
-      console.log(`[debug] Crystal evolution overlay — tier ${prev} → ${newTier} (lv ${lvl}, variant=${variant ?? 'shatter'})`);
-    },
-
-    // ── Theme ──────────────────────────────────────────────────────────────
-
-    /**
-     * Shift the UI theme (purple family + chrome tints + dark backgrounds)
-     * by an arbitrary hue / saturation / lightness offset. Mutates every
-     * --ui-* CSS variable on the document root. Leaves sprites, rarity
-     * palettes, gold accents, damage types and other semantic colours
-     * alone.
-     *
-     *   gd.themeShift(90)           → shift hue 90° (teal/green UI)
-     *   gd.themeShift(0, 0.2)       → mute the purple to near-grey
-     *   gd.themeShift(0, 0)         → pure monochrome (no colour, just greys)
-     *   gd.themeShift(55, 0.4, -5)  → sober dark-gold
-     *   gd.themeShift(180, 1, 10)   → gold/amber UI, noticeably lighter
-     *   gd.themeShift()             → reset all overrides
-     *
-     * @param {number} [hue=0]         Hue rotation in degrees (any integer).
-     * @param {number} [satScale=1]    Saturation multiplier. 0 = monochrome,
-     *                                 1 = unchanged, >1 = more vivid.
-     * @param {number} [lightOffset=0] Lightness % offset added to every shade.
-     *                                 Range roughly -20 … +20.
-     */
-    themeShift(hue = 0, satScale = 1, lightOffset = 0) {
-      const root = document.documentElement;
-      // Clear any leftover filter from an earlier (whole-app) hueShift call.
-      const app  = document.querySelector('.app');
-      if (app) app.style.filter = '';
-
-      // Solid-hex shades — each stored as [H, S, L] from its base hex.
-      const hexShades = {
-        '--ui-purple-darker': [263, 69,  42],
-        '--ui-purple-deep':   [262, 83,  58],
-        '--ui-purple-strong': [271, 91,  65],
-        '--ui-purple-soft':   [250, 95,  76],
-        '--ui-purple-light':  [252, 95,  85],
-        '--ui-purple-wash':   [252, 100, 93],
-        '--ui-purple-pale':   [270, 100, 92],
-      };
-
-      // RGB triples used in rgba() — stored as [H, S, L] so we can recompute
-      // fresh R/G/B channel values after the transform.
-      const rgbShades = {
-        '--ui-purple-rgb':         [258, 90,   66],  // #8b5cf6
-        '--ui-purple-deep-rgb':    [262, 83,   58],  // #7c3aed
-        '--ui-purple-strong-rgb':  [271, 91,   65],  // #a855f7
-        '--ui-purple-soft-rgb':    [250, 95,   76],  // #a78bfa
-        '--ui-purple-light-rgb':   [252, 95,   85],  // #c4b5fd
-        '--ui-hover-rgb':          [251, 100,  89],  // rgb(220,200,255)
-        '--ui-label-rgb':          [260, 39,   75],  // rgb(180,160,220)
-        '--ui-muted-rgb':          [249, 17,   68],  // rgb(160,155,190)
-        '--ui-shadow-rgb':         [256, 78,   35],  // rgb(60,20,160)
-        '--ui-bg-deep-rgb':        [255, 75,    3],  // rgb(5,2,14) — nav bg
-        '--ui-bg-panel-rgb':       [252, 56,    7],  // rgb(10,8,28) — panel bg
-        '--ui-border-rgb':         [264, 45,   13],  // rgb(30,18,48) — divider
-      };
-
-      const isReset = hue === 0 && satScale === 1 && lightOffset === 0;
-      if (isReset) {
-        for (const name of Object.keys(hexShades)) root.style.removeProperty(name);
-        for (const name of Object.keys(rgbShades)) root.style.removeProperty(name);
-        console.log('[debug] Theme → reset');
-        return;
-      }
-
-      // HSL → RGB (channels 0–255). h in degrees, s/l in percent.
-      const hslToRgb = (h, s, l) => {
-        s /= 100; l /= 100;
-        const k = n => (n + h / 30) % 12;
-        const a = s * Math.min(l, 1 - l);
-        const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-        return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
-      };
-      const mod360   = h => ((h % 360) + 360) % 360;
-      const clampPct = v => Math.max(0, Math.min(100, v));
-
-      for (const [name, [h, s, l]] of Object.entries(hexShades)) {
-        const newS = clampPct(s * satScale);
-        const newL = clampPct(l + lightOffset);
-        root.style.setProperty(name, `hsl(${mod360(h + hue)}, ${newS}%, ${newL}%)`);
-      }
-      for (const [name, [h, s, l]] of Object.entries(rgbShades)) {
-        const newS = clampPct(s * satScale);
-        const newL = clampPct(l + lightOffset);
-        const [r, g, b] = hslToRgb(mod360(h + hue), newS, newL);
-        root.style.setProperty(name, `${r}, ${g}, ${b}`);
-      }
-
-      const sign = n => (n >= 0 ? `+${n}` : `${n}`);
-      console.log(`[debug] Theme → hue ${hue}° · sat ×${satScale} · light ${sign(lightOffset)}%  (call gd.themeShift() to reset)`);
-    },
-
-    /**
-     * Back-compat shortcut — pure hue rotation at default saturation/lightness.
-     * Delegates to themeShift(deg, 1, 0).
-     */
-    hueShift(deg = 0) {
-      return this.themeShift(deg, 1, 0);
-    },
-
-    // ── General ────────────────────────────────────────────────────────────
-
-    /** Print a summary of the current game state. */
-    state() {
-      const cult  = g().cultivation;
-      const com   = g().combat;
-      const qi    = Math.floor(cult.qiRef.current);
-      const cost  = cult.costRef.current;
-      const realm = REALMS[cult.indexRef?.current ?? cult.realmIndex];
-      const dbg   = com.debugRef.current;
-
-      console.group('%c[debug] Game State', 'color: #c084fc; font-weight: bold');
-      console.log(`Realm:      ${realm?.name ?? '?'} (index ${cult.indexRef?.current ?? cult.realmIndex})`);
-      console.log(`Qi:         ${qi.toLocaleString()} / ${cost.toLocaleString()} (${Math.floor(qi / cost * 100)}%)`);
-      console.log(`Combat:       phase=${com.phase}`);
-      console.log(`God mode:     ${dbg.godMode}`);
-      console.log(`One-shot:     ${dbg.oneShot}`);
-      console.log(`Watch mode:   ${dbg.watchMode}`);
-      console.log(`Forced enemy: ${dbg.nextEnemy ?? '(none)'}`);
-      console.groupEnd();
-    },
-
-    /**
-     * Audit the gather/mine/combat drop distributions across all 27 regions.
-     * Logs a per-region table and a pass/fail summary. Returns true on full
-     * pass; result also stored at window.__lastDropTest. See
-     * src/debug/dropDistributionTest.js for the assertions.
-     */
-    testDrops() {
-      return runDropDistributionTest();
-    },
-
-    /**
-     * Simulated playthrough comparison: A (no rebirth, no tree), B (no
-     * rebirth, all tree unlocked), C (rebirth once at idx 24). Logs per-
-     * realm cumulative times for each scenario and a summary of the
-     * rebirth value. Result also at window.__lastPlaythroughSim. See
-     * src/debug/playthroughSim.js for the methodology and limitations.
-     */
-    simPlay() {
-      return runPlaythroughSim();
-    },
-
-    /**
-     * Sim with the combined proposals: inflate late-game qi cost
-     * (default 5.15× from idx 24+) and scale the tree to a max qi
-     * multiplier (default 5.0× = 500%). Both arguments tunable.
-     * Result at window.__lastCombinedSim.
-     */
-    simCombined(opts) {
-      return runCombinedProposalSim(opts);
-    },
+    simPlay() { return runPlaythroughSim(); },
+    simCombined(opts) { return runCombinedProposalSim(opts); },
 
     /** Print all available commands. */
     help() {
       console.group('%c[debug] Available Commands', 'color: #c084fc; font-weight: bold');
-      console.log('%cCultivation', 'font-weight: bold');
-      console.log('  gd.setRealm(n)           — jump to realm index n');
-      console.log('  gd.addQi(amount)          — add qi instantly');
-      console.log('  gd.fillQi()               — fill qi to just before breakthrough');
-      console.log('  gd.setQiRate(n=1)         — multiply qi/s by n (1 resets to normal)');
-      console.log('%cCombat', 'font-weight: bold');
-      console.log('  gd.godMode(on?)           — toggle/set player invincibility');
-      console.log('  gd.oneShot(on?)           — toggle/set enemy one-shot mode');
-      console.log('  gd.watch(id)              — preview mode: force enemy + unkillable, loops forever');
-      console.log('  gd.clearWatch()           — exit preview mode, back to normal combat');
-      console.log('  gd.watchEnemy(id)         — force a specific enemy every fight (can still die)');
-      console.log('  gd.clearEnemy()           — clear forced enemy override');
-      console.log('  gd.listEnemies()          — show all enemy IDs and names');
-      console.log('%cInventory', 'font-weight: bold');
-      console.log('  gd.giveMaterials(n=1000)  — give n of every material');
-      console.log('  gd.addItem(id, qty=1)     — add items by material ID');
-      console.log('  gd.addAllMaterials(n=10)  — add n of every material');
-      console.log('  gd.listMaterials()        — show all material IDs and rarities');
-      console.log('%cTechniques & Laws', 'font-weight: bold');
-      console.log('  gd.giveTechniques(n=10, world=1) — simulate n drops, dedupe + auto-dismantle dupes');
-      console.log('  gd.giveExpose(quality="Iron")    — grant the first Expose of that quality');
-      console.log('  gd.giveArtefacts(n=10, world=1)  — generate n random artefacts');
-      console.log('  gd.giveLaws(n=10)                — generate n random laws');
-      console.log('  gd.giveSanctuaryLaw()            — grant a water_sanctuary law for trigger testing');
-      console.log('%cBalance audits', 'font-weight: bold');
-      console.log('  gd.testDrops()                — audit gather/mine vs combat drop distributions');
-      console.log('  gd.simPlay()                  — compare playthrough times across A/B/C rebirth scenarios');
-      console.log('%cQi Crystal', 'font-weight: bold');
-      console.log('  gd.setCrystalLevel(n)     — set crystal to level n');
-      console.log('  gd.setCrystalTier(t)      — jump to visual tier t (1–10)');
-      console.log('  gd.crystalLevelUp(n=1)    — increment crystal level by n');
-      console.log('  gd.crystalEvolve(newTier, prevTier?, lvl?, variant?) — fire evolution overlay (home screen only)');
-      console.log('  gd.crystalFx(intensity=1)         — tune evolution flash intensity (0 = off)');
-      console.log('%cQi Sparks', 'font-weight: bold');
-      console.log('  gd.listQiSparks()                       — table of active sparks');
-      console.log('  gd.listQiSparkIds()                     — all card ids by rarity');
-      console.log('  gd.giveQiSpark(sparkId)                 — grant a spark by id');
-      console.log('  gd.upgradeMechanic(id, n=1)             — upgrade mechanic n tiers');
-      console.log('    ids: consecutive_focus | crystal_click | divine_qi | pattern_click');
-      console.log('  gd.rollQiSparkOffer()                   — trigger next offer immediately');
-      console.log('  gd.clearQiSparks()                      — wipe all active sparks');
-      console.log('  gd.openMeridians(tier=5)                — open Tracing Meridians overlay NOW (no wait, no spark needed)');
-      console.log('  gd.bypassConsecutiveFocus(on=true)      — ignore hold-duration threshold');
-      console.log('%cTheme', 'font-weight: bold');
-      console.log('  gd.themeShift(hue=0, sat=1, light=0) — full UI recolor preview');
-      console.log('  gd.hueShift(deg=0)        — shortcut: pure hue rotation');
-      console.log('%cGeneral', 'font-weight: bold');
-      console.log('  gd.state()                — print current game state summary');
-      console.log('  gd.help()                 — show this message');
+      console.log('  gd.setRealm(n)               — jump to realm index n');
+      console.log('  gd.addQi(amount)             — add qi instantly');
+      console.log('  gd.fillQi()                  — fill qi to just before breakthrough');
+      console.log('  gd.setCrystalLevel(n)        — set crystal level');
+      console.log('  gd.crystalLevelUp(n=1)       — increment crystal level');
+      console.log('  gd.listQiSparks()            — table of active sparks');
+      console.log('  gd.listQiSparkIds()          — all card ids by rarity');
+      console.log('  gd.giveQiSpark(sparkId)      — grant a spark by id');
+      console.log('  gd.clearQiSparks()           — wipe all active sparks');
+      console.log('  gd.clearTutorials()          — re-show every tutorial card');
+      console.log('  gd.simPlay()                 — compare playthrough times A/B/C');
+      console.log('  gd.help()                    — show this message');
       console.groupEnd();
     },
   };
 
   console.log(
     '%c[MartialArtsIdle] Debug tools ready — type gd.help()',
-    'color: #c084fc; font-weight: bold; font-size: 13px'
+    'color: #c084fc; font-weight: bold; font-size: 13px',
   );
 }

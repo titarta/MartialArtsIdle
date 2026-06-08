@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Eternal Tree Mockup, Node Review</title>
+<style>
+/* Ported from src/components/eternalTree.css so this reads like the real
+   in-game screen (warm bronze / gold / cream "cosmic ledger" palette, glyph
+   node discs, gold and bronze edges, the bottom detail card). Nodes sit on a
+   fixed grid; every edge links adjacent or diagonal cells, Idle Slayer style.
+   Verdict marking is layered on: each node gets a coloured ring. */
+.et-screen{
+  --et-void:#06051a; --et-void-soft:#0c0a26;
+  --et-violet:#dcaf6e; --et-violet-bri:#f2cd83; --et-violet-deep:#8a6a3a;
+  --et-silver:rgb(245,230,200); --et-silver-soft:rgba(232,213,168,.82); --et-silver-mute:rgba(232,213,168,.5);
+  --et-gold:#f5c842; --et-gold-bri:#ffd866; --et-gold-soft:rgba(245,200,66,.45); --et-jade:#6ec896;
+  --et-line:rgba(220,190,130,.26); --et-line-strong:rgba(220,190,130,.52);
+  --keep:#5fbf8f; --revise:#e0b54a; --cut:#d9685f;
+  position:fixed; inset:0; display:flex; flex-direction:column; width:100vw; height:100vh; height:100dvh;
+  background:var(--et-void); color:var(--et-silver);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; overflow:hidden;
+}
+*{box-sizing:border-box}
+.et-stars{position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;
+  background:radial-gradient(120% 80% at 50% -10%, rgba(140,90,40,.10), transparent 55%);}
+.et-star{position:absolute; width:1.5px; height:1.5px; border-radius:50%; background:#d4d2ee;
+  box-shadow:0 0 4px rgba(212,210,238,.6); animation:et-tw linear infinite;}
+.et-star-bri{width:2.5px;height:2.5px;background:#e8e6ff;box-shadow:0 0 8px rgba(232,230,255,.8);}
+.et-star-gold{background:#f5e4a8;box-shadow:0 0 8px rgba(245,228,168,.7);}
+@keyframes et-tw{0%,100%{opacity:.18}50%{opacity:1}}
+
+.et-bar{position:relative; z-index:3; backdrop-filter:blur(8px) saturate(110%);}
+.et-bar-top{display:flex; align-items:center; gap:12px; padding:12px 16px;
+  background:radial-gradient(40% 120% at 92% 30%, rgba(245,200,66,.10), transparent 70%),
+            linear-gradient(180deg, rgba(6,5,26,.88), rgba(6,5,26,.42));
+  border-bottom:1px solid var(--et-line); box-shadow:inset 0 -1px 0 rgba(245,200,66,.18);}
+.et-titles{display:flex; flex-direction:column; gap:3px; flex:1 1 auto; min-width:0;}
+.et-eyebrow{font-size:9px; letter-spacing:.28em; text-transform:uppercase; color:var(--et-silver-mute);}
+.et-title{font-family:'Cinzel',Georgia,serif; font-weight:700; font-size:20px; letter-spacing:.1em;
+  color:var(--et-silver); margin:0; text-shadow:0 0 18px rgba(220,190,130,.4);}
+.et-counts{display:flex; gap:7px; flex-wrap:wrap; align-items:center;}
+.cpill{display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:999px;
+  background:rgba(32,22,14,.55); border:1px solid var(--et-line); font-size:12.5px; font-weight:600;}
+.cdot{width:9px; height:9px; border-radius:50%;}
+.cdot.k{background:var(--keep)} .cdot.r{background:var(--revise)} .cdot.c{background:var(--cut)} .cdot.u{background:var(--et-violet-deep)}
+
+.et-stage{position:relative; flex:1; min-height:0; overflow:hidden; cursor:grab; display:grid; place-items:center;}
+.et-stage:active{cursor:grabbing;}
+.et-zoom{position:absolute; top:18px; right:18px; z-index:5; display:flex; flex-direction:column; gap:6px;}
+.et-zoom button{width:36px; height:36px; border-radius:9px; border:1px solid var(--et-line-strong);
+  background:rgba(32,22,14,.75); color:var(--et-silver); font-size:15px; cursor:pointer; display:grid; place-items:center;}
+.et-zoom button:hover{background:rgba(220,190,130,.28);}
+.et-content{position:relative; transform-origin:0 0; will-change:transform;}
+.et-canvas{display:block; overflow:visible;}
+
+/* Faint grid backdrop dots, to read the lattice */
+.gdot{fill:rgba(220,190,130,.10);}
+
+/* Nodes */
+.et-node{cursor:pointer;}
+.et-node-disc{fill:#1a120a; stroke:var(--et-violet-deep); stroke-width:1.5;
+  filter:drop-shadow(0 0 10px rgba(140,90,40,.32)); transition:.2s;}
+.et-node-avail .et-node-disc{fill:rgba(40,28,16,.92); stroke:var(--et-violet);}
+.et-node-root .et-node-disc{fill:#2a1c08; stroke:var(--et-gold); stroke-width:2.5;
+  filter:drop-shadow(0 0 18px rgba(245,200,66,.6));}
+.et-node-soon .et-node-disc{stroke-dasharray:4 4; opacity:.92;}
+.et-node-cap .et-node-disc{stroke:var(--et-gold-bri); stroke-width:2;}
+.et-node-halo{fill:none; stroke:var(--et-gold); stroke-width:1.5; opacity:0;}
+.et-node-root .et-node-halo{opacity:.6;}
+.et-node-cap .et-node-halo{opacity:.4;}
+.et-node-corona{fill:none; stroke:var(--et-gold-bri); stroke-width:1.3; stroke-dasharray:3 6; opacity:0;
+  pointer-events:none; filter:drop-shadow(0 0 6px rgba(255,216,102,.65));}
+.et-node-selected .et-node-corona{opacity:.95; animation:et-flow 5.4s linear infinite;}
+@keyframes et-flow{to{stroke-dashoffset:-80}}
+.et-node-glyph{font-family:'Ma Shan Zheng','Songti SC','STSong','Noto Serif CJK SC',serif; font-size:27px;
+  fill:var(--et-silver-mute); user-select:none; pointer-events:none; transition:.2s;}
+.et-node-avail .et-node-glyph{fill:var(--et-violet-bri);}
+.et-node-root .et-node-glyph{fill:var(--et-gold-bri); filter:drop-shadow(0 0 6px var(--et-gold-soft));}
+.et-node-cap .et-node-glyph{fill:var(--et-gold-bri);}
+.et-node-soon .et-node-glyph{fill:rgba(220,190,130,.6);}
+.et-node-badge{font-family:'Cinzel',Georgia,serif; font-size:11px; letter-spacing:.08em; fill:var(--et-silver-mute);
+  user-select:none; pointer-events:none;}
+.et-node-root .et-node-badge{fill:var(--et-gold);}
+.et-node-cap .et-node-badge{fill:var(--et-gold);}
+.et-node-soon .et-node-badge{fill:var(--et-violet);}
+.et-node-label{font-size:11px; letter-spacing:.05em; font-weight:600; fill:var(--et-silver);
+  paint-order:stroke fill; stroke:rgba(6,5,26,.92); stroke-width:3.2; stroke-linejoin:round;
+  user-select:none; pointer-events:none; text-transform:uppercase;}
+.et-node-avail .et-node-label{fill:var(--et-violet-bri);}
+.et-node-root .et-node-label{fill:var(--et-gold-bri);}
+.et-node-cap .et-node-label{fill:var(--et-gold-bri);}
+.et-node-soon .et-node-label{fill:rgba(220,190,130,.7);}
+
+/* Verdict ring overlay */
+.vring{fill:none; stroke-width:3.5; opacity:0; transition:.15s;}
+.v-keep .vring{stroke:var(--keep); opacity:.95;}
+.v-revise .vring{stroke:var(--revise); opacity:.95;}
+.v-cut .vring{stroke:var(--cut); opacity:.95;}
+.v-cut{opacity:.45;}
+.vbadge{font-size:13px; font-weight:800; pointer-events:none; user-select:none;}
+
+/* Edges */
+.et-edge{fill:none; stroke-linecap:round;}
+.et-edge-real{stroke:var(--et-line-strong); stroke-width:2.2;}
+.et-edge-teaser{stroke:var(--et-violet-deep); stroke-width:1.4; stroke-dasharray:3 6; opacity:.5;}
+.et-edge-cap{stroke:var(--et-gold); stroke-width:2; stroke-dasharray:6 6; opacity:.75;
+  filter:drop-shadow(0 0 5px var(--et-gold-soft));}
+
+/* Detail card */
+.et-detail{position:absolute; left:14px; right:14px; bottom:14px; z-index:10; display:flex; flex-direction:column; gap:10px;
+  padding:13px 15px 15px; border-radius:14px; background:rgba(20,14,8,.95); border:1px solid var(--et-line-strong);
+  backdrop-filter:blur(10px) saturate(110%); box-shadow:0 16px 36px rgba(0,0,0,.6), 0 0 30px rgba(140,90,40,.2);
+  max-width:720px; margin:0 auto; animation:et-up 220ms cubic-bezier(.3,.9,.3,1);}
+@keyframes et-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.et-drow{display:flex; align-items:center; gap:12px;}
+.et-dglyph{flex:0 0 auto; width:46px; height:46px; display:grid; place-items:center;
+  font-family:'Ma Shan Zheng','Songti SC','STSong',serif; font-size:28px; color:var(--et-violet-bri);
+  border-radius:10px; background:rgba(40,28,16,.7); border:1px solid var(--et-line-strong); text-shadow:0 0 14px rgba(220,190,130,.5);}
+.et-dbody{flex:1 1 auto; min-width:0;}
+.et-dname{font-family:'Cinzel',Georgia,serif; font-size:16px; font-weight:700; color:var(--et-silver);}
+.et-dmeta{font-size:11px; color:var(--et-silver-mute); margin-top:2px; font-family:ui-monospace,Consolas,monospace;}
+.et-deff{font-size:13.5px; color:var(--et-silver); margin-top:1px;}
+.et-dclose{flex:0 0 auto; width:28px; height:28px; border-radius:7px; background:rgba(32,22,14,.7);
+  border:1px solid var(--et-line); color:var(--et-silver-soft); font-size:12px; cursor:pointer;}
+.et-cost{flex:0 0 auto; background:#11140a; border:1px solid var(--et-violet-deep); color:var(--et-gold);
+  border-radius:8px; padding:3px 9px; font-weight:700; font-size:12px; font-family:'Cinzel',serif;}
+.et-rows{display:grid; grid-template-columns:1fr; gap:3px; font-size:12px; color:var(--et-silver-soft);
+  border-top:1px solid var(--et-line); padding-top:9px;}
+.et-rows b{color:var(--et-silver); font-weight:600;}
+.et-tags{display:flex; gap:6px; flex-wrap:wrap;}
+.et-tag{font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:3px 8px;
+  border-radius:6px; border:1px solid var(--et-line); color:var(--et-silver-soft);}
+.et-tag.live{color:#bfe6cf; border-color:#2c4a38;}
+.et-tag.prewired{color:#ffd49a; border-color:#574716;}
+.et-tag.teaser{color:#cfd4da; border-color:#3a434e;}
+.et-tag.balance{color:#f0d28a; border-color:#574716;}
+.et-tag.tbd{color:#c9b8e0; border-color:#4a3f5e;}
+.et-tag.done{color:#9fe0c4; border-color:#27483a;}
+.et-verdict{display:flex; gap:8px;}
+.et-vbtn{flex:1; cursor:pointer; border:1px solid var(--et-line-strong); background:rgba(32,22,14,.55);
+  color:var(--et-silver); border-radius:10px; padding:9px 6px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; font-size:12px; transition:.1s;}
+.et-vbtn:hover{filter:brightness(1.15);}
+.et-vbtn.on-keep{background:rgba(95,191,143,.2); border-color:var(--keep); color:#cdeede;}
+.et-vbtn.on-revise{background:rgba(224,181,74,.2); border-color:var(--revise); color:#f3e0ad;}
+.et-vbtn.on-cut{background:rgba(217,104,95,.2); border-color:var(--cut); color:#f3c4c0;}
+.et-notes{width:100%; background:rgba(8,10,6,.7); border:1px solid var(--et-line); border-radius:8px;
+  color:var(--et-silver); padding:7px 9px; font:13px/1.45 inherit; resize:vertical; min-height:34px;}
+
+/* Footer */
+.et-bar-bot{display:flex; align-items:center; gap:14px; padding:10px 16px;
+  background:linear-gradient(0deg, rgba(6,5,26,.86), rgba(6,5,26,.4)); border-top:1px solid var(--et-line);}
+.et-legend{display:flex; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--et-silver-soft); flex:1;}
+.et-legend span{display:inline-flex; align-items:center; gap:5px;}
+.lg{width:11px; height:11px; border-radius:50%; border:2px solid;}
+.et-export{display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:11px;
+  font:inherit; font-weight:700; letter-spacing:.08em; text-transform:uppercase; font-size:12px; color:var(--et-void);
+  cursor:pointer; background:linear-gradient(180deg, var(--et-gold-bri), var(--et-gold));
+  border:1px solid rgba(255,220,130,.7); box-shadow:0 6px 20px rgba(245,200,66,.3);}
+
+/* Export modal */
+.modal{position:fixed; inset:0; background:rgba(4,4,12,.78); display:none; place-items:center; z-index:30; padding:20px;}
+.modal.open{display:grid;}
+.sheet{background:rgba(20,14,8,.97); border:1px solid var(--et-line-strong); border-radius:14px; max-width:760px; width:100%;
+  max-height:86vh; overflow:auto; padding:18px;}
+.sheet h3{margin:0 0 4px; font-family:'Cinzel',serif; color:var(--et-silver);}
+.sheet p{color:var(--et-silver-soft); font-size:13px; margin:0 0 10px;}
+textarea.exp{width:100%; height:330px; background:rgba(8,10,6,.8); border:1px solid var(--et-line); border-radius:9px;
+  color:var(--et-silver); font:12.5px/1.5 ui-monospace,Consolas,monospace; padding:11px;}
+.sheetbar{display:flex; gap:9px; justify-content:flex-end; margin-top:11px;}
+.sbtn{cursor:pointer; border:1px solid var(--et-line-strong); background:rgba(32,22,14,.6); color:var(--et-silver);
+  padding:9px 16px; border-radius:9px; font-weight:600;}
+.sbtn.primary{background:linear-gradient(180deg, var(--et-gold-bri), var(--et-gold)); color:var(--et-void); border-color:rgba(255,220,130,.7);}
+</style>
+</head>
+<body>
+<div class="et-screen">
+  <div class="et-stars" id="stars" aria-hidden="true"></div>
+
+  <header class="et-bar et-bar-top">
+    <div class="et-titles">
+      <div class="et-eyebrow">Between Lives · Design Review</div>
+      <h1 class="et-title">Eternal Tree</h1>
+    </div>
+    <div class="et-counts" id="counts"></div>
+  </header>
+
+  <div class="et-stage" id="stage">
+    <div class="et-zoom">
+      <button onclick="zoom(1.2)" title="Zoom in">+</button>
+      <button onclick="fit()" title="Fit">⤢</button>
+      <button onclick="zoom(0.833)" title="Zoom out">−</button>
+    </div>
+    <div class="et-content" id="content">
+      <svg class="et-canvas" id="canvas"></svg>
+    </div>
+    <div id="detailHolder"></div>
+  </div>
+
+  <footer class="et-bar et-bar-bot">
+    <div class="et-legend">
+      <span><i class="lg" style="border-color:var(--keep)"></i>Keep</span>
+      <span><i class="lg" style="border-color:var(--revise)"></i>Revise</span>
+      <span><i class="lg" style="border-color:var(--cut)"></i>Cut</span>
+      <span><i class="lg" style="border-color:var(--et-gold)"></i>Root / Capstone</span>
+      <span style="opacity:.7">Every link is a grid step. Tap a node to mark it. Drag to pan, wheel to zoom.</span>
+    </div>
+    <button class="et-export" onclick="openExport()">Export ▸</button>
+  </footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3>Your verdicts</h3>
+    <p>Copy this and paste it back into chat. I keep the Keeps, rework the Revises, drop the Cuts.</p>
+    <textarea class="exp" id="expText" readonly></textarea>
+    <div class="sheetbar">
+      <button class="sbtn" onclick="closeExport()">Close</button>
+      <button class="sbtn primary" onclick="copyExport()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Nodes on a fixed grid (col,row). Every prereq edge links cells that are
+//    one grid step apart (orthogonal or diagonal). Capstones (2 prereqs) sit
+//    adjacent to BOTH. ─────────────────────────────────────────────────────
+const NODES = [
+  {id:"n_1",label:"Devoted Path",glyph:"道",branch:"Root",col:3,row:0,prereqs:[],cost:1,maps:"n_1",flag:"done",wiring:"Done",
+   system:"treeQiMult (wired)", effect:"+0.1% qi/s for every karma ever spent on the tree.",
+   value:"1 + 0.001 x karmaSpent (existing).", note:"The single root. Roster, Frugal and the Qi Crystal line all open straight off it."},
+
+  // Hidden Arts chain (producer order): roster -> garden -> furnace -> echoes -> beast
+  {id:"roster",label:"Eternal Roster",glyph:"升",branch:"The Sect",col:3,row:1,prereqs:["n_1"],cost:1,maps:null,flag:"live",wiring:"Med",
+   system:"Minigame access gate (p_disciple)", effect:"The Roster (disciple merge) stays open every life, no re-grind to Mythic Disciples.",
+   value:"Access decoupled from the ~100-owned gate.", note:"Hidden Art 1. Opens the Sect, the disciple upgrades, and the Garden."},
+  {id:"garden",label:"Eternal Garden",glyph:"苗",branch:"Spirit Garden",col:4,row:2,prereqs:["roster"],cost:1,maps:null,flag:"live",wiring:"Med",
+   system:"Minigame access gate (p_herb_garden)", effect:"The Spirit Garden stays open every life.",
+   value:"Access decoupled from the ~100-owned gate.", note:"Hidden Art 2. Requires Roster (the previous producer minigame), per your note."},
+  {id:"furnace",label:"Eternal Furnace",glyph:"丹",branch:"The Crucible",col:5,row:2,prereqs:["garden"],cost:1,maps:null,flag:"live",wiring:"Med",
+   system:"Minigame access gate (p_meridian_furnace)", effect:"Pill Refinement stays open every life.",
+   value:"Access decoupled from the ~100-owned gate.", note:"Hidden Art 3. Requires the Garden, per your note. Pills are inert in v1, but the minigame pays a qi cash-out."},
+
+  // Teasers continue the Hidden Arts chain in producer order
+  {id:"echoes",label:"Ancestral Echoes",glyph:"祖",branch:"Future Arts",col:6,row:2,prereqs:["furnace"],cost:1,maps:null,flag:"teaser",wiring:"n/a",teaser:true,
+   system:"Minigame gate (p_treasure), NOT built", effect:"Unlock the Treasure Hidden Art across lives.",
+   value:"Dormant until the minigame ships.", note:"Hidden Art 4 (teaser). Requires the previous producer minigame (Furnace), per your note. Revise: +25% Treasure output until built."},
+  {id:"beast",label:"Beast Arena",glyph:"兽",branch:"Future Arts",col:7,row:2,prereqs:["echoes"],cost:1,maps:null,flag:"teaser",wiring:"n/a",teaser:true,
+   system:"Minigame gate (p_beast_pact), NOT built", effect:"Unlock the Beast Pact Hidden Art across lives.",
+   value:"Dormant until the minigame ships.", note:"Hidden Art 5 (teaser). Requires the previous one (Echoes), per your note. Revise: +25% Beast output until built."},
+
+  // Treasury, frugal is a direct child of the root
+  {id:"frugal",label:"Frugal Cultivation",glyph:"儉",branch:"The Treasury",col:2,row:0,prereqs:["n_1"],cost:2,maps:"n_5",flag:"live",wiring:"Done",
+   system:"producerCostMult (wired, retune value)", effect:"All producers cost 5% less.",
+   value:"x0.95 (was x0.90). Cost raised to 2 karma because cheaper producers compound hard.", note:"Direct branch off Devoted Path, per your note. Reuses n_5 wiring at a softer value."},
+  {id:"resonance",label:"Sect Resonance",glyph:"響",branch:"The Treasury",col:1,row:1,prereqs:["frugal"],cost:2,maps:"n_6",flag:"done",wiring:"Done",
+   system:"producerSelfSynergyPct (wired)", effect:"Each producer +1% qi/s per owned of its kind.",
+   value:"0.01/owned (existing).", note:"Existing n_6. Follows Frugal (Auspicious Start was cut)."},
+  {id:"guidance",label:"Senior's Guidance",glyph:"承",branch:"The Treasury",col:1,row:2,prereqs:["resonance"],cost:2,maps:"n_7",flag:"done",wiring:"Done",
+   system:"producerCrossSynergyPct (wired)", effect:"Each producer +0.5% qi/s per owned of the previous tier.",
+   value:"0.005/prev (existing).", note:"Existing n_7."},
+  {id:"coffers",label:"Boundless Coffers",glyph:"庫",branch:"The Treasury",col:1,row:3,prereqs:["guidance"],cost:3,maps:null,flag:"prewired",wiring:"Low",keystone:true,
+   system:"treeProducerOutputMultRef (STUB exists, =1)", effect:"All producers output +15%.",
+   value:"x1.15 (starting).", note:"Treasury keystone. Ref already stubbed. Feeds Eternal Foundation."},
+
+  // Sect column + the two disciple nodes that replace Stipend (both off Roster now)
+  {id:"star",label:"Star Disciples",glyph:"星",branch:"The Sect",col:3,row:2,prereqs:["roster"],cost:1,maps:"n_2",flag:"live",wiring:"Med",
+   system:"discipleMerge.BONUS_PER_BOARD_SUM", effect:"+50% disciple board-sum bonus (each point gives 1.5% disciple qi/s).",
+   value:"0.01 to 0.015 (starting).", note:"Reborn n_2 stub. First disciple upgrade after unlocking the game."},
+  {id:"disc_base",label:"Disciple Foundation",glyph:"育",branch:"The Sect",col:2,row:1,prereqs:["roster"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"discipleMerge per-tier base production", effect:"Raise the base qi/s every disciple rank produces, lifting the whole roster at once.",
+   value:"+base output per disciple tier (start at x2 for testing, then tune down).", note:"New, replaces Sect Stipend. Connects straight off Eternal Roster, per your note."},
+  {id:"disc_transcend",label:"Transcendent Disciples",glyph:"超",branch:"The Sect",col:2,row:2,prereqs:["disc_base"],cost:3,maps:null,flag:"live",wiring:"High",
+   system:"discipleMerge new tier (T-transcendent)", effect:"Disciples gain a new Transcendent tier, reached at 100.",
+   value:"new top tier unlocked at 100 owned.", note:"New, replaces Sect Stipend. Needs a new merge tier + sprite. Confirm what '100' counts (board sum, owned, or a tier above Ancestor)."},
+  {id:"hand",label:"Open Hand",glyph:"施",branch:"The Sect",col:3,row:3,prereqs:["star"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"discipleMerge.PLACE_BASE", effect:"Disciple placements cost 20% less Merit.",
+   value:"PLACE_BASE 10 to 8 (starting).", note:"Follows Star (Stipend was split into the two disciple nodes off Roster)."},
+  {id:"thousand",label:"Thousand Disciples",glyph:"萬",branch:"The Sect",col:3,row:4,prereqs:["hand"],cost:3,maps:null,flag:"live",wiring:"Med",keystone:true,
+   system:"Per-producer output mult (p_disciple)", effect:"Disciple producer output doubled.",
+   value:"x2 (starting).", note:"Sect keystone. Feeds the Eternal Foundation capstone."},
+
+  // Garden upgrades hang under the Garden
+  {id:"potency",label:"Verdant Potency",glyph:"露",branch:"Spirit Garden",col:4,row:3,prereqs:["garden"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"spiritGarden recipe magnitude", effect:"Elixir buffs are 20% stronger.",
+   value:"buff bonus x1.2 (starting).", note:"Better brews."},
+  {id:"linger",label:"Lingering Brew",glyph:"留",branch:"Spirit Garden",col:4,row:4,prereqs:["potency"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"spiritGarden buff duration", effect:"Elixir buffs last 30% longer.",
+   value:"duration x1.3 (starting).", note:"Raises uptime toward the ~50% target."},
+  {id:"soil",label:"Fertile Soil",glyph:"沃",branch:"Spirit Garden",col:4,row:5,prereqs:["linger"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"spiritGarden grow time", effect:"Crops grow 20% faster.",
+   value:"grow time x0.8 (starting).", note:"Speeds the loop."},
+  {id:"bloom",label:"Spirit Bloom",glyph:"蓮",branch:"Spirit Garden",col:4,row:6,prereqs:["soil"],cost:3,maps:null,flag:"live",wiring:"Med-High",keystone:true,
+   system:"Garden state seeded at rebirth", effect:"Begin each life with 50 Spirit Dew and the Verdant recipe.",
+   value:"50 Dew + e_verdant (starting).", note:"Garden keystone, a permanent head-start."},
+
+  // Furnace reward node, kept but parked
+  {id:"mastery",label:"Hidden Art Mastery",glyph:"藝",branch:"The Crucible",col:5,row:3,prereqs:["furnace"],cost:2,maps:null,flag:"tbd",wiring:"TBD",
+   system:"To define with the minigames", effect:"Placeholder: a boost to Hidden Art rewards. Exact effect deferred.",
+   value:"To define.", note:"Parked: you did not find this clear and several minigames are undefined. A standalone Furnace reward now (it no longer gates the crystal). Revisit later."},
+
+  // Qi Crystal line, now its own arm straight off the root, with the spark line under it
+  {id:"crystal",label:"Crystalline Focus",glyph:"晶",branch:"The Crucible",col:4,row:0,prereqs:["n_1"],cost:2,maps:null,flag:"live",wiring:"High",
+   system:"Unlocks a new Qi Crystal upgrade line (bought with qi in the Upgrades tab)", effect:"Unlocks a new tier of Qi Crystal upgrades, purchasable with qi on the upgrade tab.",
+   value:"unlock gate (the upgrade line itself needs to be designed + priced).", note:"Reworked per your note: connects directly to Devoted Path (no Furnace dependency), and its descendants follow from it. No longer reuses n_3."},
+  {id:"lattice",label:"Dense Lattice",glyph:"紋",branch:"The Crucible",col:5,row:0,prereqs:["crystal"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"Qi Crystal feed cost", effect:"Qi Crystal levels cost 20% less to feed.",
+   value:"feed cost x0.8 (starting).", note:"Cheaper re-leveling each life."},
+  {id:"core",label:"Unbroken Core",glyph:"髓",branch:"The Crucible",col:6,row:0,prereqs:["lattice"],cost:3,maps:null,flag:"live",wiring:"High",keystone:true,
+   system:"Crystal level carried through rebirth", effect:"Keep 25% of Qi Crystal level through reincarnation.",
+   value:"0.25 retained (starting).", note:"Crystal-line keystone. Highest wiring cost. Feeds Heaven-Touched."},
+
+  // Fortune hangs off the Qi Crystal line (Discerning Eye + Smooth Ascension were cut)
+  {id:"rspark",label:"Resonant Spark",glyph:"韻",branch:"The Ascendant Way",col:5,row:1,prereqs:["crystal"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"Qi Spark permanent buff values", effect:"Permanent Qi Spark buffs are 25% stronger.",
+   value:"x1.25 (starting).", note:"Discerning Eye was cut, so this hangs off the Qi Crystal line (the personal-cultivation arm). Could re-home if you prefer."},
+  {id:"vigil",label:"Unbroken Vigil",glyph:"守",branch:"The Ascendant Way",col:6,row:1,prereqs:["rspark"],cost:2,maps:null,flag:"live",wiring:"Med",
+   system:"Offline qi accrual rate", effect:"Earn 30% more qi while away.",
+   value:"offline x1.30 (starting).", note:"Rewards the idle half. Feeds Heaven-Touched. (Smooth Ascension was cut, so it follows Resonant Spark.)"},
+  {id:"merit",label:"Boundless Merit",glyph:"福",branch:"The Ascendant Way",col:7,row:1,prereqs:["vigil"],cost:4,maps:null,flag:"balance",wiring:"Med",
+   system:"Karma awarded per life", effect:"Earn 10% more karma each life.",
+   value:"x1.10 (starting).", note:"Balance risk: inflates the prestige currency. Gate deep or cut."},
+
+  // Capstones (two adjacent parents each)
+  {id:"foundation",label:"Eternal Foundation",glyph:"基",branch:"Capstone",col:2,row:3,prereqs:["coffers","thousand"],cost:5,maps:null,flag:"prewired",wiring:"Low-Med",capstone:true,
+   system:"keepProducerLevelsFrac (anticipated in save.js)", effect:"Keep 20% of every ALREADY-UNLOCKED producer's count through reincarnation.",
+   value:"0.20 retained, only for producers unlocked in the new life (starting).", note:"Clarified per your note: producers stay dormant until unlocked normally; this only restores counts on the ones you have unlocked, it never hands you a locked producer early. Touches Coffers and Thousand Disciples."},
+  {id:"heaven",label:"Heaven-Touched",glyph:"天",branch:"Capstone",col:7,row:0,prereqs:["core","vigil"],cost:5,maps:null,flag:"prewired",wiring:"Low",capstone:true,
+   system:"treeHeavenlyMultRef (STUB exists, =1)", effect:"While any boost or elixir is active, +25% qi.",
+   value:"x1.25 during boosts (starting).", note:"Touches Unbroken Core and Unbroken Vigil. Ref already stubbed."},
+];
+const BY_ID = Object.fromEntries(NODES.map(n=>[n.id,n]));
+const FLAG_LABEL = {live:"Live", prewired:"Pre-wired", teaser:"Teaser", balance:"Balance risk", done:"Wired", tbd:"To define"};
+const STORE_KEY = "mai_eternal_tree_mockup_v2";
+let state = (()=>{ try{return JSON.parse(localStorage.getItem(STORE_KEY))||{verdicts:{},notes:{}}}catch{return {verdicts:{},notes:{}}} })();
+const saveState = ()=>{ try{localStorage.setItem(STORE_KEY, JSON.stringify(state))}catch{} };
+
+// ── Grid geometry ───────────────────────────────────────────────────────────
+const NODE_R=30, COL_W=132, ROW_H=128, PAD=72;
+const maxCol=Math.max(...NODES.map(n=>n.col)), maxRow=Math.max(...NODES.map(n=>n.row));
+const CW=PAD*2+maxCol*COL_W, CH=PAD*2+maxRow*ROW_H+34;
+const cx=n=>PAD+n.col*COL_W, cy=n=>PAD+n.row*ROW_H;
+function straight(a,b){ // line between two cell centres, trimmed to the disc edge
+  const ax=cx(a),ay=cy(a),bx=cx(b),by=cy(b), dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len;
+  return `M ${(ax+ux*NODE_R).toFixed(1)} ${(ay+uy*NODE_R).toFixed(1)} L ${(bx-ux*NODE_R).toFixed(1)} ${(by-uy*NODE_R).toFixed(1)}`;
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+let selected=null;
+function render(){
+  let dots="", edges="", nodes="";
+  for(let c=0;c<=maxCol;c++) for(let r=0;r<=maxRow;r++)
+    dots += `<circle class="gdot" cx="${PAD+c*COL_W}" cy="${PAD+r*ROW_H}" r="2"/>`;
+  for(const n of NODES) for(const p of n.prereqs){
+    const kind = n.capstone ? "cap" : n.teaser ? "teaser" : "real";
+    edges += `<path class="et-edge et-edge-${kind}" d="${straight(BY_ID[p],n)}"/>`;
+  }
+  for(const n of NODES){
+    const v = state.verdicts[n.id];
+    const base = n.id==="n_1" ? "et-node-root" : n.capstone ? "et-node-cap" : n.teaser ? "et-node-soon" : "et-node-avail";
+    const sel = selected===n.id ? " et-node-selected" : "";
+    const vc = v ? ` v-${v}` : "";
+    const vmark = v ? `<text class="vbadge" x="${NODE_R-2}" y="${-NODE_R+4}" fill="var(--${v})">${v==="keep"?"✓":v==="revise"?"✎":"✕"}</text>` : "";
+    nodes += `<g class="et-node ${base}${sel}${vc}" transform="translate(${cx(n)},${cy(n)})" onclick="select('${n.id}',event)">
+      <circle class="vring" r="${NODE_R+11}"/>
+      <circle class="et-node-halo" r="${NODE_R+7}"/>
+      <circle class="et-node-corona" r="${NODE_R+14}"/>
+      <circle class="et-node-disc" r="${NODE_R}"/>
+      <text class="et-node-glyph" x="0" y="2" text-anchor="middle" dominant-baseline="middle">${n.glyph}</text>
+      <text class="et-node-badge" x="0" y="${NODE_R+16}" text-anchor="middle">${n.teaser?"✦":n.cost}</text>
+      <text class="et-node-label" x="0" y="${NODE_R+31}" text-anchor="middle">${n.label.toUpperCase()}</text>
+      ${vmark}
+    </g>`;
+  }
+  const svg=document.getElementById("canvas");
+  svg.setAttribute("width",CW); svg.setAttribute("height",CH); svg.setAttribute("viewBox",`0 0 ${CW} ${CH}`);
+  svg.innerHTML = dots + edges + nodes;
+  renderDetail(); renderCounts();
+}
+function select(id,e){ if(e) e.stopPropagation(); selected = selected===id?null:id; render(); }
+
+function renderDetail(){
+  const holder=document.getElementById("detailHolder");
+  if(!selected){ holder.innerHTML=""; return; }
+  const n=BY_ID[selected]; const v=state.verdicts[n.id]; const note=state.notes[n.id]||"";
+  const prereq = n.prereqs.length ? n.prereqs.map(p=>BY_ID[p]?.label||p).join(" + ") : "none (root)";
+  const tags = [
+    `<span class="et-tag ${n.flag}">${FLAG_LABEL[n.flag]}</span>`,
+    `<span class="et-tag">Wiring: ${n.wiring}</span>`,
+    n.maps?`<span class="et-tag done">reuses ${n.maps}</span>`:"",
+    n.keystone?`<span class="et-tag" style="color:var(--et-gold);border-color:var(--et-violet-deep)">Keystone</span>`:"",
+    n.capstone?`<span class="et-tag" style="color:#fff4c8;border-color:#5a553f">Capstone</span>`:"",
+  ].join("");
+  holder.innerHTML = `<div class="et-detail" onclick="event.stopPropagation()">
+    <div class="et-drow">
+      <div class="et-dglyph">${n.glyph}</div>
+      <div class="et-dbody">
+        <div class="et-dname">${n.label}</div>
+        <div class="et-dmeta">${n.id} · ${n.branch} · cell [${n.col},${n.row}] · needs: ${prereq}</div>
+        <div class="et-deff">${n.effect}</div>
+      </div>
+      <div class="et-cost">${n.teaser?"✦":n.cost+" karma"}</div>
+      <button class="et-dclose" onclick="select('${n.id}')">✕</button>
+    </div>
+    <div class="et-rows">
+      <div><b>System:</b> ${n.system}</div>
+      <div><b>Value:</b> ${n.value}</div>
+      <div><b>Why here:</b> ${n.note}</div>
+      <div class="et-tags">${tags}</div>
+    </div>
+    <div class="et-verdict">
+      <button class="et-vbtn ${v==="keep"?"on-keep":""}" onclick="setV('${n.id}','keep')">✓ Keep</button>
+      <button class="et-vbtn ${v==="revise"?"on-revise":""}" onclick="setV('${n.id}','revise')">✎ Revise</button>
+      <button class="et-vbtn ${v==="cut"?"on-cut":""}" onclick="setV('${n.id}','cut')">✕ Cut</button>
+    </div>
+    <textarea class="et-notes" placeholder="What to change, or why you cut it..." oninput="setNote('${n.id}',this.value)">${note}</textarea>
+  </div>`;
+}
+function setV(id,v){ if(state.verdicts[id]===v) delete state.verdicts[id]; else state.verdicts[id]=v; saveState(); render(); }
+function setNote(id,val){ state.notes[id]=val; saveState(); renderCounts(); }
+
+function renderCounts(){
+  const c={keep:0,revise:0,cut:0,undecided:0};
+  for(const n of NODES){ c[state.verdicts[n.id]||"undecided"]++; }
+  document.getElementById("counts").innerHTML =
+    `<span class="cpill"><i class="cdot k"></i>${c.keep}</span>
+     <span class="cpill"><i class="cdot r"></i>${c.revise}</span>
+     <span class="cpill"><i class="cdot c"></i>${c.cut}</span>
+     <span class="cpill"><i class="cdot u"></i>${c.undecided} left</span>`;
+}
+
+function exportText(){
+  const c={keep:[],revise:[],cut:[],undecided:[]};
+  for(const n of NODES) c[state.verdicts[n.id]||"undecided"].push(n.id);
+  const L=["ETERNAL TREE NODE VERDICTS",
+    `(${c.keep.length} keep, ${c.revise.length} revise, ${c.cut.length} cut, ${c.undecided.length} undecided)`,""];
+  for(const v of ["keep","revise","cut","undecided"]) if(c[v].length) L.push(`${v.toUpperCase()}: ${c[v].join(", ")}`);
+  const notes=NODES.filter(n=>(state.notes[n.id]||"").trim());
+  if(notes.length){ L.push("","NOTES:"); for(const n of notes) L.push(`- ${n.id} (${n.label}): ${state.notes[n.id].trim()}`); }
+  return L.join("\n");
+}
+function openExport(){ document.getElementById("expText").value=exportText(); document.getElementById("modal").classList.add("open"); }
+function closeExport(){ document.getElementById("modal").classList.remove("open"); }
+function copyExport(){ const t=document.getElementById("expText"); t.select(); try{navigator.clipboard.writeText(t.value)}catch{} document.execCommand&&document.execCommand("copy"); }
+document.getElementById("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeExport(); });
+
+// ── Pan / zoom ──────────────────────────────────────────────────────────────
+let scale=1, panX=0, panY=0, drag=null;
+const content=document.getElementById("content"), stage=document.getElementById("stage");
+function apply(){ content.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`; }
+function zoom(f){ scale=Math.max(.3,Math.min(2.2,scale*f)); apply(); }
+function fit(){ const r=stage.getBoundingClientRect(); scale=Math.max(.3,Math.min(1,Math.min((r.width-40)/CW,(r.height-120)/CH)));
+  panX=(r.width-CW*scale)/2; panY=22; apply(); }
+stage.addEventListener("mousedown",e=>{ if(e.target.closest(".et-node, .et-detail, .et-zoom, .et-export")) return; drag={x:e.clientX,y:e.clientY,px:panX,py:panY}; });
+window.addEventListener("mousemove",e=>{ if(!drag) return; panX=drag.px+(e.clientX-drag.x); panY=drag.py+(e.clientY-drag.y); apply(); });
+window.addEventListener("mouseup",()=>{drag=null;});
+stage.addEventListener("wheel",e=>{ e.preventDefault(); zoom(e.deltaY>0?0.9:1.1); },{passive:false});
+stage.addEventListener("click",e=>{ if(!e.target.closest(".et-node, .et-detail, .et-zoom, .et-export") && selected){ selected=null; render(); } });
+
+// Starfield
+(function(){ let seed=7; const rnd=()=>{seed=(seed*9301+49297)%233280; return seed/233280;};
+  let h=""; for(let i=0;i<120;i++){ const r=rnd(); const k=r<0.06?" et-star-gold":r<0.18?" et-star-bri":"";
+    h+=`<span class="et-star${k}" style="left:${(rnd()*100).toFixed(2)}%;top:${(rnd()*100).toFixed(2)}%;animation-delay:${(rnd()*5).toFixed(2)}s;animation-duration:${(2+rnd()*4).toFixed(2)}s"></span>`; }
+  document.getElementById("stars").innerHTML=h; })();
+
+render(); fit();
+</script>
+</body>
+</html>

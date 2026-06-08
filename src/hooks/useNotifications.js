@@ -1,120 +1,28 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import WORLDS from '../data/worlds';
-import { RECIPE_MAP } from '../data/pills';
-import { FEATURES } from '../data/featureFlags';
+import { useState, useCallback } from 'react';
 import AudioManager from '../audio/AudioManager';
 
-const SEEN_WORLDS_KEY = 'mai_seen_worlds';
-
-function loadSeenWorlds(realmIndex) {
-  try {
-    const raw = localStorage.getItem(SEEN_WORLDS_KEY);
-    if (raw) return new Set(JSON.parse(raw));
-  } catch {}
-  // First load — treat all currently unlocked worlds as already seen
-  // so the badge only fires for genuinely new unlocks going forward.
-  return new Set(
-    WORLDS.filter(w => realmIndex >= w.minRealmIndex).map(w => w.id)
-  );
-}
-
-function saveSeenWorlds(set) {
-  try {
-    localStorage.setItem(SEEN_WORLDS_KEY, JSON.stringify([...set]));
-  } catch {}
-}
-
-/** Returns true if the player can brew at least one pill right now. */
-function canBrewAnyPill(getQuantity) {
-  return Object.keys(RECIPE_MAP).some(key => {
-    const herbs = key.split('|');
-    const needed = {};
-    for (const h of herbs) needed[h] = (needed[h] ?? 0) + 1;
-    return Object.entries(needed).every(([id, qty]) => getQuantity(id) >= qty);
-  });
-}
+/**
+ * useNotifications — toast queue + nav badge map.
+ *
+ * The Cookie-Clicker pivot retired combat, the Worlds hub, gathering, mining,
+ * and alchemy, so the world-unlock toasts + worlds / production badges that
+ * used to fire from here are gone. The toast queue + addToast API stay live
+ * so achievement / unlock / spark toasts still surface.
+ */
 
 let toastCounter = 0;
 
-export default function useNotifications({ cultivation, inventory }) {
-  const [seenWorlds, setSeenWorlds] = useState(() =>
-    loadSeenWorlds(cultivation.realmIndex)
-  );
+export default function useNotifications(/* { cultivation } */) {
   const [toastQueue, setToastQueue] = useState([]);
-  const prevRealmIndex = useRef(cultivation.realmIndex);
 
-  useEffect(() => {
-    saveSeenWorlds(seenWorlds);
-  }, [seenWorlds]);
-
-  // Detect realm index jumps → fire toast for newly unlocked worlds.
-  // GATED on FEATURES.combat: when combat is off the Worlds tab isn't
-  // in the nav, so a "New World Unlocked" toast with targetScreen:
-  // 'worlds' would navigate to a hidden screen. Skip entirely.
-  useEffect(() => {
-    if (!FEATURES.combat) return;
-    const prev = prevRealmIndex.current;
-    const curr = cultivation.realmIndex;
-    if (curr === prev) return;
-    prevRealmIndex.current = curr;
-
-    const newlyUnlocked = WORLDS.filter(
-      w => w.minRealmIndex > 0 && curr >= w.minRealmIndex && prev < w.minRealmIndex
-    );
-
-    if (newlyUnlocked.length === 0) return;
-
-    setToastQueue(q => [
-      ...q,
-      ...newlyUnlocked.map(w => ({
-        id: `world-${w.id}-${++toastCounter}`,
-        // Sanctum v38: structured toast = stamp glyph + kicker + message.
-        // kicker is a small-caps brass label above the message body; glyph
-        // is the Ma Shan Zheng calligraphic character that rides in the
-        // vermillion seal stamp on the left. Type drives the stamp tint.
-        type: 'unlock',
-        kicker: 'New World',
-        glyph: '山', // mountain - reads as 'realm beyond'
-        message: w.name,
-        targetScreen: 'worlds',
-        targetParam: { expandWorldId: w.id },
-        duration: 6000,
-      })),
-    ]);
-    try { AudioManager.playSfx('ui_notify'); } catch {}
-  }, [cultivation.realmIndex]);
-
-  // Badges for tabs that may not exist in this build. Both Worlds and
-  // Production are gated behind FEATURES.combat - when combat is off
-  // those tabs aren't in the nav, so any badge we'd compute would have
-  // no surface to render on. Skip the computation entirely (saves
-  // pointless inventory + WORLDS scans every render).
-  const worldsBadge = useMemo(() =>
-    FEATURES.combat
-      && WORLDS.some(w => cultivation.realmIndex >= w.minRealmIndex && !seenWorlds.has(w.id)),
-    [cultivation.realmIndex, seenWorlds]
-  );
-  const productionBadge = useMemo(() =>
-    FEATURES.combat && canBrewAnyPill(inventory.getQuantity),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [inventory.inventory]
-  );
-
-  const badges = { worlds: worldsBadge, production: productionBadge };
+  // No nav-tab badges remain in v1. The empty bag means NavBar's badge map
+  // lookup ({} ?? false) just falls through to no dot on every tab.
+  const badges = {};
 
   /** Call when the player navigates to a tab to clear its badge. */
-  const clearBadge = useCallback((screen) => {
-    if (screen === 'worlds') {
-      setSeenWorlds(prev => {
-        const next = new Set(prev);
-        WORLDS.forEach(w => {
-          if (cultivation.realmIndex >= w.minRealmIndex) next.add(w.id);
-        });
-        return next;
-      });
-    }
-    // production badge is purely derived — clears automatically once ingredients are used
-  }, [cultivation.realmIndex]);
+  const clearBadge = useCallback(() => {
+    // No-op in v1 — there are no live badges to clear.
+  }, []);
 
   const dismissToast = useCallback((id) => {
     setToastQueue(q => q.filter(t => t.id !== id));
