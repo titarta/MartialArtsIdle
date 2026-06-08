@@ -10,7 +10,7 @@
  */
 import { useMemo, useState, useCallback } from 'react';
 import {
-  CURVES, groupedCurves, sampleXs, defaultParams, baselineFn, auditCurves,
+  CURVES, CURVE_COUNTS, groupedCurves, sampleXs, defaultParams, baselineFn, auditCurves,
 } from './curves';
 import { buildExport } from './apply';
 import CurveChart from './CurveChart';
@@ -19,6 +19,9 @@ import './balance.css';
 
 const GROUPS = groupedCurves();
 const AUDIT = auditCurves(); // dev assertion: defaults must reproduce baseline
+const POINT_TABLE_CAP = 64;  // domains up to this size get a fully editable points table
+const hasOwn = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+const tidy = (v) => (Number.isFinite(v) ? Number(v.toPrecision(6)) : 0);
 
 export default function BalanceDashboard() {
   const [selId, setSelId] = useState(CURVES[0].id);
@@ -76,13 +79,21 @@ export default function BalanceDashboard() {
   const ovrKeys = Object.keys(overrides).map(Number).sort((a, b) => a - b);
   const dirty = ovrKeys.length > 0 || JSON.stringify(params) !== JSON.stringify(defaults);
 
+  const hasFormula = curve.paramsSpec.length > 0;
+  // Baseline pass → fine-tune: snapshot the current formula onto every point as
+  // an override, so each point can then be nudged numerically or by drag.
+  const bakeFormula = () => setEntry(e => ({
+    ...e,
+    overrides: Object.fromEntries(xs.map(x => [x, curve.fn(x, e.params)])),
+  }));
+
   return (
     <div className="bd-root">
       <header className="bd-top">
         <div className="bd-brand">Balance <b>Dashboard</b></div>
         <div className="bd-top-meta">
           {AUDIT.length === 0
-            ? <span className="bd-audit-ok">✓ {CURVES.length} curves match live game</span>
+            ? <span className="bd-audit-ok">✓ {CURVE_COUNTS.exact} exact · {CURVE_COUNTS.approx} fitted baseline</span>
             : <span className="bd-audit-bad">⚠ {AUDIT.length} baseline mismatches (see console)</span>}
           <span className="bd-top-hint">read-only on game state · ?balance</span>
         </div>
@@ -180,26 +191,52 @@ export default function BalanceDashboard() {
 
           <section className="bd-sec">
             <div className="bd-sec-row">
-              <label className="bd-sec-title">Point overrides ({ovrKeys.length})</label>
-              {ovrKeys.length > 0 && <button className="bd-mini" onClick={resetPoints}>clear</button>}
-            </div>
-            {ovrKeys.length === 0 ? (
-              <p className="bd-hint">Drag points on the chart, or edit a value below.</p>
-            ) : (
-              <div className="bd-pts">
-                {ovrKeys.map(x => (
-                  <div key={x} className="bd-pt-row">
-                    <span className="bd-pt-x">{curve.pointLabel ? curve.pointLabel(x) : x}</span>
-                    <input
-                      className="bd-pt-val"
-                      type="number"
-                      value={overrides[x]}
-                      onChange={e => setPoint(x, Number(e.target.value))}
-                    />
-                    <button className="bd-mini" onClick={() => resetPoint(x)}>↺</button>
-                  </div>
-                ))}
+              <label className="bd-sec-title">Points ({ovrKeys.length} tuned)</label>
+              <div className="bd-sec-actions">
+                {hasFormula && (
+                  <button className="bd-mini" onClick={bakeFormula}
+                    title="Snapshot the formula onto every point so you can fine-tune each one">
+                    bake formula
+                  </button>
+                )}
+                {ovrKeys.length > 0 && <button className="bd-mini" onClick={resetPoints}>clear</button>}
               </div>
+            </div>
+            {xs.length <= POINT_TABLE_CAP ? (
+              <div className="bd-pts bd-pts-all">
+                {xs.map((x, i) => {
+                  const ov = hasOwn(overrides, x);
+                  return (
+                    <div key={x} className={`bd-pt-row${ov ? ' bd-pt-row-ovr' : ''}`}>
+                      <span className="bd-pt-x">{curve.pointLabel ? curve.pointLabel(x) : `${curve.x.label} ${x}`}</span>
+                      <input
+                        className="bd-pt-val"
+                        type="number"
+                        value={tidy(tunedYs[i])}
+                        onChange={e => setPoint(x, Number(e.target.value))}
+                      />
+                      <button className="bd-mini bd-pt-rst" disabled={!ov}
+                        onClick={() => resetPoint(x)} title="Reset to formula / baseline">↺</button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <p className="bd-hint">{xs.length} points. Drag on the chart, or bake the formula to edit every point numerically.</p>
+                {ovrKeys.length > 0 && (
+                  <div className="bd-pts">
+                    {ovrKeys.map(x => (
+                      <div key={x} className="bd-pt-row bd-pt-row-ovr">
+                        <span className="bd-pt-x">{curve.pointLabel ? curve.pointLabel(x) : x}</span>
+                        <input className="bd-pt-val" type="number" value={overrides[x]}
+                          onChange={e => setPoint(x, Number(e.target.value))} />
+                        <button className="bd-mini" onClick={() => resetPoint(x)}>↺</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </section>
 

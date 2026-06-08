@@ -99,6 +99,24 @@ const TREE_COST     = NODES.map(n => n.cost);
 // Blood Lotus gameplay items (exclude the flat-priced cosmetic particles).
 const SHOP_GAMEPLAY = SHOP_ITEMS.filter(it => it.category !== 'cosmetic');
 
+// ── fit helpers: derive baseline-pass defaults from hand-tuned data ───────────
+// Many game values (producer start cost/output, mechanic costs) are hand-tuned
+// with no governing formula. These pick the geometric / linear formula whose
+// defaults best track the real data, so a curve can offer a "baseline pass"
+// (tune the formula) and then per-point fine-tuning on top.
+const geomFit = (first, last, steps) =>
+  ({ base: first, ratio: steps > 0 && first > 0 ? Math.pow(last / first, 1 / steps) : 1 });
+const linFit = (first, last, steps) =>
+  ({ base: first, slope: steps > 0 ? (last - first) / steps : 0 });
+
+const PROD_COST = PRODUCERS.map(p => p.startCost);
+const PROD_OUT  = PRODUCERS.map(p => p.startQiPerSec);
+const COST_FIT  = geomFit(PROD_COST[0], PROD_COST[PROD_COST.length - 1], PROD_COST.length - 1);
+const OUT_FIT   = geomFit(PROD_OUT[0],  PROD_OUT[PROD_OUT.length - 1],  PROD_OUT.length - 1);
+const CR_FIT    = linFit(CRYSTAL_RATE[1], CRYSTAL_RATE[5], 4);
+const DB_FIT    = linFit(DIVINE_BURST[1], DIVINE_BURST[5], 4);
+const CF_FIT    = linFit(CF_CUMULATIVE[1], CF_CUMULATIVE[5], 4);
+
 // ── the registry ─────────────────────────────────────────────────────────────
 
 export const CURVES = [
@@ -181,6 +199,43 @@ export const CURVES = [
       baseline: (o) => o * p.startQiPerSec,
     })),
     apply: { kind: 'snippet', target: 'src/data/producers.js' },
+  },
+
+  {
+    id: 'producer_base_cost',
+    group: 'Producers',
+    label: 'Producer base cost (per tier)',
+    blurb: 'startCost of each producer across the 10 tiers. The game hand-tunes these (no formula), ' +
+           'so tune the geometric base/ratio for a baseline pass, then fine-tune per producer (drag or type).',
+    x: { label: 'Producer tier', from: 0, to: PRODUCERS.length - 1, step: 1 },
+    y: { label: 'startCost', log: true },
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'tier-0 cost', value: COST_FIT.base,  step: 1 },
+      { key: 'ratio', label: '× per tier',  value: COST_FIT.ratio, min: 1.5, max: 30, step: 0.1 },
+    ],
+    fn: (i, p) => Math.round(p.base * Math.pow(p.ratio, i)),
+    baseline: (i) => PROD_COST[i] ?? 0,
+    pointLabel: (i) => PRODUCERS[i]?.name ?? `#${i}`,
+    apply: { kind: 'snippet', target: 'src/data/producers.js (startCost)' },
+  },
+  {
+    id: 'producer_base_output',
+    group: 'Producers',
+    label: 'Producer base output (per tier)',
+    blurb: 'startQiPerSec of each producer across the 10 tiers. Hand-tuned in the game; set the ' +
+           'geometric base/ratio for a baseline pass, then fine-tune per producer (drag or type).',
+    x: { label: 'Producer tier', from: 0, to: PRODUCERS.length - 1, step: 1 },
+    y: { label: 'startQiPerSec', log: true },
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'tier-0 qi/s', value: OUT_FIT.base,  step: 0.1 },
+      { key: 'ratio', label: '× per tier',  value: OUT_FIT.ratio, min: 1.5, max: 20, step: 0.1 },
+    ],
+    fn: (i, p) => p.base * Math.pow(p.ratio, i),
+    baseline: (i) => PROD_OUT[i] ?? 0,
+    pointLabel: (i) => PRODUCERS[i]?.name ?? `#${i}`,
+    apply: { kind: 'snippet', target: 'src/data/producers.js (startQiPerSec)' },
   },
 
   // ══ Qi Crystal ══════════════════════════════════════════════════════════
@@ -289,17 +344,24 @@ export const CURVES = [
     id: 'mechanic_cost',
     group: 'Mechanics',
     label: 'Mechanic upgrade cost',
-    blurb: 'Qi to buy each mechanic tier (T2-T5; T1 is granted by crystal evolution). ' +
-           'Hand-tuned ~×8 ramp, pick a mechanic and drag a tier to retune.',
+    blurb: 'Qi to buy each mechanic tier (T2-T5; T1 is granted by crystal evolution). Pick a mechanic, ' +
+           'tune the geometric base/ratio for a baseline pass, then fine-tune a tier (drag or type).',
     x: { label: 'Tier', from: 2, to: 5, step: 1 },
     y: { label: 'Qi cost', log: true },
-    paramsSpec: [],
-    fn: (tier, p) => p.table?.[tier] ?? 0,
-    variants: MECHANIC_DEFS.map(m => ({
-      id: m.id, label: m.label,
-      params: { table: mechCostTable(m.id) },
-      baseline: (t) => mechCostTable(m.id)[t] ?? 0,
-    })),
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'T2 cost', step: 1000 },
+      { key: 'ratio', label: '× per tier', min: 2, max: 16, step: 0.1 },
+    ],
+    fn: (tier, p) => Math.round(p.base * Math.pow(p.ratio, tier - 2)),
+    variants: MECHANIC_DEFS.map(m => {
+      const tbl = mechCostTable(m.id);
+      return {
+        id: m.id, label: m.label,
+        params: { base: tbl[2], ratio: geomFit(tbl[2], tbl[5], 3).ratio },
+        baseline: (t) => tbl[t] ?? 0,
+      };
+    }),
     pointLabel: (t) => `Tier ${t}`,
     apply: { kind: 'snippet', target: 'src/data/upgrades.js (MECHANIC_TIER_CONFIG)' },
   },
@@ -310,8 +372,12 @@ export const CURVES = [
     blurb: 'Fraction of your qi/s the reservoir stockpiles, per crystal_click tier.',
     x: { label: 'Tier', from: 1, to: 5, step: 1 },
     y: { label: 'rate (× qi/s)', log: false },
-    paramsSpec: [],
-    fn: (t) => CRYSTAL_RATE[t] ?? 0,
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'T1 rate',    value: CR_FIT.base,  min: 0, max: 1,   step: 0.05 },
+      { key: 'slope', label: '+ per tier', value: CR_FIT.slope, min: 0, max: 0.5, step: 0.01 },
+    ],
+    fn: (t, p) => p.base + p.slope * (t - 1),
     baseline: (t) => CRYSTAL_RATE[t] ?? 0,
     pointLabel: (t) => `Tier ${t}`,
     apply: { kind: 'snippet', target: 'src/data/qiSparks.js (crystal_click_t*)' },
@@ -323,8 +389,12 @@ export const CURVES = [
     blurb: 'Seconds of qi/s granted by collecting a Divine Qi orb, per tier.',
     x: { label: 'Tier', from: 1, to: 5, step: 1 },
     y: { label: 'burst (s of qi/s)', log: false },
-    paramsSpec: [],
-    fn: (t) => DIVINE_BURST[t] ?? 0,
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'T1 burst',   value: DB_FIT.base,  step: 1 },
+      { key: 'slope', label: '+ per tier', value: DB_FIT.slope, step: 1 },
+    ],
+    fn: (t, p) => p.base + p.slope * (t - 1),
     baseline: (t) => DIVINE_BURST[t] ?? 0,
     pointLabel: (t) => `Tier ${t}`,
     apply: { kind: 'snippet', target: 'src/data/qiSparks.js (divine_qi_t*)' },
@@ -336,8 +406,12 @@ export const CURVES = [
     blurb: 'Cumulative qi/s bonus (%) once you hold Focus through each tier threshold.',
     x: { label: 'Tier', from: 1, to: 5, step: 1 },
     y: { label: 'cumulative qi/s %', log: false },
-    paramsSpec: [],
-    fn: (t) => CF_CUMULATIVE[t] ?? 0,
+    approx: true,
+    paramsSpec: [
+      { key: 'base',  label: 'T1 bonus %',  value: CF_FIT.base,  step: 1 },
+      { key: 'slope', label: '+ per tier',  value: CF_FIT.slope, step: 1 },
+    ],
+    fn: (t, p) => p.base + p.slope * (t - 1),
     baseline: (t) => CF_CUMULATIVE[t] ?? 0,
     pointLabel: (t) => `Tier ${t}`,
     apply: { kind: 'snippet', target: 'src/data/qiSparks.js (consecutive_focus_t*)' },
@@ -419,9 +493,16 @@ export function groupedCurves() {
  * Pure-formula curves should be exact; rounding-heavy ones use a small
  * relative tolerance.
  */
+export const CURVE_COUNTS = {
+  total:  CURVES.length,
+  exact:  CURVES.filter(c => !c.approx).length,
+  approx: CURVES.filter(c =>  c.approx).length,
+};
+
 export function auditCurves(tol = 1e-6) {
   const issues = [];
   for (const curve of CURVES) {
+    if (curve.approx) continue; // fitted-baseline curves intentionally approximate hand-tuned data
     const variants = curve.variants ?? [null];
     for (const variant of variants) {
       const params = defaultParams(curve, variant);

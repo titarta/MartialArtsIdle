@@ -70,14 +70,14 @@ export function buildSnippet(curve, params, defaults, overrides, variantLabel) {
     lines.push('// Param changes:');
     for (const c of changes) lines.push(`//   ${c.label}: ${numStr(c.from)} -> ${numStr(c.to)}`);
   }
-  // Point overrides on a formula curve are export-only (the runtime reads a
-  // formula, not a table), surface them so nothing is silently dropped.
+  // Tuned points, labelled (e.g. producer name) so the values are pasteable
+  // back into the source by hand. On a formula curve these are export-only.
   if (ptCount > 0 && !isOverrideDomain) {
-    lines.push(`// Point overrides (${ptCount}), export-only on a formula curve:`);
-    const entries = Object.keys(overrides)
-      .map(Number).sort((a, b) => a - b)
-      .map(x => `${x}: ${numStr(overrides[x])}`);
-    lines.push(`//   { ${entries.join(', ')} }`);
+    lines.push(`// Tuned points (${ptCount}):`);
+    Object.keys(overrides).map(Number).sort((a, b) => a - b).forEach(x => {
+      const lbl = curve.pointLabel ? curve.pointLabel(x) : `x=${x}`;
+      lines.push(`//   ${lbl}: ${numStr(overrides[x])}`);
+    });
   }
   return lines.join('\n');
 }
