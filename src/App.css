@@ -6642,6 +6642,24 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   transition: transform 0.05s ease-out;                          /* snappy squish on press */
 }
 
+/* Level-up pop — the OPPOSITE of the tap squish: a brief tilt + EXPAND when a
+   refine gains a crystal level (no tier change), versus the tap's tilt + shrink.
+   Triggered by a DOM class toggle in HomeScreen handleCrystalRefine, re-armed
+   via reflow so rapid refines re-fire it. Animates the same .home-crystal-img-wrap
+   the tap squishes, so they read as inverses. */
+@keyframes home-crystal-levelup-pop {
+  0%   { transform: scale(1)    rotate(0deg);    }
+  40%  { transform: scale(1.12) rotate(2.5deg);  }
+  72%  { transform: scale(0.99) rotate(-0.8deg); }
+  100% { transform: scale(1)    rotate(0deg);    }
+}
+.home-crystal-img-wrap.home-crystal-levelup {
+  animation: home-crystal-levelup-pop 0.5s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-crystal-img-wrap.home-crystal-levelup { animation: none; }
+}
+
 /* Pulse when reservoir is completely full */
 @keyframes crystal-full-pulse {
   0%, 100% { opacity: 0.65; }

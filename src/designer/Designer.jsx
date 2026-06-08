@@ -1,40 +1,24 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { loadPat, savePat, clearPat } from './pat.js';
 import { checkToken, getFile, putTextFile, REPO_OWNER, REPO_NAME, BRANCH } from './github.js';
-import WorldsEditor     from './categories/WorldsEditor.jsx';
-import EnemiesEditor    from './categories/EnemiesEditor.jsx';
 import RealmsEditor     from './categories/RealmsEditor.jsx';
-import CraftingEditor   from './categories/CraftingEditor.jsx';
-import PillsEditor      from './categories/PillsEditor.jsx';
-import LawsEditor       from './categories/LawsEditor.jsx';
-import LawUniquesViewer from './categories/LawUniquesViewer.jsx';
-import ArtefactsEditor  from './categories/ArtefactsEditor.jsx';
-import AffixPoolsEditor from './categories/AffixPoolsEditor.jsx';
-import MaterialsEditor  from './categories/MaterialsEditor.jsx';
 import AudioEditor         from './categories/AudioEditor.jsx';
 import FeatureGatesEditor  from './categories/FeatureGatesEditor.jsx';
 import QiSparksEditor      from './categories/QiSparksEditor.jsx';
-import ArtefactSetsEditor  from './categories/ArtefactSetsEditor.jsx';
-import TechniquesEditor    from './categories/TechniquesEditor.jsx';
 import ReincarnationTreeEditor from './categories/ReincarnationTreeEditor.jsx';
 import './designer.css';
 
+// 2026-06-08: removed editor entries for systems deleted in the big cleanup:
+// worlds, enemies, laws, lawUniques, pills (old), artefacts, artefactSets,
+// crafting, affixPools, techniques, materials (the old gather/mine maps).
+// Materials editor is gone because materials.js no longer carries HERBS /
+// ORES / BLOOD_CORES / CULTIVATION_MATERIALS — only the RARITY constant
+// remains and it doesn't need a designer surface.
 const EDITORS = {
-  worlds:     WorldsEditor,
-  enemies:    EnemiesEditor,
-  realms:     RealmsEditor,
-  laws:       LawsEditor,
-  lawUniques: LawUniquesViewer,
-  materials:  MaterialsEditor,
-  pills:      PillsEditor,
-  artefacts:  ArtefactsEditor,
-  crafting:   CraftingEditor,
-  affixPools: AffixPoolsEditor,
-  audio:        AudioEditor,
-  featureGates: FeatureGatesEditor,
-  qiSparks:     QiSparksEditor,
-  artefactSets: ArtefactSetsEditor,
-  techniques:   TechniquesEditor,
+  realms:            RealmsEditor,
+  audio:             AudioEditor,
+  featureGates:      FeatureGatesEditor,
+  qiSparks:          QiSparksEditor,
   reincarnationTree: ReincarnationTreeEditor,
 };
 
@@ -50,30 +34,14 @@ const EDITORS = {
  */
 
 const CATEGORIES = [
-  // ── Worlds & Encounters ──────────────────────────────────────────────────
-  { id: 'worlds',     label: 'Worlds',      section: 'Worlds & Encounters', path: 'src/data/config/worlds.override.json'     },
-  { id: 'enemies',    label: 'Enemies',     section: 'Worlds & Encounters', path: 'src/data/config/enemies.override.json'    },
   // ── Progression ──────────────────────────────────────────────────────────
-  { id: 'realms',     label: 'Realms',      section: 'Progression',         path: 'src/data/config/realms.override.json'     },
-  { id: 'laws',       label: 'Laws',        section: 'Progression',         path: 'src/data/config/laws.override.json'       },
-  { id: 'lawUniques', label: 'Law Uniques', section: 'Progression',         path: null, readOnly: true },
-  // ── Inventory ────────────────────────────────────────────────────────────
-  { id: 'materials',  label: 'Materials',   section: 'Inventory',           path: 'src/data/config/materials.override.json'  },
-  { id: 'pills',      label: 'Pills',       section: 'Inventory',           path: 'src/data/config/pills.override.json'      },
-  { id: 'artefacts',  label: 'Artefacts',   section: 'Inventory',           path: 'src/data/config/artefacts.override.json'  },
-  { id: 'artefactSets', label: 'Artefact Sets', section: 'Inventory',       path: 'src/data/config/artefactSets.override.json' },
-  // ── Combat ───────────────────────────────────────────────────────────────
-  { id: 'techniques', label: 'Techniques',  section: 'Combat',              path: 'src/data/config/techniques.override.json' },
+  { id: 'realms',            label: 'Realms',             section: 'Progression',  path: 'src/data/config/realms.override.json'     },
+  { id: 'reincarnationTree', label: 'Reincarnation Tree', section: 'Progression',  path: 'src/data/config/reincarnationTree.override.json' },
+  { id: 'featureGates',      label: 'Feature Gates',      section: 'Progression',  path: 'src/data/config/featureGates.override.json' },
   // ── Cultivation ──────────────────────────────────────────────────────────
-  { id: 'qiSparks',   label: 'Qi Sparks',   section: 'Cultivation',         path: 'src/data/config/qiSparks.override.json'   },
-  { id: 'reincarnationTree', label: 'Reincarnation Tree', section: 'Cultivation', path: 'src/data/config/reincarnationTree.override.json' },
-  // ── Crafting ─────────────────────────────────────────────────────────────
-  { id: 'crafting',   label: 'Crafting',    section: 'Crafting',            path: 'src/data/config/crafting.override.json'   },
-  { id: 'affixPools', label: 'Affix Pools', section: 'Crafting',            path: 'src/data/config/affixPools.override.json' },
-  // ── Audio ─────────────────────────────────────────────────────────────────
-  { id: 'audio',      label: 'Audio',       section: 'Audio',               path: 'src/data/config/audio.override.json'      },
-  // ── Progression Gates ─────────────────────────────────────────────────────
-  { id: 'featureGates', label: 'Feature Gates', section: 'Progression',     path: 'src/data/config/featureGates.override.json' },
+  { id: 'qiSparks',          label: 'Qi Sparks',          section: 'Cultivation',  path: 'src/data/config/qiSparks.override.json'   },
+  // ── Audio ────────────────────────────────────────────────────────────────
+  { id: 'audio',             label: 'Audio',              section: 'Audio',        path: 'src/data/config/audio.override.json'      },
 ];
 
 const EMPTY_OVERRIDE = { version: 1, updatedAt: null, records: {} };

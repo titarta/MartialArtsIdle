@@ -2776,6 +2776,15 @@ function HomeScreen({
     } else if (leveledUp) {
       // Gained a level without crossing a visual tier; evolve carries its own sound.
       try { AudioManager.playSfx('crystal_level_up'); } catch {}
+      // Level-up pop: a brief tilt + expand on the crystal, the visual inverse of
+      // the tap squish (tilt + shrink). DOM-direct + reflow re-arm so rapid
+      // refines re-trigger it without a React render (matches the spark pattern).
+      const wrap = document.querySelector('.home-crystal-img-wrap');
+      if (wrap) {
+        wrap.classList.remove('home-crystal-levelup');
+        void wrap.offsetWidth; // force reflow so the animation restarts each level
+        wrap.classList.add('home-crystal-levelup');
+      }
     }
   }, [crystal, isCrystalUnlocked, cultivation, handleCrystalEvolve]);
 

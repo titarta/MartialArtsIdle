@@ -1,40 +1,25 @@
 /**
  * Enum option providers for SchemaForm.
  *
- * Sourced from the game's data modules so dropdowns stay in sync with
- * whatever is actually available at build time. These helpers are pure
- * reads — the designer panel never mutates the imported modules.
+ * 2026-06-08: gutted alongside the big cleanup. The enemy / worlds / pills /
+ * gather / mine option providers were tied to data modules that no longer
+ * exist. What's left are the providers still wired into surviving editors
+ * (realms / materials / qi sparks / reincarnation tree / audio / feature
+ * gates): rarity / stats / sprite.
  */
 
-import ENEMIES from '../data/enemies.js';
-import WORLDS from '../data/worlds.js';
-import { ALL_MATERIALS } from '../data/materials.js';
-import { PILLS } from '../data/pills.js';
-
-export function enemyIdOptions() {
-  return Object.keys(ENEMIES).map((id) => ({ value: id, label: `${id} — ${ENEMIES[id].name}` }));
-}
-
-export function itemIdOptions() {
-  const all = [];
-  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
-    all.push({ value: id, label: `${id} — ${mat.name}` });
-  }
-  for (const pill of PILLS) {
-    all.push({ value: pill.id, label: `${pill.id} — ${pill.name}` });
-  }
-  return all;
+export function rarityOptions() {
+  return ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
 }
 
 export function spriteOptions() {
   // Eagerly enumerate every PNG under public/sprites/enemies at build time.
-  // Only filenames are needed — stripping path + extension for the value.
+  // Kept as a generic sprite picker — schemas that still reference sprite
+  // dropdowns (audio, etc.) can use this.
   const files = import.meta.glob('/public/sprites/enemies/*.png', { eager: true, as: 'url' });
   const bases = new Set();
   for (const path of Object.keys(files)) {
     const file = path.split('/').pop().replace(/\.png$/, '');
-    // Enemies use pairs: `{name}-idle.png` + `{name}-attack.png`.
-    // Collapse to the base name so sprite dropdown shows one option per pair.
     const base = file.replace(/-(idle|attack)$/, '');
     bases.add(base);
   }
@@ -43,66 +28,11 @@ export function spriteOptions() {
     .map((b) => ({ value: b, label: b }));
 }
 
-export function worldIdOptions() {
-  return WORLDS.map((w) => ({ value: w.id, label: `${w.id} — ${w.name}` }));
-}
-
 /**
- * Items that can be dropped by enemies: blood_core + cultivation types.
- * Used by the enemy drops schema to restrict the itemId dropdown.
- */
-export function combatDropItemOptions() {
-  const all = [];
-  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
-    if (mat.type === 'blood_core' || mat.type === 'cultivation') {
-      all.push({ value: id, label: `${id} — ${mat.name}` });
-    }
-  }
-  return all;
-}
-
-/**
- * Items that can appear in gatherDrops: herbs + cultivation types.
- */
-export function gatherDropItemOptions() {
-  const all = [];
-  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
-    if (mat.type === 'herb' || mat.type === 'cultivation') {
-      all.push({ value: id, label: `${id} — ${mat.name}` });
-    }
-  }
-  return all;
-}
-
-/**
- * Items that can appear in mineDrops: ores + cultivation types.
- */
-export function mineDropItemOptions() {
-  const all = [];
-  for (const [id, mat] of Object.entries(ALL_MATERIALS)) {
-    if (mat.type === 'ore' || mat.type === 'cultivation') {
-      all.push({ value: id, label: `${id} — ${mat.name}` });
-    }
-  }
-  return all;
-}
-
-export function rarityOptions() {
-  return ['Iron', 'Bronze', 'Silver', 'Gold', 'Transcendent'];
-}
-
-/**
- * Master list of every stat id the gameplay engine actually consumes.
- *
- * Sources of truth:
- *   - src/data/stats.js computeAllStats (primary derivations)
- *   - src/App.jsx collapseFlat / collapsePct (modifier aggregations into
- *     the stats bundle consumed by useCombat / useCultivation / etc.)
- *   - src/data/artefactSets.js stat effects
- *   - src/data/laws.js + lawUniques.js stat effects
- *
- * Schemas import this so designers can ONLY pick stats that are wired
- * into gameplay. Adding a new stat to gameplay = add it here.
+ * Master list of every stat id the gameplay engine consumes. Schemas import
+ * this so designers can ONLY pick stats that are wired into gameplay. The
+ * combat / gather / mine stats are intentionally retained here as a stable
+ * surface for future systems that may need to bind to those names.
  */
 export const STAT_IDS = [
   // ── Survival ──
@@ -124,7 +54,7 @@ export const STAT_IDS = [
   'defense_penetration',
   'ignore_defense_pct',
   'ignore_defense_chance',
-  // ── Exploit (post-2026-04-26 consolidation; replaces crit) ──
+  // ── Exploit ──
   'exploit_chance',
   'exploit_attack_mult',
   // ── Dodge / reflect ──
