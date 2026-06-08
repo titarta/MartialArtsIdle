@@ -5,6 +5,7 @@ import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import ActiveBuffsChip from '../components/ActiveBuffsChip';
+import CrimsonOrbitLayer from '../components/CrimsonOrbitLayer';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
@@ -3123,11 +3124,14 @@ function HomeScreen({
                 className={`home-cultivator-sprite${cultivatorPose === 'focused' ? '' : ' home-cultivator-sprite-fade'}`}
                 draggable="false"
               />
-              {/* CrimsonOrbitLayer was the in-sprite orbital VFX component;
-                  it was deleted in the v1 cleanup pass alongside the other
-                  combat-era components. Crimson Aura cosmetics now live on
-                  the body class set in App.jsx (.body-crimson-aura-active),
-                  which CSS attaches as a pseudo-element halo. */}
+              {/* CrimsonOrbitLayer — premium Crimson Aura (x2) orbital VFX.
+                  rAF-driven, self-gated on the .body-crimson-aura-active class
+                  that App.jsx sets. Renders 4 orb + 4 shard sprites in two
+                  counter-rotating elliptical rings; depth via continuous
+                  z-sort so bodies pass both in front of (z:3) and behind (z:1)
+                  the cultivator sprite (z:2), and the wider-than-sprite orbits
+                  are not clipped (overflow:visible). */}
+              <CrimsonOrbitLayer />
             </div>
           </div>
           </div>{/* end home-crystal-char-stack */}
