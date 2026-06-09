@@ -19717,170 +19717,281 @@ button.pl-leader.pl-leader-clickable:focus-visible {
    has a Heaven's Pardon token in inventory. Visually distinct from the
    BT button (warm lacquer + bronze decree, distinct from the BT button's
    bright parchment edict) so they don't compete when both could show. */
-/* ── Gate Bypass — "Vermilion Edict Slip" ──────────────────────────────
-   The button overlays the qi-progress bar slot (a thin horizontal
-   strip ~28-32 px tall). Previous attempts used wax-seal chrome that
-   physically didn't fit and got clipped by the parent. This layout is
-   designed FOR the strip: three side-by-side zones, each filling the
-   full strip height with no overflow. Reads as a sealed decree, not a
-   shrunken button.
+/* ── Gate Bypass — "Heaven's Vermilion Plaque" ─────────────────────────
+   Anchored to .home-scene-bottom (NOT the thin .home-bar-wrap strip the
+   previous passes targeted) so the button can fill the whole bottom
+   card from the realm header down. Three earlier passes all clipped
+   because they tried to host card-style chrome inside a ~30 px progress-
+   bar slot; this version finally has the height to land properly.
 
-     ┌──────┬─────────────────────────┬──────┐
-     │  符  │      BYPASS GATE        │  ×N  │   ← vermilion · gold · vermilion
-     └──────┴─────────────────────────┴──────┘
-       wax        action ribbon         count
+   Composition:
 
-   No big floating seal, no halo overflow, no pip clipping. */
+     ┌◤ ───────────────────────────────────────────────────────────────◥┐
+     │                                                                   │
+     │  ⊙ 符      BYPASS GATE                            ┌── 1 ──┐        │
+     │  wax       Heaven's Pardon · talisman              │  LEFT  │      │
+     │                                                    └────────┘     │
+     │◣ ───── ember ─────────────────────────────────────────────────── ◢│
+     └───────────────────────────────────────────────────────────────────┘
+       seal +     stacked text block                    count plaque
+       halo       (CTA + subtitle)                      (gold tablet) */
+
 .home-gate-bypass-btn {
+  /* Anchored to .home-scene-bottom (position:relative).
+     bottom:10px keeps it clear of the home-scene-bottom's padding;
+     left/right hug the card edge with the same gutter the qi bar uses. */
   position: absolute;
-  top: 4px;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc((100% - 32px) * 0.95);
-  z-index: 4;
+  bottom: 10px;
+  left: 16px;
+  right: 16px;
+  height: 64px;
+  z-index: 8;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px 0 14px;
   margin: 0;
-  padding: 0;
   border: 1px solid #c9923f;                 /* aged bronze frame */
-  border-radius: 9px;
-  background: linear-gradient(180deg, #2c151a 0%, #190c10 100%);
+  border-radius: 10px;
   color: #f3e7cf;
   font-family: inherit;
   cursor: pointer;
-  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+  /* Vermilion lacquer face with a top sheen + a stronger ink-stain
+     gradient under the seal area on the left, so the wax seal looks
+     pressed INTO the paper rather than floated on top. */
+  background:
+    radial-gradient(circle at 12% 60%, rgba(216, 50, 74, 0.20) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(255, 226, 170, 0.10) 0%, rgba(255, 226, 170, 0) 18%),
+    linear-gradient(180deg, #2c151a 0%, #190c10 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 220, 160, 0.22),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.5),
-    0 3px 10px rgba(0, 0, 0, 0.55),
-    0 0 16px rgba(216, 50, 74, 0.18);        /* soft vermilion outer pulse */
+    inset 0 1px 0 rgba(255, 220, 160, 0.28),
+    inset 0 -3px 10px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 22px rgba(216, 50, 74, 0.22);        /* vermilion outer pulse */
   transition: transform 0.08s ease-out, filter 0.15s, box-shadow 0.15s;
   animation: home-gate-bypass-aware 3.6s ease-in-out infinite;
 }
-/* Whole-button awareness pulse. Period 3.6 s — deliberately different
-   from the cultivator aura (2.4 s) and the ember underline (3 s) so the
-   signals layer instead of locking into one throb. */
 @keyframes home-gate-bypass-aware {
   0%, 100% { box-shadow:
-    inset 0 1px 0 rgba(255, 220, 160, 0.22),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.5),
-    0 3px 10px rgba(0, 0, 0, 0.55),
-    0 0 16px rgba(216, 50, 74, 0.16);
+    inset 0 1px 0 rgba(255, 220, 160, 0.28),
+    inset 0 -3px 10px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 22px rgba(216, 50, 74, 0.20);
   }
   50%      { box-shadow:
-    inset 0 1px 0 rgba(255, 220, 160, 0.28),
-    inset 0 -2px 6px rgba(0, 0, 0, 0.5),
-    0 3px 14px rgba(0, 0, 0, 0.6),
-    0 0 26px rgba(216, 50, 74, 0.36);
+    inset 0 1px 0 rgba(255, 220, 160, 0.34),
+    inset 0 -3px 10px rgba(0, 0, 0, 0.55),
+    0 5px 18px rgba(0, 0, 0, 0.6),
+    0 0 32px rgba(216, 50, 74, 0.42);
   }
 }
 .home-gate-bypass-btn:hover  { filter: brightness(1.08); }
-.home-gate-bypass-btn:active { transform: translateX(-50%) scale(0.985); }
+.home-gate-bypass-btn:active { transform: scale(0.99); }
 
-/* ── End caps (left = wax seal, right = count) ─────────────────────
-   Same vermilion gradient on both. Brass hairline divider on the inner
-   edge so each cap reads as its own stamped block. Both caps fill the
-   strip's full height (align-items: stretch on the parent), eliminating
-   the "round seal overflows the strip" problem the old design had. */
-.home-gate-bypass-cap {
-  position: relative;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255, 220, 200, 0.28) 0%, transparent 42%),
-    linear-gradient(180deg, #d8324a 0%, #a81730 60%, #7c0f22 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 200, 200, 0.45),
-    inset 0 -2px 5px rgba(70, 6, 16, 0.85);
-  z-index: 1;
-}
-.home-gate-bypass-cap-left  { padding: 0 12px; border-right: 1px solid #c9923f; }
-.home-gate-bypass-cap-right { padding: 0 10px; border-left:  1px solid #c9923f; }
-
-.home-gate-bypass-glyph {
-  font-family: var(--font-glyph), serif;
-  font-size: 19px;
-  line-height: 1;
-  color: #ffe9c2;
-  text-shadow:
-    0 1px 2px rgba(80, 8, 18, 0.95),
-    0 0 9px  rgba(255, 220, 130, 0.5);
-}
-.home-gate-bypass-count {
-  font-family: 'Cinzel', Georgia, serif;
-  font-weight: 800;
-  font-size: 13px;
-  line-height: 1;
-  color: #ffe9c2;
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  text-shadow:
-    0 1px 2px rgba(80, 8, 18, 0.95),
-    0 0 7px  rgba(255, 220, 130, 0.4);
-}
-
-/* ── Center ribbon — the action zone ──────────────────────────────── */
-.home-gate-bypass-center {
-  position: relative;
-  flex: 1 1 auto;
-  display: grid;
-  place-items: center;
-  background:
-    linear-gradient(180deg, rgba(255, 226, 170, 0.10) 0%, rgba(255, 226, 170, 0) 18%),
-    linear-gradient(180deg, #2c151a 0%, #190c10 100%);
-  overflow: hidden;
-}
-/* Gold gleam sweep — scoped to the center ribbon so it doesn't pass over
-   the vermilion end caps (which would muddy their colour). */
-.home-gate-bypass-center::after {
+/* Gold gleam sweep over the whole plaque — single subtle pass, throttled
+   to 4.2 s so it doesn't fight the awareness pulse. Sits BENEATH text
+   via z-index: 0 so type stays crisp. */
+.home-gate-bypass-btn::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 38%, rgba(255, 224, 160, 0.30) 50%, transparent 62%);
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 224, 160, 0.22) 50%, transparent 62%);
   transform: translateX(-120%);
   pointer-events: none;
+  z-index: 0;
   animation: home-gate-bypass-gleam 4.2s ease-in-out infinite;
 }
 @keyframes home-gate-bypass-gleam {
   0%, 60%   { transform: translateX(-120%); }
   88%, 100% { transform: translateX(120%); }
 }
-.home-gate-bypass-cta {
+
+/* ── Brass corner brackets ─────────────────────────────────────────
+   Thin L-shapes at each of the four corners. Read as the metal mounts
+   that nail an imperial plaque to a wall — pure ornament, but the
+   vocabulary that lifts the button from "fancy bar" to "actual plaque". */
+.home-gate-bypass-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  z-index: 3;
+}
+.home-gate-bypass-corner::before,
+.home-gate-bypass-corner::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(135deg, #f5cf7a 0%, #c9923f 100%);
+  box-shadow: 0 0 4px rgba(245, 200, 66, 0.55);
+}
+.home-gate-bypass-corner::before { width: 12px; height: 1.5px; }   /* horizontal arm */
+.home-gate-bypass-corner::after  { width: 1.5px; height: 12px; }   /* vertical arm */
+.home-gate-bypass-corner-tl { top: 4px; left: 4px;  }
+.home-gate-bypass-corner-tl::before { top: 0; left: 0; }
+.home-gate-bypass-corner-tl::after  { top: 0; left: 0; }
+.home-gate-bypass-corner-tr { top: 4px; right: 4px; }
+.home-gate-bypass-corner-tr::before { top: 0; right: 0; }
+.home-gate-bypass-corner-tr::after  { top: 0; right: 0; }
+.home-gate-bypass-corner-bl { bottom: 4px; left: 4px; }
+.home-gate-bypass-corner-bl::before { bottom: 0; left: 0; }
+.home-gate-bypass-corner-bl::after  { bottom: 0; left: 0; }
+.home-gate-bypass-corner-br { bottom: 4px; right: 4px; }
+.home-gate-bypass-corner-br::before { bottom: 0; right: 0; }
+.home-gate-bypass-corner-br::after  { bottom: 0; right: 0; }
+
+/* ── Wax seal (left) ───────────────────────────────────────────────
+   Big circular seal with a pulsing halo. Finally has the vertical
+   room it always needed (button is 64 px tall, seal is 46 px). */
+.home-gate-bypass-seal {
+  position: relative;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  transition: transform 0.08s ease-out;
+}
+.home-gate-bypass-btn:active .home-gate-bypass-seal { transform: scale(0.94); }
+.home-gate-bypass-seal-halo {
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(216, 50, 74, 0.55) 0%,
+    rgba(216, 50, 74, 0.22) 38%,
+    transparent             72%);
+  filter: blur(4px);
+  pointer-events: none;
+  animation: home-gate-bypass-halo 2.8s ease-in-out infinite;
+}
+@keyframes home-gate-bypass-halo {
+  0%, 100% { opacity: 0.6;  transform: scale(1);    }
+  50%      { opacity: 1;    transform: scale(1.16); }
+}
+.home-gate-bypass-seal-disc {
   position: relative;
   z-index: 1;
-  font-size: 14px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: var(--font-glyph), serif;
+  font-size: 26px;
+  line-height: 1;
+  color: #fff2cf;
+  background: radial-gradient(circle at 36% 28%,
+    #ec3e58 0%,
+    #b21833 60%,
+    #7c0f22 100%);
+  border: 1.5px solid #c9923f;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 210, 210, 0.6),
+    inset 0 -2px 5px rgba(70, 6, 16, 0.85),
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    0 0 12px rgba(216, 50, 74, 0.5);
+  text-shadow: 0 1px 2px rgba(80, 8, 18, 0.9);
+}
+
+/* ── Body (centre): stacked CTA + subtitle ──────────────────────── */
+.home-gate-bypass-body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 2px;
+}
+.home-gate-bypass-cta {
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.20em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #ffd97a;                            /* warmer bronze-gold */
+  color: #ffd97a;
   text-shadow:
     0 1px 2px rgba(0, 0, 0, 0.92),
-    0 0 12px rgba(245, 200, 66, 0.3);
+    0 0 14px rgba(245, 200, 66, 0.35);
   white-space: nowrap;
   line-height: 1;
 }
+.home-gate-bypass-sub {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(226, 201, 158, 0.85);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
 
-/* Thin ember underline — 1 px hairline along the bottom inner edge. The
-   ONLY motion piece that touches the bottom edge, so the strip stays
-   visually clean. Vermilion → amber → vermilion gradient, breathes on
-   a 3 s cycle. */
+/* ── Count plaque (right) ──────────────────────────────────────────
+   A small gold-bronze tablet stamped into the right edge. The big
+   number is the dominant signal; LEFT label sits below as a quiet tag. */
+.home-gate-bypass-count-plaque {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  min-width: 42px;
+  padding: 4px 8px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #f5cf7a 0%, #c8923a 100%);
+  border: 1px solid #5a3818;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.7),
+    inset 0 -2px 3px rgba(80, 40, 16, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(245, 200, 66, 0.32);
+}
+.home-gate-bypass-count-num {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+  color: #2a1408;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55);
+}
+.home-gate-bypass-count-lbl {
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700;
+  font-size: 8px;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(42, 20, 8, 0.85);
+}
+
+/* ── Ember underline ──────────────────────────────────────────────
+   1 px hairline along the bottom inner edge, vermilion → amber →
+   vermilion, breathes on a 3 s cycle. Now that the plaque is tall it
+   sits inside its own visual footer line instead of overlapping the
+   text the way it did on the thin-strip versions. */
 .home-gate-bypass-ember {
   position: absolute;
-  left: 8%; right: 8%; bottom: 1px;
+  left: 22px; right: 22px; bottom: 4px;
   height: 1px;
   background: linear-gradient(90deg,
     transparent              0%,
     rgba(216,  50,  74, 0.6)  18%,
-    rgba(245, 200,  66, 0.85) 50%,
+    rgba(245, 200,  66, 0.9)  50%,
     rgba(216,  50,  74, 0.6)  82%,
     transparent            100%);
   filter: blur(0.4px);
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.75;
   z-index: 2;
   animation: home-gate-bypass-ember 3s ease-in-out infinite;
 }
@@ -19891,11 +20002,13 @@ button.pl-leader.pl-leader-clickable:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .home-gate-bypass-btn,
-  .home-gate-bypass-center::after,
+  .home-gate-bypass-btn::before,
+  .home-gate-bypass-seal-halo,
   .home-gate-bypass-ember { animation: none; }
-  .home-gate-bypass-center::after { opacity: 0; }
+  .home-gate-bypass-btn::before { opacity: 0; }
 }
-.vfx-disabled .home-gate-bypass-center::after,
+.vfx-disabled .home-gate-bypass-btn::before,
+.vfx-disabled .home-gate-bypass-seal-halo,
 .vfx-disabled .home-gate-bypass-ember { display: none; }
 .vfx-disabled .home-gate-bypass-btn { animation: none; }
 .home-mb-icon {

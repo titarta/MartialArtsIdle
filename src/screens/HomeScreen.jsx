@@ -203,24 +203,33 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
       onClick={onUse}
       aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
     >
-      {/* Three-zone "Vermilion Edict Slip" layout designed FOR the thin
-          .home-bar-wrap strip the button overlays. Each zone fills the
-          strip's full height; nothing overflows or relies on chrome that
-          a 40 px wax seal can't fit. The 符 glyph and count number live
-          as the END SEALS on a horizontal decree, gold ribbon in between
-          carrying the action. */}
-      <span className="home-gate-bypass-cap home-gate-bypass-cap-left" aria-hidden="true">
-        <span className="home-gate-bypass-glyph">符</span>
+      {/* "Heaven's Vermilion Plaque" — the button now occupies the full
+          bottom-card height (~64 px on mobile), letting the design breathe
+          instead of being clipped by a thin strip. Layout: a big circular
+          wax SEAL on the left (符 talisman with a pulsing halo); a stacked
+          text block (CTA + subtitle) in the centre; a gold count plaque on
+          the right. Brass corner brackets at all 4 corners, an ember line
+          along the bottom, a soft vermilion outer pulse. */}
+      <span className="home-gate-bypass-corner home-gate-bypass-corner-tl" aria-hidden="true" />
+      <span className="home-gate-bypass-corner home-gate-bypass-corner-tr" aria-hidden="true" />
+      <span className="home-gate-bypass-corner home-gate-bypass-corner-bl" aria-hidden="true" />
+      <span className="home-gate-bypass-corner home-gate-bypass-corner-br" aria-hidden="true" />
+
+      <span className="home-gate-bypass-seal" aria-hidden="true">
+        <span className="home-gate-bypass-seal-halo" />
+        <span className="home-gate-bypass-seal-disc">符</span>
       </span>
-      <span className="home-gate-bypass-center">
+
+      <span className="home-gate-bypass-body">
         <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
+        <span className="home-gate-bypass-sub">{t('home.heavensPardon', { n: tokenCount })}</span>
       </span>
-      <span className="home-gate-bypass-cap home-gate-bypass-cap-right" aria-hidden="true">
-        <span className="home-gate-bypass-count">{`×${tokenCount}`}</span>
+
+      <span className="home-gate-bypass-count-plaque" aria-hidden="true">
+        <span className="home-gate-bypass-count-num">{tokenCount}</span>
+        <span className="home-gate-bypass-count-lbl">LEFT</span>
       </span>
-      {/* Thin ember underline that breathes on a 3 s cycle — the only
-          piece of overflow-style chrome left, intentionally a 1 px hairline
-          so it can't clip. Reads as "this decree is alive, ready to fire". */}
+
       <span className="home-gate-bypass-ember" aria-hidden="true" />
     </button>
   );
@@ -3250,11 +3259,6 @@ function HomeScreen({
                 </span>
               </button>
             )}
-            <GateBypassButton
-              gateRef={gateRef}
-              tokenCount={bypassTokenCount}
-              onUse={onUseBypassToken}
-            />
 
             <RealmProgressBar
               qiRef={qiRef}
@@ -3268,6 +3272,19 @@ function HomeScreen({
               peakStage={cultivation.isInPeakStage}
             />
           </div>
+
+          {/* Heaven's Pardon plaque — moved OUT of .home-bar-wrap so it can
+              anchor to .home-scene-bottom and overlay the whole bottom card
+              (gate readout row + qi bar slot) when the player is gated AND
+              has a token. Inside .home-bar-wrap it could only overlay the
+              thin qi-bar strip, which made the design feel cramped.
+              When the bypass is not eligible the component renders null,
+              so the gate readout + qi bar show normally. */}
+          <GateBypassButton
+            gateRef={gateRef}
+            tokenCount={bypassTokenCount}
+            onUse={onUseBypassToken}
+          />
 
         </div>
 
