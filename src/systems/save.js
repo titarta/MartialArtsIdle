@@ -157,6 +157,36 @@ export function wipeReincarnation() {
   const tree          = snapshot('mai_reincarnation_tree');
   const ownedLawsRaw  = snapshot('mai_owned_laws');
   const pinnedRecipes = snapshot('mai_pinned_recipes');
+
+  // ── Eternal Alchemy keystone: keep 1 Foundation Pill effect across rebirth ─
+  // Node description: "Keep 1 Foundation Pill effect through reincarnation.
+  // (The strongest one is preserved.)" Implemented here as a snapshot-then-
+  // re-seed step: while the tree owned set still contains 'eternal_alchemy'
+  // (the snapshot lookup is identity-safe — tree is restored later), pull
+  // the dying life's foundations off mai_furnace, pick the highest-magnitude
+  // entry, and stash it for re-seeding into the fresh furnace blob after
+  // wipeSave. If the keystone isn't owned, or the player has no foundations,
+  // preservedFoundation stays null and the new life starts with an empty
+  // Foundation row exactly as before.
+  let preservedFoundation = null;
+  try {
+    const ownedSet = tree ? new Set(JSON.parse(tree)) : new Set();
+    if (ownedSet.has('eternal_alchemy')) {
+      const furnaceRaw = snapshot('mai_furnace');
+      if (furnaceRaw) {
+        const furnace = JSON.parse(furnaceRaw);
+        const foundations = Array.isArray(furnace?.foundations) ? furnace.foundations : [];
+        // Reduce on magnitude with a deterministic tiebreaker (first wins,
+        // matching slot order — players associate slot 1 with their "main"
+        // foundation when ties occur naturally on the same heat tier).
+        preservedFoundation = foundations.reduce((best, f) => {
+          if (!f || typeof f.id !== 'string') return best;
+          if (!best) return f;
+          return (f.magnitude ?? 0) > (best.magnitude ?? 0) ? f : best;
+        }, null);
+      }
+    }
+  } catch { /* leave preservedFoundation null on any parse error */ }
   // Cookie-Clicker stats — lifetime + sinceTs survive reincarnation; the
   // run bucket is wiped to zero and the player starts the new life with
   // fresh per-run counters.
@@ -217,6 +247,29 @@ export function wipeReincarnation() {
   restore('mai_pinned_recipes', pinnedRecipes);
   // mai_active_law was removed by wipeSave; leave it absent so activeLaw
   // derives to null on next load.
+
+  // ── Eternal Alchemy keystone re-seed ────────────────────────────────────
+  // If the dying life had a foundation worth preserving AND eternal_alchemy
+  // was anchored, write a minimal mai_furnace blob with just that foundation
+  // sitting in slot 1. defaultFurnace() + migrate() (in src/data/furnace.js)
+  // fill every other field with the empty-life defaults on load, so we only
+  // need to carry the foundations array here. grantedAt is bumped to "now"
+  // so the new life's foundation feels like a fresh anchor in the UI rather
+  // than a stale timestamp from the prior life. Version is pinned to 1
+  // (the only existing VERSION today); migrate() will lift this if the
+  // schema bumps later.
+  if (preservedFoundation) {
+    try {
+      localStorage.setItem('mai_furnace', JSON.stringify({
+        v: 1,
+        foundations: [{
+          id:        preservedFoundation.id,
+          magnitude: preservedFoundation.magnitude,
+          grantedAt: Date.now(),
+        }],
+      }));
+    } catch { /* non-fatal — the next life simply starts with empty slots */ }
+  }
 }
 
 // ─── Technique slots ──────────────────────────────────────────────────────────
