@@ -910,3 +910,73 @@
   background: rgba(80, 20, 25, 0.18);
   opacity: 1;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   Pill Refinement — Meridian Furnace 3-layer alchemy
+   (added 2026-06-09 with the furnace minigame v1)
+   ════════════════════════════════════════════════════════════════════════ */
+.pr-screen { display: flex; flex-direction: column; gap: 12px; padding: 12px; color: var(--mg-cream); font-size: 12.5px; }
+
+.pr-heat { display: flex; flex-direction: column; gap: 4px; }
+.pr-heat-label { display: flex; gap: 10px; align-items: baseline; font-size: 11px; }
+.pr-heat-amt { font-family: 'Cinzel', Georgia, serif; color: var(--mg-amber-bright); font-size: 14px; font-variant-numeric: tabular-nums; }
+.pr-heat-regen { color: var(--mg-cream-soft); opacity: 0.75; margin-left: auto; }
+.pr-heat-track { height: 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--mg-line); overflow: hidden; }
+.pr-heat-fill { height: 100%; background: linear-gradient(90deg, #c8362a, var(--mg-amber-bright)); transition: width 0.4s linear; }
+
+.pr-cauldrons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.pr-cauldron { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--mg-line); background: rgba(0, 0, 0, 0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; }
+.pr-cauldron-locked { opacity: 0.35; }
+.pr-cauldron-cooking { border-color: var(--mg-amber-bright); background: rgba(220, 175, 110, 0.08); }
+.pr-cauldron-idx { font-family: 'Cinzel', Georgia, serif; color: var(--mg-amber-bright); font-size: 12px; }
+.pr-cauldron-layer { font-size: 9px; letter-spacing: 0.06em; color: var(--mg-cream-soft); }
+.pr-cauldron-time { font-size: 10.5px; color: var(--mg-cream); font-variant-numeric: tabular-nums; }
+.pr-cauldron-heat { font-size: 9px; color: #f5b95c; opacity: 0.7; }
+.pr-cauldron-idle { font-size: 10px; color: var(--mg-cream-soft); opacity: 0.55; }
+.pr-cauldron-locked-text { font-size: 9px; color: var(--mg-cream-soft); opacity: 0.5; }
+
+.pr-foundations { padding: 8px 10px; border-radius: 10px; border: 1px dashed var(--mg-line); background: rgba(0, 0, 0, 0.18); font-size: 11px; }
+.pr-foundation-chip { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: rgba(220, 175, 110, 0.18); border: 1px solid var(--mg-line-strong); color: var(--mg-amber-bright); }
+.pr-empty { color: var(--mg-cream-soft); opacity: 0.55; font-style: italic; }
+
+.pr-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--mg-line); padding-bottom: 4px; }
+.pr-tabs button { padding: 6px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream-soft); cursor: pointer; font: inherit; font-size: 12px; }
+.pr-tabs button.pr-tab-on { background: rgba(220, 175, 110, 0.18); color: var(--mg-amber-bright); border-color: var(--mg-line-strong); }
+
+.pr-tab { display: flex; flex-direction: column; gap: 10px; }
+.pr-tab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.pr-tab-head h3 { font-family: 'Cinzel', Georgia, serif; font-size: 14px; color: var(--mg-amber-bright); margin: 0; }
+.pr-tab-cook { font-size: 10.5px; color: var(--mg-cream-soft); }
+
+.pr-pantry { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; max-height: 200px; overflow-y: auto; padding: 6px; border-radius: 8px; border: 1px solid var(--mg-line); background: rgba(0, 0, 0, 0.22); }
+.pr-pantry-tile { padding: 6px 4px; border-radius: 8px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; transition: background 0.12s, border-color 0.12s; }
+.pr-pantry-tile:hover { border-color: var(--mg-line-strong); background: rgba(220, 175, 110, 0.10); }
+.pr-pantry-tile:disabled { opacity: 0.4; cursor: not-allowed; }
+.pr-pantry-tile-pill { cursor: default; gap: 4px; padding: 8px; }
+.pr-pantry-tile-pill:hover { background: rgba(255, 240, 200, 0.04); border-color: var(--mg-line); }
+.pr-pantry-sprite { width: 36px; height: 36px; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: contain; }
+.pr-pantry-orb { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 12px currentColor; opacity: 0.7; }
+.pr-pantry-id { font-size: 9.5px; text-align: center; color: var(--mg-cream); text-transform: capitalize; line-height: 1.1; }
+.pr-pantry-count { font-size: 10px; color: var(--mg-amber-bright); font-variant-numeric: tabular-nums; }
+.pr-pantry-actions { display: flex; gap: 4px; margin-top: 4px; }
+.pr-pantry-actions button { font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.05); color: var(--mg-cream); cursor: pointer; }
+.pr-pantry-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pr-slots { display: flex; gap: 8px; justify-content: center; }
+.pr-slot { flex: 1; max-width: 100px; aspect-ratio: 1; border-radius: 12px; border: 2px dashed var(--mg-line); background: rgba(0, 0, 0, 0.22); display: grid; place-items: center; cursor: pointer; transition: border-color 0.12s; }
+.pr-slot:hover { border-color: var(--mg-line-strong); }
+.pr-slot-empty { font-size: 24px; color: var(--mg-cream-soft); opacity: 0.45; }
+.pr-slot-filled { font-size: 10.5px; color: var(--mg-amber-bright); text-align: center; padding: 6px; text-transform: capitalize; line-height: 1.2; }
+
+.pr-predict { padding: 8px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.22); border: 1px solid var(--mg-line); font-size: 11px; color: var(--mg-cream); }
+.pr-predict strong { color: var(--mg-amber-bright); }
+.pr-predict-sub { margin-top: 4px; font-size: 10.5px; color: var(--mg-cream-soft); opacity: 0.85; }
+
+.pr-heat-pick { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.pr-heat-pick-lbl { font-size: 11px; color: var(--mg-cream-soft); margin-right: 4px; }
+.pr-heat-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream); cursor: pointer; font-size: 10.5px; }
+.pr-heat-btn-on { background: rgba(220, 175, 110, 0.20); color: var(--mg-amber-bright); border-color: var(--mg-line-strong); }
+.pr-heat-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.pr-fire { padding: 10px; border-radius: 10px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mg-void); background: linear-gradient(180deg, var(--mg-amber-bright), var(--mg-amber)); border: 1px solid rgba(255, 220, 130, 0.65); cursor: pointer; box-shadow: 0 4px 16px rgba(220, 175, 110, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+.pr-fire:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }

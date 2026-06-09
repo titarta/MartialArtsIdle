@@ -14,6 +14,7 @@ import {
   channelPerformance, canChannel, clearBasket,
   nextPlotCost, expandPlot, discoveredCount, growLabel,
 } from '../../data/spiritGarden';
+import useFurnace from '../../hooks/useFurnace';
 
 const BASE = import.meta.env.BASE_URL;
 const url = (s) => (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
@@ -115,6 +116,19 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   const doSellAll = () => {
     const r = sellBasket(garden);
     if (r.ok) { commit(r.garden); flash(`Sold basket. +${r.gained} Dew`); }
+  };
+  // Transfer the basket's plants into the Meridian Furnace pantry. The
+  // furnace's useFurnace hook reads from the same localStorage key (the
+  // App-level instance ticks heat regen in parallel; this seam just calls
+  // sendPlantsFromBasket and lets persistence reconcile).
+  const furnaceSeam = useFurnace();
+  const doSendToFurnace = () => {
+    if (basketCount(garden) === 0) { flash('Basket is empty'); return; }
+    furnaceSeam.sendPlantsFromBasket(garden.basket, () => {
+      // Clear the garden basket — the plants now live in the furnace pantry.
+      commit({ ...garden, basket: {} });
+      flash('Sent plants to the Furnace');
+    });
   };
   const doBrew = (rid) => {
     const r = brew(garden, rid, undefined, treeMods.durationMult);
@@ -333,6 +347,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               </div>
               <div className="gd-basket-actions">
                 <button type="button" className="mg-btn mg-btn-ghost" onClick={doSellAll}>{t('garden.sellAll', { n: bVal })}</button>
+                <button type="button" className="mg-btn mg-btn-ghost" onClick={doSendToFurnace}>Send to Furnace</button>
                 <button type="button" className="mg-btn mg-btn-primary" disabled={!channelOK} onClick={() => setCash(true)}>
                   {t('garden.channel')}
                 </button>

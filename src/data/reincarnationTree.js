@@ -76,6 +76,26 @@ export const NODES = [
     cost: 2, prereqs: ['furnace'], col: 5, row: 3, comingSoon: true,
     description: 'Strengthens the rewards of every Hidden Art. (Coming soon — effect being defined alongside the minigames.)' },
 
+  // ── Alchemy (Furnace cauldron capacity) ─────────────────────────────────
+  // Each cauldron node grants +1 parallel cook slot in the Meridian Furnace.
+  // The furnace minigame starts with 1 cauldron (unlocked alongside the
+  // p_meridian_furnace producer at realm 7); the rest are prestige-gated.
+  { id: 'cauldron_2', label: 'Second Cauldron', glyph: '鼎', branch: 'The Crucible',
+    cost: 2, prereqs: ['furnace'], col: 6, row: 3,
+    description: '+1 cauldron in the Meridian Furnace (2 parallel cooks).' },
+  { id: 'cauldron_3', label: 'Third Cauldron', glyph: '鼎', branch: 'The Crucible',
+    cost: 4, prereqs: ['cauldron_2'], col: 6, row: 4,
+    description: '+1 cauldron in the Meridian Furnace (3 parallel cooks).' },
+  { id: 'cauldron_4', label: 'Fourth Cauldron', glyph: '鼎', branch: 'The Crucible',
+    cost: 8, prereqs: ['cauldron_3'], col: 6, row: 5,
+    description: '+1 cauldron in the Meridian Furnace (4 parallel cooks).' },
+  { id: 'cauldron_5', label: 'Fifth Cauldron', glyph: '鼎', branch: 'The Crucible',
+    cost: 16, prereqs: ['cauldron_4'], col: 6, row: 6,
+    description: '+1 cauldron in the Meridian Furnace (5 parallel cooks).' },
+  { id: 'eternal_alchemy', label: 'Eternal Alchemy', glyph: '丹', branch: 'The Crucible',
+    cost: 32, prereqs: ['cauldron_5'], col: 6, row: 7, keystone: true,
+    description: 'Keep 1 Foundation Pill effect through reincarnation. (The strongest one is preserved.)' },
+
   // Qi Crystal line — its own arm off the root
   { id: 'crystal', label: 'Crystalline Focus', glyph: '晶', branch: 'The Crucible',
     cost: 2, prereqs: ['n_1'], col: 4, row: 0, comingSoon: true,

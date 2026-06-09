@@ -31,6 +31,7 @@ import AboutScreen    from './screens/AboutScreen';
 import useReincarnationKarma from './hooks/useReincarnationKarma';
 import useReincarnationTree  from './hooks/useReincarnationTree';
 import { useDiscipleMergeProvider, DiscipleMergeContext } from './hooks/useDiscipleMerge';
+import useFurnace from './hooks/useFurnace';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
 import useCultivation from './hooks/useCultivation';
 import useQiCrystal  from './hooks/useQiCrystal';
@@ -251,6 +252,14 @@ function AppInner() {
   }, [currentEvent]);
   const producers       = useProducers();
   const upgrades        = useUpgrades();
+  // Meridian Furnace (alchemy minigame) — uses pantry of plants, materials,
+  // pills, and Foundation slots. Heat regen / cap scale with the
+  // p_meridian_furnace producer count; cauldron count comes from the
+  // Eternal Tree Alchemy branch (1 + per node).
+  const furnace         = useFurnace({
+    furnaceCount:  producers.getOwned?.('p_meridian_furnace') ?? 0,
+    cauldronCount: tree.modifiers.furnaceCauldronCount ?? 1,
+  });
 
   // Blood Lotus Shop — "Disciple's Diligence" auto-buy tick. Declared
   // here (after `producers` enters scope) so the effect's dependency
@@ -466,10 +475,14 @@ function AppInner() {
     // (default 0). The bonus flows through per-producer mults and all
     // downstream global mults the same way the producer's own base does.
     const flatPerUnit = qiSparks.producerFlatPerUnitRef?.current ?? 0;
+    // Foundation Pill permanent qi/s buff (from the Meridian Furnace alchemy
+    // minigame). Aggregated multiplicatively into the global rate so the
+    // bonus flows through every producer. Default 1 = no buff.
+    const foundationQiMult = furnace.foundationMods?.qiPerSecMult ?? 1;
     const effective = producers.getRate(perProducer, flatPerUnit, {
       selfSynergyPct:  tree.modifiers.producerSelfSynergyPct  ?? 0,
       crossSynergyPct: tree.modifiers.producerCrossSynergyPct ?? 0,
-    });
+    }) * foundationQiMult;
     cultivation.producerRateRef.current = effective;
     // Trinity Convergence + producer_pair_global_mult — global multipliers
     // from legendary sparks, folded into the rate calc downstream.
@@ -479,7 +492,7 @@ function AppInner() {
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult, furnace.foundationMods]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Disciple Merit settle-on-change — when the disciple producer count
   // changes, fold the Merit accumulated SO FAR (using the prior count) into

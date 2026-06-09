@@ -186,6 +186,20 @@ export default function useReincarnationTree({ karma, spendKarma } = {}) {
       gardenGrowTimeMult:        has('soil')    ? 0.8 : 1,
       gardenRebirthSeed:         has('bloom'),
 
+      // ── Meridian Furnace (Alchemy) ─────────────────────────────────────
+      // Cauldron capacity. Default 1 (from realm-7 producer unlock); each
+      // Alchemy-branch node grants +1 up to MAX_CAULDRONS (5).
+      // Read by useFurnace + the FurnaceScreen UI.
+      furnaceCauldronCount: 1
+        + (has('cauldron_2') ? 1 : 0)
+        + (has('cauldron_3') ? 1 : 0)
+        + (has('cauldron_4') ? 1 : 0)
+        + (has('cauldron_5') ? 1 : 0),
+      // Keystone: when true, the strongest active Foundation Pill effect
+      // persists across reincarnation (chosen at death by descending
+      // magnitude). Resets to 1-slot persisted.
+      eternalAlchemyUnlocked: has('eternal_alchemy'),
+
       // ── Qi Crystal ──────────────────────────────────────────────────────
       crystalQiBonusMult:  1, // crystal node is comingSoon (no flat bonus today)
       crystalFeedCostMult: has('lattice') ? 0.8 : 1,
