@@ -19728,13 +19728,16 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 11px;
-  padding: 4px 16px;
+  gap: 14px;
+  padding: 4px 16px 4px 14px;
   margin: 0;
   border: 1px solid #c9923f;                 /* aged bronze frame */
   border-radius: 11px;
-  /* Deep lacquer face + warm top sheen — an imperial decree, not a blue bar. */
+  /* Deep lacquer face + warm top sheen + a tiny vermilion ink stain on the
+     left where the wax seal sits, so the decree-paper metaphor extends past
+     the seal itself into the surface around it. */
   background:
+    radial-gradient(circle at 9% 50%, rgba(216, 50, 74, 0.10) 0%, transparent 30%),
     linear-gradient(180deg, rgba(255, 226, 170, 0.10) 0%, rgba(255, 226, 170, 0) 16%),
     linear-gradient(180deg, #2c151a 0%, #190c10 100%);
   color: #f3e7cf;
@@ -19747,8 +19750,30 @@ button.pl-leader.pl-leader-clickable:focus-visible {
     inset 0 0 0 1px rgba(60, 30, 18, 0.7),
     inset 0 -6px 14px rgba(0, 0, 0, 0.5),
     0 4px 14px rgba(0, 0, 0, 0.55),
-    0 0 16px rgba(201, 146, 63, 0.18);
+    0 0 20px rgba(216, 50, 74, 0.18);        /* faint vermilion outer pulse */
   transition: transform 0.08s ease-out, filter 0.15s, box-shadow 0.15s;
+  animation: home-gate-bypass-aware 3.6s ease-in-out infinite;
+}
+/* Whole-button breath. The vermilion outer halo pulses gently so the
+   decree claims attention even when the player isn't actively looking at
+   the bottom bar. Period chosen NOT to match the cultivator's aura
+   (2.4s) or the seal halo (2.8s) so the three signals stay distinct
+   instead of locking into one big throb. */
+@keyframes home-gate-bypass-aware {
+  0%, 100% { box-shadow:
+    inset 0 1px 0 rgba(255, 220, 160, 0.22),
+    inset 0 0 0 1px rgba(60, 30, 18, 0.7),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.5),
+    0 4px 14px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(216, 50, 74, 0.16);
+  }
+  50%      { box-shadow:
+    inset 0 1px 0 rgba(255, 220, 160, 0.28),
+    inset 0 0 0 1px rgba(60, 30, 18, 0.7),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.5),
+    0 5px 18px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(216, 50, 74, 0.34);
+  }
 }
 /* Slow gold gleam sweeping the lacquer — telegraphs a precious, single-use
    heavenly decree (sits under the text via z-index so type stays crisp). */
@@ -19757,7 +19782,7 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(105deg, transparent 38%, rgba(255, 224, 160, 0.26) 50%, transparent 62%);
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 224, 160, 0.28) 50%, transparent 62%);
   transform: translateX(-120%);
   animation: home-gate-bypass-gleam 4.2s ease-in-out infinite;
 }
@@ -19767,41 +19792,126 @@ button.pl-leader.pl-leader-clickable:focus-visible {
 }
 .home-gate-bypass-btn:hover {
   filter: brightness(1.07);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 220, 160, 0.3),
-    inset 0 0 0 1px rgba(60, 30, 18, 0.7),
-    inset 0 -6px 14px rgba(0, 0, 0, 0.5),
-    0 5px 18px rgba(0, 0, 0, 0.6),
-    0 0 22px rgba(201, 146, 63, 0.34);
 }
 .home-gate-bypass-btn:active { transform: translateX(-50%) scale(0.975); }
 
-/* Heaven's Pardon — a vermillion wax seal stamped with 符 (heavenly talisman)
-   in the brush font, echoing the BREAKTHROUGH edict's seal language. */
+/* Bottom ember channel — thin horizontal vermilion → amber → vermilion
+   gradient that breathes on a 3s cycle. Sells the "this thing is a LIVE
+   decree, ready to fire" feeling. Sits behind text/seal via z-index 0. */
+.home-gate-bypass-ember {
+  position: absolute;
+  left: 8%; right: 8%; bottom: 2px;
+  height: 1.5px;
+  background: linear-gradient(90deg,
+    transparent              0%,
+    rgba(216,  50,  74, 0.55) 18%,
+    rgba(245, 200,  66, 0.85) 50%,
+    rgba(216,  50,  74, 0.55) 82%,
+    transparent            100%);
+  filter: blur(0.4px);
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 0;
+  animation: home-gate-bypass-ember 3s ease-in-out infinite;
+}
+@keyframes home-gate-bypass-ember {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+/* Heaven's Pardon — a vermilion wax seal stamped with 符 in the brush
+   font, echoing the BREAKTHROUGH edict's seal language. Restructured
+   into a halo + glyph + pip stack so the count badge can ride the rim. */
 .home-gate-bypass-seal {
   position: relative;
   z-index: 1;
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  font-family: var(--font-glyph), serif;
-  font-size: 18px;
-  line-height: 1;
-  color: #ffe9c2;
-  background: radial-gradient(circle at 38% 30%, #d8324a 0%, #a81730 60%, #7c0f22 100%);
-  border: 1.5px solid #c9923f;
-  box-shadow:
-    inset 0 1px 2px rgba(255, 200, 200, 0.45),
-    inset 0 -2px 5px rgba(70, 6, 16, 0.85),
-    0 1px 3px rgba(0, 0, 0, 0.5);
-  text-shadow: 0 1px 2px rgba(80, 8, 18, 0.9);
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
   transition: transform 0.08s ease-out;
 }
 .home-gate-bypass-btn:active .home-gate-bypass-seal { transform: scale(0.92); }
+
+/* Pulsing vermilion halo around the wax seal. Period 2.8s — DIFFERENT
+   from the button-wide 3.6s breath and the bottom ember's 3s, so the
+   three signals layer rather than lock-step. */
+.home-gate-bypass-seal-halo {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(216, 50, 74, 0.45) 0%,
+    rgba(216, 50, 74, 0.20) 38%,
+    transparent             72%);
+  filter: blur(3px);
+  pointer-events: none;
+  animation: home-gate-bypass-halo 2.8s ease-in-out infinite;
+}
+@keyframes home-gate-bypass-halo {
+  0%, 100% { opacity: 0.55; transform: scale(1);    }
+  50%      { opacity: 0.95; transform: scale(1.14); }
+}
+
+/* The actual wax-stamp disc. Slightly larger and hotter than before
+   (40px now, brighter vermilion core, tighter highlight) so it reads
+   as freshly pressed rather than "a small icon". */
+.home-gate-bypass-seal-glyph {
+  position: relative;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: var(--font-glyph), serif;
+  font-size: 22px;
+  line-height: 1;
+  color: #fff2cf;
+  background: radial-gradient(circle at 36% 28%,
+    #ec3e58 0%,
+    #b21833 60%,
+    #7c0f22 100%);
+  border: 1.5px solid #c9923f;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 210, 210, 0.55),
+    inset 0 -2px 5px rgba(70, 6, 16, 0.85),
+    0 1px 3px rgba(0, 0, 0, 0.55),
+    0 0 10px rgba(216, 50, 74, 0.45);
+  text-shadow: 0 1px 2px rgba(80, 8, 18, 0.9);
+}
+
+/* Gold ammo-style stack pip on the seal corner. Carries the count badge
+   into the player's eyeline so they don't have to read the subtitle.
+   Bronze-gold gradient + dark hairline border = the imperial coin
+   vocabulary used elsewhere in the game's chrome. */
+.home-gate-bypass-seal-pip {
+  position: absolute;
+  z-index: 2;
+  bottom: -3px;
+  right: -4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #f5cf7a 0%, #c8923a 100%);
+  border: 1px solid #5a3818;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 800;
+  font-size: 10.5px;
+  line-height: 1;
+  color: #2a1408;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.7),
+    inset 0 -1px 0 rgba(80, 40, 16, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
 .home-gate-bypass-body {
   position: relative;
   z-index: 1;
@@ -19813,12 +19923,14 @@ button.pl-leader.pl-leader-clickable:focus-visible {
   line-height: 1.16;
 }
 .home-gate-bypass-cta {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #f4cd78;                            /* bronze-gold */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  color: #ffd97a;                            /* warmer bronze-gold */
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(245, 200, 66, 0.28);
 }
 .home-gate-bypass-sub {
   font-size: 10px;
@@ -19829,9 +19941,16 @@ button.pl-leader.pl-leader-clickable:focus-visible {
 }
 /* Respect the player's motion / VFX choices. */
 @media (prefers-reduced-motion: reduce) {
-  .home-gate-bypass-btn::after { animation: none; opacity: 0; }
+  .home-gate-bypass-btn,
+  .home-gate-bypass-btn::after,
+  .home-gate-bypass-seal-halo,
+  .home-gate-bypass-ember { animation: none; opacity: 1; }
+  .home-gate-bypass-btn::after { opacity: 0; }
 }
-.vfx-disabled .home-gate-bypass-btn::after { display: none; }
+.vfx-disabled .home-gate-bypass-btn::after,
+.vfx-disabled .home-gate-bypass-seal-halo,
+.vfx-disabled .home-gate-bypass-ember { display: none; }
+.vfx-disabled .home-gate-bypass-btn { animation: none; }
 .home-mb-icon {
   color: #ffd66b;
   font-size: 22px;

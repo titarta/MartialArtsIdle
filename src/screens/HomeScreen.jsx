@@ -203,11 +203,24 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
       onClick={onUse}
       aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
     >
-      <span className="home-gate-bypass-seal" aria-hidden="true">符</span>
+      {/* Wax seal stack: pulsing vermilion halo, the 符 talisman stamp itself,
+          and a small gold ammo-style pip carrying the stack count. The pip
+          lifts the "how many do I have" signal out of the subtitle and into
+          the player's immediate eyeline so it survives across glances. */}
+      <span className="home-gate-bypass-seal" aria-hidden="true">
+        <span className="home-gate-bypass-seal-halo" />
+        <span className="home-gate-bypass-seal-glyph">符</span>
+        <span className="home-gate-bypass-seal-pip">{tokenCount}</span>
+      </span>
       <span className="home-gate-bypass-body">
         <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
         <span className="home-gate-bypass-sub">{t('home.heavensPardon', { n: tokenCount })}</span>
       </span>
+      {/* Thin ember channel along the bottom edge — vermilion → amber →
+          vermilion, breathes on a 3s cycle so the decree reads as ALIVE,
+          not a static graphic. Echoes the cultivator's crimson aura halo
+          rhythm without competing with it (different period). */}
+      <span className="home-gate-bypass-ember" aria-hidden="true" />
     </button>
   );
 }
@@ -289,7 +302,7 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
       <HQTablet
         state="active"
         kicker={t('home.channeling', { defaultValue: 'Channeling' })}
-        offer="×1.5 QI/S"
+        offer={t('home.boostOffer')}
         cta={adBoostRemaining}
         title={t('home.heavenlyQiActive', { defaultValue: 'Heavenly Qi active' })}
       />
@@ -303,7 +316,7 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
       <HQTablet
         state="cd"
         kicker={t('home.returnsAt', { defaultValue: 'Returns in' })}
-        offer="— REST —"
+        offer={t('home.restOffer')}
         cta={formatCooldown(ad.cooldownRemaining)}
         title={formatCooldown(ad.cooldownRemaining)}
       />
@@ -321,8 +334,8 @@ function HeavenlyQiButton({ ad, adBoostActive, adBoostRemaining, maxed }) {
     <HQTablet
       state="ready"
       kicker={t('home.heavenlyQi', { defaultValue: 'Heavenly Qi' })}
-      offer="×1.5 QI/S"
-      offerDur="30 MIN"
+      offer={t('home.boostOffer')}
+      offerDur={t('home.boostDur')}
       cta={isLoading
         ? t('home.channeling', { defaultValue: 'Channeling…' })
         : t('home.tapToPetition', { defaultValue: 'Tap to petition' })}
@@ -1185,7 +1198,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
           <span className="home-crystal-tag home-crystal-tag-btn home-crystal-tag-locked">
             {t('home.crystalTag')}
             <span className="home-crystal-tag-divider">·</span>
-            <span className="home-crystal-tag-level" role="img" aria-label="Locked">🔒</span>
+            <span className="home-crystal-tag-level" role="img" aria-label={t('common.locked')}>🔒</span>
           </span>
           <div className="home-crystal-img-wrap">
             <img
@@ -1225,11 +1238,11 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
             e.stopPropagation();
             onOpenDetail?.();
           }}
-          aria-label="Crystal details"
+          aria-label={t('home.crystalDetailsLabel')}
         >
           {t('home.crystalTag')}
           <span className="home-crystal-tag-divider">·</span>
-          <span className="home-crystal-tag-level">Lv {level}</span>
+          <span className="home-crystal-tag-level">{t('home.levelTag', { n: level })}</span>
         </button>
         <div
           className="home-crystal-img-wrap"
@@ -1455,6 +1468,7 @@ function meridianPath(x1, y1, x2, y2) {
  * a render-layer decoration — `data-num` stays numeric.
  */
 function PatternDot({ dot, isCurrent, isTapped, onClick }) {
+  const { t } = useTranslation('ui');
   const phase = isTapped ? 'tapped' : isCurrent ? 'current' : 'waiting';
   // Tapped → 印 seal. Waiting/current → Chinese numeral. Fallback to "?" if
   // someone bumps dot counts above the numeral pool without expanding it.
@@ -1468,7 +1482,7 @@ function PatternDot({ dot, isCurrent, isTapped, onClick }) {
       onClick={onClick}
       data-num={dot.num}
       data-sfx="none"
-      aria-label={`Acupressure node ${dot.num}`}
+      aria-label={t('home.acupressureNode', { n: dot.num })}
     >
       <span className="pc-dot-glyph" aria-hidden="true">{glyph}</span>
     </button>
@@ -1555,7 +1569,7 @@ function PatternClickOverlay({ pattern, onComplete, rateRef, spawnVFX }) {
   }, [pattern.dots.length, pattern.burstSeconds, rateRef, spawnVFX, onComplete]);
 
   return (
-    <div className={`pc-overlay pc-overlay-${phase}`} aria-label="Tracing Meridians challenge">
+    <div className={`pc-overlay pc-overlay-${phase}`} aria-label={t('home.tracingMeridiansAria')}>
 
       {/* Atmospheric title strip — brush 气脉 + Cinzel subtitle anchored at
           the very top of the overlay so the mechanic identifies itself. */}
@@ -1615,6 +1629,7 @@ function PatternClickOverlay({ pattern, onComplete, rateRef, spawnVFX }) {
  * if the player taps the prompt before its window closes.
  */
 function PatternClickPrompt({ prompt, onAccept, onDismiss }) {
+  const { t } = useTranslation('ui');
   const [phase, setPhase] = useState('alive');
   const phaseRef = useRef('alive');
 
@@ -1660,7 +1675,7 @@ function PatternClickPrompt({ prompt, onAccept, onDismiss }) {
       style={{ left: `${prompt.x}%`, top: `${prompt.y}%` }}
       onClick={handleClick}
       data-sfx="none"
-      aria-label="Pattern spark — tap to begin"
+      aria-label={t('home.patternSparkAria')}
     >
       <span className="pc-prompt-glyph" aria-hidden="true">
         <span className="pc-prompt-dot pc-prompt-dot-1" />
@@ -1896,6 +1911,7 @@ function releaseSparkAttention(id) {
  * Phases: 'alive' → 'expiring' (last 3s) → 'collected' | 'expired'
  */
 function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
+  const { t } = useTranslation('ui');
   const [phase, setPhase] = useState('alive');
   const phaseRef = useRef('alive');
 
@@ -1977,7 +1993,7 @@ function DivineQiOrb({ orb, onResolve, onSpawnFloater, rateRef }) {
       style={{ left: `${orb.x}%`, top: `${orb.y}%` }}
       onClick={handleClick}
       data-sfx="none"
-      aria-label="Divine Qi orb"
+      aria-label={t('home.divineQiOrbAria')}
     >
       <img className="divine-qi-orb-img" src={`${BASE}ui/qi_divine.png`} alt="" draggable="false" />
     </button>
@@ -2996,7 +3012,7 @@ function HomeScreen({
               <button
                 className="home-sel-btn home-sel-btn-spark"
                 onClick={onReviewSparkQueue}
-                title="Review queued spark moments"
+                title={t('home.reviewSparksTitle')}
               >
                 <span className="home-sel-btn-icon">✦</span>
                 <span className="home-sel-btn-label">
@@ -3207,7 +3223,7 @@ function HomeScreen({
               <button
                 className="home-major-breakthrough-btn home-mb-edict"
                 onClick={cultivation.confirmMajorBreakthrough}
-                aria-label={`Breakthrough to ${cultivation.nextRealmName ?? 'next realm'}`}
+                aria-label={t('home.breakthroughToAria', { realm: cultivation.nextRealmName ?? t('home.nextRealmFallback') })}
               >
                 {/* Inner parchment-cream panel inside the brass frame.
                     Holds the calligraphic 突 watermark, mandala corner
