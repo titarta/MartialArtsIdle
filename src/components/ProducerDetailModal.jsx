@@ -65,14 +65,12 @@ export default function ProducerDetailModal({
   // tiers added later (e.g. transcended) don't drop other producers to Bronze.
   const sprite    = resolveSprite(producer, spriteIdx) ?? '◆';
   const minigame  = getMinigame(producer.id);
-  // Mythic-OR-HIGHER tier OR an Eternal Tree node (roster/garden/furnace)
-  // opens the art. Hardcoding "=== 'mythic'" caused the disciple to lose
-  // minigame access at Transcended — but tier progression is monotone, you
-  // never lose what a lower tier unlocked. Compare by tier-idx so any tier
-  // at or above Mythic keeps the gate open.
-  const mythicIdx        = SPRITE_TIERS.find(t => t.name === 'mythic')?.idx ?? 3;
-  const reachedMythic    = (tier?.idx ?? -1) >= mythicIdx;
-  const canEnterMinigame = reachedMythic || !!minigameUnlocked;
+  // Hidden Arts are gated ONLY by their Eternal Tree node (roster/garden/
+  // furnace), which stays unlocked across lives. This makes the minigames a
+  // deliberate prestige reward: run 1 stays a clean, simple climb, and the
+  // arts arrive on run 2+ as new mechanics. Reaching Mythic tier in-run no
+  // longer opens them — that leaked the mechanic into the first run.
+  const canEnterMinigame = !!minigameUnlocked;
 
   const upMult        = upgradeMult ?? 1;
   const xMult         = extraMult   ?? 1;
