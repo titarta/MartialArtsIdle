@@ -87,6 +87,13 @@ CHARS = sorted(set(
     # a system serif on Windows ("rounder vs sharper" glyph drift). 火 / 丹 /
     # 超 / 基 are already covered above.
     + "生溫煉極"                    # furnace: heat tiers + refine predict seal
+    # 2026-06-09 Dissolution Rite (reincarnation outro cinematic) calligraphy.
+    # 寂 (jì, "stillness") is the large translucent seal that ghosts in
+    # behind the lotus at the bell moment. 歸 (guī, "return") sits next to
+    # the realm-name whisper ("<realm> returns to the wheel"). Without
+    # these, the rite's brush glyphs would fall back to a system serif on
+    # Windows and the carefully-tuned ink balance would look broken.
+    + "寂歸"                        # dissolution rite: stillness + return seals
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.

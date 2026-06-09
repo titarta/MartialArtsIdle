@@ -1,204 +1,346 @@
 /* ════════════════════════════════════════════════════════════════════════
-   The Dissolution — soft cinematic at the actual reincarnation moment.
-   Where the SeveringRite was sharp (gong, white flash, fast wheel),
-   THIS one is grief-with-acceptance: a glowing life-essence orb
-   beats three times, breathes out karma-motes, and dissolves. The
-   motes coalesce into the seed that carries to the next life. A
-   warm dawn blooms outward; the page reloads beneath it.
+   Dissolution Rite — The Cultivator's Lotus Releases.
+
+   Plays as the outro at the actual reincarnation moment (after the
+   Eternal Tree, before the wipe + page reload). Where the SeveringRite
+   intro is SHARP (gong, white flash, tree growing UP from a seed), this
+   rite is SOFT: a jade-gold lotus blooms over a 寂 (stillness) seal,
+   the 8 petals detach one by one as rising embers, only the golden
+   core remains, it streams down into the karma seed, and a warm dawn
+   blooms outward as the page reloads under a clean wash.
+
+   Aesthetic siblings: SeveringRite (sr-*), Crucible (pr-*), Roster
+   (dmg-*). Same Cinzel + Ma Shan Zheng typography. Same brass-hairline
+   sutra seam vocabulary at the top edge.
    ════════════════════════════════════════════════════════════════════════ */
 
 .dr-overlay {
+  /* Cinematic-only palette — restated so the rite reads consistently
+     even if the page-level CSS variables aren't loaded yet at the
+     moment the overlay mounts. */
+  --dr-void:           #0a0612;
+  --dr-void-tint:      #1a0e2a;
+  --dr-amber:          #f2cd83;
+  --dr-amber-bright:   #ffd97a;
+  --dr-cream:          #fff5dc;
+  --dr-divine:         #fff8e8;
+  --dr-jade-pale:      #a9e2c6;
+  --dr-jade:           #6ec896;
+  --dr-jade-deep:      #2f6a48;
+  --dr-vermilion:      #e94560;
+  --dr-ember:          #ffc34f;
+  --dr-ember-warm:     #ff9b54;
+
   position: fixed; inset: 0;
   z-index: 14000;
-  pointer-events: all;
+  pointer-events: all;   /* block taps from leaking to the tree behind */
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* Warm white-out — the very last beat. Fades in over 600ms starting at
-   FINISH_MS (3000ms in the JSX) and HOLDS at opacity 1 through the
-   browser's unavoidable reload pause (~100-1500ms). Without it, the
-   page would sit frozen on a static "dawn end-state" frame during the
-   reload, which reads as "the cinematic broke and now I'm stuck." With
-   it, the dawn matures INTO pure light, the light holds, and the new
-   home screen materialises underneath. The radial gradient is brighter
-   in the centre so the white-out feels like the dawn becoming the sun. */
+/* Warm whiteout — the very last beat. Fades in over 500ms starting at
+   FINISH_MS (3600ms in the JSX) and HOLDS through the browser's
+   unavoidable reload pause (~100-1500ms). Without it, the page would
+   sit frozen on a static "dawn end-state" frame during the reload,
+   which reads as "the cinematic broke and now I'm stuck." With it,
+   the dawn matures INTO pure light, the light holds, and the new
+   home screen materialises underneath. */
 .dr-overlay::after {
   content: '';
   position: absolute; inset: 0;
   background: radial-gradient(75% 75% at 50% 55%,
-    rgba(255, 250, 232, 1)  0%,
-    rgba(255, 238, 200, 1) 40%,
-    rgba(248, 222, 168, 1) 72%,
+    rgba(255, 250, 232, 1)   0%,
+    rgba(255, 238, 200, 1)  40%,
+    rgba(248, 222, 168, 1)  72%,
     rgba(220, 178, 112, 0.96) 100%);
   opacity: 0;
   pointer-events: none;
-  z-index: 20;
-  transition: opacity 600ms ease-out;
+  z-index: 30;
+  transition: opacity 500ms ease-out;
 }
 .dr-finishing::after {
   opacity: 1;
-  /* Slow breath so the held state never feels frozen during the browser
-     reload pause. Eye reads slow change as "still alive", stillness as
-     "stuck". The breath subtly brightens + warms then settles back —
-     reads as the dawn maturing into day. */
-  animation: dr-dawn-breath 2.6s ease-in-out 600ms infinite;
+  animation: dr-dawn-breath 2.6s ease-in-out 500ms infinite;
 }
 @keyframes dr-dawn-breath {
   0%, 100% { filter: brightness(1)    saturate(1); }
   50%      { filter: brightness(1.08) saturate(0.94); }
 }
 
-/* ── 1. Void fades in over the Eternal Tree ─────────────────────────────── */
+/* ── Void backdrop ──────────────────────────────────────────────────── */
 .dr-void {
   position: absolute; inset: 0;
   background:
-    radial-gradient(80% 80% at 50% 50%, rgba(20, 12, 38, 0.92), rgba(0, 0, 0, 0.99) 70%),
-    rgba(0, 0, 0, 1);
+    radial-gradient(120% 80% at 50% 100%, rgba(40, 18, 60, 0.55), transparent 60%),
+    radial-gradient(80% 80% at 50% 40%, rgba(24, 14, 36, 0.96), rgba(8, 4, 14, 1) 70%),
+    var(--dr-void);
   opacity: 0;
-  animation: dr-void-in 420ms ease-out both;
+  animation: dr-void-in 520ms ease-out both;
 }
 @keyframes dr-void-in { to { opacity: 1; } }
 
-/* ── 2. The Soul — central life-essence orb ─────────────────────────────── */
-/* One animation, several phases so the lifecycle reads as continuous:
-     0%   appear,
-     35%  fully formed,
-     45%  heartbeat 1 (brightest),
-     55%  heartbeat 2 (a little weaker),
-     65%  heartbeat 3 (the last)
-     100% breath out + dissolve into blur
-*/
-.dr-soul {
-  position: absolute;
-  left: 50%; top: 46%;
-  width: 16vmin; max-width: 110px; height: 16vmin; max-height: 110px;
-  display: grid; place-items: center;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 0;
-  animation: dr-soul-life 2600ms cubic-bezier(0.42, 0, 0.58, 1) 400ms forwards;
+/* Brass hairline at the top edge — same sutra-seam vocabulary as
+   the Crucible screen. Draws in left-to-right in a quick swipe. */
+.dr-sutra {
+  position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(220, 175, 110, 0.0)  10%,
+    rgba(245, 200, 66, 0.7)  50%,
+    rgba(220, 175, 110, 0.0)  90%,
+    transparent 100%);
+  transform-origin: 50% 50%;
+  transform: scaleX(0);
+  animation: dr-sutra-draw 900ms cubic-bezier(0.4, 0, 0.2, 1) 200ms forwards;
 }
-@keyframes dr-soul-life {
-  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.45); filter: blur(0); }
-  20%  { opacity: 1; transform: translate(-50%, -50%) scale(1);    filter: blur(0); }
-  /* heartbeat 1 */
-  28%  { transform: translate(-50%, -50%) scale(1.14); filter: brightness(1.4); }
-  32%  { transform: translate(-50%, -50%) scale(1);    filter: brightness(1); }
-  /* heartbeat 2 (smaller) */
-  44%  { transform: translate(-50%, -50%) scale(1.10); filter: brightness(1.3); }
-  48%  { transform: translate(-50%, -50%) scale(1);    filter: brightness(1); }
-  /* heartbeat 3 (faint) */
-  56%  { transform: translate(-50%, -50%) scale(1.06); filter: brightness(1.15); }
-  60%  { transform: translate(-50%, -50%) scale(1);    filter: brightness(1); }
-  /* the breath out — opacity + blur fade */
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.78); filter: blur(22px); }
-}
-.dr-soul-halo {
-  position: absolute;
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle,
-    rgba(255, 226, 160, 0.65),
-    rgba(245, 200, 66, 0.22) 42%,
-    transparent 72%);
-  filter: blur(10px);
-}
-.dr-soul-core {
-  position: relative;
-  width: 32%; height: 32%;
-  border-radius: 50%;
-  background: #ffe6b0;
-  box-shadow:
-    0 0 18px rgba(255, 226, 160, 1),
-    0 0 44px rgba(245, 200, 66, 0.8);
+@keyframes dr-sutra-draw {
+  from { transform: scaleX(0); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { transform: scaleX(1); opacity: 0.8; }
 }
 
-/* ── 3. Rising karma-motes (the breath out) ─────────────────────────────── */
-.dr-motes {
+/* ── Star bokeh ─────────────────────────────────────────────────────── */
+.dr-bokeh {
   position: absolute; inset: 0;
   pointer-events: none;
 }
-.dr-mote {
+.dr-star {
   position: absolute;
-  top: 49%;
-  width: 3px; height: 3px;
+  width: 2px; height: 2px;
   border-radius: 50%;
-  background: #ffd866;
-  box-shadow: 0 0 6px rgba(245, 200, 66, 0.9);
+  background: rgba(245, 230, 200, 0.55);
+  box-shadow: 0 0 4px rgba(255, 240, 200, 0.45);
   opacity: 0;
-  animation: dr-mote-rise cubic-bezier(0.42, 0, 0.4, 1) forwards;
+  animation: dr-star-twinkle 4.6s ease-in-out infinite, dr-star-fade-in 900ms ease-out 400ms forwards;
 }
-@keyframes dr-mote-rise {
-  0%   { opacity: 0; transform: translateY(0)    scale(0.6); }
-  15%  { opacity: 1; }
-  50%  { opacity: 0.85; }
-  100% { opacity: 0; transform: translateY(-70vh) scale(0.3); }
+.dr-star-bri {
+  width: 3px; height: 3px;
+  background: rgba(255, 240, 200, 0.9);
+  box-shadow: 0 0 8px rgba(255, 220, 130, 0.75);
+}
+@keyframes dr-star-twinkle {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+@keyframes dr-star-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* ── 4. Whisper text — soft, italic, brief ──────────────────────────────── */
+/* ── 寂 stillness seal — large translucent calligraphy behind the lotus ─ */
+.dr-seal {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: clamp(220px, 64vmin, 520px);
+  line-height: 1;
+  color: var(--dr-amber-bright);
+  opacity: 0;
+  pointer-events: none;
+  text-shadow:
+    0 0 60px rgba(245, 200, 66, 0.35),
+    0 0 120px rgba(245, 200, 66, 0.18);
+  filter: drop-shadow(0 0 22px rgba(220, 178, 112, 0.4));
+  animation: dr-seal-bloom 2200ms cubic-bezier(0.22, 0.85, 0.3, 1) 1900ms forwards;
+}
+@keyframes dr-seal-bloom {
+  0%   { opacity: 0;     letter-spacing: -0.4em; filter: blur(8px) drop-shadow(0 0 0 transparent); transform: translate(-50%, -50%) scale(1.4); }
+  25%  { opacity: 0.4;   letter-spacing: 0;      filter: blur(2px) drop-shadow(0 0 22px rgba(220, 178, 112, 0.55)); transform: translate(-50%, -50%) scale(1.08); }
+  60%  { opacity: 0.22;  letter-spacing: 0;      filter: blur(0)   drop-shadow(0 0 22px rgba(220, 178, 112, 0.4));  transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0.08;  letter-spacing: 0;      filter: blur(0)   drop-shadow(0 0 18px rgba(220, 178, 112, 0.2));  transform: translate(-50%, -50%) scale(0.98); }
+}
+
+/* ── The lotus ──────────────────────────────────────────────────────── */
+.dr-lotus {
+  position: absolute;
+  left: 50%; top: 46%;
+  transform: translate(-50%, -50%);
+  width: 56vmin; max-width: 360px;
+  aspect-ratio: 1;
+  display: grid; place-items: center;
+  animation:
+    dr-lotus-life 1600ms ease-in-out 1200ms infinite,  /* heartbeat after bloom */
+    dr-lotus-fade 1200ms ease-out 2700ms forwards;     /* shrink + fade as core streams down */
+  filter: drop-shadow(0 0 28px rgba(245, 200, 66, 0.32));
+}
+@keyframes dr-lotus-life {
+  /* Two soft heartbeats — same metaphor as the original soul orb, now
+     read through the lotus instead. Subtle: brighten + faint scale. */
+  0%   { filter: drop-shadow(0 0 28px rgba(245, 200, 66, 0.32)); transform: translate(-50%, -50%) scale(1); }
+  6%   { filter: drop-shadow(0 0 42px rgba(255, 220, 130, 0.55)); transform: translate(-50%, -50%) scale(1.04); }
+  12%  { filter: drop-shadow(0 0 28px rgba(245, 200, 66, 0.32)); transform: translate(-50%, -50%) scale(1); }
+  30%  { filter: drop-shadow(0 0 36px rgba(255, 220, 130, 0.45)); transform: translate(-50%, -50%) scale(1.025); }
+  36%  { filter: drop-shadow(0 0 28px rgba(245, 200, 66, 0.32)); transform: translate(-50%, -50%) scale(1); }
+  100% { filter: drop-shadow(0 0 28px rgba(245, 200, 66, 0.32)); transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes dr-lotus-fade {
+  /* The core streams DOWNWARD into the karma seed at the bottom. The
+     whole lotus wrapper translates and fades while the petals do their
+     own detach animations. Compositing-safe: only transform + opacity. */
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  50%  { opacity: 0.92; transform: translate(-50%, 6%)   scale(0.5);  filter: blur(0); }
+  100% { opacity: 0;    transform: translate(-50%, 36%)  scale(0.18); filter: blur(2px); }
+}
+
+.dr-lotus-svg {
+  width: 100%; height: 100%;
+  overflow: visible;
+  opacity: 0;
+  animation: dr-lotus-bloom 900ms cubic-bezier(0.22, 0.85, 0.3, 1) 300ms forwards;
+}
+@keyframes dr-lotus-bloom {
+  from { opacity: 0; transform: scale(0.4); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Each petal carries its own --angle and --detach inline. Two animations:
+   the bloom unfurls it from the centre; the detach lets it drift outward
+   and dissolve. Detach starts at `--detach` (set per petal in JSX) so
+   the petals scatter in a stagger rather than all at once. */
+.dr-lotus-petal {
+  transform-origin: 200px 200px;
+  transform: rotate(var(--angle));
+  opacity: 0;
+  animation:
+    dr-petal-bloom  720ms cubic-bezier(0.22, 0.85, 0.3, 1) 400ms forwards,
+    dr-petal-detach 1100ms cubic-bezier(0.4, 0, 0.2, 1)    var(--detach) forwards;
+}
+@keyframes dr-petal-bloom {
+  /* Unfurl from a closed bud at the centre. The TRANSFORM rotates AND
+     scales, so we re-state the rotation inside the keyframe to preserve
+     the petal's orientation as it grows. */
+  from { opacity: 0; transform: rotate(var(--angle)) scale(0.3)  translateY(20px); }
+  60%  { opacity: 1; }
+  to   { opacity: 1; transform: rotate(var(--angle)) scale(1)    translateY(0); }
+}
+@keyframes dr-petal-detach {
+  /* Detach: drift outward in the petal's local direction (translateY
+     in the rotated frame = away from the centre, since the petal
+     points along the rotated +Y axis... wait, SVG y grows DOWNWARD,
+     so the petal "up" in screen space is -y. translateY(-X) here =
+     outward in the rotated frame). */
+  0%   { opacity: 1; transform: rotate(var(--angle)) translateY(0)     scale(1)   ; filter: blur(0); }
+  100% { opacity: 0; transform: rotate(var(--angle)) translateY(-50px) scale(0.4); filter: blur(8px); }
+}
+
+.dr-lotus-petal-outer {
+  fill: url(#dr-petal-grad);
+  stroke: rgba(255, 220, 170, 0.32);
+  stroke-width: 1.2;
+}
+.dr-lotus-petal-inner {
+  fill: url(#dr-petal-inner);
+  opacity: 0.85;
+}
+
+.dr-lotus-core-halo {
+  transform-origin: 200px 200px;
+  animation: dr-core-halo 2.6s ease-in-out 600ms infinite;
+}
+@keyframes dr-core-halo {
+  0%, 100% { transform: scale(1)    ; opacity: 0.78; }
+  50%      { transform: scale(1.18); opacity: 1; }
+}
+.dr-lotus-core {
+  fill: var(--dr-cream);
+  filter:
+    drop-shadow(0 0 14px rgba(255, 226, 160, 1))
+    drop-shadow(0 0 36px rgba(245, 200, 66, 0.85));
+}
+
+/* ── Whisper — realm name returns to the wheel ─────────────────────── */
 .dr-whisper {
   position: absolute;
-  left: 50%; top: 26%;
+  left: 50%; top: 22%;
   transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px;
   font-family: 'Cinzel', Georgia, serif;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(15px, 2.4vmin, 22px);
-  letter-spacing: 0.18em;
-  color: rgba(245, 230, 200, 0.78);
+  font-size: clamp(14px, 2.3vmin, 21px);
+  letter-spacing: 0.16em;
+  color: rgba(245, 230, 200, 0.82);
   text-shadow: 0 0 22px rgba(245, 200, 66, 0.35);
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  animation: dr-whisper 1700ms ease-in-out 1500ms both;
+  animation: dr-whisper 2300ms ease-in-out 950ms both;
 }
 @keyframes dr-whisper {
-  0%   { opacity: 0; transform: translate(-50%, 6px); }
-  22%  { opacity: 0.92; transform: translate(-50%, 0); }
-  72%  { opacity: 0.78; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -6px); }
+  0%   { opacity: 0;    transform: translate(-50%,  6px); }
+  15%  { opacity: 0.95; transform: translate(-50%,  0); }
+  72%  { opacity: 0.82; transform: translate(-50%,  0); }
+  100% { opacity: 0;    transform: translate(-50%, -6px); }
+}
+.dr-whisper-glyph {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-style: normal;
+  font-size: 1.5em;
+  color: var(--dr-amber-bright);
+  text-shadow: 0 0 18px rgba(255, 220, 130, 0.65);
+  line-height: 1;
+}
+.dr-whisper-text { font-variant: small-caps; }
+
+/* ── Embers — rise as petals detach ────────────────────────────────── */
+.dr-embers {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.dr-ember {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 240, 184, 1)  0%,
+    rgba(255, 195, 79, 0.9) 55%,
+    transparent             95%);
+  box-shadow:
+    0 0 6px rgba(255, 195, 79, 0.85),
+    0 0 14px rgba(245, 200, 66, 0.45);
+  opacity: 0;
+  animation: dr-ember-rise cubic-bezier(0.32, 0, 0.16, 1) forwards;
+}
+@keyframes dr-ember-rise {
+  0%   { opacity: 0;    transform: translate(0, 0)                       scale(0.5); }
+  18%  { opacity: 1;    transform: translate(calc(var(--dx) * 0.25), calc(var(--dy) * 0.18)) scale(1); }
+  60%  { opacity: 0.85; transform: translate(calc(var(--dx) * 0.7),  calc(var(--dy) * 0.55)) scale(0.9); }
+  100% { opacity: 0;    transform: translate(var(--dx),               var(--dy))                scale(0.25); }
 }
 
-/* ── 5. The Seed — what carries forward ─────────────────────────────────── */
+/* ── Karma seed — what survives ────────────────────────────────────── */
 .dr-seed {
   position: absolute;
   left: 50%; bottom: 26%;
-  width: 12vmin; max-width: 84px; height: 12vmin; max-height: 84px;
+  width: 14vmin; max-width: 96px; height: 14vmin; max-height: 96px;
   display: grid; place-items: center;
   transform: translateX(-50%) scale(1);
   opacity: 0;
   animation:
-    dr-seed-in    600ms cubic-bezier(0.2, 0.9, 0.3, 1) 2400ms both,
-    dr-seed-pulse 1.4s ease-in-out 2700ms infinite;
+    dr-seed-in    700ms cubic-bezier(0.18, 0.9, 0.32, 1.05) 3200ms both,
+    dr-seed-pulse 1.4s ease-in-out 3700ms infinite;
+  z-index: 6;
 }
 @keyframes dr-seed-in {
-  from { opacity: 0; transform: translateX(-50%) scale(0.4); }
-  to   { opacity: 1; transform: translateX(-50%) scale(1); }
+  from { opacity: 0; transform: translateX(-50%) scale(0.35); filter: blur(4px); }
+  to   { opacity: 1; transform: translateX(-50%) scale(1);    filter: blur(0); }
 }
 @keyframes dr-seed-pulse {
   0%, 100% { filter: brightness(1); }
-  50%      { filter: brightness(1.4); }
+  50%      { filter: brightness(1.34); }
 }
-.dr-seed-glow {
+.dr-seed-halo {
   position: absolute;
-  width: 100%; height: 100%;
+  width: 140%; height: 140%;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(255, 226, 160, 0.7),
-    rgba(245, 200, 66, 0.22) 40%,
-    transparent 66%);
-  filter: blur(9px);
+    rgba(255, 226, 160, 0.72) 0%,
+    rgba(245, 200, 66, 0.25) 38%,
+    transparent 68%);
+  filter: blur(10px);
 }
-.dr-seed-core {
-  position: relative;
-  width: 22%; height: 22%;
-  border-radius: 50%;
-  background: #ffe6b0;
-  box-shadow:
-    0 0 12px rgba(255, 226, 160, 1),
-    0 0 30px rgba(245, 200, 66, 0.85);
-}
-/* Karma sprite at the seed's centre — same ui/karma.png as the Eternal
-   Tree header. The dr-seed-glow halo still drives the warmth around it. */
 .dr-seed-icon {
   position: relative;
   width: 56%; height: 56%;
@@ -206,11 +348,11 @@
   image-rendering: crisp-edges;
   object-fit: contain;
   filter:
-    drop-shadow(0 0 10px rgba(255, 226, 160, 0.95))
-    drop-shadow(0 0 22px rgba(245, 200, 66, 0.65));
+    drop-shadow(0 0 12px rgba(255, 226, 160, 0.95))
+    drop-shadow(0 0 26px rgba(245, 200, 66, 0.7));
 }
 
-/* ── 6. Dawn — warm gold light blooms outward, covers everything ─────────── */
+/* ── Dawn — warm gold light blooms outward ─────────────────────────── */
 .dr-dawn {
   position: absolute;
   left: 50%; bottom: 30%;
@@ -218,14 +360,15 @@
   width: 0; height: 0;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(255, 245, 215, 0.95) 0%,
-    rgba(255, 226, 160, 0.78) 22%,
-    rgba(245, 200, 66, 0.4)  50%,
-    rgba(200, 110, 60, 0.12) 72%,
-    transparent 88%);
+    rgba(255, 245, 215, 0.95)   0%,
+    rgba(255, 226, 160, 0.78)  22%,
+    rgba(245, 200, 66, 0.4)    50%,
+    rgba(200, 110, 60, 0.12)   72%,
+    transparent                88%);
   filter: blur(3px);
   pointer-events: none;
-  animation: dr-dawn-bloom 800ms cubic-bezier(0.22, 0.85, 0.3, 1) 2800ms forwards;
+  animation: dr-dawn-bloom 900ms cubic-bezier(0.22, 0.85, 0.3, 1) 3500ms forwards;
+  z-index: 5;
 }
 @keyframes dr-dawn-bloom {
   0%   { width: 0;       height: 0;       opacity: 0; }
@@ -263,13 +406,17 @@
 @media (prefers-reduced-motion: reduce) {
   .dr-overlay,
   .dr-void,
-  .dr-soul, .dr-soul-halo, .dr-soul-core,
-  .dr-mote,
+  .dr-sutra,
+  .dr-star,
+  .dr-seal,
+  .dr-lotus, .dr-lotus-svg, .dr-lotus-petal, .dr-lotus-core-halo,
   .dr-whisper,
-  .dr-seed, .dr-seed-glow, .dr-seed-core,
-  .dr-dawn {
+  .dr-ember,
+  .dr-seed, .dr-seed-halo,
+  .dr-dawn,
+  .app-reset-wash {
     animation: none !important;
   }
-  .dr-soul, .dr-seed { opacity: 0; }
+  .dr-lotus, .dr-seed { opacity: 0; }
   .dr-overlay::after { transition: none; }
 }
