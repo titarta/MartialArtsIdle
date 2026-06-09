@@ -203,28 +203,24 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
       onClick={onUse}
       aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
     >
-      {/* Wax seal stack: pulsing vermilion halo, the 符 talisman stamp itself,
-          and a small gold ammo-style pip carrying the stack count. The pip
-          lifts the "how many do I have" signal out of the subtitle and into
-          the player's immediate eyeline so it survives across glances. */}
-      <span className="home-gate-bypass-seal" aria-hidden="true">
-        <span className="home-gate-bypass-seal-halo" />
-        <span className="home-gate-bypass-seal-glyph">符</span>
-        <span className="home-gate-bypass-seal-pip">{tokenCount}</span>
+      {/* Three-zone "Vermilion Edict Slip" layout designed FOR the thin
+          .home-bar-wrap strip the button overlays. Each zone fills the
+          strip's full height; nothing overflows or relies on chrome that
+          a 40 px wax seal can't fit. The 符 glyph and count number live
+          as the END SEALS on a horizontal decree, gold ribbon in between
+          carrying the action. */}
+      <span className="home-gate-bypass-cap home-gate-bypass-cap-left" aria-hidden="true">
+        <span className="home-gate-bypass-glyph">符</span>
       </span>
-      {/* Single-line CTA. The previous layout stacked CTA + subtitle, but
-          the row's vertical budget (top:4 / bottom:6 inside .home-bar-wrap)
-          can't fit a 40 px wax seal + two text lines, so the subtitle
-          ("Heaven's Pardon · ×N") got clipped at the bottom edge. The
-          item NAME is already visible elsewhere (shop, active-buffs chip,
-          aria-label), and the COUNT is now on the seal pip, so the sub
-          was redundant; dropping it leaves the CTA on a single readable
-          line and clears the clipping. */}
-      <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
-      {/* Thin ember channel along the bottom edge — vermilion → amber →
-          vermilion, breathes on a 3s cycle so the decree reads as ALIVE,
-          not a static graphic. Echoes the cultivator's crimson aura halo
-          rhythm without competing with it (different period). */}
+      <span className="home-gate-bypass-center">
+        <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
+      </span>
+      <span className="home-gate-bypass-cap home-gate-bypass-cap-right" aria-hidden="true">
+        <span className="home-gate-bypass-count">{`×${tokenCount}`}</span>
+      </span>
+      {/* Thin ember underline that breathes on a 3 s cycle — the only
+          piece of overflow-style chrome left, intentionally a 1 px hairline
+          so it can't clip. Reads as "this decree is alive, ready to fire". */}
       <span className="home-gate-bypass-ember" aria-hidden="true" />
     </button>
   );
