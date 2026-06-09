@@ -1,4 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { fmt, fmtRate } from '../utils/format';
 import { getSpriteTier, resolveSprite, resolveTierFor, SPRITE_TIERS } from '../data/producers';
 import AudioManager from '../audio/AudioManager';
@@ -59,6 +61,9 @@ export default function PavilionPlaque({
   // cap on/off. Defaults to empty so component works in isolation tests.
   treeMods = {},
 }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
+  const pName = gt('producers', producer.id, 'name', producer.name);
   // Resolve current tier + sprite. Tier null when 0 owned. resolveTierFor
   // respects the producer's transcendedNode gate (disc_transcend for the
   // disciple) so Transcended doesn't appear before the node is purchased.
@@ -85,9 +90,9 @@ export default function PavilionPlaque({
     if (nextRank > prevRank && next != null) {
       setCelebrating(true);
       try { AudioManager.playSfx('producer_tier_up'); } catch {}
-      const t = setTimeout(() => setCelebrating(false), 1400);
+      const timer = setTimeout(() => setCelebrating(false), 1400);
       prevTierNameRef.current = next;
-      return () => clearTimeout(t);
+      return () => clearTimeout(timer);
     }
     prevTierNameRef.current = next;
   }, [tier?.name]);
@@ -122,7 +127,7 @@ export default function PavilionPlaque({
           type="button"
           className="pp-frame pp-frame-btn"
           onClick={() => onShowDetail?.(producer)}
-          aria-label={`${producer.name} details (sealed)`}
+          aria-label={t('producer.detailsSealedLabel', { name: pName })}
         >
           <Sprite sprite={teaserSprite} className="pp-emblem pp-emblem-locked" />
           <span className="pp-seal" aria-hidden="true">
@@ -130,14 +135,14 @@ export default function PavilionPlaque({
           </span>
         </button>
         <div className="pp-lintel">
-          <div className="pp-name">{producer.name}</div>
+          <div className="pp-name">{pName}</div>
           <div className="pp-tier-row">
-            <span className="pp-owned pp-owned-sealed">— sealed shrine —</span>
+            <span className="pp-owned pp-owned-sealed">{t('producer.sealedShrine')}</span>
           </div>
-          <div className="pp-gate">Unsealed at <b>realm {minRealm}</b></div>
+          <div className="pp-gate">{t('producer.unsealedPre')} <b>{t('producer.unsealedRealm', { n: minRealm })}</b></div>
         </div>
         <div className="pp-sealed-cart" aria-disabled="true">
-          <span className="pp-sealed-lab">Sealed</span>
+          <span className="pp-sealed-lab">{t('producer.sealed')}</span>
           <span className="pp-sealed-realm">R{minRealm}</span>
         </div>
       </article>
@@ -160,7 +165,7 @@ export default function PavilionPlaque({
         type="button"
         className="pp-frame pp-frame-btn"
         onClick={() => onShowDetail?.(producer)}
-        aria-label={`${producer.name} details`}
+        aria-label={t('producer.detailsLabel', { name: pName })}
       >
         <Sprite sprite={sprite} className="pp-emblem" />
       </button>
@@ -170,12 +175,12 @@ export default function PavilionPlaque({
           {tierLabel && (
             <span className={`pp-tier-badge pp-tier-${tierName}`}>{tierLabel}</span>
           )}
-          {owned > 0 && <span className="pp-owned">×{owned} owned</span>}
+          {owned > 0 && <span className="pp-owned">{t('producer.ownedCount', { n: owned })}</span>}
         </div>
         {owned > 0 ? (
-          <div className="pp-rate">Yields <b>{fmtRate(totalQiPerSec)} Qi/s</b></div>
+          <div className="pp-rate">{t('producer.yields')} <b>{t('producer.ratePerSec', { rate: fmtRate(totalQiPerSec) })}</b></div>
         ) : (
-          <div className="pp-rate">Yields <b>{fmtRate(producer.startQiPerSec)} Qi/s</b> per unit</div>
+          <div className="pp-rate">{t('producer.yields')} <b>{t('producer.ratePerSec', { rate: fmtRate(producer.startQiPerSec) })}</b> {t('producer.perUnit')}</div>
         )}
       </div>
       <div className="pp-cart">
@@ -185,8 +190,8 @@ export default function PavilionPlaque({
           onClick={() => onBuy(producer.id, resolvedCount)}
           disabled={!affordable}
         >
-          <span className="pp-cart-mult">Tribute ×{buyMode}</span>
-          <span className="pp-cart-cost">{fmt(displayCost)} Qi</span>
+          <span className="pp-cart-mult">{t('producer.tribute', { n: buyMode })}</span>
+          <span className="pp-cart-cost">{t('producer.cost', { n: fmt(displayCost) })}</span>
         </button>
       </div>
     </article>

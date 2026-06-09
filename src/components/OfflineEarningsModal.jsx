@@ -89,7 +89,7 @@ function OfflineEarningsModal({
         </div>
 
         {hasSparkQueue && (
-          <div className="offline-spark-queue" aria-label="Spark moments awaiting your discernment">
+          <div className="offline-spark-queue" aria-label={t('offlineModal.sparkQueueLabel')}>
             <span className="offline-spark-queue-glyph" aria-hidden="true">✦</span>
             <span className="offline-spark-queue-text">
               <strong>{pendingSparkCount}</strong>

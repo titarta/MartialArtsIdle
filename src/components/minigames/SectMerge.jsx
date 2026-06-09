@@ -17,6 +17,8 @@
  * Imports: TIERS / BONUS_PER_BOARD_SUM / gridIsFull from discipleMerge.
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGameText } from '../../i18n/gameText';
 import useDiscipleMerge, { currentMerit } from '../../hooks/useDiscipleMerge';
 import { TIERS, BONUS_PER_BOARD_SUM, gridIsFull, effectiveTier } from '../../data/discipleMerge';
 import { fmt } from '../../utils/format';
@@ -29,13 +31,14 @@ const spriteUrl = (s) =>
 function Tile({ tile, transcendUnlocked }) {
   // effectiveTier honors the disc_transcend gate: T5+ render the chrome-rose
   // Transcended sprite only when the Eternal Tree node is purchased.
+  const gt = useGameText();
   const t = effectiveTier(tile.tier, transcendUnlocked);
   return (
     <div className="dmg-tile">
       <img
         className="dmg-tile-sprite"
         src={spriteUrl(t.sprite)}
-        alt={t.rank}
+        alt={gt('discipleTiers', String(tile.tier), 'rank', t.rank)}
         draggable={false}
       />
       {t.badge && <span className="dmg-tile-badge">{t.badge}</span>}
@@ -45,6 +48,8 @@ function Tile({ tile, transcendUnlocked }) {
 }
 
 export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   // disc_transcend Eternal Tree node gates the Transcended sprite on T5+
   // ranks. When unpurchased, the roster falls back to mythic + escalating
   // badges (the pre-2026-06-08 scheme).
@@ -81,14 +86,14 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} })
 
   const flagAnim = (idx, kind, ms = 700) => {
     setAnimFlags(prev => ({ ...prev, [idx]: kind }));
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       setAnimFlags(prev => {
         const next = { ...prev };
         delete next[idx];
         return next;
       });
     }, ms);
-    animTimers.current.push(t);
+    animTimers.current.push(timer);
   };
 
   // ── Pointer drag ──────────────────────────────────────────────────────────
@@ -204,16 +209,16 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} })
           Board / Bonus on the right (the payoff readout). */}
       <div className="dmg-stats">
         <div className="dmg-stat">
-          <div className="dmg-stat-k">Merit</div>
+          <div className="dmg-stat-k">{t('sectMerge.merit')}</div>
           <div className="dmg-stat-v dmg-stat-merit">{fmt(Math.floor(meritNow))}</div>
-          <div className="dmg-stat-sub">+{meritPerSec.toFixed(1)}/s</div>
+          <div className="dmg-stat-sub">{t('sectMerge.meritRate', { n: meritPerSec.toFixed(1) })}</div>
         </div>
         <div className="dmg-stat">
-          <div className="dmg-stat-k">Board sum</div>
+          <div className="dmg-stat-k">{t('sectMerge.boardSum')}</div>
           <div className="dmg-stat-v dmg-stat-violet">{sum}</div>
         </div>
         <div className="dmg-stat">
-          <div className="dmg-stat-k">Per disciple</div>
+          <div className="dmg-stat-k">{t('sectMerge.perDisciple')}</div>
           <div className="dmg-stat-v dmg-stat-gold">×{(1 + perDiscipleBonusPct).toFixed(2)}</div>
           <div className="dmg-stat-sub">+{(perDiscipleBonusPct * 100).toFixed(1)}%</div>
         </div>
@@ -269,19 +274,19 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} })
             <div className="dmg-sel-info">
               <div className="dmg-sel-name">
                 <span className="dmg-sel-tier">T{selectedTile.tier}</span>
-                {TIERS[selectedTile.tier].rank}
+                {gt('discipleTiers', String(selectedTile.tier), 'rank', TIERS[selectedTile.tier].rank)}
               </div>
               <div className="dmg-sel-sub">
-                Value {TIERS[selectedTile.tier].value} · contributes +{(TIERS[selectedTile.tier].value * BONUS_PER_BOARD_SUM * 100).toFixed(2)}% to per-disciple qi/s
+                {t('sectMerge.tileStat', { value: TIERS[selectedTile.tier].value, pct: (TIERS[selectedTile.tier].value * BONUS_PER_BOARD_SUM * 100).toFixed(2) })}
               </div>
             </div>
             <button type="button" className="dmg-seclude" onClick={handleSeclude}>
-              Seclude
+              {t('sectMerge.seclude')}
             </button>
           </>
         ) : (
           <div className="dmg-sel-empty">
-            Drag two same-rank disciples to promote · drag a different rank to swap
+            {t('sectMerge.dragHint')}
           </div>
         )}
       </div>
@@ -295,11 +300,11 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} })
           disabled={!canPlace}
         >
           {full ? (
-            <span className="dmg-act-label">Grid full</span>
+            <span className="dmg-act-label">{t('sectMerge.gridFull')}</span>
           ) : (
             <>
-              <span className="dmg-act-label">+ Place Disciple</span>
-              <span className="dmg-act-cost">{fmt(nextPlaceCost)} Merit</span>
+              <span className="dmg-act-label">{t('sectMerge.placeDisciple')}</span>
+              <span className="dmg-act-cost">{t('sectMerge.placeCost', { cost: fmt(nextPlaceCost) })}</span>
             </>
           )}
         </button>
@@ -310,30 +315,30 @@ export default function SectMerge({ owned = 0, qi = 0, spendQi, treeMods = {} })
             className="mg-btn mg-btn-ghost dmg-act dmg-act-expand"
             onClick={handleExpand}
             disabled={!canExpand}
-            title={tierGateLocked ? `Reach T${nextExpansion.unlockTier} on the board to unlock` : ''}
+            title={tierGateLocked ? t('sectMerge.tierGateTitle', { tier: nextExpansion.unlockTier }) : ''}
           >
             {tierGateLocked ? (
               <>
-                <span className="dmg-act-label">Expand to {nextExpansion.size}×{nextExpansion.size}</span>
-                <span className="dmg-act-cost dmg-act-locked">Need T{nextExpansion.unlockTier}</span>
+                <span className="dmg-act-label">{t('sectMerge.expandTo', { size: nextExpansion.size })}</span>
+                <span className="dmg-act-cost dmg-act-locked">{t('sectMerge.needTier', { tier: nextExpansion.unlockTier })}</span>
               </>
             ) : (
               <>
-                <span className="dmg-act-label">Expand to {nextExpansion.size}×{nextExpansion.size}</span>
-                <span className="dmg-act-cost">{fmt(nextExpansion.qiCost)} Qi</span>
+                <span className="dmg-act-label">{t('sectMerge.expandTo', { size: nextExpansion.size })}</span>
+                <span className="dmg-act-cost">{t('sectMerge.expandCost', { cost: fmt(nextExpansion.qiCost) })}</span>
               </>
             )}
           </button>
         ) : (
           <div className="dmg-act dmg-act-maxed">
-            <span className="dmg-act-label">Grid maxed</span>
-            <span className="dmg-act-cost">{gridSize}×{gridSize}</span>
+            <span className="dmg-act-label">{t('sectMerge.gridMaxed')}</span>
+            <span className="dmg-act-cost">{t('sectMerge.gridSize', { size: gridSize })}</span>
           </div>
         )}
       </div>
 
       <div className="dmg-hint">
-        Owned disciples generate Merit. Spend it to Place new T1s; merge to promote ranks. Each merge yields Merit equal to the new tile’s value.
+        {t('sectMerge.hint')}
       </div>
 
       {import.meta.env.DEV && (

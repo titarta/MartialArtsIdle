@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import {
   QI_SPARK_BY_ID,
   SPARK_RARITY,
@@ -191,8 +192,10 @@ function describeContribution(spark, card, ctx, t) {
 
 function Charm({ spark, ctx, isTrinityActive, onOpen }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const card = QI_SPARK_BY_ID[spark.sparkId];
   if (!card) return null;
+  const name = gt('qiSparks', spark.sparkId, 'name', card.name);
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
   const icon = iconFor(spark.sparkId);
   const isMechanic = card.kind === 'mechanic';
@@ -219,7 +222,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
       className={`charm ${rarityClass}${isLegendary ? ' charm-legendary' : ''}${trinityActive ? ' charm-trinity-active' : ''}`}
       style={{ '--r': rarityToken }}
       onClick={() => onOpen(spark)}
-      aria-label={`${card.name} — ${t('sparks.tapForDetails')}`}
+      aria-label={`${name} — ${t('sparks.tapForDetails')}`}
     >
       <span className="charm-rarity-mark" aria-hidden="true" />
       {isTrinityPiece && <span className="charm-trinity" aria-hidden="true">✦</span>}
@@ -227,7 +230,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
       <div className="charm-mount">
         <Icon icon={icon} className="charm-icon" />
       </div>
-      <div className="charm-name">{card.name}</div>
+      <div className="charm-name">{name}</div>
       {contribution && <div className="charm-line">{contribution}</div>}
     </button>
   );
@@ -239,15 +242,19 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
 
 function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const card = QI_SPARK_BY_ID[spark?.sparkId];
   if (!card) return null;
   const rarity = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
   const copy = SPARK_COPY[spark.sparkId];
   const icon = iconFor(spark.sparkId);
   const glyph = heroGlyphFor(spark.sparkId);
-  const effectText = copy?.effectText ?? card.description ?? '';
-  const exampleHtml = copy?.exampleText ?? null;
-  const loreHtml = copy?.loreText ?? null;
+  const name = gt('qiSparks', spark.sparkId, 'name', card.name);
+  const effectText = copy?.effectText != null
+    ? gt('sparkCopy', spark.sparkId, 'effectText', copy.effectText)
+    : gt('qiSparks', spark.sparkId, 'description', card.description ?? '');
+  const exampleHtml = copy?.exampleText != null ? gt('sparkCopy', spark.sparkId, 'exampleText', copy.exampleText) : null;
+  const loreHtml = copy?.loreText != null ? gt('sparkCopy', spark.sparkId, 'loreText', copy.loreText) : null;
   const contribution = describeContribution(spark, card, ctx, t);
 
   const isMechanic = card.kind === 'mechanic';
@@ -270,7 +277,7 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
         style={{ '--r': rarityToken }}
         role="dialog"
         aria-modal="true"
-        aria-label={card.name}
+        aria-label={name}
       >
         <button type="button" className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
@@ -278,7 +285,7 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
           <div className="charm-detail-hero-mount">
             <Icon icon={icon} className="charm-detail-hero-icon" />
           </div>
-          <h2 className="charm-detail-hero-name">{card.name}</h2>
+          <h2 className="charm-detail-hero-name">{name}</h2>
           <div className="charm-detail-hero-rarity">{rarityLabel}</div>
         </header>
 

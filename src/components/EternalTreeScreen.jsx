@@ -6,6 +6,7 @@
 // the rest of the game instead of feeling like a separate sub-app.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
 import { fmt } from '../utils/format';
 import { assertGlyphsCovered } from '../utils/glyphCoverage';
@@ -166,6 +167,7 @@ export default function EternalTreeScreen({
   onReincarnate, onClose,
 }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const stageRef = useRef(null);
   const stars = useMemo(() => makeStars(140), []);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -429,9 +431,9 @@ export default function EternalTreeScreen({
                 {selectedNode.glyph ?? '◇'}
               </div>
               <div className="et-detail-body">
-                <div className="et-detail-name">{selectedNode.label}</div>
+                <div className="et-detail-name">{gt('eternalTree', selectedNode.id, 'label', selectedNode.label)}</div>
                 <div className="et-detail-desc">
-                  {selectedNode.description ?? t('eternalTree.futurePathDefault')}
+                  {selectedNode.description ? gt('eternalTree', selectedNode.id, 'description', selectedNode.description) : t('eternalTree.futurePathDefault')}
                 </div>
               </div>
               <button

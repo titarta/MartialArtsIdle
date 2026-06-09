@@ -21,6 +21,8 @@
  */
 
 import { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGameText } from '../../i18n/gameText';
 import {
   MATERIALS, PILLS, FOUNDATIONS,
   LAYER_DEF, HEAT_QUALITY_TIERS,
@@ -50,14 +52,15 @@ function fmtHeat(now, cap) {
 
 // ── Layout primitives ──────────────────────────────────────────────────────
 function HeatBar({ heat, cap, regenPerSec }) {
+  const { t } = useTranslation('ui');
   const pct = Math.max(0, Math.min(100, (heat / cap) * 100));
   const hot = pct >= 75;
   return (
     <div className={`pr-heat ${hot ? 'pr-heat-hot' : ''}`}>
       <div className="pr-heat-label">
-        <span className="pr-heat-lbl">Heat</span>
+        <span className="pr-heat-lbl">{t('pillRefine.heat')}</span>
         <span className="pr-heat-amt">{fmtHeat(heat, cap)}</span>
-        <span className="pr-heat-regen">+{(regenPerSec * 60).toFixed(1)}/min</span>
+        <span className="pr-heat-regen">{t('pillRefine.heatRegen', { n: (regenPerSec * 60).toFixed(1) })}</span>
       </div>
       <div className="pr-heat-track" aria-hidden="true">
         <div className="pr-heat-fill" style={{ width: `${pct}%` }}>
@@ -70,6 +73,7 @@ function HeatBar({ heat, cap, regenPerSec }) {
 }
 
 function CauldronTile({ cauldron, idx, locked, now }) {
+  const { t } = useTranslation('ui');
   const isCooking = cauldron?.state === 'cooking';
   const remaining = isCooking ? Math.max(0, cauldron.finishAt - now) : 0;
   return (
@@ -87,7 +91,7 @@ function CauldronTile({ cauldron, idx, locked, now }) {
           <div className="pr-cauldron-heat">{cauldron.heat}</div>
         </>
       ) : (
-        <div className="pr-cauldron-idle">idle</div>
+        <div className="pr-cauldron-idle">{t('pillRefine.idle')}</div>
       )}
     </div>
   );
@@ -99,9 +103,11 @@ function CauldronTile({ cauldron, idx, locked, now }) {
 const HEAT_TIER_GLYPHS = ['生', '溫', '煉', '極']; // raw · warm · refined · peak
 
 function HeatSelector({ heat, setHeat, min, cap }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   return (
     <div className="pr-heat-pick">
-      <span className="pr-heat-pick-lbl">Fire</span>
+      <span className="pr-heat-pick-lbl">{t('pillRefine.fire')}</span>
       <div className="pr-heat-dials">
         {HEAT_QUALITY_TIERS.map((tier, idx) => {
           const allowed = tier.heat >= min && tier.heat <= cap;
@@ -113,10 +119,10 @@ function HeatSelector({ heat, setHeat, min, cap }) {
               className={`pr-heat-btn pr-heat-tier-${idx} ${isOn ? 'pr-heat-btn-on' : ''}`}
               onClick={() => setHeat(tier.heat)}
               disabled={!allowed}
-              title={`${tier.label} — ×${tier.mult} magnitude`}
+              title={t('pillRefine.magnitudeTitle', { label: gt('furnaceHeat', String(idx), 'label', tier.label), mult: tier.mult })}
             >
               <span className="pr-heat-glyph" aria-hidden="true">{HEAT_TIER_GLYPHS[idx]}</span>
-              <span className="pr-heat-tier-lbl">{tier.label}</span>
+              <span className="pr-heat-tier-lbl">{gt('furnaceHeat', String(idx), 'label', tier.label)}</span>
               <span className="pr-heat-tier-num">{tier.heat}</span>
             </button>
           );
@@ -128,6 +134,8 @@ function HeatSelector({ heat, setHeat, min, cap }) {
 
 // ── Layer 1 — REFINE tab ──────────────────────────────────────────────────
 function RefineTab({ furnace, heatCapNow, onRefine }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   const plantIds = useMemo(
     () => Object.entries(furnace.plants).filter(([, n]) => n > 0).map(([id]) => id),
     [furnace.plants]
@@ -155,17 +163,17 @@ function RefineTab({ furnace, heatCapNow, onRefine }) {
   return (
     <div className="pr-tab">
       <div className="pr-tab-head">
-        <h3>Refine — 3 plants → 1 Material</h3>
-        <span className="pr-tab-cook">Cook: 15 min</span>
+        <h3>{t('pillRefine.refineHead')}</h3>
+        <span className="pr-tab-cook">{t('pillRefine.cookRefine')}</span>
       </div>
       <div className="pr-pantry">
         {plantIds.length === 0 && (
-          <div className="pr-empty">No plants in pantry. Send some from the Spirit Garden basket.</div>
+          <div className="pr-empty">{t('pillRefine.noPlants')}</div>
         )}
         {plantIds.map((id) => (
           <button key={id} type="button" className="pr-pantry-tile" onClick={() => pick(id)} disabled={selected.length >= 3}>
             <img src={url(`/sprites/plants/${id}.png`)} alt="" className="pr-pantry-sprite" />
-            <span className="pr-pantry-id">{id.replace(/_/g, ' ')}</span>
+            <span className="pr-pantry-id">{gt('gardenPlants', id, 'name', id.replace(/_/g, ' '))}</span>
             <span className="pr-pantry-count">×{furnace.plants[id]}</span>
           </button>
         ))}
@@ -174,24 +182,24 @@ function RefineTab({ furnace, heatCapNow, onRefine }) {
         {[0, 1, 2].map((i) => (
           <div key={i} className="pr-slot" onClick={() => selected[i] && drop(i)}>
             {selected[i]
-              ? <span className="pr-slot-filled">{selected[i].replace(/_/g, ' ')}</span>
+              ? <span className="pr-slot-filled">{gt('gardenPlants', selected[i], 'name', selected[i].replace(/_/g, ' '))}</span>
               : <span className="pr-slot-empty">+</span>}
           </div>
         ))}
       </div>
       <div className={`pr-predict ${predictedMat ? 'pr-predict-on' : ''}`}>
         <span className="pr-predict-seal" aria-hidden="true">煉</span>
-        <span className="pr-predict-lbl">Will yield</span>
-        <strong className="pr-predict-name">{predictedMat?.name ?? '— select 3 ingredients —'}</strong>
+        <span className="pr-predict-lbl">{t('pillRefine.willYield')}</span>
+        <strong className="pr-predict-name">{predictedMat ? gt('furnaceMaterials', predicted, 'name', predictedMat.name) : t('pillRefine.selectIngredients')}</strong>
         {predictedMat && (
-          <span className="pr-predict-sub">Refined from {(predictedMat.plant || 'mixed').replace(/_/g, ' ')}.</span>
+          <span className="pr-predict-sub">{t('pillRefine.refinedFrom', { plant: predictedMat.plant ? gt('gardenPlants', predictedMat.plant, 'name', predictedMat.plant.replace(/_/g, ' ')) : 'mixed' })}</span>
         )}
       </div>
       <HeatSelector heat={heat} setHeat={setHeat} min={LAYER_DEF.refine.minHeat} cap={Math.min(heatCapNow, furnace.heat ?? 0)} />
       <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
         <span className="pr-fire-glow" aria-hidden="true" />
         <span className="pr-fire-glyph" aria-hidden="true">火</span>
-        <span className="pr-fire-label">Ignite — Refine ({heatQualityLabel(heat)})</span>
+        <span className="pr-fire-label">{t('pillRefine.igniteRefine', { heat: heatQualityLabel(heat) })}</span>
       </button>
     </div>
   );
@@ -199,6 +207,8 @@ function RefineTab({ furnace, heatCapNow, onRefine }) {
 
 // ── Layer 2 — COMBINE tab ─────────────────────────────────────────────────
 function CombineTab({ furnace, heatCapNow, onCombine }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   const materialIds = useMemo(
     () => Object.entries(furnace.materials).filter(([, n]) => n > 0).map(([id]) => id),
     [furnace.materials]
@@ -226,19 +236,19 @@ function CombineTab({ furnace, heatCapNow, onCombine }) {
   return (
     <div className="pr-tab">
       <div className="pr-tab-head">
-        <h3>Combine — 3 Materials → 1 Pill</h3>
-        <span className="pr-tab-cook">Cook: 1 hr</span>
+        <h3>{t('pillRefine.combineHead')}</h3>
+        <span className="pr-tab-cook">{t('pillRefine.cookCombine')}</span>
       </div>
       <div className="pr-pantry">
         {materialIds.length === 0 && (
-          <div className="pr-empty">No materials yet. Refine some plants first.</div>
+          <div className="pr-empty">{t('pillRefine.noMaterials')}</div>
         )}
         {materialIds.map((id) => {
           const m = MATERIALS[id];
           return (
             <button key={id} type="button" className="pr-pantry-tile" onClick={() => pick(id)} disabled={selected.length >= 3}>
               <span className="pr-pantry-orb" style={{ background: m?.color || '#888' }} />
-              <span className="pr-pantry-id">{m?.name ?? id}</span>
+              <span className="pr-pantry-id">{m ? gt('furnaceMaterials', id, 'name', m.name) : id}</span>
               <span className="pr-pantry-count">×{furnace.materials[id]}</span>
             </button>
           );
@@ -248,22 +258,22 @@ function CombineTab({ furnace, heatCapNow, onCombine }) {
         {[0, 1, 2].map((i) => (
           <div key={i} className="pr-slot" onClick={() => selected[i] && drop(i)}>
             {selected[i]
-              ? <span className="pr-slot-filled">{MATERIALS[selected[i]]?.name ?? selected[i]}</span>
+              ? <span className="pr-slot-filled">{MATERIALS[selected[i]] ? gt('furnaceMaterials', selected[i], 'name', MATERIALS[selected[i]].name) : selected[i]}</span>
               : <span className="pr-slot-empty">+</span>}
           </div>
         ))}
       </div>
       <div className={`pr-predict ${predictedPill ? 'pr-predict-on' : ''}`}>
         <span className="pr-predict-seal" aria-hidden="true">丹</span>
-        <span className="pr-predict-lbl">Will yield</span>
-        <strong className="pr-predict-name">{predictedPill?.name ?? '— select 3 materials —'}</strong>
-        {predictedPill?.desc && <span className="pr-predict-sub">{predictedPill.desc}</span>}
+        <span className="pr-predict-lbl">{t('pillRefine.willYield')}</span>
+        <strong className="pr-predict-name">{predictedPill ? gt('furnacePills', predicted, 'name', predictedPill.name) : t('pillRefine.selectMaterials')}</strong>
+        {predictedPill?.desc && <span className="pr-predict-sub">{gt('furnacePills', predicted, 'desc', predictedPill.desc)}</span>}
       </div>
       <HeatSelector heat={heat} setHeat={setHeat} min={LAYER_DEF.combine.minHeat} cap={Math.min(heatCapNow, furnace.heat ?? 0)} />
       <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
         <span className="pr-fire-glow" aria-hidden="true" />
         <span className="pr-fire-glyph" aria-hidden="true">丹</span>
-        <span className="pr-fire-label">Ignite — Combine ({heatQualityLabel(heat)})</span>
+        <span className="pr-fire-label">{t('pillRefine.igniteCombine', { heat: heatQualityLabel(heat) })}</span>
       </button>
     </div>
   );
@@ -271,6 +281,8 @@ function CombineTab({ furnace, heatCapNow, onCombine }) {
 
 // ── Layer 3 — TRANSCEND tab ───────────────────────────────────────────────
 function TranscendTab({ furnace, onTranscend, onConsume }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   const realPillIds = useMemo(
     () => Object.entries(furnace.pills).filter(([id, n]) => n > 0 && !id.startsWith('capsule:')).map(([id]) => id),
     [furnace.pills]
@@ -310,24 +322,24 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
   return (
     <div className="pr-tab">
       <div className="pr-tab-head">
-        <h3>Transcend — 3 of the same Pill → 1 Foundation Pill (permanent)</h3>
-        <span className="pr-tab-cook">Cook: 6 hr · Heat: 60</span>
+        <h3>{t('pillRefine.transcendHead')}</h3>
+        <span className="pr-tab-cook">{t('pillRefine.cookTranscend')}</span>
       </div>
       <div className="pr-pantry">
         {realPillIds.length === 0 && (
-          <div className="pr-empty">No pills on the shelf. Combine some materials first.</div>
+          <div className="pr-empty">{t('pillRefine.noPills')}</div>
         )}
         {realPillIds.map((id) => {
           const p = PILLS[id];
           const canTrans = transcendable.includes(id);
           return (
             <div key={id} className="pr-pantry-tile pr-pantry-tile-pill">
-              <span className="pr-pantry-id">{p?.name ?? id}</span>
+              <span className="pr-pantry-id">{p ? gt('furnacePills', id, 'name', p.name) : id}</span>
               <span className="pr-pantry-count">×{furnace.pills[id]}</span>
               <div className="pr-pantry-actions">
-                <button type="button" onClick={() => onConsume(id)}>Consume</button>
+                <button type="button" onClick={() => onConsume(id)}>{t('pillRefine.consume')}</button>
                 {canTrans && (
-                  <button type="button" disabled={selected.length >= 3} onClick={() => pick(id)}>+ Slot</button>
+                  <button type="button" disabled={selected.length >= 3} onClick={() => pick(id)}>{t('pillRefine.addSlot')}</button>
                 )}
               </div>
             </div>
@@ -338,37 +350,36 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
         {[0, 1, 2].map((i) => (
           <div key={i} className="pr-slot" onClick={() => selected[i] && drop(i)}>
             {selected[i]
-              ? <span className="pr-slot-filled">{PILLS[selected[i]]?.name ?? selected[i]}</span>
+              ? <span className="pr-slot-filled">{PILLS[selected[i]] ? gt('furnacePills', selected[i], 'name', PILLS[selected[i]].name) : selected[i]}</span>
               : <span className="pr-slot-empty">+</span>}
           </div>
         ))}
       </div>
       <div className={`pr-predict pr-predict-divine ${predictedFound ? 'pr-predict-on' : ''}`}>
         <span className="pr-predict-seal" aria-hidden="true">超</span>
-        <span className="pr-predict-lbl">Permanent boon</span>
-        <strong className="pr-predict-name">{predictedFound?.name ?? '— select 3 identical pills —'}</strong>
-        {predictedFound?.desc && <span className="pr-predict-sub">{predictedFound.desc}</span>}
+        <span className="pr-predict-lbl">{t('pillRefine.permanentBoon')}</span>
+        <strong className="pr-predict-name">{predictedFound ? gt('furnaceFoundations', predicted, 'name', predictedFound.name) : t('pillRefine.selectPills')}</strong>
+        {predictedFound?.desc && <span className="pr-predict-sub">{gt('furnaceFoundations', predicted, 'desc', predictedFound.desc)}</span>}
       </div>
       <button type="button" className="pr-fire pr-fire-transcend" disabled={!canFire} onClick={fire}>
         <span className="pr-fire-glow" aria-hidden="true" />
         <span className="pr-fire-glyph" aria-hidden="true">超</span>
-        <span className="pr-fire-label">Transcend</span>
+        <span className="pr-fire-label">{t('pillRefine.transcend')}</span>
       </button>
       {capsules.length > 0 && (
         <div className="pr-capsules">
           <div className="pr-capsules-h">
-            Pending Foundation capsules ({capsules.length})
+            {t('pillRefine.pendingCapsules', { n: capsules.length })}
           </div>
           <div className="pr-capsules-note">
-            Foundation slots full when these crafted — they will auto-apply
-            on reincarnation.
+            {t('pillRefine.capsulesNote')}
           </div>
           <div className="pr-capsules-grid">
             {capsules.map((c) => {
               const fdef = FOUNDATIONS[c.foundationId];
               return (
                 <div key={c.id} className="pr-capsule">
-                  <span className="pr-capsule-name">{fdef?.name ?? c.foundationId}</span>
+                  <span className="pr-capsule-name">{fdef ? gt('furnaceFoundations', c.foundationId, 'name', fdef.name) : c.foundationId}</span>
                   <span className="pr-capsule-count">×{c.count}</span>
                 </div>
               );
@@ -382,6 +393,8 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
 
 // ── Main screen ───────────────────────────────────────────────────────────
 export default function PillRefinement(_props) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
   const f = useFurnace();
   const [tab, setTab] = useState('refine');
   const [now, setNow] = useState(() => Date.now());
@@ -402,7 +415,7 @@ export default function PillRefinement(_props) {
       <div className="pr-foundations">
         <div className="pr-foundations-head">
           <span className="pr-foundations-glyph" aria-hidden="true">基</span>
-          <span className="pr-foundations-title">Foundation</span>
+          <span className="pr-foundations-title">{t('pillRefine.foundation')}</span>
           <span className="pr-foundations-count">{f.furnace.foundations.length}/3</span>
         </div>
         <div className="pr-foundations-slots">
@@ -410,7 +423,7 @@ export default function PillRefinement(_props) {
             const fnd = f.furnace.foundations[i];
             const fdef = fnd ? FOUNDATIONS[fnd.id] : null;
             return (
-              <div key={i} className={`pr-foundation-medal ${fnd ? 'pr-foundation-medal-on' : ''}`} title={fdef?.desc ?? 'Empty Foundation slot — transcend a pill to fill.'}>
+              <div key={i} className={`pr-foundation-medal ${fnd ? 'pr-foundation-medal-on' : ''}`} title={fdef ? gt('furnaceFoundations', fnd.id, 'desc', fdef.desc) : t('pillRefine.emptyFoundationSlot')}>
                 <span className="pr-foundation-rope" aria-hidden="true" />
                 <span className="pr-foundation-seal" aria-hidden="true">{fdef ? '丹' : '○'}</span>
                 {fnd && (
@@ -424,15 +437,15 @@ export default function PillRefinement(_props) {
       <div className="pr-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={tab === 'refine'}    className={`pr-tab-btn pr-tab-refine    ${tab === 'refine'    ? 'pr-tab-on' : ''}`} onClick={() => setTab('refine')}>
           <span className="pr-tab-glyph" aria-hidden="true">火</span>
-          <span className="pr-tab-name">Refine</span>
+          <span className="pr-tab-name">{t('pillRefine.tabRefine')}</span>
         </button>
         <button type="button" role="tab" aria-selected={tab === 'combine'}   className={`pr-tab-btn pr-tab-combine   ${tab === 'combine'   ? 'pr-tab-on' : ''}`} onClick={() => setTab('combine')}>
           <span className="pr-tab-glyph" aria-hidden="true">丹</span>
-          <span className="pr-tab-name">Combine</span>
+          <span className="pr-tab-name">{t('pillRefine.tabCombine')}</span>
         </button>
         <button type="button" role="tab" aria-selected={tab === 'transcend'} className={`pr-tab-btn pr-tab-transcend ${tab === 'transcend' ? 'pr-tab-on' : ''}`} onClick={() => setTab('transcend')}>
           <span className="pr-tab-glyph" aria-hidden="true">超</span>
-          <span className="pr-tab-name">Transcend</span>
+          <span className="pr-tab-name">{t('pillRefine.tabTranscend')}</span>
         </button>
       </div>
       {tab === 'refine'    && <RefineTab    furnace={f.furnace} heatCapNow={f.heatCapNow} onRefine={f.refine} />}

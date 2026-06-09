@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import {
   SHOP_ITEMS,
   SHOP_BUNDLES,
@@ -139,6 +140,7 @@ function ParticleShowcase({ variant = '1' }) {
 
 function SkinCard({ item, balance, onBuy, busy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const sprites    = getSkinSprites(item);
   const revealed   = 3;
   const totalCount = sprites.length;
@@ -151,7 +153,7 @@ function SkinCard({ item, balance, onBuy, busy }) {
     <div className="bls-skin-card" data-slot={item.cosmeticSlot}>
       <div className="bls-skin-card-head">
         <div className="bls-skin-card-titles">
-          <div className="bls-skin-card-name">{item.name}</div>
+          <div className="bls-skin-card-name">{gt('shopItems', item.id, 'name', item.name)}</div>
           <div className="bls-skin-card-kicker">
             {isParticles
               ? t('bazaar.particleKicker')
@@ -189,7 +191,7 @@ function SkinCard({ item, balance, onBuy, busy }) {
       <div className="bls-skin-card-foot">
         <span className="bls-skin-foot-label">
           {isParticles
-            ? <>Live preview of the new <b>qi flow</b></>
+            ? <>{t('bazaar.particlePreviewPre')} <b>{t('bazaar.particlePreviewBold')}</b></>
             : t('bazaar.stagesRevealed', { n: revealed, total: totalCount })}
         </span>
         <button
@@ -217,6 +219,7 @@ function SkinCard({ item, balance, onBuy, busy }) {
  */
 function BundleCard({ bundle, balance, onBuy, busy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const disabled = balance < bundle.cost || busy;
   const components = (bundle.components ?? [])
     .map(id => SHOP_ITEMS_BY_ID[id])
@@ -227,8 +230,8 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
       <span className="bls-bundle-save-ribbon">{t('bazaar.savePack', { n: bundle.saveAmount?.toLocaleString() ?? '' })}</span>
 
       <div className="bls-bundle-head">
-        <div className="bls-bundle-name">{bundle.name}</div>
-        <div className="bls-bundle-tag">{bundle.desc}</div>
+        <div className="bls-bundle-name">{gt('shopBundles', bundle.id, 'name', bundle.name)}</div>
+        <div className="bls-bundle-tag">{gt('shopBundles', bundle.id, 'desc', bundle.desc)}</div>
       </div>
 
       <div className="bls-bundle-pieces">
@@ -268,7 +271,7 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
                 </div>
               )}
               <div className="bls-bundle-piece-meta">
-                <div className="bls-bundle-piece-name">{c.name}</div>
+                <div className="bls-bundle-piece-name">{gt('shopItems', c.id, 'name', c.name)}</div>
                 <div className="bls-bundle-piece-type">{slotLabel(c.cosmeticSlot)}</div>
               </div>
               <span className="bls-bundle-piece-strike">{c.cost?.toLocaleString() ?? ''}</span>
@@ -312,6 +315,7 @@ function BundleCard({ bundle, balance, onBuy, busy }) {
  */
 function BuffCard({ item, ownership, balance, onBuy, busy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   // Match by effect TYPE, not itemId: buffs are one-per-type now, so every
   // duration product of the same buff reads as active (and shares its timer)
   // when that buff is running.
@@ -336,7 +340,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
   // Strip a trailing " — 1h" / " - 4h" duration suffix from the name; the
   // duration chip below already carries that signal, and the tile is too
   // narrow to repeat it without truncation.
-  const cleanName = (item.name ?? '').replace(/\s*[—-]\s*\d+\s*[hm]\s*$/i, '');
+  const cleanName = gt('shopItems', item.id, 'name', item.name).replace(/\s*[—-]\s*\d+\s*[hm]\s*$/i, '');
   const disabled  = balance < item.cost || busy;
 
   return (
@@ -363,6 +367,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
 
 function CompactRow({ item, ownership, balance, onBuy, busy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const { state, label, disabled } = (() => {
     if (item.ownership === 'permanent' && ownership.hasQol(item.id)) {
       return { state: 'owned', label: t('bazaar.owned'), disabled: true };
@@ -389,11 +394,11 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
       <div className="bls-item-icon">{item.icon}</div>
       <div className="bls-item-body">
         <div className="bls-item-name">
-          {item.name}
+          {gt('shopItems', item.id, 'name', item.name)}
           {stackCount > 0 && <span className="bls-item-tag">×{stackCount}</span>}
           {oneshotCount > 0 && <span className="bls-item-tag">×{oneshotCount}</span>}
         </div>
-        <div className="bls-item-desc">{item.desc}</div>
+        <div className="bls-item-desc">{gt('shopItems', item.id, 'desc', item.desc)}</div>
       </div>
       <button
         type="button"
@@ -416,12 +421,13 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
  */
 function FeaturedHero({ featured, balance, busy, onBuy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   if (!featured) return null;
   const { item, originalCost, discountedCost, endsAtMs } = featured;
   const disabled = balance < discountedCost || busy;
   const isSkin = item.ownership === 'cosmetic';
   return (
-    <div className="sbz-featured" aria-label="Today's pick">
+    <div className="sbz-featured" aria-label={t('bazaar.todaysPick')}>
       <span className="sbz-featured-ribbon">{t('bazaar.todaysPick')}</span>
 
       <div className="sbz-featured-preview">
@@ -455,8 +461,8 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
 
       <div className="sbz-featured-body">
         <span className="sbz-featured-eyebrow">{t('bazaar.limitedOffering')}</span>
-        <span className="sbz-featured-name">{item.name}</span>
-        <span className="sbz-featured-desc">{item.desc}</span>
+        <span className="sbz-featured-name">{gt('shopItems', item.id, 'name', item.name)}</span>
+        <span className="sbz-featured-desc">{gt('shopItems', item.id, 'desc', item.desc)}</span>
 
         <div className="sbz-featured-cta">
           <button
@@ -531,10 +537,10 @@ export default function SpiritBazaarScreen({
   // least one available item.
   const cosmeticsBySlot = useMemo(() => {
     const groups = {
-      [COSMETIC_SLOTS.CHARACTER]:  { label: 'Cultivator Skins', items: [] },
-      [COSMETIC_SLOTS.CRYSTAL]:    { label: 'Crystal Skins',    items: [] },
-      [COSMETIC_SLOTS.PARTICLES]:  { label: 'Particle Effects', items: [] },
-      [COSMETIC_SLOTS.BACKGROUND]: { label: 'Backdrops',        items: [] },
+      [COSMETIC_SLOTS.CHARACTER]:  { label: t('bazaar.slotCharacter'), items: [] },
+      [COSMETIC_SLOTS.CRYSTAL]:    { label: t('bazaar.slotCrystal'),    items: [] },
+      [COSMETIC_SLOTS.PARTICLES]:  { label: t('bazaar.slotParticles'),  items: [] },
+      [COSMETIC_SLOTS.BACKGROUND]: { label: t('bazaar.slotBackdrop'),   items: [] },
     };
     const cosmetics = itemsByCategory.get('cosmetic') ?? [];
     for (const it of cosmetics) {
@@ -543,7 +549,7 @@ export default function SpiritBazaarScreen({
       groups[it.cosmeticSlot].items.push(it);
     }
     return groups;
-  }, [itemsByCategory, inventory]);
+  }, [itemsByCategory, inventory, t]);
 
   // Bundles available to the player. A bundle hides the moment any of
   // its components is owned (the discount stops making sense once the

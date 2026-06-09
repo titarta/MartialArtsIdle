@@ -152,7 +152,7 @@ export default function ReincarnationConfirmModal({
       className="rc-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Reincarnation"
+      aria-label={t('reincarnation.title')}
       onClick={onCancel}
     >
       <div className={`rc-card${canReincarnate ? '' : ' rc-card-closed'}`} onClick={(e) => e.stopPropagation()}>

@@ -20,6 +20,8 @@
  * hint text. Discovered entries show the real name + description.
  */
 
+import { useTranslation } from 'react-i18next';
+
 const BASE = import.meta.env.BASE_URL;
 const url  = (s) => (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
 
@@ -46,11 +48,12 @@ function EntryRow({ entry }) {
 }
 
 export default function CodexSectionsBody({ sections, progress }) {
+  const { t } = useTranslation('ui');
   return (
     <div className="cx-body">
       {progress && (
         <div className="cx-progress">
-          Discovered <strong>{progress.discovered}</strong> / {progress.total}
+          {t('codex.discovered')} <strong>{progress.discovered}</strong> / {progress.total}
         </div>
       )}
       {sections.map((section) => (

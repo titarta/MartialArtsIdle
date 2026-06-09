@@ -31,7 +31,7 @@
  * tinting needed for Tier A.
  */
 
-const BASE = (typeof import.meta !== 'undefined' && import.meta?.env?.BASE_URL) || '/';
+const BASE = import.meta.env.BASE_URL || '/';
 
 export const TUTORIAL_IDS = Object.freeze({
   WELCOME:            'welcome',
@@ -133,9 +133,12 @@ const CARDS = {
   // TUTORIAL_IDS block for the full rationale.
 };
 
-/** Fetch the payload for a tutorial id, or undefined if none. */
+/** Fetch the payload for a tutorial id, or undefined if none. The id is
+ *  folded into the returned object so downstream consumers (the i18n
+ *  resolver in App.jsx) can key translations by it. */
 export function getTutorialCard(id) {
-  return CARDS[id];
+  const card = CARDS[id];
+  return card ? { ...card, id } : undefined;
 }
 
 // Re-export the icon base so consumers can build iconSrc paths without

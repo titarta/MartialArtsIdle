@@ -1,4 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { fmt, fmtRate } from '../utils/format';
 import { getSpriteTier, resolveSprite, resolveTierFor, SPRITE_TIERS } from '../data/producers';
 
@@ -58,6 +60,9 @@ export default function ProducerLane({
   // Transcended tier on the disc_transcend Eternal Tree node.
   treeMods = {},
 }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
+  const pName = gt('producers', producer.id, 'name', producer.name);
   // Resolve current tier + sprite. Tier null when 0 owned. resolveTierFor
   // respects the producer's transcendedNode gate; resolveSprite falls back
   // to the producer's highest available sprite if the tier exceeds the
@@ -83,9 +88,9 @@ export default function ProducerLane({
     const nextRank = ranks.indexOf(next);
     if (nextRank > prevRank && next != null) {
       setCelebrating(true);
-      const t = setTimeout(() => setCelebrating(false), 1400);
+      const timer = setTimeout(() => setCelebrating(false), 1400);
       prevTierNameRef.current = next;
-      return () => clearTimeout(t);
+      return () => clearTimeout(timer);
     }
     prevTierNameRef.current = next;
   }, [tier?.name]);
@@ -125,20 +130,20 @@ export default function ProducerLane({
         <button
           className="pl-leader pl-leader-clickable"
           onClick={() => onShowDetail?.(producer)}
-          aria-label={`${producer.name} details`}
+          aria-label={t('producer.detailsLabel', { name: pName })}
           type="button"
         >
           <Sprite sprite={teaserSprite} className="pl-leader-sprite pl-leader-silhouette" />
         </button>
         <div className="pl-body">
           <div className="pl-caption">
-            <span className="pl-name pl-name-locked">??? Locked</span>
+            <span className="pl-name pl-name-locked">{t('producer.lockedName')}</span>
             <span className="pl-sep">·</span>
-            <span className="pl-rate">Unlocks at realm {minRealm}</span>
+            <span className="pl-rate">{t('producer.unlocksAt', { n: minRealm })}</span>
           </div>
           <div className="pl-stack pl-stack-empty" aria-hidden="true"></div>
         </div>
-        <div className="pl-buy-zone pl-buy-zone-locked">Locked</div>
+        <div className="pl-buy-zone pl-buy-zone-locked">{t('common.locked')}</div>
       </div>
     );
   }
@@ -158,7 +163,7 @@ export default function ProducerLane({
       <button
         className="pl-leader pl-leader-clickable"
         onClick={() => onShowDetail?.(producer)}
-        aria-label={`${producer.name} details`}
+        aria-label={t('producer.detailsLabel', { name: pName })}
         type="button"
       >
         <Sprite sprite={sprite} className="pl-leader-sprite" />
@@ -166,11 +171,11 @@ export default function ProducerLane({
 
       <div className="pl-body">
         <div className="pl-caption">
-          <span className="pl-name">{producer.name}</span>
+          <span className="pl-name">{pName}</span>
           {owned > 0 && (
             <>
               <span className="pl-sep">·</span>
-              <span className="pl-rate">{fmtRate(totalQiPerSec)} Qi/s</span>
+              <span className="pl-rate">{t('producer.ratePerSec', { rate: fmtRate(totalQiPerSec) })}</span>
             </>
           )}
         </div>
@@ -188,7 +193,7 @@ export default function ProducerLane({
         disabled={!affordable}
       >
         <span className="pl-buy-count">×{buyMode}</span>
-        <span className="pl-buy-cost">{fmt(displayCost)} Qi</span>
+        <span className="pl-buy-cost">{t('producer.cost', { n: fmt(displayCost) })}</span>
       </button>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fmt as fmtNum } from '../utils/format';
 
 const BASE = import.meta.env.BASE_URL;
@@ -35,6 +36,7 @@ export default function TopBar({
   qiRef,
   karma,
 }) {
+  const { t } = useTranslation('ui');
   return (
     <div className="top-bar">
       {/* Top Up button: opens the IAP modal where Blood Lotus is bought
@@ -43,7 +45,7 @@ export default function TopBar({
       <button
         className={`home-hud-blood-lotus${activeModal === 'shop' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenShop}
-        aria-label="Top Up Blood Lotus"
+        aria-label={t('topBar.topUp')}
       >
         <img
           src={`${BASE}sprites/items/blood_lotus.png`}
@@ -60,7 +62,7 @@ export default function TopBar({
       <button
         className={`home-hud-lotus-shop${currentScreen === 'spirit-bazaar' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenLotusShop}
-        aria-label="Spirit Bazaar"
+        aria-label={t('topBar.bazaar')}
       >
         <img
           src={`${BASE}ui/shop_nav.png`}
@@ -77,7 +79,7 @@ export default function TopBar({
           karma slot, so the divider's screen position never shifts as
           the qi readout changes scale. Per home-pass/home-v2-mockup. */}
       <div className="topbar-currencies">
-        <div className="topbar-currency-row topbar-currency-qi" aria-label="Current Qi">
+        <div className="topbar-currency-row topbar-currency-qi" aria-label={t('topBar.currentQi')}>
           <img
             src={`${BASE}ui/qi.png`}
             className="topbar-currency-icon"
@@ -87,7 +89,7 @@ export default function TopBar({
           <QiLiveText qiRef={qiRef} />
         </div>
         <span className="topbar-currency-sep" aria-hidden="true" />
-        <div className="topbar-currency-row topbar-currency-karma" aria-label="Current Karma">
+        <div className="topbar-currency-row topbar-currency-karma" aria-label={t('topBar.currentKarma')}>
           <img
             src={`${BASE}ui/karma.png`}
             className="topbar-currency-icon"
@@ -102,7 +104,7 @@ export default function TopBar({
         <button
           className={`home-hud-reinc${currentScreen === 'reincarnation' ? ' top-bar-btn--active' : ''}`}
           onClick={onOpenReincarnation}
-          aria-label="Reincarnation"
+          aria-label={t('topBar.reincarnation')}
         >
           <img
             src={`${BASE}sprites/nav/eternal_tree.png`}
@@ -119,7 +121,7 @@ export default function TopBar({
       <button
         className={`home-hud-progress${activeModal === 'codex' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenProgress}
-        aria-label="Codex"
+        aria-label={t('topBar.codex')}
       >
         <img
           src={`${BASE}sprites/nav/codex.png`}
@@ -132,7 +134,7 @@ export default function TopBar({
       <button
         className={`home-hud-settings${currentScreen === 'settings' ? ' top-bar-btn--active' : ''}`}
         onClick={onOpenSettings}
-        aria-label="Settings"
+        aria-label={t('topBar.settings')}
       >
         <img
           src={`${BASE}sprites/nav/settings.png`}

@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { recordStat } from '../systems/statsRecorder';
 import AchievementPlaque from './AchievementPlaque';
 
@@ -15,6 +17,9 @@ const LOCKED_ICON = '?';
  *   secretDesc:true title visible, desc hidden
  */
 function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
+  const { t } = useTranslation('ui');
+  const gt = useGameText();
+  const aTitle = gt('achievements', achievement.id, 'title', achievement.title);
   const isHidden = !unlocked && (achievement.hidden === true);
   const cls = [
     'ach-badge',
@@ -22,15 +27,15 @@ function AchievementBadge({ achievement, unlocked, selected, onSelect }) {
     selected ? 'ach-badge-selected' : '',
   ].filter(Boolean).join(' ');
   const tooltip = unlocked
-    ? achievement.title
-    : (isHidden ? '???' : achievement.title);
+    ? aTitle
+    : (isHidden ? t('common.unknown') : aTitle);
   const iconChar = unlocked ? achievement.icon : LOCKED_ICON;
   return (
     <button
       type="button"
       className={cls}
       onClick={() => onSelect(achievement.id)}
-      aria-label={unlocked ? achievement.title : 'Locked achievement'}
+      aria-label={unlocked ? aTitle : t('achievement.lockedAriaLabel')}
       title={tooltip}
     >
       <span className="ach-badge-icon">{iconChar}</span>

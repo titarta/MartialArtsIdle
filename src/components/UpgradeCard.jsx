@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { fmt } from '../utils/format';
 import { upgradeIconSrc } from '../utils/upgradeIcons';
 
@@ -45,8 +46,11 @@ function identityFor(upgrade) {
  */
 export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const affordable = unlocked && qi >= upgrade.cost;
   const ident = identityFor(upgrade);
+  const name = gt('upgrades', upgrade.id, 'name', upgrade.name);
+  const desc = gt('upgrades', upgrade.id, 'desc', upgrade.desc);
 
   return (
     <div className={`it${unlocked ? '' : ' it-locked'}`}>
@@ -57,8 +61,8 @@ export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
           <span className={`it-glyph${ident.accent ? ' it-glyph-accent' : ''}`}>{ident.char}</span>
         )}
       </div>
-      <div className="it-name">{upgrade.name}</div>
-      <div className="it-desc">{upgrade.desc}</div>
+      <div className="it-name">{name}</div>
+      <div className="it-desc">{desc}</div>
       <button
         type="button"
         className={`it-cost${unlocked ? (affordable ? '' : ' it-cost-dim') : ' it-cost-sealed'}`}
@@ -78,19 +82,22 @@ export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
  * grid's visual budget.
  */
 export function OwnedUpgradeChip({ upgrade }) {
+  const gt = useGameText();
   const ident = identityFor(upgrade);
+  const name = gt('upgrades', upgrade.id, 'name', upgrade.name);
+  const desc = gt('upgrades', upgrade.id, 'desc', upgrade.desc);
   return (
     <div
       className="it-chip"
-      title={upgrade.desc}
-      aria-label={`${upgrade.name} — ${upgrade.desc}`}
+      title={desc}
+      aria-label={`${name} — ${desc}`}
     >
       {ident.kind === 'sprite' ? (
         <img className="it-chip-icon" src={ident.src} alt="" draggable="false" onError={handleIconError} />
       ) : (
         <span className="it-chip-glyph" aria-hidden="true">{ident.char}</span>
       )}
-      <span className="it-chip-name">{upgrade.name}</span>
+      <span className="it-chip-name">{name}</span>
     </div>
   );
 }

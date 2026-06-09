@@ -62,9 +62,9 @@ function CodexModal({
     wardrobe:     t('codex.tabWardrobe'),
     achievements: t('codex.tabAchievements'),
     stats:        t('codex.tabStats'),
-    garden:       'Garden',
-    roster:       'Roster',
-    furnace:      'Furnace',
+    garden:       t('codex.tabGarden'),
+    roster:       t('codex.tabRoster'),
+    furnace:      t('codex.tabFurnace'),
   };
 
   // Load minigame state ON DEMAND when a relevant tab is active (avoids

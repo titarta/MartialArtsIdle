@@ -44,6 +44,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { AudioManager } from '../audio';
 import './dissolutionRite.css';
 
@@ -119,6 +120,7 @@ const BOKEH = Array.from({ length: 36 }, (_, i) => {
 });
 
 export default function DissolutionRite({ onComplete, realmName }) {
+  const { t } = useTranslation('ui');
   // Latest onComplete in a ref so the timer effect can run once on mount
   // and still call the freshest callback. App.jsx's cultivation tick
   // re-renders this component at 1Hz with a new inline `onComplete`
@@ -130,8 +132,8 @@ export default function DissolutionRite({ onComplete, realmName }) {
 
   const [finishing, setFinishing] = useState(false);
   const whisper = useMemo(() => (
-    realmName ? `${realmName} returns to the wheel` : 'All that was, returns'
-  ), [realmName]);
+    realmName ? t('reincarnationModal.whisperReturns', { realm: realmName }) : t('reincarnationModal.whisperFallback')
+  ), [realmName, t]);
 
   useEffect(() => {
     const reduced = typeof window !== 'undefined'

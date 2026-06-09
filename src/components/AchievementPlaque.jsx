@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 
 /**
  * AchievementPlaque — the "trophy plaque" detail surface for an achievement.
@@ -61,6 +62,7 @@ function kickerKey(unlocked, hidden, secretDesc) {
 
 export default function AchievementPlaque({ achievement, unlocked, onClose }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
 
   // Esc closes
   useEffect(() => {
@@ -70,6 +72,9 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
   }, [onClose]);
 
   if (!achievement) return null;
+
+  const aTitle = gt('achievements', achievement.id, 'title', achievement.title);
+  const aDesc  = gt('achievements', achievement.id, 'desc', achievement.desc);
 
   const isHidden     = !unlocked && achievement.hidden === true;
   const isSecretDesc = !unlocked && achievement.secretDesc === true && !isHidden;
@@ -85,8 +90,8 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
   let kickerClass = '';
 
   if (unlocked) {
-    titleText  = achievement.title;
-    bodyText   = achievement.desc;
+    titleText  = aTitle;
+    bodyText   = aDesc;
     medalGlyph = achievement.icon;
   } else if (isHidden) {
     titleText  = t('common.unknown');
@@ -95,7 +100,7 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
     medalIsSeal = true;
     kickerClass = 'ach-plaque-kicker-locked';
   } else if (isSecretDesc) {
-    titleText  = achievement.title;
+    titleText  = aTitle;
     bodyText   = t('achievement.secretDesc');
     bodyItalic = true;
     medalIsSeal = true;
@@ -103,8 +108,8 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
   } else {
     // isLockedShow — locked but not hidden / not secretDesc; show real
     // info just dimmed
-    titleText  = achievement.title;
-    bodyText   = achievement.desc;
+    titleText  = aTitle;
+    bodyText   = aDesc;
     medalIsSeal = true;
     kickerClass = 'ach-plaque-kicker-locked';
   }
@@ -133,7 +138,7 @@ export default function AchievementPlaque({ achievement, unlocked, onClose }) {
       className="modal-overlay ach-plaque-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={unlocked ? `Achievement: ${achievement.title}` : t('achievement.lockedAriaLabel')}
+      aria-label={unlocked ? `Achievement: ${aTitle}` : t('achievement.lockedAriaLabel')}
       onClick={onClose}
     >
       <div

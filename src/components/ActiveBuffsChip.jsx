@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { QI_SPARK_BY_ID, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
@@ -66,49 +67,50 @@ function BuffIcon({ icon, fallback = '✦' }) {
 }
 
 function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
+  const { t } = useTranslation('ui');
   const [open, setOpen] = useState(false);
   // Single 250ms tick drives chip countdown text AND popover bar fills.
   const [now, setNow] = useState(() => Date.now());
 
   const buffs = useMemo(() => {
-    const t = now;
+    const tNow = now;
     const sparkEntries = (activeSparks ?? [])
-      .filter(s => s?.expiresAt && s.expiresAt > t)
+      .filter(s => s?.expiresAt && s.expiresAt > tNow)
       .map(s => {
         const card = QI_SPARK_BY_ID[s.sparkId];
         const copy = SPARK_COPY[s.sparkId];
         return {
           key:       `spark:${s.instanceId}`,
-          name:      card?.name ?? 'Buff',
+          name:      card?.name ?? t('activeBuffs.buffFallback'),
           icon:      copy?.icon ?? '✦',
           expiresAt: s.expiresAt,
-          total:     card?.duration ?? Math.max(1, s.expiresAt - t),
+          total:     card?.duration ?? Math.max(1, s.expiresAt - tNow),
         };
       });
     const shopEntries = (activeBuffs ?? [])
-      .filter(b => b?.expiresAtMs && b.expiresAtMs > t)
+      .filter(b => b?.expiresAtMs && b.expiresAtMs > tNow)
       .map(b => ({
         key:       `shop:${b.id}`,
-        name:      b.item?.name ?? 'Buff',
+        name:      b.item?.name ?? t('activeBuffs.buffFallback'),
         icon:      b.item?.icon ?? '✦',
         expiresAt: b.expiresAtMs,
-        total:     b.item?.effect?.durationMs ?? Math.max(1, b.expiresAtMs - t),
+        total:     b.item?.effect?.durationMs ?? Math.max(1, b.expiresAtMs - tNow),
       }));
     // Furnace timed pill buffs (added 2026-06-09). Same shape as the other
     // two sources after normalisation. The chip surfaces every alchemy
     // buff alongside the others — single source of truth for "what's
     // currently boosting me."
     const furnaceEntries = (furnaceBuffs ?? [])
-      .filter(b => b?.expiresAt && b.expiresAt > t)
+      .filter(b => b?.expiresAt && b.expiresAt > tNow)
       .map(b => ({
         key:       `furnace:${b.pillId}:${b.consumedAt}`,
-        name:      b.name ?? 'Pill',
+        name:      b.name ?? t('activeBuffs.pillFallback'),
         icon:      '丹', // Cinzel/Ma Shan Zheng calligraphy glyph for "pill"
         expiresAt: b.expiresAt,
-        total:     b.durationMs ?? Math.max(1, b.expiresAt - t),
+        total:     b.durationMs ?? Math.max(1, b.expiresAt - tNow),
       }));
     return [...sparkEntries, ...shopEntries, ...furnaceEntries].sort((a, b) => a.expiresAt - b.expiresAt);
-  }, [activeSparks, activeBuffs, furnaceBuffs, now]);
+  }, [activeSparks, activeBuffs, furnaceBuffs, now, t]);
 
   // Tick only while something is buffing. Stops the timer when the
   // pool is empty so we don't burn cycles in the common idle case.
@@ -159,8 +161,8 @@ function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
         onClick={handleOpen}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={`${count} active ${count === 1 ? 'buff' : 'buffs'}, tap to view`}
-        title="Active buffs"
+        aria-label={t('activeBuffs.chipAriaLabel', { count })}
+        title={t('activeBuffs.title')}
       >
         <span className="tb-buffs-chip-icon" aria-hidden="true">✦</span>
         <span className="tb-buffs-chip-count">{count}</span>
@@ -173,17 +175,17 @@ function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
           className="modal-overlay abp-overlay"
           role="dialog"
           aria-modal="true"
-          aria-label="Active temporary buffs"
+          aria-label={t('activeBuffs.dialogLabel')}
           onClick={() => setOpen(false)}
         >
           <div className="abp-popover" onClick={(e) => e.stopPropagation()}>
             <header className="abp-popover-header">
-              <span className="abp-popover-title">Active buffs</span>
+              <span className="abp-popover-title">{t('activeBuffs.title')}</span>
               <span className="abp-popover-count">{count}</span>
               <button
                 type="button"
                 className="modal-close"
-                aria-label="Close"
+                aria-label={t('common.closeAriaLabel')}
                 onClick={() => setOpen(false)}
               >✕</button>
             </header>

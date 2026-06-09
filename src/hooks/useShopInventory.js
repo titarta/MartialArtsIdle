@@ -26,6 +26,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SHOP_ITEMS_BY_ID } from '../data/shopItems';
 import { getBloodLotusBalance, spendBloodLotus } from '../systems/bloodLotus';
 import { recordStat } from '../systems/statsRecorder';
@@ -104,6 +105,7 @@ function normalizeBuffs(rawBuffs) {
 }
 
 export default function useShopInventory() {
+  const { t } = useTranslation('ui');
   const [inv, setInv] = useState(loadInventory);
 
   // Persist on every change.
@@ -135,27 +137,27 @@ export default function useShopInventory() {
   // ── Purchase flow ──────────────────────────────────────────────────────
   const purchase = useCallback((itemId) => {
     const item = SHOP_ITEMS_BY_ID[itemId];
-    if (!item) return { ok: false, error: 'Unknown item' };
+    if (!item) return { ok: false, error: t('shop.errorUnknownItem') };
 
     // Affordability gate
     const balance = getBloodLotusBalance();
-    if (balance < item.cost) return { ok: false, error: 'Not enough Blood Lotus' };
+    if (balance < item.cost) return { ok: false, error: t('shop.errorInsufficientBL') };
 
     // Permanent QoL — refuse second buy
     if (item.ownership === 'permanent' && inv.qol[itemId]) {
-      return { ok: false, error: 'Already owned' };
+      return { ok: false, error: t('shop.errorAlreadyOwned') };
     }
     // Stackable — refuse if at cap
     if (item.ownership === 'stackable') {
       const cur = inv.stacks[itemId] ?? 0;
       if (item.maxStack && cur >= item.maxStack) {
-        return { ok: false, error: 'Max stack reached' };
+        return { ok: false, error: t('shop.errorMaxStack') };
       }
     }
 
     // Spend BL (atomic — refuses if balance shifted since the check)
     if (!spendBloodLotus(item.cost)) {
-      return { ok: false, error: 'Not enough Blood Lotus' };
+      return { ok: false, error: t('shop.errorInsufficientBL') };
     }
 
     // Achievement counters. Cosmetic and non-cosmetic split so the
@@ -216,7 +218,7 @@ export default function useShopInventory() {
     });
 
     return { ok: true };
-  }, [inv]);
+  }, [inv, t]);
 
   /**
    * True if a bundle is still buyable - i.e. the player does NOT own any

@@ -57,6 +57,7 @@ import { fireTutorialOnce } from './systems/fireTutorial';
 import { hasSeenTutorial, markTutorialSeen } from './systems/tutorialSeen';
 import { TUTORIAL_IDS } from './data/tutorialCards';
 import TutorialModal from './components/TutorialModal';
+import { useGameText } from './i18n/gameText';
 
 // The v1 nav routes are home / cultivation / journey + the top-bar surfaces
 // (spirit-bazaar / settings / about). Every combat-adjacent screen
@@ -77,6 +78,7 @@ import { EventQueueProvider, useEventQueue, useBlockingPresence } from './contex
 import './App.css';
 
 function AppInner() {
+  const gt = useGameText();
   const [currentScreen, setCurrentScreen] = useState('home');
   const [screenParam,   setScreenParam]   = useState(null);
   // selectionModalOpen used to gate the law-offer SelectionModal. Laws are
@@ -1707,11 +1709,11 @@ function AppInner() {
         && (
         <TutorialModal
           key={currentEvent.id}
-          kicker={currentEvent.payload?.kicker}
-          title={currentEvent.payload?.title}
-          body={currentEvent.payload?.body}
+          kicker={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'kicker', currentEvent.payload.kicker) : currentEvent.payload?.kicker}
+          title={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'title', currentEvent.payload.title) : currentEvent.payload?.title}
+          body={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'body', currentEvent.payload.body) : currentEvent.payload?.body}
           iconSrc={currentEvent.payload?.iconSrc}
-          ctaText={currentEvent.payload?.ctaText}
+          ctaText={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'ctaText', currentEvent.payload.ctaText) : currentEvent.payload?.ctaText}
           glowA={currentEvent.payload?.glowA}
           glowB={currentEvent.payload?.glowB}
           onDone={() => dismiss(currentEvent.id)}

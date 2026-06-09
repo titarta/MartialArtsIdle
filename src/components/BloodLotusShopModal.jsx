@@ -249,7 +249,7 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy, t 
       </div>
 
       <div className="blshop-pack-body">
-        <span className="blshop-pack-label">{pkg.label}</span>
+        <span className="blshop-pack-label">{t(`shop.packages.${pkg.id}`, { defaultValue: pkg.label })}</span>
         <div className="blshop-pack-amount-row">
           <span className="blshop-pack-amount">{pkg.amount.toLocaleString()}</span>
           <span className="blshop-pack-amount-unit">BL</span>
@@ -273,7 +273,7 @@ function PackCard({ pkg, meta, bonus, strike, rate, pending, disabled, onBuy, t 
                 {bonus > 0 && (
                   <span
                     className="blshop-pack-bonus"
-                    aria-label={`Bonus ${bonus}% over baseline`}
+                    aria-label={t('shop.bonusAriaLabel', { bonus })}
                   >
                     +{bonus}%
                   </span>

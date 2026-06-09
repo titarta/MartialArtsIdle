@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * DetailModal — centered modal primitive used by Crystal Detail and
@@ -22,6 +23,7 @@ import { createPortal } from 'react-dom';
  *   below the navbar.
  */
 export default function DetailModal({ open, onClose, children, className = '', ariaLabel }) {
+  const { t } = useTranslation('ui');
   useEffect(() => {
     if (!open) return undefined;
     document.body.classList.add('sheet-open');
@@ -40,7 +42,7 @@ export default function DetailModal({ open, onClose, children, className = '', a
       className="modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label={ariaLabel ?? 'Details'}
+      aria-label={ariaLabel ?? t('common.details')}
       onClick={onClose}
     >
       <div

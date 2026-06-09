@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { QI_SPARK_BY_ID, SPARK_RARITY, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
@@ -76,11 +77,15 @@ function iconFor(sparkId) {
  * so players never have to hunt for the commit moment.
  */
 function SparkCardSlot({ sparkId, onPick }) {
+  const gt = useGameText();
   const card = QI_SPARK_BY_ID[sparkId];
   if (!card) return null;
   const rarity     = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
   const copy       = SPARK_COPY[sparkId];
-  const effectText = copy?.effectText ?? card.description ?? '';
+  const name       = gt('qiSparks', sparkId, 'name', card.name);
+  const effectText = copy?.effectText != null
+    ? gt('sparkCopy', sparkId, 'effectText', copy.effectText)
+    : gt('qiSparks', sparkId, 'description', card.description ?? '');
   const icon       = iconFor(sparkId);
   const sealGlyph  = copy?.sealGlyph ?? null;
 
@@ -103,7 +108,7 @@ function SparkCardSlot({ sparkId, onPick }) {
             onPick(sparkId);
           }
         }}
-        aria-label={`Pick ${card.name}`}
+        aria-label={`Pick ${name}`}
       >
         <span className="spk-grain" aria-hidden="true" />
         <span className="spk-mark"  aria-hidden="true" />
@@ -125,7 +130,7 @@ function SparkCardSlot({ sparkId, onPick }) {
             <span className="spk-icon-glyph"><CardIcon icon={icon} /></span>
           </div>
           <hr className="spk-rule" />
-          <h3 className="spk-name">{card.name}</h3>
+          <h3 className="spk-name">{name}</h3>
           <div className="spk-effect-wrap">
             <p className="spk-effect">{renderEffect(effectText)}</p>
           </div>
@@ -306,7 +311,7 @@ function QiSparkChoiceModal({
             </div>
           )}
           {hasContext && (
-            <div className="spk-snapshot-context" aria-label="Roll context">
+            <div className="spk-snapshot-context" aria-label={t('sparkChoice.rollContext')}>
               {realmLabel}
               {realmLabel && ageLabel && <span className="spk-snapshot-sep"> · </span>}
               {ageLabel}

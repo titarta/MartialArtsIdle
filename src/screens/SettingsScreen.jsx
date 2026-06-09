@@ -38,14 +38,14 @@ const REALM_ICONS = {
 };
 
 const RENDERING_MODES = [
-  { mode: 'auto',      label: 'Smooth',    sub: 'bilinear',  icon: '〜' },
-  { mode: 'pixelated', label: 'Crisp',     sub: 'pixelated', icon: '▦' },
+  { mode: 'auto',      labelKey: 'settings.renderSmooth', subKey: 'settings.renderSmoothSub', icon: '〜' },
+  { mode: 'pixelated', labelKey: 'settings.renderCrisp',  subKey: 'settings.renderCrispSub',  icon: '▦' },
 ];
 
 const AUDIO_CHANNELS = [
-  { channel: 'master', label: 'Master', volKey: 'masterVol', muteKey: 'masterMuted' },
-  { channel: 'bgm',    label: 'Music',  volKey: 'bgmVol',    muteKey: 'bgmMuted'    },
-  { channel: 'sfx',    label: 'Effects',volKey: 'sfxVol',    muteKey: 'sfxMuted'    },
+  { channel: 'master', labelKey: 'settings.audioMaster',  volKey: 'masterVol', muteKey: 'masterMuted' },
+  { channel: 'bgm',    labelKey: 'settings.audioMusic',   volKey: 'bgmVol',    muteKey: 'bgmMuted'    },
+  { channel: 'sfx',    labelKey: 'settings.audioEffects', volKey: 'sfxVol',    muteKey: 'sfxMuted'    },
 ];
 
 function SegmentedControl({ options, value, onChange }) {
@@ -158,6 +158,7 @@ const PERK_ROWS = [
 ];
 
 function ActivePerks({ shopInventory, autoBuyEnabled }) {
+  const { t } = useTranslation('ui');
   if (!shopInventory) return null;
   const owned = PERK_ROWS.map(row => {
     if (row.kind === 'permanent') {
@@ -178,17 +179,17 @@ function ActivePerks({ shopInventory, autoBuyEnabled }) {
 
   return (
     <section className="stg-section">
-      <div className="stg-section-label stg-cinzel-label stg-label-perk">Active Perks</div>
+      <div className="stg-section-label stg-cinzel-label stg-label-perk">{t('settings.activePerks')}</div>
       <div className="stg-perk-card">
         {owned.map(perk => (
           <div key={perk.id} className="stg-perk-row">
             <span className="stg-perk-icon">{perk.icon}</span>
             <span className="stg-perk-body">
-              <span className="stg-perk-name">{perk.name}</span>
+              <span className="stg-perk-name">{t(`settings.perks.${perk.id}.name`, { defaultValue: perk.name })}</span>
               <span className="stg-perk-effect">
                 {perk.kind === 'stackable'
-                  ? perk.effectForStack(perk.stack)
-                  : perk.effect}
+                  ? t('settings.perks.qol_offline_cap_2h.effect', { add: perk.stack * 2, total: 8 + perk.stack * 2 })
+                  : t(`settings.perks.${perk.id}.effect`, { defaultValue: perk.effect })}
               </span>
             </span>
             <span className="stg-perk-state">
@@ -197,11 +198,11 @@ function ActivePerks({ shopInventory, autoBuyEnabled }) {
                   ×{perk.stack}{perk.maxStack ? ` / ${perk.maxStack}` : ''}
                 </span>
               ) : (
-                <span className="stg-perk-badge">Active</span>
+                <span className="stg-perk-badge">{t('common.active')}</span>
               )}
               {perk.id === 'qol_autobuy_cheapest' && (
                 <span className="stg-perk-toggle">
-                  {autoBuyEnabled ? 'Enabled' : 'Disabled'}
+                  {autoBuyEnabled ? t('settings.enabled') : t('settings.disabled')}
                 </span>
               )}
             </span>
@@ -310,8 +311,8 @@ function SettingsScreen({
       </button>
 
       {/* IDENTITY PLAQUE */}
-      <div className="stg-identity" aria-label="Cultivator Tablet">
-        <div className="stg-identity-eyebrow">Cultivator Tablet</div>
+      <div className="stg-identity" aria-label={t('settings.cultivatorTablet')}>
+        <div className="stg-identity-eyebrow">{t('settings.cultivatorTablet')}</div>
         <div className="stg-identity-title">{t('settings.title')}</div>
         {realmName && (
           <div className="stg-identity-realm">
@@ -333,26 +334,27 @@ function SettingsScreen({
         )}
         <div className="stg-identity-meta">
           <span className="stg-identity-stat">
-            <b>{livesCount}</b> Lives
+            <b>{livesCount}</b> {t('settings.lives')}
           </span>
           <span className="stg-identity-divider" aria-hidden="true" />
           <span className="stg-identity-stat">
-            <b>{stagesCrossed}</b>{totalRealms > 0 ? ` / ${totalRealms - 1}` : ''} Realms
+            <b>{stagesCrossed}</b>{totalRealms > 0 ? ` / ${totalRealms - 1}` : ''} {t('settings.realms')}
           </span>
           <span className="stg-identity-divider" aria-hidden="true" />
           <span className="stg-identity-stat">
-            <b>{cultivatingDuration}</b> Cultivating
+            <b>{cultivatingDuration}</b> {t('settings.cultivating')}
           </span>
         </div>
       </div>
 
       {/* AUDIO */}
       <section className="stg-section">
-        <div className="stg-section-label stg-cinzel-label">Audio</div>
+        <div className="stg-section-label stg-cinzel-label">{t('settings.audioSection')}</div>
         <div className="stg-panel">
-          {AUDIO_CHANNELS.map(({ channel, label, muteKey }) => {
+          {AUDIO_CHANNELS.map(({ channel, labelKey, muteKey }) => {
             const muted    = audio.settings[muteKey];
             const localVol = sliderVols[channel];
+            const label    = t(labelKey);
             return (
               <div key={channel} className="stg-audio-row">
                 <span className="stg-audio-label">{label}</span>
@@ -368,7 +370,7 @@ function SettingsScreen({
                   onMouseUp={e  => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
                   onTouchEnd={e => { audio.setVolume(channel, parseFloat(e.target.value)); noteSettingTouched('audio_vol'); }}
                   disabled={muted}
-                  aria-label={`${label} volume`}
+                  aria-label={t('settings.volumeAria', { label })}
                 />
                 <span className="stg-audio-pct">{muted ? '—' : `${Math.round(localVol * 100)}%`}</span>
                 <button
@@ -378,7 +380,7 @@ function SettingsScreen({
                     try { recordStat('audioToggles', 1); } catch {}
                     noteSettingTouched('audio_mute');
                   }}
-                  aria-label={muted ? `Unmute ${label}` : `Mute ${label}`}
+                  aria-label={muted ? t('settings.unmute', { label }) : t('settings.mute', { label })}
                 >
                   {muted ? '🔇' : '🔊'}
                 </button>
@@ -390,14 +392,14 @@ function SettingsScreen({
 
       {/* Visual effects */}
       <section className="stg-section">
-        <div className="stg-section-label stg-cinzel-label">Visual Effects</div>
+        <div className="stg-section-label stg-cinzel-label">{t('settings.visualEffects')}</div>
         <div className="stg-panel">
           <div className="stg-row">
             <div className="stg-row-info">
-              <span className="stg-row-title">Particles &amp; Animations</span>
+              <span className="stg-row-title">{t('settings.particles')}</span>
             </div>
             <SegmentedControl
-              options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]}
+              options={[{ value: true, label: t('common.on') }, { value: false, label: t('common.off') }]}
               value={graphics.vfxEnabled}
               onChange={v => { setGraphics({ ...graphics, vfxEnabled: v }); noteSettingTouched('particles'); }}
             />
@@ -407,9 +409,9 @@ function SettingsScreen({
 
       {/* Rendering mode */}
       <section className="stg-section">
-        <div className="stg-section-label stg-cinzel-label">Rendering Mode</div>
+        <div className="stg-section-label stg-cinzel-label">{t('settings.renderingMode')}</div>
         <OptionGrid
-          options={RENDERING_MODES}
+          options={RENDERING_MODES.map(m => ({ ...m, label: t(m.labelKey), sub: t(m.subKey) }))}
           value={graphics.renderingMode}
           onChange={mode => { setGraphics({ ...graphics, renderingMode: mode }); noteSettingTouched('rendering'); }}
         />
@@ -418,7 +420,7 @@ function SettingsScreen({
       {/* Resolution — desktop only */}
       {isDesktop && (
         <section className="stg-section">
-          <div className="stg-section-label stg-cinzel-label">Window Resolution</div>
+          <div className="stg-section-label stg-cinzel-label">{t('settings.windowResolution')}</div>
           <OptionGrid
             options={RESOLUTIONS}
             value={resolution}
@@ -492,8 +494,8 @@ function SettingsScreen({
             >
               <span className="stg-action-icon">ℹ</span>
               <span className="stg-action-body">
-                <span className="stg-action-label">About this app</span>
-                <span className="stg-action-sub">Credits · fonts · licenses</span>
+                <span className="stg-action-label">{t('settings.aboutApp')}</span>
+                <span className="stg-action-sub">{t('settings.aboutSub')}</span>
               </span>
               <span className="stg-action-chevron">›</span>
             </button>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MiniGameResult } from './MiniGameMode';
 import { fmt } from '../../utils/format';
+import { useGameText } from '../../i18n/gameText';
 import {
   SEEDS, SEEDS_BY_ID, RECIPES, RECIPES_BY_ID,
   LOCKED_SEEDS, LOCKED_SEEDS_BY_ID, ALMANAC_TOTAL,
@@ -47,6 +48,9 @@ function fmtCountdown(ms) {
 
 export default function SpiritGarden({ ratePerSec, onAward }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
+  const plantName  = (s) => gt('gardenPlants', s.id, 'name', s.name);
+  const recipeName = (r) => gt('gardenRecipes', r.id, 'name', r.name);
   const [garden, setGarden] = useState(loadGarden);
   // Eternal Tree garden nodes (linger / soil) — read the committed set once.
   const [treeMods] = useState(() => {
@@ -91,12 +95,12 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
       const seed = SEEDS_BY_ID[selSeed];
       const r = plantSeed(garden, i, selSeed, undefined, treeMods.growMult);
       if (r.ok) commit(r.garden);
-      else if (r.reason === 'dew') flash(`Need ${t('garden.dewCost', { n: seed.dewCost })} to sow ${seed.name}`);
+      else if (r.reason === 'dew') flash(t('garden.needToSow', { cost: t('garden.dewCost', { n: seed.dewCost }), seed: plantName(seed) }));
     } else if (st === 'bloom') {
       const r = harvestPlot(garden, i);
       if (r.ok) {
         commit(r.garden);
-        const nm = SEEDS_BY_ID[r.gained.herbId]?.name ?? 'herb';
+        const nm = SEEDS_BY_ID[r.gained.herbId] ? plantName(SEEDS_BY_ID[r.gained.herbId]) : 'herb';
         flash(r.firstTime ? t('garden.discovered', { herb: nm, n: DISCOVERY_BONUS }) : t('garden.gathered', { n: r.gained.amount, herb: nm }));
       }
     }
@@ -106,16 +110,16 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
     const { garden: g2, total, firsts } = harvestAll(garden);
     if (total <= 0) return;
     commit(g2);
-    flash(firsts.length ? t('garden.gathered', { n: total, herb: 'herbs' }) + `. ${firsts.length} newly discovered` : t('garden.gathered', { n: total, herb: 'herbs' }));
+    flash(firsts.length ? t('garden.flashHarvestedFirsts', { n: total, f: firsts.length }) : t('garden.flashHarvested', { n: total }));
   };
 
   const doSellHerb = (id) => {
     const r = sellHerb(garden, id);
-    if (r.ok) { commit(r.garden); flash(`+${r.gained} Dew`); }
+    if (r.ok) { commit(r.garden); flash(t('garden.flashDew', { n: r.gained })); }
   };
   const doSellAll = () => {
     const r = sellBasket(garden);
-    if (r.ok) { commit(r.garden); flash(`Sold basket. +${r.gained} Dew`); }
+    if (r.ok) { commit(r.garden); flash(t('garden.flashSoldBasket', { n: r.gained })); }
   };
   // Transfer the basket's plants into the Meridian Furnace pantry. The
   // furnace's useFurnace hook reads from the same localStorage key (the
@@ -123,21 +127,21 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   // sendPlantsFromBasket and lets persistence reconcile).
   const furnaceSeam = useFurnace();
   const doSendToFurnace = () => {
-    if (basketCount(garden) === 0) { flash('Basket is empty'); return; }
+    if (basketCount(garden) === 0) { flash(t('garden.flashBasketEmpty')); return; }
     furnaceSeam.sendPlantsFromBasket(garden.basket, () => {
       // Clear the garden basket — the plants now live in the furnace pantry.
       commit({ ...garden, basket: {} });
-      flash('Sent plants to the Furnace');
+      flash(t('garden.flashSentFurnace'));
     });
   };
   const doBrew = (rid) => {
     const r = brew(garden, rid, undefined, treeMods.durationMult);
-    if (r.ok) { commit(r.garden); flash(t('garden.brew') + ` ${RECIPES_BY_ID[rid].name}`); setTab('garden'); }
+    if (r.ok) { commit(r.garden); flash(t('garden.flashBrewed', { name: RECIPES_BY_ID[rid].name })); setTab('garden'); }
   };
   const doExpand = () => {
     const r = expandPlot(garden);
-    if (r.ok) { commit(r.garden); flash('New plot cleared'); }
-    else if (r.reason === 'dew') flash(`Need ${t('garden.expandCost', { n: nextPlotCost(garden.plotCount) })} to clear a plot`);
+    if (r.ok) { commit(r.garden); flash(t('garden.flashPlotCleared')); }
+    else if (r.reason === 'dew') flash(t('garden.needToExpand', { cost: t('garden.expandCost', { n: nextPlotCost(garden.plotCount) }) }));
   };
 
   // ── Derived ────────────────────────────────────────────────────────────────
@@ -173,12 +177,12 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
     <div className="gd">
       {/* Status: Spirit Dew + almanac progress */}
       <div className="gd-topbar">
-        <div className="gd-dew" title="Spirit Dew — the garden's own currency">
+        <div className="gd-dew" title={t('garden.dewTitle')}>
           <span className="gd-dew-drop" aria-hidden="true" />
           <span className="gd-dew-val">{fmt(dew)}</span>
           <span className="gd-dew-label">{t('garden.spiritDew')}</span>
         </div>
-        <div className="gd-almanac" title="Distinct spirit herbs discovered">
+        <div className="gd-almanac" title={t('garden.almanacTitle')}>
           <span className="gd-almanac-glyph" aria-hidden="true">苗</span>
           <span className="gd-almanac-val">{discovered}<span className="gd-almanac-tot">/{ALMANAC_TOTAL}</span></span>
         </div>
@@ -190,7 +194,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
           <span className="gd-elixir-orb" aria-hidden="true" />
           <div className="gd-elixir-body">
             <div className="gd-elixir-top">
-              <span className="gd-elixir-name">{buffRecipe.name}</span>
+              <span className="gd-elixir-name">{recipeName(buffRecipe)}</span>
               <span className="gd-elixir-pct">+{buffRecipe.pct}% qi/s</span>
             </div>
             <div className="gd-elixir-bar">
@@ -231,10 +235,10 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               // shifts background-position to the matching 64x64 quadrant.
               const growing = st === 'seed' || st === 'sprout' || st === 'growing';
               const label = st === 'empty'
-                ? `Empty plot. Sow ${SEEDS_BY_ID[selSeed].name}`
+                ? t('garden.plotEmptyLabel', { seed: plantName(SEEDS_BY_ID[selSeed]) })
                 : st === 'bloom'
-                  ? `Harvest ${seed.name}`
-                  : `${seed.name} growing, ${fmtCountdown(remain)} left`;
+                  ? t('garden.plotHarvestLabel', { seed: plantName(seed) })
+                  : t('garden.plotGrowingLabel', { seed: plantName(seed), time: fmtCountdown(remain) });
               return (
                 <button key={i} type="button" className={`gd-plot gd-plot-${st}`} onClick={() => onPlotTap(i)} aria-label={label}>
                   {st === 'empty' && <span className="gd-plot-hole" />}
@@ -255,7 +259,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
             })}
             {expandCost != null && (
               <button type="button" className={`gd-plot gd-plot-expand ${dew < expandCost ? 'gd-plot-poor' : ''}`} onClick={doExpand}
-                aria-label={`Clear a new plot for ${expandCost} Spirit Dew`}>
+                aria-label={t('garden.expandPlotLabel', { n: expandCost })}>
                 <span className="gd-expand-plus" aria-hidden="true">+</span>
                 <span className="gd-expand-cost">{t('garden.expandCost', { n: expandCost })}</span>
               </button>
@@ -277,7 +281,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
           </div>
 
           {/* Seed selector */}
-          <div className="gd-seedbar" role="radiogroup" aria-label="Choose a seed to sow">
+          <div className="gd-seedbar" role="radiogroup" aria-label={t('garden.seedRadioLabel')}>
             {SEEDS.map((s) => {
               const afford = s.dewCost === 0 || dew >= s.dewCost;
               const on = selSeed === s.id;
@@ -291,7 +295,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                     style={{ backgroundImage: `url(${spriteFor(s.id)})` }}
                     aria-hidden="true"
                   />
-                  <span className="gd-chip-name">{s.name}</span>
+                  <span className="gd-chip-name">{plantName(s)}</span>
                   <span className="gd-chip-cost">{s.dewCost === 0 ? t('common.free') : t('garden.dewCost', { n: s.dewCost })}</span>
                   <span className="gd-chip-time">{growLabel(s.growMs)}</span>
                 </button>
@@ -306,7 +310,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                     style={{ backgroundImage: `url(${spriteFor(id)})` }}
                     aria-hidden="true"
                   />
-                  <span className="gd-chip-name">{meta?.name ?? '???'}</span>
+                  <span className="gd-chip-name">{meta ? plantName(meta) : '???'}</span>
                   <span className="gd-chip-lock">{t('garden.deeperRealms')}</span>
                 </div>
               );
@@ -332,7 +336,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                   if (!s) return null;
                   return (
                     <button key={id} type="button" className="gd-bk" onClick={() => doSellHerb(id)}
-                      title={`Sell ${n}x ${s.name} for ${s.sell * n} Spirit Dew`}>
+                      title={t('garden.sellHerbTitle', { n, herb: plantName(s), dew: s.sell * n })}>
                       <span className="gd-bk-rarity" style={{ background: s.color }} aria-hidden="true" />
                       <span
                         className="gd-bk-sprite gd-plant gd-plant-bloom"
@@ -347,7 +351,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               </div>
               <div className="gd-basket-actions">
                 <button type="button" className="mg-btn mg-btn-ghost" onClick={doSellAll}>{t('garden.sellAll', { n: bVal })}</button>
-                <button type="button" className="mg-btn mg-btn-ghost" onClick={doSendToFurnace}>Send to Furnace</button>
+                <button type="button" className="mg-btn mg-btn-ghost" onClick={doSendToFurnace}>{t('garden.sendToFurnace')}</button>
                 <button type="button" className="mg-btn mg-btn-primary" disabled={!channelOK} onClick={() => setCash(true)}>
                   {t('garden.channel')}
                 </button>
@@ -368,14 +372,14 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
               return (
                 <div key={r.id} className={`gd-recipe ${ready ? '' : 'gd-recipe-poor'}`}>
                   <div className="gd-recipe-main">
-                    <div className="gd-recipe-name">{r.name}</div>
+                    <div className="gd-recipe-name">{recipeName(r)}</div>
                     <div className="gd-recipe-effect">{r.desc}</div>
                     <div className="gd-recipe-inputs">
                       {Object.entries(r.inputs).map(([id, need]) => {
                         const have = garden.basket[id] || 0;
                         return (
                           <span key={id} className={`gd-ri ${have >= need ? 'gd-ri-ok' : 'gd-ri-no'}`}
-                            title={SEEDS_BY_ID[id]?.name ?? id}>
+                            title={SEEDS_BY_ID[id] ? plantName(SEEDS_BY_ID[id]) : id}>
                             <span
                               className="gd-plant gd-plant-bloom"
                               style={{ backgroundImage: `url(${spriteFor(id)})` }}

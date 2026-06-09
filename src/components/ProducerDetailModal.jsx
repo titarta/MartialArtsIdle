@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
 import { getSpriteTier, SPRITE_TIERS, resolveSprite, resolveTierFor } from '../data/producers';
@@ -57,6 +58,8 @@ export default function ProducerDetailModal({
   onClose,
 }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
+  const pName = gt('producers', producer.id, 'name', producer.name);
   // resolveTierFor respects producer.transcendedNode so the disciple's
   // Transcended tier only appears after disc_transcend is purchased.
   const tier      = unlocked ? resolveTierFor(producer, owned, treeMods) : null;
@@ -94,7 +97,7 @@ export default function ProducerDetailModal({
     : null;
 
   return (
-    <DetailModal open onClose={onClose} className="pdm-modal" ariaLabel={unlocked ? `${producer.name} details` : t('producerDetail.lockedAriaLabel')}>
+    <DetailModal open onClose={onClose} className="pdm-modal" ariaLabel={unlocked ? `${pName} details` : t('producerDetail.lockedAriaLabel')}>
       <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <div className="pdm-hero">
@@ -110,7 +113,7 @@ export default function ProducerDetailModal({
             keeps the Cookie-Clicker mystery; the unlock-realm hint below
             tells the player when to expect it without revealing what. */}
         <div className={`pdm-name${!unlocked ? ' pdm-name-locked' : ''}`}>
-          {unlocked ? producer.name : t('common.unknown')}
+          {unlocked ? pName : t('common.unknown')}
         </div>
 
         {!unlocked ? (
@@ -122,7 +125,7 @@ export default function ProducerDetailModal({
           </div>
         ) : (
           <>
-            <p className="pdm-lore">{producer.desc}</p>
+            <p className="pdm-lore">{gt('producers', producer.id, 'desc', producer.desc)}</p>
 
             <div className="pdm-stats">
               <div className="pdm-stat-row">
@@ -177,7 +180,7 @@ export default function ProducerDetailModal({
                         ? (minigame.ready ? t('producerDetail.hiddenArtUnlocked') : t('producerDetail.comingSoon'))
                         : 'Preview · dev'}
                     </span>
-                    <span className="pdm-mg-name">{minigame.name}</span>
+                    <span className="pdm-mg-name">{gt('minigames', producer.id, 'name', minigame.name)}</span>
                   </span>
                   <span className="pdm-mg-arrow" aria-hidden="true">▶</span>
                 </button>
