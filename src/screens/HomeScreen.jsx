@@ -203,7 +203,7 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
       onClick={onUse}
       aria-label={`Use Heaven's Pardon to bypass the gate. ${tokenCount} remaining.`}
     >
-      <span className="home-gate-bypass-icon">☁️</span>
+      <span className="home-gate-bypass-seal" aria-hidden="true">符</span>
       <span className="home-gate-bypass-body">
         <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
         <span className="home-gate-bypass-sub">{t('home.heavensPardon', { n: tokenCount })}</span>
