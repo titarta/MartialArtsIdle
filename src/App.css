@@ -20266,7 +20266,17 @@ body.body-crimson-aura-active .home-fighter-stage::before {
   will-change: transform;
   /* image-rendering intentionally omitted — it follows the global
      Settings -> Rendering toggle via the `.rendering-pixelated img` rule. */
-  filter: drop-shadow(0 0 3px rgba(226, 59, 84, 0.5));
+  /* Two-layer drop-shadow tuned to read as a smaller, scaled-down version of
+     the cultivator's crimson aura (body.body-crimson-aura-active .home-
+     cultivator-sprite, line ~20035). Inner crimson hugs the silhouette of
+     each orb / crystal shard; outer red-gold blooms wider so the bodies
+     read as embers, not just sprites with a thin halo. drop-shadow follows
+     the alpha channel of the PNG, so the glow traces the actual fragment
+     shape rather than its bounding box. */
+  filter:
+    drop-shadow(0 0 6px  rgba(255,  80,  80, 0.85))
+    drop-shadow(0 0 14px rgba(255, 160,  60, 0.55));
+  transition: filter 0.4s ease;
 }
 /* Player turned VFX off -> drop the orbit entirely. */
 .vfx-disabled .crimson-orbit-layer { display: none; }
