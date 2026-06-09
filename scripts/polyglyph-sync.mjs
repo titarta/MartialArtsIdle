@@ -117,7 +117,10 @@ async function push() {
     }
   }
   console.log(`Pushing ${strings.length} source strings to "${SLUG}" ...`);
-  const BATCH = 300;
+  // Each push batch is one Prisma interactive transaction on the server (5s
+  // default timeout). Keep batches small so the sequential upserts finish well
+  // under that limit; 300 timed out, 50 is comfortable.
+  const BATCH = 50;
   let created = 0, updated = 0;
   for (let i = 0; i < strings.length; i += BATCH) {
     const chunk = strings.slice(i, i + BATCH);
