@@ -45,6 +45,14 @@ const SLUG = ENV.POLYGLYPH_PROJECT_SLUG || '';
 
 const languages = JSON.parse(fs.readFileSync(path.resolve('src/i18n/languages.json'), 'utf8'));
 
+// Map the game's i18next locale code -> the Polyglyph project's language code
+// where they differ. The game uses generic `pt`/`zh`; the Polyglyph project
+// targets the specific variants pt-BR (Brazilian Portuguese) and zh-CN
+// (Simplified Chinese). Translate/pull talk to Polyglyph in its codes; locale
+// files are still written under the game's codes.
+const POLYGLYPH_LANG = { pt: 'pt-BR', zh: 'zh-CN' };
+const toPg = (code) => POLYGLYPH_LANG[code] ?? code;
+
 // ── flatten / unflatten nested locale JSON <-> dot-keyed map ──────────────────
 function flatten(obj, prefix = '') {
   const out = {};
@@ -96,8 +104,8 @@ async function api(method, urlPath, body) {
   return data;
 }
 
-// ── status (offline) ─────────────────────────────────────────────────────────
-function status() {
+// ── status (local counts + live Polyglyph state when configured) ─────────────
+async function status() {
   let total = 0;
   for (const ns of NAMESPACES) {
     const n = Object.keys(readSource(ns)).length;
@@ -105,8 +113,29 @@ function status() {
     console.log(`  ${ns}: ${n} source strings`);
   }
   console.log(`  TOTAL: ${total} EN source strings`);
-  console.log(`  languages to translate: ${languages.filter(l => l.code !== 'en').map(l => l.code).join(', ')}`);
   console.log(`  target: ${SLUG || '(no slug set)'} @ ${BASE || '(no base url set)'}`);
+
+  const want = languages.filter(l => l.code !== 'en').map(l => l.code);
+  if (!BASE || !KEY || !SLUG) {
+    console.log(`  languages to translate: ${want.join(', ')}`);
+    return;
+  }
+  try {
+    const r = await api('GET', `/api/plugin/status?projectSlug=${encodeURIComponent(SLUG)}`);
+    console.log(`\n  Polyglyph "${r.project.slug}" (source: ${r.project.sourceLanguage}) — ${r.totalStrings} strings`);
+    for (const l of r.languages) {
+      console.log(`    ${l.code}: ${l.enabled ? 'enabled ' : 'DISABLED'} | ${l.approved} approved, ${l.translated} drafted, ${l.untranslated} untranslated (${l.approvedPct}%)`);
+    }
+    const enabled = new Set(r.languages.filter(l => l.enabled).map(l => l.code));
+    const missing = want.filter(c => !enabled.has(toPg(c)));
+    if (missing.length) {
+      console.log(`\n  >> Add + enable these in the Polyglyph project settings, then re-run translate: ${missing.join(', ')}`);
+    } else {
+      console.log(`\n  All ${want.length} target languages are enabled. Ready for: npm run i18n:translate`);
+    }
+  } catch (e) {
+    console.log(`  (live status unavailable: ${e.message})`);
+  }
 }
 
 // ── push ─────────────────────────────────────────────────────────────────────
@@ -142,7 +171,7 @@ async function pull(langArg) {
   console.log(`Pulling approved translations for: ${targets.join(', ')}`);
   for (const lang of targets) {
     const r = await api('GET',
-      `/api/plugin/pull?projectSlug=${encodeURIComponent(SLUG)}&language=${encodeURIComponent(lang)}&onlyApproved=true`);
+      `/api/plugin/pull?projectSlug=${encodeURIComponent(SLUG)}&language=${encodeURIComponent(toPg(lang))}&onlyApproved=true`);
     const byNs = Object.fromEntries(NAMESPACES.map(ns => [ns, {}]));
     let count = 0;
     for (const s of (r.strings ?? [])) {
@@ -168,7 +197,7 @@ async function translate(langArg) {
 
   const pending = new Map(); // jobId -> { lang, last }
   for (const lang of targets) {
-    const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: lang });
+    const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: toPg(lang) });
     pending.set(r.jobId, { lang, last: '' });
     console.log(`  ${lang}: job ${r.jobId} queued`);
   }
@@ -195,7 +224,7 @@ try {
   if (cmd === 'push') await push();
   else if (cmd === 'translate') await translate(arg);
   else if (cmd === 'pull') await pull(arg);
-  else if (cmd === 'status') status();
+  else if (cmd === 'status') await status();
   else {
     console.error('Usage: node scripts/polyglyph-sync.mjs <push|translate|pull|status> [lang]');
     process.exit(1);
