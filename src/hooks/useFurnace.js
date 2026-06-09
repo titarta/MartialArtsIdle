@@ -32,6 +32,8 @@ import {
   consumePill as pureConsumePill,
   transferFromBasket,
   aggregateFoundationMods,
+  aggregateActivePillMods,
+  getActiveFurnaceBuffs,
   heatCap, heatRegenPerSec,
   DEFAULT_CAULDRONS,
 } from '../data/furnace';
@@ -121,6 +123,19 @@ export default function useFurnace({ furnaceCount = 0, cauldronCount = DEFAULT_C
   const heatCapNow        = useMemo(() => heatCap(furnaceCount),         [furnaceCount]);
   const heatRegenPerSecNow= useMemo(() => heatRegenPerSec(furnaceCount), [furnaceCount]);
   const foundationMods    = useMemo(() => aggregateFoundationMods(furnace), [furnace]);
+  const pillBuffMods      = useMemo(() => aggregateActivePillMods(furnace), [furnace]);
+  // Combined modifier bundle (foundations + active pill buffs). The
+  // consumer multiplies / sums these into the cultivation formulas
+  // multiplicatively so they stack with tree + spark + shop bonuses.
+  const allMods = useMemo(() => ({
+    qiPerSecMult:         (foundationMods.qiPerSecMult         || 1) * (pillBuffMods.qiPerSecMult         || 1),
+    breakthroughDiscount: (foundationMods.breakthroughDiscount || 0) + (pillBuffMods.breakthroughDiscount || 0),
+    offlineQiMult:        (foundationMods.offlineQiMult        || 1) * (pillBuffMods.offlineQiMult        || 1),
+    producerCostMult:     (foundationMods.producerCostMult     || 1) * (pillBuffMods.producerCostMult     || 1),
+    karmaGainMult:        (foundationMods.karmaGainMult        || 1) * (pillBuffMods.karmaGainMult        || 1),
+  }), [foundationMods, pillBuffMods]);
+  // Live (non-expired) active pill buffs — fed into ActiveBuffsChip.
+  const activePillBuffs   = useMemo(() => getActiveFurnaceBuffs(furnace), [furnace]);
 
   return {
     furnace,
@@ -132,6 +147,9 @@ export default function useFurnace({ furnaceCount = 0, cauldronCount = DEFAULT_C
     heatCapNow,
     heatRegenPerSecNow,
     foundationMods,
+    pillBuffMods,
+    allMods,
+    activePillBuffs,
     cauldronCount,
   };
 }

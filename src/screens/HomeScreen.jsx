@@ -2328,6 +2328,10 @@ function HomeScreen({
   // ActiveBuffsChip alongside activeSparks so the top-left chip
   // surfaces every kind of temporary buff in one place.
   activeBuffs,
+  // Furnace pill buffs (furnace.activePillBuffs) — added 2026-06-09.
+  // Same chip, third source. Shape: { pillId, name, kind, magnitude,
+  // expiresAt, durationMs }.
+  furnaceBuffs,
   crystalReservoirRef,
   crystalClickCapMinRef,
   collectCrystalReservoir,
@@ -2952,7 +2956,7 @@ function HomeScreen({
               nothing is buffing. Below it: selection-pending, idle
               rewards, pills shortcut. */}
           <div className="home-chips-tl">
-            <ActiveBuffsChip activeSparks={activeSparks} activeBuffs={activeBuffs} />
+            <ActiveBuffsChip activeSparks={activeSparks} activeBuffs={activeBuffs} furnaceBuffs={furnaceBuffs} />
             {/* Spark queue chip — appears when the player has dismissed
                 the picker (or returned from offline to a non-empty queue
                 and dismissed) and there are still unresolved spark

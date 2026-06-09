@@ -65,7 +65,7 @@ function BuffIcon({ icon, fallback = '✦' }) {
   return <span className="abp-row-icon-emoji" aria-hidden="true">{ic}</span>;
 }
 
-function ActiveBuffsChip({ activeSparks, activeBuffs }) {
+function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
   const [open, setOpen] = useState(false);
   // Single 250ms tick drives chip countdown text AND popover bar fills.
   const [now, setNow] = useState(() => Date.now());
@@ -94,8 +94,21 @@ function ActiveBuffsChip({ activeSparks, activeBuffs }) {
         expiresAt: b.expiresAtMs,
         total:     b.item?.effect?.durationMs ?? Math.max(1, b.expiresAtMs - t),
       }));
-    return [...sparkEntries, ...shopEntries].sort((a, b) => a.expiresAt - b.expiresAt);
-  }, [activeSparks, activeBuffs, now]);
+    // Furnace timed pill buffs (added 2026-06-09). Same shape as the other
+    // two sources after normalisation. The chip surfaces every alchemy
+    // buff alongside the others — single source of truth for "what's
+    // currently boosting me."
+    const furnaceEntries = (furnaceBuffs ?? [])
+      .filter(b => b?.expiresAt && b.expiresAt > t)
+      .map(b => ({
+        key:       `furnace:${b.pillId}:${b.consumedAt}`,
+        name:      b.name ?? 'Pill',
+        icon:      '丹', // Cinzel/Ma Shan Zheng calligraphy glyph for "pill"
+        expiresAt: b.expiresAt,
+        total:     b.durationMs ?? Math.max(1, b.expiresAt - t),
+      }));
+    return [...sparkEntries, ...shopEntries, ...furnaceEntries].sort((a, b) => a.expiresAt - b.expiresAt);
+  }, [activeSparks, activeBuffs, furnaceBuffs, now]);
 
   // Tick only while something is buffing. Stops the timer when the
   // pool is empty so we don't burn cycles in the common idle case.

@@ -980,3 +980,12 @@
 
 .pr-fire { padding: 10px; border-radius: 10px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mg-void); background: linear-gradient(180deg, var(--mg-amber-bright), var(--mg-amber)); border: 1px solid rgba(255, 220, 130, 0.65); cursor: pointer; box-shadow: 0 4px 16px rgba(220, 175, 110, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
 .pr-fire:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+/* Capsule overflow panel (Transcend tab, when Foundation slots are full) */
+.pr-capsules { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 10px; border: 1px dashed var(--mg-line); background: rgba(0, 0, 0, 0.22); }
+.pr-capsules-h { font-family: 'Cinzel', Georgia, serif; font-size: 12px; color: var(--mg-amber-bright); letter-spacing: 0.04em; }
+.pr-capsules-note { font-size: 10.5px; color: var(--mg-cream-soft); font-style: italic; }
+.pr-capsules-grid { display: flex; gap: 6px; flex-wrap: wrap; }
+.pr-capsule { padding: 4px 10px; border-radius: 999px; background: rgba(220, 175, 110, 0.16); border: 1px solid var(--mg-line-strong); font-size: 11px; color: var(--mg-cream); display: flex; gap: 6px; align-items: center; }
+.pr-capsule-name { color: var(--mg-amber-bright); }
+.pr-capsule-count { font-family: 'Cinzel', Georgia, serif; color: var(--mg-cream); font-variant-numeric: tabular-nums; }

@@ -248,6 +248,20 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
     () => Object.entries(furnace.pills).filter(([id, n]) => n > 0 && !id.startsWith('capsule:')).map(([id]) => id),
     [furnace.pills]
   );
+  // Foundation capsules — produced when transcend completes but Foundation
+  // slots are full. Stored as 'capsule:foundationId:heat' entries in the
+  // pills bag. Surfaced here so the player knows they exist; they auto-apply
+  // when a Foundation slot opens (reincarnation today; manual swap in a
+  // future commit).
+  const capsules = useMemo(
+    () => Object.entries(furnace.pills)
+      .filter(([id, n]) => n > 0 && id.startsWith('capsule:'))
+      .map(([id, n]) => {
+        const [, foundationId] = id.split(':');
+        return { id, count: n, foundationId };
+      }),
+    [furnace.pills]
+  );
   const transcendable = realPillIds.filter(id => !!PILL_TO_FOUNDATION[id]);
   const [selected, setSelected] = useState([]);
 
@@ -309,6 +323,28 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
       <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
         Transcend
       </button>
+      {capsules.length > 0 && (
+        <div className="pr-capsules">
+          <div className="pr-capsules-h">
+            Pending Foundation capsules ({capsules.length})
+          </div>
+          <div className="pr-capsules-note">
+            Foundation slots full when these crafted — they will auto-apply
+            on reincarnation.
+          </div>
+          <div className="pr-capsules-grid">
+            {capsules.map((c) => {
+              const fdef = FOUNDATIONS[c.foundationId];
+              return (
+                <div key={c.id} className="pr-capsule">
+                  <span className="pr-capsule-name">{fdef?.name ?? c.foundationId}</span>
+                  <span className="pr-capsule-count">×{c.count}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

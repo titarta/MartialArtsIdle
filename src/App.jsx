@@ -401,15 +401,33 @@ function AppInner() {
     if (cultivation.treeProducerOutputMultRef) {
       cultivation.treeProducerOutputMultRef.current = tree.modifiers.producerOutputMult ?? 1;
     }
-    // n_5 Frugal Cultivation — write producer cost discount ref.
+    // n_5 Frugal Cultivation — write producer cost discount ref. Furnace
+    // Foundation Frugal + Frugal Mind / Quiet Tide pill buffs stack
+    // multiplicatively with the tree node so a player who has all three
+    // sees additive-percent reductions compound. allMods.producerCostMult
+    // is already (1 - frac), so multiply straight in.
     if (producers.costMultRef) {
-      producers.costMultRef.current = tree.modifiers.producerCostMult ?? 1;
+      producers.costMultRef.current = (tree.modifiers.producerCostMult ?? 1)
+        * (furnace.allMods?.producerCostMult ?? 1);
     }
+    // Furnace breakthrough cost discount — mirror into the cultivation ref
+    // so the next breakthrough costs less qi.
+    if (cultivation.breakthroughCostMultRef) {
+      cultivation.breakthroughCostMultRef.current = 1 - (furnace.allMods?.breakthroughDiscount ?? 0);
+    }
+    // Furnace offline-qi snapshot — useCultivation's offline catch-up calc
+    // runs BEFORE React mounts (it has to read from localStorage during
+    // load), so we mirror the live mult into a snapshot here that the
+    // hook can pick up next session.
+    try {
+      const offlineMult = furnace.allMods?.offlineQiMult ?? 1;
+      localStorage.setItem('mai_furnace_offline_snapshot', JSON.stringify({ offlineQiMult: offlineMult }));
+    } catch {}
     // hand Open Hand — disciple placement Merit cost discount.
     if (discipleMerge?.placeCostMultRef) {
       discipleMerge.placeCostMultRef.current = tree.modifiers.disciplePlaceCostMult ?? 1;
     }
-  }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef, cultivation.qiOnRealmFracRef, cultivation.treeProducerOutputMultRef, producers.costMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tree.modifiers, cultivation.treeQiMultRef, cultivation.treeHeavenlyMultRef, cultivation.qiOnRealmFracRef, cultivation.treeProducerOutputMultRef, producers.costMultRef, furnace.allMods]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   // Ref updated every render so effects always see the latest breakthrough state
@@ -476,14 +494,16 @@ function AppInner() {
     // (default 0). The bonus flows through per-producer mults and all
     // downstream global mults the same way the producer's own base does.
     const flatPerUnit = qiSparks.producerFlatPerUnitRef?.current ?? 0;
-    // Foundation Pill permanent qi/s buff (from the Meridian Furnace alchemy
-    // minigame). Aggregated multiplicatively into the global rate so the
-    // bonus flows through every producer. Default 1 = no buff.
-    const foundationQiMult = furnace.foundationMods?.qiPerSecMult ?? 1;
+    // Furnace alchemy bundle — Foundation Pill (permanent) effects plus
+    // any active timed pill buffs the player has consumed. Multiplied into
+    // the global producer rate; producer-cost reductions flow through
+    // producers.costMultRef below; offline / breakthrough effects are
+    // mirrored into snapshots that useCultivation reads.
+    const furnaceQiMult = furnace.allMods?.qiPerSecMult ?? 1;
     const effective = producers.getRate(perProducer, flatPerUnit, {
       selfSynergyPct:  tree.modifiers.producerSelfSynergyPct  ?? 0,
       crossSynergyPct: tree.modifiers.producerCrossSynergyPct ?? 0,
-    }) * foundationQiMult;
+    }) * furnaceQiMult;
     cultivation.producerRateRef.current = effective;
     // Trinity Convergence + producer_pair_global_mult — global multipliers
     // from legendary sparks, folded into the rate calc downstream.
@@ -493,7 +513,7 @@ function AppInner() {
     try {
       localStorage.setItem('mai_producers_rate_snapshot', JSON.stringify({ rate: effective }));
     } catch {}
-  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult, furnace.foundationMods]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [producers.owned, upgrades.owned, qiSparks.activeSparks, shopInventory.inv, tree.modifiers, cultivation.producerRateRef, cultivation.sparkLegendaryGlobalMultRef, discipleMerge?.producerMult, furnace.allMods]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Disciple Merit settle-on-change — when the disciple producer count
   // changes, fold the Merit accumulated SO FAR (using the prior count) into
@@ -934,6 +954,23 @@ function AppInner() {
     if (count > prevAchCountRef.current) setHasNewAch(true);
     prevAchCountRef.current = count;
   }, [achievements?.unlockedCount]);
+
+  // ── Furnace cook-complete SFX ───────────────────────────────────────────
+  // Diff cauldron states to detect cooking → idle transitions. Plays the
+  // producer_tier_up SFX (same as a tier crossing) so cooks have an
+  // audible 'done' cue without inventing a new asset.
+  const prevCauldronsRef = useRef(furnace.furnace.cauldrons);
+  useEffect(() => {
+    const prev = prevCauldronsRef.current || [];
+    const next = furnace.furnace.cauldrons   || [];
+    for (let i = 0; i < next.length; i++) {
+      if (prev[i]?.state === 'cooking' && next[i]?.state !== 'cooking') {
+        try { AudioManager.playSfx?.('producer_tier_up'); } catch {}
+        break; // one cue per render even if multiple finish together
+      }
+    }
+    prevCauldronsRef.current = next;
+  }, [furnace.furnace.cauldrons]);
 
   // ── Furnace codex discovery toasts ──────────────────────────────────────
   // Diff the codex state and fire a toast + audio cue on each new entry.
@@ -1484,7 +1521,7 @@ function AppInner() {
     // the v1 Cookie-Clicker pivot. The Rewards chip + idle assignment chip
     // are already null-guarded inside HomeScreen, so omitting the props lets
     // those branches fall through to render nothing.
-    home:   <HomeScreen cultivation={cultivation} selections={null} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
+    home:   <HomeScreen cultivation={cultivation} selections={null} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} furnaceBuffs={furnace.activePillBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} unlockedHiddenArts={tree.modifiers.unlockedHiddenArts} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} treeMods={tree.modifiers} />,
     journey:    <JourneyScreen cultivation={cultivation} />,

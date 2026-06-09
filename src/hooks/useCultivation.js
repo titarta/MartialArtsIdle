@@ -245,6 +245,15 @@ export default function useCultivation() {
       }
     } catch {}
 
+    // Furnace Foundation Tide + active Calm Pond Pill buffs. Read from a
+    // snapshot for the same reason as the artefact snapshot (offline calc
+    // runs before React mounts).
+    let furnaceOfflineMult = 1;
+    try {
+      const raw = localStorage.getItem('mai_furnace_offline_snapshot');
+      if (raw) furnaceOfflineMult = JSON.parse(raw).offlineQiMult ?? 1;
+    } catch {}
+
     // Artefact `offline_qi_mult` (a_visionary_mind). Stored under its own
     // localStorage snapshot so offline calc (which runs before React mounts)
     // can still read it — see App.jsx where it mirrors the scalar.
@@ -298,7 +307,7 @@ export default function useCultivation() {
       if (rawTree && JSON.parse(rawTree).includes('vigil')) treeOfflineMult = 1.30;
     } catch {}
     const OFFLINE_QI_MULTIPLIER = 0.20 + offlineRateBonus;
-    const baseRate = (BASE_RATE + producerOfflineRate) * crystalMult * lawMult * offlineQiMult * artefactOfflineMult * sparkOfflineMult * treeOfflineMult * (1 + pillQiSpeedBonus) * OFFLINE_QI_MULTIPLIER;
+    const baseRate = (BASE_RATE + producerOfflineRate) * crystalMult * lawMult * offlineQiMult * artefactOfflineMult * sparkOfflineMult * treeOfflineMult * furnaceOfflineMult * (1 + pillQiSpeedBonus) * OFFLINE_QI_MULTIPLIER;
     const total = baseRate * awaySeconds;
 
     // Crystal Click offline reservoir fill — silently updates localStorage so
@@ -492,7 +501,14 @@ export default function useCultivation() {
     } catch {}
     qiEarnedAllTimeRef.current = seed;
   }
-  const costRef    = useRef(REALMS[savedIndex].cost);
+  // Breakthrough cost MULTIPLIER. Default 1 = full cost. App.jsx writes
+  // (1 - furnace.allMods.breakthroughDiscount) so Foundation Crucible +
+  // Inner Flame pill buffs lower the qi needed to advance. Applied at the
+  // moment costRef is set from REALMS[i].cost (see seed below + every
+  // breakthrough advance site).
+  const breakthroughCostMultRef = useRef(1);
+  const realmCost = (idx) => (REALMS[idx]?.cost ?? 0) * (breakthroughCostMultRef.current || 1);
+  const costRef    = useRef(realmCost(savedIndex));
   const maxedRef   = useRef(!REALMS[savedIndex + 1]);
   const indexRef   = useRef(savedIndex);
   // Live cultivation rate (qi/s) — updated every tick for the HUD readout.
@@ -524,7 +540,7 @@ export default function useCultivation() {
   // Keep cost/maxed refs in sync whenever realmIndex state changes
   useEffect(() => {
     const realm = REALMS[realmIndex];
-    costRef.current  = realm.cost;
+    costRef.current  = realm.cost * (breakthroughCostMultRef.current || 1);
     maxedRef.current = !REALMS[realmIndex + 1];
     indexRef.current = realmIndex;
   }, [realmIndex]);
@@ -787,7 +803,7 @@ export default function useCultivation() {
             const isMajor = isMajorTransition(fromIndex);
             const isPeak  = !isMajor && isPeakTransition(fromIndex);
             indexRef.current  = nextIndex;
-            costRef.current   = REALMS[nextIndex].cost;
+            costRef.current   = REALMS[nextIndex].cost * (breakthroughCostMultRef.current || 1);
             maxedRef.current  = !REALMS[nextIndex + 1];
             gateRef.current = null;
             // yy_2 Yin Reservoir — every realm starts with a fraction of its
@@ -1044,7 +1060,7 @@ export default function useCultivation() {
 
     qiEarnedThisRealmRef.current = 0;
     indexRef.current  = nextIndex;
-    costRef.current   = REALMS[nextIndex].cost;
+    costRef.current   = REALMS[nextIndex].cost * (breakthroughCostMultRef.current || 1);
     maxedRef.current  = !REALMS[nextIndex + 1];
     gateRef.current   = null;
 
@@ -1339,6 +1355,9 @@ export default function useCultivation() {
     artefactQiMultRef,
     // Artefact heavenly_qi_mult ref — updated by App.jsx from getFullStats
     heavenlyQiMultRef,
+    // Furnace breakthrough cost mult — App.jsx mirrors
+    // (1 - furnace.allMods.breakthroughDiscount) into this ref. Default 1.
+    breakthroughCostMultRef,
     // Reincarnation tree refs — updated by App.jsx each render
     treeQiMultRef,
     treeHeavenlyMultRef,

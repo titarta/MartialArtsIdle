@@ -377,6 +377,13 @@ export function defaultFurnace() {
     //   pills:       { pillId: true }        — first combine that produced it
     //   foundations: { foundationId: true }  — first transcend that produced it
     codex:     { materials: {}, pills: {}, foundations: {} },
+    // Active timed pill buffs. One slot per pill effect kind so a player
+    // can stack a qiPerSec buff WITH an offlineQi buff (different kinds)
+    // but cannot stack two qiPerSec pills. Re-consuming the same kind
+    // replaces the existing buff (longer duration / higher magnitude
+    // overwrite is intentional — the player wants the BETTER buff).
+    // Each entry: { pillId, kind, magnitude, durationMs, expiresAt }.
+    activeBuffs: [],
     // Stats for analytics / achievements.
     stats: { refined: 0, combined: 0, transcended: 0, consumed: 0 },
   };
@@ -400,6 +407,13 @@ function migrate(data) {
   }
   g.stats     = { ...base.stats, ...(data.stats || {}) };
   g.foundations = Array.isArray(data.foundations) ? data.foundations.slice(0, FOUNDATION_SLOTS) : [];
+  // Active pill buffs migrate from null/missing → empty. Expired entries
+  // are pruned at load so the on-disk state stays small.
+  {
+    const now = Date.now();
+    const raw = Array.isArray(data.activeBuffs) ? data.activeBuffs : [];
+    g.activeBuffs = raw.filter(b => b && Number.isFinite(b.expiresAt) && b.expiresAt > now);
+  }
   g.heat      = Number.isFinite(data.heat) ? Math.max(0, data.heat) : 0;
   g.heatTickAt= Number.isFinite(data.heatTickAt) ? data.heatTickAt : Date.now();
   // Reconcile cauldrons against MAX_CAULDRONS.
@@ -656,28 +670,79 @@ export function startTranscend(g, pillIds, heatInvest, cauldronCount = DEFAULT_C
 
 // ── Pill consumption (timed buff path) ──────────────────────────────────────
 
-/** Consume a Layer 2 Pill. Returns:
- *    { ok, furnace, buff }
- *  where `buff` is the descriptor the React layer routes into the existing
- *  buff slot (same shape as garden elixir buffs). Returns { ok:false } if
- *  the pill isn't in inventory. */
+/** Consume a Layer 2 Pill. Returns { ok, furnace, buff }.
+ *
+ *  The buff is also pushed into furnace.activeBuffs (one slot per effect
+ *  kind — re-consuming the same kind replaces the existing entry so the
+ *  player always sees the most-recent effect). Zero-duration effects
+ *  (e.g. Inner Flame Pill: discount applies to the next breakthrough
+ *  only) skip the active list and instead route to a one-shot pending
+ *  list (pendingCharges) — TBD for v1.2; v1.1 still routes them through
+ *  the regular path with expiresAt=now+30s so the chip shows the trigger
+ *  for half a minute before the player needs to break through. */
 export function consumePill(g, pillId, now = Date.now()) {
   if (!(g.pills[pillId] > 0)) return { ok: false, reason: 'not-owned' };
   const pdef = PILLS[pillId];
   if (!pdef) return { ok: false, reason: 'unknown-pill' };
   const newPills = consumeFromBag(g.pills, pillId, 1);
+  const effect = pdef.effect;
+  const durationMs = effect.baseDurationMs > 0 ? effect.baseDurationMs : 30_000;
   const buff = {
     pillId,
-    name: pdef.name,
-    effect: pdef.effect,
-    consumedAt: now,
-    expiresAt: pdef.effect.baseDurationMs > 0 ? now + pdef.effect.baseDurationMs : null,
+    name:        pdef.name,
+    kind:        effect.kind,
+    magnitude:   effect.baseMagnitude || 0,
+    side:        effect.side  || null,
+    side2:       effect.side2 || null,
+    consumedAt:  now,
+    expiresAt:   now + durationMs,
+    durationMs,
   };
+  // One slot per effect kind. Re-consuming replaces existing of same kind.
+  const activeBuffs = (g.activeBuffs || []).filter(b => b.kind !== effect.kind && b.expiresAt > now);
+  activeBuffs.push(buff);
   return {
     ok: true,
-    furnace: { ...g, pills: newPills, stats: { ...g.stats, consumed: g.stats.consumed + 1 } },
+    furnace: {
+      ...g,
+      pills: newPills,
+      activeBuffs,
+      stats: { ...g.stats, consumed: g.stats.consumed + 1 },
+    },
     buff,
   };
+}
+
+/** Returns the non-expired active pill buffs, pruning expired ones for
+ *  display. Pure: doesn't mutate furnace state. */
+export function getActiveFurnaceBuffs(g, now = Date.now()) {
+  return (g.activeBuffs || []).filter(b => Number.isFinite(b.expiresAt) && b.expiresAt > now);
+}
+
+/** Aggregate active pill buffs into a flat modifier bundle, similar to
+ *  aggregateFoundationMods. Caller multiplies / sums into formulas. */
+export function aggregateActivePillMods(g, now = Date.now()) {
+  let qiPerSecMult         = 1;
+  let breakthroughDiscount = 0;
+  let offlineQiMult        = 1;
+  let producerCostMult     = 1;
+  let karmaGainMult        = 1;
+  const apply = (kind, mag) => {
+    switch (kind) {
+      case 'qiPerSecMult':         qiPerSecMult         *= (1 + mag); break;
+      case 'breakthroughDiscount': breakthroughDiscount += mag;       break;
+      case 'offlineQiMult':        offlineQiMult        *= (1 + mag); break;
+      case 'producerCostMult':     producerCostMult     *= (1 - mag); break;
+      case 'karmaGainMult':        karmaGainMult        *= (1 + mag); break;
+      default: break;
+    }
+  };
+  for (const b of getActiveFurnaceBuffs(g, now)) {
+    apply(b.kind, b.magnitude || 0);
+    if (b.side)  apply(b.side.kind,  b.side.baseMagnitude  || 0);
+    if (b.side2) apply(b.side2.kind, b.side2.baseMagnitude || 0);
+  }
+  return { qiPerSecMult, breakthroughDiscount, offlineQiMult, producerCostMult, karmaGainMult };
 }
 
 // ── Garden basket → furnace pantry transfer ─────────────────────────────────
