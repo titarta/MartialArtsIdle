@@ -92,6 +92,21 @@ export function wipeSave() {
   // Per-pill consumption counter that drives diminishing returns. Lives
   // alongside permanentStats — both are per-incarnation, both wipe together.
   localStorage.removeItem('mai_pills_consumed');
+  // ── Minigame state ────────────────────────────────────────────────────
+  // Per-life state for the three Hidden Arts. Previously omitted, which
+  // meant the Roster merge board, Spirit Garden plots, and Meridian
+  // Furnace cauldrons + heat pool + Foundation slots all silently carried
+  // over from a factory reset and from reincarnation. The codex /
+  // discovered set lives INSIDE each of these blobs, so wiping the parent
+  // key also resets per-minigame discovery (that's per-life by design —
+  // a new cultivator re-learns the recipes). The "Eternal Roster /
+  // Garden / Furnace" tree nodes don't touch these keys; they only keep
+  // the producer unlock state through reincarnation (handled by
+  // tree.modifiers.unlockedHiddenArts), not the live minigame contents.
+  localStorage.removeItem('mai_disciple_merge');     // Sect Roster board + tiers
+  localStorage.removeItem('mai_garden');             // Spirit Garden plots + dew + recipes
+  localStorage.removeItem('mai_furnace');            // Meridian Furnace cauldrons + heat + foundations
+  localStorage.removeItem('mai_furnace_offline_snapshot');  // furnace's pre-mount offline qi mirror
   // 2026-05-21 — Settings > "Wipe save" is a true factory reset. Karma +
   // Eternal Tree are part of the player's progression and DO get wiped here.
   // `wipeReincarnation()` below is the prestige-only path that preserves
