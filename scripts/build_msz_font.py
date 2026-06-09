@@ -81,6 +81,12 @@ CHARS = sorted(set(
     # introduced by the reincarnation respec. (The placeholder glyphs above are
     # now unused but harmless to keep bundled.)
     + "升育超施萬露留沃藝紋髓承庫韻守福基"  # new Eternal Tree node glyphs
+    # 2026-06-09 Meridian Furnace heat tier seals + Refine predict seal.
+    # 生 (raw / unfired) · 溫 (warm / tempered) · 煉 (refined / smelt) · 極 (extreme / peak).
+    # Without these, the heat dials and the Refine predict seal fell back to
+    # a system serif on Windows ("rounder vs sharper" glyph drift). 火 / 丹 /
+    # 超 / 基 are already covered above.
+    + "生溫煉極"                    # furnace: heat tiers + refine predict seal
 ))
 
 # Google Fonts hosts the unsubsetted TTF for non-browser User-Agents.

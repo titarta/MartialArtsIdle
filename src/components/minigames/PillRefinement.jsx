@@ -51,15 +51,19 @@ function fmtHeat(now, cap) {
 // ── Layout primitives ──────────────────────────────────────────────────────
 function HeatBar({ heat, cap, regenPerSec }) {
   const pct = Math.max(0, Math.min(100, (heat / cap) * 100));
+  const hot = pct >= 75;
   return (
-    <div className="pr-heat">
+    <div className={`pr-heat ${hot ? 'pr-heat-hot' : ''}`}>
       <div className="pr-heat-label">
-        <span>Heat</span>
+        <span className="pr-heat-lbl">Heat</span>
         <span className="pr-heat-amt">{fmtHeat(heat, cap)}</span>
         <span className="pr-heat-regen">+{(regenPerSec * 60).toFixed(1)}/min</span>
       </div>
-      <div className="pr-heat-track">
-        <div className="pr-heat-fill" style={{ width: `${pct}%` }} />
+      <div className="pr-heat-track" aria-hidden="true">
+        <div className="pr-heat-fill" style={{ width: `${pct}%` }}>
+          <span className="pr-heat-shimmer" />
+          <span className="pr-heat-embers" />
+        </div>
       </div>
     </div>
   );
@@ -70,14 +74,17 @@ function CauldronTile({ cauldron, idx, locked, now }) {
   const remaining = isCooking ? Math.max(0, cauldron.finishAt - now) : 0;
   return (
     <div className={`pr-cauldron ${isCooking ? 'pr-cauldron-cooking' : ''} ${locked ? 'pr-cauldron-locked' : ''}`}>
-      <div className="pr-cauldron-idx">#{idx + 1}</div>
+      <span className="pr-cauldron-rim" aria-hidden="true" />
+      <span className="pr-cauldron-glow" aria-hidden="true" />
+      <span className="pr-cauldron-feet" aria-hidden="true" />
+      <div className="pr-cauldron-idx">{idx + 1}</div>
       {locked ? (
-        <div className="pr-cauldron-locked-text">Locked</div>
+        <div className="pr-cauldron-locked-text">—</div>
       ) : isCooking ? (
         <>
-          <div className="pr-cauldron-layer">{cauldron.layer.toUpperCase()}</div>
+          <div className="pr-cauldron-layer" data-layer={cauldron.layer}>{cauldron.layer}</div>
           <div className="pr-cauldron-time">{fmtCountdown(remaining)}</div>
-          <div className="pr-cauldron-heat">heat {cauldron.heat}</div>
+          <div className="pr-cauldron-heat">{cauldron.heat}</div>
         </>
       ) : (
         <div className="pr-cauldron-idle">idle</div>
@@ -87,25 +94,34 @@ function CauldronTile({ cauldron, idx, locked, now }) {
 }
 
 // ── Heat selector ─────────────────────────────────────────────────────────
+// Calligraphic glyph per tier — these surface a Chinese character above the
+// numeric heat value so each tier reads as its own alchemical seal.
+const HEAT_TIER_GLYPHS = ['生', '溫', '煉', '極']; // raw · warm · refined · peak
+
 function HeatSelector({ heat, setHeat, min, cap }) {
   return (
     <div className="pr-heat-pick">
-      <span className="pr-heat-pick-lbl">Heat:</span>
-      {HEAT_QUALITY_TIERS.map((tier) => {
-        const allowed = tier.heat >= min && tier.heat <= cap;
-        return (
-          <button
-            key={tier.heat}
-            type="button"
-            className={`pr-heat-btn ${heat === tier.heat ? 'pr-heat-btn-on' : ''}`}
-            onClick={() => setHeat(tier.heat)}
-            disabled={!allowed}
-            title={`${tier.label} — ×${tier.mult} magnitude`}
-          >
-            {tier.heat} ({tier.label})
-          </button>
-        );
-      })}
+      <span className="pr-heat-pick-lbl">Fire</span>
+      <div className="pr-heat-dials">
+        {HEAT_QUALITY_TIERS.map((tier, idx) => {
+          const allowed = tier.heat >= min && tier.heat <= cap;
+          const isOn = heat === tier.heat;
+          return (
+            <button
+              key={tier.heat}
+              type="button"
+              className={`pr-heat-btn pr-heat-tier-${idx} ${isOn ? 'pr-heat-btn-on' : ''}`}
+              onClick={() => setHeat(tier.heat)}
+              disabled={!allowed}
+              title={`${tier.label} — ×${tier.mult} magnitude`}
+            >
+              <span className="pr-heat-glyph" aria-hidden="true">{HEAT_TIER_GLYPHS[idx]}</span>
+              <span className="pr-heat-tier-lbl">{tier.label}</span>
+              <span className="pr-heat-tier-num">{tier.heat}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -163,12 +179,19 @@ function RefineTab({ furnace, heatCapNow, onRefine }) {
           </div>
         ))}
       </div>
-      <div className="pr-predict">
-        Predicted: <strong>{predictedMat?.name ?? '—'}</strong>
+      <div className={`pr-predict ${predictedMat ? 'pr-predict-on' : ''}`}>
+        <span className="pr-predict-seal" aria-hidden="true">煉</span>
+        <span className="pr-predict-lbl">Will yield</span>
+        <strong className="pr-predict-name">{predictedMat?.name ?? '— select 3 ingredients —'}</strong>
+        {predictedMat && (
+          <span className="pr-predict-sub">Refined from {(predictedMat.plant || 'mixed').replace(/_/g, ' ')}.</span>
+        )}
       </div>
       <HeatSelector heat={heat} setHeat={setHeat} min={LAYER_DEF.refine.minHeat} cap={Math.min(heatCapNow, furnace.heat ?? 0)} />
       <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
-        Refine ({heatQualityLabel(heat)})
+        <span className="pr-fire-glow" aria-hidden="true" />
+        <span className="pr-fire-glyph" aria-hidden="true">火</span>
+        <span className="pr-fire-label">Ignite — Refine ({heatQualityLabel(heat)})</span>
       </button>
     </div>
   );
@@ -230,13 +253,17 @@ function CombineTab({ furnace, heatCapNow, onCombine }) {
           </div>
         ))}
       </div>
-      <div className="pr-predict">
-        Predicted: <strong>{predictedPill?.name ?? '—'}</strong>
-        {predictedPill?.desc && <div className="pr-predict-sub">{predictedPill.desc}</div>}
+      <div className={`pr-predict ${predictedPill ? 'pr-predict-on' : ''}`}>
+        <span className="pr-predict-seal" aria-hidden="true">丹</span>
+        <span className="pr-predict-lbl">Will yield</span>
+        <strong className="pr-predict-name">{predictedPill?.name ?? '— select 3 materials —'}</strong>
+        {predictedPill?.desc && <span className="pr-predict-sub">{predictedPill.desc}</span>}
       </div>
       <HeatSelector heat={heat} setHeat={setHeat} min={LAYER_DEF.combine.minHeat} cap={Math.min(heatCapNow, furnace.heat ?? 0)} />
       <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
-        Combine ({heatQualityLabel(heat)})
+        <span className="pr-fire-glow" aria-hidden="true" />
+        <span className="pr-fire-glyph" aria-hidden="true">丹</span>
+        <span className="pr-fire-label">Ignite — Combine ({heatQualityLabel(heat)})</span>
       </button>
     </div>
   );
@@ -316,12 +343,16 @@ function TranscendTab({ furnace, onTranscend, onConsume }) {
           </div>
         ))}
       </div>
-      <div className="pr-predict">
-        Predicted: <strong>{predictedFound?.name ?? '—'}</strong>
-        {predictedFound?.desc && <div className="pr-predict-sub">{predictedFound.desc}</div>}
+      <div className={`pr-predict pr-predict-divine ${predictedFound ? 'pr-predict-on' : ''}`}>
+        <span className="pr-predict-seal" aria-hidden="true">超</span>
+        <span className="pr-predict-lbl">Permanent boon</span>
+        <strong className="pr-predict-name">{predictedFound?.name ?? '— select 3 identical pills —'}</strong>
+        {predictedFound?.desc && <span className="pr-predict-sub">{predictedFound.desc}</span>}
       </div>
-      <button type="button" className="pr-fire" disabled={!canFire} onClick={fire}>
-        Transcend
+      <button type="button" className="pr-fire pr-fire-transcend" disabled={!canFire} onClick={fire}>
+        <span className="pr-fire-glow" aria-hidden="true" />
+        <span className="pr-fire-glyph" aria-hidden="true">超</span>
+        <span className="pr-fire-label">Transcend</span>
       </button>
       {capsules.length > 0 && (
         <div className="pr-capsules">
@@ -369,19 +400,40 @@ export default function PillRefinement(_props) {
         ))}
       </div>
       <div className="pr-foundations">
-        <strong>Foundation slots ({f.furnace.foundations.length}/3):</strong>
-        {f.furnace.foundations.length === 0
-          ? <span className="pr-empty"> none</span>
-          : f.furnace.foundations.map((fnd, i) => (
-              <span key={i} className="pr-foundation-chip">
-                {FOUNDATIONS[fnd.id]?.name ?? fnd.id} (+{((fnd.magnitude || 0) * 100).toFixed(1)}%)
-              </span>
-            ))}
+        <div className="pr-foundations-head">
+          <span className="pr-foundations-glyph" aria-hidden="true">基</span>
+          <span className="pr-foundations-title">Foundation</span>
+          <span className="pr-foundations-count">{f.furnace.foundations.length}/3</span>
+        </div>
+        <div className="pr-foundations-slots">
+          {[0, 1, 2].map((i) => {
+            const fnd = f.furnace.foundations[i];
+            const fdef = fnd ? FOUNDATIONS[fnd.id] : null;
+            return (
+              <div key={i} className={`pr-foundation-medal ${fnd ? 'pr-foundation-medal-on' : ''}`} title={fdef?.desc ?? 'Empty Foundation slot — transcend a pill to fill.'}>
+                <span className="pr-foundation-rope" aria-hidden="true" />
+                <span className="pr-foundation-seal" aria-hidden="true">{fdef ? '丹' : '○'}</span>
+                {fnd && (
+                  <span className="pr-foundation-mag">+{((fnd.magnitude || 0) * 100).toFixed(1)}%</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="pr-tabs">
-        <button type="button" className={tab === 'refine'    ? 'pr-tab-on' : ''} onClick={() => setTab('refine')}>Refine</button>
-        <button type="button" className={tab === 'combine'   ? 'pr-tab-on' : ''} onClick={() => setTab('combine')}>Combine</button>
-        <button type="button" className={tab === 'transcend' ? 'pr-tab-on' : ''} onClick={() => setTab('transcend')}>Transcend</button>
+      <div className="pr-tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === 'refine'}    className={`pr-tab-btn pr-tab-refine    ${tab === 'refine'    ? 'pr-tab-on' : ''}`} onClick={() => setTab('refine')}>
+          <span className="pr-tab-glyph" aria-hidden="true">火</span>
+          <span className="pr-tab-name">Refine</span>
+        </button>
+        <button type="button" role="tab" aria-selected={tab === 'combine'}   className={`pr-tab-btn pr-tab-combine   ${tab === 'combine'   ? 'pr-tab-on' : ''}`} onClick={() => setTab('combine')}>
+          <span className="pr-tab-glyph" aria-hidden="true">丹</span>
+          <span className="pr-tab-name">Combine</span>
+        </button>
+        <button type="button" role="tab" aria-selected={tab === 'transcend'} className={`pr-tab-btn pr-tab-transcend ${tab === 'transcend' ? 'pr-tab-on' : ''}`} onClick={() => setTab('transcend')}>
+          <span className="pr-tab-glyph" aria-hidden="true">超</span>
+          <span className="pr-tab-name">Transcend</span>
+        </button>
       </div>
       {tab === 'refine'    && <RefineTab    furnace={f.furnace} heatCapNow={f.heatCapNow} onRefine={f.refine} />}
       {tab === 'combine'   && <CombineTab   furnace={f.furnace} heatCapNow={f.heatCapNow} onCombine={f.combine} />}

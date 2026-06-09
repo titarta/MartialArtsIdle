@@ -912,80 +912,617 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   Pill Refinement — Meridian Furnace 3-layer alchemy
-   (added 2026-06-09 with the furnace minigame v1)
+   Pill Refinement — The Alchemist's Crucible
+   Bronze tripod cauldrons, molten heat channel, embers rising from a
+   furnace pit. Three ascending tabs (Refine workshop / Combine study /
+   Transcend divine sanctum) carry the cultivator from craft to godhood.
+   Aesthetic siblings: gd-* (Spirit Garden) + dmg-* (Sect Roster).
+   Refreshed 2026-06-09.
    ════════════════════════════════════════════════════════════════════════ */
-.pr-screen { display: flex; flex-direction: column; gap: 12px; padding: 12px; color: var(--mg-cream); font-size: 12.5px; }
+.pr-screen {
+  /* Crucible-specific palette layered over the shared mg-* tokens. */
+  --pr-bronze:        #c08858;
+  --pr-bronze-deep:   #6e4823;
+  --pr-bronze-dark:   #2a1a0d;
+  --pr-bronze-light:  #e6c192;
+  --pr-ember:         #ff6b3d;
+  --pr-ember-deep:    #c8362a;
+  --pr-ember-bright:  #ffb05c;
+  --pr-vermilion:     #e94560;
+  --pr-divine:        #ffeec2;
+  --pr-divine-violet: #b89adb;
+  --pr-jade:          #6ec896;
+  --pr-ink:           #15110a;
 
-.pr-heat { display: flex; flex-direction: column; gap: 4px; }
-.pr-heat-label { display: flex; gap: 10px; align-items: baseline; font-size: 11px; }
-.pr-heat-amt { font-family: 'Cinzel', Georgia, serif; color: var(--mg-amber-bright); font-size: 14px; font-variant-numeric: tabular-nums; }
-.pr-heat-regen { color: var(--mg-cream-soft); opacity: 0.75; margin-left: auto; }
-.pr-heat-track { height: 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); border: 1px solid var(--mg-line); overflow: hidden; }
-.pr-heat-fill { height: 100%; background: linear-gradient(90deg, #c8362a, var(--mg-amber-bright)); transition: width 0.4s linear; }
+  position: relative;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 14px 12px 18px;
+  color: var(--mg-cream);
+  font-size: 12.5px;
+  isolation: isolate;
+}
 
-.pr-cauldrons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.pr-cauldron { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--mg-line); background: rgba(0, 0, 0, 0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 10px; }
-.pr-cauldron-locked { opacity: 0.35; }
-.pr-cauldron-cooking { border-color: var(--mg-amber-bright); background: rgba(220, 175, 110, 0.08); }
-.pr-cauldron-idx { font-family: 'Cinzel', Georgia, serif; color: var(--mg-amber-bright); font-size: 12px; }
-.pr-cauldron-layer { font-size: 9px; letter-spacing: 0.06em; color: var(--mg-cream-soft); }
-.pr-cauldron-time { font-size: 10.5px; color: var(--mg-cream); font-variant-numeric: tabular-nums; }
-.pr-cauldron-heat { font-size: 9px; color: #f5b95c; opacity: 0.7; }
-.pr-cauldron-idle { font-size: 10px; color: var(--mg-cream-soft); opacity: 0.55; }
-.pr-cauldron-locked-text { font-size: 9px; color: var(--mg-cream-soft); opacity: 0.5; }
+/* Furnace pit glow rising from the bottom of the chamber.
+   Sits BEHIND every element. The room is dark, the floor warm. */
+.pr-screen::before {
+  content: '';
+  position: absolute; inset: auto 0 -20px 0; height: 220px;
+  background:
+    radial-gradient(80% 100% at 50% 100%, rgba(255, 107, 61, 0.16), transparent 60%),
+    radial-gradient(60% 70% at 30% 100%, rgba(255, 176, 92, 0.10), transparent 65%),
+    radial-gradient(60% 70% at 70% 100%, rgba(220, 50, 30, 0.10), transparent 65%);
+  pointer-events: none;
+  z-index: -1;
+  animation: pr-pit-breathe 6.2s ease-in-out infinite;
+}
+@keyframes pr-pit-breathe {
+  0%, 100% { opacity: 0.78; }
+  50%      { opacity: 1; }
+}
+/* Top sutra-script seam: a thin brass hairline at the upper edge. */
+.pr-screen::after {
+  content: '';
+  position: absolute; inset: -2px 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(220, 175, 110, 0.45) 20%, rgba(245, 200, 66, 0.6) 50%, rgba(220, 175, 110, 0.45) 80%, transparent 100%);
+  pointer-events: none;
+}
 
-.pr-foundations { padding: 8px 10px; border-radius: 10px; border: 1px dashed var(--mg-line); background: rgba(0, 0, 0, 0.18); font-size: 11px; }
-.pr-foundation-chip { display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: rgba(220, 175, 110, 0.18); border: 1px solid var(--mg-line-strong); color: var(--mg-amber-bright); }
-.pr-empty { color: var(--mg-cream-soft); opacity: 0.55; font-style: italic; }
+/* ── Heat channel: molten metal flowing through a brass-rimmed trough ── */
+.pr-heat {
+  position: relative;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px 12px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(40, 26, 10, 0.7) 0%, rgba(20, 12, 6, 0.85) 100%);
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 4px 14px rgba(0, 0, 0, 0.32);
+}
+.pr-heat-label { display: flex; gap: 10px; align-items: baseline; font-size: 11px; font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.04em; }
+.pr-heat-lbl   { text-transform: uppercase; letter-spacing: 0.22em; font-size: 9.5px; color: var(--mg-cream-soft); opacity: 0.85; }
+.pr-heat-amt   { font-size: 17px; font-weight: 700; color: var(--pr-ember-bright); text-shadow: 0 0 14px rgba(255, 176, 92, 0.55); font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.pr-heat-regen { margin-left: auto; font-size: 10px; letter-spacing: 0.06em; color: var(--mg-cream-soft); opacity: 0.7; font-variant-numeric: tabular-nums; }
 
-.pr-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--mg-line); padding-bottom: 4px; }
-.pr-tabs button { padding: 6px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream-soft); cursor: pointer; font: inherit; font-size: 12px; }
-.pr-tabs button.pr-tab-on { background: rgba(220, 175, 110, 0.18); color: var(--mg-amber-bright); border-color: var(--mg-line-strong); }
+.pr-heat-track {
+  position: relative; height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.55));
+  border: 1px solid var(--pr-bronze);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    inset 0 -1px 0 rgba(255, 220, 170, 0.10),
+    0 0 0 1px var(--pr-bronze-deep);
+  overflow: hidden;
+}
+.pr-heat-fill {
+  position: relative; height: 100%;
+  background: linear-gradient(180deg, var(--pr-ember-bright) 0%, var(--pr-ember) 35%, var(--pr-ember-deep) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(120, 30, 10, 0.5),
+    0 0 10px rgba(255, 107, 61, 0.55);
+  transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: inherit;
+  overflow: hidden;
+}
+.pr-heat-shimmer {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.45) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: pr-heat-shimmer 3.4s linear infinite;
+  pointer-events: none;
+}
+@keyframes pr-heat-shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.pr-heat-embers {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 70%, rgba(255, 220, 130, 0.85) 0%, transparent 14%),
+    radial-gradient(circle at 38% 30%, rgba(255, 180, 90, 0.7)  0%, transparent 14%),
+    radial-gradient(circle at 62% 80%, rgba(255, 200, 110, 0.7) 0%, transparent 14%),
+    radial-gradient(circle at 84% 40%, rgba(255, 220, 130, 0.85) 0%, transparent 14%);
+  background-size: 2.5px 2.5px;
+  opacity: 0;
+  pointer-events: none;
+  animation: pr-ember-drift 2.1s linear infinite;
+}
+.pr-heat-hot .pr-heat-embers { opacity: 0.85; }
+.pr-heat-hot .pr-heat-fill   { animation: pr-heat-pulse 1.6s ease-in-out infinite; }
+@keyframes pr-heat-pulse {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50%      { filter: brightness(1.16) saturate(1.1); }
+}
+@keyframes pr-ember-drift {
+  0%   { transform: translateY(0)    scaleY(1);   }
+  100% { transform: translateY(-14px) scaleY(0.6); }
+}
 
-.pr-tab { display: flex; flex-direction: column; gap: 10px; }
-.pr-tab-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.pr-tab-head h3 { font-family: 'Cinzel', Georgia, serif; font-size: 14px; color: var(--mg-amber-bright); margin: 0; }
-.pr-tab-cook { font-size: 10.5px; color: var(--mg-cream-soft); }
+/* ── Cauldron strip: bronze tripods set into the hearth ─────────────── */
+.pr-cauldrons {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 8px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(30, 18, 8, 0.65), rgba(16, 10, 5, 0.85));
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+.pr-cauldron {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 14px 14px 16px 16px / 14px 14px 22px 22px;
+  background: radial-gradient(120% 100% at 50% 40%, rgba(60, 38, 18, 0.95), rgba(20, 12, 6, 1));
+  border: 1px solid var(--pr-bronze);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px;
+  font-size: 9.5px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.18),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+.pr-cauldron-rim {
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  border-top: 1px solid var(--pr-bronze-light);
+  border-bottom: 2px solid var(--pr-bronze-deep);
+  pointer-events: none;
+  z-index: 2;
+}
+.pr-cauldron-feet {
+  position: absolute; left: 12%; right: 12%; bottom: -1px; height: 4px;
+  background:
+    radial-gradient(circle at 10% 0%, var(--pr-bronze-deep) 0%, transparent 50%),
+    radial-gradient(circle at 50% 0%, var(--pr-bronze-deep) 0%, transparent 50%),
+    radial-gradient(circle at 90% 0%, var(--pr-bronze-deep) 0%, transparent 50%);
+  pointer-events: none;
+}
+.pr-cauldron-glow {
+  position: absolute; inset: 30% 12% 6% 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 60%,
+    rgba(255, 220, 130, 0.85) 0%,
+    rgba(255, 107, 61, 0.55) 35%,
+    rgba(200, 50, 30, 0.3) 65%,
+    transparent 85%);
+  filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.pr-cauldron-cooking .pr-cauldron-glow { opacity: 1; animation: pr-cauldron-glow 1.7s ease-in-out infinite; }
+@keyframes pr-cauldron-glow {
+  0%, 100% { opacity: 0.78; transform: scale(0.95); }
+  50%      { opacity: 1;    transform: scale(1.05); }
+}
+.pr-cauldron-cooking {
+  border-color: var(--pr-ember-bright);
+  background: radial-gradient(120% 100% at 50% 70%, rgba(120, 50, 12, 0.55), rgba(20, 12, 6, 1));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.28),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7),
+    0 0 14px rgba(255, 107, 61, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.pr-cauldron-locked {
+  opacity: 0.32;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.65));
+  border-color: rgba(110, 72, 35, 0.6);
+}
+.pr-cauldron-locked .pr-cauldron-rim {
+  border-top-color: rgba(220, 175, 110, 0.3);
+  border-bottom-color: rgba(20, 12, 6, 0.5);
+}
+.pr-cauldron-idx { position: relative; z-index: 1; font-family: 'Cinzel', Georgia, serif; font-size: 11px; color: var(--pr-bronze-light); letter-spacing: 0.02em; opacity: 0.7; }
+.pr-cauldron-cooking .pr-cauldron-idx { opacity: 0.95; color: var(--pr-ember-bright); }
+.pr-cauldron-layer { position: relative; z-index: 1; font-family: 'Cinzel', Georgia, serif; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mg-cream); opacity: 0.9; }
+.pr-cauldron-layer[data-layer="transcend"] { color: var(--pr-divine); }
+.pr-cauldron-time { position: relative; z-index: 1; font-family: 'Cinzel', Georgia, serif; font-size: 11.5px; font-weight: 700; color: var(--pr-divine); font-variant-numeric: tabular-nums; text-shadow: 0 0 8px rgba(255, 220, 130, 0.55); }
+.pr-cauldron-heat { position: relative; z-index: 1; font-size: 9px; color: var(--pr-ember-bright); opacity: 0.85; font-variant-numeric: tabular-nums; }
+.pr-cauldron-idle { position: relative; z-index: 1; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mg-cream-soft); opacity: 0.45; }
+.pr-cauldron-locked-text { position: relative; z-index: 1; font-size: 16px; color: var(--mg-cream-soft); opacity: 0.45; }
 
-.pr-pantry { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; max-height: 200px; overflow-y: auto; padding: 6px; border-radius: 8px; border: 1px solid var(--mg-line); background: rgba(0, 0, 0, 0.22); }
-.pr-pantry-tile { padding: 6px 4px; border-radius: 8px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; transition: background 0.12s, border-color 0.12s; }
-.pr-pantry-tile:hover { border-color: var(--mg-line-strong); background: rgba(220, 175, 110, 0.10); }
-.pr-pantry-tile:disabled { opacity: 0.4; cursor: not-allowed; }
-.pr-pantry-tile-pill { cursor: default; gap: 4px; padding: 8px; }
-.pr-pantry-tile-pill:hover { background: rgba(255, 240, 200, 0.04); border-color: var(--mg-line); }
-.pr-pantry-sprite { width: 36px; height: 36px; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: contain; }
-.pr-pantry-orb { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 12px currentColor; opacity: 0.7; }
-.pr-pantry-id { font-size: 9.5px; text-align: center; color: var(--mg-cream); text-transform: capitalize; line-height: 1.1; }
-.pr-pantry-count { font-size: 10px; color: var(--mg-amber-bright); font-variant-numeric: tabular-nums; }
-.pr-pantry-actions { display: flex; gap: 4px; margin-top: 4px; }
-.pr-pantry-actions button { font-size: 10px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.05); color: var(--mg-cream); cursor: pointer; }
-.pr-pantry-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── Foundation medallion row ──────────────────────────────────────── */
+.pr-foundations {
+  position: relative;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: linear-gradient(180deg, rgba(40, 30, 16, 0.85) 0%, rgba(20, 14, 8, 0.95) 100%);
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.16),
+    0 4px 12px rgba(0, 0, 0, 0.32);
+}
+.pr-foundations-head  { display: flex; align-items: baseline; gap: 8px; }
+.pr-foundations-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif; font-size: 19px; line-height: 1; color: var(--pr-divine); text-shadow: 0 0 12px rgba(255, 220, 130, 0.5); }
+.pr-foundations-title { font-family: 'Cinzel', Georgia, serif; font-size: 12.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mg-cream); }
+.pr-foundations-count { margin-left: auto; font-family: 'Cinzel', Georgia, serif; font-size: 11px; color: var(--mg-cream-soft); opacity: 0.7; font-variant-numeric: tabular-nums; }
+.pr-foundations-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pr-foundation-medal {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 10px 6px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+  border: 1px dashed var(--pr-bronze-deep);
+  min-height: 64px;
+  text-align: center;
+  transition: border-color 200ms, background 200ms;
+}
+.pr-foundation-medal-on {
+  background: radial-gradient(circle at 50% 40%, rgba(245, 200, 66, 0.18), rgba(20, 12, 6, 0.85) 70%);
+  border: 1px solid var(--mg-amber-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.25),
+    0 0 14px rgba(245, 200, 66, 0.32);
+}
+.pr-foundation-rope { display: none; }
+.pr-foundation-medal-on .pr-foundation-rope {
+  display: block;
+  position: absolute; inset: 4px;
+  border-radius: 9px;
+  border: 1px solid rgba(245, 200, 66, 0.28);
+  pointer-events: none;
+}
+.pr-foundation-seal {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 22px; line-height: 1;
+  color: rgba(220, 175, 110, 0.32);
+}
+.pr-foundation-medal-on .pr-foundation-seal {
+  color: var(--mg-amber-bright);
+  text-shadow: 0 0 14px rgba(245, 200, 66, 0.65);
+  animation: pr-medal-halo 3.6s ease-in-out infinite;
+}
+@keyframes pr-medal-halo {
+  0%, 100% { filter: brightness(1)    drop-shadow(0 0 6px rgba(245, 200, 66, 0.4)); }
+  50%      { filter: brightness(1.18) drop-shadow(0 0 10px rgba(245, 200, 66, 0.7)); }
+}
+.pr-foundation-mag {
+  margin-top: 4px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11px; color: var(--mg-jade);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 8px rgba(110, 200, 150, 0.42);
+}
 
-.pr-slots { display: flex; gap: 8px; justify-content: center; }
-.pr-slot { flex: 1; max-width: 100px; aspect-ratio: 1; border-radius: 12px; border: 2px dashed var(--mg-line); background: rgba(0, 0, 0, 0.22); display: grid; place-items: center; cursor: pointer; transition: border-color 0.12s; }
-.pr-slot:hover { border-color: var(--mg-line-strong); }
-.pr-slot-empty { font-size: 24px; color: var(--mg-cream-soft); opacity: 0.45; }
-.pr-slot-filled { font-size: 10.5px; color: var(--mg-amber-bright); text-align: center; padding: 6px; text-transform: capitalize; line-height: 1.2; }
+/* ── Tabs: three ascending tiers of craft ──────────────────────────── */
+.pr-tabs {
+  display: flex; gap: 0;
+  padding: 4px;
+  border-radius: 13px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+.pr-tab-btn {
+  position: relative;
+  flex: 1; min-height: 48px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 6px 8px;
+  cursor: pointer;
+  border: none; background: transparent;
+  border-radius: 10px;
+  color: var(--mg-cream-soft); opacity: 0.78;
+  font: inherit;
+  transition: background 200ms, color 200ms, transform 80ms, opacity 200ms;
+}
+.pr-tab-btn:hover  { opacity: 1; }
+.pr-tab-btn:active { transform: scale(0.97); }
+.pr-tab-glyph {
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 19px; line-height: 1; color: inherit;
+  transition: text-shadow 200ms;
+}
+.pr-tab-name { font-family: 'Cinzel', Georgia, serif; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; }
+.pr-tab-btn.pr-tab-on { opacity: 1; }
+.pr-tab-refine.pr-tab-on    { color: var(--pr-ember-bright); background: radial-gradient(120% 130% at 50% 100%, rgba(255, 107, 61, 0.32), transparent 70%); }
+.pr-tab-combine.pr-tab-on   { color: var(--mg-amber-bright); background: radial-gradient(120% 130% at 50% 100%, rgba(245, 200, 66, 0.32), transparent 70%); }
+.pr-tab-transcend.pr-tab-on { color: var(--pr-divine);       background: radial-gradient(120% 130% at 50% 100%, rgba(184, 154, 219, 0.30), rgba(255, 220, 130, 0.18) 40%, transparent 75%); }
+.pr-tab-on .pr-tab-glyph { text-shadow: 0 0 14px currentColor; }
+.pr-tab-btn.pr-tab-on::after {
+  content: '';
+  position: absolute; left: 14%; right: 14%; bottom: 1px; height: 2px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  border-radius: 999px;
+  filter: drop-shadow(0 0 4px currentColor);
+}
 
-.pr-predict { padding: 8px 10px; border-radius: 8px; background: rgba(0, 0, 0, 0.22); border: 1px solid var(--mg-line); font-size: 11px; color: var(--mg-cream); }
-.pr-predict strong { color: var(--mg-amber-bright); }
-.pr-predict-sub { margin-top: 4px; font-size: 10.5px; color: var(--mg-cream-soft); opacity: 0.85; }
+/* ── Tab body ──────────────────────────────────────────────────────── */
+.pr-tab { display: flex; flex-direction: column; gap: 12px; animation: pr-tab-in 260ms ease-out; }
+@keyframes pr-tab-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.pr-tab-head    { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 2px; }
+.pr-tab-head h3 { font-family: 'Cinzel', Georgia, serif; font-size: 14px; font-weight: 700; color: var(--mg-amber-bright); margin: 0; letter-spacing: 0.04em; text-shadow: 0 0 14px rgba(245, 200, 66, 0.32); }
+.pr-tab-cook    { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mg-cream-soft); opacity: 0.7; font-variant-numeric: tabular-nums; }
 
-.pr-heat-pick { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-.pr-heat-pick-lbl { font-size: 11px; color: var(--mg-cream-soft); margin-right: 4px; }
-.pr-heat-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--mg-line); background: rgba(255, 240, 200, 0.04); color: var(--mg-cream); cursor: pointer; font-size: 10.5px; }
-.pr-heat-btn-on { background: rgba(220, 175, 110, 0.20); color: var(--mg-amber-bright); border-color: var(--mg-line-strong); }
-.pr-heat-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+/* ── Pantry ────────────────────────────────────────────────────────── */
+.pr-pantry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(20, 12, 6, 0.45));
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.55);
+  scrollbar-width: thin;
+  scrollbar-color: var(--pr-bronze) transparent;
+}
+.pr-pantry::-webkit-scrollbar       { width: 6px; }
+.pr-pantry::-webkit-scrollbar-thumb { background: var(--pr-bronze); border-radius: 999px; }
+.pr-pantry-tile {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 4px;
+  cursor: pointer; font: inherit;
+  background: linear-gradient(180deg, rgba(60, 40, 20, 0.4) 0%, rgba(28, 18, 10, 0.6) 100%);
+  border: 1px solid var(--pr-bronze-deep);
+  border-radius: 10px;
+  color: var(--mg-cream);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+  transition: border-color 160ms, background 160ms, transform 80ms;
+}
+.pr-pantry-tile:hover:not(:disabled)  { border-color: var(--mg-amber-bright); background: linear-gradient(180deg, rgba(80, 56, 28, 0.5) 0%, rgba(36, 24, 12, 0.7) 100%); }
+.pr-pantry-tile:active:not(:disabled) { transform: scale(0.96); }
+.pr-pantry-tile:disabled              { opacity: 0.4; cursor: not-allowed; }
+.pr-pantry-tile-pill {
+  cursor: default; gap: 6px; padding: 10px 8px;
+  background: linear-gradient(180deg, rgba(80, 56, 28, 0.5), rgba(36, 24, 12, 0.7));
+}
+.pr-pantry-tile-pill:hover { transform: none; }
+.pr-pantry-sprite { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55)); }
+.pr-pantry-orb {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 14px currentColor,
+    inset 0 -3px 4px rgba(0, 0, 0, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  opacity: 0.92;
+}
+.pr-pantry-id      { font-size: 9.5px; line-height: 1.15; text-align: center; color: var(--mg-cream); text-transform: capitalize; font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.02em; }
+.pr-pantry-count   { font-family: 'Cinzel', Georgia, serif; font-size: 11px; font-weight: 700; color: var(--mg-amber-bright); font-variant-numeric: tabular-nums; }
+.pr-pantry-actions         { display: flex; gap: 4px; margin-top: 3px; width: 100%; }
+.pr-pantry-actions button  { flex: 1; font: inherit; font-size: 10px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--pr-bronze-deep); background: rgba(255, 240, 200, 0.06); color: var(--mg-cream); cursor: pointer; transition: background 140ms, border-color 140ms; }
+.pr-pantry-actions button:hover:not(:disabled) { background: rgba(245, 200, 66, 0.18); border-color: var(--mg-amber-bright); }
+.pr-pantry-actions button:disabled             { opacity: 0.35; cursor: not-allowed; }
 
-.pr-fire { padding: 10px; border-radius: 10px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mg-void); background: linear-gradient(180deg, var(--mg-amber-bright), var(--mg-amber)); border: 1px solid rgba(255, 220, 130, 0.65); cursor: pointer; box-shadow: 0 4px 16px rgba(220, 175, 110, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
-.pr-fire:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+/* ── Slots: three brass receptacles arranged like an altar ─────────── */
+.pr-slots { display: flex; gap: 10px; justify-content: center; padding: 4px 2px; }
+.pr-slot {
+  position: relative;
+  flex: 1; max-width: 110px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 40%, rgba(40, 26, 14, 0.95) 0%, rgba(12, 8, 4, 1) 70%);
+  border: 2px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.18),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: border-color 200ms, transform 80ms, box-shadow 200ms;
+}
+.pr-slot:hover  { border-color: var(--mg-amber-bright); }
+.pr-slot:active { transform: scale(0.96); }
+.pr-slot-empty  { font-family: 'Cinzel', Georgia, serif; font-size: 28px; color: rgba(220, 175, 110, 0.25); }
+.pr-slot-filled { font-family: 'Cinzel', Georgia, serif; font-size: 10.5px; line-height: 1.2; color: var(--mg-amber-bright); text-align: center; padding: 8px; text-transform: capitalize; text-shadow: 0 0 12px rgba(245, 200, 66, 0.6); }
+/* Filled slot picks up the bronze halo (no :has support needed; the
+   .pr-slot-filled child is enough to drive the parent via a wrapper class
+   on the JSX side. Fallback: keep border swap via :has where supported.) */
+.pr-slot:has(.pr-slot-filled) {
+  border-color: var(--mg-amber-bright);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 220, 170, 0.28),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6),
+    0 0 18px rgba(245, 200, 66, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.4);
+}
 
-/* Capsule overflow panel (Transcend tab, when Foundation slots are full) */
-.pr-capsules { display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 10px; border: 1px dashed var(--mg-line); background: rgba(0, 0, 0, 0.22); }
-.pr-capsules-h { font-family: 'Cinzel', Georgia, serif; font-size: 12px; color: var(--mg-amber-bright); letter-spacing: 0.04em; }
-.pr-capsules-note { font-size: 10.5px; color: var(--mg-cream-soft); font-style: italic; }
+/* ── Predict card: divination vellum with a vermilion seal ─────────── */
+.pr-predict {
+  position: relative;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 14px 16px 14px 60px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(56, 38, 20, 0.55) 0%, rgba(28, 18, 10, 0.7) 100%);
+  border: 1px solid var(--pr-bronze-deep);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 220, 170, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 4px 10px rgba(0, 0, 0, 0.3);
+  font-size: 11.5px;
+  color: var(--mg-cream);
+  overflow: hidden;
+}
+.pr-predict-seal {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  border-radius: 8px;
+  font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif;
+  font-size: 20px; line-height: 1;
+  color: var(--mg-cream-soft);
+  background: linear-gradient(180deg, rgba(80, 30, 30, 0.45), rgba(40, 14, 14, 0.7));
+  border: 1px solid rgba(120, 50, 50, 0.55);
+  box-shadow: inset 0 0 8px rgba(233, 69, 96, 0.18);
+  opacity: 0.55;
+  transition: opacity 240ms, color 240ms, background 240ms, border-color 240ms, box-shadow 240ms;
+}
+.pr-predict-on .pr-predict-seal {
+  opacity: 1;
+  color: var(--pr-vermilion);
+  text-shadow: 0 0 12px rgba(233, 69, 96, 0.65);
+  background: linear-gradient(180deg, rgba(120, 30, 30, 0.55), rgba(60, 16, 16, 0.85));
+  border-color: rgba(220, 80, 80, 0.7);
+  box-shadow: inset 0 0 14px rgba(233, 69, 96, 0.35), 0 0 12px rgba(233, 69, 96, 0.25);
+}
+.pr-predict-lbl  { font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mg-cream-soft); opacity: 0.65; }
+.pr-predict-name { font-family: 'Cinzel', Georgia, serif; font-size: 15px; font-weight: 700; color: var(--mg-cream-soft); letter-spacing: 0.04em; transition: color 240ms, text-shadow 240ms; }
+.pr-predict-on   .pr-predict-name { color: var(--mg-amber-bright); text-shadow: 0 0 14px rgba(245, 200, 66, 0.4); }
+.pr-predict-divine.pr-predict-on .pr-predict-name { color: var(--pr-divine); text-shadow: 0 0 16px rgba(255, 238, 194, 0.65); }
+.pr-predict-sub  { font-size: 10.5px; line-height: 1.4; color: var(--mg-cream-soft); opacity: 0.82; margin-top: 2px; }
+
+/* ── Heat selector: brass dials ────────────────────────────────────── */
+.pr-heat-pick     { display: flex; flex-direction: column; gap: 6px; }
+.pr-heat-pick-lbl { font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mg-cream-soft); opacity: 0.7; font-family: 'Cinzel', Georgia, serif; }
+.pr-heat-dials    { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.pr-heat-btn {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 8px 4px;
+  cursor: pointer; font: inherit;
+  background: linear-gradient(180deg, rgba(48, 32, 16, 0.6), rgba(24, 16, 10, 0.85));
+  border: 1px solid var(--pr-bronze-deep);
+  border-radius: 10px;
+  color: var(--mg-cream-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.16);
+  transition: border-color 180ms, background 180ms, color 180ms, transform 80ms;
+}
+.pr-heat-btn:active:not(:disabled) { transform: scale(0.96); }
+.pr-heat-btn:disabled              { opacity: 0.32; cursor: not-allowed; }
+.pr-heat-glyph    { font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif; font-size: 17px; line-height: 1; color: currentColor; opacity: 0.7; }
+.pr-heat-tier-lbl { font-family: 'Cinzel', Georgia, serif; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: currentColor; }
+.pr-heat-tier-num { font-family: 'Cinzel', Georgia, serif; font-size: 10px; font-weight: 700; color: var(--pr-ember-bright); font-variant-numeric: tabular-nums; opacity: 0.85; }
+/* Tier-specific accent on active selection (raw → peak). */
+.pr-heat-tier-0.pr-heat-btn-on { color: var(--mg-cream);        background: linear-gradient(180deg, rgba(80, 60, 36, 0.7),   rgba(36, 24, 14, 0.95)); border-color: var(--pr-bronze); }
+.pr-heat-tier-1.pr-heat-btn-on { color: var(--pr-ember-bright); background: linear-gradient(180deg, rgba(120, 60, 28, 0.7),  rgba(50, 24, 12, 0.95)); border-color: var(--pr-ember);        box-shadow: inset 0 1px 0 rgba(255, 220, 170, 0.28), 0 0 12px rgba(255, 107, 61, 0.32); }
+.pr-heat-tier-2.pr-heat-btn-on { color: var(--mg-amber-bright); background: linear-gradient(180deg, rgba(140, 90, 30, 0.7),  rgba(58, 32, 12, 0.95)); border-color: var(--mg-amber-bright); box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.32), 0 0 14px rgba(245, 200, 66, 0.4);  }
+.pr-heat-tier-3.pr-heat-btn-on { color: var(--pr-divine);       background: linear-gradient(180deg, rgba(160, 110, 50, 0.75), rgba(70, 38, 16, 0.95)); border-color: var(--pr-divine);       box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.38), 0 0 18px rgba(255, 238, 194, 0.55); }
+.pr-heat-btn-on .pr-heat-glyph { opacity: 1; text-shadow: 0 0 12px currentColor; }
+
+/* ── Fire button: ignition lever ───────────────────────────────────── */
+.pr-fire {
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-family: 'Cinzel', Georgia, serif;
+  font-weight: 700; font-size: 13.5px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #2a1c08;
+  background: linear-gradient(180deg, var(--mg-amber-bright) 0%, var(--mg-amber) 60%, var(--pr-ember-deep) 100%);
+  border: 1px solid rgba(255, 220, 130, 0.7);
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, 0.6);
+  box-shadow:
+    0 6px 18px rgba(220, 160, 80, 0.35),
+    0 0 24px rgba(255, 107, 61, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 0 rgba(120, 30, 10, 0.4);
+  overflow: hidden;
+  isolation: isolate;
+  transition: filter 160ms, transform 80ms, box-shadow 200ms;
+}
+.pr-fire:not(:disabled):hover {
+  filter: brightness(1.08);
+  box-shadow:
+    0 6px 22px rgba(220, 160, 80, 0.45),
+    0 0 32px rgba(255, 107, 61, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(120, 30, 10, 0.4);
+}
+.pr-fire:not(:disabled):active { transform: translateY(1px) scale(0.99); }
+.pr-fire:disabled {
+  opacity: 0.42; cursor: not-allowed;
+  background: linear-gradient(180deg, rgba(140, 110, 70, 0.5), rgba(80, 56, 28, 0.6));
+  color: rgba(245, 230, 200, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 240, 200, 0.18);
+  text-shadow: none;
+}
+.pr-fire-glow {
+  position: absolute; left: -10%; right: -10%; bottom: -40%; height: 80%;
+  background: radial-gradient(60% 100% at 50% 100%, rgba(255, 220, 130, 0.85) 0%, rgba(255, 107, 61, 0.5) 35%, transparent 80%);
+  filter: blur(8px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 200ms;
+}
+.pr-fire:not(:disabled):hover .pr-fire-glow { opacity: 0.85; }
+.pr-fire-glyph { font-family: 'Ma Shan Zheng', 'Songti SC', 'STSong', 'Noto Serif CJK SC', serif; font-size: 22px; line-height: 1; color: #3a1c08; text-shadow: 0 1px 0 rgba(255, 240, 200, 0.65); }
+.pr-fire-label { font-size: 13px; }
+/* Transcend fire button reads cooler and more divine. */
+.pr-fire-transcend {
+  background: linear-gradient(180deg, var(--pr-divine) 0%, var(--mg-amber-bright) 40%, var(--pr-divine-violet) 100%);
+  color: #2a1234;
+  border-color: rgba(255, 240, 200, 0.75);
+  box-shadow:
+    0 6px 20px rgba(184, 154, 219, 0.4),
+    0 0 28px rgba(255, 238, 194, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -2px 0 rgba(80, 50, 110, 0.45);
+}
+.pr-fire-transcend .pr-fire-glow  { background: radial-gradient(60% 100% at 50% 100%, rgba(255, 238, 194, 0.85) 0%, rgba(184, 154, 219, 0.55) 40%, transparent 80%); }
+.pr-fire-transcend .pr-fire-glyph { color: #2a1234; }
+
+/* ── Empty / placeholder states ────────────────────────────────────── */
+.pr-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--mg-cream-soft);
+  opacity: 0.6;
+  font-style: italic;
+  padding: 16px 12px;
+}
+
+/* ── Capsule overflow panel (Transcend tab, when Foundation slots full) ── */
+.pr-capsules {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(60, 18, 18, 0.4) 0%, rgba(20, 8, 8, 0.6) 100%);
+  border: 1px solid rgba(220, 80, 80, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 200, 180, 0.18);
+}
+.pr-capsules-h    { font-family: 'Cinzel', Georgia, serif; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pr-vermilion); text-shadow: 0 0 10px rgba(233, 69, 96, 0.4); }
+.pr-capsules-note { font-size: 10.5px; color: var(--mg-cream-soft); opacity: 0.78; font-style: italic; line-height: 1.45; }
 .pr-capsules-grid { display: flex; gap: 6px; flex-wrap: wrap; }
-.pr-capsule { padding: 4px 10px; border-radius: 999px; background: rgba(220, 175, 110, 0.16); border: 1px solid var(--mg-line-strong); font-size: 11px; color: var(--mg-cream); display: flex; gap: 6px; align-items: center; }
-.pr-capsule-name { color: var(--mg-amber-bright); }
-.pr-capsule-count { font-family: 'Cinzel', Georgia, serif; color: var(--mg-cream); font-variant-numeric: tabular-nums; }
+.pr-capsule {
+  position: relative;
+  display: flex; gap: 8px; align-items: center;
+  padding: 6px 12px 6px 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(220, 80, 80, 0.18), rgba(140, 30, 30, 0.32));
+  border: 1px solid rgba(220, 80, 80, 0.55);
+  font-size: 11px;
+  color: var(--mg-cream);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 200, 0.2), 0 2px 6px rgba(80, 12, 12, 0.4);
+}
+.pr-capsule::before {
+  content: '';
+  position: absolute; left: 5px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--pr-ember), var(--pr-vermilion) 70%);
+  box-shadow: 0 0 6px rgba(233, 69, 96, 0.6);
+}
+.pr-capsule-name  { font-family: 'Cinzel', Georgia, serif; color: var(--pr-divine); letter-spacing: 0.02em; text-shadow: 0 0 8px rgba(255, 220, 130, 0.32); }
+.pr-capsule-count { font-family: 'Cinzel', Georgia, serif; color: var(--mg-cream); font-variant-numeric: tabular-nums; font-weight: 700; }
+
+/* ── Reduced motion accommodations ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pr-heat-shimmer,
+  .pr-heat-embers,
+  .pr-heat-hot .pr-heat-fill,
+  .pr-cauldron-cooking .pr-cauldron-glow,
+  .pr-foundation-medal-on .pr-foundation-seal,
+  .pr-screen::before,
+  .pr-tab { animation: none; }
+}
