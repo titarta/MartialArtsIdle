@@ -170,7 +170,7 @@ export default function PavilionPlaque({
         <Sprite sprite={sprite} className="pp-emblem" />
       </button>
       <div className="pp-lintel">
-        <div className="pp-name">{producer.name}</div>
+        <div className="pp-name">{pName}</div>
         <div className="pp-tier-row">
           {tierLabel && (
             <span className={`pp-tier-badge pp-tier-${tierName}`}>{tierLabel}</span>

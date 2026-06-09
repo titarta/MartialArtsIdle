@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../../i18n/gameText';
 import { getMinigame, computeReward } from '../../data/minigames';
 import { fmt } from '../../utils/format';
 import SectMerge from './SectMerge';
@@ -35,14 +36,15 @@ export function MiniGameResult({ ratePerSec, performance01, label, onCollect, on
   );
 }
 
-function ComingSoon({ meta }) {
+function ComingSoon({ meta, pid }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   return (
     <div className="mg-soon">
       <div className="mg-soon-glyph" aria-hidden="true">{meta.glyph}</div>
-      <div className="mg-soon-name">{meta.name}</div>
-      <p className="mg-soon-tag">{meta.tagline}</p>
-      <div className="mg-soon-badge">{meta.mode}</div>
+      <div className="mg-soon-name">{gt('minigames', pid, 'name', meta.name)}</div>
+      <p className="mg-soon-tag">{gt('minigames', pid, 'tagline', meta.tagline)}</p>
+      <div className="mg-soon-badge">{gt('minigames', pid, 'mode', meta.mode)}</div>
       <div className="mg-soon-note">{t('minigame.comingSoon')}</div>
     </div>
   );
@@ -55,6 +57,7 @@ function ComingSoon({ meta }) {
  */
 export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAward, recruit, qi, spendQi, treeMods = {}, onClose }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const meta = producer ? getMinigame(producer.id) : null;
 
   useEffect(() => {
@@ -73,7 +76,7 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
   const Game = meta.component ? GAMES[meta.component] : null;
 
   return createPortal(
-    <div className="mg-overlay" role="dialog" aria-modal="true" aria-label={`${meta.name}`}>
+    <div className="mg-overlay" role="dialog" aria-modal="true" aria-label={gt('minigames', producer.id, 'name', meta.name)}>
       <div className="mg-scrim" aria-hidden="true" />
       <div className="mg-frame">
         <header className="mg-header">
@@ -81,8 +84,8 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
             <img className="mg-head-sprite" src={spriteUrl(mythicSprite)} alt="" draggable={false} />
           </div>
           <div className="mg-head-titles">
-            <div className="mg-kicker">{meta.mode}</div>
-            <h2 className="mg-title">{meta.name}</h2>
+            <div className="mg-kicker">{gt('minigames', producer.id, 'mode', meta.mode)}</div>
+            <h2 className="mg-title">{gt('minigames', producer.id, 'name', meta.name)}</h2>
           </div>
           <div className="mg-glyph" aria-hidden="true">{meta.glyph}</div>
           <button type="button" className="mg-close" onClick={onClose} aria-label={t('minigame.leaveAriaLabel')}>✕</button>
@@ -91,7 +94,7 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
         <div className="mg-stage">
           {Game
             ? <Game producer={producer} owned={owned} ratePerSec={ratePerSec} onAward={onAward} recruit={recruit} qi={qi} spendQi={spendQi} treeMods={treeMods} />
-            : <ComingSoon meta={meta} />}
+            : <ComingSoon meta={meta} pid={producer.id} />}
         </div>
       </div>
     </div>,

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import {
   SHOP_ITEMS,
   SHOP_ITEMS_BY_ID,
@@ -104,6 +105,7 @@ function CosmeticPreview({ item }) {
  */
 function WardrobeTab({ inventory, onBrowseBazaar }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
 
   const SLOT_LABELS = {
     [COSMETIC_SLOTS.CHARACTER]:  t('wardrobe.slotCharacter'),
@@ -171,8 +173,8 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                     <CosmeticPreview item={equippedItem} />
                   </div>
                   <div className="wdb-eq-body">
-                    <div className="wdb-eq-name">{equippedItem.name}</div>
-                    <div className="wdb-eq-desc">{equippedItem.desc}</div>
+                    <div className="wdb-eq-name">{gt('shopItems', equippedItem.id, 'name', equippedItem.name)}</div>
+                    <div className="wdb-eq-desc">{gt('shopItems', equippedItem.id, 'desc', equippedItem.desc)}</div>
                   </div>
                   <div className="wdb-eq-actions">
                     <button
@@ -212,7 +214,7 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                       <div className="wdb-tile-preview">
                         <CosmeticPreview item={item} />
                       </div>
-                      <div className="wdb-tile-name">{item.name}</div>
+                      <div className="wdb-tile-name">{gt('shopItems', item.id, 'name', item.name)}</div>
                       <div className="wdb-tile-cta">{t('wardrobe.equip')}</div>
                     </button>
                   ))}
