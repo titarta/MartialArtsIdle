@@ -78,6 +78,8 @@ function requireConfig() {
   }
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 async function api(method, urlPath, body) {
   const res = await fetch(`${BASE}${urlPath}`, {
     method,
@@ -158,14 +160,44 @@ async function pull(langArg) {
   console.log('Done. Restart the dev server (or rebuild) to see the new translations.');
 }
 
+// ── translate (trigger AI drafting + poll to completion) ─────────────────────
+async function translate(langArg) {
+  requireConfig();
+  const targets = (langArg ? [langArg] : languages.map((l) => l.code)).filter((c) => c !== 'en');
+  console.log(`Triggering AI translation (all untranslated strings) for: ${targets.join(', ')}`);
+
+  const pending = new Map(); // jobId -> { lang, last }
+  for (const lang of targets) {
+    const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: lang });
+    pending.set(r.jobId, { lang, last: '' });
+    console.log(`  ${lang}: job ${r.jobId} queued`);
+  }
+
+  console.log('Waiting for jobs to finish (Ctrl-C is safe — the server keeps working)...');
+  while (pending.size > 0) {
+    await sleep(3000);
+    for (const [jobId, info] of [...pending]) {
+      let job;
+      try { ({ job } = await api('GET', `/api/plugin/jobs/${jobId}`)); }
+      catch (e) { console.log(`  ${info.lang}: poll error (${e.message}) — retrying`); continue; }
+      const prog = job.total ? `${job.completed}/${job.total}` : 'queued';
+      if (prog !== info.last) { console.log(`  ${info.lang}: ${prog} [${job.status}]`); info.last = prog; }
+      if (job.status === 'COMPLETED') { console.log(`  ${info.lang}: DONE (${job.completed}/${job.total})`); pending.delete(jobId); }
+      else if (job.status === 'FAILED') { console.log(`  ${info.lang}: FAILED — ${job.error ?? 'unknown'}`); pending.delete(jobId); }
+    }
+  }
+  console.log('\nAll jobs finished. Drafts saved as AI_DRAFT. Review/approve in the dashboard, then `npm run i18n:pull`.');
+}
+
 // ── dispatch ─────────────────────────────────────────────────────────────────
 const [cmd, arg] = process.argv.slice(2);
 try {
   if (cmd === 'push') await push();
+  else if (cmd === 'translate') await translate(arg);
   else if (cmd === 'pull') await pull(arg);
   else if (cmd === 'status') status();
   else {
-    console.error('Usage: node scripts/polyglyph-sync.mjs <push|pull|status> [lang]');
+    console.error('Usage: node scripts/polyglyph-sync.mjs <push|translate|pull|status> [lang]');
     process.exit(1);
   }
 } catch (err) {
