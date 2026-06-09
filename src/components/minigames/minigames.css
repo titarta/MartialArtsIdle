@@ -50,7 +50,10 @@
 @keyframes mg-frame-in { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
 
 .mg-header {
-  position: relative; display: flex; align-items: center; gap: 12px;
+  /* flex:0 0 auto — never let a tall tab's content shrink the header (default
+     flex-shrink:1 was compressing it 75px -> 70px between tabs). The stage is
+     the only flexible child, so it absorbs all sizing and scrolls. */
+  position: relative; flex: 0 0 auto; display: flex; align-items: center; gap: 12px;
   padding: 14px 16px; border-bottom: 1px solid var(--mg-line);
   background: linear-gradient(180deg, rgba(60, 46, 28, 0.55), transparent); overflow: hidden;
 }
