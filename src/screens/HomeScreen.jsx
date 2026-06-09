@@ -2701,6 +2701,36 @@ function HomeScreen({
     return () => window.removeEventListener('mai:crystal-evolve', handler);
   }, [handleCrystalEvolve]);
 
+  // Debug bridge — gd.breakthrough() fires the major-realm Character Evolution
+  // cinematic (or gd.breakthrough(true) the peak-stage banner) AND its sound,
+  // WITHOUT advancing the realm, so the artist can audition the BT beat on
+  // demand. Parity with mai:crystal-evolve above.
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.detail?.peak) {
+        enqueue('breakthrough', { id: `dbg-${Date.now()}`, isPeak: true, label: cultivation.nextRealmName ?? 'Peak Stage' });
+        return;
+      }
+      const oldTierIdx = getCultivatorTier(cultivation.realmIndex);
+      const newTierIdx = Math.min(oldTierIdx + 1, CULTIVATOR_TIER_NAMES.length - 1);
+      let origin = null;
+      if (typeof document !== 'undefined') {
+        const el = document.querySelector('.home-cultivator-sprite');
+        if (el) { const r = el.getBoundingClientRect(); origin = { x: r.left, y: r.top, w: r.width, h: r.height }; }
+      }
+      enqueue('character-evolution', {
+        oldTier:   CULTIVATOR_TIER_NAMES[oldTierIdx],
+        newTier:   CULTIVATOR_TIER_NAMES[newTierIdx],
+        realmName: cultivation.nextRealmName ?? 'Ascension',
+        tierName:  CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
+        isFinal:   false,
+        origin,
+      }, { priority: 'high' });
+    };
+    window.addEventListener('mai:breakthrough', handler);
+    return () => window.removeEventListener('mai:breakthrough', handler);
+  }, [enqueue, cultivation.realmIndex, cultivation.nextRealmName]);
+
   // #6 First major-realm gate (Tier-A tutorial). Fires the moment the
   // player hits the cost cap on a major-realm transition — either while
   // CAPPED waiting on the qi/s gate (gateRef.current non-null), or after

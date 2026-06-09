@@ -54,22 +54,42 @@ export function initDebug(hooksRef) {
       console.log('[debug] Qi filled — one tick from breakthrough');
     },
 
+    /**
+     * Fire the BREAKTHROUGH moment + sound WITHOUT advancing the realm.
+     * gd.breakthrough()     plays the major-realm Character Evolution cinematic.
+     * gd.breakthrough(true) plays the lighter peak-stage text banner.
+     */
+    breakthrough(peak = false) {
+      window.dispatchEvent(new CustomEvent('mai:breakthrough', { detail: { peak: !!peak } }));
+      console.log(`[debug] Breakthrough ${peak ? 'banner' : 'cinematic'} fired`);
+    },
+
     // ── Qi Crystal ─────────────────────────────────────────────────────────
 
-    /** Set crystal directly to level n. */
+    /** Set crystal directly to level n (no overlay — use crystalEvolve for that). */
     setCrystalLevel(n) {
       const target = Math.max(0, Math.floor(n));
-      const cur    = g().crystal?.level ?? 0;
-      const delta  = target - cur;
-      if (delta === 0) return;
-      g().crystal?.adminAddLevels?.(delta);
+      g().crystal?._setLevel?.(target);
       console.log(`[debug] Crystal level → ${target}`);
     },
 
     /** Increment crystal level by n. */
     crystalLevelUp(n = 1) {
-      g().crystal?.adminAddLevels?.(n);
-      console.log(`[debug] Crystal +${n} levels (now ${g().crystal?.level})`);
+      const next = (g().crystal?.level ?? 0) + Math.floor(n);
+      g().crystal?._setLevel?.(next);
+      console.log(`[debug] Crystal level → ${next}`);
+    },
+
+    /**
+     * Fire the crystal EVOLUTION cinematic + sound (a tier crossing) WITHOUT
+     * grinding levels — for auditing the event. Defaults to a tier 1 → 2
+     * evolution; pass a tier to preview a specific one, e.g. gd.crystalEvolve(7).
+     */
+    crystalEvolve(toTier = 2, fromTier = toTier - 1) {
+      window.dispatchEvent(new CustomEvent('mai:crystal-evolve', {
+        detail: { previousTier: fromTier, newTier: toTier, newLevel: g().crystal?.level ?? 0 },
+      }));
+      console.log(`[debug] Crystal evolution ${fromTier} → ${toTier} (cinematic + sound)`);
     },
 
     // ── Qi Sparks ──────────────────────────────────────────────────────────
@@ -92,6 +112,13 @@ export function initDebug(hooksRef) {
         : `[debug] Spark grant failed for ${sparkId}`);
     },
 
+    /** Grant every qi spark at once (mechanic sparks max out via grant's tier-upgrade). */
+    giveAllSparks() {
+      let n = 0;
+      for (const s of QI_SPARKS) { if (g().qiSparks?.grant?.(s.id)) n++; }
+      console.log(`[debug] Granted ${n} / ${QI_SPARKS.length} sparks`);
+    },
+
     clearQiSparks() {
       g().qiSparks?.clearAll?.();
       console.log('[debug] All qi sparks cleared');
@@ -112,6 +139,9 @@ export function initDebug(hooksRef) {
     /** Print all available commands. */
     help() {
       console.group('%c[debug] Available Commands', 'color: #c084fc; font-weight: bold');
+      console.log('  gd.breakthrough(peak=false)    fire BT cinematic / peak banner + sound');
+      console.log('  gd.crystalEvolve(to=2, from)   fire crystal evolution cinematic + sound');
+      console.log('  gd.giveAllSparks()             grant every spark at once');
       console.log('  gd.setRealm(n)               — jump to realm index n');
       console.log('  gd.addQi(amount)             — add qi instantly');
       console.log('  gd.fillQi()                  — fill qi to just before breakthrough');
