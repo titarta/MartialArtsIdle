@@ -23,6 +23,10 @@
     "build:designer": "vite build --mode designer",
     "preview:demo": "npm run build:demo && vite preview --host",
     "lint": "eslint .",
+    "i18n:gen": "node scripts/gen_game_i18n.mjs",
+    "i18n:push": "node scripts/polyglyph-sync.mjs push",
+    "i18n:pull": "node scripts/polyglyph-sync.mjs pull",
+    "i18n:status": "node scripts/polyglyph-sync.mjs status",
     "preview": "vite preview"
   },
   "build": {

@@ -43,6 +43,10 @@ android/keystore.properties
 android/play-service-account.json
 play-service-account.json
 *.service-account.json
+# Local environment config (Polyglyph API key / base URL / project slug) — NEVER commit
+.env
+.env.local
+.env.*.local
 
 # ── Build artefacts that shouldn't be in source control ────────────────────
 # Bundletool downloaded by scripts/install_to_emulator.sh on first run.
