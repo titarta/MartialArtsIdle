@@ -212,10 +212,15 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
         <span className="home-gate-bypass-seal-glyph">符</span>
         <span className="home-gate-bypass-seal-pip">{tokenCount}</span>
       </span>
-      <span className="home-gate-bypass-body">
-        <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
-        <span className="home-gate-bypass-sub">{t('home.heavensPardon', { n: tokenCount })}</span>
-      </span>
+      {/* Single-line CTA. The previous layout stacked CTA + subtitle, but
+          the row's vertical budget (top:4 / bottom:6 inside .home-bar-wrap)
+          can't fit a 40 px wax seal + two text lines, so the subtitle
+          ("Heaven's Pardon · ×N") got clipped at the bottom edge. The
+          item NAME is already visible elsewhere (shop, active-buffs chip,
+          aria-label), and the COUNT is now on the seal pip, so the sub
+          was redundant; dropping it leaves the CTA on a single readable
+          line and clears the clipping. */}
+      <span className="home-gate-bypass-cta">{t('home.bypassGate')}</span>
       {/* Thin ember channel along the bottom edge — vermilion → amber →
           vermilion, breathes on a 3s cycle so the decree reads as ALIVE,
           not a static graphic. Echoes the cultivator's crimson aura halo

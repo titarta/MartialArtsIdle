@@ -19912,32 +19912,23 @@ button.pl-leader.pl-leader-clickable:focus-visible {
     0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-.home-gate-bypass-body {
+/* CTA is now a direct child of the button (no wrapper), so it inherits
+   the button's align-items: center / justify-content: center and sits
+   on a single readable line in the middle of the row. Sized up to claim
+   the height the dropped subtitle used to take. */
+.home-gate-bypass-cta {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-  min-width: 0;
-  line-height: 1.16;
-}
-.home-gate-bypass-cta {
-  font-size: 13.5px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #ffd97a;                            /* warmer bronze-gold */
   text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.9),
-    0 0 12px rgba(245, 200, 66, 0.28);
-}
-.home-gate-bypass-sub {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: rgba(226, 201, 158, 0.78);          /* muted cream */
-  font-variant-numeric: tabular-nums;
+    0 1px 2px rgba(0, 0, 0, 0.92),
+    0 0 14px rgba(245, 200, 66, 0.32);
+  white-space: nowrap;
+  line-height: 1;
 }
 /* Respect the player's motion / VFX choices. */
 @media (prefers-reduced-motion: reduce) {
