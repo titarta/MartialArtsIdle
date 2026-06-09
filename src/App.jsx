@@ -888,7 +888,15 @@ function AppInner() {
   useEffect(() => {
     if (!cultivation.focusMultRef) return;
     const id = setInterval(() => {
-      const base = 1; // pre-pivot getFullStats returned ~1 by default
+      // focusMultRef is a PERCENT — every consumer reads it as (value / 100).
+      // Baseline 250 = x2.5, and it MUST match focusMultRef's useRef(250)
+      // default in useCultivation, otherwise the badge/rate flashes x2.5 on
+      // load and then jumps when this interval first fires. The cb480f5
+      // cleanup set this to 1 by mistake (treating focus as a x1 multiplier),
+      // so /100 produced x0.01. Tree focus node scales the base; Deeper-Breath
+      // upgrades add flat percentage points (max stack 250 + 35+35+35+75 = 430
+      // = x4.30).
+      const base = 250;
       const upgradeAdd = cultivation.upgradeFocusMultAddRef?.current ?? 0;
       const treeMult   = tree?.modifiers?.focusMult ?? 1;
       cultivation.focusMultRef.current = base * treeMult + upgradeAdd;
