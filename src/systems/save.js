@@ -125,10 +125,46 @@ export function wipeSave() {
   // alongside Blood Lotus + cosmetics so a wipe-save doesn't lose
   // tutorial completion for legitimate players who reset on purpose.
   localStorage.removeItem('mai_tutorial_seen');
-  // mai_blood_lotus is intentionally NOT wiped — paid currency survives a save reset
-  // mai_lang is intentionally NOT wiped — language preference survives a save reset
-  // mai_save_version is intentionally NOT wiped — version marker survives
-  //   so we don't re-trigger one-shot migrations on the fresh save
+
+  // ── Gameplay-state leaks (added 2026-06-09) ──────────────────────────
+  // These keys had been silently surviving the "factory reset" path,
+  // which made the dev tool feel haunted: a freshly-downloaded install
+  // would never have any of these, so leaving them in place meant the
+  // first run on a wiped save was earning karma at the rate of a
+  // long-playing one, the Journey intro never re-appeared, and so on.
+  // Each one is per-incarnation gameplay state, not "device-level"
+  // preference, so a true factory reset must include them.
+  localStorage.removeItem('mai_qi_alltime');          // total qi earned across all lives (drives karma cube-root)
+  localStorage.removeItem('mai_journey_intro_seen');  // Journey screen intro cinematic flag
+  localStorage.removeItem('mai_ach_gate_hit_ever');   // achievement one-shot gate marker
+  localStorage.removeItem('mai_lunch_break_progress');// lunch-break offline accumulator
+  localStorage.removeItem('mai_audio_muted_progress');// muted-time accumulator (audio achievement)
+  // Daily-streak meta. A first-time download has no streak history, so
+  // a true factory reset clears these alongside the rest of the save.
+  localStorage.removeItem('mai_consecutive_days');
+  localStorage.removeItem('mai_daily_bonus');
+  localStorage.removeItem('mai_daily_skip_streak');
+  localStorage.removeItem('mai_daily_skip_last_day');
+  // Settings interaction marker — "I've touched the settings page". A
+  // first-time install hasn't. Resetting matches the fresh-download intent.
+  localStorage.removeItem('mai_settings_touched');
+
+  // ── Intentionally NOT wiped (device-level, not gameplay) ─────────────
+  // mai_blood_lotus      — paid currency
+  // mai_shop_inventory   — paid shop QoL / cosmetics (parallels blood_lotus)
+  // mai_lang             — language preference
+  // mai_save_version     — schema marker (avoid re-triggering one-shot migrations)
+  // mai_audio            — audio settings
+  // mai_audio_settings   — finer-grained audio prefs
+  // mai_audio_timeline   — audio scheduling state (session-only-ish)
+  // mai_vfx              — VFX setting
+  // mai_rendering        — pixel/smooth rendering setting
+  // mai_autobuy_enabled  — UI preference
+  // mai_producer_buy_mode— UI preference (buy x1 / xN)
+  // mai_analytics_*      — analytics IDs / first-event markers
+  // mai_ad_cd_cultivation— ad cooldown (anti-grind, device-level)
+  // mai_designer_pat     — dev-tool access token
+  // mai_jade             — legacy migration handle, no-op after first run
 }
 
 /**

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { exportSave, importSave, wipeSave } from '../systems/save';
+import { DEV_TOOLS_ENABLED } from '../systems/devTools';
 import { setLanguage, SUPPORTED_LANGUAGES } from '../i18n';
 import { loadGraphics, applyGraphics, saveGraphics } from '../systems/graphics';
 import useAudio from '../audio/useAudio';
@@ -444,29 +445,42 @@ function SettingsScreen({
         </div>
       </section>
 
-      {/* Save data */}
+      {/* Save data + About.
+          The Export / Import action rows are dev-only. They round-trip only
+          the main save blob (`mai_save`), not the ~30 other `mai_*` keys
+          (producers, sparks, achievements, tree, karma, minigame state…), so
+          they cannot serve as a real cloud-save replacement and shipping
+          them implied a guarantee the implementation doesn't deliver.
+          See src/systems/devTools.js for the build gate. About this app
+          stays visible in every build — it's the credits/legal entry point. */}
       <section className="stg-section">
-        <div className="stg-section-label stg-cinzel-label">{t('settings.saveData')}</div>
+        {DEV_TOOLS_ENABLED && (
+          <div className="stg-section-label stg-cinzel-label">{t('settings.saveData')}</div>
+        )}
 
-        {message && (
+        {DEV_TOOLS_ENABLED && message && (
           <div className={`stg-flash ${message.isError ? 'stg-flash-error' : 'stg-flash-ok'}`}>
             {message.text}
           </div>
         )}
 
         <div className="stg-action-list">
-          <ActionRow
-            icon="📤"
-            label={t('settings.exportSave')}
-            sublabel="Copy save code to clipboard"
-            onClick={handleExport}
-          />
-          <ActionRow
-            icon="📥"
-            label={t('settings.importSave')}
-            sublabel="Paste a save code to restore"
-            onClick={() => setShowImport(v => !v)}
-          />
+          {DEV_TOOLS_ENABLED && (
+            <>
+              <ActionRow
+                icon="📤"
+                label={t('settings.exportSave')}
+                sublabel="Copy save code to clipboard (dev tool — main save blob only)"
+                onClick={handleExport}
+              />
+              <ActionRow
+                icon="📥"
+                label={t('settings.importSave')}
+                sublabel="Paste a save code to restore (dev tool — main save blob only)"
+                onClick={() => setShowImport(v => !v)}
+              />
+            </>
+          )}
           {/* About / Credits — pushed from this section per the audit. The
               row sits at the bottom of Save Data so it stays visually
               tucked under the config block, the standard mobile pattern. */}
@@ -486,7 +500,7 @@ function SettingsScreen({
           )}
         </div>
 
-        {showImport && (
+        {DEV_TOOLS_ENABLED && showImport && (
           <div className="stg-import-area">
             <textarea
               className="stg-import-input"
@@ -510,33 +524,39 @@ function SettingsScreen({
         autoBuyEnabled={autoBuyEnabled}
       />
 
-      {/* Danger Path — quarantined card with two-tap commit */}
-      <section className="stg-section stg-section-last">
-        <div className="stg-section-label stg-cinzel-label stg-label-danger">Danger Path</div>
-        <div className="stg-danger-card">
-          {confirmWipe ? (
-            <div className="stg-wipe-confirm">
-              <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
-              <div className="stg-wipe-btns">
-                <button className="stg-wipe-yes" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
-                <button className="stg-wipe-cancel" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+      {/* Danger Path — quarantined card with two-tap commit. Dev-only:
+          Wipe save is a debugging tool used to test the cold-start flow
+          ("install for the first time" rehearsal). It is NOT a player-
+          facing factory reset and must never reach shipping builds. See
+          src/systems/devTools.js for the build gate. */}
+      {DEV_TOOLS_ENABLED && (
+        <section className="stg-section stg-section-last">
+          <div className="stg-section-label stg-cinzel-label stg-label-danger">Danger Path · Dev only</div>
+          <div className="stg-danger-card">
+            {confirmWipe ? (
+              <div className="stg-wipe-confirm">
+                <span className="stg-wipe-label">{t('settings.areYouSure')}</span>
+                <div className="stg-wipe-btns">
+                  <button className="stg-wipe-yes" onClick={confirmDoWipe}>{t('settings.yesWipe')}</button>
+                  <button className="stg-wipe-cancel" onClick={() => setConfirmWipe(false)}>{t('common.cancel')}</button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <button
-              className="stg-danger-row"
-              onClick={() => setConfirmWipe(true)}
-            >
-              <span className="stg-danger-icon">🗑</span>
-              <span className="stg-danger-body">
-                <span className="stg-danger-label">{t('settings.wipeSave')}</span>
-                <span className="stg-danger-sub">Permanently delete all progress. Requires two taps.</span>
-              </span>
-              <span className="stg-danger-chev">›</span>
-            </button>
-          )}
-        </div>
-      </section>
+            ) : (
+              <button
+                className="stg-danger-row"
+                onClick={() => setConfirmWipe(true)}
+              >
+                <span className="stg-danger-icon">🗑</span>
+                <span className="stg-danger-body">
+                  <span className="stg-danger-label">{t('settings.wipeSave')}</span>
+                  <span className="stg-danger-sub">Dev tool. Wipes every gameplay key (emulates a fresh download).</span>
+                </span>
+                <span className="stg-danger-chev">›</span>
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
     </div>
   );
