@@ -27,6 +27,7 @@
     "i18n:push": "node scripts/polyglyph-sync.mjs push",
     "i18n:translate": "node scripts/polyglyph-sync.mjs translate",
     "i18n:pull": "node scripts/polyglyph-sync.mjs pull",
+    "i18n:pull:drafts": "node scripts/polyglyph-sync.mjs pull --drafts",
     "i18n:status": "node scripts/polyglyph-sync.mjs status",
     "preview": "vite preview"
   },

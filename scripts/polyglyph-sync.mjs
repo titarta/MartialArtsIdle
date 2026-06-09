@@ -165,26 +165,27 @@ async function push() {
 }
 
 // ── pull ─────────────────────────────────────────────────────────────────────
-async function pull(langArg) {
+async function pull(langArg, includeDrafts = false) {
   requireConfig();
   const targets = (langArg ? [langArg] : languages.map(l => l.code)).filter(c => c !== 'en');
-  console.log(`Pulling approved translations for: ${targets.join(', ')}`);
+  const approved = includeDrafts ? 'false' : 'true';
+  console.log(`Pulling ${includeDrafts ? 'AI drafts + approved' : 'approved-only'} translations for: ${targets.join(', ')}`);
   for (const lang of targets) {
     const r = await api('GET',
-      `/api/plugin/pull?projectSlug=${encodeURIComponent(SLUG)}&language=${encodeURIComponent(toPg(lang))}&onlyApproved=true`);
+      `/api/plugin/pull?projectSlug=${encodeURIComponent(SLUG)}&language=${encodeURIComponent(toPg(lang))}&onlyApproved=${approved}`);
     const byNs = Object.fromEntries(NAMESPACES.map(ns => [ns, {}]));
     let count = 0;
     for (const s of (r.strings ?? [])) {
       (byNs[s.namespace] ??= {})[s.key] = s.value;
       count += 1;
     }
-    if (count === 0) { console.log(`  ${lang}: 0 approved (left unchanged, falls back to EN)`); continue; }
+    if (count === 0) { console.log(`  ${lang}: 0 strings (left unchanged, falls back to EN)`); continue; }
     const dir = path.join(LOCALES_DIR, lang);
     fs.mkdirSync(dir, { recursive: true });
     for (const ns of NAMESPACES) {
       fs.writeFileSync(path.join(dir, `${ns}.json`), JSON.stringify(unflatten(byNs[ns] ?? {}), null, 2) + '\n', 'utf8');
     }
-    console.log(`  ${lang}: wrote ${count} approved strings`);
+    console.log(`  ${lang}: wrote ${count} strings`);
   }
   console.log('Done. Restart the dev server (or rebuild) to see the new translations.');
 }
@@ -219,14 +220,17 @@ async function translate(langArg) {
 }
 
 // ── dispatch ─────────────────────────────────────────────────────────────────
-const [cmd, arg] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const cmd = args[0];
+const drafts = args.includes('--drafts');
+const lang = args.slice(1).find((a) => !a.startsWith('--'));
 try {
   if (cmd === 'push') await push();
-  else if (cmd === 'translate') await translate(arg);
-  else if (cmd === 'pull') await pull(arg);
+  else if (cmd === 'translate') await translate(lang);
+  else if (cmd === 'pull') await pull(lang, drafts);
   else if (cmd === 'status') await status();
   else {
-    console.error('Usage: node scripts/polyglyph-sync.mjs <push|translate|pull|status> [lang]');
+    console.error('Usage: node scripts/polyglyph-sync.mjs <push|translate|pull|status> [lang] [--drafts]');
     process.exit(1);
   }
 } catch (err) {
