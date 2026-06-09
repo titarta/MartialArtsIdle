@@ -326,3 +326,49 @@ export function expandGrid(state) {
     next,
   };
 }
+
+// ── Codex queries ───────────────────────────────────────────────────────────
+// Surfaced through the global Codex modal under the 'Roster' tab. One
+// section: ranks. Discovery happens when the player first promotes a
+// tile to that rank (tracked via `highestTier` in the merge state).
+
+const RANK_HINTS = {
+  1:  'Drop your first disciple on the grid.',
+  2:  'Merge two Outer Disciples.',
+  3:  'Merge two Inner Disciples.',
+  4:  'Merge two Core Disciples.',
+  5:  'Merge two Sword Disciples.',
+  6:  'Merge two Elders.',
+  7:  'Merge two Senior Elders.',
+  8:  'Merge two Hall Masters.',
+  9:  'Merge two Sect Masters.',
+  10: 'Merge two Patriarchs — the apex of the roster.',
+};
+
+/** Returns codex entries for the Roster tab. `state` is the disciple-merge
+ *  persistence object (has `highestTier`). `transcendUnlocked` decides which
+ *  sprite displays for T5+ ranks (mythic vs transcended). */
+export function getRosterCodexEntries(state, transcendUnlocked) {
+  const highest = state?.highestTier ?? 0;
+  const entries = [];
+  for (let i = 1; i <= 10; i++) {
+    const t = effectiveTier(i, transcendUnlocked);
+    if (!t) continue;
+    const discovered = highest >= i;
+    entries.push({
+      id:   `rank_${i}`,
+      name: discovered ? `T${i} ${t.rank}` : '???',
+      desc: discovered ? `Glyph ${t.glyph}. Value ${t.value}. +${(t.value * BONUS_PER_BOARD_SUM * 100).toFixed(2)}% to per-disciple qi/s.` : null,
+      hint: discovered ? null : (RANK_HINTS[i] || ''),
+      discovered,
+      sprite: t.sprite,
+      badge:  t.badge,
+    });
+  }
+  return [{ id: 'ranks', label: 'Ranks', entries }];
+}
+
+export function getRosterCodexProgress(state) {
+  const highest = state?.highestTier ?? 0;
+  return { total: 10, discovered: Math.min(10, highest) };
+}

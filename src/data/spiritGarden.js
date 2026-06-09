@@ -446,3 +446,80 @@ export function growLabel(ms) {
   const hr = min / 60;
   return hr % 1 === 0 ? `${hr} hr` : `${hr.toFixed(1)} hr`;
 }
+
+// ── Codex queries ───────────────────────────────────────────────────────────
+// Surfaced through the global Codex modal under the 'Garden' tab. Two
+// sections: plants discovered (the existing almanac, repackaged) and
+// elixir recipes (always visible since the brewhouse exposes them).
+
+const PLANT_HINTS = {
+  spirit_mint:         'Sow the free starter seed and harvest your first plot.',
+  cinnabar_bloom:      'Bronze-tier seed. Buy with Spirit Dew, sow, harvest.',
+  jade_lotus_bud:      'Bronze-tier seed. Sow and harvest to discover.',
+  moonleaf_vine:       'Silver-tier seed. Sow and harvest to discover.',
+  dragonscale_ginseng: 'Silver-tier seed. Sow and harvest to discover.',
+  phoenix_tail_grass:  'Silver-tier seed. Sow and harvest to discover.',
+  gold_crown_peony:    'Gold-tier seed. Requires a future content unlock.',
+  black_iron_reed:     'Gold-tier seed. Requires a future content unlock.',
+  heaven_pierce_bamboo:'Transcendent-tier seed. Requires a future content unlock.',
+  soul_lily:           'Transcendent-tier seed. Requires a future content unlock.',
+};
+
+export function getGardenCodexEntries(g) {
+  const disc = g.discovered || {};
+  const plantEntries = SEEDS.map((s) => {
+    const discovered = !!disc[s.id];
+    return {
+      id:   s.id,
+      name: discovered ? s.name : '???',
+      desc: discovered ? `Tier: ${s.rarity}. Grows in ${growLabel(s.growMs)}.` : null,
+      hint: discovered ? null : (PLANT_HINTS[s.id] || ''),
+      discovered,
+      color: s.color,
+      sprite: s.sprite,
+    };
+  });
+  // Locked plants are always undiscovered in v1 (no recipe to unlock them
+  // — they're v2 content). Surface them as silhouettes with the "future
+  // content" hint so the player knows the codex isn't full and where the
+  // gap lives.
+  for (const id of LOCKED_SEEDS) {
+    const meta = LOCKED_SEEDS_BY_ID[id];
+    plantEntries.push({
+      id,
+      name: '???',
+      desc: null,
+      hint: PLANT_HINTS[id] || 'Locked plant. Future content.',
+      discovered: false,
+      color: meta?.color,
+      sprite: `/sprites/plants/${id}.png`,
+    });
+  }
+  // Recipe entries — the 3 elixir recipes are always discovered (visible
+  // in the brewhouse from the start) but we expose them in the codex so
+  // the player has a unified view of what they can brew. Future locked
+  // recipes can join this section as comingSoon entries.
+  const recipeEntries = RECIPES.map((r) => ({
+    id:         r.id,
+    name:       r.name,
+    desc:       r.desc,
+    hint:       null,
+    discovered: true,
+  }));
+  return [
+    { id: 'plants',  label: 'Plants',  entries: plantEntries },
+    { id: 'recipes', label: 'Recipes', entries: recipeEntries },
+  ];
+}
+
+export function getGardenCodexProgress(g) {
+  const disc = g.discovered || {};
+  const plantsT = SEEDS.length + LOCKED_SEEDS.length;
+  const plantsD = SEEDS.filter(s => disc[s.id]).length;
+  const recipesT = RECIPES.length;
+  const recipesD = RECIPES.length; // recipes always visible
+  return {
+    total:      plantsT + recipesT,
+    discovered: plantsD + recipesD,
+  };
+}

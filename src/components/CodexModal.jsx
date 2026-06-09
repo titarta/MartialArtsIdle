@@ -1,26 +1,32 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import AchievementsBody  from './AchievementsBody';
 import StatsBody         from './StatsBody';
 import WardrobeTab       from './WardrobeTab';
+import CodexSectionsBody from './CodexSectionsBody';
+import { loadGarden,  getGardenCodexEntries,  getGardenCodexProgress  } from '../data/spiritGarden';
+import { loadMerge,   getRosterCodexEntries,  getRosterCodexProgress  } from '../data/discipleMerge';
+import { loadFurnace, getFurnaceCodexEntries, getFurnaceCodexProgress } from '../data/furnace';
 
 /**
- * Codex — TopBar paper-roll modal (post content-audit).
+ * Codex — TopBar paper-roll modal.
  *
- * Renamed from AnnalsModal. The audit added a third surface: Wardrobe.
- * Owned cosmetics now live here (grouped by slot, equip / unequip in
- * place) so the Bazaar can hide owned cards from its main grid. The
- * Achievements + Stats tabs stay unchanged from the Annals build.
+ * Tabs (in order):
+ *   1. Wardrobe       — owned cosmetics (always available)
+ *   2. Achievements   — unlocked + progress (always available)
+ *   3. Stats          — lifetime stats (always available)
+ *   4. Garden         — plant + recipe almanac (gated on garden producer unlock)
+ *   5. Roster         — disciple rank ladder (gated on disciple producer owned ≥ 1)
+ *   6. Furnace        — material/pill/foundation catalogue
+ *                       (gated on Meridian Furnace producer unlock)
  *
- * Tab order: Wardrobe first (fashion is the most-visited surface after
- * a cosmetic purchase), Achievements second (badge dot lives on the
- * TopBar button), Stats third. Default tab is Wardrobe.
- *
- * (Earlier builds fired an ANNALS_TO_CODEX_MIGRATION returning-player
- * tutorial card to explain the rename. That card has been removed -
- * see the comment in src/data/tutorialCards.js TUTORIAL_IDS block.)
+ * Minigame tabs only appear once the corresponding minigame is unlocked.
+ * The `gating` prop carries flat booleans from App.jsx (which knows the
+ * producer-unlock + owned-count state).
  */
-const TAB_IDS = ['wardrobe', 'achievements', 'stats'];
+
+const ALL_TABS = ['wardrobe', 'achievements', 'stats', 'garden', 'roster', 'furnace'];
+const ALWAYS_VISIBLE = new Set(['wardrobe', 'achievements', 'stats']);
 
 function CodexModal({
   achievements,
@@ -28,17 +34,44 @@ function CodexModal({
   qiRef,
   rateRef,
   inventory,
+  // Minigame-unlock gating from App.jsx. Each flag = is the matching codex
+  // tab visible. Default false so the modal can render before the parent
+  // wires them in.
+  gating = { garden: false, roster: false, furnace: false },
+  // discipleTranscendUnlocked: lets the Roster codex pick the right sprite
+  // for T5+ ranks (mirrors the in-roster gating).
+  discipleTranscendUnlocked = false,
   onNavigateBazaar,
   onClose,
 }) {
   const { t } = useTranslation('ui');
+
+  // Filter tabs by gating. Memoised so changes to gating only re-derive
+  // when the relevant flags change.
+  const visibleTabs = useMemo(
+    () => ALL_TABS.filter(id => ALWAYS_VISIBLE.has(id) || gating[id]),
+    [gating]
+  );
+
   const [tab, setTab] = useState('wardrobe');
+  // If the active tab got hidden between renders (rare — e.g. a save load
+  // dropped a producer unlock), snap to wardrobe.
+  const safeTab = visibleTabs.includes(tab) ? tab : 'wardrobe';
 
   const TAB_LABELS = {
     wardrobe:     t('codex.tabWardrobe'),
     achievements: t('codex.tabAchievements'),
     stats:        t('codex.tabStats'),
+    garden:       'Garden',
+    roster:       'Roster',
+    furnace:      'Furnace',
   };
+
+  // Load minigame state ON DEMAND when a relevant tab is active (avoids
+  // touching localStorage for sections the player isn't viewing).
+  const gardenState  = (safeTab === 'garden')  ? loadGarden()  : null;
+  const rosterState  = (safeTab === 'roster')  ? loadMerge()   : null;
+  const furnaceState = (safeTab === 'furnace') ? loadFurnace() : null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -46,10 +79,10 @@ function CodexModal({
         <button className="modal-close" onClick={onClose} aria-label={t('common.closeAriaLabel')}>✕</button>
 
         <div className="ach-tabs progress-hub-tabs">
-          {TAB_IDS.map(id => (
+          {visibleTabs.map(id => (
             <button
               key={id}
-              className={`ach-tab${tab === id ? ' ach-tab-active' : ''}`}
+              className={`ach-tab${safeTab === id ? ' ach-tab-active' : ''}`}
               onClick={() => setTab(id)}
             >
               {TAB_LABELS[id]}
@@ -58,7 +91,7 @@ function CodexModal({
         </div>
 
         <div className="progress-hub-body">
-          {tab === 'wardrobe' && (
+          {safeTab === 'wardrobe' && (
             <WardrobeTab
               inventory={inventory}
               onBrowseBazaar={() => {
@@ -67,13 +100,31 @@ function CodexModal({
               }}
             />
           )}
-          {tab === 'achievements' && achievements && <AchievementsBody achievements={achievements} />}
-          {tab === 'stats'        && (
+          {safeTab === 'achievements' && achievements && <AchievementsBody achievements={achievements} />}
+          {safeTab === 'stats' && (
             <StatsBody
               stats={stats}
               qiRef={qiRef}
               rateRef={rateRef}
               achievements={achievements}
+            />
+          )}
+          {safeTab === 'garden' && gardenState && (
+            <CodexSectionsBody
+              sections={getGardenCodexEntries(gardenState)}
+              progress={getGardenCodexProgress(gardenState)}
+            />
+          )}
+          {safeTab === 'roster' && rosterState && (
+            <CodexSectionsBody
+              sections={getRosterCodexEntries(rosterState, discipleTranscendUnlocked)}
+              progress={getRosterCodexProgress(rosterState)}
+            />
+          )}
+          {safeTab === 'furnace' && furnaceState && (
+            <CodexSectionsBody
+              sections={getFurnaceCodexEntries(furnaceState)}
+              progress={getFurnaceCodexProgress(furnaceState)}
             />
           )}
         </div>

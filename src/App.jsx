@@ -32,6 +32,7 @@ import useReincarnationKarma from './hooks/useReincarnationKarma';
 import useReincarnationTree  from './hooks/useReincarnationTree';
 import { useDiscipleMergeProvider, DiscipleMergeContext } from './hooks/useDiscipleMerge';
 import useFurnace from './hooks/useFurnace';
+import { MATERIALS as FURNACE_MATERIALS_REF, PILLS as FURNACE_PILLS_REF, FOUNDATIONS as FURNACE_FOUNDATIONS_REF } from './data/furnace';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
 import useCultivation from './hooks/useCultivation';
 import useQiCrystal  from './hooks/useQiCrystal';
@@ -934,6 +935,39 @@ function AppInner() {
     prevAchCountRef.current = count;
   }, [achievements?.unlockedCount]);
 
+  // ── Furnace codex discovery toasts ──────────────────────────────────────
+  // Diff the codex state and fire a toast + audio cue on each new entry.
+  // Re-uses the achievement-unlock toast/audio path so the discovery moment
+  // feels consistent with other unlock beats.
+  const prevFurnaceCodexRef = useRef(furnace.furnace.codex);
+  useEffect(() => {
+    const prev = prevFurnaceCodexRef.current || { materials: {}, pills: {}, foundations: {} };
+    const next = furnace.furnace.codex || { materials: {}, pills: {}, foundations: {} };
+    const fire = (kicker, glyph, label) => {
+      notifications.addToast({ type: 'achievement', kicker, glyph, message: label });
+      try { AudioManager.playSfx?.('achievement_unlock'); } catch {}
+    };
+    for (const id of Object.keys(next.materials || {})) {
+      if (!prev.materials?.[id]) {
+        const mat = (FURNACE_MATERIALS_REF[id] || {}).name || id;
+        fire('Codex — Material', '丹', mat);
+      }
+    }
+    for (const id of Object.keys(next.pills || {})) {
+      if (!prev.pills?.[id]) {
+        const p = (FURNACE_PILLS_REF[id] || {}).name || id;
+        fire('Codex — Pill', '丹', p);
+      }
+    }
+    for (const id of Object.keys(next.foundations || {})) {
+      if (!prev.foundations?.[id]) {
+        const f = (FURNACE_FOUNDATIONS_REF[id] || {}).name || id;
+        fire('Codex — Foundation', '丹', f);
+      }
+    }
+    prevFurnaceCodexRef.current = next;
+  }, [furnace.furnace.codex, notifications]);
+
   // ── Achievement snapshot ────────────────────────────────────────────────
   // Pollers and event sources land in two paths:
   //   1. condition-based achievements check this snapshot, polled on
@@ -1646,6 +1680,14 @@ function AppInner() {
           qiRef={cultivation.qiRef}
           rateRef={cultivation.rateRef}
           inventory={shopInventory}
+          gating={{
+            // Per-minigame tab visibility. Each codex section only appears
+            // when the matching minigame is unlocked / engaged.
+            garden:  producers.isUnlocked('p_herb_garden',      cultivation.realmIndex),
+            roster:  (producers.getOwned?.('p_disciple') ?? 0) >= 1,
+            furnace: producers.isUnlocked('p_meridian_furnace', cultivation.realmIndex),
+          }}
+          discipleTranscendUnlocked={!!tree.modifiers.discipleTranscendUnlocked}
           onNavigateBazaar={() => navigate('spirit-bazaar')}
           onClose={() => setActiveModal(null)}
         />

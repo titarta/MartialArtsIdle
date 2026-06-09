@@ -369,10 +369,14 @@ export function defaultFurnace() {
     // full array up to MAX_CAULDRONS and only treat the first `cauldronCount`
     // as accessible. Idle cauldrons sit as { state: 'idle' }.
     cauldrons: Array.from({ length: MAX_CAULDRONS }, () => ({ state: 'idle' })),
-    // Codex — recipes discovered this life. Set of recipe keys
-    // ('layer1:plantA|plantB|plantC' / 'layer2:matA|matB|matC' /
-    // 'layer3:pillId'). Used to flag first-discovery in the UI.
-    codex:     {},
+    // Codex — what the player has discovered. Stored as three sub-maps so
+    // the UI can iterate per section without parsing keys. Values are true
+    // (discovered) — never deleted, even across reincarnation, so the codex
+    // is a permanent meta-progression record across all lives.
+    //   materials:   { materialId: true }    — first refine of that species
+    //   pills:       { pillId: true }        — first combine that produced it
+    //   foundations: { foundationId: true }  — first transcend that produced it
+    codex:     { materials: {}, pills: {}, foundations: {} },
     // Stats for analytics / achievements.
     stats: { refined: 0, combined: 0, transcended: 0, consumed: 0 },
   };
@@ -384,7 +388,16 @@ function migrate(data) {
   g.plants    = { ...(data.plants    || {}) };
   g.materials = { ...(data.materials || {}) };
   g.pills     = { ...(data.pills     || {}) };
-  g.codex     = { ...(data.codex     || {}) };
+  // Codex is split into 3 sub-maps (materials/pills/foundations) and is
+  // PERMANENT across reincarnation. Migrate from any older flat shape.
+  {
+    const c = data.codex || {};
+    g.codex = {
+      materials:   { ...(c.materials   || {}) },
+      pills:       { ...(c.pills       || {}) },
+      foundations: { ...(c.foundations || {}) },
+    };
+  }
   g.stats     = { ...base.stats, ...(data.stats || {}) };
   g.foundations = Array.isArray(data.foundations) ? data.foundations.slice(0, FOUNDATION_SLOTS) : [];
   g.heat      = Number.isFinite(data.heat) ? Math.max(0, data.heat) : 0;
@@ -456,11 +469,27 @@ export function tickFurnace(g, furnaceCount = 0, now = Date.now()) {
       cauldrons[i] = { state: 'idle' };
       continue;
     }
-    // Apply output to inventory.
+    // Apply output to inventory. Also log first-discovery into the
+    // permanent codex (the UI diffs prev codex vs next to detect new
+    // entries and fire toasts).
     if (layer === 'refine') {
-      cur = { ...cur, materials: { ...cur.materials, [outputId]: (cur.materials[outputId] || 0) + 1 }, stats: { ...cur.stats, refined: cur.stats.refined + 1 } };
+      const isFirst = !cur.codex.materials[outputId];
+      cur = {
+        ...cur,
+        materials: { ...cur.materials, [outputId]: (cur.materials[outputId] || 0) + 1 },
+        codex: isFirst ? { ...cur.codex, materials: { ...cur.codex.materials, [outputId]: true } } : cur.codex,
+        stats: { ...cur.stats, refined: cur.stats.refined + 1 },
+      };
+      if (isFirst) events.push({ kind: 'codex-discover', section: 'materials', id: outputId });
     } else if (layer === 'combine') {
-      cur = { ...cur, pills: { ...cur.pills, [outputId]: (cur.pills[outputId] || 0) + 1 }, stats: { ...cur.stats, combined: cur.stats.combined + 1 } };
+      const isFirst = !cur.codex.pills[outputId];
+      cur = {
+        ...cur,
+        pills: { ...cur.pills, [outputId]: (cur.pills[outputId] || 0) + 1 },
+        codex: isFirst ? { ...cur.codex, pills: { ...cur.codex.pills, [outputId]: true } } : cur.codex,
+        stats: { ...cur.stats, combined: cur.stats.combined + 1 },
+      };
+      if (isFirst) events.push({ kind: 'codex-discover', section: 'pills', id: outputId });
     } else if (layer === 'transcend') {
       // Foundation Pills are auto-consumed on cook completion — they go
       // straight into the active foundations array (subject to the 3-slot
@@ -469,6 +498,7 @@ export function tickFurnace(g, furnaceCount = 0, now = Date.now()) {
       if (cur.foundations.length < FOUNDATION_SLOTS) {
         const fdef = FOUNDATIONS[outputId];
         const heatMult = heatQualityMult(c.heat || 0);
+        const isFirst = !cur.codex.foundations[outputId];
         cur = {
           ...cur,
           foundations: [...cur.foundations, {
@@ -476,8 +506,10 @@ export function tickFurnace(g, furnaceCount = 0, now = Date.now()) {
             magnitude: (fdef.effect.baseMagnitude || 0) * heatMult,
             grantedAt: now,
           }],
+          codex: isFirst ? { ...cur.codex, foundations: { ...cur.codex.foundations, [outputId]: true } } : cur.codex,
           stats: { ...cur.stats, transcended: cur.stats.transcended + 1 },
         };
+        if (isFirst) events.push({ kind: 'codex-discover', section: 'foundations', id: outputId });
       } else {
         // Slot full — drop the pill onto the shelf as a Foundation Capsule
         // the player can apply later when a slot opens. Store under pills
@@ -685,4 +717,100 @@ export function aggregateFoundationMods(g) {
     }
   }
   return { qiPerSecMult, breakthroughDiscount, offlineQiMult, producerCostMult, karmaGainMult };
+}
+
+// ── Codex queries ───────────────────────────────────────────────────────────
+// The UI calls these to render the Furnace tab of the global Codex modal.
+// Hints are written so the player can guess at the recipe without being
+// fully spoiled.
+
+const MATERIAL_HINTS = {
+  mint_essence:    'Refine 3 Spirit Mint plants.',
+  cinnabar_powder: 'Refine 3 Cinnabar Bloom plants.',
+  jade_tincture:   'Refine 3 Jade Lotus Bud plants.',
+  moon_dust:       'Refine 3 Moonleaf Vine plants.',
+  dragon_root:     'Refine 3 Dragonscale Ginseng plants.',
+  phoenix_ash:     'Refine 3 Phoenix Tail Grass plants.',
+  spirit_sediment: 'Refine a mixed batch (3 plants, not all the same species).',
+};
+
+const PILL_HINTS = {
+  verdant_body:     'Combine 3 Mint Essence (3 of the same Material).',
+  inner_flame:      'Combine 3 Cinnabar Powder.',
+  calm_pond:        'Combine 3 Jade Tincture.',
+  frugal_mind:      'Combine 3 Moon Dust.',
+  rooted_vigor:     'Combine 3 Dragon Root.',
+  phoenix_radiance: 'Combine 3 Phoenix Ash.',
+  spring_flame:     'A mixed combo: 2 Mint + 1 Cinnabar.',
+  verdant_tide:     'A mixed combo: 2 Mint + 1 Jade.',
+  trinity:          'A mixed combo: 1 Mint + 1 Cinnabar + 1 Jade.',
+  quiet_tide:       'A mixed combo: 2 Jade + 1 Moon Dust.',
+  mystery:          'Mix any 3 Materials in a combination not yet discovered.',
+};
+
+const FOUNDATION_HINTS = {
+  foundation_verdant:  'Transcend 3 Verdant Body Pills at Peak heat (60).',
+  foundation_crucible: 'Transcend 3 Inner Flame Pills at Peak heat.',
+  foundation_tide:     'Transcend 3 Calm Pond Pills at Peak heat.',
+  foundation_frugal:   'Transcend 3 Frugal Mind Pills at Peak heat.',
+  foundation_root:     'Transcend 3 Rooted Vigor Pills at Peak heat.',
+  foundation_radiance: 'Transcend 3 Phoenix Radiance Pills at Peak heat.',
+};
+
+/** Returns the codex entries for the Furnace tab as 3 grouped sections.
+ *  Each entry: { id, name, desc, discovered, hint }. Locked entries have
+ *  discovered:false and the hint visible; unlocked show the real name+desc. */
+export function getFurnaceCodexEntries(g) {
+  const codex = g.codex || { materials: {}, pills: {}, foundations: {} };
+  const matEntries = Object.values(MATERIALS).map((m) => {
+    const discovered = !!codex.materials[m.id];
+    return {
+      id:   m.id,
+      name: discovered ? m.name : '???',
+      desc: discovered ? `Refined from ${m.plant ? m.plant.replace(/_/g, ' ') : 'mixed plants'}.` : null,
+      hint: discovered ? null : (MATERIAL_HINTS[m.id] || ''),
+      discovered,
+      color: m.color,
+    };
+  });
+  const pillEntries = Object.values(PILLS).filter(p => p.id !== 'mystery').map((p) => {
+    const discovered = !!codex.pills[p.id];
+    return {
+      id:   p.id,
+      name: discovered ? p.name : '???',
+      desc: discovered ? p.desc : null,
+      hint: discovered ? null : (PILL_HINTS[p.id] || ''),
+      discovered,
+    };
+  });
+  const foundationEntries = Object.values(FOUNDATIONS).map((f) => {
+    const discovered = !!codex.foundations[f.id];
+    return {
+      id:   f.id,
+      name: discovered ? f.name : '???',
+      desc: discovered ? f.desc : null,
+      hint: discovered ? null : (FOUNDATION_HINTS[f.id] || ''),
+      discovered,
+    };
+  });
+  return [
+    { id: 'materials',   label: 'Materials',   entries: matEntries },
+    { id: 'pills',       label: 'Pills',       entries: pillEntries },
+    { id: 'foundations', label: 'Foundations', entries: foundationEntries },
+  ];
+}
+
+/** Returns aggregate progress { discovered, total } for the tab badge. */
+export function getFurnaceCodexProgress(g) {
+  const codex = g.codex || { materials: {}, pills: {}, foundations: {} };
+  const matT = Object.keys(MATERIALS).length;
+  const pillT = Object.values(PILLS).filter(p => p.id !== 'mystery').length;
+  const fndT = Object.keys(FOUNDATIONS).length;
+  const matD  = Object.keys(codex.materials).length;
+  const pillD = Object.keys(codex.pills).length;
+  const fndD  = Object.keys(codex.foundations).length;
+  return {
+    total:      matT + pillT + fndT,
+    discovered: matD + pillD + fndD,
+  };
 }
