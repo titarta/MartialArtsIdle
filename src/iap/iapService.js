@@ -1,7 +1,7 @@
 // SKU IDs must match exactly what you create in Google Play Console / App Store Connect:
 //   blood_lotus_1, blood_lotus_2, blood_lotus_3, blood_lotus_4, blood_lotus_5, blood_lotus_6
 
-import { Purchases, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
+import { Purchases, LOG_LEVEL, PRODUCT_CATEGORY } from '@revenuecat/purchases-capacitor';
 import { Capacitor } from '@capacitor/core';
 
 const RC_ANDROID_KEY = import.meta.env.VITE_RC_ANDROID_KEY ?? '';
@@ -26,7 +26,9 @@ export async function initIAP(userId) {
 
 export async function getProducts(productIds) {
   if (!Capacitor.isNativePlatform()) return [];
-  const { products } = await Purchases.getProducts({ productIdentifiers: productIds });
+  // Blood Lotus packs are one-time products. getProducts defaults to SUBSCRIPTION
+  // on Android, which returns [] for them, so we must query NON_SUBSCRIPTION.
+  const { products } = await Purchases.getProducts({ productIdentifiers: productIds, type: PRODUCT_CATEGORY.NON_SUBSCRIPTION });
   return products;
 }
 
@@ -49,7 +51,9 @@ export async function purchaseProduct(productId) {
   // configured before calling" error.
   await initIAP();
 
-  const { products } = await Purchases.getProducts({ productIdentifiers: [productId] });
+  // One-time products MUST be queried as NON_SUBSCRIPTION; the default is
+  // SUBSCRIPTION on Android, which returns [] and throws "product not found".
+  const { products } = await Purchases.getProducts({ productIdentifiers: [productId], type: PRODUCT_CATEGORY.NON_SUBSCRIPTION });
   if (!products.length) throw new Error(`Product not found: ${productId}`);
 
   const { customerInfo } = await Purchases.purchaseStoreProduct({ product: products[0] });
