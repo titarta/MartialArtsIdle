@@ -22,7 +22,7 @@
  * SFX placeholder: crystal_level_up is reused as the gong stinger
  * until a bespoke severing bell is recorded.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AudioManager } from '../audio';
 import './severingRite.css';
@@ -83,12 +83,23 @@ function CinematicTree() {
 }
 
 export default function SeveringRite({ onComplete, fading = false }) {
+  // Stash onComplete in a ref so the timers below can call the latest
+  // callback identity without forcing the effect to depend on it. Without
+  // this, App.jsx's cultivation tick (a 1Hz setState) re-creates the
+  // inline `onComplete={() => setReincarnationStage('rising')}` arrow on
+  // every tick, the effect cleanup fires, clearTimeout(endTimer) cancels
+  // the auto-advance, and a fresh RITE_MS timer is scheduled — perpetually
+  // resetting before it can fire. The player got stuck on the cinematic
+  // intro because the cinematic could never finish.
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
   useEffect(() => {
     // Honour reduced-motion: skip the rite entirely and advance to the tree.
     const reduced = typeof window !== 'undefined'
       && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
-      const t = setTimeout(() => onComplete?.(), 80);
+      const t = setTimeout(() => onCompleteRef.current?.(), 80);
       return () => clearTimeout(t);
     }
 
@@ -100,13 +111,13 @@ export default function SeveringRite({ onComplete, fading = false }) {
     }, GONG_MS);
 
     // Auto-advance to the Eternal Tree screen at the end.
-    const endTimer = setTimeout(() => onComplete?.(), RITE_MS);
+    const endTimer = setTimeout(() => onCompleteRef.current?.(), RITE_MS);
 
     return () => {
       clearTimeout(gongTimer);
       clearTimeout(endTimer);
     };
-  }, [onComplete]);
+  }, []);
 
   return createPortal(
     <div className={`sr-overlay${fading ? ' sr-fading' : ''}`} role="presentation" aria-hidden="true">
