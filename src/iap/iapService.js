@@ -65,3 +65,21 @@ export async function restorePurchases() {
   const { customerInfo } = await Purchases.restorePurchases();
   return customerInfo;
 }
+
+/**
+ * Push any purchases sitting on the device (paid but never validated/consumed,
+ * e.g. the SDK threw after Google charged) to RevenueCat. Validation makes the
+ * SDK consume them, which is what lets the player buy the same pack again.
+ */
+export async function syncPurchases() {
+  if (!Capacitor.isNativePlatform()) return;
+  await initIAP();
+  await Purchases.syncPurchases();
+}
+
+export async function getCustomerInfo() {
+  if (!Capacitor.isNativePlatform()) return null;
+  await initIAP();
+  const { customerInfo } = await Purchases.getCustomerInfo();
+  return customerInfo;
+}

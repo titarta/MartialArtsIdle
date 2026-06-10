@@ -4,6 +4,7 @@ import {
   BLOOD_LOTUS_PACKAGES,
   purchaseBloodLotus,
   getBloodLotusBalance,
+  recoverPendingBloodLotus,
 } from '../systems/bloodLotus';
 import { restorePurchases } from '../iap/iapService';
 
@@ -84,6 +85,29 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     if (typeof addToast === 'function') addToast(toast);
   }, [addToast]);
 
+  // Self-heal on open: if a previous purchase was charged but never granted
+  // (SDK error after payment), sync + grant it now. The shop is where a
+  // shorted player will come looking. No-op on web / when nothing is stuck.
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try {
+        const { recovered } = await recoverPendingBloodLotus();
+        if (live && recovered > 0) {
+          fire({
+            type:    'success',
+            kicker:  t('shop.toastKicker'),
+            glyph:   '蓮',
+            message: t('shop.recoveredToast', { amount: recovered.toLocaleString() }),
+            duration: 5500,
+          });
+        }
+      } catch {}
+    })();
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const buy = useCallback(async (pkg) => {
     setPending(pkg.id);
     const result = await purchaseBloodLotus(pkg.id);
@@ -93,7 +117,9 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
         type:    'success',
         kicker:  t('shop.toastKicker'),
         glyph:   '蓮',  // lotus
-        message: t('shop.purchaseSuccess', { amount: pkg.amount.toLocaleString() }),
+        // result.amount can exceed the pack when a stuck earlier purchase was
+        // recovered in the same flow — show what was actually granted.
+        message: t('shop.purchaseSuccess', { amount: (result.amount ?? pkg.amount).toLocaleString() }),
         duration: 4500,
       });
       setBalance(getBloodLotusBalance());
@@ -112,7 +138,27 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
   const restore = useCallback(async () => {
     setPending('restore');
     try {
-      await restorePurchases();
+      // Recovery first: sync validates + consumes any stuck purchase (which
+      // unblocks "already owned" on rebuy) and grants what is owed. Plain
+      // restorePurchases can't return consumed consumables, so for Blood
+      // Lotus the sync is the call that actually helps.
+      const { recovered } = await recoverPendingBloodLotus();
+      try { await restorePurchases(); } catch {}
+      fire(recovered > 0
+        ? {
+            type:    'success',
+            kicker:  t('shop.toastKicker'),
+            glyph:   '蓮',
+            message: t('shop.recoveredToast', { amount: recovered.toLocaleString() }),
+            duration: 5000,
+          }
+        : {
+            type:    'success',
+            kicker:  t('shop.restorePurchases'),
+            glyph:   '蓮',
+            message: t('shop.restoreNone'),
+            duration: 4000,
+          });
     } catch (e) {
       fire({
         type:    'error',

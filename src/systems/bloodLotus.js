@@ -76,16 +76,103 @@ export const BLOOD_LOTUS_PACKAGES = [
   { id: 'blood_lotus_6', amount: 45500,  price: '$99.99', label: 'Heaven\'s Fortune'       },
 ];
 
+// ── Grant ledger ──────────────────────────────────────────────────────────────
+// Blood Lotus is granted from RevenueCat's transaction history, NOT from "the
+// purchase call resolved". Each granted store transaction id is recorded here
+// so a transaction is granted exactly once no matter how many times we see it
+// (purchase return, boot recovery, shop-open recovery, Restore button).
+// This is what makes a paid-but-errored purchase recoverable instead of lost.
+
+const GRANTED_TX_KEY = 'mai_blood_lotus_granted_tx';
+
+function loadGrantedTxIds() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(GRANTED_TX_KEY) ?? '[]');
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch { return new Set(); }
+}
+
+function saveGrantedTxIds(set) {
+  try { localStorage.setItem(GRANTED_TX_KEY, JSON.stringify([...set])); } catch {}
+}
+
+/**
+ * Grant every Blood Lotus pack transaction in `customerInfo` that has not been
+ * granted yet. Returns the total amount newly granted (0 if nothing new).
+ */
+function reconcileBloodLotusTransactions(customerInfo) {
+  const txs = customerInfo?.nonSubscriptionTransactions ?? [];
+  if (!txs.length) return 0;
+  const seen = loadGrantedTxIds();
+  let total = 0;
+  for (const tx of txs) {
+    const txId = tx?.transactionIdentifier;
+    const pkg  = BLOOD_LOTUS_PACKAGES.find(p => p.id === tx?.productIdentifier);
+    if (!pkg || !txId || seen.has(txId)) continue;
+    seen.add(txId);
+    total += pkg.amount;
+  }
+  if (total > 0) {
+    saveGrantedTxIds(seen);
+    addBloodLotus(total);
+  }
+  return total;
+}
+
+let recoveryInFlight = null;
+
+/**
+ * Self-heal stuck purchases: sync device purchases to RevenueCat (validates and
+ * CONSUMES them, unblocking "you already own this item" on rebuy), then grant
+ * any paid-but-ungranted packs via the ledger. Single-flight so concurrent
+ * callers (boot + shop open) can't double-grant. Returns { recovered }.
+ */
+export function recoverPendingBloodLotus() {
+  if (recoveryInFlight) return recoveryInFlight;
+  recoveryInFlight = (async () => {
+    try {
+      const { syncPurchases, getCustomerInfo } = await import('../iap/iapService');
+      try { await syncPurchases(); } catch {} // best-effort; getCustomerInfo still worth trying
+      const info = await getCustomerInfo();
+      if (!info) return { recovered: 0 };
+      return { recovered: reconcileBloodLotusTransactions(info) };
+    } catch (err) {
+      return { recovered: 0, error: err?.message };
+    } finally {
+      recoveryInFlight = null;
+    }
+  })();
+  return recoveryInFlight;
+}
+
 export async function purchaseBloodLotus(packageId) {
   const { purchaseProduct } = await import('../iap/iapService');
   const pkg = BLOOD_LOTUS_PACKAGES.find(p => p.id === packageId);
   if (!pkg) return { ok: false, error: 'Unknown package' };
   try {
-    await purchaseProduct(packageId);
-    addBloodLotus(pkg.amount);
-    return { ok: true, amount: pkg.amount };
+    const result = await purchaseProduct(packageId);
+    if (result?.simulated) {
+      // Browser/debug path: no store transaction exists, grant directly.
+      addBloodLotus(pkg.amount);
+      return { ok: true, amount: pkg.amount };
+    }
+    // Native: grant from the returned CustomerInfo via the ledger.
+    const granted = reconcileBloodLotusTransactions(result);
+    if (granted === 0) {
+      // Defensive: transaction missing from the returned info. A paying player
+      // must never be left empty-handed, so grant directly.
+      addBloodLotus(pkg.amount);
+      return { ok: true, amount: pkg.amount };
+    }
+    return { ok: true, amount: granted };
   } catch (err) {
     if (err?.message?.includes('cancel')) return { ok: false, cancelled: true };
+    // The SDK can throw AFTER Google has charged (validation hiccup). Try to
+    // recover immediately so the player still gets their Blood Lotus.
+    try {
+      const { recovered } = await recoverPendingBloodLotus();
+      if (recovered > 0) return { ok: true, amount: recovered, recovered: true };
+    } catch {}
     return { ok: false, error: err?.message ?? 'Purchase failed' };
   }
 }

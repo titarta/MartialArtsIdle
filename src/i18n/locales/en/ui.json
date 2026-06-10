@@ -165,6 +165,8 @@
     "toastKicker": "Blood Lotus",
     "purchaseFailed": "Purchase failed",
     "restoreFailed": "Restore failed",
+    "recoveredToast": "+{{amount}} restored from a previous purchase",
+    "restoreNone": "No purchases to restore.",
     "finePrint": "All purchases unlock instantly. Prices in USD.",
     "restoring": "Restoring…",
     "restorePurchases": "Restore Purchases",

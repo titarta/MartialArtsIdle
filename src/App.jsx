@@ -143,7 +143,28 @@ function AppInner() {
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { initAnalytics(); }, []);
-  useEffect(() => { initIAP(); }, []);        // RevenueCat IAP: no-op on non-native / empty key
+  // RevenueCat IAP: no-op on non-native / empty key. After init, self-heal any
+  // paid-but-ungranted purchase (SDK error after Google charged): syncing
+  // validates + consumes it (unblocks rebuy) and the ledger grants the packs.
+  useEffect(() => {
+    (async () => {
+      await initIAP();
+      try {
+        const { recoverPendingBloodLotus } = await import('./systems/bloodLotus');
+        const { recovered } = await recoverPendingBloodLotus();
+        if (recovered > 0) {
+          const { default: i18n } = await import('./i18n');
+          notifications.addToast?.({
+            type:    'success',
+            kicker:  i18n.t('ui:shop.toastKicker'),
+            glyph:   '蓮',
+            message: i18n.t('ui:shop.recoveredToast', { amount: recovered.toLocaleString() }),
+            duration: 6500,
+          });
+        }
+      } catch {}
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { preloadImages(PLAYER_SPRITE_SRCS); }, []);
   useEffect(() => { applyGraphics(loadGraphics()); }, []);
 
