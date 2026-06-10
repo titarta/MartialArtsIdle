@@ -1,0 +1,29 @@
+{
+  "brief": "Idle/incremental cultivation game (xianxia fantasy), 'The Long Road to Heaven'. The player is a cultivator refining Qi to break through realms of power toward immortality and 'Open Heaven'. Tone: reverent and mythic with a temple-and-sect aesthetic, evocative power-fantasy (not grimdark). Address the player as a cultivator. Use established xianxia/wuxia terminology and keep it consistent (see glossary). 'Qi' is the core energy resource: use the standard cultivation term (zh: 气, ja: 気, ko: 기; keep 'Qi' or 'Chi' in Latin-script languages), never generic 'energy'. Realm and stage names are cultivation ranks; render them evocatively and consistently. In-game resources/items (Blood Lotus, Spirit Dew, Karma, Merit, Qi Spark, Foundation Pill, Qi Crystal) are not literal objects. Keep strings terse for a tight mobile UI. Preserve all {{placeholders}} and **markdown**/<strong> tags exactly.",
+  "terms": [
+    { "sourceTerm": "Qi", "context": "Core energy resource (appears 255x). Standard cultivation term: 气 (zh), 気 (ja), 기 (ko); keep 'Qi'/'Chi' in Latin scripts. Never 'energy'." },
+    { "sourceTerm": "Dao", "context": "The Way (道). Transliterate ('Dao'/'Tao') or use the established rendering." },
+    { "sourceTerm": "Cultivation", "context": "The xianxia practice of refining qi to gain power (修炼/修行); the game's core activity." },
+    { "sourceTerm": "Cultivator", "context": "One who cultivates; the player (修士/修仙者)." },
+    { "sourceTerm": "Realm", "context": "A major cultivation power tier (境界). Same word every time." },
+    { "sourceTerm": "Stage", "context": "A sub-division/step within a Realm, toward the next Realm." },
+    { "sourceTerm": "Breakthrough", "context": "Advancing past a layer/realm gate (突破)." },
+    { "sourceTerm": "Sect", "context": "The player's cultivation order/clan (宗门)." },
+    { "sourceTerm": "Disciple", "context": "A sect member; the basic producer unit (弟子)." },
+    { "sourceTerm": "Qi Crystal", "context": "The crystal the player refines/taps for qi gain. Keep consistent." },
+    { "sourceTerm": "Qi Spark", "context": "A buff card offered on breakthroughs (符). Keep consistent." },
+    { "sourceTerm": "Pill", "context": "An alchemy product / consumable buff (丹)." },
+    { "sourceTerm": "Foundation Pill", "context": "A permanent-buff pill from the furnace (筑基丹); distinct from a regular Pill." },
+    { "sourceTerm": "Meridian", "context": "Qi channels in the body (经络); 'Meridian Furnace' is a producer." },
+    { "sourceTerm": "Karma", "context": "Reincarnation currency earned on rebirth, spent on the Eternal Tree (业/功德)." },
+    { "sourceTerm": "Reincarnation", "context": "The prestige reset; also 'Rebirth' (转生/重生)." },
+    { "sourceTerm": "Merit", "context": "Currency that powers the disciple Roster minigame." },
+    { "sourceTerm": "Elixir", "context": "A brewed buff from the Spirit Garden." },
+    { "sourceTerm": "Tribute", "context": "The cost/offering to buy a producer (the buy action on producer cards)." },
+    { "sourceTerm": "Blood Lotus", "context": "Premium (paid) currency (血莲). Evocative, not literal 'blood'." },
+    { "sourceTerm": "Spirit Dew", "context": "The Spirit Garden's own currency (灵露)." },
+    { "sourceTerm": "Eternal Tree", "context": "The reincarnation skill tree spent with Karma." },
+    { "sourceTerm": "Heavenly Qi", "context": "A special boost qi (the petition/ad reward)." },
+    { "sourceTerm": "Saint", "context": "A high cultivation realm/title (圣)." }
+  ]
+}

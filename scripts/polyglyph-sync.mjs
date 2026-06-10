@@ -93,6 +93,7 @@ async function api(method, urlPath, body) {
     method,
     headers: { 'X-Polyglyph-Key': KEY, ...(body ? { 'Content-Type': 'application/json' } : {}) },
     body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(30000), // never hang on a half-open connection (e.g. backend restart)
   });
   const text = await res.text();
   let data;
@@ -191,14 +192,21 @@ async function pull(langArg, includeDrafts = false) {
 }
 
 // ── translate (trigger AI drafting + poll to completion) ─────────────────────
-async function translate(langArg) {
+async function translate(langArg, force = false) {
   requireConfig();
   const targets = (langArg ? [langArg] : languages.map((l) => l.code)).filter((c) => c !== 'en');
-  console.log(`Triggering AI translation (all untranslated strings) for: ${targets.join(', ')}`);
+  // --force re-translates EVERY string (passing all keys) instead of only the
+  // untranslated ones, so drafts made before the glossary/brief get redone.
+  let keys;
+  if (force) {
+    keys = [];
+    for (const ns of NAMESPACES) for (const key of Object.keys(readSource(ns))) keys.push({ namespace: ns, key });
+  }
+  console.log(`Triggering AI translation (${force ? `FORCE: all ${keys.length} strings, re-translates drafts` : 'all untranslated'}) for: ${targets.join(', ')}`);
 
   const pending = new Map(); // jobId -> { lang, last }
   for (const lang of targets) {
-    const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: toPg(lang) });
+    const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: toPg(lang), ...(force ? { keys } : {}) });
     pending.set(r.jobId, { lang, last: '' });
     console.log(`  ${lang}: job ${r.jobId} queued`);
   }
@@ -219,18 +227,45 @@ async function translate(langArg) {
   console.log('\nAll jobs finished. Drafts saved as AI_DRAFT. Review/approve in the dashboard, then `npm run i18n:pull`.');
 }
 
+// ── glossary (set brief, upsert terms, AI-fill per-language values) ──────────
+async function glossary() {
+  requireConfig();
+  const cfg = JSON.parse(fs.readFileSync(path.resolve('scripts/i18n-glossary.json'), 'utf8'));
+  if (cfg.brief) {
+    await api('POST', '/api/plugin/project', { projectSlug: SLUG, brief: cfg.brief });
+    console.log('Set project brief / game context.');
+  }
+  const r = await api('POST', '/api/plugin/glossary', { projectSlug: SLUG, terms: cfg.terms });
+  console.log(`Glossary upserted: ${r.created} created, ${r.updated} updated (${r.total} total).`);
+  console.log('AI-filling per-language values (one suggest call per term)...');
+  for (const term of cfg.terms) {
+    try {
+      const s = await api('POST', '/api/plugin/glossary/suggest',
+        { projectSlug: SLUG, sourceTerm: term.sourceTerm, context: term.context ?? null, apply: true });
+      const entries = Object.entries(s.translations || {});
+      const sample = entries.slice(0, 3).map(([l, v]) => `${l}=${v}`).join(', ');
+      console.log(`  ${term.sourceTerm}: ${entries.length} langs${sample ? ` (${sample}${entries.length > 3 ? ', …' : ''})` : ''}`);
+    } catch (e) {
+      console.log(`  ${term.sourceTerm}: suggest failed — ${e.message}`);
+    }
+  }
+  console.log('\nGlossary ready. Re-translate so it applies:  npm run i18n:translate -- --force');
+}
+
 // ── dispatch ─────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 const cmd = args[0];
 const drafts = args.includes('--drafts');
+const force = args.includes('--force');
 const lang = args.slice(1).find((a) => !a.startsWith('--'));
 try {
   if (cmd === 'push') await push();
-  else if (cmd === 'translate') await translate(lang);
+  else if (cmd === 'glossary') await glossary();
+  else if (cmd === 'translate') await translate(lang, force);
   else if (cmd === 'pull') await pull(lang, drafts);
   else if (cmd === 'status') await status();
   else {
-    console.error('Usage: node scripts/polyglyph-sync.mjs <push|translate|pull|status> [lang] [--drafts]');
+    console.error('Usage: node scripts/polyglyph-sync.mjs <push|glossary|translate|pull|status> [lang] [--drafts] [--force]');
     process.exit(1);
   }
 } catch (err) {
