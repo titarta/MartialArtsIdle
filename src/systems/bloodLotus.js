@@ -1,3 +1,4 @@
+/* global __MAI_VERSION__ */
 /**
  * bloodLotus.js — Blood Lotus currency system.
  *
@@ -167,6 +168,15 @@ export async function purchaseBloodLotus(packageId) {
     return { ok: true, amount: granted };
   } catch (err) {
     if (err?.message?.includes('cancel')) return { ok: false, cancelled: true };
+    // Keep the last real purchase error on disk — it rides along in the
+    // support-ticket diagnostics so we can see what the player actually hit.
+    try {
+      localStorage.setItem(LAST_IAP_ERROR_KEY, JSON.stringify({
+        when: new Date().toISOString(),
+        packageId,
+        message: err?.message ?? String(err),
+      }));
+    } catch {}
     // The SDK can throw AFTER Google has charged (validation hiccup). Try to
     // recover immediately so the player still gets their Blood Lotus.
     try {
@@ -175,6 +185,43 @@ export async function purchaseBloodLotus(packageId) {
     } catch {}
     return { ok: false, error: err?.message ?? 'Purchase failed' };
   }
+}
+
+// ── Purchase support diagnostics ──────────────────────────────────────────────
+
+const LAST_IAP_ERROR_KEY = 'mai_last_iap_error';
+
+/**
+ * Plain-text block for the "report a purchase issue" email. Everything WE can
+ * collect automatically lives here; the only thing the player must add by
+ * hand is their Google Play order number (GPA.…), which only exists in their
+ * Google receipt.
+ */
+export async function getPurchaseSupportDiagnostics() {
+  let appUserId = 'unknown';
+  let platform  = 'web';
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    platform = Capacitor.getPlatform?.() ?? 'web';
+  } catch {}
+  try {
+    const { getAppUserID } = await import('../iap/iapService');
+    appUserId = (await getAppUserID()) ?? appUserId;
+  } catch {}
+  let lastError = 'none';
+  try { lastError = localStorage.getItem(LAST_IAP_ERROR_KEY) ?? 'none'; } catch {}
+  let ledger = '[]';
+  try { ledger = localStorage.getItem(GRANTED_TX_KEY) ?? '[]'; } catch {}
+  const version = (typeof __MAI_VERSION__ !== 'undefined' && __MAI_VERSION__) || 'dev';
+  return [
+    `Support ID: ${appUserId}`,
+    `Platform: ${platform}`,
+    `App version: ${version}`,
+    `Blood Lotus balance: ${getBloodLotusBalance()}`,
+    `Granted transactions: ${ledger}`,
+    `Last purchase error: ${lastError}`,
+    `Date: ${new Date().toISOString()}`,
+  ].join('\n');
 }
 
 // ── Blood Lotus costs ─────────────────────────────────────────────────────────

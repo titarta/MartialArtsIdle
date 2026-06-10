@@ -83,3 +83,15 @@ export async function getCustomerInfo() {
   const { customerInfo } = await Purchases.getCustomerInfo();
   return customerInfo;
 }
+
+/**
+ * RevenueCat app user id (anonymous, per install). This is the "Support ID"
+ * players paste into purchase-issue tickets — it finds their customer record
+ * and transaction history in the RevenueCat dashboard.
+ */
+export async function getAppUserID() {
+  if (!Capacitor.isNativePlatform()) return null;
+  await initIAP();
+  const { appUserID } = await Purchases.getAppUserID();
+  return appUserID;
+}

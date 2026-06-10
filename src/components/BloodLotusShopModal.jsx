@@ -10,6 +10,9 @@ import { restorePurchases } from '../iap/iapService';
 
 const BASE = import.meta.env.BASE_URL;
 
+// Same address as AboutScreen's "Contact support" entry.
+const SUPPORT_EMAIL = 'theninjatoa@gmail.com';
+
 /**
  * Per-tier presentation metadata. The pack DATA lives in
  * src/systems/bloodLotus.js (id / amount / price / label) — this file
@@ -172,6 +175,35 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     }
   }, [fire]);
 
+  // "Purchase issue?" → prefilled support email. Everything we can collect
+  // automatically (Support ID, platform, version, balance, grant ledger, last
+  // purchase error) is appended; the player only adds a description and their
+  // Google Play order number (GPA.…), which exists only in THEIR receipt.
+  // mailto keeps this offline-friendly: composes locally, sends when online.
+  const reportIssue = useCallback(async () => {
+    let diagnostics = '';
+    try {
+      const { getPurchaseSupportDiagnostics } = await import('../systems/bloodLotus');
+      diagnostics = await getPurchaseSupportDiagnostics();
+    } catch {}
+    const subject = 'Blood Lotus purchase issue';
+    const body = [
+      'Describe what happened (which pack, what you saw):',
+      '',
+      '',
+      'If you were charged, paste your Google Play order number below.',
+      'It looks like GPA.1234-5678-9012-34567 and is in your Google Play',
+      'email receipt, or at play.google.com under Payments & subscriptions.',
+      '',
+      'Order number: ',
+      '',
+      '--- Diagnostic info, please do not edit ---',
+      diagnostics,
+    ].join('\n');
+    window.location.href =
+      `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }, []);
+
   const basePkg = BLOOD_LOTUS_PACKAGES[0];
 
   return (
@@ -239,6 +271,13 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
             type="button"
           >
             {pending === 'restore' ? t('shop.restoring') : t('shop.restorePurchases')}
+          </button>
+          <button
+            className="blshop-restore blshop-support"
+            onClick={reportIssue}
+            type="button"
+          >
+            {t('shop.supportLink')}
           </button>
         </footer>
       </div>

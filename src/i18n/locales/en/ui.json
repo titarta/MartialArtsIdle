@@ -167,6 +167,7 @@
     "restoreFailed": "Restore failed",
     "recoveredToast": "+{{amount}} restored from a previous purchase",
     "restoreNone": "No purchases to restore.",
+    "supportLink": "Purchase issue?",
     "finePrint": "All purchases unlock instantly. Prices in USD.",
     "restoring": "Restoring…",
     "restorePurchases": "Restore Purchases",
