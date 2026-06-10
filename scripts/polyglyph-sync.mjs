@@ -127,6 +127,15 @@ async function status() {
     for (const l of r.languages) {
       console.log(`    ${l.code}: ${l.enabled ? 'enabled ' : 'DISABLED'} | ${l.approved} approved, ${l.translated} drafted, ${l.untranslated} untranslated (${l.approvedPct}%)`);
     }
+    // Project-level settings injected into every translation — confirm they
+    // survived (a wiped brief/glossary means translations lose the game context).
+    console.log(`\n  brief: ${r.project.brief ? `set (${r.project.brief.length} chars)` : 'NOT SET'}`);
+    try {
+      const g = await api('GET', `/api/plugin/glossary?projectSlug=${encodeURIComponent(SLUG)}`);
+      console.log(`  glossary: ${g.terms?.length ?? 0} terms`);
+    } catch (e) {
+      console.log(`  glossary: (unavailable: ${e.message})`);
+    }
     const enabled = new Set(r.languages.filter(l => l.enabled).map(l => l.code));
     const missing = want.filter(c => !enabled.has(toPg(c)));
     if (missing.length) {
@@ -208,7 +217,7 @@ async function translate(langArg, force = false) {
   for (const lang of targets) {
     const r = await api('POST', '/api/plugin/translate', { projectSlug: SLUG, language: toPg(lang), ...(force ? { keys } : {}) });
     pending.set(r.jobId, { lang, last: '' });
-    console.log(`  ${lang}: job ${r.jobId} queued`);
+    console.log(`  ${lang}: job ${r.jobId} queued [mode: ${r.mode ?? '?'}]`);
   }
 
   console.log('Waiting for jobs to finish (Ctrl-C is safe — the server keeps working)...');
