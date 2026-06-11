@@ -22618,16 +22618,12 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
   cursor: pointer;
   transition: background-color 120ms ease;
 }
-.jc-realm-head:hover {
-  background: rgba(220, 175, 110, 0.06);
-}
 .jc-realm-head:focus-visible {
   outline: 1px solid rgba(220, 175, 110, 0.55);
   outline-offset: 2px;
 }
 .jc-realm-head:disabled {
   cursor: default;
-  background: transparent;
 }
 .jc-realm-chev {
   font-size: 11px;
@@ -22636,9 +22632,6 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
   text-align: center;
   flex-shrink: 0;
   transition: color 120ms ease;
-}
-.jc-realm-head:hover .jc-realm-chev {
-  color: var(--ui-purple-strong);
 }
 .jc-realm-open .jc-realm-chev {
   color: var(--ui-purple-strong);
