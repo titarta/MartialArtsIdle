@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "Capítulo {{cur}} de {{total}} · Etapa {{stage}} / {{stages}}",
+    "collapseAll": "Contraer todo",
+    "collapseRealm": "Contraer {{realm}}",
     "current": "Actual",
     "currentRate": "{{rate}} qi/s",
     "currentRealm": "Reino Actual",
+    "expandAll": "Expandir todo",
+    "expandRealm": "Expandir {{realm}}",
     "gate": "Puerta",
     "gateNone": "Ninguno",
     "gateRequired": "{{rate}} qi/s requerido",

@@ -492,7 +492,11 @@
     "gateNone": "None",
     "current": "Current",
     "currentRate": "{{rate}} qi/s",
-    "chapterEyebrow": "Chapter {{cur}} of {{total}} · Stage {{stage}} / {{stages}}"
+    "chapterEyebrow": "Chapter {{cur}} of {{total}} · Stage {{stage}} / {{stages}}",
+    "expandAll": "Expand all",
+    "collapseAll": "Collapse all",
+    "expandRealm": "Expand {{realm}}",
+    "collapseRealm": "Collapse {{realm}}"
   },
   "reincarnation": {
     "title": "Reincarnation",

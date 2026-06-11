@@ -22603,7 +22603,99 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Tap-to-expand affordance — the head is the click target for the whole
+     row. Button reset so it inherits the chronicle's typography, but stays
+     full-width and shows a pointer + subtle hover bg so it reads tappable. */
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 6px;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 120ms ease;
 }
+.jc-realm-head:hover {
+  background: rgba(220, 175, 110, 0.06);
+}
+.jc-realm-head:focus-visible {
+  outline: 1px solid rgba(220, 175, 110, 0.55);
+  outline-offset: 2px;
+}
+.jc-realm-head:disabled {
+  cursor: default;
+  background: transparent;
+}
+.jc-realm-chev {
+  font-size: 11px;
+  color: rgba(var(--ui-muted-rgb), 0.70);
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: color 120ms ease;
+}
+.jc-realm-head:hover .jc-realm-chev {
+  color: var(--ui-purple-strong);
+}
+.jc-realm-open .jc-realm-chev {
+  color: var(--ui-purple-strong);
+}
+
+/* "Expand all / Collapse all" toolbar — small text button pinned to the top
+   right of the chronicle so it sits over the first chapter divider without
+   stealing visual weight. */
+.jc-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: -6px;
+  padding: 0 2px;
+}
+.jc-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid rgba(220, 175, 110, 0.22);
+  color: rgba(var(--ui-muted-rgb), 0.80);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.jc-toolbar-btn:hover {
+  background: rgba(220, 175, 110, 0.08);
+  color: var(--ui-purple-strong);
+  border-color: rgba(220, 175, 110, 0.45);
+}
+.jc-toolbar-btn[aria-pressed="true"] {
+  background: rgba(220, 175, 110, 0.10);
+  color: var(--ui-purple-strong);
+  border-color: rgba(220, 175, 110, 0.45);
+}
+.jc-toolbar-chev {
+  font-size: 9px;
+}
+
+/* Future stages revealed via expand — read slightly muted so they parse as
+   a preview, not as something the player has already touched. The base
+   .jc-stage already handles "unmodified" but past/current got explicit
+   treatments and future inherited the base — adding the class lets us
+   tighten the preview look without retouching the others. */
+.jc-stage-future .jc-stage-label,
+.jc-stage-future .jc-stage-cost {
+  color: rgba(var(--ui-muted-rgb), 0.60);
+}
+.jc-stage-future .jc-stage-dot {
+  border-color: rgba(220, 175, 110, 0.22);
+}
+
 .jc-realm-icon {
   width: 30px;
   height: 30px;

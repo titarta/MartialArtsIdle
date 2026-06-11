@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "第{{cur}}章 / 共{{total}}章 · 阶段 {{stage}} / {{stages}}",
+    "collapseAll": "全部折叠",
+    "collapseRealm": "折叠{{realm}}",
     "current": "当前",
     "currentRate": "{{rate}}气/秒",
     "currentRealm": "当前境界",
+    "expandAll": "全部展开",
+    "expandRealm": "展开{{realm}}",
     "gate": "关卡",
     "gateNone": "无",
     "gateRequired": "需要{{rate}}气/秒",

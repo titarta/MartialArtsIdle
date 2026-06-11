@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGameText } from '../i18n/gameText';
 import REALMS, {
@@ -81,13 +81,75 @@ const GROUPS = groupRealms(REALMS);
  * Journey "Chronicle" body — the realm list, rendered as 7 chapters
  * (Roman-numeral dividers + Cinzel title) with the realm groups clustered
  * under each chapter. Past chapters dim, current chapter is full opacity,
- * future chapters fade out. Only the realm the player is currently in
- * expands to show its sub-stages — everything else stays single-line so
- * the screen reads as a "lore arc" instead of a flat ladder.
+ * future chapters fade out.
+ *
+ * Tap any realm header to expand/collapse its sub-stages — past realms reveal
+ * the path you walked (costs + which stages granted sparks), future realms
+ * preview what's ahead (costs scaling, where the next sparks are). The current
+ * realm is auto-expanded so the player always sees their immediate next
+ * breakthrough; tapping its header collapses it like any other. An "Expand
+ * all" toggle at the top flips every realm at once so the entire 60-rung
+ * ladder reads as a single scroll for power-users.
  */
 function JourneyBody({ realmIndex }) {
   const { t } = useTranslation('ui');
   const gt = useGameText();
+
+  // Realm-name-index Set of currently-expanded groups. Initialised with the
+  // player's current realm so first-time openers see their next breakthrough.
+  // Tapping a header adds/removes its index; "Expand all" fills/clears.
+  const currentRealmNameIndex = useMemo(() => {
+    for (const g of GROUPS) {
+      if (g.entries.some((e) => e.index === realmIndex)) return g.realmNameIndex;
+    }
+    return -1;
+  }, [realmIndex]);
+  const [expandedRealms, setExpandedRealms] = useState(() => new Set([currentRealmNameIndex]));
+
+  // Whenever the player breaks through into a new realm, auto-expand it too
+  // (without collapsing the realms the player has already opened for preview).
+  // Tracked by ref so the effect only fires on realmNameIndex transitions.
+  const lastCurrentRef = useRef(currentRealmNameIndex);
+  useEffect(() => {
+    if (lastCurrentRef.current !== currentRealmNameIndex && currentRealmNameIndex >= 0) {
+      setExpandedRealms((prev) => {
+        if (prev.has(currentRealmNameIndex)) return prev;
+        const next = new Set(prev);
+        next.add(currentRealmNameIndex);
+        return next;
+      });
+      lastCurrentRef.current = currentRealmNameIndex;
+    }
+  }, [currentRealmNameIndex]);
+
+  const toggleRealm = (idx) => {
+    setExpandedRealms((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  };
+
+  // Eligible groups are everything with sub-stages (Half-Step Open Heaven and
+  // any other single-entry no-stage realm are excluded — nothing to expand).
+  const expandableGroups = useMemo(
+    () => GROUPS.filter((g) => !(g.entries.length === 1 && !g.entries[0].stage)),
+    [],
+  );
+  const allExpanded = expandableGroups.length > 0
+    && expandableGroups.every((g) => expandedRealms.has(g.realmNameIndex));
+  const toggleAll = () => {
+    setExpandedRealms(() => {
+      // Collapse-all reverts to the default state (current realm only) rather
+      // than wiping every preview, so the player isn't left staring at a
+      // header-only screen that hides the immediate next breakthrough.
+      if (allExpanded) {
+        return currentRealmNameIndex >= 0 ? new Set([currentRealmNameIndex]) : new Set();
+      }
+      return new Set(expandableGroups.map((g) => g.realmNameIndex));
+    });
+  };
   const currentRef = useRef(null);
 
   // Scroll behavior on mount:
@@ -195,6 +257,17 @@ function JourneyBody({ realmIndex }) {
 
   return (
     <div className="journey-chronicle">
+      <div className="jc-toolbar">
+        <button
+          type="button"
+          className="jc-toolbar-btn"
+          onClick={toggleAll}
+          aria-pressed={allExpanded}
+        >
+          <span className="jc-toolbar-chev" aria-hidden="true">{allExpanded ? '▴' : '▾'}</span>
+          {allExpanded ? t('journey.collapseAll') : t('journey.expandAll')}
+        </button>
+      </div>
       {CHAPTERS.map((chapter) => {
         const chapterGroups = GROUPS.filter(g => chapter.realmIndices.includes(g.realmNameIndex));
         if (chapterGroups.length === 0) return null;
@@ -223,14 +296,20 @@ function JourneyBody({ realmIndex }) {
               const groupCurrent = group.entries.some(e => e.index === realmIndex);
               const groupFuture  = group.entries.every(e => e.index > realmIndex);
               const noSubStages  = group.entries.length === 1 && !group.entries[0].stage;
+              const isOpen       = !noSubStages && expandedRealms.has(group.realmNameIndex);
               const groupCls =
                 'jc-realm' +
                 (groupPast    ? ' jc-realm-past'    : '') +
                 (groupCurrent ? ' jc-realm-current' : '') +
-                (groupFuture  ? ' jc-realm-future'  : '');
+                (groupFuture  ? ' jc-realm-future'  : '') +
+                (isOpen       ? ' jc-realm-open'    : '');
               const completedCount = group.entries.filter(e => e.index < realmIndex).length;
               const totalCount = group.entries.length;
               const icon = REALM_ICONS[group.name];
+              const translatedName = gt('realmNames', group.name, 'name', group.name);
+              const headAriaLabel = isOpen
+                ? t('journey.collapseRealm', { realm: translatedName, defaultValue: `Collapse ${translatedName}` })
+                : t('journey.expandRealm',   { realm: translatedName, defaultValue: `Expand ${translatedName}` });
 
               return (
                 <div
@@ -238,13 +317,20 @@ function JourneyBody({ realmIndex }) {
                   className={groupCls}
                   ref={groupCurrent ? currentRef : null}
                 >
-                  <div className="jc-realm-head">
+                  <button
+                    type="button"
+                    className="jc-realm-head"
+                    onClick={() => !noSubStages && toggleRealm(group.realmNameIndex)}
+                    aria-expanded={!noSubStages ? isOpen : undefined}
+                    aria-label={!noSubStages ? headAriaLabel : undefined}
+                    disabled={noSubStages}
+                  >
                     <span className="jc-realm-icon">
                       {typeof icon === 'string' && icon.startsWith && icon.startsWith(BASE)
                         ? <img src={icon} alt="" className="jc-realm-icon-img" draggable="false" />
                         : <span className="jc-realm-icon-glyph">{REALM_GLYPHS[group.name] ?? icon ?? '•'}</span>}
                     </span>
-                    <span className="jc-realm-name">{gt('realmNames', group.name, 'name', group.name)}</span>
+                    <span className="jc-realm-name">{translatedName}</span>
                     <span className="jc-realm-tag">
                       {groupPast
                         ? `${totalCount} ${totalCount === 1 ? t('journey.stage') : t('journey.stages')}`
@@ -253,22 +339,28 @@ function JourneyBody({ realmIndex }) {
                           : `${totalCount} ${totalCount === 1 ? t('journey.stage') : t('journey.stages')}`}
                     </span>
                     {groupPast && <span className="jc-realm-check" aria-hidden="true">✓</span>}
-                  </div>
+                    {!noSubStages && (
+                      <span className="jc-realm-chev" aria-hidden="true">{isOpen ? '▴' : '▾'}</span>
+                    )}
+                  </button>
 
-                  {/* Only the CURRENT realm expands to show sub-stages — past
-                      and future stay collapsed so the chronicle reads as a
-                      compact arc. Single-entry no-stage groups (Half-Step
-                      Open Heaven) never expand. */}
-                  {groupCurrent && !noSubStages && (
+                  {/* Sub-stages render whenever the realm is in the expanded
+                      set. Current realm starts expanded automatically (see
+                      initial state); past + future open on tap so the player
+                      can scout the costs ahead AND look back at which gates
+                      they've crossed. Half-Step (noSubStages) never expands. */}
+                  {isOpen && (
                     <div className="jc-stages">
                       {group.entries.map((entry, i) => {
                         const isCurrent = entry.index === realmIndex;
                         const isPast    = entry.index < realmIndex;
+                        const isFuture  = entry.index > realmIndex;
                         const hasSpark  = stageHasSpark(entry.index);
                         const cls = 'jc-stage' +
                           (i === 0 ? ' jc-stage-first' : '') +
                           (isCurrent ? ' jc-stage-current' : '') +
                           (isPast    ? ' jc-stage-past'    : '') +
+                          (isFuture  ? ' jc-stage-future'  : '') +
                           (hasSpark  ? ' jc-stage-spark'   : '');
 
                         return (

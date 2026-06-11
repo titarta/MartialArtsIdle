@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "Глава {{cur}} из {{total}} · Этап {{stage}} / {{stages}}",
+    "collapseAll": "Свернуть всё",
+    "collapseRealm": "Свернуть {{realm}}",
     "current": "Текущее",
     "currentRate": "{{rate}} ци/с",
     "currentRealm": "Текущий Рубеж",
+    "expandAll": "Развернуть всё",
+    "expandRealm": "Развернуть {{realm}}",
     "gate": "Врата",
     "gateNone": "Отсутствует",
     "gateRequired": "Требуется {{rate}} ци/с",

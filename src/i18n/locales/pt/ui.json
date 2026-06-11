@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "Capítulo {{cur}} de {{total}} · Estágio {{stage}} / {{stages}}",
+    "collapseAll": "Recolher tudo",
+    "collapseRealm": "Recolher {{realm}}",
     "current": "Atual",
     "currentRate": "{{rate}} Qi/s",
     "currentRealm": "Reino Atual",
+    "expandAll": "Expandir tudo",
+    "expandRealm": "Expandir {{realm}}",
     "gate": "Portão",
     "gateNone": "Nenhum",
     "gateRequired": "{{rate}} Qi/s necessário",

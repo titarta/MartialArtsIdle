@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "Capitolo {{cur}} di {{total}} · Stadio {{stage}} / {{stages}}",
+    "collapseAll": "Comprimi tutto",
+    "collapseRealm": "Comprimi {{realm}}",
     "current": "Attuale",
     "currentRate": "{{rate}} Qi/s",
     "currentRealm": "Regno Attuale",
+    "expandAll": "Espandi tutto",
+    "expandRealm": "Espandi {{realm}}",
     "gate": "Porta",
     "gateNone": "Nessuno",
     "gateRequired": "{{rate}} Qi/s richiesti",

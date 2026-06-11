@@ -46,5 +46,10 @@
   "sparks.contribCostDiscount_other": { "zh": "生产者花费 −{{pct}}% · 剩余 {{n}} 次购买", "ja": "生産者コスト −{{pct}}% · 残り {{n}} 回購入", "ko": "생산자 비용 −{{pct}}% · 남은 {{n}}회 구매", "pt": "−{{pct}}% custo produtor · {{n}} compras restantes", "es": "−{{pct}}% costo productor · {{n}} compras restantes", "fr": "−{{pct}} % coût producteur · {{n}} achats restants", "de": "−{{pct}}% Erzeuger-Kosten · {{n}} Käufe übrig", "it": "−{{pct}}% costo produttore · {{n}} acquisti rimasti", "ru": "−{{pct}}% к стоимости · осталось {{n}} покупок" },
 
   "home.levelTag":   { "zh": "{{n}} 级", "ja": "Lv {{n}}", "ko": "Lv {{n}}", "pt": "Lv {{n}}", "es": "Lv {{n}}", "fr": "Niv. {{n}}", "de": "Stufe {{n}}", "it": "Lv {{n}}", "ru": "Ур. {{n}}" },
-  "home.refineVerb": { "zh": "精炼 → {{n}} 级", "ja": "精錬 → Lv {{n}}", "ko": "정련 → Lv {{n}}", "pt": "Refinar → Lv {{n}}", "es": "Refinar → Lv {{n}}", "fr": "Affiner → Niv. {{n}}", "de": "Verfeinern → Stufe {{n}}", "it": "Raffinare → Lv {{n}}", "ru": "Очистить → Ур. {{n}}" }
+  "home.refineVerb": { "zh": "精炼 → {{n}} 级", "ja": "精錬 → Lv {{n}}", "ko": "정련 → Lv {{n}}", "pt": "Refinar → Lv {{n}}", "es": "Refinar → Lv {{n}}", "fr": "Affiner → Niv. {{n}}", "de": "Verfeinern → Stufe {{n}}", "it": "Raffinare → Lv {{n}}", "ru": "Очистить → Ур. {{n}}" },
+
+  "journey.expandAll":     { "zh": "全部展开", "ja": "全て展開", "ko": "모두 펼치기",   "pt": "Expandir tudo", "es": "Expandir todo", "fr": "Tout déplier", "de": "Alle ausklappen", "it": "Espandi tutto", "ru": "Развернуть всё" },
+  "journey.collapseAll":   { "zh": "全部折叠", "ja": "全て折りたたみ", "ko": "모두 접기", "pt": "Recolher tudo", "es": "Contraer todo", "fr": "Tout replier", "de": "Alle einklappen", "it": "Comprimi tutto", "ru": "Свернуть всё" },
+  "journey.expandRealm":   { "zh": "展开{{realm}}", "ja": "{{realm}}を展開", "ko": "{{realm}} 펼치기", "pt": "Expandir {{realm}}", "es": "Expandir {{realm}}", "fr": "Déplier {{realm}}", "de": "{{realm}} ausklappen", "it": "Espandi {{realm}}", "ru": "Развернуть {{realm}}" },
+  "journey.collapseRealm": { "zh": "折叠{{realm}}", "ja": "{{realm}}を折りたたみ", "ko": "{{realm}} 접기", "pt": "Recolher {{realm}}", "es": "Contraer {{realm}}", "fr": "Replier {{realm}}", "de": "{{realm}} einklappen", "it": "Comprimi {{realm}}", "ru": "Свернуть {{realm}}" }
 }

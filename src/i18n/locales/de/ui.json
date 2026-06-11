@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "Kapitel {{cur}} von {{total}} · Stufe {{stage}} / {{stages}}",
+    "collapseAll": "Alle einklappen",
+    "collapseRealm": "{{realm}} einklappen",
     "current": "Aktuell",
     "currentRate": "{{rate}} Qi/s",
     "currentRealm": "Aktuelles Reich",
+    "expandAll": "Alle ausklappen",
+    "expandRealm": "{{realm}} ausklappen",
     "gate": "Tor",
     "gateNone": "Keine",
     "gateRequired": "{{rate}} Qi/s erforderlich",

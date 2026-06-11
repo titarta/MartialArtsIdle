@@ -261,9 +261,13 @@
   },
   "journey": {
     "chapterEyebrow": "第{{cur}}章 / 全{{total}}章 · 段階 {{stage}} / {{stages}}",
+    "collapseAll": "全て折りたたみ",
+    "collapseRealm": "{{realm}}を折りたたみ",
     "current": "現在",
     "currentRate": "{{rate}}気/秒",
     "currentRealm": "現在の境",
+    "expandAll": "全て展開",
+    "expandRealm": "{{realm}}を展開",
     "gate": "門",
     "gateNone": "なし",
     "gateRequired": "{{rate}}気/秒が必要",
