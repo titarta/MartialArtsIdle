@@ -23,7 +23,8 @@
     { "sourceTerm": "Blood Lotus", "context": "Premium (paid) currency (血莲). Evocative, not literal 'blood'." },
     { "sourceTerm": "Spirit Dew", "context": "The Spirit Garden's own currency (灵露)." },
     { "sourceTerm": "Eternal Tree", "context": "The reincarnation skill tree spent with Karma." },
-    { "sourceTerm": "Heavenly Qi", "context": "A special boost qi (the petition/ad reward)." },
+    { "sourceTerm": "Heavenly Qi", "context": "A special boost qi (the petition/ad reward). Not weather: zh MUST be 天之气, never 天气.", "translations": { "zh-CN": "天之气" } },
+    { "sourceTerm": "Divine Qi", "context": "A tappable golden-orb spark/upgrade (golden-cookie style boost). Not weather: zh MUST be 神之气, never 天气.", "translations": { "zh-CN": "神之气" } },
     { "sourceTerm": "Saint", "context": "A high cultivation realm/title (圣)." }
   ]
 }
