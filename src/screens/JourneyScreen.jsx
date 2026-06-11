@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import JourneyBody from '../components/JourneyBody';
 import REALMS, {
   CHAPTERS,
@@ -63,6 +64,7 @@ function fmtRate(n) {
  */
 function HeroHeader({ cultivation, vfxEnabled }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const [, force] = useState(0);
   useEffect(() => {
     const id = setInterval(() => force(t => (t + 1) % 1000), 250);
@@ -133,8 +135,8 @@ function HeroHeader({ cultivation, vfxEnabled }) {
         </div>
         <div className="jc-hero-text">
           <span className="jc-hero-eyebrow">{t('journey.currentRealm')}</span>
-          <span className="jc-hero-name">{realmMajor}</span>
-          {realmStage && <span className="jc-hero-stage">{realmStage}</span>}
+          <span className="jc-hero-name">{realmMajor ? gt('realmNames', realmMajor, 'name', realmMajor) : ''}</span>
+          {realmStage && <span className="jc-hero-stage">{gt('realmStages', realmStage, 'label', realmStage)}</span>}
           <span className="jc-hero-chapter">
             Chapter {chapterRomanCurrent} of {toRoman(totalChapters)} · Stage {realmIndex + 1} / {totalRealms}
           </span>

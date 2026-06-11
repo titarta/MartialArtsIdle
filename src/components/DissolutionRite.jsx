@@ -45,6 +45,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { AudioManager } from '../audio';
 import './dissolutionRite.css';
 
@@ -121,6 +122,10 @@ const BOKEH = Array.from({ length: 36 }, (_, i) => {
 
 export default function DissolutionRite({ onComplete, realmName }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
+  // `realmName` is the raw realm name (cultivation.realmMajor); translate
+  // it before interpolating into the whisper so the line reads in-locale.
+  const trRealm = realmName ? gt('realmNames', realmName, 'name', realmName) : '';
   // Latest onComplete in a ref so the timer effect can run once on mount
   // and still call the freshest callback. App.jsx's cultivation tick
   // re-renders this component at 1Hz with a new inline `onComplete`
@@ -132,8 +137,8 @@ export default function DissolutionRite({ onComplete, realmName }) {
 
   const [finishing, setFinishing] = useState(false);
   const whisper = useMemo(() => (
-    realmName ? t('reincarnationModal.whisperReturns', { realm: realmName }) : t('reincarnationModal.whisperFallback')
-  ), [realmName, t]);
+    trRealm ? t('reincarnationModal.whisperReturns', { realm: trRealm }) : t('reincarnationModal.whisperFallback')
+  ), [trRealm, t]);
 
   useEffect(() => {
     const reduced = typeof window !== 'undefined'

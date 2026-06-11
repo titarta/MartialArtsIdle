@@ -301,6 +301,29 @@
       "title": "알고 계셨나요?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "속세의 길"
+    },
+    "2": {
+      "title": "원소 각성"
+    },
+    "3": {
+      "title": "성도"
+    },
+    "4": {
+      "title": "귀원"
+    },
+    "5": {
+      "title": "허공의 관"
+    },
+    "6": {
+      "title": "도의 근원"
+    },
+    "7": {
+      "title": "개천"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "외제자"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "초월적"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "도원"
+    },
+    "Emperor Realm": {
+      "name": "제경"
+    },
+    "Immortal Ascension": {
+      "name": "선승"
+    },
+    "Open Heaven": {
+      "name": "개천"
+    },
+    "Origin King": {
+      "name": "원왕"
+    },
+    "Origin Returning": {
+      "name": "귀원"
+    },
+    "Qi Transformation": {
+      "name": "화기"
+    },
+    "Saint": {
+      "name": "성인"
+    },
+    "Saint King": {
+      "name": "성왕"
+    },
+    "Separation & Reunion": {
+      "name": "분합"
+    },
+    "Tempered Body": {
+      "name": "단체"
+    },
+    "True Element": {
+      "name": "진원"
+    },
+    "Void King": {
+      "name": "허왕"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "초기"
+    },
+    "Late Stage": {
+      "label": "후기"
+    },
+    "Layer 1": {
+      "label": "1층"
+    },
+    "Layer 10": {
+      "label": "10층"
+    },
+    "Layer 2": {
+      "label": "2층"
+    },
+    "Layer 3": {
+      "label": "3층"
+    },
+    "Layer 4": {
+      "label": "4층"
+    },
+    "Layer 5": {
+      "label": "5층"
+    },
+    "Layer 6": {
+      "label": "6층"
+    },
+    "Layer 7": {
+      "label": "7층"
+    },
+    "Layer 8": {
+      "label": "8층"
+    },
+    "Layer 9": {
+      "label": "9층"
+    },
+    "Middle Stage": {
+      "label": "중기"
+    },
+    "Peak Stage": {
+      "label": "정점"
     }
   },
   "shopBundles": {

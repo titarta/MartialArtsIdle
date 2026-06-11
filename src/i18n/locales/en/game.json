@@ -301,6 +301,29 @@
       "title": "Did You Know?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "The Mortal Path"
+    },
+    "2": {
+      "title": "Awakening Element"
+    },
+    "3": {
+      "title": "The Saintly Path"
+    },
+    "4": {
+      "title": "Origin Returning"
+    },
+    "5": {
+      "title": "The Void Crown"
+    },
+    "6": {
+      "title": "The Dao Source"
+    },
+    "7": {
+      "title": "Open Heaven"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Outer Disciple"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Transcendent"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Dao Source"
+    },
+    "Emperor Realm": {
+      "name": "Emperor Realm"
+    },
+    "Immortal Ascension": {
+      "name": "Immortal Ascension"
+    },
+    "Open Heaven": {
+      "name": "Open Heaven"
+    },
+    "Origin King": {
+      "name": "Origin King"
+    },
+    "Origin Returning": {
+      "name": "Origin Returning"
+    },
+    "Qi Transformation": {
+      "name": "Qi Transformation"
+    },
+    "Saint": {
+      "name": "Saint"
+    },
+    "Saint King": {
+      "name": "Saint King"
+    },
+    "Separation & Reunion": {
+      "name": "Separation & Reunion"
+    },
+    "Tempered Body": {
+      "name": "Tempered Body"
+    },
+    "True Element": {
+      "name": "True Element"
+    },
+    "Void King": {
+      "name": "Void King"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Early Stage"
+    },
+    "Late Stage": {
+      "label": "Late Stage"
+    },
+    "Layer 1": {
+      "label": "Layer 1"
+    },
+    "Layer 10": {
+      "label": "Layer 10"
+    },
+    "Layer 2": {
+      "label": "Layer 2"
+    },
+    "Layer 3": {
+      "label": "Layer 3"
+    },
+    "Layer 4": {
+      "label": "Layer 4"
+    },
+    "Layer 5": {
+      "label": "Layer 5"
+    },
+    "Layer 6": {
+      "label": "Layer 6"
+    },
+    "Layer 7": {
+      "label": "Layer 7"
+    },
+    "Layer 8": {
+      "label": "Layer 8"
+    },
+    "Layer 9": {
+      "label": "Layer 9"
+    },
+    "Middle Stage": {
+      "label": "Middle Stage"
+    },
+    "Peak Stage": {
+      "label": "Peak Stage"
     }
   },
   "shopBundles": {

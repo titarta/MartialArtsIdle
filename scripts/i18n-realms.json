@@ -1,0 +1,43 @@
+{
+  "_comment": "Hand-authored realm/stage/chapter translations seeded into all 9 locale game.json files. Source of truth: this file. The EN source lives in en/game.json (auto-generated from src/data/realms.js). When Polyglyph is back online, push will upload the EN keys; if a future pull --drafts overwrites these hand-translations with AI drafts, re-run scripts/apply-realm-translations.mjs to restore. Realm-name suffix conventions: zh/ja/ko keep names bare (no -境/-경) for compact display since the journey screen pairs them with stage labels and chapter titles for context.",
+  "realmNames": {
+    "Tempered Body":        { "zh": "锻体",           "ja": "鍛体",         "ko": "단체",                 "pt": "Corpo Temperado",       "es": "Cuerpo Templado",       "fr": "Corps Trempé",            "de": "Gehärteter Körper",     "it": "Corpo Temperato",         "ru": "Закалённое Тело" },
+    "Qi Transformation":    { "zh": "化气",           "ja": "化気",         "ko": "화기",                 "pt": "Transformação do Qi",   "es": "Transformación del Qi", "fr": "Transformation du Qi",    "de": "Qi-Wandlung",           "it": "Trasformazione del Qi",   "ru": "Преобразование Ци" },
+    "True Element":         { "zh": "真元",           "ja": "真元",         "ko": "진원",                 "pt": "Elemento Verdadeiro",   "es": "Elemento Verdadero",    "fr": "Élément Véritable",       "de": "Wahres Element",        "it": "Vero Elemento",           "ru": "Истинная Стихия" },
+    "Separation & Reunion": { "zh": "分合",           "ja": "分合",         "ko": "분합",                 "pt": "Separação e Reunião",   "es": "Separación y Reunión",  "fr": "Séparation et Réunion",   "de": "Trennung & Vereinigung","it": "Separazione e Riunione",  "ru": "Разделение и Воссоединение" },
+    "Immortal Ascension":   { "zh": "仙升",           "ja": "仙昇",         "ko": "선승",                 "pt": "Ascensão Imortal",      "es": "Ascensión Inmortal",    "fr": "Ascension Immortelle",    "de": "Unsterblicher Aufstieg","it": "Ascesa Immortale",        "ru": "Бессмертное Вознесение" },
+    "Saint":                { "zh": "圣境",           "ja": "聖境",         "ko": "성인",                 "pt": "Santo",                 "es": "Santo",                 "fr": "Saint",                   "de": "Heiliger",              "it": "Santo",                   "ru": "Святой" },
+    "Saint King":           { "zh": "圣王",           "ja": "聖王",         "ko": "성왕",                 "pt": "Rei Santo",             "es": "Rey Santo",             "fr": "Roi Saint",               "de": "Heiliger König",        "it": "Re Santo",                "ru": "Святой Король" },
+    "Origin Returning":     { "zh": "归源",           "ja": "帰源",         "ko": "귀원",                 "pt": "Retorno à Origem",      "es": "Retorno al Origen",     "fr": "Retour à l'Origine",      "de": "Rückkehr zum Ursprung", "it": "Ritorno all'Origine",     "ru": "Возвращение к Истоку" },
+    "Origin King":          { "zh": "源王",           "ja": "源王",         "ko": "원왕",                 "pt": "Rei da Origem",         "es": "Rey del Origen",        "fr": "Roi d'Origine",           "de": "Ursprungskönig",        "it": "Re dell'Origine",         "ru": "Король Истока" },
+    "Void King":            { "zh": "虚王",           "ja": "虚王",         "ko": "허왕",                 "pt": "Rei do Vazio",          "es": "Rey del Vacío",         "fr": "Roi du Vide",             "de": "Leeren-König",          "it": "Re del Vuoto",            "ru": "Король Пустоты" },
+    "Dao Source":           { "zh": "道源",           "ja": "道源",         "ko": "도원",                 "pt": "Fonte do Dao",          "es": "Fuente del Dao",        "fr": "Source du Dao",           "de": "Dao-Quelle",            "it": "Sorgente del Dao",        "ru": "Источник Дао" },
+    "Emperor Realm":        { "zh": "帝境",           "ja": "帝境",         "ko": "제경",                 "pt": "Domínio Imperial",      "es": "Reino Imperial",        "fr": "Royaume Impérial",        "de": "Kaiserreich",           "it": "Regno Imperiale",         "ru": "Имперский Рубеж" },
+    "Open Heaven":          { "zh": "开天",           "ja": "開天",         "ko": "개천",                 "pt": "Céu Aberto",            "es": "Cielo Abierto",         "fr": "Ciel Ouvert",             "de": "Offener Himmel",        "it": "Cielo Aperto",            "ru": "Открытое Небо" }
+  },
+  "realmStages": {
+    "Layer 1":      { "zh": "第一层",  "ja": "第一層",  "ko": "1층",  "pt": "Camada 1",  "es": "Capa 1",  "fr": "Couche 1",  "de": "Schicht 1",  "it": "Strato 1",  "ru": "Слой 1" },
+    "Layer 2":      { "zh": "第二层",  "ja": "第二層",  "ko": "2층",  "pt": "Camada 2",  "es": "Capa 2",  "fr": "Couche 2",  "de": "Schicht 2",  "it": "Strato 2",  "ru": "Слой 2" },
+    "Layer 3":      { "zh": "第三层",  "ja": "第三層",  "ko": "3층",  "pt": "Camada 3",  "es": "Capa 3",  "fr": "Couche 3",  "de": "Schicht 3",  "it": "Strato 3",  "ru": "Слой 3" },
+    "Layer 4":      { "zh": "第四层",  "ja": "第四層",  "ko": "4층",  "pt": "Camada 4",  "es": "Capa 4",  "fr": "Couche 4",  "de": "Schicht 4",  "it": "Strato 4",  "ru": "Слой 4" },
+    "Layer 5":      { "zh": "第五层",  "ja": "第五層",  "ko": "5층",  "pt": "Camada 5",  "es": "Capa 5",  "fr": "Couche 5",  "de": "Schicht 5",  "it": "Strato 5",  "ru": "Слой 5" },
+    "Layer 6":      { "zh": "第六层",  "ja": "第六層",  "ko": "6층",  "pt": "Camada 6",  "es": "Capa 6",  "fr": "Couche 6",  "de": "Schicht 6",  "it": "Strato 6",  "ru": "Слой 6" },
+    "Layer 7":      { "zh": "第七层",  "ja": "第七層",  "ko": "7층",  "pt": "Camada 7",  "es": "Capa 7",  "fr": "Couche 7",  "de": "Schicht 7",  "it": "Strato 7",  "ru": "Слой 7" },
+    "Layer 8":      { "zh": "第八层",  "ja": "第八層",  "ko": "8층",  "pt": "Camada 8",  "es": "Capa 8",  "fr": "Couche 8",  "de": "Schicht 8",  "it": "Strato 8",  "ru": "Слой 8" },
+    "Layer 9":      { "zh": "第九层",  "ja": "第九層",  "ko": "9층",  "pt": "Camada 9",  "es": "Capa 9",  "fr": "Couche 9",  "de": "Schicht 9",  "it": "Strato 9",  "ru": "Слой 9" },
+    "Layer 10":     { "zh": "第十层",  "ja": "第十層",  "ko": "10층", "pt": "Camada 10", "es": "Capa 10", "fr": "Couche 10", "de": "Schicht 10", "it": "Strato 10", "ru": "Слой 10" },
+    "Early Stage":  { "zh": "初期",    "ja": "初期",    "ko": "초기", "pt": "Estágio Inicial",       "es": "Etapa Temprana",  "fr": "Stade Initial",  "de": "Frühes Stadium",     "it": "Stadio Iniziale",   "ru": "Ранняя Стадия" },
+    "Middle Stage": { "zh": "中期",    "ja": "中期",    "ko": "중기", "pt": "Estágio Intermediário", "es": "Etapa Media",     "fr": "Stade Médian",   "de": "Mittleres Stadium",  "it": "Stadio Intermedio", "ru": "Средняя Стадия" },
+    "Late Stage":   { "zh": "后期",    "ja": "後期",    "ko": "후기", "pt": "Estágio Avançado",      "es": "Etapa Tardía",    "fr": "Stade Tardif",   "de": "Spätes Stadium",     "it": "Stadio Avanzato",   "ru": "Поздняя Стадия" },
+    "Peak Stage":   { "zh": "巅峰",    "ja": "頂点",    "ko": "정점", "pt": "Estágio Máximo",        "es": "Etapa Cumbre",    "fr": "Stade Suprême",  "de": "Höhepunkt-Stadium",  "it": "Stadio Apice",      "ru": "Пиковая Стадия" }
+  },
+  "chapters": {
+    "1": { "zh": "凡尘之路",     "ja": "凡塵の道",       "ko": "속세의 길",  "pt": "O Caminho Mortal",  "es": "El Sendero Mortal",  "fr": "La Voie Mortelle",   "de": "Der Sterbliche Pfad",   "it": "Il Sentiero Mortale",  "ru": "Смертный Путь" },
+    "2": { "zh": "元素觉醒",     "ja": "元素覚醒",       "ko": "원소 각성",  "pt": "Despertar Elemental","es": "Despertar Elemental","fr": "Éveil Élémentaire",  "de": "Erwachen des Elements", "it": "Risveglio Elementale", "ru": "Пробуждение Стихии" },
+    "3": { "zh": "圣道",         "ja": "聖道",           "ko": "성도",       "pt": "O Caminho Santo",   "es": "El Sendero Santo",   "fr": "La Voie Sainte",     "de": "Der Heilige Pfad",      "it": "Il Sentiero Santo",    "ru": "Святой Путь" },
+    "4": { "zh": "归源",         "ja": "帰源",           "ko": "귀원",       "pt": "Retorno à Origem",  "es": "Retorno al Origen",  "fr": "Retour à l'Origine", "de": "Rückkehr zum Ursprung", "it": "Ritorno all'Origine",  "ru": "Возвращение к Истоку" },
+    "5": { "zh": "虚空之冕",     "ja": "虚空の冠",       "ko": "허공의 관",  "pt": "A Coroa do Vazio",  "es": "La Corona del Vacío","fr": "La Couronne du Vide","de": "Die Krone der Leere",   "it": "La Corona del Vuoto",  "ru": "Корона Пустоты" },
+    "6": { "zh": "道之源",       "ja": "道の源",         "ko": "도의 근원",  "pt": "A Fonte do Dao",    "es": "La Fuente del Dao",  "fr": "La Source du Dao",   "de": "Die Dao-Quelle",        "it": "La Sorgente del Dao",  "ru": "Источник Дао" },
+    "7": { "zh": "开天辟地",     "ja": "開天",           "ko": "개천",       "pt": "Céu Aberto",        "es": "Cielo Abierto",      "fr": "Ciel Ouvert",        "de": "Offener Himmel",        "it": "Cielo Aperto",         "ru": "Открытое Небо" }
+  }
+}

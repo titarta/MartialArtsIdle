@@ -301,6 +301,29 @@
       "title": "ご存知でしたか？"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "凡塵の道"
+    },
+    "2": {
+      "title": "元素覚醒"
+    },
+    "3": {
+      "title": "聖道"
+    },
+    "4": {
+      "title": "帰源"
+    },
+    "5": {
+      "title": "虚空の冠"
+    },
+    "6": {
+      "title": "道の源"
+    },
+    "7": {
+      "title": "開天"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "外門弟子"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "超越"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "道源"
+    },
+    "Emperor Realm": {
+      "name": "帝境"
+    },
+    "Immortal Ascension": {
+      "name": "仙昇"
+    },
+    "Open Heaven": {
+      "name": "開天"
+    },
+    "Origin King": {
+      "name": "源王"
+    },
+    "Origin Returning": {
+      "name": "帰源"
+    },
+    "Qi Transformation": {
+      "name": "化気"
+    },
+    "Saint": {
+      "name": "聖境"
+    },
+    "Saint King": {
+      "name": "聖王"
+    },
+    "Separation & Reunion": {
+      "name": "分合"
+    },
+    "Tempered Body": {
+      "name": "鍛体"
+    },
+    "True Element": {
+      "name": "真元"
+    },
+    "Void King": {
+      "name": "虚王"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "初期"
+    },
+    "Late Stage": {
+      "label": "後期"
+    },
+    "Layer 1": {
+      "label": "第一層"
+    },
+    "Layer 10": {
+      "label": "第十層"
+    },
+    "Layer 2": {
+      "label": "第二層"
+    },
+    "Layer 3": {
+      "label": "第三層"
+    },
+    "Layer 4": {
+      "label": "第四層"
+    },
+    "Layer 5": {
+      "label": "第五層"
+    },
+    "Layer 6": {
+      "label": "第六層"
+    },
+    "Layer 7": {
+      "label": "第七層"
+    },
+    "Layer 8": {
+      "label": "第八層"
+    },
+    "Layer 9": {
+      "label": "第九層"
+    },
+    "Middle Stage": {
+      "label": "中期"
+    },
+    "Peak Stage": {
+      "label": "頂点"
     }
   },
   "shopBundles": {

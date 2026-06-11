@@ -301,6 +301,29 @@
       "title": "¿Sabías que?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "El Sendero Mortal"
+    },
+    "2": {
+      "title": "Despertar Elemental"
+    },
+    "3": {
+      "title": "El Sendero Santo"
+    },
+    "4": {
+      "title": "Retorno al Origen"
+    },
+    "5": {
+      "title": "La Corona del Vacío"
+    },
+    "6": {
+      "title": "La Fuente del Dao"
+    },
+    "7": {
+      "title": "Cielo Abierto"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Discípulo Externo"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Trascendente"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Fuente del Dao"
+    },
+    "Emperor Realm": {
+      "name": "Reino Imperial"
+    },
+    "Immortal Ascension": {
+      "name": "Ascensión Inmortal"
+    },
+    "Open Heaven": {
+      "name": "Cielo Abierto"
+    },
+    "Origin King": {
+      "name": "Rey del Origen"
+    },
+    "Origin Returning": {
+      "name": "Retorno al Origen"
+    },
+    "Qi Transformation": {
+      "name": "Transformación del Qi"
+    },
+    "Saint": {
+      "name": "Santo"
+    },
+    "Saint King": {
+      "name": "Rey Santo"
+    },
+    "Separation & Reunion": {
+      "name": "Separación y Reunión"
+    },
+    "Tempered Body": {
+      "name": "Cuerpo Templado"
+    },
+    "True Element": {
+      "name": "Elemento Verdadero"
+    },
+    "Void King": {
+      "name": "Rey del Vacío"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Etapa Temprana"
+    },
+    "Late Stage": {
+      "label": "Etapa Tardía"
+    },
+    "Layer 1": {
+      "label": "Capa 1"
+    },
+    "Layer 10": {
+      "label": "Capa 10"
+    },
+    "Layer 2": {
+      "label": "Capa 2"
+    },
+    "Layer 3": {
+      "label": "Capa 3"
+    },
+    "Layer 4": {
+      "label": "Capa 4"
+    },
+    "Layer 5": {
+      "label": "Capa 5"
+    },
+    "Layer 6": {
+      "label": "Capa 6"
+    },
+    "Layer 7": {
+      "label": "Capa 7"
+    },
+    "Layer 8": {
+      "label": "Capa 8"
+    },
+    "Layer 9": {
+      "label": "Capa 9"
+    },
+    "Middle Stage": {
+      "label": "Etapa Media"
+    },
+    "Peak Stage": {
+      "label": "Etapa Cumbre"
     }
   },
   "shopBundles": {

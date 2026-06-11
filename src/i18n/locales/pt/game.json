@@ -301,6 +301,29 @@
       "title": "Você Sabia?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "O Caminho Mortal"
+    },
+    "2": {
+      "title": "Despertar Elemental"
+    },
+    "3": {
+      "title": "O Caminho Santo"
+    },
+    "4": {
+      "title": "Retorno à Origem"
+    },
+    "5": {
+      "title": "A Coroa do Vazio"
+    },
+    "6": {
+      "title": "A Fonte do Dao"
+    },
+    "7": {
+      "title": "Céu Aberto"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Discípulo Externo"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Transcendente"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Fonte do Dao"
+    },
+    "Emperor Realm": {
+      "name": "Domínio Imperial"
+    },
+    "Immortal Ascension": {
+      "name": "Ascensão Imortal"
+    },
+    "Open Heaven": {
+      "name": "Céu Aberto"
+    },
+    "Origin King": {
+      "name": "Rei da Origem"
+    },
+    "Origin Returning": {
+      "name": "Retorno à Origem"
+    },
+    "Qi Transformation": {
+      "name": "Transformação do Qi"
+    },
+    "Saint": {
+      "name": "Santo"
+    },
+    "Saint King": {
+      "name": "Rei Santo"
+    },
+    "Separation & Reunion": {
+      "name": "Separação e Reunião"
+    },
+    "Tempered Body": {
+      "name": "Corpo Temperado"
+    },
+    "True Element": {
+      "name": "Elemento Verdadeiro"
+    },
+    "Void King": {
+      "name": "Rei do Vazio"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Estágio Inicial"
+    },
+    "Late Stage": {
+      "label": "Estágio Avançado"
+    },
+    "Layer 1": {
+      "label": "Camada 1"
+    },
+    "Layer 10": {
+      "label": "Camada 10"
+    },
+    "Layer 2": {
+      "label": "Camada 2"
+    },
+    "Layer 3": {
+      "label": "Camada 3"
+    },
+    "Layer 4": {
+      "label": "Camada 4"
+    },
+    "Layer 5": {
+      "label": "Camada 5"
+    },
+    "Layer 6": {
+      "label": "Camada 6"
+    },
+    "Layer 7": {
+      "label": "Camada 7"
+    },
+    "Layer 8": {
+      "label": "Camada 8"
+    },
+    "Layer 9": {
+      "label": "Camada 9"
+    },
+    "Middle Stage": {
+      "label": "Estágio Intermediário"
+    },
+    "Peak Stage": {
+      "label": "Estágio Máximo"
     }
   },
   "shopBundles": {

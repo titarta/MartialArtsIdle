@@ -1,6 +1,7 @@
 // @refresh reset
 import { useCallback, useState, useRef, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import RealmProgressBar from '../components/RealmProgressBar';
 import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
@@ -410,6 +411,7 @@ function HQTablet({ state, kicker, offer, offerDur, cta, onClick, disabled, titl
  */
 function BreakthroughBanner({ event, onDone }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   useEffect(() => {
@@ -419,6 +421,13 @@ function BreakthroughBanner({ event, onDone }) {
     return () => clearTimeout(id);
   }, [event]); // onDone intentionally excluded — captured via ref so re-renders don't reset the timer
   if (!event) return null;
+  // Event payload carries raw realmName + (optional) realmStage. Older saves
+  // / debug paths may still set `label` as a pre-formatted fallback.
+  const rawName  = event.realmName ?? event.label ?? '';
+  const rawStage = event.realmStage ?? null;
+  const trName   = rawName  ? gt('realmNames',  rawName,  'name',  rawName)  : '';
+  const trStage  = rawStage ? gt('realmStages', rawStage, 'label', rawStage) : '';
+  const display  = trStage ? `${trName} — ${trStage}` : trName;
   return (
     <div className="home-breakthrough-overlay" aria-live="assertive">
       <div className="home-breakthrough-flash" />
@@ -428,7 +437,7 @@ function BreakthroughBanner({ event, onDone }) {
            : event.isPeak ? t('home.peakKicker',        { defaultValue: 'Peak Stage' })
            :                t('home.breakthroughKicker', { defaultValue: 'Breakthrough' })}
         </div>
-        <div className="home-breakthrough-name">{event.label}</div>
+        <div className="home-breakthrough-name">{display}</div>
       </div>
     </div>
   );
@@ -753,6 +762,7 @@ const CES_CHAR_RETURN_MS  = 500;
 
 function CharacterEvolutionOverlay({ event, onDone }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   const [phase, setPhase] = useState('playing');
@@ -833,7 +843,16 @@ function CharacterEvolutionOverlay({ event, onDone }) {
       </div>
       <div className="char-evolve-card">
         <div className="char-evolve-kicker">{kicker}</div>
-        <div className="char-evolve-name">{event.realmName}</div>
+        <div className="char-evolve-name">{(() => {
+          // Payload carries raw name + optional stage (translated here); falls
+          // back to the legacy combined string if older code still sets it.
+          const rawName  = event.realmName ?? '';
+          const rawStage = event.realmStage ?? null;
+          if (!rawName) return '';
+          const trName  = gt('realmNames',  rawName,  'name',  rawName);
+          const trStage = rawStage ? gt('realmStages', rawStage, 'label', rawStage) : '';
+          return trStage ? `${trName} — ${trStage}` : trName;
+        })()}</div>
         {event.tierName && <div className="char-evolve-sub">{event.tierName}</div>}
       </div>
       {phase === 'settled' && (
@@ -1358,13 +1377,14 @@ function PCQiProgressText({ qiRef, progressRef, costRef, gateRef, rateRef, maxed
 
 /** Left panel — visible only at wide (≥ 900 px) breakpoints.
  *  Shows cultivation stats so the player doesn't have to look at the bar. */
-function HomePCLeftPanel({ realmName, realmStage, qiRef, progressRef, costRef, rateRef, gateRef, focusMultRef, sparkFocusMultBonusRef, sparkConsecutiveCurrentBonusRef, boosting, adBoostActive, maxed, ascended }) {
+function HomePCLeftPanel({ realmMajor, realmStage, qiRef, progressRef, costRef, rateRef, gateRef, focusMultRef, sparkFocusMultBonusRef, sparkConsecutiveCurrentBonusRef, boosting, adBoostActive, maxed, ascended }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   return (
     <div className="home-pc-left">
       <div className="home-pc-section-label">{t('home.cultivationLabel')}</div>
-      <div className="home-pc-realm-name">{realmName.split(' - ')[0]}</div>
-      {realmStage && !ascended && <div className="home-pc-realm-stage">{realmStage}</div>}
+      <div className="home-pc-realm-name">{gt('realmNames', realmMajor, 'name', realmMajor)}</div>
+      {realmStage && !ascended && <div className="home-pc-realm-stage">{gt('realmStages', realmStage, 'label', realmStage)}</div>}
       <PCQiProgressText qiRef={qiRef} progressRef={progressRef} costRef={costRef} gateRef={gateRef} rateRef={rateRef} maxed={maxed} ascended={ascended} />
       <QiRateReadout rateRef={rateRef} focusMultRef={focusMultRef} sparkFocusMultBonusRef={sparkFocusMultBonusRef} sparkConsecutiveCurrentBonusRef={sparkConsecutiveCurrentBonusRef} boosting={boosting} adBoostActive={adBoostActive} maxed={maxed} />
     </div>
@@ -2380,6 +2400,7 @@ function HomeScreen({
   equippedParticle = null,
 }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
 
   // The crystal becomes a tap target only once the Crystal Reservoir
   // (crystal_click) mechanic is actually active — granted via crystal-tier
@@ -2401,8 +2422,11 @@ function HomeScreen({
   }, [equippedParticle]);
   const {
     realmName,
+    realmMajor,
     realmStage,
     nextRealmName,
+    nextRealmMajor,
+    nextRealmStage,
     qiRef,
     // Monotone counter of qi accrued ONLY by the cultivation tick (no
     // crystal/divine-qi/pattern-click grants). Used by the cultivator
@@ -2745,11 +2769,12 @@ function HomeScreen({
         if (el) { const r = el.getBoundingClientRect(); origin = { x: r.left, y: r.top, w: r.width, h: r.height }; }
       }
       enqueue('character-evolution', {
-        oldTier:   CULTIVATOR_TIER_NAMES[oldTierIdx],
-        newTier:   CULTIVATOR_TIER_NAMES[newTierIdx],
-        realmName: cultivation.nextRealmName ?? 'Ascension',
-        tierName:  CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
-        isFinal:   false,
+        oldTier:    CULTIVATOR_TIER_NAMES[oldTierIdx],
+        newTier:    CULTIVATOR_TIER_NAMES[newTierIdx],
+        realmName:  cultivation.nextRealmMajor ?? cultivation.nextRealmName ?? 'Ascension',
+        realmStage: cultivation.nextRealmStage ?? null,
+        tierName:   CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
+        isFinal:    false,
         origin,
       }, { priority: 'high' });
     };
@@ -2896,7 +2921,8 @@ function HomeScreen({
     enqueue('character-evolution', {
       oldTier:    CULTIVATOR_TIER_NAMES[oldTierIdx],
       newTier:    CULTIVATOR_TIER_NAMES[newTierIdx],
-      realmName:  majorBreakthrough.label,
+      realmName:  majorBreakthrough.realmName ?? majorBreakthrough.label ?? '',
+      realmStage: majorBreakthrough.realmStage ?? null,
       tierName:   CULTIVATOR_TIER_DISPLAY_NAMES[newTierIdx],
       isFinal:    !!majorBreakthrough.isFinal,
       origin,
@@ -2968,7 +2994,7 @@ function HomeScreen({
 
         {/* Left info panel — only visible at PC widths (≥ 900 px) */}
         <HomePCLeftPanel
-          realmName={realmName}
+          realmMajor={realmMajor}
           realmStage={realmStage}
           qiRef={qiRef}
           progressRef={qiEarnedThisRealmRef}
@@ -3205,8 +3231,8 @@ function HomeScreen({
               same info at the top of the side rail at ≥900px. */}
           {realmName && (
             <div className="home-scene-realm-header" data-bonk="realm">
-              <span className="home-scene-realm-name">{realmName.split(' - ')[0]}</span>
-              {realmStage && <span className="home-scene-realm-stage">{realmStage}</span>}
+              <span className="home-scene-realm-name">{gt('realmNames', realmMajor, 'name', realmMajor)}</span>
+              {realmStage && <span className="home-scene-realm-stage">{gt('realmStages', realmStage, 'label', realmStage)}</span>}
             </div>
           )}
 

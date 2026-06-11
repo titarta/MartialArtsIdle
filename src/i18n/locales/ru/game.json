@@ -301,6 +301,29 @@
       "title": "Знаете ли вы?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "Смертный Путь"
+    },
+    "2": {
+      "title": "Пробуждение Стихии"
+    },
+    "3": {
+      "title": "Святой Путь"
+    },
+    "4": {
+      "title": "Возвращение к Истоку"
+    },
+    "5": {
+      "title": "Корона Пустоты"
+    },
+    "6": {
+      "title": "Источник Дао"
+    },
+    "7": {
+      "title": "Открытое Небо"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Внешний Ученик"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Трансцендентный"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Источник Дао"
+    },
+    "Emperor Realm": {
+      "name": "Имперский Рубеж"
+    },
+    "Immortal Ascension": {
+      "name": "Бессмертное Вознесение"
+    },
+    "Open Heaven": {
+      "name": "Открытое Небо"
+    },
+    "Origin King": {
+      "name": "Король Истока"
+    },
+    "Origin Returning": {
+      "name": "Возвращение к Истоку"
+    },
+    "Qi Transformation": {
+      "name": "Преобразование Ци"
+    },
+    "Saint": {
+      "name": "Святой"
+    },
+    "Saint King": {
+      "name": "Святой Король"
+    },
+    "Separation & Reunion": {
+      "name": "Разделение и Воссоединение"
+    },
+    "Tempered Body": {
+      "name": "Закалённое Тело"
+    },
+    "True Element": {
+      "name": "Истинная Стихия"
+    },
+    "Void King": {
+      "name": "Король Пустоты"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Ранняя Стадия"
+    },
+    "Late Stage": {
+      "label": "Поздняя Стадия"
+    },
+    "Layer 1": {
+      "label": "Слой 1"
+    },
+    "Layer 10": {
+      "label": "Слой 10"
+    },
+    "Layer 2": {
+      "label": "Слой 2"
+    },
+    "Layer 3": {
+      "label": "Слой 3"
+    },
+    "Layer 4": {
+      "label": "Слой 4"
+    },
+    "Layer 5": {
+      "label": "Слой 5"
+    },
+    "Layer 6": {
+      "label": "Слой 6"
+    },
+    "Layer 7": {
+      "label": "Слой 7"
+    },
+    "Layer 8": {
+      "label": "Слой 8"
+    },
+    "Layer 9": {
+      "label": "Слой 9"
+    },
+    "Middle Stage": {
+      "label": "Средняя Стадия"
+    },
+    "Peak Stage": {
+      "label": "Пиковая Стадия"
     }
   },
   "shopBundles": {

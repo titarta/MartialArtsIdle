@@ -301,6 +301,29 @@
       "title": "Le savais-tu?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "La Voie Mortelle"
+    },
+    "2": {
+      "title": "Éveil Élémentaire"
+    },
+    "3": {
+      "title": "La Voie Sainte"
+    },
+    "4": {
+      "title": "Retour à l'Origine"
+    },
+    "5": {
+      "title": "La Couronne du Vide"
+    },
+    "6": {
+      "title": "La Source du Dao"
+    },
+    "7": {
+      "title": "Ciel Ouvert"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Disciple externe"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Transcendant"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Source du Dao"
+    },
+    "Emperor Realm": {
+      "name": "Royaume Impérial"
+    },
+    "Immortal Ascension": {
+      "name": "Ascension Immortelle"
+    },
+    "Open Heaven": {
+      "name": "Ciel Ouvert"
+    },
+    "Origin King": {
+      "name": "Roi d'Origine"
+    },
+    "Origin Returning": {
+      "name": "Retour à l'Origine"
+    },
+    "Qi Transformation": {
+      "name": "Transformation du Qi"
+    },
+    "Saint": {
+      "name": "Saint"
+    },
+    "Saint King": {
+      "name": "Roi Saint"
+    },
+    "Separation & Reunion": {
+      "name": "Séparation et Réunion"
+    },
+    "Tempered Body": {
+      "name": "Corps Trempé"
+    },
+    "True Element": {
+      "name": "Élément Véritable"
+    },
+    "Void King": {
+      "name": "Roi du Vide"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Stade Initial"
+    },
+    "Late Stage": {
+      "label": "Stade Tardif"
+    },
+    "Layer 1": {
+      "label": "Couche 1"
+    },
+    "Layer 10": {
+      "label": "Couche 10"
+    },
+    "Layer 2": {
+      "label": "Couche 2"
+    },
+    "Layer 3": {
+      "label": "Couche 3"
+    },
+    "Layer 4": {
+      "label": "Couche 4"
+    },
+    "Layer 5": {
+      "label": "Couche 5"
+    },
+    "Layer 6": {
+      "label": "Couche 6"
+    },
+    "Layer 7": {
+      "label": "Couche 7"
+    },
+    "Layer 8": {
+      "label": "Couche 8"
+    },
+    "Layer 9": {
+      "label": "Couche 9"
+    },
+    "Middle Stage": {
+      "label": "Stade Médian"
+    },
+    "Peak Stage": {
+      "label": "Stade Suprême"
     }
   },
   "shopBundles": {

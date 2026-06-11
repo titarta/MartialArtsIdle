@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { fmt } from '../utils/format';
 import './reincarnationConfirm.css';
 
@@ -138,6 +139,10 @@ export default function ReincarnationConfirmModal({
   onCancel,
 }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
+  // `realmName` is the raw realm name (cultivation.realmMajor); translate
+  // it through the realm-name resolver so the cartouche reads correctly.
+  const trRealm = realmName ? gt('realmNames', realmName, 'name', realmName) : '';
 
   // Esc backs out (same as "Hold the wheel"). Confirm is never key-bound:
   // turning the wheel must be a deliberate tap.
@@ -209,7 +214,7 @@ export default function ReincarnationConfirmModal({
               {realmName && (
                 <div className="rc-karma-cartouche rc-karma-cartouche-realm">
                   <span className="rc-karma-label">{t('reincarnationModal.youStandAt')}</span>
-                  <span className="rc-karma-value">{realmName}</span>
+                  <span className="rc-karma-value">{trRealm}</span>
                 </div>
               )}
               <div className="rc-actions rc-actions-single">

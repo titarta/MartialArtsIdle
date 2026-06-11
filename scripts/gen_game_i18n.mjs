@@ -76,6 +76,17 @@ extract('discipleTiers', arr((await load('/src/data/discipleMerge.js')).TIERS), 
 extract('tutorials', obj((await load('/src/data/tutorialCards.js')).default), '__key__', ['kicker', 'title', 'body', 'ctaText']);
 extract('rarity',    obj((await load('/src/data/materials.js')).RARITY),      '__key__', ['label']);
 
+// ── Realm names / stage labels / chapter titles ──────────────────────────────
+// Keyed by the English string itself (realm name / stage label) so render sites
+// resolve with gt('realmNames', realm.name, 'name', realm.name). Names + stages
+// repeat across the 56-entry REALMS ladder, so we de-dupe to the unique set.
+const realmsMod = await load('/src/data/realms.js');
+for (const name of (realmsMod.REALM_NAMES ?? [])) put('realmNames', name, 'name', name);
+const stageSet = new Set();
+for (const r of (realmsMod.default ?? [])) if (r.stage) stageSet.add(r.stage);
+for (const s of stageSet) put('realmStages', s, 'label', s);
+extract('chapters', arr(realmsMod.CHAPTERS), 'id', ['title']);
+
 await vite.close();
 
 // Stable, sorted output for clean diffs.

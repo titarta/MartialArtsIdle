@@ -733,9 +733,10 @@ export default function useCultivation() {
             trackFirstTime('Ascension', indexRef.current);
           } catch {}
           setMajorBreakthrough({
-            id:      Date.now(),
-            label:   REALMS[indexRef.current].name,
-            isFinal: true,
+            id:        Date.now(),
+            realmName: REALMS[indexRef.current].name,
+            realmStage: REALMS[indexRef.current].stage ?? null,
+            isFinal:   true,
           });
         }
       } else {
@@ -826,10 +827,9 @@ export default function useCultivation() {
                 if (isMajor) trackFirstTime('RealmMajor', nextIndex);
               } catch {}
               setMajorBreakthrough({
-                id:    Date.now(),
-                label: isPeak
-                  ? `${REALMS[nextIndex].name} — ${REALMS[nextIndex].stage}`
-                  : REALMS[nextIndex].name,
+                id:         Date.now(),
+                realmName:  REALMS[nextIndex].name,
+                realmStage: isPeak ? REALMS[nextIndex].stage : null,
                 isPeak,
               });
             }
@@ -1103,8 +1103,9 @@ export default function useCultivation() {
 
     // Fires the BreakthroughBanner + downstream spark-offer flow.
     setMajorBreakthrough({
-      id:    Date.now(),
-      label: REALMS[nextIndex].name,
+      id:         Date.now(),
+      realmName:  REALMS[nextIndex].name,
+      realmStage: null,
     });
   }, []);
 
@@ -1244,7 +1245,9 @@ export default function useCultivation() {
     realmName:     label(realm),
     realmMajor:    realm.name,
     realmStage:    realm.stage,
-    nextRealmName: nextRealm ? label(nextRealm) : 'Peak',
+    nextRealmName:  nextRealm ? label(nextRealm) : 'Peak',
+    nextRealmMajor: nextRealm ? nextRealm.name : null,
+    nextRealmStage: nextRealm ? (nextRealm.stage ?? null) : null,
     maxed:         !nextRealm,
     boosting,
     startBoost,

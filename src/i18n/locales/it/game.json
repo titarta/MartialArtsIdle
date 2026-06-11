@@ -301,6 +301,29 @@
       "title": "Lo sapevi?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "Il Sentiero Mortale"
+    },
+    "2": {
+      "title": "Risveglio Elementale"
+    },
+    "3": {
+      "title": "Il Sentiero Santo"
+    },
+    "4": {
+      "title": "Ritorno all'Origine"
+    },
+    "5": {
+      "title": "La Corona del Vuoto"
+    },
+    "6": {
+      "title": "La Sorgente del Dao"
+    },
+    "7": {
+      "title": "Cielo Aperto"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Discepolo Esterno"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Trascendente"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Sorgente del Dao"
+    },
+    "Emperor Realm": {
+      "name": "Regno Imperiale"
+    },
+    "Immortal Ascension": {
+      "name": "Ascesa Immortale"
+    },
+    "Open Heaven": {
+      "name": "Cielo Aperto"
+    },
+    "Origin King": {
+      "name": "Re dell'Origine"
+    },
+    "Origin Returning": {
+      "name": "Ritorno all'Origine"
+    },
+    "Qi Transformation": {
+      "name": "Trasformazione del Qi"
+    },
+    "Saint": {
+      "name": "Santo"
+    },
+    "Saint King": {
+      "name": "Re Santo"
+    },
+    "Separation & Reunion": {
+      "name": "Separazione e Riunione"
+    },
+    "Tempered Body": {
+      "name": "Corpo Temperato"
+    },
+    "True Element": {
+      "name": "Vero Elemento"
+    },
+    "Void King": {
+      "name": "Re del Vuoto"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Stadio Iniziale"
+    },
+    "Late Stage": {
+      "label": "Stadio Avanzato"
+    },
+    "Layer 1": {
+      "label": "Strato 1"
+    },
+    "Layer 10": {
+      "label": "Strato 10"
+    },
+    "Layer 2": {
+      "label": "Strato 2"
+    },
+    "Layer 3": {
+      "label": "Strato 3"
+    },
+    "Layer 4": {
+      "label": "Strato 4"
+    },
+    "Layer 5": {
+      "label": "Strato 5"
+    },
+    "Layer 6": {
+      "label": "Strato 6"
+    },
+    "Layer 7": {
+      "label": "Strato 7"
+    },
+    "Layer 8": {
+      "label": "Strato 8"
+    },
+    "Layer 9": {
+      "label": "Strato 9"
+    },
+    "Middle Stage": {
+      "label": "Stadio Intermedio"
+    },
+    "Peak Stage": {
+      "label": "Stadio Apice"
     }
   },
   "shopBundles": {

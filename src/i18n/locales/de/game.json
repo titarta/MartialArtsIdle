@@ -301,6 +301,29 @@
       "title": "Wusstest du schon?"
     }
   },
+  "chapters": {
+    "1": {
+      "title": "Der Sterbliche Pfad"
+    },
+    "2": {
+      "title": "Erwachen des Elements"
+    },
+    "3": {
+      "title": "Der Heilige Pfad"
+    },
+    "4": {
+      "title": "Rückkehr zum Ursprung"
+    },
+    "5": {
+      "title": "Die Krone der Leere"
+    },
+    "6": {
+      "title": "Die Dao-Quelle"
+    },
+    "7": {
+      "title": "Offener Himmel"
+    }
+  },
   "discipleTiers": {
     "1": {
       "rank": "Äußerer Schüler"
@@ -914,6 +937,91 @@
     },
     "Transcendent": {
       "label": "Transzendent"
+    }
+  },
+  "realmNames": {
+    "Dao Source": {
+      "name": "Dao-Quelle"
+    },
+    "Emperor Realm": {
+      "name": "Kaiserreich"
+    },
+    "Immortal Ascension": {
+      "name": "Unsterblicher Aufstieg"
+    },
+    "Open Heaven": {
+      "name": "Offener Himmel"
+    },
+    "Origin King": {
+      "name": "Ursprungskönig"
+    },
+    "Origin Returning": {
+      "name": "Rückkehr zum Ursprung"
+    },
+    "Qi Transformation": {
+      "name": "Qi-Wandlung"
+    },
+    "Saint": {
+      "name": "Heiliger"
+    },
+    "Saint King": {
+      "name": "Heiliger König"
+    },
+    "Separation & Reunion": {
+      "name": "Trennung & Vereinigung"
+    },
+    "Tempered Body": {
+      "name": "Gehärteter Körper"
+    },
+    "True Element": {
+      "name": "Wahres Element"
+    },
+    "Void King": {
+      "name": "Leeren-König"
+    }
+  },
+  "realmStages": {
+    "Early Stage": {
+      "label": "Frühes Stadium"
+    },
+    "Late Stage": {
+      "label": "Spätes Stadium"
+    },
+    "Layer 1": {
+      "label": "Schicht 1"
+    },
+    "Layer 10": {
+      "label": "Schicht 10"
+    },
+    "Layer 2": {
+      "label": "Schicht 2"
+    },
+    "Layer 3": {
+      "label": "Schicht 3"
+    },
+    "Layer 4": {
+      "label": "Schicht 4"
+    },
+    "Layer 5": {
+      "label": "Schicht 5"
+    },
+    "Layer 6": {
+      "label": "Schicht 6"
+    },
+    "Layer 7": {
+      "label": "Schicht 7"
+    },
+    "Layer 8": {
+      "label": "Schicht 8"
+    },
+    "Layer 9": {
+      "label": "Schicht 9"
+    },
+    "Middle Stage": {
+      "label": "Mittleres Stadium"
+    },
+    "Peak Stage": {
+      "label": "Höhepunkt-Stadium"
     }
   },
   "shopBundles": {

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import REALMS, {
   stageHasSpark,
   CHAPTERS,
@@ -86,6 +87,7 @@ const GROUPS = groupRealms(REALMS);
  */
 function JourneyBody({ realmIndex }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const currentRef = useRef(null);
 
   // Scroll behavior on mount:
@@ -212,7 +214,7 @@ function JourneyBody({ realmIndex }) {
           <section key={chapter.id} className={chapterCls}>
             <header className="jc-chapter-head">
               <span className="jc-chapter-num">{toRoman(chapter.id)}</span>
-              <span className="jc-chapter-title">{chapter.title}</span>
+              <span className="jc-chapter-title">{gt('chapters', String(chapter.id), 'title', chapter.title)}</span>
               <span className="jc-chapter-rule" aria-hidden="true" />
             </header>
 
@@ -242,7 +244,7 @@ function JourneyBody({ realmIndex }) {
                         ? <img src={icon} alt="" className="jc-realm-icon-img" draggable="false" />
                         : <span className="jc-realm-icon-glyph">{REALM_GLYPHS[group.name] ?? icon ?? '•'}</span>}
                     </span>
-                    <span className="jc-realm-name">{group.name}</span>
+                    <span className="jc-realm-name">{gt('realmNames', group.name, 'name', group.name)}</span>
                     <span className="jc-realm-tag">
                       {groupPast
                         ? `${totalCount} ${totalCount === 1 ? t('journey.stage') : t('journey.stages')}`
@@ -276,7 +278,7 @@ function JourneyBody({ realmIndex }) {
                               {isCurrent && <span className="jc-stage-pulse" />}
                             </span>
                             <span className="jc-stage-label">
-                              {entry.stage}
+                              {gt('realmStages', entry.stage, 'label', entry.stage)}
                               <span className="jc-stage-num">#{entry.index + 1}</span>
                             </span>
                             <span className="jc-stage-cost-group">
