@@ -16,12 +16,12 @@
  *   - volume     — number 0..1 (BGM + SFX)
  *   - loop       — boolean (BGM only)
  *   - src        — string[] of file URLs (single sample; legacy + non-variant SFX)
- *   - variations — { src: string[] }[] (multi-sample pool; combat hit variants)
+ *   - variations — { src: string[] }[] (multi-sample pool; e.g. crystal-tap variants)
  *
  * Variation pool model
  * ──────────────────────────────────────────────────────────────────────────
  * Some sounds are randomised at playback to avoid the machine-gun feel — every
- * combat hit picks one of N samples at random. A SFX entry can declare either
+ * crystal tap picks one of N samples at random. A SFX entry can declare either
  * `src` (single sample) OR `variations: [{ src }, ...]`. AudioManager normalises
  * single-src entries to a one-element variation list internally.
  *
@@ -87,8 +87,8 @@ function sfx(stem, ...exts) {
 }
 
 /**
- * Build N variation entries for a base stem, e.g. sfxVariants('combat_hit_player', 3, 'ogg', 'mp3')
- * → [{src: [..._1.ogg, _1.mp3]}, {src: [..._2.ogg, _2.mp3]}, {src: [..._3.ogg, _3.mp3]}].
+ * Build N variation entries for a base stem, e.g. sfxVariants('crystal_tap', 4, 'ogg', 'mp3')
+ * → [{src: [..._1.ogg, _1.mp3]}, {src: [..._2.ogg, _2.mp3]}, ... up to _N].
  * Each Howl falls back through its own ogg/mp3 chain (browser format support).
  */
 function sfxVariants(stem, count, ...exts) {
@@ -98,20 +98,13 @@ function sfxVariants(stem, count, ...exts) {
 }
 
 // ── Background music ─────────────────────────────────────────────────────────
-// v1 plays ONE continuous track everywhere (`cultivation`); `combat` is reserved
-// for the combat-arena that ships with the v2 combat update. The old per-screen
-// `world` / `menu` swaps were retired. Do not reintroduce them.
+// One continuous track plays everywhere (`cultivation`). The old per-screen
+// `world` / `menu` / `combat` swaps were retired. Do not reintroduce them.
 
 const _BGM_BASE = {
-  /** The single continuous main track. Plays on every v1 screen. */
+  /** The single continuous main track. Plays on every screen. */
   cultivation: {
     src:    [`${BASE}audio/bgm/cultivation.ogg`, `${BASE}audio/bgm/cultivation.mp3`],
-    loop:   true,
-    volume: 1.0,
-  },
-  /** v2 (combat): high-energy loop for the combat-arena. Hidden until combat ships. */
-  combat: {
-    src:    [`${BASE}audio/bgm/combat.ogg`, `${BASE}audio/bgm/combat.mp3`],
     loop:   true,
     volume: 1.0,
   },
@@ -149,20 +142,6 @@ const _SFX_BASE = {
   // above). One per level (1..5), played by index: level N → variant N.
   focus_tick:          { variations: sfxVariants('focus_tick', 5, 'ogg', 'mp3') },
 
-  // ── Combat ────────────────────────────────────────────────────────────────
-  // Hit / dodge / death sounds use 3-variant pools so consecutive triggers don't
-  // sound identical. Once-per-fight sounds (technique / heal / victory / defeat)
-  // stay single-sample.
-  combat_hit_player:   { variations: sfxVariants('combat_hit_player', 3, 'ogg', 'mp3') },
-  combat_hit_enemy:    { variations: sfxVariants('combat_hit_enemy',  3, 'ogg', 'mp3') },
-  combat_critical:     { variations: sfxVariants('combat_critical',   3, 'ogg', 'mp3') },
-  combat_dodge:        { variations: sfxVariants('combat_dodge',      3, 'ogg', 'mp3') },
-  combat_enemy_die:    { variations: sfxVariants('combat_enemy_die',  3, 'ogg', 'mp3') },
-  combat_technique:    { src: sfx('combat_technique',    'ogg', 'mp3') },
-  combat_heal:         { src: sfx('combat_heal',         'ogg', 'mp3') },
-  combat_victory:      { src: sfx('combat_victory',      'ogg', 'mp3') },
-  combat_defeat:       { src: sfx('combat_defeat',       'ogg', 'mp3') },
-
   // ── Qi Crystal ────────────────────────────────────────────────────────────
   // Tapped constantly to collect the reservoir, so a 4-sample random pool
   // avoids the machine-gun repeat feel (same model as divine_qi_collect).
@@ -189,13 +168,6 @@ const _SFX_BASE = {
   spark_pattern_tap:   { src: sfx('spark_pattern_tap',   'ogg', 'mp3') },
   spark_pattern_clear: { src: sfx('spark_pattern_clear', 'ogg', 'mp3') },
   spark_pattern_miss:  { src: sfx('spark_pattern_miss',  'ogg', 'mp3') },
-
-  // ── Items / Crafting ──────────────────────────────────────────────────────
-  item_craft:          { src: sfx('item_craft',          'ogg', 'mp3') },
-  item_upgrade:        { src: sfx('item_upgrade',        'ogg', 'mp3') },
-  item_equip:          { src: sfx('item_equip',          'ogg', 'mp3') },
-  item_unequip:        { src: sfx('item_unequip',        'ogg', 'mp3') },
-  item_pill_use:       { src: sfx('item_pill_use',       'ogg', 'mp3') },
 };
 
 export const SFX = Object.fromEntries(

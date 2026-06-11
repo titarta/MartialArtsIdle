@@ -8,9 +8,8 @@ const BGM_META = [
   { id: 'cultivation', label: 'Main Theme',  desc: 'The single continuous track that plays on every v1 screen', defaultVol: 1.0 },
 ];
 
-// Only sounds reachable in the current v1 build are listed. Combat + item/crafting
-// SFX still exist in the engine manifest (sounds.js), kept compilable for the v2
-// combat update, but are hidden from this panel until those surfaces ship.
+// Only sounds reachable in the current v1 build are listed — this mirrors the
+// engine manifest (sounds.js), which carries the same set.
 const SFX_GROUPS = [
   {
     label: 'UI',
@@ -370,7 +369,7 @@ function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onU
  * Upload a .ogg/.mp3/.wav for a single sound (or one variant of a pool).
  * Commits directly via the GitHub API (same as SpriteUpload).
  * `fileStem` is the basename without extension — e.g. 'ui_click' for a single
- * sample, 'combat_hit_player_2' for variant 2 of a pool.
+ * sample, 'crystal_tap_2' for variant 2 of a pool.
  * Calls onUploaded([oggPath, mp3Path, wavPath]) with whatever was successfully uploaded.
  */
 const WAV_BGM_WARNING_MB = 4; // warn if a WAV uploaded for BGM exceeds this

@@ -46,18 +46,9 @@ const bgmCache    = {};
 const pendingStops = new WeakMap();
 
 // SFX cache: { [sfxId]: Howl[] } — one Howl per variation. Single-sample
-// sounds collapse to a one-element array; variation pools (combat hits) hold
-// one Howl per uploaded sample so playSfx can pick at random.
+// sounds collapse to a one-element array; variation pools (e.g. crystal taps)
+// hold one Howl per uploaded sample so playSfx can pick at random.
 const sfxCache    = {};
-
-// Combat hit SFXs — get a small random rate jitter on every play so even the
-// same variation sample doesn't sound bit-perfect identical twice in a row.
-// Range: ±SFX_JITTER (so 0.04 → rate falls in [0.96, 1.04]).
-const COMBAT_HIT_SFX = new Set([
-  'combat_hit_player', 'combat_hit_enemy', 'combat_critical',
-  'combat_dodge',      'combat_enemy_die',
-]);
-const SFX_JITTER = 0.04;
 
 // Subscribers for settings changes (useAudio hooks)
 const subscribers = new Set();
@@ -96,9 +87,9 @@ function _createBgmHowl(trackId) {
   if (!config) return null;
 
   // Cache lazily-created howls too — without this, every navigation to a
-  // non-preloaded track (menu, world) creates a fresh Howl whose old
-  // instance becomes an orphan (no longer in bgmHowl, can't be paused on
-  // tab hide, plays through until its scheduled stop fires).
+  // non-preloaded track creates a fresh Howl whose old instance becomes an
+  // orphan (no longer in bgmHowl, can't be paused on tab hide, plays through
+  // until its scheduled stop fires).
   const howl = new Howl({
     src:    config.src,
     loop:   config.loop ?? true,
@@ -313,7 +304,7 @@ const AudioManager = {
    * Play a BGM track. If the same track is already playing, does nothing.
    * Crossfades from the previous track if one is active.
    *
-   * @param {string} trackId - Key from BGM_TRACKS (e.g. 'cultivation', 'combat')
+   * @param {string} trackId - Key from BGM_TRACKS (e.g. 'cultivation')
    * @param {{ fade?: boolean }} [opts]
    */
   playBgm(trackId, { fade = true } = {}) {
@@ -371,10 +362,9 @@ const AudioManager = {
 
   /**
    * Play a one-shot SFX. If the SFX has a variation pool, picks one variant at
-   * random. Combat hit SFXs additionally get a small ±SFX_JITTER rate jitter so
-   * back-to-back triggers never sound bit-perfect identical.
+   * random.
    *
-   * @param {string} sfxId - Key from SFX (e.g. 'ui_click', 'combat_hit_player')
+   * @param {string} sfxId - Key from SFX (e.g. 'ui_click', 'crystal_tap')
    * @param {{ rate?: number, variant?: number, loop?: boolean }} [opts]
    *   rate=1 is normal speed; >1 raises pitch (Pattern Click rising-pitch taps).
    *   variant picks a specific sample from a pool by 1-based index (clamped to
@@ -407,11 +397,7 @@ const AudioManager = {
     // to false) so a cached howl can't carry stale loop state from a prior
     // looped play into a later one-shot.
     howl.loop(!!loop);
-    let finalRate = rate ?? 1;
-    if (COMBAT_HIT_SFX.has(sfxId)) {
-      finalRate *= 1 + (Math.random() * 2 - 1) * SFX_JITTER;
-    }
-    howl.rate(finalRate);
+    howl.rate(rate ?? 1);
     return howl.play();
   },
 
@@ -554,7 +540,7 @@ const AudioManager = {
 
     if (firstTime) {
       // Preload everything now that the context is allowed to run.
-      this.preloadBgm(['cultivation', 'combat']);
+      this.preloadBgm(['cultivation']);
       this.preload();
     }
 

@@ -1004,16 +1004,15 @@ function AppInner() {
   }, [furnace.furnace.cauldrons]);
 
   // ── Furnace codex discovery toasts ──────────────────────────────────────
-  // Diff the codex state and fire a toast + audio cue on each new entry.
-  // Re-uses the achievement-unlock toast/audio path so the discovery moment
-  // feels consistent with other unlock beats.
+  // Diff the codex state and fire a toast on each new entry. addToast already
+  // plays the ui_notify chime, so the discovery moment is cued like every
+  // other notification — no separate sound needed.
   const prevFurnaceCodexRef = useRef(furnace.furnace.codex);
   useEffect(() => {
     const prev = prevFurnaceCodexRef.current || { materials: {}, pills: {}, foundations: {} };
     const next = furnace.furnace.codex || { materials: {}, pills: {}, foundations: {} };
     const fire = (kicker, glyph, label) => {
       notifications.addToast({ type: 'achievement', kicker, glyph, message: label });
-      try { AudioManager.playSfx?.('achievement_unlock'); } catch {}
     };
     for (const id of Object.keys(next.materials || {})) {
       if (!prev.materials?.[id]) {
@@ -1429,13 +1428,11 @@ function AppInner() {
     };
   }, []);
 
-  // BGM: one continuous main track for the whole game; combat-arena swaps to
-  // the combat track and we cross-fade back to main on exit. AudioManager's
-  // playBgm() early-returns when the requested track is already playing, so
-  // navigating between non-combat screens leaves the music untouched.
+  // BGM: one continuous main track plays across the whole game. playBgm()
+  // early-returns when the track is already playing, so navigation leaves the
+  // music untouched; this just re-asserts it (a recovery net if it was stopped).
   useEffect(() => {
-    const trackId = currentScreen === 'combat-arena' ? 'combat' : 'cultivation';
-    AudioManager.playBgm(trackId);
+    AudioManager.playBgm('cultivation');
   }, [currentScreen]);
 
   // Navigate to a screen, optionally carrying a parameter (e.g. region data).

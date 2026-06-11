@@ -7,24 +7,9 @@
         "audio/sfx/ui_click.mp3"
       ]
     },
-    "bgm_menu": {
-      "src": [
-        "/audio/bgm/menu.mp3"
-      ]
-    },
-    "bgm_combat": {
-      "src": [
-        "/audio/bgm/combat.mp3"
-      ]
-    },
     "bgm_cultivation": {
       "src": [
         "audio/bgm/cultivation.mp3"
-      ]
-    },
-    "bgm_world": {
-      "src": [
-        "/audio/bgm/world.mp3"
       ]
     },
     "crystal_evolve": {
@@ -35,26 +20,6 @@
     "ui_notify": {
       "src": [
         "audio/sfx/ui_notify.mp3"
-      ]
-    },
-    "item_craft": {
-      "src": [
-        "audio/sfx/item_craft.mp3"
-      ]
-    },
-    "combat_hit_player": {
-      "variations": [
-        {
-          "src": [
-            "audio/sfx/combat_hit_player_1.mp3"
-          ]
-        },
-        null,
-        {
-          "src": [
-            "audio/sfx/combat_hit_player_3.mp3"
-          ]
-        }
       ]
     },
     "spark_pattern_miss": {
