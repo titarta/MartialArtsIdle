@@ -1,689 +1,1457 @@
 {
-  "realms": {
-    "Tempered Body": "淬体境",
-    "Qi Transformation": "化气境",
-    "True Element": "真元境",
-    "Separation & Reunion": "离合境",
-    "Immortal Ascension": "飞升境",
-    "Saint": "圣人境",
-    "Saint King": "圣王境",
-    "Origin Returning": "归元境",
-    "Origin King": "元王境",
-    "Void King": "虚王境",
-    "Dao Source": "道源境",
-    "Emperor Realm": "帝主境",
-    "Open Heaven": "开天境"
+  "achievements": {
+    "ach_panel_50": {
+      "desc": "打开成就面板 50 次。我们看到你在检查。",
+      "title": "耐心，小草芥"
+    },
+    "ach_unlocked_meta": {
+      "desc": "解锁任意成就。惊喜。这是你的第二个。",
+      "title": "成就解锁"
+    },
+    "all_in": {
+      "desc": "进行一次至少花费1万亿气的生产者购买或升级。",
+      "title": "孤注一掷"
+    },
+    "audio_mute_30m": {
+      "desc": "关闭所有音频30分钟后游玩。",
+      "title": "沉默"
+    },
+    "audio_toggle_10": {
+      "desc": "切换音乐10次。选择立场。",
+      "title": "音乐爱好者"
+    },
+    "bonk": {
+      "desc": "连续点击20次不可交互的UI元素。什么都没有发生。",
+      "title": "敲打"
+    },
+    "cal_double_ninth": {
+      "desc": "在农历九月初九游玩。吉利，或许不。",
+      "title": "劫难之日"
+    },
+    "cal_lunar_new_year": {
+      "desc": "在农历新年游玩。",
+      "title": "农历新年"
+    },
+    "capstone": {
+      "desc": "你没有攀登山峰。你成为了它。",
+      "title": "成为道途"
+    },
+    "daily_100": {
+      "desc": "保持100天登录连续记录。",
+      "title": "百日隐士"
+    },
+    "daily_30": {
+      "desc": "保持30天登录连续记录。",
+      "title": "铁血意志"
+    },
+    "daily_7": {
+      "desc": "保持7天登录连续记录。",
+      "title": "忠心弟子"
+    },
+    "daily_skip_7_claim": {
+      "desc": "连续7天跳过日常奖励，然后领取。值得。",
+      "title": "无日粮"
+    },
+    "gate_hit": {
+      "desc": "触及你的第一个修炼速度关卡。",
+      "title": "铁壁"
+    },
+    "gate_pass_1": {
+      "desc": "第一次通过一个修炼速度关卡。",
+      "title": "穿越之门"
+    },
+    "gate_pass_max": {
+      "desc": "通过最高阶的修炼速度之门。",
+      "title": "铁门"
+    },
+    "hold_30m": {
+      "desc": "持续握持气晶30分钟。雕像模式。",
+      "title": "执守之道"
+    },
+    "hold_5m": {
+      "desc": "持续握持气晶5分钟。",
+      "title": "铁肺"
+    },
+    "hold_60s": {
+      "desc": "持续握持气晶60秒。",
+      "title": "蜡上，蜡下"
+    },
+    "karma_10": {
+      "desc": "在永恒之树上解锁10个业力节点。",
+      "title": "菩提枝"
+    },
+    "karma_50": {
+      "desc": "在永恒之树上解锁50个业力节点。",
+      "title": "菩提树"
+    },
+    "karma_first": {
+      "desc": "在永恒之树上花费你的第一个业力点。",
+      "title": "业力种子"
+    },
+    "karma_full": {
+      "desc": "解锁整个永恒之树。",
+      "title": "菩提冠"
+    },
+    "long_slumber": {
+      "desc": "单次离线获得的气超过你之前总游玩时间的累计气。",
+      "title": "漫长沉眠"
+    },
+    "offline_1h": {
+      "desc": "离线1小时后返回游戏。",
+      "title": "短暂逗留"
+    },
+    "offline_24h": {
+      "desc": "闭关24小时后返回。山不移，心自动。",
+      "title": "闭关修炼"
+    },
+    "offline_30d": {
+      "desc": "离线30天后返回。宗门已将你视作故人。",
+      "title": "老怪物"
+    },
+    "offline_365d": {
+      "desc": "整整一年后回归。欢迎。世界已非昨日模样。",
+      "title": "永恒冬眠"
+    },
+    "offline_7d": {
+      "desc": "离线7天后返回。",
+      "title": "沉睡一个朝代"
+    },
+    "offline_qi_1b": {
+      "desc": "离线累积获得10亿气。",
+      "title": "懒散帝国"
+    },
+    "play_1000h": {
+      "desc": "达到1000小时总游玩时间。",
+      "title": "闲适之道"
+    },
+    "play_100h": {
+      "desc": "达到100小时总游玩时间。",
+      "title": "天地义兄"
+    },
+    "play_500h": {
+      "desc": "达到500小时总游玩时间。",
+      "title": "东洲不眠客"
+    },
+    "producer_42": {
+      "desc": "恰好拥有某一类生产者42个。答案。",
+      "title": "42"
+    },
+    "qis_666": {
+      "desc": "保持恰好每秒666气持续满一秒。",
+      "title": "野兽之数"
+    },
+    "qis_9001": {
+      "desc": "达到每秒9,001气。",
+      "title": "它已超过9000"
+    },
+    "realm_1": {
+      "desc": "踏出修炼之路的第一步。",
+      "title": "初息"
+    },
+    "realm_10": {
+      "desc": "通过淬体的全部十重来锻造你的肉身。",
+      "title": "筑基成就"
+    },
+    "realm_13": {
+      "desc": "掌握气化。你体内的气已非凡夫俗气。",
+      "title": "气化万物"
+    },
+    "realm_14": {
+      "desc": "进入真元境界，驾驭天地之力。",
+      "title": "真元觉醒"
+    },
+    "realm_18": {
+      "desc": "达至分身合一之境。你的神识分裂，同时行走两条道路。",
+      "title": "神识分裂"
+    },
+    "realm_21": {
+      "desc": "踏上超越凡俗的上升之路。",
+      "title": "仙途初升"
+    },
+    "realm_24": {
+      "desc": "与那些超越凡俗之人同行。",
+      "title": "圣者之路"
+    },
+    "realm_27": {
+      "desc": "跻身圣者之巅。",
+      "title": "圣王"
+    },
+    "realm_30": {
+      "desc": "归返万气之源。",
+      "title": "本源归返"
+    },
+    "realm_36": {
+      "desc": "踏入世界之隙，统御其中。",
+      "title": "虚空之王"
+    },
+    "realm_39": {
+      "desc": "在源头触及大道。",
+      "title": "道之源"
+    },
+    "realm_46": {
+      "desc": "破碎诸天，触及开天之境。",
+      "title": "开天"
+    },
+    "reincarnate_1": {
+      "desc": "首次进行转生。",
+      "title": "三界轮回"
+    },
+    "reincarnate_10": {
+      "desc": "转生十次。你记得每一世生命。",
+      "title": "超越轮回"
+    },
+    "reincarnate_2": {
+      "desc": "第二次转生。事情变得容易了，不是吗。",
+      "title": "第二春"
+    },
+    "reincarnate_lowest": {
+      "desc": "在最低可用的境界阈值处主动转生。",
+      "title": "林家弃徒"
+    },
+    "restless": {
+      "desc": "5分钟内切换屏幕100次。选一个吧，道友。",
+      "title": "不安"
+    },
+    "settings_all": {
+      "desc": "至少触及一次所有设置。",
+      "title": "设置鉴赏家"
+    },
+    "shop_100_visits": {
+      "desc": "访问商店 100 次。常贫常笑。",
+      "title": "白菜商人"
+    },
+    "shop_first_skin": {
+      "desc": "购买第一个装扮皮肤。",
+      "title": "虚荣"
+    },
+    "spark_100": {
+      "desc": "捕获100个气火花。",
+      "title": "气火花猎手"
+    },
+    "spark_1000": {
+      "desc": "捕获1,000个气火花。",
+      "title": "气火花贤者"
+    },
+    "spark_drought": {
+      "desc": "连续1小时不见一个气火花。风已止息。",
+      "title": "旱灾"
+    },
+    "spark_first": {
+      "desc": "捕获你的第一个气火花。",
+      "title": "初始气火花"
+    },
+    "sprite_tickle_100": {
+      "desc": "点击修仙者头像100次。他感受到了。",
+      "title": "逗乐大师"
+    },
+    "tap_100": {
+      "desc": "达到100次终身气晶点击。",
+      "title": "轻如鸿毛"
+    },
+    "tap_100k": {
+      "desc": "达到100,000次终身气晶点击。",
+      "title": "石槌"
+    },
+    "tap_10k": {
+      "desc": "达到10,000次终身气晶点击。",
+      "title": "造物之手"
+    },
+    "tap_1m": {
+      "desc": "累计轻点气晶100万次。你的手机还撑得住。",
+      "title": "崩山之力"
+    },
+    "tap_burst_100": {
+      "desc": "10秒内轻点100次。我们为你担心。",
+      "title": "腕隧症侯群"
+    },
+    "tap_dancer": {
+      "desc": "以60拍/分的节奏轻点气晶30秒。节奏很重要。",
+      "title": "轻点舞者"
+    },
+    "tap_first": {
+      "desc": "首次轻点气晶。",
+      "title": "初次触碰"
+    },
+    "tap_rate_12": {
+      "desc": "在一秒内轻点气晶12次。",
+      "title": "蜂鸟"
+    },
+    "time_all_brackets": {
+      "desc": "在24小时内的四个时段（夜间、清晨、午间、傍晚）各至少游玩一次。",
+      "title": "天空守望者"
+    },
+    "time_early_bird": {
+      "desc": "在本地时间凌晨5点至7点之间突破一个境界。",
+      "title": "早起鸟儿"
+    },
+    "time_lunch": {
+      "desc": "在工作日的正午至下午1点之间游玩至少10分钟。",
+      "title": "午休时光"
+    },
+    "time_midnight_tap": {
+      "desc": "在当地时间00:00:00时点击气晶。",
+      "title": "巫术时刻"
+    },
+    "time_night_owl": {
+      "desc": "在当地时间凌晨1点至4点之间突破境界。",
+      "title": "夜猫子"
+    },
+    "tutorial_all": {
+      "desc": "阅读所有教程卡牌。",
+      "title": "你知道吗?"
+    }
   },
-  "stages": {
-    "Layer 1": "第一重",
-    "Layer 2": "第二重",
-    "Layer 3": "第三重",
-    "Layer 4": "第四重",
-    "Layer 5": "第五重",
-    "Layer 6": "第六重",
-    "Layer 7": "第七重",
-    "Layer 8": "第八重",
-    "Layer 9": "第九重",
-    "Layer 10": "第十重",
-    "Early Stage": "初期",
-    "Middle Stage": "中期",
-    "Late Stage": "后期",
-    "Peak Stage": "巅峰",
-    "1st Stage": "第一阶",
-    "2nd Stage": "第二阶",
-    "3rd Stage": "第三阶"
-  },
-  "worlds": {
+  "discipleTiers": {
     "1": {
-      "name": "凡人之地",
-      "realms": "淬体境 → 真元境",
-      "description": "薄雾笼罩的宗门大院，前方耸立着朱金两色的礼仪大门，石刻铭文柱与风化守护石像林立两侧。竹林在演武场后方苍翠挺立，苍白的远山没入永恒的云雾之中。空气中弥漫着粉笔灰尘与多年弟子修炼所留残余灵气的气息。"
+      "rank": "外门弟子"
     },
     "2": {
-      "name": "远古边疆",
-      "realms": "离合境 → 飞升境",
-      "description": "一片广袤的荒地，橙红色的大地干裂，纹理如同古老陶器。坍塌的石拱门与残破的关隘结构从沙漠地表突兀而出，旁边散落着巨大的漂白骨骸。一座巨型锈蚀炼丹炉矗立于废墟核心——四周一片死寂，唯有它巍然屹立。"
+      "rank": "内门弟子"
     },
     "3": {
-      "name": "禁忌之地",
-      "realms": "圣人境 → 圣王境",
-      "description": "一条禁忌的石质走廊，两侧排列着古老守护石像，其眼中燃烧着冰冷的绿色灵火。在哨兵的行列之后，一座黑暗宫殿矗立其中，封印门槛上绿色火炬长明。空气凝滞而沉重，弥漫着久逝者的灵气，寂静中唯有远处古战封印的共鸣声若隐若现。"
+      "rank": "核心弟子"
     },
     "4": {
-      "name": "元源深渊",
-      "realms": "归元境 → 元王境",
-      "description": "一处广阔的地下洞窟，由一对龙首石柱照亮，瀑布从柱间倾泻而下，汇入一片发光的元气之池。青绿色晶体群簇生于洞壁之上，将幽冷的光芒投入黑暗之中。古老盘根错节的巨根从头顶高不可及的天花板垂下，空气中充盈着远古大地之力的磅礴压迫。"
+      "rank": "剑弟子"
     },
     "5": {
-      "name": "虚空之海",
-      "realms": "虚王境 → 帝主境",
-      "description": "一片破碎的虚空，深品红色的天空被参差的能量裂缝撕裂，浮悬着道文刻碑。一座孤零零的石门矗立于地平线上崩碎的土地之上，一个阴阳符号在带电的寂静中从头顶缓缓飘过。地面裂如旧陶——这是一片不断在边缘碎裂消解的空间中唯一坚实的地表。"
+      "rank": "长老"
     },
     "6": {
-      "name": "开天境域",
-      "realms": "开天境第一层 → 开天境第六层",
-      "description": "一片无垠的开天境域，金光与白光令人目眩，刻满铭文的巨柱从无缝的天界地面升入延伸至无穷的云层之中。仙鹤在柱间辉煌的雾霭中无声滑翔。单是环境压力便足以将任何尚未跨越开天门槛的存在彻底湮灭。"
+      "rank": "大长老"
+    },
+    "7": {
+      "rank": "殿主"
+    },
+    "8": {
+      "rank": "宗主"
+    },
+    "9": {
+      "rank": "族长"
+    },
+    "10": {
+      "rank": "祖仙"
     }
   },
-  "regions": {
-    "Outer Sect Training Grounds": "外门演武场",
-    "Borderland Wilds": "边荒野地",
-    "Bandit's Crossing": "山匪渡口",
-    "Qi-Vein Ravines": "气脉峡谷",
-    "Misty Spirit Forest": "迷雾灵林",
-    "Shattered Sky Desert": "破天沙漠",
-    "Demon Beast Plains": "妖兽平原",
-    "Sunken Immortal City": "沉没仙城",
-    "Blood Sea Wastes": "血海荒原",
-    "Saint Burial Grounds": "圣人墓地",
-    "Void Rift Expanse": "虚空裂缝荒原",
-    "Nine-Death Mountain Range": "九死山脉",
-    "Sealed War Altar": "封印战祭坛",
-    "Origin Qi Spring Depths": "元气泉源深处",
-    "World Root Caverns": "世界根脉洞窟",
-    "Ancient Root Grotto": "古根石窟",
-    "Primordial Forest Core": "洪荒林核",
-    "Ancient Origin Altar": "远古元源祭坛",
-    "Fractured Space Corridors": "破碎空间走廊",
-    "Void Sea Shores": "虚空海岸",
-    "Dao Inscription Ruins": "道文铭文废墟",
-    "Ancient Emperor Tomb": "远古帝陵",
-    "Heaven Sword Ridge": "天剑山脊",
-    "Heaven Pillar Ascent": "天柱登升处",
-    "Star Sea Approaches": "星海入口",
-    "Celestial Rift Expanse": "天界裂缝荒原",
-    "Heaven's Core": "天界核心"
-  },
-  "enemies": {
-    "outer_sect_disciple": {
-      "name": "外门弟子",
-      "description": "一位身着朴素白色训练道袍的年轻修士，手持一柄基础木制练习剑，摆出笨拙却充满热忱的架势。"
+  "eternalTree": {
+    "beast": {
+      "description": "在多个生命中解锁兽约隐秘功法。(敬请期待。)",
+      "label": "兽王竞技场"
     },
-    "training_golem": {
-      "name": "训练傀儡",
-      "description": "一尊矮壮的泥土与铁质自动机，身上印有宗门封印，以耐久著称而非伤害——其双拳为钝铁球体。"
+    "bloom": {
+      "description": "每个生命开始时已获得50灵露和翠绿灵汤配方。",
+      "label": "灵花盛开"
     },
-    "wolf": {
-      "name": "群狼",
-      "description": "一头精瘦的灰毛狼，双眼隐隐发光，显示其多年游弋于灵气丰沛的荒野中略有所得。"
+    "cauldron_2": {
+      "description": "经络炼丹炉增加 1 个釜鼎（2 个并行烹饪）。",
+      "label": "第二炉鼎"
     },
-    "bandit_scout": {
-      "name": "山匪斥候",
-      "description": "一名精干的战士，身着粗劣的拼凑甲胄，携带一把短刃，以靠埋伏求生者特有的老练身手潜行而动。"
+    "cauldron_3": {
+      "description": "经络炉中增加1个鼎炉（3个并行烹饪）。",
+      "label": "第三炉鼎"
     },
-    "wandering_beast": {
-      "name": "游荡妖兽",
-      "description": "一头庞大、蓬毛的四肢巨兽，没有固定领地，皮毛上布满多年游荡危险荒野所留下的伤疤。"
+    "cauldron_4": {
+      "description": "经络炉中增加1个鼎炉（4个并行烹饪）。",
+      "label": "第四炉鼎"
     },
-    "rogue_disciple": {
-      "name": "叛道弟子",
-      "description": "一名前宗门成员，身着褴褛污迹斑斑的修炼道袍，身上留着禁忌气功技法的伤疤，眼神中透露出一无所有者的决绝。"
+    "cauldron_5": {
+      "description": "经络炉中增加1个鼎炉（5个并行烹饪）。",
+      "label": "第五炉鼎"
     },
-    "iron_fang_wolf": {
-      "name": "铁牙狼",
-      "description": "一头体型巨大的狼，长年在远古平原游荡、吸收矿物灵气，牙齿密度堪比铁，皮毛也已硬化。"
+    "coffers": {
+      "description": "所有生产者的气/秒产出增加15%。",
+      "label": "无尽库藏"
     },
-    "iron_spine_boar": {
-      "name": "铁脊野猪",
-      "description": "一头矮壮而凶猛的野猪，其背脊上的毛刺因在富含矿物的平地上觅食而钙化为坚如铁质的长刺。俯首以蛮力猛冲。"
+    "core": {
+      "description": "转生时保留气晶等级的25%。",
+      "label": "不灭之核"
     },
-    "sand_dragon": {
-      "name": "沙漠蛟龙",
-      "description": "一条蜿蜒的蛟龙，鳞片经阳光漂白，边缘锋利如刀，在沙漠中如水般穿行。从地下突然跃起袭击猎物，拖曳一片飞沙。"
+    "crystal": {
+      "description": "解锁新的气晶升级线路，在升级选项卡中用气购买。（即将推出。）",
+      "label": "晶澈之心"
     },
-    "bone_construct": {
-      "name": "骸骨傀儡",
-      "description": "一台由陨落仙人的骸骨融合拼装而成的活动战争机器，以残余战气和锈蚀阵法封印束缚在一起。凡古代亡者遍布之地皆可见其踪影。"
+    "disc_base": {
+      "description": "弟子生产者输出翻倍（对整个名册的平直加成；与千弟之力叠加）。",
+      "label": "弟子根基"
     },
-    "city_guardian": {
-      "name": "城池守护傀儡",
-      "description": "一尊高大的黑铁与玉石人形傀儡，胸前刻有沉没仙城的徽纹，依旧忠诚地在其主人已死去已久的水淹殿堂中巡逻。"
+    "disc_transcend": {
+      "description": "为你的弟子生产者解锁超越级（在神话之上）。宗门花名册也获得超越者阶级，置于祖先之上。",
+      "label": "超越弟子"
     },
-    "immortal_shade": {
-      "name": "困缚仙魂",
-      "description": "一位仙人修士的幽灵残影，在城市沉入地下时被困于此。其形态在实体与虚魂之间闪烁，被一个未竟的誓言永恒束缚。"
+    "echoes": {
+      "description": "在多个生命周期解锁宝库隐秘之艺。（敬请期待。）",
+      "label": "祖先回响"
     },
-    "corrupted_cultivator": {
-      "name": "腐化修士",
-      "description": "一名前宗门弟子，修炼灵气已吞噬其神志。道袍碎裂，皮下经脉明显发黑，双眼因气乱而一片空洞。"
+    "eternal_alchemy": {
+      "description": "保留 1 个筑基丹效果穿越转生。（最强效果被保留。）",
+      "label": "永恒炼丹"
     },
-    "blood_leviathan": {
-      "name": "血海巨兽",
-      "description": "一头庞大的海兽，数百年来以血海为食，鳞片已变为深红。它移动时拖曳着腐蚀性的红色蒸汽，以其整个躯体为武器猛扑而来。"
+    "foundation": {
+      "description": "转生后保留已解锁生产者数量的 20%。",
+      "label": "永恒基础"
     },
-    "burial_guardian": {
-      "name": "墓地守卫",
-      "description": "一名魁梧的铠甲战士，其魂魄被永久封缚于墓地作为永恒哨兵。古老铠甲华丽却已锈蚀，行动间带着数百年未曾休憩之物特有的诡异静默。"
+    "frugal": {
+      "description": "生产者购买成本降低 5%。",
+      "label": "节俭修行"
     },
-    "saint_corpse_soldier": {
-      "name": "圣人尸兵",
-      "description": "一具保存完好的圣人境武者遗骸，仍身着战甲，以死握之力紧握武器。誓约封印的符文在其胸口发光，无论遭受多少伤害都驱使其前进。"
+    "furnace": {
+      "description": "丹药精炼每次轮回保持解锁。",
+      "label": "永恒丹炉"
     },
-    "void_rift_predator": {
-      "name": "虚空裂缝掠夺者",
-      "description": "一种诞生于裂缝撕裂处的生物，其身体部分地相位于两个维度之间。当它在实体空间与虚空之间穿梭时，会从意料之外的角度发动攻击。"
+    "garden": {
+      "description": "灵园每次轮回保持解锁。",
+      "label": "永恒灵园"
     },
-    "rift_stalker": {
-      "name": "裂缝潜行者",
-      "description": "裂缝生态系统中一种更精瘦、更快速的掠夺者。通过跨越维度边界追踪灵气特征来猎杀，从裂缝内部发动伏击。"
+    "guidance": {
+      "description": "生产者每拥有一个前置类型生产者，其气/秒提升 0.5%。",
+      "label": "前辈指引"
     },
-    "saint_bone_sovereign": {
-      "name": "圣人骸骨君主",
-      "description": "一具圣人境君主的复生骸骨，对死亡灵气的掌控绝对无上。它以山脉为领地，从山口之巅统率低阶亡灵。"
+    "hand": {
+      "description": "弟子配置消耗20%更少的功德。",
+      "label": "开放之手"
     },
-    "void_shade": {
-      "name": "虚空幽影",
-      "description": "一个来自虚空、寄居于诅咒山道的阴影实体。它没有实体形态，只有集中虚空能量的轮廓，接触时会吸取灵气。"
+    "heaven": {
+      "description": "激活任何加成时，获得+25%气。",
+      "label": "天眷者"
     },
-    "forbidden_construct": {
-      "name": "禁制傀儡",
-      "description": "一台被封印在祭坛内数百年的高大战争自动机，一直守护着封印铭文。其启动本属禁忌——直到你跨越了门槛。"
+    "lattice": {
+      "description": "气晶等级消耗20%更少的气来蓄养。",
+      "label": "密集格局"
     },
-    "ancient_war_spirit": {
-      "name": "远古战争灵魂",
-      "description": "一名战士的束缚灵魂，在一场远古战争期间被封印入祭坛。依旧紧握着它殉道的信念，其怒火未因岁月而丝毫消减。"
+    "linger": {
+      "description": "灵露花园仙丹加成持续30%更久。",
+      "label": "流转之酿"
     },
-    "origin_guardian": {
-      "name": "元源守护者",
-      "description": "一尊由压缩元气凝聚而成的巨型人形，永久驻守于深渊入口。其躯体每迈出一步都散发出令人窒息的洪荒压迫。"
+    "mastery": {
+      "description": "强化每项隐秘武艺的奖励。（即将推出——效果正与小游戏一同定义。）",
+      "label": "隐秘武艺精通"
     },
-    "origin_crystal_golem": {
-      "name": "元源晶石傀儡",
-      "description": "一具由元气泉中生长的晶体构造而成的傀儡。其攻击会从嵌入拳中的晶体中迸发出原始洪荒能量。"
+    "merit": {
+      "description": "每次轮回多获得10%业力。",
+      "label": "无尽功德"
     },
-    "primordial_serpent": {
-      "name": "洪荒巨蟒",
-      "description": "一条自上古时代便在世界根脉洞窟中捕猎的巨蟒。数千年的矿物吸收使其鳞片已硬化至世界岩石的密度。"
+    "n_1": {
+      "description": "每花在永恒之树上的业力，获得+0.1%气/秒。",
+      "label": "执道之心"
     },
-    "cavern_elder_demon": {
-      "name": "洞穴元老恶魔",
-      "description": "一头与洞穴融合了无数世纪的恶魔，其躯体部分由石头与根系构成。在移动之前，它几乎与洞壁融为一体。"
+    "potency": {
+      "description": "灵露花园仙丹加成强度提升20%。",
+      "label": "翠绿效力"
     },
-    "forest_spirit": {
-      "name": "林间幽灵",
-      "description": "一个在根脉洞穴中飘荡的发光灵体，被古老根系中凝聚的世界能量所吸引。平时温顺——受到打扰时则极为危险。"
+    "resonance": {
+      "description": "生产者每拥有同类型的一个生产者，气/秒增加+1%。",
+      "label": "宗门共鸣"
     },
-    "root_sovereign": {
-      "name": "根脉君主",
-      "description": "根脉网络的主宰力量，一个庞大的实体，其躯体由世界树最粗壮的根系交织而成。极度具有领地意识，将所有入侵者视为寄生虫。"
+    "roster": {
+      "description": "花名册（弟子晋升）每次轮回保持解锁，而非等到弟子再次达到神话阶才重新解锁。",
+      "label": "永恒花名册"
     },
-    "ancient_beast": {
-      "name": "远古巨兽",
-      "description": "一头古老到早于当今修炼时代的巨兽。其本能已磨砺至极致，其躯体承载着十万年生存岁月的分量。"
+    "rspark": {
+      "description": "永久气火花加成强度提升25%。",
+      "label": "共鸣气火花"
     },
-    "world_root_wraith": {
-      "name": "世界根脉幽魂",
-      "description": "一个从世界树根脉的生命力中具现而出的幽灵守护者。它穿行于根脉网络中，拦截一切威胁林核之物。"
+    "soil": {
+      "description": "灵露花园作物生长速度快20%。",
+      "label": "肥沃之土"
     },
-    "deep_earth_titan": {
-      "name": "深地巨神",
-      "description": "远古元源祭坛的唯一守护者——一个质量如此之大以至于其脚步能震裂基岩的实体。没有任何生物能在其压力场的范围内存活。"
+    "star": {
+      "description": "+50%弟子棋盘加成：每点棋盘提升弟子气/秒1.5%而非1%。",
+      "label": "明星弟子"
     },
-    "spatial_fissure_beast": {
-      "name": "空间裂缝巨兽",
-      "description": "一种原生于破碎空间走廊的生物，其躯体已适应在部分坍塌的维度中生存。它将裂缝用作猎场。"
+    "thousand": {
+      "description": "弟子生产者产出翻倍。",
+      "label": "千弟子"
     },
-    "qi_beast": {
-      "name": "感气妖兽",
-      "description": "一种完全依靠灵气特征进行捕猎的虚空适应型掠夺者。对物理伪装视而不见，能够跨越维度边界追踪修士。"
-    },
-    "void_elemental": {
-      "name": "虚空元素体",
-      "description": "一种在破碎走廊中凝聚而成的纯粹虚空能量显现。它没有躯体，只有一团集中的否定之力。"
-    },
-    "void_sea_leviathan": {
-      "name": "虚空海巨兽",
-      "description": "一头已适应虚空之海无水环境的巨型海兽，游弋于纯粹的空间能量之中。其质量之大足以将维度边界推开。"
-    },
-    "dao_inscription_guardian": {
-      "name": "道文铭文守护者",
-      "description": "一具被铭文阵法束缚于废墟中、无休止地守护其奉命保护的道文碑的傀儡。任何干扰铭文者皆遭其攻击。"
-    },
-    "dao_inscription_revenant": {
-      "name": "道文铭文复生者",
-      "description": "一名试图破译道文碑而亡者的残影。其意识被吸收入铭文阵法，如今化身为凶猛的守护者。"
-    },
-    "emperor_will_fragment": {
-      "name": "帝主意志残片",
-      "description": "一块远古帝主临终意志的碎片，仍携带着足以显现为半实体力量的威权。它本能地攻击闯入者，以本能守护陵寝。"
-    },
-    "petrified_dao_lord": {
-      "name": "石化道主",
-      "description": "一位被封印在帝陵内作为最后防线的道主。其肉身已化为石头，但道的领悟依然完整——以纯粹的道理作战。"
-    },
-    "star_sea_drifter": {
-      "name": "星海漂泊者",
-      "description": "一个被天剑山脊灾难性道之汇聚从星海拉来的实体。它孤独地捕猎，迷失方向、充满攻击性，远离其本土虚空。"
-    },
-    "heaven_pillar_guardian": {
-      "name": "天柱守护者",
-      "description": "一个被束缚于开天境铭文石柱的天界哨兵，维护着境界之间的边界。它不给任何人通行谈判的机会。"
-    },
-    "boundary_wraith": {
-      "name": "边界幽魂",
-      "description": "一个由境界边界残余灵压所形成的幽魂。它在开天境的门槛处飘荡，猎食逗留于登升之路的修士。"
-    },
-    "open_heaven_beast": {
-      "name": "开天境妖兽",
-      "description": "一头原生于开天境的妖兽，自出生起躯体便已饱含天阶灵气。即便是其休憩状态也会散发出堪比巅峰帝主境修士的压迫。"
-    },
-    "star_sea_leviathan": {
-      "name": "星海巨兽",
-      "description": "一头从星海穿越坍塌边界进入开天境的巨兽。其体形使凡人世界的一切都相形见绌。"
-    },
-    "celestial_sovereign": {
-      "name": "天界君主",
-      "description": "一位开天境君主，统辖天界裂缝的一个领域。在其领地内，对空间能量的掌控绝对无上。"
-    },
-    "eternal_storm_titan": {
-      "name": "永恒风暴巨神",
-      "description": "一股由裂缝永恒风暴赋予形态的自然之力。它没有意识——只有天界天气所显现的无尽狂暴能量。"
-    },
-    "open_heaven_sovereign": {
-      "name": "开天境至尊",
-      "description": "开天境的最高统治者，其道的领悟已超越凡人世界所能达到的一切。与它相遇是飞升的最终考验。"
-    },
-    "void_apex_predator": {
-      "name": "虚空顶级掠夺者",
-      "description": "虚空中的终极掠夺者，曾历经多个境界的崩塌而存活。将天界君主视为猎物取乐，并将飞升中的修士当作猎物。"
+    "vigil": {
+      "description": "离线时获得30%更多气。",
+      "label": "不断守望"
     }
   },
-  "items": {
-    "iron_herb_1": {
-      "name": "宗门地草",
-      "desc": "一种生长于凡人修士训练之处的野草，吸收宗门地气中的残余灵气。"
+  "furnaceFoundations": {
+    "foundation_crucible": {
+      "desc": "此次轮回突破消耗永久-3%。",
+      "name": "筑基炉鼎丹"
     },
-    "iron_herb_2": {
-      "name": "边荒草根",
-      "desc": "在边荒野地中发现的一种盘根错节的草根，受土壤中微弱灵气所吸引。"
+    "foundation_frugal": {
+      "desc": "此次轮回生产者购买消耗永久-3%。",
+      "name": "筑基节俭丹"
     },
-    "bronze_herb_1": {
-      "name": "气脉藤",
-      "desc": "一种沿地下气脉生长的攀援藤蔓，其叶片隐隐散发着微光。"
+    "foundation_radiance": {
+      "desc": "此次轮回气/秒永久+4%。后期内容。",
+      "name": "筑基辉耀丹"
     },
-    "bronze_herb_2": {
-      "name": "灵林花",
-      "desc": "一种只在迷雾灵林中绽放的淡色花朵，由林间灵体授粉。"
+    "foundation_root": {
+      "desc": "此次轮回业力获取永久+3%。",
+      "name": "筑基根源丹"
     },
-    "silver_herb_1": {
-      "name": "破天银莲",
-      "desc": "一种在破天沙漠废墟中存活的银色莲花，从深层地脉中汲取水分。"
+    "foundation_tide": {
+      "desc": "此次轮回离线气追赶永久+5%。",
+      "name": "筑基潮汐丹"
     },
-    "silver_herb_2": {
-      "name": "血海苇草",
-      "desc": "一种生长在血海边缘的血红色苇草，其汁液中含有浓厚的腐化生命之力。"
-    },
-    "gold_herb_1": {
-      "name": "圣葬幽莲",
-      "desc": "一种只在圣人级墓地上方绽放的暗色莲花，以数百年的死亡灵气为食。"
-    },
-    "gold_herb_2": {
-      "name": "虚空荆藤",
-      "desc": "一种穿裂缝生长的带刺藤蔓，其倒钩之锋利足以刺穿圣人级防御。"
-    },
-    "transcendent_herb_1": {
-      "name": "元源花瓣",
-      "desc": "由世界元气泉源处生长的花朵所脱落的花瓣，充盈着洪荒之力。"
-    },
-    "transcendent_herb_2": {
-      "name": "开天灵藤",
-      "desc": "一种传奇藤蔓，其根系延伸至开天境本身，引导天阶能量。"
-    },
-    "iron_mineral_1": {
-      "name": "宗门铁片",
-      "desc": "从宗门傀儡、训练器材以及凡人修士铁质物品上脱落的铁阶材料碎片。"
-    },
-    "iron_mineral_2": {
-      "name": "铁脉矿片",
-      "desc": "从浅层矿脉中提取的致密铁矿碎片，用于基础炼化。"
-    },
-    "bronze_mineral_1": {
-      "name": "气牙",
-      "desc": "来自长年吸收地脉灵气而矿物密度极高的妖兽的獠牙或骨刺碎片。"
-    },
-    "bronze_mineral_2": {
-      "name": "灵木核心",
-      "desc": "来自灵体或古树的硬化核心，渗透着浓缩的林间灵气。"
-    },
-    "silver_mineral_1": {
-      "name": "铁脊鳞片",
-      "desc": "来自远古边疆铁阶掠夺者的鳞片或脊骨段，致密度足以偏转银阶攻击。"
-    },
-    "silver_mineral_2": {
-      "name": "仙阵玉石",
-      "desc": "注入了沉没仙人废墟阵法的玉石，仍含有其原始铭文的残余痕迹。"
-    },
-    "gold_mineral_1": {
-      "name": "圣人骨片",
-      "desc": "从圣人境遗骸中取得的骨骼碎片，散发着难以炼化的冰冷死亡灵气。"
-    },
-    "gold_mineral_2": {
-      "name": "禁印碎片",
-      "desc": "曾封印禁忌之地的虚空封印碎片，隐隐散发着被压制的力量。"
-    },
-    "transcendent_mineral_1": {
-      "name": "虚空晶石",
-      "desc": "在裂缝撕裂处中生长的晶体，其结构完全由压缩虚空能量形成。"
-    },
-    "transcendent_mineral_2": {
-      "name": "世界石核",
-      "desc": "在世界最深层地层中形成或由上天巨神脱落的极致致密石核，仅用于最高阶的炼化。"
-    },
-    "iron_cultivation_1": {
-      "name": "铁阶灵气石 一",
-      "desc": "一块自然形成的石头，在凡人境修炼场中随时间积累环境灵气。"
-    },
-    "iron_cultivation_2": {
-      "name": "铁阶灵气石 二",
-      "desc": "残留灵气在被击败的凡人修士或妖兽上方聚结，短暂可见后消散。"
-    },
-    "bronze_cultivation_1": {
-      "name": "铜阶灵气石 一",
-      "desc": "在多年以灵能为食的妖兽核心处发现的致密灵气核，死后依然微微跳动。"
-    },
-    "bronze_cultivation_2": {
-      "name": "铜阶灵气石 二",
-      "desc": "从能量通道被腐化或粉碎的陨落修士或傀儡身上撕扯下来的结晶灵气碎片。"
-    },
-    "silver_cultivation_1": {
-      "name": "银阶灵气石 一",
-      "desc": "在远古边疆生物深处发现的类骨髓灵气凝结物，历经数百年灵气吸收而饱和。"
-    },
-    "silver_cultivation_2": {
-      "name": "银阶灵气石 二",
-      "desc": "一个在仙人级实体死亡后残留的魂力碎片，仍携带着其修炼的回声。"
-    },
-    "gold_cultivation_1": {
-      "name": "金阶灵气石 一",
-      "desc": "一块从墓地和战祭坛中取得的圣人境灵气钙化遗物。"
-    },
-    "gold_cultivation_2": {
-      "name": "金阶灵气石 二",
-      "desc": "在被虚空侵染的掠夺者和幽影体内形成的小型珍珠，含有压缩的虚空属性能量。"
-    },
-    "transcendent_cultivation_1": {
-      "name": "超凡灵气石 一",
-      "desc": "一个洪荒实体的结晶灵气核——由数百万年不间断的修炼凝缩而成。"
-    },
-    "transcendent_cultivation_2": {
-      "name": "超凡灵气石 二",
-      "desc": "从已超越凡人极限的实体中提取的纯天阶灵气晶体。"
-    },
-    "iron_essence_pill":          { "name": "铁阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_soul_pill":             { "name": "铁阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_body_pill":             { "name": "铁阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_fist_pill":             { "name": "铁阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_ember_pill":            { "name": "铁阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_mind_pill":             { "name": "铁阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_skin_pill":             { "name": "铁阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_ward_pill":             { "name": "铁阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_anchor_pill":           { "name": "铁阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "iron_vigor_pill":            { "name": "铁阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_essence_pill":        { "name": "铜阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_soul_pill":           { "name": "铜阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_body_pill":           { "name": "铜阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_fist_pill":           { "name": "铜阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_ember_pill":          { "name": "铜阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_mind_pill":           { "name": "铜阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_skin_pill":           { "name": "铜阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_ward_pill":           { "name": "铜阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_anchor_pill":         { "name": "铜阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "bronze_vigor_pill":          { "name": "铜阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_essence_pill":        { "name": "银阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_soul_pill":           { "name": "银阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_body_pill":           { "name": "银阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_fist_pill":           { "name": "银阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_ember_pill":          { "name": "银阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_mind_pill":           { "name": "银阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_skin_pill":           { "name": "银阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_ward_pill":           { "name": "银阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_anchor_pill":         { "name": "银阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "silver_vigor_pill":          { "name": "银阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_essence_pill":          { "name": "金阶元力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_soul_pill":             { "name": "金阶神魂丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_body_pill":             { "name": "金阶体魄丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_fist_pill":             { "name": "金阶铁拳丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_ember_pill":            { "name": "金阶炎火丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_mind_pill":             { "name": "金阶静心丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_skin_pill":             { "name": "金阶铁肤丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_ward_pill":             { "name": "金阶护盾丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_anchor_pill":           { "name": "金阶定锚丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "gold_vigor_pill":            { "name": "金阶活力丹",          "desc": "一颗炼制的丹药，永久提升基础属性。" },
-    "transcendent_essence_pill":  { "name": "超凡精华丹",          "desc": "一颗炼制的丹药，永久提升三项主要属性。" },
-    "exploit_mastery_pill":       { "name": "破绽精通丹",          "desc": "一颗炼制的丹药，永久提升破绽几率与伤害。" },
-    "world_harvest_pill":         { "name": "世界收获丹",          "desc": "一颗炼制的丹药，永久提升采集与采矿速度及幸运。" },
-    "cataclysm_pill":             { "name": "灾变丹",              "desc": "一颗炼制的丹药，永久提升所有伤害类型。" },
-    "dao_bulwark_pill":           { "name": "道之壁垒丹",          "desc": "一颗炼制的丹药，永久提升所有防御类型。" },
-    "eternal_vigor_pill":         { "name": "永恒活力丹",          "desc": "一颗炼制的丹药，永久大幅提升气血上限。" },
-    "iron_blood_core_1": {
-      "name": "铁阶血核 一",
-      "desc": "占位——从陨落敌人身上提取的致密铁阶血核。"
-    },
-    "iron_blood_core_2": {
-      "name": "铁阶血核 二",
-      "desc": "占位——从凡人修士身上凝结而成的结晶铁阶血精。"
-    },
-    "bronze_blood_core_1": {
-      "name": "铜阶血核 一",
-      "desc": "占位——一颗脉动着妖兽生命力的铜阶血核。"
-    },
-    "bronze_blood_core_2": {
-      "name": "铜阶血核 二",
-      "desc": "占位——来自腐化实体的凝结铜阶血气碎片。"
-    },
-    "silver_blood_core_1": {
-      "name": "银阶血核 一",
-      "desc": "占位——充满远古边疆生命力的银阶血核。"
-    },
-    "silver_blood_core_2": {
-      "name": "银阶血核 二",
-      "desc": "占位——来自仙人境实体的残余血晶。"
-    },
-    "gold_blood_core_1": {
-      "name": "金阶血核 一",
-      "desc": "占位——散发着冰冷死亡灵气的圣人级血核。"
-    },
-    "gold_blood_core_2": {
-      "name": "金阶血核 二",
-      "desc": "占位——来自金阶掠夺者的虚空属性血珠。"
-    },
-    "transcendent_blood_core_1": {
-      "name": "超凡血核 一",
-      "desc": "占位——凝缩自超越凡人极限的实体的洪荒血核。"
-    },
-    "transcendent_blood_core_2": {
-      "name": "超凡血核 二",
-      "desc": "占位——散发着压倒性压迫的天阶血晶。"
+    "foundation_verdant": {
+      "desc": "此次轮回气/秒永久+2%（每火热等阶，随等阶递增）。",
+      "name": "筑基翠绿丹"
     }
   },
-  "artefacts": {
-    "iron_sword": {
-      "name": "铁剑",
-      "desc": "一柄为外门弟子锻造的普通铁剑。可靠却平淡无奇。"
+  "furnaceHeat": {
+    "0": {
+      "label": "生坯"
     },
-    "spirit_edge_sword": {
-      "name": "灵刃剑",
-      "desc": "一柄以灵能磨砺的剑；当灵气流过时，剑身会发出微弱的嗡鸣。"
+    "1": {
+      "label": "已锻"
     },
-    "void_cleaver": {
-      "name": "虚空裂刀",
-      "desc": "以虚空石锻造；每一击都会在周围空间织物上撕裂出一道微小的裂缝。"
+    "2": {
+      "label": "精炼"
     },
-    "dragon_fang_sword": {
-      "name": "龙牙剑",
-      "desc": "以龙兽獠牙铸造；将原始的龙之压力灌入每一击之中。"
-    },
-    "heaven_slaying_sword": {
-      "name": "斩天剑",
-      "desc": "一柄传说中曾斩破境界壁障的神剑。其锋刃永不钝化。"
-    },
-    "iron_polearm": {
-      "name": "铁长枪",
-      "desc": "一柄沉重的铁质长杆兵器，因其攻击距离与制停力而受到体修的青睐。"
-    },
-    "serpent_spear": {
-      "name": "蛇牙枪",
-      "desc": "一柄柔韧的长枪，矛尖形如蛇牙，穿透时注入温和的灵毒。"
-    },
-    "mountain_breaker": {
-      "name": "碎山戟",
-      "desc": "一柄宽刃戟，据说曾击倒一座小型灵山。能粉碎物理防御。"
-    },
-    "thunder_lance": {
-      "name": "雷霆战矛",
-      "desc": "一柄涂覆压缩雷矿的长矛；攻击时以雷霆般的爆音引爆。"
-    },
-    "divine_pillar_spear": {
-      "name": "天柱神矛",
-      "desc": "曾是一座天宫的柱石，被重塑为长矛。全力一刺可撕裂空间。"
-    },
-    "spirit_headband": {
-      "name": "灵气头带",
-      "desc": "一条注入基础灵能的简单布带，有助于修炼时集中心神。"
-    },
-    "jade_cultivation_crown": {
-      "name": "玉修冠",
-      "desc": "一顶雕刻玉石冠冕，可稳固神海，减少突破时的动荡。"
-    },
-    "ghost_kings_circlet": {
-      "name": "鬼王箍",
-      "desc": "以鬼铁锻造；削弱灵魂攻击并压制基于神魂的负面效果。"
-    },
-    "heaven_forged_war_crown": {
-      "name": "天锻战冠",
-      "desc": "一顶以天火冶炼的战冠；大幅提升对元素伤害的抗性。"
-    },
-    "crown_of_the_undying": {
-      "name": "不死之冠",
-      "desc": "据说曾被一位开天境修士佩戴；保护灵魂免遭致命的神魂攻击。"
-    },
-    "cotton_spirit_robe": {
-      "name": "棉质灵气道袍",
-      "desc": "以灵线织成的轻便道袍，提供微弱却稳定的气息流通。"
-    },
-    "cloud_silk_battle_vest": {
-      "name": "云绡战甲背心",
-      "desc": "以高空云绡纺织的背心，可偏转轻微的物理与元素攻击。"
-    },
-    "dragon_scale_armour": {
-      "name": "龙鳞铠甲",
-      "desc": "一头较弱的龙兽脱落的鳞片；坚如铁石，能抵御火焰与雷电。"
-    },
-    "phoenix_feather_war_robe": {
-      "name": "凤羽战袍",
-      "desc": "以凤凰绒毛织就；随时间恢复轻微伤害，并能抵御极度高温。"
-    },
-    "heaven_piercing_divine_robe": {
-      "name": "穿天神袍",
-      "desc": "一件顶级道袍，在柔软与钢铁之间转换；抵消低于力量阈值的攻击。"
-    },
-    "iron_bracers": {
-      "name": "铁护腕",
-      "desc": "强化前臂并提升格挡稳定性的基础铁护腕。"
-    },
-    "tiger_claw_gauntlets": {
-      "name": "虎爪拳套",
-      "desc": "仿虎爪造型的拳套；略微提升徒手和长柄武器攻击的伤害。"
-    },
-    "mithril_bracers": {
-      "name": "秘银护腕",
-      "desc": "轻便的秘银护腕，在每次攻击中传导元素能量。"
-    },
-    "dragon_vein_gauntlets": {
-      "name": "龙脉拳套",
-      "desc": "以龙脉矿石穿制的拳套；以明显更快的节奏通过双臂引导灵气。"
-    },
-    "heaven_palm_guards": {
-      "name": "天掌护",
-      "desc": "一位掌法宗师曾穿戴的远古护手；大幅增强开掌秘术。"
-    },
-    "leather_cultivation_belt": {
-      "name": "皮质修炼腰带",
-      "desc": "一条稳固丹田、减少战斗中灵气散逸的结实腰带。"
-    },
-    "spirit_jade_sash": {
-      "name": "灵玉腰带",
-      "desc": "嵌有灵玉珠的丝质腰带；改善上下体之间的气息流通。"
-    },
-    "serpent_skin_belt": {
-      "name": "蛇皮腰带",
-      "desc": "以灵蛇脱皮制成；提升敏捷并增强对毒素的抗性。"
-    },
-    "golden_dragon_belt": {
-      "name": "金龙腰带",
-      "desc": "一条压印盘龙纹样的宽腰带；大幅提升体魄属性转化。"
-    },
-    "void_emperors_sash": {
-      "name": "虚帝腰带",
-      "desc": "以空间线编织的腰带；将一部分受到的伤害吸收进虚空囊袋。"
-    },
-    "wind_step_boots": {
-      "name": "风步靴",
-      "desc": "为迅捷步伐附魔的轻便靴子；略微提升闪避率。"
-    },
-    "swiftcloud_sandals": {
-      "name": "疾云鞋",
-      "desc": "携带微量云能的鞋履；可进行短暂的加速移动。"
-    },
-    "thunderstep_boots": {
-      "name": "雷步战靴",
-      "desc": "蓄积雷电的战靴；每一步接触时释放低功率电击。"
-    },
-    "dragon_treading_boots": {
-      "name": "踏龙战靴",
-      "desc": "以龙兽骨骼锻造；大幅提升地面稳定性与踏地攻击。"
-    },
-    "heaven_soaring_sandals": {
-      "name": "凌天鞋",
-      "desc": "据说能让穿者踏空而行的鞋履；大幅提升闪避与移动系秘术。"
-    },
-    "jade_spirit_pendant": {
-      "name": "灵玉坠",
-      "desc": "一块佩戴于心口附近的磨光玉石；温和地强化神海。"
-    },
-    "soul_calming_necklace": {
-      "name": "定魂项链",
-      "desc": "一串压制神魂波动与战斗中精神负面效果的灵珠。"
-    },
-    "blood_dragon_talisman": {
-      "name": "血龙符",
-      "desc": "一块浸泡过龙兽之血的雕刻骨符；提升原始物理抗性。"
-    },
-    "elemental_core_pendant": {
-      "name": "元素核心吊坠",
-      "desc": "内含一颗压缩元素核；增强元素亲和力加成。"
-    },
-    "heavens_eye_amulet": {
-      "name": "天眼护符",
-      "desc": "一件收容神兽石化眼珠的护符；在战斗中赋予短暂的预知能力。"
-    },
-    "copper_spirit_ring": {
-      "name": "铜灵戒",
-      "desc": "一枚通过经脉引导微弱灵气流的普通铜戒指。"
-    },
-    "jade_focus_ring": {
-      "name": "玉聚焦戒",
-      "desc": "一枚雕刻玉石戒指，锐化元素秘术控制，减少能量浪费。"
-    },
-    "void_stone_ring": {
-      "name": "虚空石戒",
-      "desc": "镶嵌一块虚空石碎片；拥有小型储物空间并提升空间秘术伤害。"
-    },
-    "dragon_blood_ring": {
-      "name": "龙血戒",
-      "desc": "以龙血合金锻造的戒指；大幅加速佩戴者的灵气运行。"
-    },
-    "immortal_soul_ring": {
-      "name": "仙魂戒",
-      "desc": "据说含有一缕仙人灵魂的戒指；大幅增强佩戴者的气速。"
+    "3": {
+      "label": "至臻"
     }
   },
-  "techniques": {},
-  "laws": {
-    "three_harmony_manual": {
-      "name": "三和心经",
-      "flavour": "古籍所言，无火、无暴风、无山岳——唯有万物之间均匀的呼吸。",
-      "realmRequirementLabel": "淬体境"
+  "furnaceMaterials": {
+    "cinnabar_powder": {
+      "name": "朱砂粉"
+    },
+    "dragon_root": {
+      "name": "龙根"
+    },
+    "jade_tincture": {
+      "name": "玉液"
+    },
+    "mint_essence": {
+      "name": "薄荷精华"
+    },
+    "moon_dust": {
+      "name": "月尘"
+    },
+    "phoenix_ash": {
+      "name": "凤凰灰"
+    },
+    "spirit_sediment": {
+      "name": "灵沙"
+    }
+  },
+  "furnacePills": {
+    "calm_pond": {
+      "desc": "+10% 离线气吸收加速，持续4小时。",
+      "name": "静心丹"
+    },
+    "frugal_mind": {
+      "desc": "下一个10次招募弟子消耗减少10%。",
+      "name": "俭心丹"
+    },
+    "inner_flame": {
+      "desc": "下一次突破消耗气减少10%（一次性）。",
+      "name": "内火丹"
+    },
+    "mystery": {
+      "desc": "一枚神秘的丹。服用时效果才会显现。",
+      "name": "??? 丹"
+    },
+    "phoenix_radiance": {
+      "desc": "+10% 气/秒，持续1小时。后期冲刺。",
+      "name": "凤凰辉光丹"
+    },
+    "quiet_tide": {
+      "desc": "-7% 下一个10次招募消耗 且 +5% 离线。",
+      "name": "静潮丹"
+    },
+    "rooted_vigor": {
+      "desc": "+5% 业力获得，持续4小时。",
+      "name": "根力丹"
+    },
+    "spring_flame": {
+      "desc": "+4% 气/秒 且 下一次突破减少5%，持续1小时。",
+      "name": "春焰丹"
+    },
+    "trinity": {
+      "desc": "+3% 气/秒、+3% 突破折扣、+3% 离线。全能。",
+      "name": "三合丹"
+    },
+    "verdant_body": {
+      "desc": "+5% 气/秒，持续2小时（按火层级，可叠加）。",
+      "name": "翠身丹"
+    },
+    "verdant_tide": {
+      "desc": "+4% 气/秒 且 +5% 离线，持续2小时。",
+      "name": "翠潮丹"
+    }
+  },
+  "gardenPlants": {
+    "black_iron_reed": {
+      "name": "黑铁芦"
+    },
+    "cinnabar_bloom": {
+      "name": "朱砂花"
+    },
+    "dragonscale_ginseng": {
+      "name": "龙鳞人参"
+    },
+    "gold_crown_peony": {
+      "name": "金冠牡丹"
+    },
+    "heaven_pierce_bamboo": {
+      "name": "穿天竹"
+    },
+    "jade_lotus_bud": {
+      "name": "玉莲蕾"
+    },
+    "moonleaf_vine": {
+      "name": "月叶藤"
+    },
+    "phoenix_tail_grass": {
+      "name": "凤尾草"
+    },
+    "soul_lily": {
+      "name": "魂莲"
+    },
+    "spirit_mint": {
+      "name": "灵薄荷"
+    }
+  },
+  "gardenRecipes": {
+    "e_jade": {
+      "name": "玉露茶"
+    },
+    "e_spirit": {
+      "name": "灵花仙丹"
+    },
+    "e_verdant": {
+      "name": "翠生补"
+    }
+  },
+  "minigames": {
+    "p_beast_pact": {
+      "mode": "活跃 · 斗兽",
+      "name": "野兽竞技场",
+      "tagline": "将契约之兽推上灵力阶梯。"
+    },
+    "p_disciple": {
+      "mode": "活跃 · 融合网格",
+      "name": "弟子名簿",
+      "tagline": "晋升你的弟子修炼境界。名簿总和提升每位弟子的气输出。"
+    },
+    "p_dragon": {
+      "mode": "活跃 · 推运气",
+      "name": "龙梦",
+      "tagline": "它呼吸时汲取气息；醒前转存。"
+    },
+    "p_herb_garden": {
+      "mode": "懒散 · 侍弄与采收",
+      "name": "灵园",
+      "tagline": "播下灵种、侍弄田地、回返丰收。"
+    },
+    "p_meridian_furnace": {
+      "mode": "活跃 · 计时",
+      "name": "丹药炼制",
+      "tagline": "掌握火焰之心，将珍稀灵材折叠成强效的丹。"
+    },
+    "p_phoenix": {
+      "mode": "活跃·街机",
+      "name": "凤凰烈火",
+      "tagline": "驾驭火焰流转，采集羽毛。"
+    },
+    "p_pillar": {
+      "mode": "活跃·攀爬",
+      "name": "天柱登临",
+      "tagline": "攀登天柱，躲避劫难。"
+    },
+    "p_sect_followers": {
+      "mode": "光源管理",
+      "name": "宗门贡献",
+      "tagline": "调遣万名弟子奉献香火。"
+    },
+    "p_treasure": {
+      "mode": "闲置·插位",
+      "name": "祖灵共鸣",
+      "tagline": "供奉祖先，获得永恒的祝福。"
+    },
+    "p_void": {
+      "mode": "活跃·谜题",
+      "name": "虚空导引",
+      "tagline": "在裂隙封闭前引导其气流。"
+    }
+  },
+  "producers": {
+    "p_beast_pact": {
+      "desc": "你吹一声哨，它们从凡人无法涉足之地归来。虎背缠绕着气风暴。狐舌上闪烁着星光。它们将丰收献至你的门庭。",
+      "name": "灵兽契约"
+    },
+    "p_disciple": {
+      "desc": "一名弟子跪伏在你的庭院中，呼吸均匀，掌心温热。他们从天地间汲取的气，不过一缕细丝。每一缕都使织机更强。",
+      "name": "淬体弟子"
+    },
+    "p_dragon": {
+      "desc": "它在你的丹田中梦想，梦想之一就是你。它盘绕的珠子比山岳更古老。每一次缓缓的吐息，都在你的经络上镀金，赐予你本不该得到的修为。",
+      "name": "沉眠灵龙"
+    },
+    "p_herb_garden": {
+      "desc": "翠叶在晨曦中展开，静静吸干苍天。灵草无法吸收的，都献给你。",
+      "name": "灵草园"
+    },
+    "p_meridian_furnace": {
+      "desc": "青铜之足，密封之盖，永不熄灭的火焰。浊厚的气进入，从经络流出时已浓如黄金。",
+      "name": "经络熔炉"
+    },
+    "p_phoenix": {
+      "desc": "凤凰只在天地共鸣之时降临。它以彩虹之翼拥住你的神魂。每一根羽毛都是一条河流。每一声鸣啼，都是比天地更古老的经文。",
+      "name": "至尊凤凰"
+    },
+    "p_pillar": {
+      "desc": "在你祖父的祖父之前就已刻下的天柱，攀升到云都遗忘它曾是石头的高度。贯穿其间，天地本身都在渗血流入你的丹田。",
+      "name": "天柱"
+    },
+    "p_sect_followers": {
+      "desc": "万名弟子在黎明时醒来，向刻有你印记的殿堂叩拜。每人一粒米汇成山岳。每人一缕气汇成河流。",
+      "name": "凡俗宗门信众"
+    },
+    "p_treasure": {
+      "desc": "你祖先携手百生的翡翠坠子。他们每一次呼吸都留下了痕迹，而今这些痕迹都如潮汐般流回你的体内。",
+      "name": "祖传瑰宝"
+    },
+    "p_void": {
+      "desc": "现实中永不闭合、永不减少的伤口。透过它，异界之气涌入你的世界。另一个宇宙慷慨的贡品。",
+      "name": "虚空导管"
+    }
+  },
+  "qiSparks": {
+    "consecutive_focus_t1": {
+      "description": "维持专注2秒 → 气/秒+5%。",
+      "name": "连续专注"
+    },
+    "consecutive_focus_t2": {
+      "description": "增加：维持专注4秒 → 气/秒额外+7%（共+12%）。",
+      "name": "连续专注"
+    },
+    "consecutive_focus_t3": {
+      "description": "增加：维持专注6秒 → 气/秒额外+13%（共+25%）。",
+      "name": "连续专注"
+    },
+    "consecutive_focus_t4": {
+      "description": "增加：维持专注8秒 → 气/秒额外+15%（共+40%）。",
+      "name": "连续专注"
+    },
+    "consecutive_focus_t5": {
+      "description": "增加：维持专注10秒 → 气/秒额外+20%（共+60%）且进入深层冥想。",
+      "name": "连续专注"
+    },
+    "crystal_click_t1": {
+      "description": "气晶储备你气/秒的30%（最多2分钟）。点击收集。",
+      "name": "晶体蓄能"
+    },
+    "crystal_click_t2": {
+      "description": "升级为储备气/秒的50%（最多3分钟）。点击收集。",
+      "name": "气晶储库"
+    },
+    "crystal_click_t3": {
+      "description": "升级至你气/秒的70%（最多4分钟）。点击收集。",
+      "name": "气晶储库"
+    },
+    "crystal_click_t4": {
+      "description": "升级至你气/秒的85%（最多5分钟）。点击收集。",
+      "name": "气晶储库"
+    },
+    "crystal_click_t5": {
+      "description": "满速率：气/秒的100%（最多6分钟）。点击气晶收集。",
+      "name": "气晶储库"
+    },
+    "divine_qi_t1": {
+      "description": "约每10分钟出现一个金色光球。8秒内点击可获得25秒的气。",
+      "name": "天气"
+    },
+    "divine_qi_t2": {
+      "description": "约每9分钟出现光球，10秒窗口。点击获得35秒的气。",
+      "name": "天气"
+    },
+    "divine_qi_t3": {
+      "description": "约每8分钟出现光球，12秒窗口。点击获得50秒的气。",
+      "name": "天气"
+    },
+    "divine_qi_t4": {
+      "description": "约每7分钟出现光球，15秒窗口。点击获得65秒的气。",
+      "name": "天气"
+    },
+    "divine_qi_t5": {
+      "description": "约每6分钟出现两个光球。收集两个可获得75秒气+气/秒×1.25，持续20秒。",
+      "name": "天气"
+    },
+    "enduring_stream": {
+      "description": "本轮修炼气/秒+1%。可堆叠。",
+      "name": "恒久之流"
+    },
+    "heavens_bond": {
+      "description": "本轮修炼离线气获取+3%。可堆叠。",
+      "name": "天的羁绊"
+    },
+    "legendary_a1_smoke_petal": {
+      "description": "每一对灵草园和经络炉将两者乘以×1.5。园子的翠叶在炉火烟雾中卷曲绽放得更快；炉火品味到灵草的气息而燃烧更炽。",
+      "name": "烟与花瓣"
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "description": "每一对身体淬炼弟子和凡俗宗门追随者将两者乘以×1.75。一名弟子成为焦点；万千香客向他们膜拜。",
+      "name": "万人殿堂"
+    },
+    "legendary_a3_pearl_pendant": {
+      "description": "每一对沉睡灵龙和祖传宝物将两者乘以×2。龙的睡梦珠识得你祖先携带的遗物——它们总是注定要再次找到彼此。",
+      "name": "珍珠与吊坠"
+    },
+    "legendary_a4_climbing_beasts": {
+      "description": "每一对灵兽契约和天柱对全局气/秒增加+10%。虎在午夜爬上天柱直接饮用。它们不告诉狐狸。狐狸最终发现了。",
+      "name": "攀爬之兽"
+    },
+    "legendary_a5_void_garden": {
+      "description": "每一对虚空导管和灵草园将两者乘以×2.5。虚空的渗漏携来异界之种；园子吞噬它们，盛开人眼未曾命名的色彩。",
+      "name": "虚空花园"
+    },
+    "legendary_a6_phoenix_pillar": {
+      "description": "每一对主宰凤凰和天柱将两者乘以×3。凤凰仅停于足够高的栖处。每根柱子都是朝天堂迈进的一步。",
+      "name": "凤凰与天柱"
+    },
+    "legendary_b1_dragon_hoard": {
+      "description": "沉睡灵龙每拥有一件祖传宝物气/秒+25%。龙的珠是你献予它的一切。你保留的每件遗物，它都已折叠入自身。",
+      "name": "龙的宝藏"
+    },
+    "legendary_b3_beast_tribute": {
+      "description": "灵兽契约每拥有一座灵草园气/秒+12%。虎食你种植的灵草。它们归来时更壮、更快、更锐。",
+      "name": "兽类贡品"
+    },
+    "legendary_b4_furnace_sect": {
+      "description": "经络炉每拥有一名身体淬炼弟子气/秒+4%。每名学徒的呼吸都令铜炉的腿更闪耀。炉火向来是宗门的努力。",
+      "name": "宗门之炉"
+    },
+    "legendary_b5_heavens_bend": {
+      "description": "若你拥有至少1座虚空导管，天柱气/秒×2。现实既已撕裂，天堂不再抵抗。",
+      "name": "天堂俯身"
+    },
+    "legendary_b6_phoenix_garden": {
+      "description": "主宰凤凰每拥有一座灵草园气/秒+5%。凤凰仅在土壤是药的地方筑巢。百座园子，百个理由留下。",
+      "name": "凤凰的花园"
+    },
+    "legendary_e2_phoenix_reborn": {
+      "description": "每次境界突破重置凤凰数量为0，但本轮修炼永久增加所有其他生产者气/秒+50%。凤凰涅槃于自身灰烬——祝福其心脏所在的宗门。",
+      "name": "凤凰涅槃"
+    },
+    "legendary_f1_storm_tiger": {
+      "description": "灵兽契约气/秒×2。虎踱步，耳贴头皮。未曾有龙梦其名、凤凰唱回其名前，它不会咆哮。暴风隐在其毛发中只能低声呜鸣。",
+      "name": "风毛虎"
+    },
+    "legendary_f2_pearl_dragon": {
+      "description": "沉睡灵龙气/秒×2。珠听到两个远处的声音时温暖——虎踱步，凤凰折起彩虹翅。唯有此刻梦才完成。",
+      "name": "梦珠龙"
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "description": "主宰凤凰气/秒×2。凤凰的鸣有三个音符。独唱时发一音——某处虎踱步，某处龙做梦。三音合鸣时，天堂低眉。",
+      "name": "虹泣凤凰"
+    },
+    "masters_patience": {
+      "description": "专注此轮的每一秒增加+0.1%气/秒。可堆叠。每层上限+12%。",
+      "name": "大道耐心"
+    },
+    "pattern_click_t1": {
+      "description": "约12分钟出现一个纹路火花。点击开始：3个点，10秒内清除可获得30秒的气。",
+      "name": "描绘经络"
+    },
+    "pattern_click_t2": {
+      "description": "约11分钟出现一个火花。4个点，12秒窗口。完全清除：40秒的气。",
+      "name": "描绘经络"
+    },
+    "pattern_click_t3": {
+      "description": "约10分钟出现一个火花。5个点，14秒窗口。完全清除：55秒的气。",
+      "name": "描绘经络"
+    },
+    "pattern_click_t4": {
+      "description": "约9分钟出现一个火花。6个点，16秒窗口。完全清除：70秒的气。",
+      "name": "描绘经络"
+    },
+    "pattern_click_t5": {
+      "description": "约8分钟出现一个火花。7个点，18秒窗口。完全清除：90秒气+20秒内×1.5气/秒。",
+      "name": "描绘经络"
+    },
+    "quick_burst": {
+      "description": "瞬间获得相当于30秒当前气/秒的气。",
+      "name": "迅速爆发"
+    },
+    "resonant_soul": {
+      "description": "此轮每突破一层境界增加+0.2%气/秒。可堆叠。",
+      "name": "共鸣之魂"
+    },
+    "sect_discipline": {
+      "description": "90秒内，每个生产者获得+1每单位气/秒。弟子随时呼吸。",
+      "name": "宗门纪律"
+    },
+    "sharper_focus": {
+      "description": "此轮剩余时间专注倍数+2%。可堆叠。",
+      "name": "更锐利的专注"
+    },
+    "steady_cultivation": {
+      "description": "此轮剩余时间基础气/秒+0.3。可堆叠。",
+      "name": "稳定修炼"
+    },
+    "steady_stream": {
+      "description": "气/秒+20%，持续60秒。",
+      "name": "稳定流动"
+    },
+    "surging_stream": {
+      "description": "气/秒+50%，持续30秒。",
+      "name": "涌动流动"
+    },
+    "tinkers_bargain": {
+      "description": "接下来5次生产者购买花费-30%气。便宜偏爱早起者。",
+      "name": "工匠讨价还价"
+    }
+  },
+  "rarity": {
+    "Bronze": {
+      "label": "青铜"
+    },
+    "Gold": {
+      "label": "金"
+    },
+    "Iron": {
+      "label": "铁"
+    },
+    "Silver": {
+      "label": "银"
+    },
+    "Transcendent": {
+      "label": "超越"
+    }
+  },
+  "shopBundles": {
+    "bundle_bone_court": {
+      "desc": "修仙者+气晶，一个古冢主题。",
+      "name": "骨庭"
+    },
+    "bundle_frost_sect": {
+      "desc": "修仙者+气晶，一个冰冻主题。",
+      "name": "霜宗"
+    }
+  },
+  "shopItems": {
+    "buff_crimson_aura_12h": {
+      "desc": "×2气/秒，12小时。",
+      "name": "深红光晕——12小时"
+    },
+    "buff_crimson_aura_1h": {
+      "desc": "气 +1/秒，持续 1 小时。修仙者穿着猩红光晕。",
+      "name": "猩红光晕——1 小时"
+    },
+    "buff_crimson_aura_4h": {
+      "desc": "气 +1/秒，持续 4 小时。主动修炼者性价比最佳。",
+      "name": "猩红光晕——4 小时"
+    },
+    "buff_crystal_resonance_30m": {
+      "desc": "每次点击气晶获得 2 倍气，持续 30 分钟。与精细点击升级叠加获得巨大收益。",
+      "name": "气晶共鸣——30 分钟"
+    },
+    "buff_producer_surge_4h": {
+      "desc": "所有弟子基础产率 ×1.5，持续 4 小时。与升级乘法叠加。",
+      "name": "弟子狂潮——4 小时"
+    },
+    "consumable_major_bt_bypass": {
+      "desc": "在下次重大突破时跳过气/秒的限制。你仍需支付气的代价——但无需先提升速率。",
+      "name": "天恩赦免"
+    },
+    "cos_char_bone_patriarch": {
+      "desc": "枯骨宗的衰老长老。与你一起进化经历所有 13 个境界。",
+      "name": "骨族家主"
+    },
+    "cos_char_frost_ascetic": {
+      "desc": "冰峰的风蚀僧人。与你一起进化经历所有 13 个境界。",
+      "name": "冻雪苦行者"
+    },
+    "cos_char_lotus_sage": {
+      "desc": "花瓣绽放于隐士身周。与你一起进化经历所有 13 个境界。",
+      "name": "莲花圣者"
+    },
+    "cos_char_storm_caller": {
+      "desc": "云丝罗衫，眼中闪电。与你一起进化经历所有 13 个境界。",
+      "name": "风雷唤使"
+    },
+    "cos_crystal_frost": {
+      "desc": "冬日修仙者雕琢的冰晶碎片。与你一起进化经历所有 10 个阶层。",
+      "name": "冻晶"
+    },
+    "cos_crystal_ossuary": {
+      "desc": "由古老白骨生长的晶体格子。与你一起进化经历所有 10 个阶层。",
+      "name": "枯骨晶"
+    },
+    "cos_crystal_phoenix": {
+      "desc": "熔岩之火驭于晶体格子。与你一起进化经历所有 10 个阶层。",
+      "name": "凤凰核心"
+    },
+    "cos_particles_c9_0": {
+      "desc": "凝聚虚无的球体。沉静而纯粹。",
+      "name": "虚粒"
+    },
+    "cos_particles_c9_10": {
+      "desc": "复杂的气节点，内部排列有序。",
+      "name": "秘法球"
+    },
+    "cos_particles_c9_11": {
+      "desc": "盘旋的气。承载龙的凝聚力量。",
+      "name": "龙粒"
+    },
+    "cos_particles_c9_12": {
+      "desc": "温暖上升的球体。明亮的内核如火焰重生。",
+      "name": "凤凰球"
+    },
+    "cos_particles_c9_13": {
+      "desc": "闪烁着被困的电荷。永不静止。",
+      "name": "风暴粒"
+    },
+    "cos_particles_c9_14": {
+      "desc": "承载百次雷鸣的记忆。",
+      "name": "雷电球"
+    },
+    "cos_particles_c9_15": {
+      "desc": "巅峰之形。密集、明亮、完美均衡的气。",
+      "name": "至尊粒"
+    },
+    "cos_particles_c9_2": {
+      "desc": "原始气的拖曳缕丝。留下淡淡的发光尾迹。",
+      "name": "缕丝粒"
+    },
+    "cos_particles_c9_3": {
+      "desc": "紧凑的星形球体，闪烁着天界之光。",
+      "name": "星粒"
+    },
+    "cos_particles_c9_4": {
+      "desc": "压缩的气，意图深沉。紧凑的内部光芒。",
+      "name": "密核"
+    },
+    "cos_particles_c9_5": {
+      "desc": "柔软而扩散。如晨雾般融入你。",
+      "name": "雾球"
+    },
+    "cos_particles_c9_6": {
+      "desc": "一种较古老的气显现形式。原始而共鸣。",
+      "name": "原始球"
+    },
+    "cos_particles_c9_7": {
+      "desc": "围绕晶格阵列塑形的气。硬边内部光芒。",
+      "name": "晶体粒"
+    },
+    "cos_particles_c9_8": {
+      "desc": "几近无质的气。光芒多于实质。",
+      "name": "虚灵球"
+    },
+    "cos_particles_c9_9": {
+      "desc": "天阶球。承载遥远、古老的回响。",
+      "name": "天界粒"
+    },
+    "qol_autobuy_cheapest": {
+      "desc": "在宗门界面解锁自动购买开关。启用时，气会自动消耗在最便宜的可用生产单位上。",
+      "name": "弟子的勤勉"
+    },
+    "qol_offline_cap_2h": {
+      "desc": "将离线气积累上限延长2小时。可堆叠至3次（在基础8小时上限之上最多+6小时）。",
+      "name": "耐心之心+2小时"
+    },
+    "qol_skip_bt_confirm": {
+      "desc": "一旦大突破关卡通过，立即自动确认。跳过庆祝停顿。",
+      "name": "果决之心"
+    }
+  },
+  "sparkCopy": {
+    "enduring_stream": {
+      "effectText": "**本轮+1%气/秒**。可堆叠。",
+      "exampleText": "五层堆叠大约合成<strong>+5%总气/秒</strong>。小但可靠，永不过期。",
+      "loreText": "永不停歇之河终成浩瀚之海。"
+    },
+    "heavens_bond": {
+      "effectText": "**本轮+3%离线气率**。可堆叠。",
+      "exampleText": "基础离线率为20%。三层堆叠可提升至<strong>29%离线率</strong>，让你的宗门在你睡眠时修炼得更勤快。",
+      "loreText": "天地无需你的关注。只需你的契合。"
+    },
+    "legendary_a1_smoke_petal": {
+      "effectText": "每一对**灵草园+经络炉**：两者都产出**×1.5**。",
+      "exampleText": "拥有<strong>3座园+5座炉</strong>，共3对，每座园和每座炉的气/秒乘以<strong>×2.5</strong>（1+3×0.5）。",
+      "loreText": "园中的玉叶在炉烟中卷曲绽放得更快；炉感受灵草之息而燃烧得更炽。"
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "effectText": "每一对**淬炼弟子+宗门追随者**：两者都产出**×1.75**。",
+      "exampleText": "拥有<strong>10位弟子+4位宗门追随者</strong>，共4对，每个生产单位的气/秒乘以<strong>×4</strong>（1+4×0.75）。",
+      "loreText": "单一弟子成为焦点；万千香客向之膜拜。香客见弟子；弟子感其重。"
+    },
+    "legendary_a3_pearl_pendant": {
+      "effectText": "每一对**灵龙 + 祖传宝物**：双方产出**×2**。",
+      "exampleText": "拥有<strong>2条龙 + 5件宝物</strong>，共2对，每个生产者的气/秒乘以<strong>×3</strong>（1 + 2 × 1）。",
+      "loreText": "龙的沉睡珠识出你祖先携带的遗物。他们从未分离。他们总是注定会再次找到彼此。"
+    },
+    "legendary_a4_climbing_beasts": {
+      "effectText": "每一对**灵兽 + 天柱**：**全局气/秒+10%**。",
+      "exampleText": "拥有<strong>5个兽契 + 8根天柱</strong>，共5对，全局气/秒增加<strong>+50%</strong>。",
+      "loreText": "老虎在午夜攀登天柱直接饮水。它们没有告诉狐狸。狐狸发现了。"
+    },
+    "legendary_a5_void_garden": {
+      "effectText": "每一对**虚空导管 + 草药园**：双方产出**×2.5**。",
+      "exampleText": "拥有<strong>3个虚空导管 + 10个草药园</strong>，共3对，每个生产者的气/秒乘以<strong>×5.5</strong>（1 + 3 × 1.5）。",
+      "loreText": "虚空的裂隙携带来自异世的种子；花园吞噬它们，绽放无眼可名的色彩。"
+    },
+    "legendary_a6_phoenix_pillar": {
+      "effectText": "每一对**至尊凤凰 + 天柱**：双方产出**×3**。",
+      "exampleText": "拥有<strong>1只凤凰 + 10根支柱</strong>，即1对，两个生产者的气/秒乘以<strong>×3</strong>。增加第2只凤凰得到2对，各乘以×5。",
+      "loreText": "凤凰只在足够高的栖息处着陆。每根支柱都是向天堂更进一步。"
+    },
+    "legendary_b1_dragon_hoard": {
+      "effectText": "**灵龙**每拥有1件祖宗秘宝，气/秒增加**+25%**。",
+      "exampleText": "拥有<strong>1条龙 + 10件秘宝</strong>，龙的气/秒为<strong>×3.5</strong>（1 + 10 × 0.25）。拥有20件秘宝时，×6。",
+      "loreText": "龙珠就是你献给它的一切。你保留的每一件遗物，它都融入了自身。"
+    },
+    "legendary_b3_beast_tribute": {
+      "effectText": "**灵兽契约**每拥有1座灵草园，气/秒增加**+12%**。",
+      "exampleText": "拥有<strong>10份兽约 + 15座园</strong>，每份兽约的气/秒为<strong>×2.8</strong>（1 + 15 × 0.12）。",
+      "loreText": "虎食你种的灵草。它们回归时更大、更快、更锐利。"
+    },
+    "legendary_b4_furnace_sect": {
+      "effectText": "**经络炉**每拥有1名淬炼弟子，气/秒增加**+4%**。",
+      "exampleText": "拥有<strong>5座炉 + 50名弟子</strong>，每座炉的气/秒为<strong>×3</strong>（1 + 50 × 0.04）。",
+      "loreText": "每位学徒的呼吸都让铜炉闪烁得更加炽亮。炉从来都是宗门的集体之力。"
+    },
+    "legendary_b5_heavens_bend": {
+      "effectText": "**天柱**当你拥有≥1个虚空导管时，气/秒翻倍。",
+      "exampleText": "拥有<strong>10根柱 + 1个虚空</strong>，每根柱的气/秒为<strong>×2</strong>。拥有更多虚空不会进一步增加加成。",
+      "loreText": "当现实已然破裂，苍穹便不再抵抗。"
+    },
+    "legendary_b6_phoenix_garden": {
+      "effectText": "**圣者凤凰**每拥有1座灵草园，气/秒增加**+5%**。",
+      "exampleText": "拥有<strong>1只凤凰 + 40座园</strong>，凤凰的气/秒为<strong>×3</strong>（1 + 40 × 0.05）。",
+      "loreText": "凤凰只在灵药沃土之处筑巢。百座园，百般留恋。"
+    },
+    "legendary_e2_phoenix_reborn": {
+      "effectText": "每跨越一个大境界：**凤凰→0**，所有其他生产者**气/秒+50%**永久生效。",
+      "exampleText": "在此效果激活时跨越<strong>5个大境界</strong>，每个非凤凰生产者最终达到<strong>×3.5其常规产出</strong>（1 + 5 × 0.5）。你失去所有凤凰，但宗门其余的力量稳步增强。",
+      "loreText": "凤凰在自己的灰烬中重生，祝福其栖息的宗门。"
+    },
+    "legendary_f1_storm_tiger": {
+      "effectText": "**灵兽契约：气/秒翻倍**。三灵兽：集齐3个获得**+100% 全局气/秒**。",
+      "exampleText": "拥有<strong>10份兽约</strong>，总气/秒翻倍。同时激活龙和凤凰的符时，三灵汇聚在所有生产者基础上额外增加<strong>+100% 全局气/秒</strong>。",
+      "loreText": "虎踱步，耳贴头顶。唯待龙梦其名，凤唱其音，方能一声咆哮。此前，其毛里的风暴只余低吟。"
+    },
+    "legendary_f2_pearl_dragon": {
+      "effectText": "**灵龙：气/秒翻倍**。三灵兽：集齐3个获得**+100% 全局气/秒**。",
+      "exampleText": "拥有<strong>1条龙</strong>，其气/秒翻倍。同时激活虎和凤凰的符时，三灵汇聚在所有生产者基础上额外增加<strong>+100% 全局气/秒</strong>。",
+      "loreText": "龙珠温热，当它听到两个遥远的声音——虎踱步，凤折叠彩翼。唯此时梦方完满。"
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "effectText": "**圣者凤凰：气/秒翻倍**。三灵兽：集齐3个获得**+100% 全局气/秒**。",
+      "exampleText": "拥有<strong>1只凤凰</strong>，其气/秒翻倍。同时激活虎和龙的符时，三灵汇聚在所有生产者基础上额外增加<strong>+100% 全局气/秒</strong>。",
+      "loreText": "凤凰之鸣有三音。独鸣其一。某处虎徘徊，某处龙梦寐。三音齐鸣，天穹垂首。"
+    },
+    "masters_patience": {
+      "effectText": "每持续专注1秒，**增加气/秒+0.1%**。每层封顶**+12%**。",
+      "exampleText": "在一次运行中总共持续专注<strong>2分钟(120秒)</strong>，1层在封顶时给予气/秒+12%。三层达到<strong>气/秒+36%</strong>，直至你转生。",
+      "loreText": "最长的呼吸最为缓慢。大师可在一次吸气中静坐一小时。"
+    },
+    "quick_burst": {
+      "effectText": "即时获得气相当于**当前气/秒的30秒**产出。",
+      "exampleText": "若你当前气/秒为<strong>120万</strong>，选取此火花将增加<strong>3600万气</strong>到账户。",
+      "loreText": "一息轻吸，世界向你倾斜。"
+    },
+    "resonant_soul": {
+      "effectText": "**每次突破后气/秒+0.2%**。可堆叠。",
+      "exampleText": "激活此卡后经历50次突破，一层给予<strong>气/秒+10%</strong>。越早抽取回报越大。",
+      "loreText": "每次突破留下一音。灵魂如庙堂之钟聚集它们。"
+    },
+    "sect_discipline": {
+      "effectText": "**每个生产者单位基础气/秒+1**，持续90秒。",
+      "exampleText": "拥有<strong>20名弟子</strong>（每个基础气/秒0.1）时，每名弟子临时产出气/秒1.1（×11），持续90秒。后期拥有100+名神话生产者时，每单位+1虽小，但作用于所有单位。",
+      "loreText": "万千弟子一时顶礼。大殿铭记一息乘以万倍之力。"
+    },
+    "sharper_focus": {
+      "effectText": "**专注倍数+2%**本次运行。可堆叠。",
+      "exampleText": "三层使你的专注<strong>+6%更强</strong>。若你频繁使用专注特别有效。",
+      "loreText": "刀锋每晨在同一块石上打磨。"
+    },
+    "steady_cultivation": {
+      "effectText": "**本次运行基础气/秒+0.3**。可堆叠。",
+      "exampleText": "抽取三次给予<strong>基础气/秒+0.9</strong>。此固定加成被气晶、专注及其他倍数影响，故在早期最为重要。",
+      "loreText": "晨时一息，暮时一息。千息之呼与初息无异，此乃全部秘密。"
+    },
+    "steady_stream": {
+      "effectText": "**气/秒+20%**，持续整整一分钟。",
+      "exampleText": "稳定的20%加成持续60秒约等于<strong>12秒的额外产出</strong>。",
+      "loreText": "缓焰。长烧。山磨雨而不摧。"
+    },
+    "surging_stream": {
+      "effectText": "**气/秒+50%**，持续30秒。",
+      "exampleText": "在<strong>气/秒100万</strong>的基础上，此卡临时提升你至<strong>气/秒150万</strong>，持续半分钟。",
+      "loreText": "洪流上升。江河忘却其岸。"
+    },
+    "tinkers_bargain": {
+      "effectText": "**下次5次生产者购买气消耗-30%**。",
+      "exampleText": "购买通常花费<strong>120万气</strong>的四阶生产者，折扣后仅需<strong>84万气</strong>。每次购买操作（×1或×10）消耗一次折扣。折扣在重载前保留。",
+      "loreText": "补匠在灯下数币。\"五个人情，\"他说，\"在价格最疼的地方用掉。\""
+    }
+  },
+  "tutorials": {
+    "first_layer_bt": {
+      "body": "你的经络拓宽。每跨越一层都会解锁新的生产者、火花与强化。继续修炼；下一层已在眼前。",
+      "ctaText": "继续",
+      "kicker": "突破",
+      "title": "初次突破"
+    },
+    "first_major_gate": {
+      "body": "突破一个主要境界需要两件事。你需要充足的气储备，也需要足够的气/秒速率来推过天门。建造更多生产者，升级你的气晶，持续专注。当天穹停止压制时点击突破。",
+      "ctaText": "明白了",
+      "kicker": "主要境界",
+      "title": "天考你"
+    },
+    "first_producer": {
+      "body": "一名弟子跪在你的院中。每培养一名弟子都能略微提升你的闲置气/秒，而下一名弟子的成本略高于前一名。这个模式对所有你将解锁的生产者都成立。",
+      "ctaText": "前进",
+      "kicker": "第一名弟子",
+      "title": "弟子一拜"
+    },
+    "first_saint": {
+      "body": "从此刻起你可以转生。这一生的进度化为业力，业力在永恒之树上购买永久加成。每一生都让下一生的开局稍微更强。若此次运行仍在进行，继续磨练；若爬升开始缓慢，随时可以转生。",
+      "ctaText": "明白了",
+      "kicker": "转生",
+      "title": "第二世"
+    },
+    "first_spark_offer": {
+      "body": "每次层级突破提供一个气火花。两张牌出现，你选其一。有些给短暂加成，有些本次运行永久堆叠，稀有的解锁新机制。若两张都不心动，每次选择的第一次重抽免费。",
+      "ctaText": "慎重选择",
+      "kicker": "火花",
+      "title": "气火花"
+    },
+    "hold_to_focus": {
+      "body": "按住修仙者。你的气/秒会急剧上升，松开时回落。早期境界用手指按在屏幕上会快得多。",
+      "ctaText": "试试看",
+      "kicker": "凝聚",
+      "title": "按住凝聚"
+    },
+    "producers_hint": {
+      "body": "你独自的呼吸只能缓缓充盈经络。但他人之手可与你一起感召天地之气。访问宗门大殿，招募弟子、培养灵园、塑造生成气的源泉，让其在你静坐时为你汇聚气。",
+      "ctaText": "展示给我",
+      "kicker": "来自道的低语",
+      "title": "你并非独自攀登"
+    },
+    "producers_tab": {
+      "body": "生产者会在后台为你汇聚气，即使你不在点击。每一个都会永久提升你在此生剩余的气/秒。每次购买后价格都会上升，但每一个新阶段都胜过前一个。一旦你能承受一个的费用，就立即花费你的气。",
+      "ctaText": "明白了",
+      "kicker": "你的宗门",
+      "title": "生产者"
+    },
+    "welcome": {
+      "body": "气伴随每一次呼吸流入。填满屏幕底部的进度条来突破你的一个境界。诸多境在一个境界中堆叠，诸多境界在诸天中堆叠。这条路很长。",
+      "ctaText": "开始",
+      "kicker": "欢迎，修仙者",
+      "title": "道路伊始"
+    }
+  },
+  "upgrades": {
+    "u_consecutive_focus_t2": {
+      "desc": "增加：按住凝聚4秒 → +7% 气/秒（共计+12%）。",
+      "name": "连续凝聚 II"
+    },
+    "u_consecutive_focus_t3": {
+      "desc": "增加：按住凝聚6秒 → +13% 气/秒（共计+25%）。",
+      "name": "连续凝聚 III"
+    },
+    "u_consecutive_focus_t4": {
+      "desc": "增加：按住凝聚8秒 → +15% 气/秒（共计+40%）。",
+      "name": "连续凝聚 IV"
+    },
+    "u_consecutive_focus_t5": {
+      "desc": "增加：按住凝聚10秒 → +20% 气/秒（共计+60%）；深度静坐。",
+      "name": "连续凝聚 V"
+    },
+    "u_crystal_click_t2": {
+      "desc": "储存库填充气/秒的50%（最多3分钟）。",
+      "name": "气晶储存库 II"
+    },
+    "u_crystal_click_t3": {
+      "desc": "储存库填充气/秒的70%（最多4分钟）。",
+      "name": "气晶储存库 III"
+    },
+    "u_crystal_click_t4": {
+      "desc": "储存库填充气/秒的85%（最多5分钟）。",
+      "name": "气晶储器 IV"
+    },
+    "u_crystal_click_t5": {
+      "desc": "储器充满至每秒气流的100%（最多6分钟）。",
+      "name": "气晶储器 V"
+    },
+    "u_crystal_tap_1": {
+      "desc": "当气晶的储量为空时，轻点所获气数翻倍。",
+      "name": "炼点术 I"
+    },
+    "u_crystal_tap_2": {
+      "desc": "当气晶的储量为空时，轻点所获气数翻倍。",
+      "name": "炼点术 II"
+    },
+    "u_crystal_tap_3": {
+      "desc": "当气晶的储量为空时，轻点所获气数翻倍。",
+      "name": "炼点术 III"
+    },
+    "u_crystal_tap_4": {
+      "desc": "当气晶的储量为空时，轻点所获气数翻倍。",
+      "name": "炼点术 IV"
+    },
+    "u_crystal_tap_5": {
+      "desc": "当气晶的储量为空时，轻点所获气数翻倍。",
+      "name": "炼点术 V"
+    },
+    "u_divine_qi_t2": {
+      "desc": "约9分钟出现一次气球，10秒窗口。轻点获得35秒的气。",
+      "name": "天气 II"
+    },
+    "u_divine_qi_t3": {
+      "desc": "约8分钟出现一次气球，12秒窗口。轻点获得50秒的气。",
+      "name": "天气 III"
+    },
+    "u_divine_qi_t4": {
+      "desc": "约7分钟出现一次气球，15秒窗口。轻点获得65秒的气。",
+      "name": "天气 IV"
+    },
+    "u_divine_qi_t5": {
+      "desc": "约6分钟出现两个气球。同时获取两个，获得75秒气 + 20秒内气/秒×1.25。",
+      "name": "天气 V"
+    },
+    "u_focus_1": {
+      "desc": "长按修炼专注倍数提升35%。",
+      "name": "深呼吸 I"
+    },
+    "u_focus_2": {
+      "desc": "长按修炼专注倍数提升35%。",
+      "name": "深呼吸 II"
+    },
+    "u_focus_3": {
+      "desc": "长按修炼专注倍数提升35%。",
+      "name": "深呼吸 III"
+    },
+    "u_focus_4": {
+      "desc": "长按修炼专注倍数提升75%。",
+      "name": "深呼吸 IV"
+    },
+    "u_offline_cap_1": {
+      "desc": "离线积累窗口延长4小时。",
+      "name": "深度安眠 I"
+    },
+    "u_offline_cap_2": {
+      "desc": "离线积累窗口延长4小时。",
+      "name": "深度安眠 II"
+    },
+    "u_offline_cap_3": {
+      "desc": "离线积累窗口延长4小时。",
+      "name": "深度安眠 III"
+    },
+    "u_offline_cap_4": {
+      "desc": "离线积累窗口延长4小时。",
+      "name": "深度安眠 IV"
+    },
+    "u_offline_rate_1": {
+      "desc": "离线气积累速率提升5%。",
+      "name": "闲修 I"
+    },
+    "u_offline_rate_2": {
+      "desc": "离线气积累速率提升5%。",
+      "name": "闲修 II"
+    },
+    "u_offline_rate_3": {
+      "desc": "离线气积累速率提升5%。",
+      "name": "闲修 III"
+    },
+    "u_offline_rate_4": {
+      "desc": "离线气积累速率提升5%。",
+      "name": "闲修 IV"
+    },
+    "u_p_beast_pact_double_1": {
+      "desc": "灵兽契约产出翻倍。",
+      "name": "灵兽契约 I"
+    },
+    "u_p_beast_pact_double_2": {
+      "desc": "灵兽契约产出再翻倍（与第一个叠加×4）。",
+      "name": "灵兽契约 II"
+    },
+    "u_p_disciple_double_1": {
+      "desc": "淬体弟子产出翻倍。",
+      "name": "淬体弟子 I"
+    },
+    "u_p_disciple_double_2": {
+      "desc": "再次翻倍锻体弟子的产出（与第一层叠加，最多×4）。",
+      "name": "锻体弟子 II"
+    },
+    "u_p_dragon_double_1": {
+      "desc": "翻倍沉眠灵龙的产出。",
+      "name": "沉眠灵龙 I"
+    },
+    "u_p_dragon_double_2": {
+      "desc": "再次翻倍沉眠灵龙的产出（与第一层叠加，最多×4）。",
+      "name": "沉眠灵龙 II"
+    },
+    "u_p_herb_garden_double_1": {
+      "desc": "翻倍灵草园的产出。",
+      "name": "灵草园 I"
+    },
+    "u_p_herb_garden_double_2": {
+      "desc": "再次翻倍灵草园的产出（与第一层叠加，最多×4）。",
+      "name": "灵草园 II"
+    },
+    "u_p_meridian_furnace_double_1": {
+      "desc": "翻倍经络炉的产出。",
+      "name": "经络炉 I"
+    },
+    "u_p_meridian_furnace_double_2": {
+      "desc": "再次翻倍经络炉的产出（与第一层叠加，最多×4）。",
+      "name": "经络炉 II"
+    },
+    "u_p_phoenix_double_1": {
+      "desc": "翻倍主宰凤凰的产出。",
+      "name": "主宰凤凰 I"
+    },
+    "u_p_phoenix_double_2": {
+      "desc": "再次翻倍主宰凤凰的产出（与第一层叠加，最多×4）。",
+      "name": "主宰凤凰 II"
+    },
+    "u_p_pillar_double_1": {
+      "desc": "翻倍苍天之柱的产出。",
+      "name": "苍天之柱 I"
+    },
+    "u_p_pillar_double_2": {
+      "desc": "再次翻倍苍天之柱的产出（与第一层叠加，最多×4）。",
+      "name": "苍天之柱 II"
+    },
+    "u_p_sect_followers_double_1": {
+      "desc": "翻倍凡俗宗弟的产出。",
+      "name": "凡俗宗弟 I"
+    },
+    "u_p_sect_followers_double_2": {
+      "desc": "再次翻倍凡俗宗弟的产出（与第一层叠加，最多×4）。",
+      "name": "凡俗宗弟 II"
+    },
+    "u_p_treasure_double_1": {
+      "desc": "翻倍祖传瑰宝的产出。",
+      "name": "祖传瑰宝 I"
+    },
+    "u_p_treasure_double_2": {
+      "desc": "再次翻倍祖传瑰宝的产出（与第一层叠加，最多×4）。",
+      "name": "祖传瑰宝 II"
+    },
+    "u_p_void_double_1": {
+      "desc": "翻倍虚空通道的产出。",
+      "name": "虚空导管 I"
+    },
+    "u_p_void_double_2": {
+      "desc": "虚空导管的输出翻倍（与第一个叠加，最多×4）。",
+      "name": "虚空导管 II"
+    },
+    "u_pattern_click_t2": {
+      "desc": "每~11分钟迸发一次。4个点，12秒窗口。全部清除：40秒的气。",
+      "name": "追溯经络 II"
+    },
+    "u_pattern_click_t3": {
+      "desc": "每~10分钟迸发一次。5个点，14秒窗口。全部清除：55秒的气。",
+      "name": "追溯经络 III"
+    },
+    "u_pattern_click_t4": {
+      "desc": "每~9分钟迸发一次。6个点，16秒窗口。全部清除：70秒的气。",
+      "name": "追溯经络 IV"
+    },
+    "u_pattern_click_t5": {
+      "desc": "每~8分钟迸发一次。7个点，18秒窗口。全部清除：90秒气 + 20秒内×1.5气/秒。",
+      "name": "追溯经络 V"
     }
   }
 }

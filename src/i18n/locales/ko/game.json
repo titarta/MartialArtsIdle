@@ -1,689 +1,1457 @@
 {
-  "realms": {
-    "Tempered Body": "단체경 (鍛體境)",
-    "Qi Transformation": "화기경 (化氣境)",
-    "True Element": "진원경 (眞元境)",
-    "Separation & Reunion": "분합경 (分合境)",
-    "Immortal Ascension": "승선경 (昇仙境)",
-    "Saint": "성인 (聖人)",
-    "Saint King": "성왕 (聖王)",
-    "Origin Returning": "귀원경 (歸源境)",
-    "Origin King": "원왕 (源王)",
-    "Void King": "허왕 (虛王)",
-    "Dao Source": "도원 (道源)",
-    "Emperor Realm": "제자경 (帝者境)",
-    "Open Heaven": "개천 (開天)"
+  "achievements": {
+    "ach_panel_50": {
+      "desc": "업적 패널을 50번 엽니다. 우리가 당신을 봅니다.",
+      "title": "인내심, 어린 수련자여"
+    },
+    "ach_unlocked_meta": {
+      "desc": "업적을 해제하세요. 놀랍죠. 이것이 당신의 두 번째입니다.",
+      "title": "업적 해제됨"
+    },
+    "all_in": {
+      "desc": "최소 1조 기를 소비하는 제작자 구매 또는 강화를 한 번 실행합니다.",
+      "title": "올인"
+    },
+    "audio_mute_30m": {
+      "desc": "음성을 모두 끄고 30분을 플레이합니다.",
+      "title": "음소거"
+    },
+    "audio_toggle_10": {
+      "desc": "음악 토글을 10회 실행합니다. 한쪽을 선택하세요.",
+      "title": "음악애호가"
+    },
+    "bonk": {
+      "desc": "상호작용할 수 없는 UI 요소를 20회 연속 탭합니다. 아무것도 일어나지 않습니다.",
+      "title": "쾅"
+    },
+    "cal_double_ninth": {
+      "desc": "9월 9일에 플레이합니다. 길한지, 아닌지.",
+      "title": "재난의 날"
+    },
+    "cal_lunar_new_year": {
+      "desc": "음력 새해에 플레이합니다.",
+      "title": "음력 설날"
+    },
+    "capstone": {
+      "desc": "당신은 산을 오르지 않았습니다. 당신이 산이 되었습니다.",
+      "title": "도(道)가 되다"
+    },
+    "daily_100": {
+      "desc": "100일 연속 로그인 기록을 유지합니다.",
+      "title": "백일의 은자"
+    },
+    "daily_30": {
+      "desc": "30일 연속 로그인 기록을 유지합니다.",
+      "title": "철의 의지"
+    },
+    "daily_7": {
+      "desc": "7일 연속 로그인 유지하기.",
+      "title": "충성스러운 제자"
+    },
+    "daily_skip_7_claim": {
+      "desc": "7일 연속으로 일일 보너스를 건너뛴 후 획득하기. 그럴 가치가 있습니다.",
+      "title": "일일 양식 없음"
+    },
+    "gate_hit": {
+      "desc": "처음으로 수련 속도 관문에 도달하다.",
+      "title": "벽에 부딪히다"
+    },
+    "gate_pass_1": {
+      "desc": "처음으로 수련 속도 관문을 통과하다.",
+      "title": "관문을 통과하다"
+    },
+    "gate_pass_max": {
+      "desc": "가장 높은 등급의 수련 속도 관문을 통과하세요.",
+      "title": "철강 관문"
+    },
+    "hold_30m": {
+      "desc": "기 결정을 30분간 연속으로 붙잡기. 동상 모드.",
+      "title": "집념의 도(道)"
+    },
+    "hold_5m": {
+      "desc": "기 결정을 5분간 연속으로 붙잡기.",
+      "title": "철의 폐"
+    },
+    "hold_60s": {
+      "desc": "기 결정을 60초간 연속으로 붙잡기.",
+      "title": "밀랍 칠하기, 닦기"
+    },
+    "karma_10": {
+      "desc": "영원한 나무에서 업보 노드 10개 해금하기.",
+      "title": "보리 가지"
+    },
+    "karma_50": {
+      "desc": "영원한 나무에서 업보 노드 50개 해금하기.",
+      "title": "보리 나무"
+    },
+    "karma_first": {
+      "desc": "영원한 나무에서 처음으로 업보를 소비하기.",
+      "title": "업보의 씨앗"
+    },
+    "karma_full": {
+      "desc": "영원한 나무 전체 해금하기.",
+      "title": "보리 왕관"
+    },
+    "long_slumber": {
+      "desc": "한 번의 오프라인 동안 얻은 기가 이전 총 플레이 시간 동안 얻은 것보다 많기.",
+      "title": "긴 수면"
+    },
+    "offline_1h": {
+      "desc": "1시간 이상 자리를 비운 후 복귀하기.",
+      "title": "짧은 머무름"
+    },
+    "offline_24h": {
+      "desc": "24시간 폐관수련 후 복귀하기. 산은 움직이지 않는다.",
+      "title": "폐관수련"
+    },
+    "offline_30d": {
+      "desc": "30일 오프라인 후 복귀하기. 문파에서는 당신이 죽었다고 생각한다.",
+      "title": "늙은 괴물"
+    },
+    "offline_365d": {
+      "desc": "1년 오프라인 후 복귀하기. 돌아오셨군요. 세상이 달라졌습니다.",
+      "title": "영원한 겨울잠"
+    },
+    "offline_7d": {
+      "desc": "7일 이상 자리를 비운 후 복귀하기.",
+      "title": "왕조를 자며 잔 자"
+    },
+    "offline_qi_1b": {
+      "desc": "오프라인 중에만 기 10억 적립하기.",
+      "title": "한가로운 제국"
+    },
+    "play_1000h": {
+      "desc": "총 플레이 시간 1,000시간 도달하기.",
+      "title": "한가함의 도(道)"
+    },
+    "play_100h": {
+      "desc": "총 플레이 시간 100시간 도달하기.",
+      "title": "천상의 형제"
+    },
+    "play_500h": {
+      "desc": "총 플레이 시간 500시간에 도달하세요.",
+      "title": "동대륙의 불면"
+    },
+    "producer_42": {
+      "desc": "한 가지 생산자 유형을 정확히 42개 소유하다. 그 답.",
+      "title": "42"
+    },
+    "qis_666": {
+      "desc": "1초 동안 정확히 초당 666 기를 유지하다.",
+      "title": "짐승의 수"
+    },
+    "qis_9001": {
+      "desc": "초당 9,001 기에 도달하다.",
+      "title": "9000을 넘었다"
+    },
+    "realm_1": {
+      "desc": "수련의 길에 첫 발을 내딛다.",
+      "title": "첫 호흡"
+    },
+    "realm_10": {
+      "desc": "강화된 몸의 10단계 모두를 단련하다.",
+      "title": "기초를 세우다"
+    },
+    "realm_13": {
+      "desc": "기 변화를 극하다. 당신 안의 기는 더 이상 필멸자의 것이 아니다.",
+      "title": "기로 변신"
+    },
+    "realm_14": {
+      "desc": "진원 경계에 진입하여 자연의 힘을 명령합니다.",
+      "title": "진원 깨어남"
+    },
+    "realm_18": {
+      "desc": "분신 경계에 도달합니다. 당신의 영혼은 두 길을 동시에 걷습니다.",
+      "title": "영혼 분열"
+    },
+    "realm_21": {
+      "desc": "필멸의 한계를 초월한 상승을 시작합니다.",
+      "title": "불로 승천"
+    },
+    "realm_24": {
+      "desc": "범속적 존재를 초월한 자들과 함께 걷다.",
+      "title": "성인의 길"
+    },
+    "realm_27": {
+      "desc": "성인 경계의 정점에 오르다.",
+      "title": "성인의 왕"
+    },
+    "realm_30": {
+      "desc": "모든 기가 흐르는 근원으로 돌아가다.",
+      "title": "근원으로 돌아오다"
+    },
+    "realm_36": {
+      "desc": "세계 사이의 공허로 들어가 그것을 지배하다.",
+      "title": "공허의 왕"
+    },
+    "realm_39": {
+      "desc": "도(道)의 근원에 닿다.",
+      "title": "도의 근원"
+    },
+    "realm_46": {
+      "desc": "하늘을 산산조각 내고 개천의 경계에 닿다.",
+      "title": "개천"
+    },
+    "reincarnate_1": {
+      "desc": "처음으로 환생하다.",
+      "title": "윤회의 수레바퀴"
+    },
+    "reincarnate_10": {
+      "desc": "10번 환생하다. 당신은 모든 생을 기억한다.",
+      "title": "수레바퀴 너머"
+    },
+    "reincarnate_2": {
+      "desc": "두 번째 환생을 하다. 더 쉬워졌지 않은가.",
+      "title": "제2의 숨"
+    },
+    "reincarnate_lowest": {
+      "desc": "가장 낮은 경계 한계에서 자발적으로 환생하다.",
+      "title": "린 가문의 쓸모없는 놈"
+    },
+    "restless": {
+      "desc": "5분 안에 화면을 100번 전환하다. 하나를 선택하게, 친구여.",
+      "title": "불안정한"
+    },
+    "settings_all": {
+      "desc": "모든 설정에 최소 한 번씩 닿다.",
+      "title": "설정 애호가"
+    },
+    "shop_100_visits": {
+      "desc": "상점을 100번 방문하세요. 항상 가난하고 항상 웃고 있으며.",
+      "title": "배추 장수"
+    },
+    "shop_first_skin": {
+      "desc": "첫 번째 꾸미기 스킨을 구매하세요.",
+      "title": "허영"
+    },
+    "spark_100": {
+      "desc": "기 불꽃 100개를 잡으세요.",
+      "title": "기 불꽃 사냥꾼"
+    },
+    "spark_1000": {
+      "desc": "기 불꽃 1,000개를 잡으세요.",
+      "title": "기 불꽃 현자"
+    },
+    "spark_drought": {
+      "desc": "1시간을 기 불꽃 없이 플레이하세요. 바람이 고요하다.",
+      "title": "가뭄"
+    },
+    "spark_first": {
+      "desc": "첫 기 불꽃을 잡으세요.",
+      "title": "첫 기 불꽃"
+    },
+    "sprite_tickle_100": {
+      "desc": "수련자 스프라이트를 100번 탭하세요. 그는 느꼈습니다.",
+      "title": "스승을 간지럽히기"
+    },
+    "tap_100": {
+      "desc": "누적 기 결정 탭 100회 달성",
+      "title": "깃털같이 가볍게"
+    },
+    "tap_100k": {
+      "desc": "누적 기 결정 탭 100,000회 달성",
+      "title": "돌 망치"
+    },
+    "tap_10k": {
+      "desc": "누적 기 결정 탭 10,000회 달성",
+      "title": "신의 손"
+    },
+    "tap_1m": {
+      "desc": "생애 동안 기 결정을 100만 회 탭. 폰이 견디고 있네요.",
+      "title": "산 부수기"
+    },
+    "tap_burst_100": {
+      "desc": "10초 내에 100회 탭. 걱정됩니다.",
+      "title": "손목터널 증후군"
+    },
+    "tap_dancer": {
+      "desc": "기 결정을 30초 동안 분당 60박자로 탭. 박자가 중요합니다.",
+      "title": "탭 댄서"
+    },
+    "tap_first": {
+      "desc": "기 결정을 처음으로 탭.",
+      "title": "첫 터치"
+    },
+    "tap_rate_12": {
+      "desc": "1초 내에 기 결정을 12회 탭.",
+      "title": "벌새"
+    },
+    "time_all_brackets": {
+      "desc": "24시간 내에 네 가지 시간대(밤, 아침, 오후, 저녁) 모두에서 플레이.",
+      "title": "하늘 관찰자"
+    },
+    "time_early_bird": {
+      "desc": "현지 시간 오전 5시~7시 사이에 경계를 돌파.",
+      "title": "일찍 일어나는 새"
+    },
+    "time_lunch": {
+      "desc": "평일 정오부터 오후 1시 사이에 최소 10분 이상 플레이하세요.",
+      "title": "점심시간"
+    },
+    "time_midnight_tap": {
+      "desc": "정확히 자정 00:00:00에 기 결정을 탭하세요.",
+      "title": "마녀의 시간"
+    },
+    "time_night_owl": {
+      "desc": "새벽 1시부터 4시 사이에 경계를 돌파하세요.",
+      "title": "올빼미"
+    },
+    "tutorial_all": {
+      "desc": "모든 튜토리얼 카드를 읽으세요.",
+      "title": "알고 계셨나요?"
+    }
   },
-  "stages": {
-    "Layer 1": "1층",
-    "Layer 2": "2층",
-    "Layer 3": "3층",
-    "Layer 4": "4층",
-    "Layer 5": "5층",
-    "Layer 6": "6층",
-    "Layer 7": "7층",
-    "Layer 8": "8층",
-    "Layer 9": "9층",
-    "Layer 10": "10층",
-    "Early Stage": "초기",
-    "Middle Stage": "중기",
-    "Late Stage": "후기",
-    "Peak Stage": "절정",
-    "1st Stage": "1단계",
-    "2nd Stage": "2단계",
-    "3rd Stage": "3단계"
-  },
-  "worlds": {
+  "discipleTiers": {
     "1": {
-      "name": "속계 (俗界)",
-      "realms": "단체경 → 진원경",
-      "description": "의식용 붉은 금빛 문과 석각 기둥, 풍화된 수호 석상으로 둘러싸인 안개 자욱한 문파 수련장. 수련장 너머로 대나무 숲이 솟아있고 창백한 산들이 영원한 안개 속으로 사라진다. 공기 속에는 분필 먼지 냄새와 수년간 제자들이 수련하며 남긴 잔류 기의 향기가 배어있다."
+      "rank": "외제자"
     },
     "2": {
-      "name": "고대 변방 (古代邊境)",
-      "realms": "분합경 → 승선경",
-      "description": "오래된 도자기 같은 질감으로 구워진 갈라진 주황빛 대지의 광대한 황무지. 무너진 석조 아치와 폐허가 된 관문 구조물이 거대한 표백된 뼈 잔해와 함께 사막 바닥에서 솟아있다. 부식된 거대한 가마솥이 폐허의 중심에 자리잡고 있으며, 그 외에 죽은 풍경 속에서 온전히 서 있는 유일한 구조물이다."
+      "rank": "내제자"
     },
     "3": {
-      "name": "금지 구역 (禁地)",
-      "realms": "성인 → 성왕",
-      "description": "차가운 녹색 영적 불꽃이 눈에서 빛나는 고대 수호 석상이 늘어선 금지된 석조 복도. 보초들의 열 너머로 봉인된 문지방에 녹색 횃불이 타오르는 어두운 궁전이 우뚝 솟아있다. 공기는 고요하고 오랫동안 죽은 자들의 기로 무겁게 가득 차 있으며, 그 침묵은 멀리서 울려오는 고대 전쟁 봉인의 공명음만이 깨뜨린다."
+      "rank": "핵심 제자"
     },
     "4": {
-      "name": "근원의 심연 (源之深淵)",
-      "realms": "귀원경 → 원왕",
-      "description": "쌍 용두 석기둥이 폭포를 양쪽에서 받치고, 그 폭포가 빛나는 원기 연못으로 떨어지는 광대한 지하 동굴. 청록색 수정 군락이 동굴 벽 전체에 모여 어둠 속으로 서늘한 빛을 드리운다. 고대의 뒤틀린 뿌리들이 저 멀리 위의 천장에서 내려오고, 공기는 태고의 지기(地氣) 압력으로 두껍게 차있다."
+      "rank": "검 제자"
     },
     "5": {
-      "name": "허공의 바다 (虛空之海)",
-      "realms": "허왕 → 제자경",
-      "description": "깊은 자홍빛 하늘 아래 들쭉날쭉한 에너지 균열과 떠다니는 도 각문 석판으로 갈라진 파편화된 허공의 광야. 지평선의 허물어지는 땅 위에 홀로 선 석문이 있고, 충전된 고요 속에서 음양 기호가 머리 위에 떠 있다. 바닥은 오래된 점토처럼 갈라져 있으며—끝없이 무너지는 공간에서 유일한 단단한 표면이다."
+      "rank": "장로"
     },
     "6": {
-      "name": "개천 (開天)",
-      "realms": "개천 1층 → 개천 6층",
-      "description": "거대한 각문 기둥들이 끝없이 뻗은 구름층 속으로 솟아있는, 눈부신 금빛과 흰빛의 무한한 개천 경계. 두루미들이 기둥 사이의 빛나는 안개 속을 조용히 날아다닌다. 주변 압력만으로도 개천의 문턱에 달하지 못한 모든 것을 소멸시킬 수 있다."
+      "rank": "상석 장로"
+    },
+    "7": {
+      "rank": "전당 주인"
+    },
+    "8": {
+      "rank": "문파 주인"
+    },
+    "9": {
+      "rank": "종주"
+    },
+    "10": {
+      "rank": "조상"
     }
   },
-  "regions": {
-    "Outer Sect Training Grounds": "외문 수련장",
-    "Borderland Wilds": "변방 황야",
-    "Bandit's Crossing": "비적 관문",
-    "Qi-Vein Ravines": "기맥 협곡",
-    "Misty Spirit Forest": "안개 영림",
-    "Shattered Sky Desert": "파천 사막",
-    "Demon Beast Plains": "마수 평원",
-    "Sunken Immortal City": "침몰 선인 도시",
-    "Blood Sea Wastes": "혈해 황무지",
-    "Saint Burial Grounds": "성인 매장지",
-    "Void Rift Expanse": "허공 균열 광야",
-    "Nine-Death Mountain Range": "구사 산맥",
-    "Sealed War Altar": "봉인된 전쟁 제단",
-    "Origin Qi Spring Depths": "원기 샘 심층",
-    "World Root Caverns": "세계 뿌리 동굴",
-    "Ancient Root Grotto": "고대 뿌리 동굴",
-    "Primordial Forest Core": "태고 숲의 핵심",
-    "Ancient Origin Altar": "고대 기원 제단",
-    "Fractured Space Corridors": "파쇄 공간 복도",
-    "Void Sea Shores": "허공 바다 해변",
-    "Dao Inscription Ruins": "도 각문 유적",
-    "Ancient Emperor Tomb": "고대 황제릉",
-    "Heaven Sword Ridge": "천검 능선",
-    "Heaven Pillar Ascent": "천주 등정",
-    "Star Sea Approaches": "성해 입구",
-    "Celestial Rift Expanse": "천공 균열 광야",
-    "Heaven's Core": "하늘의 핵심"
-  },
-  "enemies": {
-    "outer_sect_disciple": {
-      "name": "외문 제자",
-      "description": "서툴지만 열정적인 자세로 기본 목검을 휘두르는, 평범한 흰 수련복 차림의 젊은 수련자."
+  "eternalTree": {
+    "beast": {
+      "description": "여러 생을 거쳐 야수 계약 비급 비술을 해제하세요. (곧 출시됩니다.)",
+      "label": "야수 투기장"
     },
-    "training_golem": {
-      "name": "수련용 골렘",
-      "description": "내구성을 위해 만들어진, 문파 봉인이 찍힌 땅딸막한 점토와 철 자동인형 — 주먹은 뭉툭한 철구 형태."
+    "bloom": {
+      "description": "각 생을 50 영로와 초록 강장제 조방법으로 시작하세요.",
+      "label": "영혼의 꽃"
     },
-    "wolf": {
-      "name": "무리 늑대",
-      "description": "기가 풍부한 황야를 오랫동안 떠돌며 소량의 기를 흡수했음을 암시하는 희미하게 빛나는 눈을 가진 날씬한 회색 늑대."
+    "cauldron_2": {
+      "description": "경락로에 1개 가마 추가 (2개 동시 요리).",
+      "label": "두 번째 가마"
     },
-    "bandit_scout": {
-      "name": "비적 척후",
-      "description": "짧은 칼을 들고 기습으로 살아남는 자의 숙련된 은신술로 움직이는, 거친 조각보 갑옷을 입은 가냘픈 전사."
+    "cauldron_3": {
+      "description": "경락 노에 +1개 가마 추가 (3개 동시 요리).",
+      "label": "세 번째 가마"
     },
-    "wandering_beast": {
-      "name": "방랑 마수",
-      "description": "고정된 영역 없이 위험한 황야를 떠돌며 수년간의 방랑으로 가죽에 상처가 남은 크고 덥수룩한 사지 짐승."
+    "cauldron_4": {
+      "description": "경락 노에 +1개 가마 추가 (4개 동시 요리).",
+      "label": "네 번째 가마"
     },
-    "rogue_disciple": {
-      "name": "불량 제자",
-      "description": "금기 기 수련의 흔적이 새겨진, 찢기고 얼룩진 수련복 차림의 전직 문파 일원. 잃을 것이 없는 사람의 눈빛을 지니고 있다."
+    "cauldron_5": {
+      "description": "경락 노에 +1개 가마 추가 (5개 동시 요리).",
+      "label": "다섯 번째 가마"
     },
-    "iron_fang_wolf": {
-      "name": "철아 늑대",
-      "description": "고대 평원을 떠돌며 광물 기를 흡수해 몇 년에 걸쳐 철 밀도의 송곳니와 단단해진 가죽을 가진 거대한 늑대."
+    "coffers": {
+      "description": "모든 생산자의 기/초 산출량 +15% 증가.",
+      "label": "무한한 금고"
     },
-    "iron_spine_boar": {
-      "name": "철등 멧돼지",
-      "description": "광물이 풍부한 평지에서 먹이를 먹어 등의 가시가 철처럼 굳은, 공격적인 땅딸막한 멧돼지. 무모한 힘으로 머리를 숙이고 돌진한다."
+    "core": {
+      "description": "환생 시 기 결정 레벨의 25%를 유지합니다.",
+      "label": "부서지지 않는 핵심"
     },
-    "sand_dragon": {
-      "name": "사막 용",
-      "description": "모래 속을 물처럼 흐르듯 움직이는, 햇볕에 탈색된 면도날 같은 비늘을 가진 뱀 형태의 용. 아래에서 솟구치며 모래를 뿌리면서 먹이를 기습한다."
+    "crystal": {
+      "description": "업그레이드 탭에서 기로 구매할 수 있는 새로운 기 결정 업그레이드 라인을 해금합니다. (곧 출시).",
+      "label": "결정화된 집중력"
     },
-    "bone_construct": {
-      "name": "뼈 구조물",
-      "description": "잔류 전투 기와 녹슨 진법 봉인으로 결합된, 쓰러진 선인들의 뼈로 조립된 움직이는 전쟁 기계. 고대의 죽은 자가 땅에 널린 곳에서 발견된다."
+    "disc_base": {
+      "description": "제자 생산자의 산출량이 2배 증가 (전체 명단에 대한 평탄한 상승; 천명의 제자와 중첩).",
+      "label": "제자의 기초"
     },
-    "city_guardian": {
-      "name": "도시 수호 구조물",
-      "description": "침몰 선인 도시의 문장을 달고 오래전 죽은 주인의 물에 잠긴 홀을 충실히 순찰하는 흑철과 옥으로 만든 거대한 인형 구조물."
+    "disc_transcend": {
+      "description": "제자 생산자의 초월 등급을 해금합니다 (신화 위). 문파 명단은 또한 조상 위에 초월자 등급을 얻습니다.",
+      "label": "초월자 제자"
     },
-    "immortal_shade": {
-      "name": "갇힌 선인 영혼",
-      "description": "도시가 땅 아래로 가라앉을 때 갇힌 선인 수련자의 잔영. 미완성된 서약에 영원히 묶여 고체와 유령 사이를 오가는 형태."
+    "echoes": {
+      "description": "여러 생을 통해 보물청 비전 비술을 해제하세요. (곧 출시 예정.)",
+      "label": "조상의 메아리"
     },
-    "corrupted_cultivator": {
-      "name": "타락한 수련자",
-      "description": "기 수련이 정신을 잡아먹은 전직 문파 제자. 도복은 찢겨있고, 경맥은 피부 아래서 검게 변해 보이며, 눈은 기 광증으로 공허하다."
+    "eternal_alchemy": {
+      "description": "환생을 통해 1개의 축기단 효과를 유지하세요. (가장 강력한 것이 보존됩니다.)",
+      "label": "영원한 연단술"
     },
-    "blood_leviathan": {
-      "name": "혈해 레비아탄",
-      "description": "혈해에서 수백 년간 먹이를 먹어 비늘이 짙은 적색으로 변한 거대한 바다 짐승. 움직일 때 부식성 붉은 증기를 흘리며 전체 몸으로 타격한다."
+    "foundation": {
+      "description": "환생을 통해 이미 해제된 모든 생산자의 개수의 20%를 유지합니다.",
+      "label": "영원한 기초"
     },
-    "burial_guardian": {
-      "name": "매장지 수호자",
-      "description": "영혼이 영원한 보초로서 매장지에 묶인 거대한 갑옷 병사. 고대 갑옷은 화려하지만 부식되어 있고, 수백 년간 쉬지 않은 것의 비자연적인 고요함으로 움직인다."
+    "frugal": {
+      "description": "생산자 구매 비용 5% 감소.",
+      "label": "절약의 수련"
     },
-    "saint_corpse_soldier": {
-      "name": "성인 시체 병사",
-      "description": "전투 갑옷을 입고 죽음의 악력으로 무기를 쥔 채 완벽하게 보존된 성인 경지 전사의 시신. 가슴의 서약 봉인이 빛나며 입은 피해에 관계없이 앞으로 나아가도록 강제한다."
+    "furnace": {
+      "description": "단약 제련이 매 생을 통해 해제 상태로 유지됩니다.",
+      "label": "영원한 용광로"
     },
-    "void_rift_predator": {
-      "name": "허공 균열 포식자",
-      "description": "균열 틈새에서 태어난 생물로, 몸이 차원 사이에 부분적으로 위상이 이동되어 있다. 고체와 허공 공간 사이를 미끄러지며 예상치 못한 각도로 공격한다."
+    "garden": {
+      "description": "영원한 정원이 매 생을 통해 해제 상태로 유지됩니다.",
+      "label": "영원한 정원"
     },
-    "rift_stalker": {
-      "name": "균열 추적자",
-      "description": "균열 생태계의 더 날렵하고 빠른 포식자. 차원 경계를 통해 기 신호를 추적하고 균열 내부에서 기습 공격을 가한다."
+    "guidance": {
+      "description": "생산자는 소유한 이전 종류 생산자마다 기/초 증가율 +0.5%를 얻습니다.",
+      "label": "선배의 인도"
     },
-    "saint_bone_sovereign": {
-      "name": "성인 뼈 군주",
-      "description": "성인 경지 군주의 되살아난 해골로, 사기(死氣)에 대한 권위가 절대적이다. 산맥을 영토로 삼고 고갯길 위에서 하급 언데드를 지휘한다."
+    "hand": {
+      "description": "제자 배치 비용이 공덕 20% 감소.",
+      "label": "열린 손"
     },
-    "void_shade": {
-      "name": "허공 그림자",
-      "description": "저주받은 산길에 달라붙는 허공의 그림자 존재. 물리적 형태가 없고 접촉 시 기를 소진시키는 집중된 허공 에너지의 실루엣만 있다."
+    "heaven": {
+      "description": "활성 부스트가 있는 동안 기 +25% 획득.",
+      "label": "하늘의 손길"
     },
-    "forbidden_construct": {
-      "name": "금지된 구조물",
-      "description": "수세기 동안 제단 안에 봉인되어 봉인된 각문을 지켜온 거대한 전쟁 자동인형. 활성화는 금지되어 있었다 — 당신이 문지방을 넘을 때까지는."
+    "lattice": {
+      "description": "기 결정 레벨 강화에 필요한 기 20% 감소.",
+      "label": "치밀한 격자"
     },
-    "ancient_war_spirit": {
-      "name": "고대 전쟁 영혼",
-      "description": "고대 전쟁 중에 제단에 봉인된 전사의 묶인 영혼. 목숨을 바친 대의를 여전히 붙들고 있으며, 수백 년이 지나도 분노는 사그라들지 않았다."
+    "linger": {
+      "description": "영원한 정원 선약 부스트 지속 시간 30% 증가.",
+      "label": "남겨진 양조"
     },
-    "origin_guardian": {
-      "name": "근원의 수호자",
-      "description": "압축된 원기로 형성된 거대한 인형으로, 심층의 입구에 영구적으로 배치되어 있다. 몸에서 매 걸음마다 압도적인 태고의 압력이 방사된다."
+    "mastery": {
+      "description": "모든 숨겨진 기술의 보상을 강화합니다. (곧 제공 예정 — 미니게임과 함께 효과가 정의되고 있습니다.)",
+      "label": "숨겨진 기술 숙련"
     },
-    "origin_crystal_golem": {
-      "name": "근원 수정 골렘",
-      "description": "원기 샘 내부에서 자란 수정 구조물로 만들어진 골렘. 타격 시 주먹에 박힌 수정에서 원초 에너지의 폭발을 방출한다."
+    "merit": {
+      "description": "매 생마다 업보 10% 더 획득.",
+      "label": "무한한 공덕"
     },
-    "primordial_serpent": {
-      "name": "태고 뱀",
-      "description": "기록 이전의 시대부터 세계 뿌리 동굴을 사냥한 거대한 뱀. 수천 년에 걸친 광물 흡수로 비늘이 세계석 밀도로 굳어졌다."
+    "n_1": {
+      "description": "영원한 나무에 소비한 업보마다 기/초 +0.1% 획득.",
+      "label": "헌신의 길"
     },
-    "cavern_elder_demon": {
-      "name": "동굴 장로 악마",
-      "description": "수없이 많은 세기에 걸쳐 동굴과 융합된 악마로, 몸이 부분적으로 돌과 뿌리로 이루어져 있다. 움직이기 전까지는 동굴 벽과 거의 구별이 되지 않는다."
+    "potency": {
+      "description": "영원한 정원 선약 부스트가 20% 강해집니다.",
+      "label": "푸른 힘"
     },
-    "forest_spirit": {
-      "name": "숲의 정령",
-      "description": "고대 뿌리에 집중된 세계 에너지에 이끌려 뿌리 공간을 표류하는 발광 정령. 평소에는 수동적이나 방해받으면 위험하다."
+    "resonance": {
+      "description": "생산자는 소유한 같은 종류 생산자마다 기/초 증가율 +1%를 얻습니다.",
+      "label": "문파 공명"
     },
-    "root_sovereign": {
-      "name": "뿌리 군주",
-      "description": "뿌리 네트워크의 지배 세력으로, 세계수의 가장 굵은 뿌리들로 몸이 짜인 거대한 존재. 극단적으로 영역을 지키며, 모든 침입자를 기생충으로 여긴다."
+    "roster": {
+      "description": "로스터(제자 승격)가 매 생을 통해 해제 상태로 유지되며, 제자가 신화 경계에 도달할 때까지 다시 잠기지 않습니다.",
+      "label": "영원한 로스터"
     },
-    "ancient_beast": {
-      "name": "고대 짐승",
-      "description": "현재의 수련 시대보다 오래된 짐승. 본능은 완벽하게 갈고닦여 있고 몸에는 십만 년의 생존의 무게가 담겨있다."
+    "rspark": {
+      "description": "영구 기 불꽃 부스트가 25% 강해집니다.",
+      "label": "공명하는 불꽃"
     },
-    "world_root_wraith": {
-      "name": "세계 뿌리 망령",
-      "description": "세계수 뿌리의 생명력에서 나타난 에테르적 수호자. 뿌리 네트워크를 통해 위상 이동하여 숲의 핵심을 위협하는 모든 것을 차단한다."
+    "soil": {
+      "description": "영원한 정원 작물이 20% 빠르게 성장.",
+      "label": "비옥한 흙"
     },
-    "deep_earth_titan": {
-      "name": "대지 심층 타이탄",
-      "description": "고대 기원 제단의 유일한 수호자 — 발걸음이 기반암을 갈라트리는 질량의 존재. 그 압력장 범위 내에서는 어떤 생명체도 살아남지 못한다."
+    "star": {
+      "description": "제자 보드 합산 보너스 +50%: 각 보드 포인트가 제자 기/초를 1%가 아닌 1.5%로 상승시킵니다.",
+      "label": "별의 제자"
     },
-    "spatial_fissure_beast": {
-      "name": "공간 균열 짐승",
-      "description": "파쇄 공간 복도가 고향인 생물로, 부분적으로 붕괴된 차원에 존재하도록 몸이 적응되어 있다. 균열을 사냥터로 이용한다."
+    "thousand": {
+      "description": "제자 생산자 산출량이 2배입니다.",
+      "label": "천 제자"
     },
-    "qi_beast": {
-      "name": "기 감지 짐승",
-      "description": "순전히 기 신호로 사냥하는 허공 적응 포식자. 물리적 위장에 눈이 멀어도, 차원 경계를 넘어 수련자를 추적할 수 있다."
-    },
-    "void_elemental": {
-      "name": "허공 정령",
-      "description": "파쇄된 복도에 응집된 허공 에너지의 순수한 현현. 몸이 없고 오직 집중된 무효화 힘의 덩어리만 있다."
-    },
-    "void_sea_leviathan": {
-      "name": "허공 바다 레비아탄",
-      "description": "물이 없는 허공 바다에 적응하여 순수 공간 에너지 속을 헤엄치는 거대한 바다 짐승. 질량이 너무 커서 차원 경계를 옆으로 밀어낸다."
-    },
-    "dao_inscription_guardian": {
-      "name": "도 각문 수호자",
-      "description": "각문 진법에 의해 유적에 묶인 구조물로, 보호하도록 만들어진 도 석판을 끝없이 유지관리한다. 각문에 간섭하는 모든 것을 공격한다."
-    },
-    "dao_inscription_revenant": {
-      "name": "도 각문 레버넌트",
-      "description": "도 석판을 해독하려다 죽은 학자의 잔영. 그들의 의식이 각문 진법에 흡수되어 이제 공격적인 수호자 역할을 한다."
-    },
-    "emperor_will_fragment": {
-      "name": "황제 의지 파편",
-      "description": "고대 황제의 죽어가는 의지의 파편으로, 반물리적인 힘으로 현현할 충분한 권위를 여전히 담고 있다. 본능적으로 무덤을 보호하며 반사적으로 침입자를 공격한다."
-    },
-    "petrified_dao_lord": {
-      "name": "석화된 도주",
-      "description": "황제의 무덤에 최후의 방어선으로 봉인된 도주. 몸은 돌로 변했지만 도의 이해는 온전히 남아있어 — 순수한 원리로 싸운다."
-    },
-    "star_sea_drifter": {
-      "name": "성해 방랑자",
-      "description": "천검 능선의 격변적인 도의 수렴에 의해 성해에서 끌려온 존재. 고향 허공에서 멀리 떠나 방향을 잃고 공격적으로 홀로 사냥한다."
-    },
-    "heaven_pillar_guardian": {
-      "name": "천주 수호자",
-      "description": "경계를 유지하는 개천 경계의 각문 기둥에 묶인 천계 보초. 통행을 협상하지 않는다."
-    },
-    "boundary_wraith": {
-      "name": "경계 망령",
-      "description": "경지 경계의 잔류 영적 압력에서 형성된 망령. 개천의 문턱에서 표류하며, 등정에서 머뭇거리는 수련자를 먹잇감으로 삼는다."
-    },
-    "open_heaven_beast": {
-      "name": "개천 짐승",
-      "description": "개천 경계가 고향인 짐승으로, 태어날 때부터 천급 기로 몸이 포화되어 있다. 쉬는 상태에서도 절정 황제 경지 수련자에 비견되는 압력을 가한다."
-    },
-    "star_sea_leviathan": {
-      "name": "성해 레비아탄",
-      "description": "붕괴된 경계를 통해 개천 경계로 들어온 성해의 레비아탄. 그 규모는 속계의 어떤 것도 왜소하게 만든다."
-    },
-    "celestial_sovereign": {
-      "name": "천공 군주",
-      "description": "천공 균열의 영역을 지배하는 개천 경계의 군주. 영토 내에서 공간 에너지에 대한 권위가 절대적이다."
-    },
-    "eternal_storm_titan": {
-      "name": "영원한 폭풍 타이탄",
-      "description": "균열의 영속적인 폭풍으로 형태를 얻은 자연의 힘. 의식이 없고 — 천계 날씨의 끝없이 폭력적인 에너지만이 현현한 것이다."
-    },
-    "open_heaven_sovereign": {
-      "name": "개천 군주",
-      "description": "개천 경계의 절정 지배자로, 도의 이해가 속세에서 달성 가능한 모든 것을 초월한다. 마주치는 것은 승천의 최후 시험이다."
-    },
-    "void_apex_predator": {
-      "name": "허공 정점 포식자",
-      "description": "여러 경계의 붕괴에서 살아남은 허공의 궁극 포식자. 스포츠로 천공 군주를 사냥하며 승천한 수련자를 먹잇감으로 여긴다."
+    "vigil": {
+      "description": "오프라인 중에 기를 30% 더 획득.",
+      "label": "끊기지 않는 경시"
     }
   },
-  "items": {
-    "iron_herb_1": {
-      "name": "문파 잡초",
-      "desc": "수련자들이 수련하는 곳에 자라나 문파 수련장의 잔류 기를 흡수하는 잡초."
+  "furnaceFoundations": {
+    "foundation_crucible": {
+      "desc": "영구적으로 이번 생의 돌파 비용 -3%.",
+      "name": "기초 용광로 단약"
     },
-    "iron_herb_2": {
-      "name": "변방 뿌리",
-      "desc": "흙 속의 희미한 영적 에너지에 이끌려 변방 황야에서 발견되는 뒤틀린 뿌리."
+    "foundation_frugal": {
+      "desc": "영구적으로 이번 생의 생산자 구매 비용 -3%.",
+      "name": "기초 절약 단약"
     },
-    "bronze_herb_1": {
-      "name": "기맥 덩굴",
-      "desc": "지하 기맥을 따라 자라는 덩굴로, 잎이 희미하게 빛난다."
+    "foundation_radiance": {
+      "desc": "영구적으로 이번 생의 기/초 +4%. 후반부 콘텐츠.",
+      "name": "기초 광휘 단약"
     },
-    "bronze_herb_2": {
-      "name": "영림 꽃",
-      "desc": "안개 영림에서만 피는 창백한 꽃으로, 숲의 정령이 꽃가루를 옮긴다."
+    "foundation_root": {
+      "desc": "영구적으로 이번 생의 업보 획득량 +3%.",
+      "name": "기초 근원 단약"
     },
-    "silver_herb_1": {
-      "name": "파천 연꽃",
-      "desc": "파천 사막 폐허에서 살아남는 은빛 연꽃으로, 깊은 지맥에서 물을 끌어온다."
+    "foundation_tide": {
+      "desc": "영구적으로 이번 생의 오프라인 기 보정 +5%.",
+      "name": "기초 조수 단약"
     },
-    "silver_herb_2": {
-      "name": "혈해 갈대",
-      "desc": "혈해 가장자리에서 자라는 핏빛 갈대로, 수액이 부패한 생명력으로 진하다."
-    },
-    "gold_herb_1": {
-      "name": "성인 매장지 연꽃",
-      "desc": "성인급 매장지 위에서만 피는 어두운 연꽃으로, 수백 년의 사기(死氣)를 먹고 산다."
-    },
-    "gold_herb_2": {
-      "name": "허공 가시 덩굴",
-      "desc": "균열 틈새를 통해 자라는 가시 달린 덩굴로, 가시가 성인급 방어를 관통할 만큼 날카롭다."
-    },
-    "transcendent_herb_1": {
-      "name": "근원 샘 꽃잎",
-      "desc": "세계 원기 샘에서 자라는 꽃이 흘린 꽃잎으로, 태고의 에너지로 포화되어 있다."
-    },
-    "transcendent_herb_2": {
-      "name": "개천 덩굴",
-      "desc": "뿌리가 개천 경계 자체에까지 뻗어 천급 에너지를 채널링하는 전설의 덩굴."
-    },
-    "iron_mineral_1": {
-      "name": "문파 철편",
-      "desc": "문파 구조물, 수련 장비, 속세 수련자의 철에서 떨어진 철급 재료의 파편."
-    },
-    "iron_mineral_2": {
-      "name": "철광 파편",
-      "desc": "얕은 광맥에서 채굴한 고밀도 철광석 파편으로, 기본 연금술에 사용된다."
-    },
-    "bronze_mineral_1": {
-      "name": "기 이빨",
-      "desc": "수년간 땅에서 기를 흡수하여 광물 밀도가 높아진 짐승의 이빨이나 가시 파편."
-    },
-    "bronze_mineral_2": {
-      "name": "영목 핵",
-      "desc": "정령 존재나 고대 나무에서 나온 굳은 핵으로, 집중된 숲 기가 스며있다."
-    },
-    "silver_mineral_1": {
-      "name": "철척 비늘",
-      "desc": "고대 변방의 철급 포식자 비늘이나 척추 부분으로, 은급 공격을 막을 만큼 밀도가 높다."
-    },
-    "silver_mineral_2": {
-      "name": "선인 진법 옥",
-      "desc": "침몰 선인 유적의 진법으로 주입된 옥으로, 아직 원래 각문의 흔적을 담고 있다."
-    },
-    "gold_mineral_1": {
-      "name": "성인 뼈 조각",
-      "desc": "성인 경지 시신에서 나온 뼈 조각으로, 정제를 거부하는 차가운 사기(死氣)를 발산한다."
-    },
-    "gold_mineral_2": {
-      "name": "금지 봉인 파편",
-      "desc": "한때 금지 구역을 봉쇄했던 허공 봉인의 파편으로, 억제된 힘이 지글거린다."
-    },
-    "transcendent_mineral_1": {
-      "name": "허공 수정",
-      "desc": "균열 틈새에서 자란 수정으로, 구조가 압축된 허공 에너지로만 형성되어 있다."
-    },
-    "transcendent_mineral_2": {
-      "name": "세계석 핵",
-      "desc": "세계 가장 깊은 지층에서 형성되거나 상위 천계의 타이탄이 흘린 믿을 수 없이 밀도 높은 돌 핵으로, 가장 고급 연금술에만 사용된다."
-    },
-    "iron_cultivation_1": {
-      "name": "철 기석 1",
-      "desc": "속세 수련장의 주변 기를 시간이 지나면서 자연적으로 축적하는 자연 형성 돌."
-    },
-    "iron_cultivation_2": {
-      "name": "철 기석 2",
-      "desc": "쓰러진 속세 수련자나 짐승 위에 잠시 응결되었다가 흩어지기 전에 잠깐 보이는 잔류 기."
-    },
-    "bronze_cultivation_1": {
-      "name": "동 기석 1",
-      "desc": "수년간 영적 에너지를 먹은 짐승의 중심에서 발견되는 밀도 높은 기 핵 — 죽은 후에도 희미하게 맥박 친다."
-    },
-    "bronze_cultivation_2": {
-      "name": "동 기석 2",
-      "desc": "에너지 경로가 부패하거나 산산이 부서진 쓰러진 수련자나 구조물에서 뜯겨진 결정화된 기 파편."
-    },
-    "silver_cultivation_1": {
-      "name": "은 기석 1",
-      "desc": "수백 년의 기 흡수 후 포화된, 고대 변방 생물 깊은 곳에서 발견되는 골수 같은 기 응결물."
-    },
-    "silver_cultivation_2": {
-      "name": "은 기석 2",
-      "desc": "선인급 존재가 죽은 후에도 지속되는 혼력의 파편으로, 아직 그것의 수련의 메아리를 담고 있다."
-    },
-    "gold_cultivation_1": {
-      "name": "금 기석 1",
-      "desc": "매장지와 전쟁 제단에서 회수된, 성인 경지 기의 석회화된 유물."
-    },
-    "gold_cultivation_2": {
-      "name": "금 기석 2",
-      "desc": "허공에 물든 포식자와 그림자 내부에서 형성된 작은 구슬로, 압축된 허공 속성 에너지를 담고 있다."
-    },
-    "transcendent_cultivation_1": {
-      "name": "초월 기석 1",
-      "desc": "태고 존재의 결정화된 기 핵 — 수백만 년에 걸친 끊임없는 수련에서 응축된 것."
-    },
-    "transcendent_cultivation_2": {
-      "name": "초월 기석 2",
-      "desc": "속세의 한계를 초월한 존재들에서 추출한 순수 천급 기의 수정."
-    },
-    "iron_essence_pill":          { "name": "철 정수 단약",          "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_soul_pill":             { "name": "철 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_body_pill":             { "name": "철 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_fist_pill":             { "name": "철 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_ember_pill":            { "name": "철 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_mind_pill":             { "name": "철 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_skin_pill":             { "name": "철 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_ward_pill":             { "name": "철 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_anchor_pill":           { "name": "철 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "iron_vigor_pill":            { "name": "철 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_essence_pill":        { "name": "동 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_soul_pill":           { "name": "동 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_body_pill":           { "name": "동 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_fist_pill":           { "name": "동 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_ember_pill":          { "name": "동 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_mind_pill":           { "name": "동 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_skin_pill":           { "name": "동 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_ward_pill":           { "name": "동 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_anchor_pill":         { "name": "동 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "bronze_vigor_pill":          { "name": "동 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_essence_pill":        { "name": "은 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_soul_pill":           { "name": "은 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_body_pill":           { "name": "은 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_fist_pill":           { "name": "은 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_ember_pill":          { "name": "은 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_mind_pill":           { "name": "은 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_skin_pill":           { "name": "은 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_ward_pill":           { "name": "은 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_anchor_pill":         { "name": "은 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "silver_vigor_pill":          { "name": "은 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_essence_pill":          { "name": "금 정수 단약",           "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_soul_pill":             { "name": "금 혼 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_body_pill":             { "name": "금 체 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_fist_pill":             { "name": "금 권 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_ember_pill":            { "name": "금 화 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_mind_pill":             { "name": "금 심 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_skin_pill":             { "name": "금 피 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_ward_pill":             { "name": "금 방 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_anchor_pill":           { "name": "금 정 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "gold_vigor_pill":            { "name": "금 활 단약",             "desc": "기본 능력치를 영구적으로 향상시키는 단약." },
-    "transcendent_essence_pill":  { "name": "초월 정수 단약",         "desc": "세 가지 주요 능력치를 모두 영구적으로 향상시키는 단약." },
-    "exploit_mastery_pill":       { "name": "약점 통달 단약",         "desc": "약점 공략 확률과 피해를 영구적으로 향상시키는 단약." },
-    "world_harvest_pill":         { "name": "세계 수확 단약",         "desc": "채집 및 채굴 속도와 행운을 영구적으로 향상시키는 단약." },
-    "cataclysm_pill":             { "name": "대재앙 단약",            "desc": "모든 피해 유형을 영구적으로 향상시키는 단약." },
-    "dao_bulwark_pill":           { "name": "도 방루 단약",           "desc": "모든 방어 유형을 영구적으로 향상시키는 단약." },
-    "eternal_vigor_pill":         { "name": "영원한 활력 단약",       "desc": "대량의 체력을 영구적으로 부여하는 단약." },
-    "iron_blood_core_1": {
-      "name": "철 혈핵 1",
-      "desc": "쓰러진 적에서 추출한 밀도 높은 철급 혈핵."
-    },
-    "iron_blood_core_2": {
-      "name": "철 혈핵 2",
-      "desc": "속세 수련자들에게서 응결된 결정화된 철급 혈기."
-    },
-    "bronze_blood_core_1": {
-      "name": "동 혈핵 1",
-      "desc": "짐승 생명력이 맥박 치는 동급 혈핵."
-    },
-    "bronze_blood_core_2": {
-      "name": "동 혈핵 2",
-      "desc": "타락한 존재의 응결된 동급 혈기 파편."
-    },
-    "silver_blood_core_1": {
-      "name": "은 혈핵 1",
-      "desc": "고대 변방 생명력으로 포화된 은급 혈핵."
-    },
-    "silver_blood_core_2": {
-      "name": "은 혈핵 2",
-      "desc": "선인 경지 존재의 잔류 혈기 수정."
-    },
-    "gold_blood_core_1": {
-      "name": "금 혈핵 1",
-      "desc": "차가운 사기(死氣)를 발산하는 성인급 혈핵."
-    },
-    "gold_blood_core_2": {
-      "name": "금 혈핵 2",
-      "desc": "금급 포식자의 허공 속성 혈구."
-    },
-    "transcendent_blood_core_1": {
-      "name": "초월 혈핵 1",
-      "desc": "속세의 한계를 초월한 존재에서 응결된 태고의 혈핵."
-    },
-    "transcendent_blood_core_2": {
-      "name": "초월 혈핵 2",
-      "desc": "압도적인 압력을 발산하는 천급 혈기 수정."
+    "foundation_verdant": {
+      "desc": "영구적으로 이번 생의 기/초 +2% (열 단계당, 확장).",
+      "name": "축기 푸른 단약"
     }
   },
-  "artefacts": {
-    "iron_sword": {
-      "name": "철검",
-      "desc": "외문 제자를 위해 단조된 평범한 철검. 믿을 만하지만 평범하다."
+  "furnaceHeat": {
+    "0": {
+      "label": "생(生)"
     },
-    "spirit_edge_sword": {
-      "name": "영기 도검",
-      "desc": "영적 에너지로 단련된 검; 기가 흐를 때 날이 희미하게 울린다."
+    "1": {
+      "label": "담금질됨"
     },
-    "void_cleaver": {
-      "name": "허공 대도",
-      "desc": "허공석으로 단조되었으며; 매 타격이 국소 공간 구조에 실오라기 균열을 남긴다."
+    "2": {
+      "label": "정련됨"
     },
-    "dragon_fang_sword": {
-      "name": "용아 도검",
-      "desc": "용 짐승 이빨로 제작되었으며; 매 타격에 원초적인 용의 압력을 채널링한다."
-    },
-    "heaven_slaying_sword": {
-      "name": "참천검",
-      "desc": "경지 사이의 장벽을 베었다는 전설의 도검. 날이 절대 무뎌지지 않는다."
-    },
-    "iron_polearm": {
-      "name": "철 장병기",
-      "desc": "사거리와 저지력으로 체 수련자들이 선호하는 무거운 철 장병기."
-    },
-    "serpent_spear": {
-      "name": "뱀 창",
-      "desc": "관통 시 가벼운 영적 독을 주입하는 뱀 이빨 끝이 달린 유연한 창."
-    },
-    "mountain_breaker": {
-      "name": "파산",
-      "desc": "작은 영산을 쓰러뜨렸다는 넓은 날의 극. 물리 방어를 분쇄한다."
-    },
-    "thunder_lance": {
-      "name": "뇌전 창",
-      "desc": "압축된 번개 광석으로 코팅된 창; 타격이 천둥 소리와 함께 폭발한다."
-    },
-    "divine_pillar_spear": {
-      "name": "신주 창",
-      "desc": "한때 천상 궁전의 기둥이었다가 창으로 재형성되었다. 전력 돌진은 공간을 가른다."
-    },
-    "spirit_headband": {
-      "name": "영적 머리띠",
-      "desc": "기본 영적 에너지가 주입된 단순한 천 띠로, 수련 중 집중을 돕는다."
-    },
-    "jade_cultivation_crown": {
-      "name": "옥 수련 왕관",
-      "desc": "영적 바다를 안정시키고 돌파 시 난류를 줄이는 조각된 옥 두환."
-    },
-    "ghost_kings_circlet": {
-      "name": "귀왕의 두환",
-      "desc": "귀신 철로 단조되었으며; 영적 공격을 약화시키고 혼 기반 디버프를 억제한다."
-    },
-    "heaven_forged_war_crown": {
-      "name": "천단 전쟁 왕관",
-      "desc": "천상의 불로 제련된 전투 왕관; 원소 피해에 대한 저항을 크게 증가시킨다."
-    },
-    "crown_of_the_undying": {
-      "name": "불사의 왕관",
-      "desc": "개천 수련자가 착용했다는 왕관; 치명적인 혼 공격으로부터 영혼을 보호한다."
-    },
-    "cotton_spirit_robe": {
-      "name": "면 영적 도복",
-      "desc": "영적 실로 짜인 가벼운 도복으로, 최소하지만 꾸준한 기 순환을 제공한다."
-    },
-    "cloud_silk_battle_vest": {
-      "name": "운사 전투복",
-      "desc": "경미한 물리 및 원소 타격을 막는 고고도 운사로 짜인 전투복."
-    },
-    "dragon_scale_armour": {
-      "name": "용린 갑옷",
-      "desc": "하급 용 짐승이 흘린 비늘; 철만큼 단단하고 불과 번개에 저항력이 있다."
-    },
-    "phoenix_feather_war_robe": {
-      "name": "봉황 깃털 전투 도복",
-      "desc": "봉황 솜털로 짜여; 시간이 지남에 따라 경미한 피해를 재생하고 극한의 열에 저항한다."
-    },
-    "heaven_piercing_divine_robe": {
-      "name": "파천 신성 도복",
-      "desc": "부드러움과 철 사이를 전환하는 최상급 도복; 특정 위력 이하의 타격을 무효화한다."
-    },
-    "iron_bracers": {
-      "name": "철 완갑",
-      "desc": "전완을 강화하고 막기 안정성을 향상시키는 기본 철 완갑."
-    },
-    "tiger_claw_gauntlets": {
-      "name": "호조 장갑",
-      "desc": "호랑이 발톱을 본뜬 장갑; 맨손 및 장병기 타격 피해를 약간 증가시킨다."
-    },
-    "mithril_bracers": {
-      "name": "미스릴 완갑",
-      "desc": "매 타격에 원소 에너지를 전달하는 가벼운 미스릴 완갑."
-    },
-    "dragon_vein_gauntlets": {
-      "name": "용맥 장갑",
-      "desc": "용맥 광석이 실처럼 엮인 장갑; 눈에 띄게 빠른 리듬으로 팔을 통해 기를 채널링한다."
-    },
-    "heaven_palm_guards": {
-      "name": "천장 장갑",
-      "desc": "장법 고수가 착용했던 고대 장갑; 개방형 장법 비전 무공을 극적으로 증폭시킨다."
-    },
-    "leather_cultivation_belt": {
-      "name": "가죽 수련 띠",
-      "desc": "단전을 안정시키고 전투 중 기 분산을 줄이는 튼튼한 띠."
-    },
-    "spirit_jade_sash": {
-      "name": "영옥 사시",
-      "desc": "영옥 구슬이 박힌 실크 사시; 상체와 하체 사이의 기 순환을 개선한다."
-    },
-    "serpent_skin_belt": {
-      "name": "뱀 가죽 띠",
-      "desc": "영적 뱀이 벗은 가죽으로 제작되었으며; 민첩성과 독 저항을 증가시킨다."
-    },
-    "golden_dragon_belt": {
-      "name": "황금 용 띠",
-      "desc": "또아리 용이 양각된 넓은 띠; 체 능력치 전환을 크게 증가시킨다."
-    },
-    "void_emperors_sash": {
-      "name": "허공 황제의 사시",
-      "desc": "공간 실로 짜인 사시; 들어오는 피해의 일부를 허공 주머니로 흡수한다."
-    },
-    "wind_step_boots": {
-      "name": "풍보 부츠",
-      "desc": "빠른 발놀림을 위해 마법이 걸린 가벼운 부츠; 회피율을 약간 증가시킨다."
-    },
-    "swiftcloud_sandals": {
-      "name": "속운 신발",
-      "desc": "구름 에너지의 흔적을 담은 신발; 잠깐의 가속된 이동을 허용한다."
-    },
-    "thunderstep_boots": {
-      "name": "뇌보 부츠",
-      "desc": "저장된 번개가 지글거리는 부츠; 매 걸음이 접촉 시 저출력 충격을 방출한다."
-    },
-    "dragon_treading_boots": {
-      "name": "용답 부츠",
-      "desc": "용 짐승 뼈로 단조되었으며; 지면 안정성과 짓밟기 공격을 극적으로 향상시킨다."
-    },
-    "heaven_soaring_sandals": {
-      "name": "승천 신발",
-      "desc": "착용자가 공중을 걸을 수 있다는 신발; 회피와 이동 기반 무공을 대폭 강화한다."
-    },
-    "jade_spirit_pendant": {
-      "name": "옥 영적 목걸이",
-      "desc": "심장 가까이 착용하는 매끈한 옥 조각; 영적 바다를 부드럽게 강화한다."
-    },
-    "soul_calming_necklace": {
-      "name": "진혼 목걸이",
-      "desc": "전투 중 혼의 동요와 정신 디버프를 억제하는 영적 구슬 줄."
-    },
-    "blood_dragon_talisman": {
-      "name": "혈룡 부적",
-      "desc": "용 짐승 피에 흠뻑 젖은 조각된 뼈 부적; 원초적 물리 저항을 증가시킨다."
-    },
-    "elemental_core_pendant": {
-      "name": "원소 핵 목걸이",
-      "desc": "압축된 원소 핵을 담고 있으며; 원소 친화 보너스를 증폭시킨다."
-    },
-    "heavens_eye_amulet": {
-      "name": "천안 부적",
-      "desc": "신성한 짐승의 석화된 눈을 담은 부적; 전투 중 잠깐의 예지력을 부여한다."
-    },
-    "copper_spirit_ring": {
-      "name": "동 영적 반지",
-      "desc": "경맥을 통해 희미한 기 흐름을 채널링하는 평범한 동 반지."
-    },
-    "jade_focus_ring": {
-      "name": "옥 집중 반지",
-      "desc": "원소 무공 제어를 날카롭게 하여 낭비되는 에너지를 줄이는 조각된 옥 반지."
-    },
-    "void_stone_ring": {
-      "name": "허공석 반지",
-      "desc": "허공석 파편이 박혀 있으며; 작은 수납 공간이 있고 공간 무공 피해를 증폭시킨다."
-    },
-    "dragon_blood_ring": {
-      "name": "용혈 반지",
-      "desc": "용혈 합금으로 단조되었으며; 착용자의 기 순환을 크게 가속시킨다."
-    },
-    "immortal_soul_ring": {
-      "name": "선인 혼 반지",
-      "desc": "선인의 혼 조각을 담고 있다는 반지; 착용자의 기 속도를 극적으로 증폭시킨다."
+    "3": {
+      "label": "정점(頂)"
     }
   },
-  "techniques": {},
-  "laws": {
-    "three_harmony_manual": {
-      "name": "삼화결",
-      "flavour": "고대 문서는 불도, 폭풍도, 산도 없이 — 오직 만물 사이의 고른 호흡만을 말한다.",
-      "realmRequirementLabel": "단체경"
+  "furnaceMaterials": {
+    "cinnabar_powder": {
+      "name": "주사 분말"
+    },
+    "dragon_root": {
+      "name": "용근(龍根)"
+    },
+    "jade_tincture": {
+      "name": "옥 팅크"
+    },
+    "mint_essence": {
+      "name": "박하 에센스"
+    },
+    "moon_dust": {
+      "name": "월진(月塵)"
+    },
+    "phoenix_ash": {
+      "name": "봉황 재(灰)"
+    },
+    "spirit_sediment": {
+      "name": "영 침전물"
+    }
+  },
+  "furnacePills": {
+    "calm_pond": {
+      "desc": "오프라인 기 획득량 10% 증가, 4시간.",
+      "name": "고요한 연못 단약"
+    },
+    "frugal_mind": {
+      "desc": "다음 제자 획득 10회 비용 10% 감소.",
+      "name": "검소한 마음 단약"
+    },
+    "inner_flame": {
+      "desc": "다음 돌파 기 소비 10% 감소 (1회).",
+      "name": "내면의 불꽃 단약"
+    },
+    "mystery": {
+      "desc": "신비한 단약. 복용 시 효과가 드러난다.",
+      "name": "??? 단약"
+    },
+    "phoenix_radiance": {
+      "desc": "기/초 10% 증가, 1시간. 후반 소비.",
+      "name": "봉황 광채 단약"
+    },
+    "quiet_tide": {
+      "desc": "다음 10회 제자 획득 비용 7% 감소 및 오프라인 5% 증가.",
+      "name": "고요한 조수 단약"
+    },
+    "rooted_vigor": {
+      "desc": "업보 획득량 5% 증가, 4시간.",
+      "name": "뿌리내린 활력 단약"
+    },
+    "spring_flame": {
+      "desc": "기/초 4% 증가, 다음 돌파 5% 할인.",
+      "name": "봄 불꽃 단약"
+    },
+    "trinity": {
+      "desc": "기/초 3%, 돌파 할인 3%, 오프라인 3% 증가. 전능형.",
+      "name": "삼중 단약"
+    },
+    "verdant_body": {
+      "desc": "기/초 5% 증가, 2시간 (열 단계별, 확장됨).",
+      "name": "푸른 신체 단약"
+    },
+    "verdant_tide": {
+      "desc": "기/초 4% 증가 및 오프라인 5% 증가, 2시간.",
+      "name": "푸른 조수 단약"
+    }
+  },
+  "gardenPlants": {
+    "black_iron_reed": {
+      "name": "검은 철 갈대"
+    },
+    "cinnabar_bloom": {
+      "name": "주사 꽃"
+    },
+    "dragonscale_ginseng": {
+      "name": "용비늘 인삼"
+    },
+    "gold_crown_peony": {
+      "name": "금 왕관 모란"
+    },
+    "heaven_pierce_bamboo": {
+      "name": "천상 꿰뚫는 대나무"
+    },
+    "jade_lotus_bud": {
+      "name": "옥 연꽃 봉우리"
+    },
+    "moonleaf_vine": {
+      "name": "월엽 덩굴"
+    },
+    "phoenix_tail_grass": {
+      "name": "봉황 꼬리풀"
+    },
+    "soul_lily": {
+      "name": "영혼 백합"
+    },
+    "spirit_mint": {
+      "name": "영 박하"
+    }
+  },
+  "gardenRecipes": {
+    "e_jade": {
+      "name": "옥 이슬 음료"
+    },
+    "e_spirit": {
+      "name": "영 개화 선약"
+    },
+    "e_verdant": {
+      "name": "푸른 원기 음료"
+    }
+  },
+  "minigames": {
+    "p_beast_pact": {
+      "mode": "활성 · 전투꾼",
+      "name": "야수 투기장",
+      "tagline": "계약한 야수를 영혼 사다리 위로 겨루어라."
+    },
+    "p_disciple": {
+      "mode": "활성 · 격자 병합",
+      "name": "제자 명부",
+      "tagline": "제자들을 수련 경계를 통해 승진시키세요. 명부 합계는 모든 제자의 기 산출량을 높입니다."
+    },
+    "p_dragon": {
+      "mode": "활성 · 운을 밀어붙이기",
+      "name": "용몽",
+      "tagline": "숨을 쉬며 흡수하고, 깨우기 전에 저장하세요."
+    },
+    "p_herb_garden": {
+      "mode": "유휴 · 경작 및 수확",
+      "name": "영혼의 정원",
+      "tagline": "영혼의 씨앗을 심고, 밭을 돌보고, 풍성한 수확을 거두세요."
+    },
+    "p_meridian_furnace": {
+      "mode": "활성 · 타이밍",
+      "name": "단약 제련",
+      "tagline": "불길을 제어하고 희귀한 약재를 강력한 단약으로 만드세요."
+    },
+    "p_phoenix": {
+      "mode": "활성 · 아케이드",
+      "name": "봉황의 불길",
+      "tagline": "화염의 흐름을 타고 깃털을 모으세요."
+    },
+    "p_pillar": {
+      "mode": "활성 · 클라이머",
+      "name": "기둥 상승",
+      "tagline": "천상의 기둥을 오르고 천벌을 피하세요."
+    },
+    "p_sect_followers": {
+      "mode": "빛 관리",
+      "name": "문파 공물",
+      "tagline": "만의 제자를 봉납에 모으세요."
+    },
+    "p_treasure": {
+      "mode": "유휴 · 슬롯팅",
+      "name": "조상의 메아리",
+      "tagline": "조상을 모셔 영원한 축복을 얻으세요."
+    },
+    "p_void": {
+      "mode": "활성 · 퍼즐",
+      "name": "공허 소통",
+      "tagline": "틈새가 닫히기 전에 기를 흘러보내세요."
+    }
+  },
+  "producers": {
+    "p_beast_pact": {
+      "desc": "한 번 휘파람을 불면 그들이 돌아옵니다. 죽지 않은 자가 걸을 수 없는 곳에서. 기의 폭풍이 털에 얽힌 호랑이들. 혀에 별빛을 묻힌 여우들. 그들은 수확을 당신의 문앞에 가져옵니다.",
+      "name": "영수 계약"
+    },
+    "p_disciple": {
+      "desc": "제자 하나가 당신의 뜰에 무릎을 꿇고 있습니다. 숨은 고르고, 손은 따뜻합니다. 하늘의 기를 끌어당기는 그들의 실은 가늘지만, 모든 실이 자리를 강하게 만듭니다.",
+      "name": "신체 단련 제자"
+    },
+    "p_dragon": {
+      "desc": "그것은 당신의 단전에서 꿈을 꾸고, 그 꿈 중 하나는 당신입니다. 그것이 감싼 구슬은 산보다 더 오래되었습니다. 천천한 숨 한 번이 당신의 경락에 노력하지 않고 얻은 수련으로 도금을 합니다.",
+      "name": "잠든 영용"
+    },
+    "p_herb_garden": {
+      "desc": "옥빛 잎이 새벽에 펼쳐져 조용히 하늘을 마십니다. 영초가 사용하지 못하는 것들이 당신께 바쳐집니다.",
+      "name": "영초 정원"
+    },
+    "p_meridian_furnace": {
+      "desc": "청동의 다리, 밀폐된 뚜껑, 죽지 않는 불꽃. 흙탕물 같은 기가 들어가 금보다 밀도 있는 기로 당신의 경락에 닿습니다.",
+      "name": "경락 용광로"
+    },
+    "p_phoenix": {
+      "desc": "봉황은 우주 자신이 동의할 때에만 내려옵니다. 무지개 날개를 당신의 영혼에 감싸 안습니다. 모든 깃털은 강입니다. 모든 울음은 하늘보다 더 오래된 경전입니다.",
+      "name": "주권의 봉황"
+    },
+    "p_pillar": {
+      "desc": "당신 조부의 조부보다 먼저 조각되어, 기둥은 구름이 돌이었음을 잊을 때까지 올라갑니다. 그 길이를 통해 하늘 자신이 당신의 단전으로 흘러내립니다.",
+      "name": "천상의 기둥"
+    },
+    "p_sect_followers": {
+      "desc": "만의 제자가 새벽에 깨어 당신의 표장을 담은 대전을 향해 절을 합니다. 각각의 한 톨의 쌀이 산이 되고, 각각의 한 숨 기가 강이 됩니다.",
+      "name": "범인 문파 신도"
+    },
+    "p_treasure": {
+      "desc": "당신의 조상이 백 생을 들고 다니던 옥 패물. 그들이 취한 매 숨이 흔적을 남겼고, 모든 흔적이 지금 밀물처럼 당신에게 흘러들어옵니다.",
+      "name": "조상의 보물"
+    },
+    "p_void": {
+      "desc": "현실의 상처, 절대 닫히지 않고, 절대 덜 흘리지 않습니다. 그것을 통해 당신의 세상이 아닌 세상의 기가 당신의 세상으로 흘러들어옵니다. 또 다른 우주는 관대한 봉납입니다.",
+      "name": "공허 통로"
+    }
+  },
+  "qiSparks": {
+    "consecutive_focus_t1": {
+      "description": "집중 유지 2초 → 기/초 +5%.",
+      "name": "연속 집중"
+    },
+    "consecutive_focus_t2": {
+      "description": "추가: 집중 유지 4초 → 기/초 +7% 추가 (총 +12%).",
+      "name": "연속 집중"
+    },
+    "consecutive_focus_t3": {
+      "description": "효과: 집중 유지 6초 → 기/초 +13% 증가 (총 +25%)",
+      "name": "연속 집중"
+    },
+    "consecutive_focus_t4": {
+      "description": "효과: 집중 유지 8초 → 기/초 +15% 증가 (총 +40%)",
+      "name": "연속 집중"
+    },
+    "consecutive_focus_t5": {
+      "description": "효과: 집중 유지 10초 → 기/초 +20% 증가 (총 +60%) 그리고 깊은 명상 진입",
+      "name": "연속 집중"
+    },
+    "crystal_click_t1": {
+      "description": "기 결정이 기/초의 30%를 비축합니다(최대 2분). 탭하여 수집하세요.",
+      "name": "기 결정 저장소"
+    },
+    "crystal_click_t2": {
+      "description": "기/초의 50%로 업그레이드됩니다(최대 3분). 탭하여 수집하세요.",
+      "name": "기 결정 저장소"
+    },
+    "crystal_click_t3": {
+      "description": "기/초의 70%로 업그레이드됩니다(최대 4분). 탭하여 수집하세요.",
+      "name": "기 결정 저장소"
+    },
+    "crystal_click_t4": {
+      "description": "기/초의 85%로 업그레이드됩니다(최대 5분). 탭하여 수집하세요.",
+      "name": "기 결정 저장소"
+    },
+    "crystal_click_t5": {
+      "description": "정량: 기/초의 100%(최대 6분). 기 결정을 탭하여 수집하세요.",
+      "name": "기 결정 저장소"
+    },
+    "divine_qi_t1": {
+      "description": "황금빛 구슬이 약 10분마다 나타납니다. 8초 안에 탭하면 25초간의 기를 얻습니다.",
+      "name": "천상의 기"
+    },
+    "divine_qi_t2": {
+      "description": "약 9분마다 구슬이 나타나고, 창을 10초 열어둡니다. 탭하면 35초간의 기를 얻습니다.",
+      "name": "천상의 기"
+    },
+    "divine_qi_t3": {
+      "description": "약 8분마다 구슬이 나타나고, 창을 12초 열어둡니다. 탭하면 50초간의 기를 얻습니다.",
+      "name": "천상의 기"
+    },
+    "divine_qi_t4": {
+      "description": "약 7분마다 구슬이 나타나고, 창을 15초 열어둡니다. 탭하면 65초간의 기를 얻습니다.",
+      "name": "천상의 기"
+    },
+    "divine_qi_t5": {
+      "description": "약 6분마다 구슬 2개가 나타납니다. 둘 다 수집하면 75초의 기 + 20초간 기/초 ×1.25 증가.",
+      "name": "천상의 기"
+    },
+    "enduring_stream": {
+      "description": "이번 수련 동안 기/초 +1%. 중첩됩니다.",
+      "name": "항구적인 흐름"
+    },
+    "heavens_bond": {
+      "description": "이번 수련 동안 오프라인 기 수집 +3%. 중첩됩니다.",
+      "name": "천상의 인연"
+    },
+    "legendary_a1_smoke_petal": {
+      "description": "영령의 약초 정원 + 경락 용광로 쌍마다 둘 다 ×1.5 곱해집니다. 정원의 옥색 잎이 용광로의 연기 속에 휘감기고 더 빨리 피고, 용광로는 영초의 숨결을 맛보며 더 뜨겁게 타오릅니다.",
+      "name": "연기와 꽃잎"
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "description": "신체 연마 제자 + 범인 문파 추종자 쌍마다 둘 다 ×1.75 곱해집니다. 단 한 명의 제자가 초점이 되고, 수만의 순례자가 그를 향해 절합니다.",
+      "name": "만인의 전당"
+    },
+    "legendary_a3_pearl_pendant": {
+      "description": "수면의 영룡 + 조상의 보물 쌍마다 둘 다 ×2 곱해집니다. 용의 수면주가 조상이 남긴 유물을 알아보면서, 다시 만날 운명이 정해집니다.",
+      "name": "구슬과 목걸이"
+    },
+    "legendary_a4_climbing_beasts": {
+      "description": "영수 계약 + 천주 쌍마다 전체 기/초 +10%. 호랑이는 자정에 천주를 타고 올라가 직접 마시지만, 여우들에게는 말하지 않습니다. 여우들이 결국 알게 됩니다.",
+      "name": "등반하는 야수"
+    },
+    "legendary_a5_void_garden": {
+      "description": "허공의 통로 + 영령의 약초 정원 쌍마다 둘 다 ×2.5 곱해집니다. 허공의 균열은 다른 세계의 씨앗을 실어 나르고, 정원은 그것들을 삼킨 후 누구도 이름 붙일 수 없는 색상으로 피어납니다.",
+      "name": "허공의 정원"
+    },
+    "legendary_a6_phoenix_pillar": {
+      "description": "주권의 봉황 + 천주 쌍마다 둘 다 ×3 곱해집니다. 봉황은 하늘을 향한 높이의 자리에만 내려앉으니, 각각의 천주는 천국으로 향한 한 걸음입니다.",
+      "name": "봉황과 천주"
+    },
+    "legendary_b1_dragon_hoard": {
+      "description": "수면의 영룡은 소유한 조상의 보물 1개당 기/초 +25%. 용의 구슬은 당신이 그에게 드린 모든 것이고, 보관한 모든 유물이 그 안에 스며들었습니다.",
+      "name": "용의 보물"
+    },
+    "legendary_b3_beast_tribute": {
+      "description": "영수 계약은 소유한 영령의 약초 정원 1개당 기/초 +12%. 호랑이는 당신이 기른 영초를 먹고 더 크고 빠르고 날카로워져 돌아옵니다.",
+      "name": "야수 공물"
+    },
+    "legendary_b4_furnace_sect": {
+      "description": "경락 용광로는 신체 연마 제자 1개당 기/초 +4%. 모든 제자의 숨이 청동 다리를 조금 더 밝게 피우고, 용광로는 늘 문파의 노력이었습니다.",
+      "name": "문파의 용광로"
+    },
+    "legendary_b5_heavens_bend": {
+      "description": "천주는 허공의 통로 1개 이상 소유 시 기/초 ×2. 현실이 이미 찢어졌다면, 천국도 더는 저항하지 않습니다.",
+      "name": "하늘이 고개를 숙인다"
+    },
+    "legendary_b6_phoenix_garden": {
+      "description": "주권의 봉황 소유한 영약초 정원마다 기/초 +5%. 봉황은 흙이 약인 곳에서만 둥지를 튼다. 백 개의 정원, 백 가지의 머물러야 할 이유.",
+      "name": "봉황의 정원"
+    },
+    "legendary_e2_phoenix_reborn": {
+      "description": "매번 경계 돌파 시 봉황의 수는 0으로 초기화되지만 이번 회차의 다른 모든 생산자의 기/초에 영구적으로 +50% 적용. 봉황은 자신의 재에서 다시 태어나 — 그 터전의 문파를 축복하려.",
+      "name": "다시 태어난 봉황"
+    },
+    "legendary_f1_storm_tiger": {
+      "description": "영수 계약 기/초 ×2. 호랑이는 발을 굴리고 귀를 젖힌다.용이 그 이름을 꿈꾸고 봉황이 그것을 노래해주지 않으면 울음을 내지 않으리. 그 때까지 털 속의 폭풍은 중얼거릴 뿐이다.",
+      "name": "폭풍의 털을 가진 호랑이"
+    },
+    "legendary_f2_pearl_dragon": {
+      "description": "잠자는 영수 용 기/초 ×2. 용이 두 가지 먼 소리를 들을 때 그 진주는 따뜻해진다 — 발을 구르는 호랑이, 무지개 날개를 접는 봉황. 세 소리가 모두 울려야만 꿈이 완성된다.",
+      "name": "진주 꿈의 용"
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "description": "주권의 봉황 기/초 ×2. 봉황의 울음은 세 음으로 이루어져 있다. 혼자서는 한 음만 울고 — 어디선가 호랑이가 발을 굴리고, 어디선가 용이 꿈을 꾼다. 세 음이 모두 울릴 때, 하늘이 고개를 숙인다.",
+      "name": "무지개 울음의 봉황"
+    },
+    "masters_patience": {
+      "description": "이번 회차에서 집중에 보낸 각 초마다 기/초 +0.1%. 중첩. 스택당 상한 +12%.",
+      "name": "스승의 인내심"
+    },
+    "pattern_click_t1": {
+      "description": "기 불꽃은 약 12분마다 나타난다. 탭하여 시작: 점 3개, 제거에 10초, 성공 시 기 30초.",
+      "name": "경락을 따라가기"
+    },
+    "pattern_click_t2": {
+      "description": "약 11분마다 기 불꽃 출현. 점 4개, 12초 제한 시간. 전부 제거: 기 40초.",
+      "name": "경락을 따라가기"
+    },
+    "pattern_click_t3": {
+      "description": "약 10분마다 기 불꽃 출현. 점 5개, 14초 제한 시간. 전부 제거: 기 55초.",
+      "name": "경락을 따라가기"
+    },
+    "pattern_click_t4": {
+      "description": "약 9분마다 기 불꽃 출현. 점 6개, 16초 제한 시간. 전부 제거: 기 70초.",
+      "name": "경락을 따라가기"
+    },
+    "pattern_click_t5": {
+      "description": "약 8분마다 기 불꽃 출현. 점 7개, 18초 제한 시간. 전부 제거: 기 90초 + 기/초 ×1.5 (20초간).",
+      "name": "경락을 따라가기"
+    },
+    "quick_burst": {
+      "description": "현재 기/초의 30초분에 해당하는 기를 즉시 획득.",
+      "name": "빠른 분출"
+    },
+    "resonant_soul": {
+      "description": "이번 회차에서 도달한 단계 돌파마다 기/초 +0.2%. 중첩.",
+      "name": "공명하는 영혼"
+    },
+    "sect_discipline": {
+      "description": "90초간 모든 생산자가 단위당 기/초 +1 획득. 제자들이 함께 숨을 쉰다.",
+      "name": "문파의 기풍"
+    },
+    "sharper_focus": {
+      "description": "이번 회차의 나머지 동안 집중 배수 +2%. 중첩.",
+      "name": "더 날카로운 집중"
+    },
+    "steady_cultivation": {
+      "description": "이번 회차의 나머지 동안 기본 기/초 +0.3. 중첩.",
+      "name": "꾸준한 수련"
+    },
+    "steady_stream": {
+      "description": "60초간 기/초 +20%.",
+      "name": "꾸준한 흐름"
+    },
+    "surging_stream": {
+      "description": "30초간 기/초 +50%.",
+      "name": "솟아오르는 흐름"
+    },
+    "tinkers_bargain": {
+      "description": "다음 생산자 구매 5회의 비용이 -30% 기. 조기에 움직인 자에게 유리한 거래.",
+      "name": "수공인의 거래"
+    }
+  },
+  "rarity": {
+    "Bronze": {
+      "label": "청동"
+    },
+    "Gold": {
+      "label": "금"
+    },
+    "Iron": {
+      "label": "철"
+    },
+    "Silver": {
+      "label": "은"
+    },
+    "Transcendent": {
+      "label": "초월적"
+    }
+  },
+  "shopBundles": {
+    "bundle_bone_court": {
+      "desc": "수련자 + 기 결정, 한 가지 납골당 테마.",
+      "name": "뼈의 궁전"
+    },
+    "bundle_frost_sect": {
+      "desc": "수련자 + 기 결정, 한 가지 서리 테마.",
+      "name": "서리 문파"
+    }
+  },
+  "shopItems": {
+    "buff_crimson_aura_12h": {
+      "desc": "12시간 동안 기/초 ×2. '자러 가기' 팩.",
+      "name": "진홍색 기운 — 12시간"
+    },
+    "buff_crimson_aura_1h": {
+      "desc": "1시간 동안 기/초 ×2. 수련자는 활성화 중 주홍색 광환을 띱니다.",
+      "name": "주홍색 기운 — 1시간"
+    },
+    "buff_crimson_aura_4h": {
+      "desc": "4시간 동안 기 초당 ×2 배증. 적극적으로 플레이하는 수련자에게 최고의 분당 가치.",
+      "name": "진홍 기운 — 4시간"
+    },
+    "buff_crystal_resonance_30m": {
+      "desc": "기 결정 채취당 기 ×2 배증, 30분. 정제 채취 강화와 중첩되어 엄청난 채취를 만듭니다.",
+      "name": "기 결정 공명 — 30분"
+    },
+    "buff_producer_surge_4h": {
+      "desc": "4시간 동안 모든 생산자의 기본 속도 ×1.5 배증. 강화와 곱셈 중첩됩니다.",
+      "name": "생산자 급등 — 4시간"
+    },
+    "consumable_major_bt_bypass": {
+      "desc": "다음 큰 돌파에서 기/초 관문을 건너뜁니다. 기 비용은 여전히 지불해야 하지만 속도를 먼저 올릴 필요가 없습니다.",
+      "name": "천상의 사면"
+    },
+    "cos_char_bone_patriarch": {
+      "desc": "백골 종파의 시든 장로. 13개 경계 모두를 통해 당신과 함께 진화합니다.",
+      "name": "백골 족장"
+    },
+    "cos_char_frost_ascetic": {
+      "desc": "얼어붙은 봉우리의 바람 많이 맞은 중. 13개 경계 모두를 통해 당신과 함께 진화합니다.",
+      "name": "서리 수행자"
+    },
+    "cos_char_lotus_sage": {
+      "desc": "꽃잎이 수행자의 몸 주위에 피어나갑니다. 13개 경계 모두를 통해 진화합니다.",
+      "name": "연화 성인"
+    },
+    "cos_char_storm_caller": {
+      "desc": "구름 같은 비단 옷, 번개로 빛나는 눈. 13개 경계 모두를 통해 진화합니다.",
+      "name": "폭풍 소환사"
+    },
+    "cos_crystal_frost": {
+      "desc": "겨울 수련자들이 조각한 빙하 파편. 10개 단계 모두를 통해 진화합니다.",
+      "name": "서리 기 결정"
+    },
+    "cos_crystal_ossuary": {
+      "desc": "고대 백골을 통해 자란 기 결정 격자. 10개 단계 모두를 통해 진화합니다.",
+      "name": "백골 기 결정"
+    },
+    "cos_crystal_phoenix": {
+      "desc": "기 결정 격자에 갇힌 녹은 불씨. 10개 단계 모두를 통해 진화합니다.",
+      "name": "봉황 핵"
+    },
+    "cos_particles_c9_0": {
+      "desc": "응축된 허무의 옥구. 절제되고 순수합니다.",
+      "name": "허공 점"
+    },
+    "cos_particles_c9_10": {
+      "desc": "정교한 기 노드, 내부 패턴이 정연합니다.",
+      "name": "신비 옥구"
+    },
+    "cos_particles_c9_11": {
+      "desc": "뭉쳐진 기. 용의 집중된 힘을 담고 있습니다.",
+      "name": "용 점"
+    },
+    "cos_particles_c9_12": {
+      "desc": "따뜻하게 떠오르는 옥구. 불이 다시 타오르는 듯한 밝은 내부 핵.",
+      "name": "봉황 옥구"
+    },
+    "cos_particles_c9_13": {
+      "desc": "갇힌 전하로 팝콘처럼 튑니다. 절대 가만히 있지 않습니다.",
+      "name": "폭풍 점"
+    },
+    "cos_particles_c9_14": {
+      "desc": "백 번의 천둥소리 기억을 담고 있습니다.",
+      "name": "우뢰 옥구"
+    },
+    "cos_particles_c9_15": {
+      "desc": "최고의 형태. 밀도 있고, 밝고, 완벽하게 균형잡힌 기.",
+      "name": "최고 점"
+    },
+    "cos_particles_c9_2": {
+      "desc": "원초의 기 자락. 희미한 발광 궤적을 남깁니다.",
+      "name": "실 점"
+    },
+    "cos_particles_c9_3": {
+      "desc": "천체의 빛이 반짝이는 컴팩트한 별 모양 옥구.",
+      "name": "별 점"
+    },
+    "cos_particles_c9_4": {
+      "desc": "압축된 기, 의지로 무겁습니다. 팽팽한 내부 빛.",
+      "name": "밀도 높은 핵"
+    },
+    "cos_particles_c9_5": {
+      "desc": "부드럽고 퍼져 있습니다. 아침 안개처럼 당신에게 녹아듭니다.",
+      "name": "안개 구슬"
+    },
+    "cos_particles_c9_6": {
+      "desc": "기의 오래된 형태. 거친 울림이 있다.",
+      "name": "원시 구슬"
+    },
+    "cos_particles_c9_7": {
+      "desc": "결정질 격자로 형성된 기. 날카로운 내부의 빛.",
+      "name": "수정 입자"
+    },
+    "cos_particles_c9_8": {
+      "desc": "거의 물질화된 기. 실질보다 광채가 크다.",
+      "name": "허공 구슬"
+    },
+    "cos_particles_c9_9": {
+      "desc": "천급 구슬. 먼 옛날의 울림을 품고 있다.",
+      "name": "천상의 입자"
+    },
+    "qol_autobuy_cheapest": {
+      "desc": "문파 화면에서 자동 구매 토글을 해제합니다. 활성화하면 기가 가장 저렴한 제작자에게 자동으로 소비됩니다.",
+      "name": "제자의 부지런함"
+    },
+    "qol_offline_cap_2h": {
+      "desc": "오프라인 기 축적 한계를 2시간 연장합니다. 최대 3회 적층 가능 (기본 8시간 한계에 최대 +6시간).",
+      "name": "인내심 +2시간"
+    },
+    "qol_skip_bt_confirm": {
+      "desc": "주요 돌파 게이트가 열렸을 때 자동으로 확정합니다. 축하 일시정지를 건넙니다.",
+      "name": "결연한 마음"
+    }
+  },
+  "sparkCopy": {
+    "enduring_stream": {
+      "effectText": "**+1% 기/초** 이번 회차. 적층됨.",
+      "exampleText": "5회 적층은 대략 <strong>+5% 기/초</strong>를 합산합니다. 작지만 확실하고 절대 만료되지 않습니다.",
+      "loreText": "멈추지 않는 강은 바다가 된다."
+    },
+    "heavens_bond": {
+      "effectText": "**+3% 오프라인 기 생성 속도** 이번 회차. 적층됨.",
+      "exampleText": "기본 오프라인 속도는 20%입니다. 3회 적층하면 <strong>29% 오프라인 속도</strong>로 올라가므로 당신이 잘 때 문파가 조금 더 열심히 수련합니다.",
+      "loreText": "천지는 당신의 주의를 요구하지 않습니다. 오직 당신의 정렬을 요구할 뿐입니다."
+    },
+    "legendary_a1_smoke_petal": {
+      "effectText": "각 **영초원 + 경락로 제련소** 쌍: 둘 다 **×1.5** 생산.",
+      "exampleText": "3개 정원과 5개 제련소를 소유하고 있으므로 3쌍이고, 각 정원과 각 제련소의 기/초는 <strong>×2.5</strong>배로 곱해집니다 (1 + 3 × 0.5).",
+      "loreText": "정원의 옥빛 잎사귀가 제련소 연기에 휘감겨 더 빠르게 피고, 제련소는 영초의 숨을 마시며 더 뜨겁게 타오른다."
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "effectText": "각 **수련 제자 + 문파 추종자** 쌍: 둘 다 **×1.75** 생산.",
+      "exampleText": "10명의 제자와 4명의 문파 추종자를 소유하고 있으므로 4쌍이고, 각 제작자의 기/초는 <strong>×4</strong>배로 곱해집니다 (1 + 4 × 0.75).",
+      "loreText": "한 명의 제자가 초점이 되고, 만 명의 순례자가 그들에게 절합니다. 순례자는 제자를 보고, 제자는 그 무게를 느낍니다."
+    },
+    "legendary_a3_pearl_pendant": {
+      "effectText": "각 **영룡 + 조상의 보물** 쌍: 둘 다 **×2** 생산.",
+      "exampleText": "2마리의 용과 5개의 보물을 소유하고 있으므로 2쌍이고, 각 제작자의 기/초는 <strong>×3</strong>배로 곱해집니다 (1 + 2 × 1).",
+      "loreText": "용의 슬림버 구슬이 당신의 조상들이 지닌 유물을 인식합니다. 그들은 절대 떨어진 적이 없습니다. 그들은 항상 다시 찾을 운명이었습니다."
+    },
+    "legendary_a4_climbing_beasts": {
+      "effectText": "각 **영령 수렴 + 천상의 기둥** 쌍: **전역 기/초 +10%**.",
+      "exampleText": "<strong>5개의 짐승 계약 + 8개의 기둥</strong>을 소유하여 5개 쌍을 이루면 모든 생산에 <strong>+50% 전역 기/초</strong>를 제공합니다.",
+      "loreText": "호랑이들은 한밤중에 천상의 기둥을 오르내려 직접 마십니다. 그들은 여우에게 말하지 않습니다. 여우는 알아냅니다."
+    },
+    "legendary_a5_void_garden": {
+      "effectText": "각 **허공의 통로 + 영초 정원** 쌍: 둘 다 **×2.5** 생산합니다.",
+      "exampleText": "<strong>3개의 허공 통로 + 10개의 정원</strong>을 소유하여 3개 쌍을 이루면, 각 생산자의 기/초는 <strong>×5.5</strong>배 (1 + 3 × 1.5) 곱해집니다.",
+      "loreText": "허공의 출혈은 다른 세계의 씨앗을 옮기며, 정원은 그것을 삼키고 이름 붙여진 적 없는 색상으로 피어납니다."
+    },
+    "legendary_a6_phoenix_pillar": {
+      "effectText": "각 **주권의 봉황 + 천상의 기둥** 쌍: 둘 다 **×3** 생산합니다.",
+      "exampleText": "<strong>1개의 봉황 + 10개의 기둥</strong>을 소유하여 1개 쌍을 이루면, 두 생산자의 기/초는 <strong>×3</strong>배 곱해집니다. 2번째 봉황을 추가하면 2개 쌍이 생겨 각각 ×5배가 됩니다.",
+      "loreText": "봉황은 충분히 높은 횃대에만 내려앉습니다. 각 기둥은 천상을 향한 한 발짝 더입니다."
+    },
+    "legendary_b1_dragon_hoard": {
+      "effectText": "**영룡**은 소유한 조상 유보물 당 **기/초 +25%** 상승.",
+      "exampleText": "<strong>1개의 용 + 10개의 유보물</strong>을 소유하면 용의 기/초는 <strong>×3.5</strong>배 (1 + 10 × 0.25)입니다. 20개 유보물일 때는 ×6배.",
+      "loreText": "용의 구슬은 당신이 그것에 바친 것이 무엇이든 그것입니다. 당신이 간직한 모든 유물을 그것은 자신 안에 꺾어 담았습니다."
+    },
+    "legendary_b3_beast_tribute": {
+      "effectText": "**영렴 수렴**은 영초 정원당 **기/초 +12%** 상승.",
+      "exampleText": "<strong>10개의 짐승 계약 + 15개의 정원</strong>을 소유하면, 각 짐승 계약의 기/초는 <strong>×2.8</strong>배 (1 + 15 × 0.12)입니다.",
+      "loreText": "호랑이들은 당신이 기른 영초를 먹습니다. 더 크고, 빠르고, 날카롭게 돌아옵니다."
+    },
+    "legendary_b4_furnace_sect": {
+      "effectText": "**경락 노(爐)**가 **연마 제자당 기/초 +4%**를 얻습니다.",
+      "exampleText": "<strong>5개 노 + 50명 제자</strong>를 소유하면, 각 노의 기/초는 <strong>×3</strong> (1 + 50 × 0.04).",
+      "loreText": "모든 견습생의 숨결이 청동 다리를 조금씩 더 밝게 달구어진다. 노는 항상 문파의 노력이었다."
+    },
+    "legendary_b5_heavens_bend": {
+      "effectText": "**천상의 기둥**이 ≥1개 허공 도관을 소유하는 동안 **기/초 ×2** 생산합니다.",
+      "exampleText": "<strong>10개 기둥 + 1개 허공 도관</strong>을 소유하면, 각 기둥의 기/초는 <strong>×2</strong>. 더 많은 허공 도관을 소유해도 보너스는 더 증가하지 않습니다.",
+      "loreText": "현실이 이미 찢어졌을 때, 하늘은 저항을 멈춘다."
+    },
+    "legendary_b6_phoenix_garden": {
+      "effectText": "**군주 봉황**이 **영약 정원당 기/초 +5%**를 얻습니다.",
+      "exampleText": "<strong>1개 봉황 + 40개 정원</strong>을 소유하면, 봉황의 기/초는 <strong>×3</strong> (1 + 40 × 0.05).",
+      "loreText": "봉황은 흙이 약재인 곳에만 깃든다. 백 개의 정원, 머물 백 가지 이유."
+    },
+    "legendary_e2_phoenix_reborn": {
+      "effectText": "각 주요 경계마다: **봉황 → 0**, 다른 모든 생산자 **기/초 +50% 영구**.",
+      "exampleText": "이것을 활성화하고 **5개 주요 경계**를 통과하면 모든 봉황이 아닌 생산자가 <strong>정상 산출의 ×3.5</strong> (1 + 5 × 0.5). 모든 봉황을 잃지만, 문파의 나머지 부분은 꾸준히 성장합니다.",
+      "loreText": "봉황은 자신의 재에서 다시 태어나 자신의 둥지를 품은 문파를 축복한다."
+    },
+    "legendary_f1_storm_tiger": {
+      "effectText": "**영수 계약: 기/초 ×2**. 삼성수 계약: 3가지 모두 수집하면 **전역 +100%**.",
+      "exampleText": "<strong>10개 영수 계약</strong>을 소유하면, 합산 기/초는 <strong>×2</strong>. 용과 봉황 불꽃도 활성화되어 있다면, 삼성수 수렴이 모든 생산자 위에 <strong>전역 기/초 +100%</strong>를 추가합니다.",
+      "loreText": "호랑이가 거닐고, 귀를 펼친다. 용이 그 이름을 꿈꾸고 봉황이 그것을 다시 부를 때까지 울지 않을 것이다. 그때까지 털 속의 폭풍은 중얼거릴 뿐이다."
+    },
+    "legendary_f2_pearl_dragon": {
+      "effectText": "**영용: 기/초 ×2**. 삼성수 계약: 3가지 모두 수집하면 **전역 +100%**.",
+      "exampleText": "<strong>1개 용</strong>을 소유하면, 그 기/초는 <strong>×2</strong>. 호랑이와 봉황 불꽃도 활성화되어 있다면, 삼성수 수렴이 모든 생산자 위에 <strong>전역 기/초 +100%</strong>를 추가합니다.",
+      "loreText": "주주가 두 거리 있는 소리를 듣고 따뜻해진다. 호랑이 거니는 소리, 봉황이 무지개 날개를 접는 소리. 그때만 꿈이 끝난다."
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "effectText": "**군주 봉황: 기/초 ×2**. 삼성수 계약: 3가지 모두 수집하면 **전역 +100%**.",
+      "exampleText": "<strong>1개 봉황</strong>을 소유하면, 그 기/초는 <strong>×2</strong>. 호랑이와 용 불꽃도 활성화되어 있다면, 삼성수 수렴이 모든 생산자 위에 <strong>전역 기/초 +100%</strong>를 추가합니다.",
+      "loreText": "봉황의 울음은 세 음(音)이다. 혼자일 때는 하나를 운다. 어딘가 호랑이가 거니고, 어딘가 용이 꿈을 꾼다. 셋이 울리면 하늘이 몸을 굽힌다."
+    },
+    "masters_patience": {
+      "effectText": "**초점 유지 초당 기/초 +0.1%**. 스택당 **최대 +12%**.",
+      "exampleText": "이 실행 중 총 <strong>2분(120초)</strong> 초점을 유지하면 1 스택이 최댓값에서 기/초 +12%를 제공합니다. 세 스택은 환생할 때까지 <strong>기/초 +36%</strong>에 도달합니다.",
+      "loreText": "가장 긴 숨결은 가장 느리다. 대가는 한 번의 들숨 속에서 한 시간을 쉴 수 있다."
+    },
+    "quick_burst": {
+      "effectText": "현재 기/초의 **30초**에 해당하는 즉시 기.",
+      "exampleText": "당신의 기/초가 현재 <strong>1.2M</strong>이면, 이 불꽃을 집으면 <strong>36M 기</strong>가 잔액에 추가됩니다.",
+      "loreText": "빠르게 들어 마신 숨, 세상이 당신을 향해 기울어진다."
+    },
+    "resonant_soul": {
+      "effectText": "**그리기 후 도달한 돌파당 기/초 +0.2%**. 중첩됨.",
+      "exampleText": "이것이 활성화된 상태로 50개 돌파 후, 한 스택이 <strong>기/초 +10%</strong>를 제공합니다. 일찍 그으면 가장 큰 보상을 받습니다.",
+      "loreText": "모든 돌파는 음(音)을 남긴다. 영혼은 그것들을 절의 종처럼 모은다."
+    },
+    "sect_discipline": {
+      "effectText": "**모든 생산자 단위의 기본 기/초 +1** (90초간).",
+      "exampleText": "<strong>20명 제자</strong> 소유(기본 각 0.1 기/초)하고 각 제자는 임시로 90초간 1.1 기/초(×11) 생산합니다. 후반부 100+명 신화 생산자 소유 시, +1은 단위당 작지만 소유한 모든 단위에 적용됩니다.",
+      "loreText": "만 명의 제자가 한 번에 절을 한다. 홀은 한 번의 숨결이, 곱해질 때, 할 수 있는 것을 기억한다."
+    },
+    "sharper_focus": {
+      "effectText": "**초점 승수 +2%** 이 실행. 중첩됨.",
+      "exampleText": "세 스택이 당신의 초점을 <strong>+6% 강하게</strong> 만듭니다. 초점을 자주 사용하면 특히 유용합니다.",
+      "loreText": "칼은 매일 아침 같은 돌에 갈린다."
+    },
+    "steady_cultivation": {
+      "effectText": "**기본 기/초 +0.3** 이 실행. 중첩됨.",
+      "exampleText": "3번 뽑으면 <strong>기본 기/초 +0.9</strong> 제공합니다. 고정 보너스는 결정, 초점, 기타 승수로 곱해지므로 초반부에 가장 중요합니다.",
+      "loreText": "새벽에 한 번, 황혼에 한 번. 천 번째 숨결은 첫 번째와 같고, 그것이 모든 비결이다."
+    },
+    "steady_stream": {
+      "effectText": "**다음 정각 1분간 기/초 +20%**.",
+      "exampleText": "60초간 꾸준한 +20%는 대략 <strong>12초간의 보너스 생산</strong>을 제공합니다.",
+      "loreText": "느린 불꽃. 오래 탄다. 산이 빗물을 닳게 한다."
+    },
+    "surging_stream": {
+      "effectText": "**30초간 기/초 +50%**.",
+      "exampleText": "<strong>초당 1M 기</strong> 기준에서 잠시 <strong>초당 1.5M 기</strong>로 높아져 30초간 지속됩니다.",
+      "loreText": "물줄기가 솟아오르고, 강은 그 언덕을 잊는다."
+    },
+    "tinkers_bargain": {
+      "effectText": "다음 <strong>5회 생산자 구매</strong>에서 **기 30% 감소**.",
+      "exampleText": "정상가 <strong>1.2M 기</strong>인 4단계 생산자를 할인 적용 시 <strong>840k 기</strong>에 구매할 수 있습니다. 클릭 한 번(×1 또는 ×10)마다 사용 횟수 1회가 소모됩니다. 사용 횟수는 게임 재시작 후에도 유지됩니다.",
+      "loreText": "장이는 등불 아래서 동전을 셀 때 이렇게 말한다. \"다섯 번의 은혜. 값이 가장 아플 때를 택해 쓰시오.\""
+    }
+  },
+  "tutorials": {
+    "first_layer_bt": {
+      "body": "당신의 경락이 넓어집니다. 넘어간 각 단계마다 새로운 생산자, 기 불꽃, 강화가 당신 손에 들어옵니다. 계속 수련하세요. 다음 단계는 이미 눈앞입니다.",
+      "ctaText": "계속",
+      "kicker": "돌파",
+      "title": "첫 돌파"
+    },
+    "first_major_gate": {
+      "body": "큰 경계를 뚫려면 두 가지가 동시에 필요합니다. 저장된 기와 지속적인 초당 기 생산량으로 관문을 뚫어야 합니다. 생산자를 더 지으세요. 결정을 강화하세요. 집중을 유지하세요. 천상의 저항이 멈추면 돌파를 누르세요.",
+      "ctaText": "알겠습니다",
+      "kicker": "큰 경계",
+      "title": "천상이 당신을 시험한다"
+    },
+    "first_producer": {
+      "body": "한 제자가 당신의 뜰에 무릎을 꿇습니다. 키운 제자가 많을수록 유휴 초당 기가 조금씩 올라가고, 다음 제자의 가격은 이전보다 조금씩 비싸집니다. 이 패턴은 앞으로 잠금 해제할 모든 생산자에게 적용됩니다.",
+      "ctaText": "앞으로",
+      "kicker": "첫 제자",
+      "title": "제자가 절을 한다"
+    },
+    "first_saint": {
+      "body": "이제부터 환생할 수 있습니다. 이 생의 진행 과정이 업보로 바뀌고, 업보로 영원한 나무에서 영구적 강화를 구매합니다. 생을 거듭할수록 다음 생은 조금 더 강하게 시작됩니다. 여전히 진행 중이면 계속 갈고 닦고, 오르기가 힘들어지면 언제든 환생하세요.",
+      "ctaText": "알겠습니다",
+      "kicker": "환생",
+      "title": "두 번째 인생"
+    },
+    "first_spark_offer": {
+      "body": "각 단계를 돌파할 때마다 기 불꽃을 받습니다. 두 장의 카드가 나타나면 하나를 고르세요. 어떤 것은 짧은 부스트를, 어떤 것은 이번 생동안 누적되고, 드문 것들은 새로운 메커니즘을 열어줍니다. 마음에 드는 카드가 없다면 매 선택마다 처음 한 번의 재선택은 무료입니다.",
+      "ctaText": "신중히 선택하세요",
+      "kicker": "기 불꽃",
+      "title": "기 불꽃"
+    },
+    "hold_to_focus": {
+      "body": "수련자를 누르고 있으세요. 누르는 동안 초당 기가 급상승하고, 손을 떼면 내려갑니다. 초반 단계는 화면에 손가락을 올려두면 훨씬 빨리 진행됩니다.",
+      "ctaText": "시도해보세요",
+      "kicker": "집중",
+      "title": "눌러 집중하기"
+    },
+    "producers_hint": {
+      "body": "당신의 숨만으로는 경락을 천천히 채웁니다. 다른 손들은 함께 천상을 끌어내립니다. 문파 홀을 방문하여 제자들을 모으고, 정원을 가꾸고, 당신이 명상하는 동안 기를 모을 근원을 다듬으세요.",
+      "ctaText": "보여주세요",
+      "kicker": "도(道)에서 들려오는 속삭임",
+      "title": "당신은 혼자가 아니다"
+    },
+    "producers_tab": {
+      "body": "생산자는 백그라운드에서 당신이 누르지 않는 동안에도 기를 모읍니다. 각각은 이 생동안 초당 기를 영구적으로 올립니다. 구매할 때마다 가격이 올라가지만, 새로운 등급은 이전 것을 압도합니다. 충분한 기가 모이는 즉시 구매하세요.",
+      "ctaText": "알겠습니다",
+      "kicker": "당신의 문파",
+      "title": "생산자"
+    },
+    "welcome": {
+      "body": "호흡할 때마다 기가 흘러듭니다. 화면 아래 막대를 채워 경계의 한 단계를 돌파하세요. 단계는 경계를 이루고, 경계는 천상을 이룹니다. 도(道)는 길도 깁니다.",
+      "ctaText": "시작",
+      "kicker": "환영합니다, 수련자",
+      "title": "도의 시작"
+    }
+  },
+  "upgrades": {
+    "u_consecutive_focus_t2": {
+      "desc": "추가: 집중 4초 유지 → 기/초 +7% (합계 +12%).",
+      "name": "연속 집중 II"
+    },
+    "u_consecutive_focus_t3": {
+      "desc": "추가: 집중 6초 유지 → 기/초 +13% (합계 +25%).",
+      "name": "연속 집중 III"
+    },
+    "u_consecutive_focus_t4": {
+      "desc": "추가: 집중 8초 유지 → 기/초 +15% (합계 +40%).",
+      "name": "연속 집중 IV"
+    },
+    "u_consecutive_focus_t5": {
+      "desc": "추가: 집중 10초 유지 → 기/초 +20% (합계 +60%); 심오한 명상.",
+      "name": "연속 집중 V"
+    },
+    "u_crystal_click_t2": {
+      "desc": "저수지가 기/초의 50%로 채워짐 (최대 3분).",
+      "name": "기 결정 저수지 II"
+    },
+    "u_crystal_click_t3": {
+      "desc": "저수지가 기/초의 70%로 채워짐 (최대 4분).",
+      "name": "기 결정 저수지 III"
+    },
+    "u_crystal_click_t4": {
+      "desc": "저수지가 기/초의 85%로 채워짐 (최대 5분).",
+      "name": "기 결정 저수지 IV"
+    },
+    "u_crystal_click_t5": {
+      "desc": "저수지가 기/초의 100%로 채워짐 (최대 6분).",
+      "name": "기 결정 저수지 V"
+    },
+    "u_crystal_tap_1": {
+      "desc": "기 결정의 저장소가 비어 있을 때 탭으로 얻는 기를 2배로 증가시킵니다.",
+      "name": "연마된 탭 I"
+    },
+    "u_crystal_tap_2": {
+      "desc": "기 결정의 저장소가 비어 있을 때 탭으로 얻는 기를 2배로 증가시킵니다.",
+      "name": "연마된 탭 II"
+    },
+    "u_crystal_tap_3": {
+      "desc": "기 결정의 저장소가 비어 있을 때 탭으로 얻는 기를 2배로 증가시킵니다.",
+      "name": "연마된 탭 III"
+    },
+    "u_crystal_tap_4": {
+      "desc": "기 결정의 저장소가 비어 있을 때 탭으로 얻는 기를 2배로 증가시킵니다.",
+      "name": "연마된 탭 IV"
+    },
+    "u_crystal_tap_5": {
+      "desc": "기 결정의 저장소가 비어 있을 때 탭으로 얻는 기를 2배로 증가시킵니다.",
+      "name": "연마된 탭 V"
+    },
+    "u_divine_qi_t2": {
+      "desc": "약 9분마다 주구, 10초 윈도우. 탭으로 기 35초 획득.",
+      "name": "신성한 기 II"
+    },
+    "u_divine_qi_t3": {
+      "desc": "약 8분마다 주구, 12초 윈도우. 탭으로 기 50초 획득.",
+      "name": "신성한 기 III"
+    },
+    "u_divine_qi_t4": {
+      "desc": "약 7분마다 주구, 15초 윈도우. 탭으로 기 65초 획득.",
+      "name": "신성한 기 IV"
+    },
+    "u_divine_qi_t5": {
+      "desc": "약 6분마다 두 개의 구슬. 둘 다 수집하면 75초간 기 + 20초간 기/초 ×1.25.",
+      "name": "신성한 기 V"
+    },
+    "u_focus_1": {
+      "desc": "손으로 수련하기 집중 배수 +35%.",
+      "name": "깊은 호흡 I"
+    },
+    "u_focus_2": {
+      "desc": "손으로 수련하기 집중 배수 +35%.",
+      "name": "더 깊은 숨결 II"
+    },
+    "u_focus_3": {
+      "desc": "관조 수련의 집중력 배수에 +35%를 부여합니다.",
+      "name": "더 깊은 숨결 III"
+    },
+    "u_focus_4": {
+      "desc": "관조 수련의 집중력 배수에 +75%를 부여합니다.",
+      "name": "더 깊은 숨결 IV"
+    },
+    "u_offline_cap_1": {
+      "desc": "오프라인 기 흡수 시간을 +4시간 연장합니다.",
+      "name": "더 깊은 수면 I"
+    },
+    "u_offline_cap_2": {
+      "desc": "오프라인 기 흡수 시간을 +4시간 연장합니다.",
+      "name": "더 깊은 수면 II"
+    },
+    "u_offline_cap_3": {
+      "desc": "오프라인 기 흡수 시간을 +4시간 연장합니다.",
+      "name": "더 깊은 수면 III"
+    },
+    "u_offline_cap_4": {
+      "desc": "오프라인 기 흡수 시간을 +4시간 연장합니다.",
+      "name": "더 깊은 수면 IV"
+    },
+    "u_offline_rate_1": {
+      "desc": "오프라인 기 흡수 속도에 +5%를 부여합니다.",
+      "name": "유휴 수련 I"
+    },
+    "u_offline_rate_2": {
+      "desc": "오프라인 기 흡수 속도에 +5%를 부여합니다.",
+      "name": "유휴 수련 II"
+    },
+    "u_offline_rate_3": {
+      "desc": "오프라인 기 흡수 속도에 +5%를 부여합니다.",
+      "name": "유휴 수련 III"
+    },
+    "u_offline_rate_4": {
+      "desc": "오프라인 기 흡수 속도에 +5%를 부여합니다.",
+      "name": "유휴 수련 IV"
+    },
+    "u_p_beast_pact_double_1": {
+      "desc": "영수 계약의 산출량을 2배로 증가시킵니다.",
+      "name": "영수 계약 I"
+    },
+    "u_p_beast_pact_double_2": {
+      "desc": "영수 계약의 산출량을 다시 2배로 증가시킵니다 (첫 번째와 함께 ×4 중첩).",
+      "name": "영수 계약 II"
+    },
+    "u_p_disciple_double_1": {
+      "desc": "신체 연단 제자의 산출량을 2배로 증가시킵니다.",
+      "name": "신체 연단 제자 I"
+    },
+    "u_p_disciple_double_2": {
+      "desc": "신체 연단 제자의 산출량을 다시 2배로 증가시킵니다 (첫 번째와 함께 ×4 중첩).",
+      "name": "신체 연단 제자 II"
+    },
+    "u_p_dragon_double_1": {
+      "desc": "호흡하는 영룡의 산출량을 2배로 증가시킵니다.",
+      "name": "호흡하는 영룡 I"
+    },
+    "u_p_dragon_double_2": {
+      "desc": "호흡하는 영룡의 산출량을 다시 2배로 증가시킵니다 (첫 번째와 함께 ×4 중첩).",
+      "name": "호흡하는 영룡 II"
+    },
+    "u_p_herb_garden_double_1": {
+      "desc": "영약초원의 산출량을 2배로 증가시킵니다.",
+      "name": "영약초원 I"
+    },
+    "u_p_herb_garden_double_2": {
+      "desc": "영약초원의 산출량을 다시 2배로 증가시킵니다 (첫 번째와 함께 ×4 중첩).",
+      "name": "영약초원 II"
+    },
+    "u_p_meridian_furnace_double_1": {
+      "desc": "경락 화로의 산출량을 2배로 증가시킵니다.",
+      "name": "경락 화로 I"
+    },
+    "u_p_meridian_furnace_double_2": {
+      "desc": "경락 화로의 산출량을 다시 2배로 증가시킵니다 (첫 번째와 함께 ×4 중첩).",
+      "name": "경락 화로 II"
+    },
+    "u_p_phoenix_double_1": {
+      "desc": "제황 봉황의 산출량을 2배로 증가시킵니다.",
+      "name": "제황 봉황 I"
+    },
+    "u_p_phoenix_double_2": {
+      "desc": "주권 봉황의 산출량을 다시 2배로 증가 (첫 번째와 함께 ×4로 중첩).",
+      "name": "주권 봉황 II"
+    },
+    "u_p_pillar_double_1": {
+      "desc": "천주 기둥의 산출량을 2배로 증가.",
+      "name": "천주 기둥 I"
+    },
+    "u_p_pillar_double_2": {
+      "desc": "천주 기둥의 산출량을 다시 2배로 증가 (첫 번째와 함께 ×4로 중첩).",
+      "name": "천주 기둥 II"
+    },
+    "u_p_sect_followers_double_1": {
+      "desc": "필멸자 문파 추종자의 산출량을 2배로 증가.",
+      "name": "필멸자 문파 추종자 I"
+    },
+    "u_p_sect_followers_double_2": {
+      "desc": "필멸자 문파 추종자의 산출량을 다시 2배로 증가 (첫 번째와 함께 ×4로 중첩).",
+      "name": "필멸자 문파 추종자 II"
+    },
+    "u_p_treasure_double_1": {
+      "desc": "조상의 보물의 산출량을 2배로 증가.",
+      "name": "조상의 보물 I"
+    },
+    "u_p_treasure_double_2": {
+      "desc": "조상의 보물의 산출량을 다시 2배로 증가 (첫 번째와 함께 ×4로 중첩).",
+      "name": "조상의 보물 II"
+    },
+    "u_p_void_double_1": {
+      "desc": "허공의 통로의 산출량을 2배로 증가.",
+      "name": "허공의 통로 I"
+    },
+    "u_p_void_double_2": {
+      "desc": "허공의 통로의 산출량을 다시 2배로 증가 (첫 번째와 함께 ×4로 중첩).",
+      "name": "허공의 통로 II"
+    },
+    "u_pattern_click_t2": {
+      "desc": "약 11분마다 발화. 4개 점, 12초 창. 완전 클리어: 40초분의 기.",
+      "name": "경락 추적 II"
+    },
+    "u_pattern_click_t3": {
+      "desc": "약 10분마다 발화. 5개 점, 14초 창. 완전 클리어: 55초분의 기.",
+      "name": "경락 추적 III"
+    },
+    "u_pattern_click_t4": {
+      "desc": "약 9분마다 발화. 6개 점, 16초 창. 완전 클리어: 70초분의 기.",
+      "name": "경락 추적 IV"
+    },
+    "u_pattern_click_t5": {
+      "desc": "약 8분마다 발화. 7개 점, 18초 창. 완전 클리어: 90초분의 기 + 20초간 기/초 ×1.5.",
+      "name": "경락 추적 V"
     }
   }
 }

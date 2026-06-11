@@ -1,689 +1,1457 @@
 {
-  "realms": {
-    "Tempered Body": "Cuerpo Templado",
-    "Qi Transformation": "Transformación del Qi",
-    "True Element": "Elemento Verdadero",
-    "Separation & Reunion": "Separación y Reunión",
-    "Immortal Ascension": "Ascensión Inmortal",
-    "Saint": "Santo",
-    "Saint King": "Rey Santo",
-    "Origin Returning": "Retorno al Origen",
-    "Origin King": "Rey del Origen",
-    "Void King": "Rey del Vacío",
-    "Dao Source": "Fuente del Dao",
-    "Emperor Realm": "Reino del Emperador",
-    "Open Heaven": "Cielo Abierto"
+  "achievements": {
+    "ach_panel_50": {
+      "desc": "Abre el panel de logros 50 veces. Te vemos revisando.",
+      "title": "Paciencia, Joven Saltamontes"
+    },
+    "ach_unlocked_meta": {
+      "desc": "Desbloquea cualquier logro. Sorpresa. Este es tu segundo.",
+      "title": "Logro Desbloqueado"
+    },
+    "all_in": {
+      "desc": "Realiza una única compra de productor o mejora que cueste al menos 1 billón de Qi.",
+      "title": "Todo o Nada"
+    },
+    "audio_mute_30m": {
+      "desc": "Juega con todo el audio desactivado durante 30 minutos.",
+      "title": "Silencio"
+    },
+    "audio_toggle_10": {
+      "desc": "Alterna la música 10 veces. Elige un bando.",
+      "title": "Audiófilo"
+    },
+    "bonk": {
+      "desc": "Toca un elemento de UI que no es interactivo 20 veces seguidas. Nada está pasando.",
+      "title": "Golpe"
+    },
+    "cal_double_ninth": {
+      "desc": "Juega el noveno día del noveno mes. Auspicioso, o no.",
+      "title": "Día de la Tribulación"
+    },
+    "cal_lunar_new_year": {
+      "desc": "Juega en el Año Nuevo Lunar.",
+      "title": "Año Nuevo Lunar"
+    },
+    "capstone": {
+      "desc": "No escalaste la montaña. Te convertiste en ella.",
+      "title": "Conviértete en el Dao"
+    },
+    "daily_100": {
+      "desc": "Mantén una racha de inicio de sesión de 100 días.",
+      "title": "Ermitaño de Cien Días"
+    },
+    "daily_30": {
+      "desc": "Mantén una racha de inicio de sesión de 30 días.",
+      "title": "Voluntad de Hierro"
+    },
+    "daily_7": {
+      "desc": "Mantén una racha de inicio de sesión de 7 días.",
+      "title": "Discípulo Leal"
+    },
+    "daily_skip_7_claim": {
+      "desc": "Salta el bono diario 7 días seguidos, luego reclama. Valió la pena.",
+      "title": "Sin Pan Diario"
+    },
+    "gate_hit": {
+      "desc": "Alcanza tu primera puerta de velocidad de Cultivo.",
+      "title": "Pared de Ladrillo"
+    },
+    "gate_pass_1": {
+      "desc": "Atraviesa una puerta de velocidad de Cultivo por primera vez.",
+      "title": "A Través de la Puerta"
+    },
+    "gate_pass_max": {
+      "desc": "Supera la puerta de velocidad de Cultivo de nivel más alto.",
+      "title": "Puerta de Hierro"
+    },
+    "hold_30m": {
+      "desc": "Sostén el cristal continuamente durante 30 minutos. Modo estatua.",
+      "title": "Dao de la Perseverancia"
+    },
+    "hold_5m": {
+      "desc": "Sostén el cristal continuamente durante 5 minutos.",
+      "title": "Pulmones de Hierro"
+    },
+    "hold_60s": {
+      "desc": "Sostén el cristal continuamente durante 60 segundos.",
+      "title": "Encerado y Desencerado"
+    },
+    "karma_10": {
+      "desc": "Desbloquea 10 nodos de karma en el Árbol Eterno.",
+      "title": "Rama Bodhi"
+    },
+    "karma_50": {
+      "desc": "Desbloquea 50 nodos de Karma en el Árbol Eterno.",
+      "title": "Árbol Bodhi"
+    },
+    "karma_first": {
+      "desc": "Gasta tu primer punto de Karma en el Árbol Eterno.",
+      "title": "Semilla Kármica"
+    },
+    "karma_full": {
+      "desc": "Desbloquea el Árbol Eterno completo.",
+      "title": "Corona Bodhi"
+    },
+    "long_slumber": {
+      "desc": "Recibe más Qi en una ausencia offline que en todo tu tiempo de juego anterior.",
+      "title": "El Largo Letargo"
+    },
+    "offline_1h": {
+      "desc": "Regresa al juego después de 1 hora de ausencia.",
+      "title": "Breve Estancia"
+    },
+    "offline_24h": {
+      "desc": "Regresa después de 24 horas de reclusión. La montaña no se mueve.",
+      "title": "Cultivo de Puerta Cerrada"
+    },
+    "offline_30d": {
+      "desc": "Regresa después de 30 días. Tu Secta te cree muerto.",
+      "title": "Monstruo Antiguo"
+    },
+    "offline_365d": {
+      "desc": "Regresa después de un año. Bienvenido. El mundo es diferente.",
+      "title": "Hibernación Eterna"
+    },
+    "offline_7d": {
+      "desc": "Regresa después de 7 días de ausencia.",
+      "title": "Dormiste Toda una Dinastía"
+    },
+    "offline_qi_1b": {
+      "desc": "Acumula 1 billón de Qi completamente sin conexión.",
+      "title": "Imperio Inactivo"
+    },
+    "play_1000h": {
+      "desc": "Alcanza 1.000 horas de tiempo total de juego.",
+      "title": "Dao de lo Inactivo"
+    },
+    "play_100h": {
+      "desc": "Alcanza 100 horas de tiempo total de juego.",
+      "title": "Hermano Jurado del Cielo"
+    },
+    "play_500h": {
+      "desc": "Alcanza 500 horas de tiempo total de juego.",
+      "title": "Sin Dormir en el Continente Oriental"
+    },
+    "producer_42": {
+      "desc": "Posee exactamente 42 de un único tipo de Productor. La respuesta.",
+      "title": "42"
+    },
+    "qis_666": {
+      "desc": "Mantén exactamente 666 Qi por segundo durante un segundo completo.",
+      "title": "Número de la Bestia"
+    },
+    "qis_9001": {
+      "desc": "Alcanza 9.001 Qi por segundo.",
+      "title": "¡Es Más de 9000!"
+    },
+    "realm_1": {
+      "desc": "Da tu primer paso en el camino del Cultivo.",
+      "title": "Primer Aliento"
+    },
+    "realm_10": {
+      "desc": "Forja tu cuerpo a través de las diez Fases del Cuerpo Templado.",
+      "title": "Cimiento Establecido"
+    },
+    "realm_13": {
+      "desc": "Domina la Transformación de Qi. El Qi dentro de ti ya no es mortal.",
+      "title": "Qi Transformado"
+    },
+    "realm_14": {
+      "desc": "Entra en el Reino Elemento Verdadero y domina las fuerzas de la naturaleza.",
+      "title": "Elementos Verdaderos Despertados"
+    },
+    "realm_18": {
+      "desc": "Alcanza Separación y Reencuentro. Tu espíritu se divide para andar dos caminos a la vez.",
+      "title": "Espíritu Escindido"
+    },
+    "realm_21": {
+      "desc": "Comienza tu ascenso más allá de los límites mortales.",
+      "title": "Ascensión Inmortal"
+    },
+    "realm_24": {
+      "desc": "Camina junto a quienes han trascendido la existencia ordinaria.",
+      "title": "Camino del Santo"
+    },
+    "realm_27": {
+      "desc": "Sube al apogeo de los rangos de Santo.",
+      "title": "Rey Santo"
+    },
+    "realm_30": {
+      "desc": "Retorna a la fuente de la que fluye todo Qi.",
+      "title": "Origen Retornado"
+    },
+    "realm_36": {
+      "desc": "Adéntrate en el vacío entre mundos y gobiérnalo.",
+      "title": "Rey del Vacío"
+    },
+    "realm_39": {
+      "desc": "Toca el Dao en su fuente.",
+      "title": "Fuente del Dao"
+    },
+    "realm_46": {
+      "desc": "Destroza los cielos y toca el reino del Cielo Abierto.",
+      "title": "Cielo Abierto"
+    },
+    "reincarnate_1": {
+      "desc": "Reencarna por primera vez.",
+      "title": "Rueda del Saṃsāra"
+    },
+    "reincarnate_10": {
+      "desc": "Reencarna 10 veces. Recuerdas cada vida.",
+      "title": "Más allá de la Rueda"
+    },
+    "reincarnate_2": {
+      "desc": "Reencarna una segunda vez. Se hizo más fácil, ¿verdad.",
+      "title": "Segundo Aliento"
+    },
+    "reincarnate_lowest": {
+      "desc": "Reencarna voluntariamente en el umbral del Reino más bajo disponible.",
+      "title": "Basura de la Familia Lin"
+    },
+    "restless": {
+      "desc": "Cambia de pantalla 100 veces en 5 minutos. Elige una, amigo.",
+      "title": "Inquieto"
+    },
+    "settings_all": {
+      "desc": "Toca cada configuración al menos una vez.",
+      "title": "Conocedor de Configuración"
+    },
+    "shop_100_visits": {
+      "desc": "Visita la tienda 100 veces. Siempre pobre. Siempre sonriendo.",
+      "title": "Vendedor de Repollo"
+    },
+    "shop_first_skin": {
+      "desc": "Compra tu primer disfraz cosmético.",
+      "title": "Vanidad"
+    },
+    "spark_100": {
+      "desc": "Atrapa 100 Chispas de Qi.",
+      "title": "Cazador de Chispas"
+    },
+    "spark_1000": {
+      "desc": "Atrapa 1000 Chispas de Qi.",
+      "title": "Sabio de Chispas"
+    },
+    "spark_drought": {
+      "desc": "Juega 1 hora sin ver una sola Chispa. El viento calla.",
+      "title": "Sequía"
+    },
+    "spark_first": {
+      "desc": "Atrapa tu primera Chispa de Qi.",
+      "title": "Primera Chispa"
+    },
+    "sprite_tickle_100": {
+      "desc": "Toca al Cultivador 100 veces. Lo sintió.",
+      "title": "Cosquillas al Maestro"
+    },
+    "tap_100": {
+      "desc": "Alcanza 100 toques de Cristal en toda tu vida.",
+      "title": "Ligero como pluma"
+    },
+    "tap_100k": {
+      "desc": "Alcanza 100 000 toques de Cristal en toda tu vida.",
+      "title": "Martillo de Piedra"
+    },
+    "tap_10k": {
+      "desc": "Alcanza 10 000 toques de Cristal en toda tu vida.",
+      "title": "Mano de Dios"
+    },
+    "tap_1m": {
+      "desc": "Alcanza 1,000,000 toques de Cristal de Qi en la vida. Tu teléfono aguanta.",
+      "title": "Trituradora de Montañas"
+    },
+    "tap_burst_100": {
+      "desc": "Toca 100 veces en 10 segundos. Nos preocupa.",
+      "title": "Síndrome del Túnel Carpiano"
+    },
+    "tap_dancer": {
+      "desc": "Toca el cristal a 60 BPM durante 30 segundos. El tempo importa.",
+      "title": "Bailarín de Toques"
+    },
+    "tap_first": {
+      "desc": "Toca el Cristal de Qi por primera vez.",
+      "title": "Primer Toque"
+    },
+    "tap_rate_12": {
+      "desc": "Toca el cristal 12 veces en un solo segundo.",
+      "title": "Colibrí"
+    },
+    "time_all_brackets": {
+      "desc": "Juega durante los cuatro períodos del día (noche, mañana, tarde, noche) dentro de 24 horas.",
+      "title": "Observador del Cielo"
+    },
+    "time_early_bird": {
+      "desc": "Cruza un límite de Reino entre las 5am y 7am hora local.",
+      "title": "Madrugador"
+    },
+    "time_lunch": {
+      "desc": "Juega al menos 10 minutos entre las 12 y las 13 horas en un día laboral.",
+      "title": "Descanso de Almuerzo"
+    },
+    "time_midnight_tap": {
+      "desc": "Toca el Cristal exactamente a las 00:00:00 hora local.",
+      "title": "Hora de Bruja"
+    },
+    "time_night_owl": {
+      "desc": "Cruza una frontera de Reino entre la 1 y las 4 de la madrugada hora local.",
+      "title": "Búho Nocturno"
+    },
+    "tutorial_all": {
+      "desc": "Lee todas las tarjetas de tutorial.",
+      "title": "¿Sabías que?"
+    }
   },
-  "stages": {
-    "Layer 1": "Capa 1",
-    "Layer 2": "Capa 2",
-    "Layer 3": "Capa 3",
-    "Layer 4": "Capa 4",
-    "Layer 5": "Capa 5",
-    "Layer 6": "Capa 6",
-    "Layer 7": "Capa 7",
-    "Layer 8": "Capa 8",
-    "Layer 9": "Capa 9",
-    "Layer 10": "Capa 10",
-    "Early Stage": "Etapa Temprana",
-    "Middle Stage": "Etapa Media",
-    "Late Stage": "Etapa Tardía",
-    "Peak Stage": "Etapa Cumbre",
-    "1st Stage": "1.ª Etapa",
-    "2nd Stage": "2.ª Etapa",
-    "3rd Stage": "3.ª Etapa"
-  },
-  "worlds": {
+  "discipleTiers": {
     "1": {
-      "name": "Las Tierras Mortales",
-      "realms": "Cuerpo Templado → Elemento Verdadero",
-      "description": "Un recinto de secta neblinoso enmarcado por una ceremoniosa puerta roja y dorada, pilares de piedra inscritos y desgastadas estatuas guardianas. Bosquecillos de bambú se elevan más allá de los campos de entrenamiento y pálidas montañas se disuelven en niebla perpetua. El aire lleva el olor a polvo de tiza y Qi residual de años de práctica de discípulos."
+      "rank": "Discípulo Externo"
     },
     "2": {
-      "name": "La Frontera Ancestral",
-      "realms": "Separación y Reunión → Ascensión Inmortal",
-      "description": "Un vasto páramo de tierra anaranjada agrietada, cocida hasta adquirir la textura de cerámica antigua. Arcos de piedra derrumbados y estructuras de portales en ruinas sobresalen del suelo desértico junto a enormes restos óseos blanqueados. Un enorme caldero corroído descansa en el corazón de las ruinas, la única estructura que permanece intacta en un paisaje por lo demás muerto."
+      "rank": "Discípulo Interno"
     },
     "3": {
-      "name": "Las Tierras Prohibidas",
-      "realms": "Santo → Rey Santo",
-      "description": "Un corredor de piedra prohibido flanqueado por antiguas estatuas guardianas, cuyos ojos arden con fría llama espiritual verde. Más allá de las filas de centinelas, un oscuro palacio se cierne con antorchas de luz verde ardiendo en su umbral sellado. El aire está inmóvil y pesado con el Qi de los que murieron hace mucho, el silencio roto únicamente por la lejana resonancia de antiguos sellos de guerra."
+      "rank": "Discípulo del Núcleo"
     },
     "4": {
-      "name": "Las Profundidades del Origen",
-      "realms": "Retorno al Origen → Rey del Origen",
-      "description": "Una vasta caverna subterránea iluminada por dos pilares de piedra con cabezas de dragón que flanquean una cascada que cae en un resplandeciente estanque de Qi del origen. Formaciones de cristal verde azulado se agrupan por las paredes de la cueva, proyectando luz fresca en la oscuridad. Antiguas raíces retorcidas descienden del techo muy por encima, y el aire está saturado de la abrumadora presión de la energía primordial de la tierra."
+      "rank": "Discípulo de Espada"
     },
     "5": {
-      "name": "El Mar del Vacío",
-      "realms": "Rey del Vacío → Reino del Emperador",
-      "description": "Una extensión fracturada del vacío bajo un cielo de magenta profundo, hendido por grietas de energía irregulares y tabletas flotantes de inscripciones del Dao. Una solitaria puerta de piedra se alza sobre un suelo que se desmorona en el horizonte, y un símbolo yin-yang flota sobre todo en un silencio cargado. El suelo está agrietado como arcilla vieja, la única superficie sólida en un espacio que se deshace constantemente por sus bordes."
+      "rank": "Anciano"
     },
     "6": {
-      "name": "El Cielo Abierto",
-      "realms": "Cielo Abierto Capa 1 → Cielo Abierto Capa 6",
-      "description": "Un reino ilimitado de Cielo Abierto de cegador oro y blanco, donde enormes pilares cubiertos de inscripciones se elevan desde un suelo celestial sin costuras hacia bancos de nubes que se extienden hasta el infinito. Grullas se deslizan silenciosamente a través de la neblina radiante entre los pilares. La presión ambiental por sí sola es suficiente para obliterar cualquier cosa que no haya alcanzado el umbral del Cielo Abierto."
+      "rank": "Anciano Mayor"
+    },
+    "7": {
+      "rank": "Maestro de Salón"
+    },
+    "8": {
+      "rank": "Maestro de Secta"
+    },
+    "9": {
+      "rank": "Patriarca"
+    },
+    "10": {
+      "rank": "Antepasado"
     }
   },
-  "regions": {
-    "Outer Sect Training Grounds": "Campos de Entrenamiento de la Secta Exterior",
-    "Borderland Wilds": "Tierras Fronterizas Salvajes",
-    "Bandit's Crossing": "Cruce de los Bandidos",
-    "Qi-Vein Ravines": "Barrancos de Venas de Qi",
-    "Misty Spirit Forest": "Bosque Espiritual Neblinoso",
-    "Shattered Sky Desert": "Desierto del Cielo Roto",
-    "Demon Beast Plains": "Llanuras de las Bestias Demoníacas",
-    "Sunken Immortal City": "Ciudad Inmortal Hundida",
-    "Blood Sea Wastes": "Páramos del Mar de Sangre",
-    "Saint Burial Grounds": "Tierras de Sepultura de los Santos",
-    "Void Rift Expanse": "Extensión de Grietas del Vacío",
-    "Nine-Death Mountain Range": "Cordillera de las Nueve Muertes",
-    "Sealed War Altar": "Altar de Guerra Sellado",
-    "Origin Qi Spring Depths": "Profundidades del Manantial de Qi del Origen",
-    "World Root Caverns": "Cavernas de la Raíz del Mundo",
-    "Ancient Root Grotto": "Gruta de la Raíz Ancestral",
-    "Primordial Forest Core": "Núcleo del Bosque Primordial",
-    "Ancient Origin Altar": "Altar del Origen Ancestral",
-    "Fractured Space Corridors": "Corredores del Espacio Fracturado",
-    "Void Sea Shores": "Orillas del Mar del Vacío",
-    "Dao Inscription Ruins": "Ruinas de Inscripciones del Dao",
-    "Ancient Emperor Tomb": "Tumba del Emperador Ancestral",
-    "Heaven Sword Ridge": "Cresta de la Espada Celestial",
-    "Heaven Pillar Ascent": "Ascenso al Pilar Celestial",
-    "Star Sea Approaches": "Aproximaciones al Mar Estelar",
-    "Celestial Rift Expanse": "Extensión de la Grieta Celestial",
-    "Heaven's Core": "Núcleo del Cielo"
-  },
-  "enemies": {
-    "outer_sect_disciple": {
-      "name": "Discípulo de la Secta Exterior",
-      "description": "Un joven cultivador con una sencilla túnica blanca de entrenamiento, empuñando una básica espada de madera con posturas torpes pero entusiastas."
+  "eternalTree": {
+    "beast": {
+      "description": "Desbloquea el Arte Oculto Pacto de Bestias a lo largo de vidas. (Próximamente.)",
+      "label": "Arena de Bestias"
     },
-    "training_golem": {
-      "name": "Gólem de Entrenamiento",
-      "description": "Un autómata rechoncho de arcilla y hierro estampado con sellos de la secta, construido para la durabilidad más que el daño: sus puños son esferas de hierro sin filo."
+    "bloom": {
+      "description": "Comienza cada vida con 50 Rocío espiritual y la receta de Tónico Verdante ya conocida.",
+      "label": "Floración Espiritual"
     },
-    "wolf": {
-      "name": "Lobo de Manada",
-      "description": "Un lobo delgado de pelaje gris con ojos débilmente luminosos, lo que sugiere una menor absorción de Qi tras años de deambular por una naturaleza rica en espíritu."
+    "cauldron_2": {
+      "description": "+1 caldera en el Horno de Meridianos (2 cocciones paralelas).",
+      "label": "Segundo Caldero"
     },
-    "bandit_scout": {
-      "name": "Explorador Bandido",
-      "description": "Un luchador fibroso con armadura de patchwork tosco, portando una hoja corta y moviéndose con el sigilo practicado de alguien que sobrevive por emboscada."
+    "cauldron_3": {
+      "description": "+1 caldero en el Horno de Meridiano (3 cocciones en paralelo).",
+      "label": "Tercer Caldero"
     },
-    "wandering_beast": {
-      "name": "Bestia Errante",
-      "description": "Una gran bestia peluda de cuatro extremidades sin territorio fijo, su pelaje marcado por cicatrices de años de deambular por peligrosas tierras salvajes."
+    "cauldron_4": {
+      "description": "+1 caldero en el Horno de Meridiano (4 cocciones en paralelo).",
+      "label": "Cuarto Caldero"
     },
-    "rogue_disciple": {
-      "name": "Discípulo Renegado",
-      "description": "Un antiguo miembro de la secta con una túnica de cultivación andrajosa y manchada, portando las cicatrices de técnicas de Qi prohibidas y el aspecto de alguien que no tiene nada que perder."
+    "cauldron_5": {
+      "description": "+1 caldero en el Horno de Meridiano (5 cocciones en paralelo).",
+      "label": "Quinto Caldero"
     },
-    "iron_fang_wolf": {
-      "name": "Lobo de Colmillo de Hierro",
-      "description": "Un lobo enorme con colmillos de densidad férrea y un pelaje endurecido por años de absorción de Qi mineral al vagar por las antiguas llanuras."
+    "coffers": {
+      "description": "Todos los productores ganan +15% de incremento en la producción de Qi/s.",
+      "label": "Arcas Sin Límites"
     },
-    "iron_spine_boar": {
-      "name": "Jabalí de Espina de Hierro",
-      "description": "Un jabalí rechoncho y agresivo cuyas púas dorsales se han calcificado en espinas duras como el hierro tras pacer en tierras planas ricas en minerales. Carga de cabeza con fuerza imprudente."
+    "core": {
+      "description": "Retén el 25% de tu nivel de Cristal de Qi a través de la Reencarnación.",
+      "label": "Núcleo Ininterrumpido"
     },
-    "sand_dragon": {
-      "name": "Dragón de Arena",
-      "description": "Un dragón serpentino con escamas blanqueadas por el sol y afiladas como cuchillas que fluye por las arenas del desierto como el agua. Embosca a sus presas brotando desde abajo, arrastrando una lluvia de arena."
+    "crystal": {
+      "description": "Desbloquea una nueva línea de mejoras del Cristal de Qi, compradas con Qi en la pestaña Mejoras. (Próximamente).",
+      "label": "Enfoque Cristalino"
     },
-    "bone_construct": {
-      "name": "Constructo de Huesos",
-      "description": "Una máquina de guerra animada ensamblada a partir de los huesos fusionados de inmortales caídos, unidos por Qi de batalla residual y sellos de array oxidados. Se encuentra dondequiera que los muertos antiguos pueblan la tierra."
+    "disc_base": {
+      "description": "La salida del productor Discípulo se duplica (un incremento fijo en toda la Secta; se acumula con Mil Discípulos).",
+      "label": "Cimiento del Discípulo"
     },
-    "city_guardian": {
-      "name": "Constructo Guardián de la Ciudad",
-      "description": "Un imponente constructo humanoide de hierro negro y jade que lleva el escudo de la Ciudad Inmortal Hundida, aún patrullando fielmente los pasillos inundados de su cargo hace mucho tiempo muerto."
+    "disc_transcend": {
+      "description": "Desbloquea el nivel Trascendente para tu productor de Discípulos (por encima de Mítico). El Registro de la Secta también gana un rango Trascendente por encima de Ancestro.",
+      "label": "Discípulos Trascendentes"
     },
-    "immortal_shade": {
-      "name": "Sombra Inmortal Atrapada",
-      "description": "El remanente espectral de un cultivador inmortal atrapado cuando la ciudad se hundió bajo la tierra. Su forma parpadea entre sólida y fantasmal, ligada eternamente por un voto inacabado."
+    "echoes": {
+      "description": "Desbloquea el Arte Oculto del Salón del Tesoro a través de vidas. (Próximamente.)",
+      "label": "Ecos Ancestrales"
     },
-    "corrupted_cultivator": {
-      "name": "Cultivador Corrompido",
-      "description": "Un antiguo discípulo de la secta cuya cultivación del Qi devoró su cordura. Su túnica está destrozada, sus meridianos visiblemente ennegrecidos bajo la piel, sus ojos vacíos de locura por el Qi."
+    "eternal_alchemy": {
+      "description": "Conserva 1 efecto de Píldora de Cimiento a través de la Reencarnación. (Se preserva la más poderosa.)",
+      "label": "Alquimia Eterna"
     },
-    "blood_leviathan": {
-      "name": "Leviatán del Mar de Sangre",
-      "description": "Una bestia marina colosal cuyas escamas se han vuelto carmesí profundo tras siglos alimentándose en el Mar de Sangre. Arrastra vapores rojos cáusticos al moverse y golpea con toda su masa."
+    "foundation": {
+      "description": "Conserva el 20% del recuento de cada productor ya desbloqueado a través de la Reencarnación.",
+      "label": "Fundación Eterna"
     },
-    "burial_guardian": {
-      "name": "Guardián de la Sepultura",
-      "description": "Un enorme soldado acorazado cuya alma fue ligada a las tierras de sepultura como centinela eterno. Su antigua armadura es ornamentada pero corroída, y se mueve con la inmovilidad antinatural de algo que no ha descansado en siglos."
+    "frugal": {
+      "description": "Costo de compra de productor reducido 5%.",
+      "label": "Cultivo Frugal"
     },
-    "saint_corpse_soldier": {
-      "name": "Soldado-Cadáver Santo",
-      "description": "El cadáver perfectamente conservado de un guerrero del reino Santo, aún con armadura de batalla y aferrando su arma en una presa de muerte. Los sellos de juramento brillan en su pecho, impulsándolo hacia adelante sin importar el daño recibido."
+    "furnace": {
+      "description": "Refinamiento de Píldoras permanece desbloqueado cada vida.",
+      "label": "Horno Eterno"
     },
-    "void_rift_predator": {
-      "name": "Depredador de Grieta del Vacío",
-      "description": "Una criatura nacida dentro de las grietas del vacío, cuyo cuerpo está parcialmente desfasado entre dimensiones. Golpea desde ángulos inesperados al deslizarse entre el espacio sólido y el vacío."
+    "garden": {
+      "description": "El Jardín Espiritual permanece desbloqueado cada vida.",
+      "label": "Jardín Eterno"
     },
-    "rift_stalker": {
-      "name": "Acechador de la Grieta",
-      "description": "Un depredador más esbelto y rápido del ecosistema de la grieta. Caza rastreando firmas de Qi a través de los límites dimensionales y tiende emboscadas desde dentro de la grieta misma."
+    "guidance": {
+      "description": "Los productores ganan +0,5% Qi/s aumentado por cada productor del tipo anterior poseído.",
+      "label": "Guía del Anciano"
     },
-    "saint_bone_sovereign": {
-      "name": "Soberano de Hueso Santo",
-      "description": "El esqueleto reanimado de un soberano del reino Santo, con autoridad absoluta sobre el Qi de la muerte. Reclama la cordillera como territorio y comanda a los no-muertos menores desde lo alto de los pasos."
+    "hand": {
+      "description": "Las colocaciones de Discípulos cuestan 20% menos Mérito.",
+      "label": "Mano Abierta"
     },
-    "void_shade": {
-      "name": "Sombra del Vacío",
-      "description": "Una entidad de sombra del vacío que se aferra a los malditos pasos de montaña. No tiene forma física, solo una silueta de energía del vacío concentrada que drena el Qi al contacto."
+    "heaven": {
+      "description": "Mientras cualquier potenciador esté activo, gana +25% Qi.",
+      "label": "Tocado por el Cielo"
     },
-    "forbidden_construct": {
-      "name": "Constructo Prohibido",
-      "description": "Un imponente autómata de guerra sellado dentro del altar durante siglos, manteniendo vigilia sobre las inscripciones selladas. Su activación estaba prohibida, hasta que cruzaste el umbral."
+    "lattice": {
+      "description": "Los niveles del Cristal de Qi cuestan 20% menos Qi para alimentar.",
+      "label": "Entramado Denso"
     },
-    "ancient_war_spirit": {
-      "name": "Espíritu de Guerra Ancestral",
-      "description": "El espíritu ligado de un guerrero sellado en el altar durante una guerra ancestral. Aún aferrando la causa por la que murió, su furia no ha sido apagada por los siglos."
+    "linger": {
+      "description": "Los potenciadores de Elixir del Jardín Espiritual duran 30% más.",
+      "label": "Brebaje Duradero"
     },
-    "origin_guardian": {
-      "name": "Guardián del Origen",
-      "description": "Un enorme humanoide formado a partir de Qi del origen comprimido, permanentemente apostado en la entrada de las profundidades. Su cuerpo irradia aplastante presión primordial con cada paso."
+    "mastery": {
+      "description": "Fortalece las recompensas de cada Arte Oculto. (Próximamente — efecto siendo definido junto a los minijuegos.)",
+      "label": "Dominio de las Artes Ocultas"
     },
-    "origin_crystal_golem": {
-      "name": "Gólem de Cristal del Origen",
-      "description": "Un gólem construido a partir de formaciones de cristal que crecieron dentro del manantial de Qi del origen. Sus golpes liberan ráfagas de energía primordial cruda de los cristales incrustados en sus puños."
+    "merit": {
+      "description": "Gana 10% más Karma cada vida.",
+      "label": "Mérito Infinito"
     },
-    "primordial_serpent": {
-      "name": "Serpiente Primordial",
-      "description": "Una enorme serpiente que ha cazado en las Cavernas de la Raíz del Mundo desde la era anterior a los registros. Sus escamas se han endurecido hasta la densidad de piedra del mundo a lo largo de milenios de absorción mineral."
+    "n_1": {
+      "description": "Gana +0.1% Qi/s por cada Karma gastado en el Árbol Eterno.",
+      "label": "Camino Devoto"
     },
-    "cavern_elder_demon": {
-      "name": "Demonio Anciano de la Caverna",
-      "description": "Un demonio que se ha fusionado con la caverna a lo largo de incontables siglos, cuyo cuerpo está parcialmente hecho de piedra y raíces. Apenas se distingue de las paredes de la cueva hasta que se mueve."
+    "potency": {
+      "description": "Los potenciadores de Elixir del Jardín Espiritual son 20% más fuertes.",
+      "label": "Potencia Verdante"
     },
-    "forest_spirit": {
-      "name": "Espíritu del Bosque",
-      "description": "Un espíritu luminoso que se desplaza por los huecos de las raíces, atraído por la concentrada energía del mundo en las raíces ancestrales. Normalmente pasivo, peligroso cuando se le perturba."
+    "resonance": {
+      "description": "Los Productores ganan +1% incremento de Qi/s por cada Productor del mismo tipo que poseas.",
+      "label": "Resonancia de la Secta"
     },
-    "root_sovereign": {
-      "name": "Soberano de las Raíces",
-      "description": "La fuerza dominante de la red de raíces, una entidad masiva cuyo cuerpo está tejido con las raíces más gruesas del árbol del mundo. Territorial en extremo, considera a todos los intrusos como parásitos."
+    "roster": {
+      "description": "El Registro (promoción de Discípulos) permanece desbloqueado cada vida, en lugar de bloquearse nuevamente hasta que tus Discípulos alcancen Mítico nuevamente.",
+      "label": "Registro Eterno"
     },
-    "ancient_beast": {
-      "name": "Bestia Ancestral",
-      "description": "Una bestia tan antigua que precede a la era actual de la cultivación. Sus instintos están afilados a la perfección y su cuerpo lleva el peso de cien mil años de supervivencia."
+    "rspark": {
+      "description": "Los potenciadores permanentes de Chispa de Qi son 25% más fuertes.",
+      "label": "Chispa Resonante"
     },
-    "world_root_wraith": {
-      "name": "Espectro de la Raíz del Mundo",
-      "description": "Un guardián etéreo manifestado desde la fuerza vital de las raíces del árbol del mundo. Se faza a través de la red de raíces para interceptar cualquier cosa que amenace el núcleo del bosque."
+    "soil": {
+      "description": "Los cultivos del Jardín Espiritual crecen 20% más rápido.",
+      "label": "Suelo Fértil"
     },
-    "deep_earth_titan": {
-      "name": "Titán de la Tierra Profunda",
-      "description": "El único guardián del Altar del Origen Ancestral, una entidad de tal masa que sus pisadas agrietan el lecho de roca. Ninguna otra criatura sobrevive dentro del alcance de su campo de presión."
+    "star": {
+      "description": "+50% bonificación de suma de tablero de Discípulos: cada punto de tablero aumenta Qi/s del Discípulo en 1.5% en lugar de 1%.",
+      "label": "Discípulos Estelares"
     },
-    "spatial_fissure_beast": {
-      "name": "Bestia de Fisura Espacial",
-      "description": "Una criatura nativa de los corredores del espacio fracturado, cuyo cuerpo está adaptado para existir en dimensiones parcialmente colapsadas. Usa las fisuras como terreno de caza."
+    "thousand": {
+      "description": "La salida del Productor de Discípulos se duplica.",
+      "label": "Mil Discípulos"
     },
-    "qi_beast": {
-      "name": "Bestia Sensora de Qi",
-      "description": "Un depredador adaptado al vacío que caza exclusivamente por firma de Qi. Ciego al camuflaje físico, puede rastrear a un cultivador a través de los límites dimensionales."
-    },
-    "void_elemental": {
-      "name": "Elemental del Vacío",
-      "description": "Una manifestación pura de energía del vacío que se coagulóen los corredores fracturados. No tiene cuerpo, solo una masa concentrada de fuerza negadora."
-    },
-    "void_sea_leviathan": {
-      "name": "Leviatán del Mar del Vacío",
-      "description": "Una bestia marina titánica que se ha adaptado a la ausencia de agua del mar del vacío, nadando a través de energía espacial pura. Su masa es tan grande que empuja los límites dimensionales a un lado."
-    },
-    "dao_inscription_guardian": {
-      "name": "Guardián de Inscripciones del Dao",
-      "description": "Un constructo ligado a las ruinas por arrays de inscripción, manteniendo eternamente las tabletas del Dao que fue construido para proteger. Ataca a cualquier cosa que interfiera con las inscripciones."
-    },
-    "dao_inscription_revenant": {
-      "name": "Espectro de Inscripciones del Dao",
-      "description": "El remanente de un estudioso que murió intentando descifrar las tabletas del Dao. Su conciencia fue absorbida en los arrays de inscripción y ahora sirve como guardián agresivo."
-    },
-    "emperor_will_fragment": {
-      "name": "Fragmento de Voluntad Imperial",
-      "description": "Un fragmento de la voluntad moribunda de un antiguo emperador, que aún lleva suficiente autoridad para manifestarse como una fuerza semi-física. Ataca a los intrusos reflexivamente, protegiendo la tumba por instinto."
-    },
-    "petrified_dao_lord": {
-      "name": "Señor del Dao Petrificado",
-      "description": "Un Señor del Dao sellado dentro de la tumba del emperador como última línea de defensa. Su cuerpo se ha vuelto piedra pero su comprensión del Dao permanece intacta; lucha con principio puro."
-    },
-    "star_sea_drifter": {
-      "name": "Errante del Mar Estelar",
-      "description": "Una entidad arrastrada desde el mar estelar por la catastrófica convergencia del Dao en la Cresta de la Espada Celestial. Caza solo, desorientado y agresivo, lejos de su vacío natal."
-    },
-    "heaven_pillar_guardian": {
-      "name": "Guardián del Pilar Celestial",
-      "description": "Un centinela celestial ligado a los pilares de inscripción del reino del Cielo Abierto, manteniendo el límite entre reinos. No negocia el paso."
-    },
-    "boundary_wraith": {
-      "name": "Espectro del Límite",
-      "description": "Un espectro formado de la presión espiritual residual de los límites del reino. Se desplaza en el umbral del Cielo Abierto, acechando a los cultivadores que se demoran en el ascenso."
-    },
-    "open_heaven_beast": {
-      "name": "Bestia del Cielo Abierto",
-      "description": "Una bestia nativa del reino del Cielo Abierto, cuyo cuerpo está saturado desde el nacimiento con Qi de grado celestial. Incluso su estado de reposo ejerce una presión comparable a la de un cultivador en el Pico del Reino del Emperador."
-    },
-    "star_sea_leviathan": {
-      "name": "Leviatán del Mar Estelar",
-      "description": "Un leviatán del mar estelar que ha entrado en el reino del Cielo Abierto a través de un límite colapsado. Su escala empequeñece todo lo del mundo mortal."
-    },
-    "celestial_sovereign": {
-      "name": "Soberano Celestial",
-      "description": "Un soberano del reino del Cielo Abierto, que gobierna un dominio de la Grieta Celestial. Su autoridad sobre la energía espacial es absoluta dentro de su territorio."
-    },
-    "eternal_storm_titan": {
-      "name": "Titán de la Tormenta Eterna",
-      "description": "Una fuerza natural dotada de forma por las tormentas perpetuas de la grieta. No tiene conciencia, solo la interminable energía violenta del clima celestial hecho manifiesto."
-    },
-    "open_heaven_sovereign": {
-      "name": "Soberano del Cielo Abierto",
-      "description": "El soberano supremo del reino del Cielo Abierto, con una comprensión del Dao más allá de todo lo alcanzable en el mundo mortal. Encontrarlo es la prueba final de la ascensión."
-    },
-    "void_apex_predator": {
-      "name": "Depredador Supremo del Vacío",
-      "description": "El depredador último del vacío, habiendo sobrevivido al colapso de múltiples reinos. Caza soberanos celestiales por deporte y considera a los cultivadores ascendentes como presa."
+    "vigil": {
+      "description": "Gana 30% más Qi mientras estás ausente (sin conexión).",
+      "label": "Vigilia Ininterrumpida"
     }
   },
-  "items": {
-    "iron_herb_1": {
-      "name": "Hierba de los Terrenos de la Secta",
-      "desc": "Una mala hierba que crece dondequiera que los cultivadores mortales entrenan, absorbiendo el Qi residual de los terrenos de la secta."
+  "furnaceFoundations": {
+    "foundation_crucible": {
+      "desc": "Permanentemente -3% costo de Ruptura para esta vida.",
+      "name": "Píldora de Cimiento del Crisol"
     },
-    "iron_herb_2": {
-      "name": "Raíz Fronteriza",
-      "desc": "Una raíz retorcida encontrada en la naturaleza fronteriza, atraída por la débil energía espiritual del suelo."
+    "foundation_frugal": {
+      "desc": "Permanentemente -3% costo de compra de Productores para esta vida.",
+      "name": "Píldora de Cimiento Frugal"
     },
-    "bronze_herb_1": {
-      "name": "Enredadera de Venas de Qi",
-      "desc": "Una enredadera trepadora que crece a lo largo de las venas de Qi subterráneas, sus hojas débilmente luminiscentes."
+    "foundation_radiance": {
+      "desc": "Permanentemente +4% qi/s para esta vida. Juego avanzado.",
+      "name": "Píldora de Cimiento de Radiancia"
     },
-    "bronze_herb_2": {
-      "name": "Flor del Bosque Espiritual",
-      "desc": "Una pálida flor que florece únicamente en el Bosque Espiritual Neblinoso, polinizada por espíritus del bosque."
+    "foundation_root": {
+      "desc": "Permanentemente +3% ganancia de Karma para esta vida.",
+      "name": "Píldora de Cimiento de Raíz"
     },
-    "silver_herb_1": {
-      "name": "Loto del Cielo Roto",
-      "desc": "Un loto plateado que sobrevive en las ruinas del Desierto del Cielo Roto, extrayendo agua de profundas líneas ley."
+    "foundation_tide": {
+      "desc": "Permanentemente +5% recuperación offline de Qi para esta vida.",
+      "name": "Píldora de Cimiento de Marea"
     },
-    "silver_herb_2": {
-      "name": "Caña del Mar de Sangre",
-      "desc": "Una caña rojo sangre que crece en los bordes del mar de sangre, cuya savia es espesa con vitalidad corrompida."
-    },
-    "gold_herb_1": {
-      "name": "Loto de Sepultura Santo",
-      "desc": "Un loto oscuro que florece únicamente sobre lugares de sepultura de grado santo, alimentándose de siglos de Qi de muerte."
-    },
-    "gold_herb_2": {
-      "name": "Enredadera de Espinas del Vacío",
-      "desc": "Una enredadera espinosa que crece a través de grietas del vacío, cuyas púas son lo suficientemente afiladas como para atravesar defensas de grado santo."
-    },
-    "transcendent_herb_1": {
-      "name": "Pétalo del Manantial del Origen",
-      "desc": "Un pétalo desprendido de flores que crecen en los manantiales de Qi del origen del mundo, saturado de energía primordial."
-    },
-    "transcendent_herb_2": {
-      "name": "Enredadera del Cielo Abierto",
-      "desc": "Una legendaria enredadera cuyas raíces se extienden hasta el propio reino del Cielo Abierto, canalizando energía de grado celestial."
-    },
-    "iron_mineral_1": {
-      "name": "Fragmento de Hierro de la Secta",
-      "desc": "Un fragmento de material de grado hierro desprendido de constructos de la secta, equipo de entrenamiento y el hierro de los cultivadores mortales."
-    },
-    "iron_mineral_2": {
-      "name": "Fragmento de Vena de Hierro",
-      "desc": "Un denso fragmento de mineral de hierro extraído de venas poco profundas, usado en transmutación básica."
-    },
-    "bronze_mineral_1": {
-      "name": "Colmillo de Qi",
-      "desc": "Un colmillo o fragmento de espina de una bestia que se volvió densa en minerales tras años de absorber Qi de la tierra."
-    },
-    "bronze_mineral_2": {
-      "name": "Núcleo de Madera Espiritual",
-      "desc": "El núcleo endurecido de una entidad espiritual o árbol ancestral, impregnado con Qi forestal concentrado."
-    },
-    "silver_mineral_1": {
-      "name": "Escama de Espina de Hierro",
-      "desc": "Una escama o segmento de espina de depredadores de calibre férreo de la antigua frontera, suficientemente densa como para desviar ataques de grado plata."
-    },
-    "silver_mineral_2": {
-      "name": "Jade de Array Inmortal",
-      "desc": "Jade infundido con arrays de formación de ruinas inmortales hundidas, que aún contienen trazas de sus inscripciones originales."
-    },
-    "gold_mineral_1": {
-      "name": "Astilla de Hueso Santo",
-      "desc": "Una astilla de hueso de cadáveres del reino santo, que irradia un frío Qi de muerte que resiste el refinamiento."
-    },
-    "gold_mineral_2": {
-      "name": "Fragmento de Sello Prohibido",
-      "desc": "Un fragmento de los sellos del vacío que una vez contuvieron las Tierras Prohibidas, crepitando con poder contenido."
-    },
-    "transcendent_mineral_1": {
-      "name": "Cristal del Vacío",
-      "desc": "Un cristal cultivado dentro de las grietas del vacío, cuya estructura está formada enteramente por energía del vacío comprimida."
-    },
-    "transcendent_mineral_2": {
-      "name": "Núcleo de Piedra del Mundo",
-      "desc": "Un núcleo de piedra imposiblemente denso formado en los estratos más profundos del mundo o desprendido por titanes del cielo superior, usado únicamente en la transmutación más avanzada."
-    },
-    "iron_cultivation_1": {
-      "name": "Piedra de Qi de Hierro 1",
-      "desc": "Una piedra formada naturalmente que acumula Qi ambiental con el tiempo en los campos de entrenamiento del reino mortal."
-    },
-    "iron_cultivation_2": {
-      "name": "Piedra de Qi de Hierro 2",
-      "desc": "Qi residual que se coagula sobre un cultivador mortal o bestia derrotado, brevemente visible antes de dispersarse."
-    },
-    "bronze_cultivation_1": {
-      "name": "Piedra de Qi de Bronce 1",
-      "desc": "El denso núcleo de Qi encontrado en el centro de una bestia que se ha alimentado de energía espiritual durante años, aún pulsando débilmente tras la muerte."
-    },
-    "bronze_cultivation_2": {
-      "name": "Piedra de Qi de Bronce 2",
-      "desc": "Un fragmento cristalizado de Qi arrancado de un cultivador caído o constructo cuyos canales de energía habían sido corrompidos o destrozados."
-    },
-    "silver_cultivation_1": {
-      "name": "Piedra de Qi de Plata 1",
-      "desc": "El condensado de Qi similar a la médula encontrado en lo profundo de criaturas ancestrales de la frontera, saturado tras siglos de absorción de Qi."
-    },
-    "silver_cultivation_2": {
-      "name": "Piedra de Qi de Plata 2",
-      "desc": "Un fragmento de fuerza del alma que persiste tras la muerte de una entidad de grado inmortal, que aún lleva ecos de su cultivación."
-    },
-    "gold_cultivation_1": {
-      "name": "Piedra de Qi de Oro 1",
-      "desc": "Una reliquia calcificada de Qi del reino santo, recuperada de tierras de sepultura y altares de guerra."
-    },
-    "gold_cultivation_2": {
-      "name": "Piedra de Qi de Oro 2",
-      "desc": "Una pequeña perla formada dentro de depredadores y sombras tocadas por el vacío, que contiene energía de atributo vacío comprimida."
-    },
-    "transcendent_cultivation_1": {
-      "name": "Piedra de Qi Trascendente 1",
-      "desc": "El núcleo de Qi cristalizado de una entidad primordial, condensado a partir de millones de años de cultivación ininterrumpida."
-    },
-    "transcendent_cultivation_2": {
-      "name": "Piedra de Qi Trascendente 2",
-      "desc": "Un cristal de Qi puro de grado celestial extraído de entidades que han ascendido más allá de las limitaciones mortales."
-    },
-    "iron_essence_pill":          { "name": "Píldora de Esencia de Hierro",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_soul_pill":             { "name": "Píldora de Alma de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_body_pill":             { "name": "Píldora de Cuerpo de Hierro",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_fist_pill":             { "name": "Píldora de Puño de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_ember_pill":            { "name": "Píldora de Ascua de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_mind_pill":             { "name": "Píldora de Mente de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_skin_pill":             { "name": "Píldora de Piel de Hierro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_ward_pill":             { "name": "Píldora de Guardián de Hierro",         "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_anchor_pill":           { "name": "Píldora de Ancla de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "iron_vigor_pill":            { "name": "Píldora de Vigor de Hierro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_essence_pill":        { "name": "Píldora de Esencia de Bronce",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_soul_pill":           { "name": "Píldora de Alma de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_body_pill":           { "name": "Píldora de Cuerpo de Bronce",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_fist_pill":           { "name": "Píldora de Puño de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_ember_pill":          { "name": "Píldora de Ascua de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_mind_pill":           { "name": "Píldora de Mente de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_skin_pill":           { "name": "Píldora de Piel de Bronce",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_ward_pill":           { "name": "Píldora de Guardián de Bronce",         "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_anchor_pill":         { "name": "Píldora de Ancla de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "bronze_vigor_pill":          { "name": "Píldora de Vigor de Bronce",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_essence_pill":        { "name": "Píldora de Esencia de Plata",           "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_soul_pill":           { "name": "Píldora de Alma de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_body_pill":           { "name": "Píldora de Cuerpo de Plata",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_fist_pill":           { "name": "Píldora de Puño de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_ember_pill":          { "name": "Píldora de Ascua de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_mind_pill":           { "name": "Píldora de Mente de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_skin_pill":           { "name": "Píldora de Piel de Plata",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_ward_pill":           { "name": "Píldora de Guardián de Plata",          "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_anchor_pill":         { "name": "Píldora de Ancla de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "silver_vigor_pill":          { "name": "Píldora de Vigor de Plata",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_essence_pill":          { "name": "Píldora de Esencia de Oro",             "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_soul_pill":             { "name": "Píldora de Alma de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_body_pill":             { "name": "Píldora de Cuerpo de Oro",              "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_fist_pill":             { "name": "Píldora de Puño de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_ember_pill":            { "name": "Píldora de Ascua de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_mind_pill":             { "name": "Píldora de Mente de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_skin_pill":             { "name": "Píldora de Piel de Oro",                "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_ward_pill":             { "name": "Píldora de Guardián de Oro",            "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_anchor_pill":           { "name": "Píldora de Ancla de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "gold_vigor_pill":            { "name": "Píldora de Vigor de Oro",               "desc": "Una píldora cultivada que mejora permanentemente las estadísticas base." },
-    "transcendent_essence_pill":  { "name": "Píldora de Esencia Trascendente",       "desc": "Una píldora cultivada que mejora permanentemente las tres estadísticas primarias." },
-    "exploit_mastery_pill":       { "name": "Píldora de Maestría en Explotación",    "desc": "Una píldora cultivada que mejora permanentemente la probabilidad y el daño de explotación." },
-    "world_harvest_pill":         { "name": "Píldora de Cosecha del Mundo",          "desc": "Una píldora cultivada que mejora permanentemente la velocidad y suerte de recolección y minería." },
-    "cataclysm_pill":             { "name": "Píldora del Cataclismo",                "desc": "Una píldora cultivada que mejora permanentemente todos los tipos de daño." },
-    "dao_bulwark_pill":           { "name": "Píldora del Bastión del Dao",           "desc": "Una píldora cultivada que mejora permanentemente todos los tipos de defensa." },
-    "eternal_vigor_pill":         { "name": "Píldora de Vigor Eterno",               "desc": "Una píldora cultivada que otorga permanentemente una cantidad masiva de salud." },
-    "iron_blood_core_1": {
-      "name": "Núcleo de Sangre de Hierro 1",
-      "desc": "Marcador — un denso núcleo de sangre de grado hierro extraído de un enemigo caído."
-    },
-    "iron_blood_core_2": {
-      "name": "Núcleo de Sangre de Hierro 2",
-      "desc": "Marcador — una esencia de sangre cristalizada de grado hierro condensada de cultivadores mortales."
-    },
-    "bronze_blood_core_1": {
-      "name": "Núcleo de Sangre de Bronce 1",
-      "desc": "Marcador — un núcleo de sangre de grado bronce que pulsa con vitalidad bestial."
-    },
-    "bronze_blood_core_2": {
-      "name": "Núcleo de Sangre de Bronce 2",
-      "desc": "Marcador — un fragmento de Qi de sangre de grado bronce condensado de entidades corrompidas."
-    },
-    "silver_blood_core_1": {
-      "name": "Núcleo de Sangre de Plata 1",
-      "desc": "Marcador — un núcleo de sangre de grado plata saturado de vitalidad de la antigua frontera."
-    },
-    "silver_blood_core_2": {
-      "name": "Núcleo de Sangre de Plata 2",
-      "desc": "Marcador — un cristal de sangre remanente de una entidad del reino inmortal."
-    },
-    "gold_blood_core_1": {
-      "name": "Núcleo de Sangre de Oro 1",
-      "desc": "Marcador — un núcleo de sangre de grado santo que irradia frío Qi de muerte."
-    },
-    "gold_blood_core_2": {
-      "name": "Núcleo de Sangre de Oro 2",
-      "desc": "Marcador — una perla de sangre de atributo vacío de un depredador de grado oro."
-    },
-    "transcendent_blood_core_1": {
-      "name": "Núcleo de Sangre Trascendente 1",
-      "desc": "Marcador — un núcleo de sangre primordial condensado de una entidad más allá de las limitaciones mortales."
-    },
-    "transcendent_blood_core_2": {
-      "name": "Núcleo de Sangre Trascendente 2",
-      "desc": "Marcador — un cristal de sangre de grado celestial que irradia presión abrumadora."
+    "foundation_verdant": {
+      "desc": "Permanentemente +2% qi/s para esta vida (por nivel de calor, escala).",
+      "name": "Píldora de Cimiento Verdante"
     }
   },
-  "artefacts": {
-    "iron_sword": {
-      "name": "Espada de Hierro",
-      "desc": "Una sencilla espada de hierro forjada para los discípulos de la secta exterior. Fiable pero sin nada especial."
+  "furnaceHeat": {
+    "0": {
+      "label": "Bruto"
     },
-    "spirit_edge_sword": {
-      "name": "Espada de Filo Espiritual",
-      "desc": "Una espada afilada con energía espiritual; la hoja zumba débilmente cuando el Qi fluye a través de ella."
+    "1": {
+      "label": "Templado"
     },
-    "void_cleaver": {
-      "name": "Cuchilla del Vacío",
-      "desc": "Forjada de piedra del vacío; cada golpe desgarra una minúscula grieta en el tejido espacial local."
+    "2": {
+      "label": "Refinado"
     },
-    "dragon_fang_sword": {
-      "name": "Espada de Colmillo de Dragón",
-      "desc": "Elaborada a partir de un colmillo de bestia dragón; canaliza presión dracónica pura en cada golpe."
-    },
-    "heaven_slaying_sword": {
-      "name": "Espada Destructora del Cielo",
-      "desc": "Una hoja legendaria que se dice ha cortado la barrera entre reinos. El filo nunca se desafila."
-    },
-    "iron_polearm": {
-      "name": "Arma de Asta de Hierro",
-      "desc": "Una pesada arma de asta de hierro preferida por los cultivadores de cuerpo por su alcance y poder de detención."
-    },
-    "serpent_spear": {
-      "name": "Lanza Serpiente",
-      "desc": "Una lanza flexible con punta de diente de serpiente que inyecta un leve veneno espiritual al penetrar."
-    },
-    "mountain_breaker": {
-      "name": "Rompemontañas",
-      "desc": "Una alabarda de cabeza ancha que se dice ha derribado una pequeña montaña espiritual. Pulveriza la defensa física."
-    },
-    "thunder_lance": {
-      "name": "Lanza del Trueno",
-      "desc": "Una lanza recubierta con mineral de rayo comprimido; los golpes detonan con un trueno."
-    },
-    "divine_pillar_spear": {
-      "name": "Lanza del Pilar Divino",
-      "desc": "Antes fue el pilar de un palacio celestial, reformado en lanza. Un empuje a plena potencia desgarra el espacio."
-    },
-    "spirit_headband": {
-      "name": "Banda Espiritual",
-      "desc": "Una sencilla banda de tela imbuida con energía espiritual básica, que ayuda a la concentración durante la cultivación."
-    },
-    "jade_cultivation_crown": {
-      "name": "Corona de Cultivación de Jade",
-      "desc": "Un aro de jade tallado que estabiliza el mar espiritual y reduce la turbulencia del avance."
-    },
-    "ghost_kings_circlet": {
-      "name": "Diadema del Rey Fantasma",
-      "desc": "Forjada de hierro fantasma; atenúa los ataques espirituales y suprime los efectos negativos basados en el alma."
-    },
-    "heaven_forged_war_crown": {
-      "name": "Corona de Guerra Forjada en el Cielo",
-      "desc": "Una corona de batalla fundida en fuego celestial; aumenta enormemente la resistencia al daño elemental."
-    },
-    "crown_of_the_undying": {
-      "name": "Corona del Inmortal",
-      "desc": "Se dice que fue usada por un cultivador del Cielo Abierto; protege el espíritu de ataques letales del alma."
-    },
-    "cotton_spirit_robe": {
-      "name": "Túnica Espiritual de Algodón",
-      "desc": "Túnica ligera tejida con hilo espiritual, proporcionando una circulación de Qi mínima pero constante."
-    },
-    "cloud_silk_battle_vest": {
-      "name": "Chaleco de Batalla de Seda de Nube",
-      "desc": "Un chaleco hilado de seda de nube de gran altitud que desvía golpes físicos y elementales menores."
-    },
-    "dragon_scale_armour": {
-      "name": "Armadura de Escamas de Dragón",
-      "desc": "Escamas desprendidas de una bestia dragón menor; duras como el hierro y resistentes al fuego y los rayos."
-    },
-    "phoenix_feather_war_robe": {
-      "name": "Túnica de Guerra de Plumas de Fénix",
-      "desc": "Tejida con plumón de fénix; regenera el daño menor con el tiempo y resiste el calor extremo."
-    },
-    "heaven_piercing_divine_robe": {
-      "name": "Túnica Divina Perforadora del Cielo",
-      "desc": "Una túnica de grado supremo que alterna entre suavidad y acero; anula los golpes por debajo de un umbral de poder."
-    },
-    "iron_bracers": {
-      "name": "Brazales de Hierro",
-      "desc": "Brazales básicos de hierro que refuerzan los antebrazos y mejoran la estabilidad al bloquear."
-    },
-    "tiger_claw_gauntlets": {
-      "name": "Guanteletes de Garra de Tigre",
-      "desc": "Guanteletes con estilo de garras de tigre; aumenta ligeramente el daño de los golpes desarmados y con arma de asta."
-    },
-    "mithril_bracers": {
-      "name": "Brazales de Mithril",
-      "desc": "Brazales ligeros de mithril que conducen energía elemental a través de cada golpe."
-    },
-    "dragon_vein_gauntlets": {
-      "name": "Guanteletes de Venas de Dragón",
-      "desc": "Guanteletes atravesados con mineral de venas de dragón; canalizan el Qi a través de los brazos a un ritmo notablemente más rápido."
-    },
-    "heaven_palm_guards": {
-      "name": "Guardas de Palma Celestial",
-      "desc": "Antiguas guardas usadas por un gran maestro de técnicas de palma; amplifican dramáticamente las técnicas secretas de palma abierta."
-    },
-    "leather_cultivation_belt": {
-      "name": "Cinturón de Cultivación de Cuero",
-      "desc": "Un resistente cinturón que estabiliza el Dantian y reduce la dispersión del Qi durante el combate."
-    },
-    "spirit_jade_sash": {
-      "name": "Faja de Jade Espiritual",
-      "desc": "Una faja de seda incrustada con cuentas de jade espiritual; mejora la circulación del Qi entre la parte superior e inferior del cuerpo."
-    },
-    "serpent_skin_belt": {
-      "name": "Cinturón de Piel de Serpiente",
-      "desc": "Elaborado con la piel mudada de una serpiente espiritual; aumenta la agilidad y la resistencia al veneno."
-    },
-    "golden_dragon_belt": {
-      "name": "Cinturón del Dragón Dorado",
-      "desc": "Un amplio cinturón en relieve con un dragón enroscado; aumenta enormemente la conversión del atributo Cuerpo."
-    },
-    "void_emperors_sash": {
-      "name": "Faja del Emperador del Vacío",
-      "desc": "Una faja tejida con hilo espacial; absorbe una porción del daño entrante en un bolsillo del vacío."
-    },
-    "wind_step_boots": {
-      "name": "Botas del Paso del Viento",
-      "desc": "Botas ligeras encantadas para un paso veloz; aumenta marginalmente la tasa de esquiva."
-    },
-    "swiftcloud_sandals": {
-      "name": "Sandalias de Nube Veloz",
-      "desc": "Sandalias que llevan una traza de energía de nube; permiten breves ráfagas de movimiento acelerado."
-    },
-    "thunderstep_boots": {
-      "name": "Botas del Paso del Trueno",
-      "desc": "Botas que crepitan con rayos almacenados; cada paso libera una descarga de bajo poder al contacto."
-    },
-    "dragon_treading_boots": {
-      "name": "Botas del Paso del Dragón",
-      "desc": "Forjadas con huesos de bestia dragón; mejora dramáticamente la estabilidad en el suelo y los ataques de pisotón."
-    },
-    "heaven_soaring_sandals": {
-      "name": "Sandalias Voladoras del Cielo",
-      "desc": "Sandalias que se dice permiten al portador caminar sobre el aire; aumentan masivamente la esquiva y las técnicas basadas en el movimiento."
-    },
-    "jade_spirit_pendant": {
-      "name": "Colgante Espiritual de Jade",
-      "desc": "Una pieza de jade pulida usada cerca del corazón; fortalece suavemente el mar espiritual."
-    },
-    "soul_calming_necklace": {
-      "name": "Collar Calmador del Alma",
-      "desc": "Una sarta de cuentas espirituales que suprime las fluctuaciones del alma y los efectos negativos mentales en combate."
-    },
-    "blood_dragon_talisman": {
-      "name": "Talismán del Dragón de Sangre",
-      "desc": "Un talismán de hueso tallado empapado en sangre de bestia dragón; aumenta la resistencia física bruta."
-    },
-    "elemental_core_pendant": {
-      "name": "Colgante de Núcleo Elemental",
-      "desc": "Contiene un núcleo elemental comprimido; amplifica el bono de afinidad elemental."
-    },
-    "heavens_eye_amulet": {
-      "name": "Amuleto del Ojo del Cielo",
-      "desc": "Un talismán que alberga el ojo petrificado de una bestia divina; otorga breve precognición en combate."
-    },
-    "copper_spirit_ring": {
-      "name": "Anillo Espiritual de Cobre",
-      "desc": "Un sencillo anillo de cobre que canaliza una débil corriente de Qi a través de los meridianos."
-    },
-    "jade_focus_ring": {
-      "name": "Anillo de Enfoque de Jade",
-      "desc": "Un anillo de jade tallado que agudiza el control de las técnicas elementales, reduciendo el desperdicio de energía."
-    },
-    "void_stone_ring": {
-      "name": "Anillo de Piedra del Vacío",
-      "desc": "Engastado con un fragmento de piedra del vacío; tiene un pequeño espacio de almacenamiento y potencia el daño de las técnicas espaciales."
-    },
-    "dragon_blood_ring": {
-      "name": "Anillo de Sangre de Dragón",
-      "desc": "Un anillo forjado con aleación de sangre de dragón; acelera significativamente la circulación del Qi del portador."
-    },
-    "immortal_soul_ring": {
-      "name": "Anillo del Alma Inmortal",
-      "desc": "Un anillo que se dice contiene una astilla del alma de un inmortal; amplifica dramáticamente la velocidad del Qi en el portador."
+    "3": {
+      "label": "Pico"
     }
   },
-  "techniques": {},
-  "laws": {
-    "three_harmony_manual": {
-      "name": "Manual de las Tres Armonías",
-      "flavour": "El antiguo texto no habla de fuego, ni de tormenta, ni de montaña, solo del aliento equitativo entre todas las cosas.",
-      "realmRequirementLabel": "Cuerpo Templado"
+  "furnaceMaterials": {
+    "cinnabar_powder": {
+      "name": "Polvo de Cinabrio"
+    },
+    "dragon_root": {
+      "name": "Raíz de Dragón"
+    },
+    "jade_tincture": {
+      "name": "Tintura de Jade"
+    },
+    "mint_essence": {
+      "name": "Esencia de Menta"
+    },
+    "moon_dust": {
+      "name": "Polvo de Luna"
+    },
+    "phoenix_ash": {
+      "name": "Ceniza de Fénix"
+    },
+    "spirit_sediment": {
+      "name": "Sedimento Espiritual"
+    }
+  },
+  "furnacePills": {
+    "calm_pond": {
+      "desc": "+10% captura de Qi sin conexión durante 4 horas.",
+      "name": "Píldora del Estanque Tranquilo"
+    },
+    "frugal_mind": {
+      "desc": "Las siguientes 10 compras de productores cuestan 10% menos.",
+      "name": "Píldora de Mente Frugal"
+    },
+    "inner_flame": {
+      "desc": "La siguiente Ruptura cuesta 10% menos Qi (único).",
+      "name": "Píldora de Llama Interior"
+    },
+    "mystery": {
+      "desc": "Una píldora misteriosa. Efecto revelado al consumir.",
+      "name": "Píldora ???"
+    },
+    "phoenix_radiance": {
+      "desc": "+10% Qi/s durante 1 hora. Quemazón tardía.",
+      "name": "Píldora del Resplandor Fénix"
+    },
+    "quiet_tide": {
+      "desc": "-7% próximos 10 costos de productores Y +5% sin conexión.",
+      "name": "Píldora de Marea Silenciosa"
+    },
+    "rooted_vigor": {
+      "desc": "+5% ganancia de Karma durante 4 horas.",
+      "name": "Píldora de Vigor Enraizado"
+    },
+    "spring_flame": {
+      "desc": "+4% Qi/s durante 1 hora Y 5% de descuento en siguiente Ruptura.",
+      "name": "Píldora de Llama Primaveral"
+    },
+    "trinity": {
+      "desc": "+3% Qi/s, +3% descuento Ruptura, +3% sin conexión. Versátil.",
+      "name": "Píldora Trinaria"
+    },
+    "verdant_body": {
+      "desc": "+5% Qi/s durante 2 horas (por nivel de calor, escala).",
+      "name": "Píldora del Cuerpo Lozano"
+    },
+    "verdant_tide": {
+      "desc": "+4% Qi/s Y +5% sin conexión durante 2 horas.",
+      "name": "Píldora de Marea Lozana"
+    }
+  },
+  "gardenPlants": {
+    "black_iron_reed": {
+      "name": "Caña de Hierro Negro"
+    },
+    "cinnabar_bloom": {
+      "name": "Flor de Cinabrio"
+    },
+    "dragonscale_ginseng": {
+      "name": "Ginseng de Escama de Dragón"
+    },
+    "gold_crown_peony": {
+      "name": "Peonía de Corona Dorada"
+    },
+    "heaven_pierce_bamboo": {
+      "name": "Bambú Perforador del Cielo"
+    },
+    "jade_lotus_bud": {
+      "name": "Capullo de Loto de Jade"
+    },
+    "moonleaf_vine": {
+      "name": "Vid de Hoja Lunar"
+    },
+    "phoenix_tail_grass": {
+      "name": "Hierba Cola de Fénix"
+    },
+    "soul_lily": {
+      "name": "Lirio del Alma"
+    },
+    "spirit_mint": {
+      "name": "Menta Espiritual"
+    }
+  },
+  "gardenRecipes": {
+    "e_jade": {
+      "name": "Bebida de Rocío de Jade"
+    },
+    "e_spirit": {
+      "name": "Elixir de Floración Espiritual"
+    },
+    "e_verdant": {
+      "name": "Tónico Lozano"
+    }
+  },
+  "minigames": {
+    "p_beast_pact": {
+      "mode": "Activo · combatiente",
+      "name": "Arena de Bestias",
+      "tagline": "Enfrenta tus bestias pactadas en la escalera espiritual."
+    },
+    "p_disciple": {
+      "mode": "Activo · cuadrícula de fusión",
+      "name": "El Elenco",
+      "tagline": "Promueve tus Discípulos en los rangos de Cultivo. La suma del tablero eleva la salida de Qi de cada Discípulo."
+    },
+    "p_dragon": {
+      "mode": "Activo · empujar suerte",
+      "name": "Sueño del Dragón",
+      "tagline": "Extrae mientras respira; guarda antes de que despierte."
+    },
+    "p_herb_garden": {
+      "mode": "Inactivo · tiende y recoge",
+      "name": "Jardín Espiritual",
+      "tagline": "Siembra semillas espirituales, tiende los cultivos, regresa a una cosecha abundante."
+    },
+    "p_meridian_furnace": {
+      "mode": "Activo · sincronización",
+      "name": "Refinamiento de Píldoras",
+      "tagline": "Mantén la llama verdadera y pliega reactivos raros en una píldora potente."
+    },
+    "p_phoenix": {
+      "mode": "Activo · arcade",
+      "name": "Pira Fénix",
+      "tagline": "Cabalga las corrientes de fuego y recoge plumas."
+    },
+    "p_pillar": {
+      "mode": "Activo · escalador",
+      "name": "Ascenso del Pilar",
+      "tagline": "Asciende el pilar celestial, esquiva la tribulación."
+    },
+    "p_sect_followers": {
+      "mode": "Gestión de luz",
+      "name": "Ofrendas de la Secta",
+      "tagline": "Reúne diez mil discípulos para el diezmo."
+    },
+    "p_treasure": {
+      "mode": "Inactivo · encaje",
+      "name": "Ecos Ancestrales",
+      "tagline": "Consagra a tus ancestros para bendiciones perdurables."
+    },
+    "p_void": {
+      "mode": "Activo · puzle",
+      "name": "Canalización del Vacío",
+      "tagline": "Canaliza la grieta antes de que se cierre."
+    }
+  },
+  "producers": {
+    "p_beast_pact": {
+      "desc": "Silbas una vez y regresan de lugares que ningún mortal podría andar. Tigres con tormentas de Qi enredadas en su pelaje. Zorros con luz de estrella en sus lenguas. Traen la cosecha a tu puerta.",
+      "name": "Pacto de Bestia Espiritual"
+    },
+    "p_disciple": {
+      "desc": "Un aprendiz arrodillado en tu patio, aliento tranquilo, palmas cálidas. El Qi que extraen del aire es un hilo delgado. Cada hilo fortalece el telar.",
+      "name": "Discípulo de Templanza Corporal"
+    },
+    "p_dragon": {
+      "desc": "Sueña en tu dantian, y uno de sus sueños eres tú. La perla que rodea es más antigua que las montañas. Cada exhalación lenta dora tus meridianos con Cultivo que nunca ganaste.",
+      "name": "Dragón Espiritual Dormido"
+    },
+    "p_herb_garden": {
+      "desc": "Las hojas de jade se desenvuelven al amanecer y beben calladamente los cielos. Lo que las hierbas espirituales no pueden usar, te lo ofrecen.",
+      "name": "Jardín de Hierbas Espirituales"
+    },
+    "p_meridian_furnace": {
+      "desc": "Piernas de bronce, tapa sellada, un fuego que nunca se apaga. El Qi bruto entra turbio y amargo; lo que llega a tus meridianos es más denso que el oro.",
+      "name": "Horno de Meridiano"
+    },
+    "p_phoenix": {
+      "desc": "El Fenghuang desciende solo cuando el cosmos mismo está de acuerdo. Pliega sus alas arcoíris alrededor de tu alma. Cada pluma es un río. Cada grito, una sutra más antigua que el cielo.",
+      "name": "Fénix Soberano"
+    },
+    "p_pillar": {
+      "desc": "Tallado antes del abuelo de tu abuelo, el pilar asciende hasta que las nubes olvidan que comenzó como piedra. A través de su longitud, los cielos mismos desangran en tu dantian.",
+      "name": "Pilar Celestial"
+    },
+    "p_sect_followers": {
+      "desc": "Diez mil discípulos despiertan al amanecer e inclinan la cabeza hacia la sala que lleva tu sigilo. Un grano de arroz de cada uno se convierte en una montaña. Un aliento de Qi de cada uno se convierte en un río.",
+      "name": "Seguidores de la Secta Mortal"
+    },
+    "p_treasure": {
+      "desc": "Un colgante de jade que tus ancestros llevaron cien vidas. Cada aliento que tomaron dejó una traza, y cada traza desangra hacia ti ahora, paciente como una marea.",
+      "name": "Tesoro Ancestral"
+    },
+    "p_void": {
+      "desc": "Una herida en la realidad, nunca cerrándose, nunca sangrando menos. A través de ella, Qi de un mundo que no es el tuyo vierte en un mundo que es. Otro universo es un tributo generoso.",
+      "name": "Conducto del Vacío"
+    }
+  },
+  "qiSparks": {
+    "consecutive_focus_t1": {
+      "description": "Mantén el Enfoque 2s → +5% Qi/s.",
+      "name": "Enfoque Consecutivo"
+    },
+    "consecutive_focus_t2": {
+      "description": "Añade: mantén Enfoque 4s → +7% más Qi/s (total +12%).",
+      "name": "Enfoque Consecutivo"
+    },
+    "consecutive_focus_t3": {
+      "description": "Añade: mantén Enfoque 6s → +13% más Qi/s (total +25%).",
+      "name": "Enfoque Consecutivo"
+    },
+    "consecutive_focus_t4": {
+      "description": "Añade: mantén Enfoque 8s → +15% más Qi/s (total +40%).",
+      "name": "Enfoque Consecutivo"
+    },
+    "consecutive_focus_t5": {
+      "description": "Añade: mantén Enfoque 10s → +20% más Qi/s (total +60%) e ingresa meditación profunda.",
+      "name": "Enfoque Consecutivo"
+    },
+    "crystal_click_t1": {
+      "description": "El cristal almacena 30% de tu Qi/s (hasta 2 min). Toca para recolectar.",
+      "name": "Reserva de Cristal"
+    },
+    "crystal_click_t2": {
+      "description": "Se actualiza a 50% de tu Qi/s (hasta 3 min). Toca para recolectar.",
+      "name": "Reserva de Cristal"
+    },
+    "crystal_click_t3": {
+      "description": "Mejora al 70% de tu Qi/s (hasta 4 min). Toca para recopilar.",
+      "name": "Reserva de Cristal"
+    },
+    "crystal_click_t4": {
+      "description": "Mejora al 85% de tu Qi/s (hasta 5 min). Toca para recopilar.",
+      "name": "Reserva de Cristal"
+    },
+    "crystal_click_t5": {
+      "description": "Velocidad completa: 100% de tu Qi/s (hasta 6 min). Toca el cristal para recopilar.",
+      "name": "Reserva de Cristal"
+    },
+    "divine_qi_t1": {
+      "description": "Una esfera dorada aparece cada ~10 min. Tócala dentro de 8s para obtener 25s de Qi.",
+      "name": "Qi Celestial"
+    },
+    "divine_qi_t2": {
+      "description": "Esfera cada ~9 min, ventana de 10s. Toca para 35s de Qi.",
+      "name": "Qi Celestial"
+    },
+    "divine_qi_t3": {
+      "description": "Esfera cada ~8 min, ventana de 12s. Toca para 50s de Qi.",
+      "name": "Qi Celestial"
+    },
+    "divine_qi_t4": {
+      "description": "Esfera cada ~7 min, ventana de 15s. Toca para 65s de Qi.",
+      "name": "Qi Celestial"
+    },
+    "divine_qi_t5": {
+      "description": "Dos esferas cada ~6 min. Recoge ambas para 75s Qi + ×1.25 Qi/s durante 20s.",
+      "name": "Qi Celestial"
+    },
+    "enduring_stream": {
+      "description": "+1% Qi/s para el resto de esta carrera. Se acumula.",
+      "name": "Corriente Perdurable"
+    },
+    "heavens_bond": {
+      "description": "+3% acumulación de Qi offline para el resto de esta carrera. Se acumula.",
+      "name": "Vínculo del Cielo"
+    },
+    "legendary_a1_smoke_petal": {
+      "description": "Cada par de Jardín de Hierbas Espirituales + Horno de Meridiano multiplica ambos ×1.5. Las hojas de jade del jardín se rizan en el humo del horno y florecen más rápido; el horno saborea el aliento de las hierbas espirituales y arde más caliente.",
+      "name": "Humo y Pétalo"
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "description": "Cada par de Discípulo de Templanza Corporal + Seguidor de Secta Mortal multiplica ambos ×1.75. Un único discípulo se convierte en un punto focal; diez mil peregrinos se inclinan hacia ellos.",
+      "name": "Salón de los Diez Mil"
+    },
+    "legendary_a3_pearl_pendant": {
+      "description": "Cada par de Dragón Espiritual Dormido + Tesoro Ancestral multiplica ambos ×2. La perla de ensueño del dragón reconoce una reliquia llevada por tus antepasados — siempre estaban destinados a encontrarse de nuevo.",
+      "name": "La Perla y el Colgante"
+    },
+    "legendary_a4_climbing_beasts": {
+      "description": "Cada par de Pacto de Bestia Espiritual + Pilar Celestial añade +10% Qi/s global. Los tigres suben el pilar a medianoche para beber directamente. No se lo dicen a los zorros. Los zorros se enteran.",
+      "name": "Bestias Escaladoras"
+    },
+    "legendary_a5_void_garden": {
+      "description": "Cada par de Conducto del Vacío + Jardín de Hierbas Espirituales multiplica ambos ×2.5. El sangrado del vacío lleva semillas de otro mundo; el jardín las devora, florece en colores que ningún ojo ha nombrado.",
+      "name": "Jardín del Vacío"
+    },
+    "legendary_a6_phoenix_pillar": {
+      "description": "Cada par de Fénix Soberano + Pilar Celestial multiplica ambos ×3. El Fenghuang aterriza solo en una percha lo suficientemente alta. Cada pilar es un paso más cerca del cielo.",
+      "name": "Fénix y Pilar"
+    },
+    "legendary_b1_dragon_hoard": {
+      "description": "Dragón Espiritual Dormido +25% Qi/s por cada Tesoro Ancestral poseído. La perla del dragón es lo que le ofreciste. Cada reliquia que guardaste, la ha plegado en sí misma.",
+      "name": "Tesoro del Dragón"
+    },
+    "legendary_b3_beast_tribute": {
+      "description": "Pacto de Bestia Espiritual +12% Qi/s por cada Jardín de Hierbas Espirituales poseído. Los tigres comen las hierbas espirituales que cultivas. Regresan más grandes, más rápidos, más afilados.",
+      "name": "Tributo de Bestia"
+    },
+    "legendary_b4_furnace_sect": {
+      "description": "Horno de Meridiano +4% Qi/s por cada Discípulo de Templanza Corporal. El aliento de cada aprendiz aviva un poco más las patas de bronce. El horno siempre fue un esfuerzo de la Secta.",
+      "name": "Horno de la Secta"
+    },
+    "legendary_b5_heavens_bend": {
+      "description": "Pilar Celestial ×2 Qi/s si posees al menos 1 Conducto del Vacío. Cuando la realidad ya está rota, el cielo deja de resistirse.",
+      "name": "Los Cielos se Inclinan"
+    },
+    "legendary_b6_phoenix_garden": {
+      "description": "Fénix Soberano +5% Qi/s por cada Jardín de Hierbas Espirituales poseído. El Fenghuang anida solo donde la tierra es medicina. Cien jardines, cien razones para quedarse.",
+      "name": "Jardín del Fénix"
+    },
+    "legendary_e2_phoenix_reborn": {
+      "description": "Cada Ruptura de Reino reinicia tu contador de Fénix a 0 pero añade permanentemente +50% al Qi/s de todos los demás productores para esta carrera. El Fenghuang renace de sus propias cenizas — para bendecir la Secta de su hogar.",
+      "name": "Fénix Renacido"
+    },
+    "legendary_f1_storm_tiger": {
+      "description": "Pacto de Bestia Espiritual ×2 Qi/s. El tigre pasea, orejas planas. No rugirá hasta que un dragón sueñe su nombre y un fénix lo cante de vuelta. Hasta entonces, la tormenta en su pelaje solo murmura.",
+      "name": "Tigre de Pelaje Tormentoso"
+    },
+    "legendary_f2_pearl_dragon": {
+      "description": "Dragón Espiritual Dormido ×2 Qi/s. La perla se calienta cuando el dragón escucha dos sonidos distantes — un tigre paseando, un fénix plegando sus alas arcoíris. Solo entonces el ensueño se completa.",
+      "name": "Dragón de Ensueño Perla"
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "description": "Fénix Soberano ×2 Qi/s. El grito del Fenghuang tiene tres notas. Solo canta uno — en algún lugar un tigre pasea, en algún lugar un dragón sueña. Cuando los tres suenan, los cielos se inclinan.",
+      "name": "Fénix de Lamento Arcoíris"
+    },
+    "masters_patience": {
+      "description": "Cada segundo mantenido en Enfoque en esta ejecución da +0,1% Qi/s. Se acumula. Límite por acumulación +12%.",
+      "name": "Paciencia del Maestro"
+    },
+    "pattern_click_t1": {
+      "description": "Una Chispa de patrón aparece cada ~12 min. Toca para comenzar: 3 puntos, 10s para completar y obtener 30s de Qi.",
+      "name": "Trazando Meridianos"
+    },
+    "pattern_click_t2": {
+      "description": "Chispa cada ~11 min. 4 puntos, ventana de 12s. Completar: 40s de Qi.",
+      "name": "Trazando Meridianos"
+    },
+    "pattern_click_t3": {
+      "description": "Chispa cada ~10 min. 5 puntos, ventana de 14s. Completar: 55s de Qi.",
+      "name": "Trazando Meridianos"
+    },
+    "pattern_click_t4": {
+      "description": "Chispa cada ~9 min. 6 puntos, ventana de 16s. Completar: 70s de Qi.",
+      "name": "Trazando Meridianos"
+    },
+    "pattern_click_t5": {
+      "description": "Chispa cada ~8 min. 7 puntos, ventana de 18s. Completar: 90s de Qi + ×1,5 Qi/s durante 20s.",
+      "name": "Trazando Meridianos"
+    },
+    "quick_burst": {
+      "description": "Ganancia instantánea de Qi equivalente a 30 segundos de tu Qi/s actual.",
+      "name": "Ráfaga Rápida"
+    },
+    "resonant_soul": {
+      "description": "+0,2% Qi/s por cada Ruptura de capa que alcances en esta ejecución. Se acumula.",
+      "name": "Alma Resonante"
+    },
+    "sect_discipline": {
+      "description": "Durante 90 segundos, cada productor gana +1 Qi/s por unidad. Los Discípulos respiran al ritmo.",
+      "name": "Disciplina de la Secta"
+    },
+    "sharper_focus": {
+      "description": "+2% multiplicador de Enfoque para el resto de esta ejecución. Se acumula.",
+      "name": "Enfoque más Agudo"
+    },
+    "steady_cultivation": {
+      "description": "+0,3 Qi/s base para el resto de esta ejecución. Se acumula.",
+      "name": "Cultivo Constante"
+    },
+    "steady_stream": {
+      "description": "+20% Qi/s durante 60 segundos.",
+      "name": "Corriente Constante"
+    },
+    "surging_stream": {
+      "description": "+50% Qi/s durante 30 segundos.",
+      "name": "Corriente Desbordante"
+    },
+    "tinkers_bargain": {
+      "description": "Tus próximas 5 compras de productor cuestan -30% Qi. La ganga favorece al madrugador.",
+      "name": "Ganga del Reparador"
+    }
+  },
+  "rarity": {
+    "Bronze": {
+      "label": "Bronce"
+    },
+    "Gold": {
+      "label": "Oro"
+    },
+    "Iron": {
+      "label": "Hierro"
+    },
+    "Silver": {
+      "label": "Plata"
+    },
+    "Transcendent": {
+      "label": "Trascendente"
+    }
+  },
+  "shopBundles": {
+    "bundle_bone_court": {
+      "desc": "Cultivador + Cristal de Qi, tema osario.",
+      "name": "Corte de Huesos"
+    },
+    "bundle_frost_sect": {
+      "desc": "Cultivador + Cristal de Qi, tema helado.",
+      "name": "Secta del Hielo"
+    }
+  },
+  "shopItems": {
+    "buff_crimson_aura_12h": {
+      "desc": "×2 Qi/s durante 12 horas. El paquete \"me voy a dormir\".",
+      "name": "Aura Carmesí — 12h"
+    },
+    "buff_crimson_aura_1h": {
+      "desc": "+1 qi/s durante 1 hora. El Cultivador lleva un halo carmesí mientras está activo.",
+      "name": "Aura Carmesí — 1h"
+    },
+    "buff_crimson_aura_4h": {
+      "desc": "+2 qi/s durante 4 horas. La mejor relación valor por minuto para jugadores activos.",
+      "name": "Aura Carmesí — 4h"
+    },
+    "buff_crystal_resonance_30m": {
+      "desc": "+2 qi por toque de cristal, 30 min. Combina con mejoras de Toque Refinado para toque enormes.",
+      "name": "Resonancia del Cristal — 30m"
+    },
+    "buff_producer_surge_4h": {
+      "desc": "×1,5 en la tasa base de cada productor durante 4 horas. Se acumula multiplicativamente con mejoras.",
+      "name": "Oleada de Productores — 4h"
+    },
+    "consumable_major_bt_bypass": {
+      "desc": "Salta la puerta qi/s en tu próxima ruptura mayor. Aún pagas el costo de qi — pero sin necesidad de aumentar tu tasa primero.",
+      "name": "Perdón Celestial"
+    },
+    "cos_char_bone_patriarch": {
+      "desc": "Un anciano marchito de la secta del osario. Evoluciona a través de todos los 13 Reinos contigo.",
+      "name": "Patriarca Óseo"
+    },
+    "cos_char_frost_ascetic": {
+      "desc": "Un monje azotado por el viento de los picos congelados. Evoluciona a través de todos los 13 Reinos contigo.",
+      "name": "Asceta Helado"
+    },
+    "cos_char_lotus_sage": {
+      "desc": "Pétalos florecen alrededor del marco de un asceta. Evoluciona a través de todos los 13 Reinos.",
+      "name": "Santo del Loto"
+    },
+    "cos_char_storm_caller": {
+      "desc": "Túnicas de seda celestial, ojos iluminados por relámpagos. Evoluciona a través de todos los 13 Reinos.",
+      "name": "Invocador de Tormentas"
+    },
+    "cos_crystal_frost": {
+      "desc": "Un fragmento glacial tallado por cultivadores invernales. Evoluciona a través de los 10 niveles.",
+      "name": "Cristal Helado"
+    },
+    "cos_crystal_ossuary": {
+      "desc": "Una red cristalina cultivada a través de hueso antiguo. Evoluciona a través de los 10 niveles.",
+      "name": "Cristal del Osario"
+    },
+    "cos_crystal_phoenix": {
+      "desc": "Una brasa fundida atrapada en red cristalina. Evoluciona a través de los 10 niveles.",
+      "name": "Núcleo Fénix"
+    },
+    "cos_particles_c9_0": {
+      "desc": "Orbes de ausencia condensada. Sutiles y puros.",
+      "name": "Mota del Vacío"
+    },
+    "cos_particles_c9_10": {
+      "desc": "Nodos de Qi intrincados con un patrón interior ordenado.",
+      "name": "Orbe Arcano"
+    },
+    "cos_particles_c9_11": {
+      "desc": "Qi enrollado. Lleva la fuerza concentrada de un dragón.",
+      "name": "Mota del Dragón"
+    },
+    "cos_particles_c9_12": {
+      "desc": "Orbes cálidos que ascienden. Núcleo interior brillante como llama que se reforma.",
+      "name": "Orbe Fénix"
+    },
+    "cos_particles_c9_13": {
+      "desc": "Crepita con carga contenida. Nunca completamente inmóvil.",
+      "name": "Mota de Tormenta"
+    },
+    "cos_particles_c9_14": {
+      "desc": "Lleva la memoria de cien truenos.",
+      "name": "Orbe de Trueno"
+    },
+    "cos_particles_c9_15": {
+      "desc": "La forma suprema. Qi denso, brillante y perfectamente equilibrado.",
+      "name": "Mota Suprema"
+    },
+    "cos_particles_c9_2": {
+      "desc": "Volutas de Qi bruto. Dejan un rastro luminoso tenue.",
+      "name": "Mota Espectral"
+    },
+    "cos_particles_c9_3": {
+      "desc": "Orbes compactos en forma de estrella que parpadean con luz celestial.",
+      "name": "Mota Estelar"
+    },
+    "cos_particles_c9_4": {
+      "desc": "Qi comprimido, pesado de intención. Brillo interior apretado.",
+      "name": "Núcleo Denso"
+    },
+    "cos_particles_c9_5": {
+      "desc": "Suave y difuso. Se disuelve en ti como la niebla matinal.",
+      "name": "Orbe de Niebla"
+    },
+    "cos_particles_c9_6": {
+      "desc": "Una forma antigua de manifestación de Qi. Cruda y resonante.",
+      "name": "Orbe Primordial"
+    },
+    "cos_particles_c9_7": {
+      "desc": "Qi moldeado alrededor de una red cristalina. Brillo interior con aristas afiladas.",
+      "name": "Mota Cristalina"
+    },
+    "cos_particles_c9_8": {
+      "desc": "Qi apenas material. Más radiancia que sustancia.",
+      "name": "Orbe Etéreo"
+    },
+    "cos_particles_c9_9": {
+      "desc": "Orbes de grado celestial. Llevan un eco antiguo y distante.",
+      "name": "Mota Celestial"
+    },
+    "qol_autobuy_cheapest": {
+      "desc": "Desbloquea un botón Auto-Compra en la pantalla de Secta. Mientras está activado, el Qi se gasta automáticamente en el productor más barato disponible.",
+      "name": "Diligencia del Discípulo"
+    },
+    "qol_offline_cap_2h": {
+      "desc": "Amplía el límite de acumulación de Qi offline en 2 horas. Apilable hasta 3 veces (máx. +6h sobre el límite base de 8h).",
+      "name": "Mente Paciente +2h"
+    },
+    "qol_skip_bt_confirm": {
+      "desc": "Confirma automáticamente rupturas mayores en el momento en que la puerta se abre. Salta la pausa celebratoria.",
+      "name": "Corazón Decidido"
+    }
+  },
+  "sparkCopy": {
+    "enduring_stream": {
+      "effectText": "**+1% Qi/s** esta carrera. Se acumula.",
+      "exampleText": "Cinco acumulaciones se componen a aproximadamente <strong>+5% Qi/s total</strong>. Pequeño pero confiable, nunca expira.",
+      "loreText": "El río que nunca se detiene se convierte en el mar."
+    },
+    "heavens_bond": {
+      "effectText": "**+3% tasa de Qi offline** esta carrera. Se acumula.",
+      "exampleText": "La tasa offline base es 20%. Tres acumulaciones la elevan a <strong>29% tasa offline</strong>, así tu Secta cultiva un poco más fuerte mientras duermes.",
+      "loreText": "Los cielos no requieren tu atención. Solo tu alineación."
+    },
+    "legendary_a1_smoke_petal": {
+      "effectText": "Cada pareja **Jardín de Hierbas + Horno de Meridiano**: ambos producen **×1.5**.",
+      "exampleText": "Posee <strong>3 jardines + 5 hornos</strong>, así 3 parejas, cada Qi/s del jardín Y cada horno se multiplica por <strong>×2.5</strong> (1 + 3 × 0.5).",
+      "loreText": "Las hojas de jade del jardín se rizan en el humo del horno y florecen más rápido; el horno siente el aliento de la hierba espiritual y arde más caliente."
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "effectText": "Cada pareja **Discípulo en Templanza + Seguidor de Secta**: ambos producen **×1.75**.",
+      "exampleText": "Posee <strong>10 discípulos + 4 seguidores de Secta</strong>, así 4 parejas, cada Qi/s del productor se multiplica por <strong>×4</strong> (1 + 4 × 0.75).",
+      "loreText": "Un único discípulo se convierte en un punto focal; diez mil peregrinos se inclinan hacia él. El peregrino ve al discípulo; el discípulo siente el peso."
+    },
+    "legendary_a3_pearl_pendant": {
+      "effectText": "Cada pareja de **Dragón Espiritual + Tesoro Ancestral**: ambos producen **×2**.",
+      "exampleText": "Posees <strong>2 dragones + 5 tesoros</strong>, así que 2 parejas, el Qi/s de cada productor se multiplica por <strong>×3</strong> (1 + 2 × 1).",
+      "loreText": "La perla dormida del dragón reconoce una reliquia llevada por tus antepasados. Nunca estuvieron separados. Siempre iban a encontrarse de nuevo."
+    },
+    "legendary_a4_climbing_beasts": {
+      "effectText": "Cada pareja de **Bestia Espiritual + Pilar Celestial**: **+10% Qi/s global**.",
+      "exampleText": "Posees <strong>5 pactos de bestias + 8 pilares</strong>, así que 5 parejas, da <strong>+50% Qi/s global</strong> en TODA tu producción.",
+      "loreText": "Los tigres escalan el pilar celestial a medianoche para beber directamente. No se lo dicen a los zorros. Los zorros se enteran."
+    },
+    "legendary_a5_void_garden": {
+      "effectText": "Cada pareja de **Conducto Vacío + Jardín de Hierbas**: ambos producen **×2.5**.",
+      "exampleText": "Posees <strong>3 conductos vacíos + 10 jardines</strong>, así que 3 parejas, el Qi/s de cada productor se multiplica por <strong>×5.5</strong> (1 + 3 × 1.5).",
+      "loreText": "La sangría del vacío lleva semillas de otro mundo; el jardín las devora, florece en colores que ningún ojo ha nombrado."
+    },
+    "legendary_a6_phoenix_pillar": {
+      "effectText": "Cada pareja de **Fénix Soberano + Pilar Celestial**: ambos producen **×3**.",
+      "exampleText": "Posee <strong>1 fénix + 10 pilares</strong>, así 1 par, el Qi/s de ambos productores se multiplica por <strong>×3</strong>. Añadir un 2º fénix da 2 pares y ×5 cada uno.",
+      "loreText": "El Fenghuang solo se posa en una rama lo bastante alta. Cada pilar es un paso más cerca del cielo."
+    },
+    "legendary_b1_dragon_hoard": {
+      "effectText": "El **Dragón Espiritual** gana **+25% Qi/s** por Tesoro Ancestral poseído.",
+      "exampleText": "Posee <strong>1 dragón + 10 tesoros</strong>, el Qi/s del dragón es <strong>×3.5</strong> (1 + 10 × 0,25). Con 20 tesoros, ×6.",
+      "loreText": "La perla del dragón es lo que le ofreciste. Cada reliquia que guardaste, la ha plegado en sí misma."
+    },
+    "legendary_b3_beast_tribute": {
+      "effectText": "El **Pacto de Bestia Espiritual** gana **+12% Qi/s** por Jardín de Hierbas Espirituales.",
+      "exampleText": "Posee <strong>10 pactos de bestia + 15 jardines</strong>, el Qi/s de cada pacto es <strong>×2.8</strong> (1 + 15 × 0,12).",
+      "loreText": "Los tigres comen las hierbas espirituales que cultivas. Regresan más grandes, más veloces, más afilados."
+    },
+    "legendary_b4_furnace_sect": {
+      "effectText": "El **Horno de Meridiano** gana **+4% Qi/s** por Discípulo en Templanza.",
+      "exampleText": "Posee <strong>5 hornos + 50 discípulos</strong>, el Qi/s de cada horno es <strong>×3</strong> (1 + 50 × 0,04).",
+      "loreText": "El aliento de cada aprendiz aviva un poco más las piernas de bronce. El horno fue siempre el esfuerzo de una Secta."
+    },
+    "legendary_b5_heavens_bend": {
+      "effectText": "El **Pilar Celestial** produce **el doble de Qi/s** mientras poseas ≥1 Conducto del Vacío.",
+      "exampleText": "Posee <strong>10 pilares + 1 vacío</strong>, el Qi/s de cada pilar es <strong>×2</strong>. Poseer más vacíos no aumenta el bonificador más allá.",
+      "loreText": "Cuando la realidad ya está desgarrada, el cielo deja de resistirse."
+    },
+    "legendary_b6_phoenix_garden": {
+      "effectText": "El **Fénix Soberano** gana **+5% Qi/s** por Jardín de Hierbas Espirituales.",
+      "exampleText": "Posee <strong>1 fénix + 40 jardines</strong>, el Qi/s del fénix es <strong>×3</strong> (1 + 40 × 0,05).",
+      "loreText": "Fenghuang solo anida donde el suelo es medicina. Cien jardines, cien razones para quedarse."
+    },
+    "legendary_e2_phoenix_reborn": {
+      "effectText": "Cada Reino mayor: **Fénix → 0**, todos los otros productores **+50% Qi/s** de forma permanente.",
+      "exampleText": "Cruza <strong>5 Reinos mayores</strong> con esto activo y cada productor que no sea fénix termina en <strong>×3.5 su rendimiento normal</strong> (1 + 5 × 0,5). Pierdes todos los fénix, pero el resto de tu Secta crece de forma constante.",
+      "loreText": "Fenghuang renace de sus propias cenizas, para bendecir la Secta de su hogar."
+    },
+    "legendary_f1_storm_tiger": {
+      "effectText": "**Pacto de Bestia Espiritual: Qi/s duplicado**. Bestia Trinidad: recoge los 3 para **+100% global**.",
+      "exampleText": "Posee <strong>10 pactos de bestia</strong>, el Qi/s combinado se <strong>duplica</strong>. Con los Chispas de Dragón y Fénix también activos, la Convergencia Trinidad añade <strong>+100% Qi/s global</strong> además de cada productor.",
+      "loreText": "El tigre pasea, orejas planas. No rugirá hasta que un dragón sueñe su nombre y un fénix lo cante de vuelta. Hasta entonces, la tormenta en su pelaje solo murmura."
+    },
+    "legendary_f2_pearl_dragon": {
+      "effectText": "**Dragón Espiritual: Qi/s duplicado**. Bestia Trinidad: recoge los 3 para **+100% global**.",
+      "exampleText": "Posee <strong>1 dragón</strong>, su Qi/s se <strong>duplica</strong>. Con los Chispas de Tigre y Fénix también activos, la Convergencia Trinidad añade <strong>+100% Qi/s global</strong> además de cada productor.",
+      "loreText": "La perla se calienta cuando el dragón oye dos sonidos distantes, un tigre paseando, un fénix plegando sus alas arcoíris. Solo entonces el sueño termina."
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "effectText": "**Fénix Soberano: Qi/s duplicado**. Bestia Trinidad: recoge los 3 para **+100% global**.",
+      "exampleText": "Posee <strong>1 fénix</strong>, su Qi/s se <strong>duplica</strong>. Con los Chispas de Tigre y Dragón también activos, la Convergencia Trinidad añade <strong>+100% Qi/s global</strong> además de cada productor.",
+      "loreText": "El grito del Fénix tiene tres notas. Solo, canta una. En algún lugar un tigre pasea, en algún lugar un dragón sueña. Cuando los tres suenan, los cielos se inclinan."
+    },
+    "masters_patience": {
+      "effectText": "**+0,1% Qi/s** por segundo de Enfoque mantenido. Límite en **+12%** por pila.",
+      "exampleText": "Mantén el Enfoque un total de <strong>2 minutos (120s)</strong> durante la vida y 1 pila otorga +12% Qi/s en el límite. Tres pilas alcanzan <strong>+36% Qi/s</strong> hasta que te reencarne.",
+      "loreText": "El aliento más largo es el más lento. Un maestro puede descansar dentro de una sola inhalación durante una hora."
+    },
+    "quick_burst": {
+      "effectText": "Qi instantáneo equivalente a **30 segundos** de tu Qi/s actual.",
+      "exampleText": "Si tu Qi/s es actualmente <strong>1,2M</strong>, tomar esta chispa añade <strong>36M Qi</strong> a tu saldo.",
+      "loreText": "Un aliento rápido, y el mundo se inclina hacia ti."
+    },
+    "resonant_soul": {
+      "effectText": "**+0,2% Qi/s** por Ruptura alcanzada después de ser tomada. Se apila.",
+      "exampleText": "Después de 50 Rupturas con esto activo, una pila otorga <strong>+10% Qi/s</strong>. Tómala pronto para la mayor recompensa.",
+      "loreText": "Cada Ruptura deja una nota. El alma las reúne como campanas en un templo."
+    },
+    "sect_discipline": {
+      "effectText": "**+1 Qi/s base** a cada unidad productora durante 90 segundos.",
+      "exampleText": "Posee <strong>20 Discípulos</strong> (0,1 Qi/s base cada uno) y cada Discípulo produce temporalmente 1,1 Qi/s (×11) durante 90s. Finales de juego con 100+ productores míticos, el +1 es pequeño por unidad pero se aplica a cada unidad que posees.",
+      "loreText": "Diez mil Discípulos se inclinan a la vez. La sala recuerda lo que un aliento, multiplicado, puede hacer."
+    },
+    "sharper_focus": {
+      "effectText": "**+2% multiplicador de Enfoque** esta vida. Se apila.",
+      "exampleText": "Tres pilas hacen tu Enfoque <strong>+6% más fuerte</strong>. Especialmente útil si Enfocas frecuentemente.",
+      "loreText": "La hoja se afila en la misma piedra, cada mañana."
+    },
+    "steady_cultivation": {
+      "effectText": "**+0,3 Qi/s base** esta vida. Se apila.",
+      "exampleText": "Tomada tres veces otorga <strong>+0,9 Qi/s base</strong>. El bono plano se multiplica por cristal, Enfoque y otros multiplicadores, por lo que importa más en el principio del juego.",
+      "loreText": "Un aliento al amanecer, uno al anochecer. El milésimo aliento es igual al primero, y ese es todo el secreto."
+    },
+    "steady_stream": {
+      "effectText": "**+20% Qi/s** durante el próximo minuto completo.",
+      "exampleText": "Un +20% constante durante 60 segundos te da aproximadamente <strong>12 segundos de producción bonus</strong>.",
+      "loreText": "Llama lenta. Quema larga. La montaña se desgasta con la lluvia."
+    },
+    "surging_stream": {
+      "effectText": "**+50% Qi/s** durante 30 segundos.",
+      "exampleText": "En <strong>1M Qi/s</strong> base, esto te eleva temporalmente a <strong>1,5M Qi/s</strong> durante medio minuto.",
+      "loreText": "La corriente sube. El río olvida sus orillas."
+    },
+    "tinkers_bargain": {
+      "effectText": "**-30% Qi** en tus próximas **5 compras de productores**.",
+      "exampleText": "Comprar un productor de nivel 4 que normalmente cuesta <strong>1,2M Qi</strong> cuesta <strong>840k Qi</strong> con el descuento aplicado. Cada clic de compra (×1 o ×10) gasta un cargo. Los cargos persisten entre recargas hasta que se gasten.",
+      "loreText": "El tintorero cuenta monedas a la luz de una lámpara. \"Cinco favores,\" dice. \"Gástalos donde más duele el precio.\""
+    }
+  },
+  "tutorials": {
+    "first_layer_bt": {
+      "body": "Tus Meridianos se ensanchan. Cada nivel que cruzas trae nuevos productores, Chispas y mejoras a tu alcance. Sigue cultivando; el próximo nivel ya está a la vista.",
+      "ctaText": "Continuar",
+      "kicker": "Ruptura",
+      "title": "Primera Ruptura"
+    },
+    "first_major_gate": {
+      "body": "Un Reino mayor pide dos cosas a la vez. Necesitas Qi en la reserva y una tasa de Qi/s sostenida para atravesar la puerta. Construye más productores, mejora tu Cristal de Qi, mantén el Enfoque. Toca RUPTURA cuando los cielos dejen de empujar hacia atrás.",
+      "ctaText": "Entendido",
+      "kicker": "Reino mayor",
+      "title": "Los Cielos Te Prueban"
+    },
+    "first_producer": {
+      "body": "Un Discípulo se arrodilla en tu patio. Cada Discípulo que entrenes eleva tu Qi/s inactivo un poco, y el próximo cuesta ligeramente más que el anterior. La misma forma se mantiene para cada productor que desbloquees.",
+      "ctaText": "Adelante",
+      "kicker": "Primer Discípulo",
+      "title": "El Discípulo Se Inclina"
+    },
+    "first_saint": {
+      "body": "Puedes reencarnarte desde aquí. El progreso de esta vida se convierte en Karma, y el Karma compra mejoras permanentes en el Árbol Eterno. Cada vida hace que la próxima comience un poco más fuerte. Sigue ganando esta vida si sigue avanzando, o renace cuando la subida empiece a ralentizarse.",
+      "ctaText": "Entendido",
+      "kicker": "Reencarnación",
+      "title": "Una Segunda Vida"
+    },
+    "first_spark_offer": {
+      "body": "Cada Ruptura de nivel ofrece una Chispa de Qi. Aparecen dos cartas y eliges una. Algunas otorgan un impulso corto, otras se apilan permanentemente para esta vida, y las raras desbloquean nuevas mecánicas. Si ninguna carta te tienta, tu primer reroll en cada oferta es gratis.",
+      "ctaText": "Elige con sabiduría",
+      "kicker": "Chispas",
+      "title": "Chispas de Qi"
+    },
+    "hold_to_focus": {
+      "body": "Mantén presionado al Cultivador. Tu Qi/s sube bruscamente mientras sostienes, y cae cuando sueltas. Las primeras fases avanzan mucho más rápido con el dedo en la pantalla.",
+      "ctaText": "Pruébalo",
+      "kicker": "Enfoque",
+      "title": "Mantener para Enfocar"
+    },
+    "producers_hint": {
+      "body": "Tu aliento solo llena los Meridianos lentamente. Otras manos pueden atraer los cielos contigo. Visita el salón de la Secta para reunir Discípulos, cultivar jardines y dar forma a las fuentes que reúnen Qi mientras permaneces inmóvil.",
+      "ctaText": "Mostrar",
+      "kicker": "Un susurro del Dao",
+      "title": "No subes solo"
+    },
+    "producers_tab": {
+      "body": "Los Productores reúnen Qi para ti en segundo plano, incluso cuando no tocas. Cada uno aumenta tu Qi/s permanentemente el resto de esta vida. Su precio sube después de cada compra, pero cada nuevo rango supera al anterior. Gasta tu Qi en cuanto puedas permitirte uno.",
+      "ctaText": "Entendido",
+      "kicker": "Tu Secta",
+      "title": "Productores"
+    },
+    "welcome": {
+      "body": "El Qi fluye con cada aliento. Llena la barra en la parte inferior de la pantalla para lograr una Ruptura en una Fase de tu Reino. Las Fases se apilan en Reinos, los Reinos en los cielos. El camino es largo.",
+      "ctaText": "Comenzar",
+      "kicker": "Bienvenido, Cultivador",
+      "title": "El Camino Comienza"
+    }
+  },
+  "upgrades": {
+    "u_consecutive_focus_t2": {
+      "desc": "Suma: mantener Enfoque 4s → +7% Qi/s (total +12%).",
+      "name": "Enfoque Consecutivo II"
+    },
+    "u_consecutive_focus_t3": {
+      "desc": "Suma: mantener Enfoque 6s → +13% Qi/s (total +25%).",
+      "name": "Enfoque Consecutivo III"
+    },
+    "u_consecutive_focus_t4": {
+      "desc": "Suma: mantener Enfoque 8s → +15% Qi/s (total +40%).",
+      "name": "Enfoque Consecutivo IV"
+    },
+    "u_consecutive_focus_t5": {
+      "desc": "Suma: mantener Enfoque 10s → +20% Qi/s (total +60%); meditación profunda.",
+      "name": "Enfoque Consecutivo V"
+    },
+    "u_crystal_click_t2": {
+      "desc": "El Depósito se llena al 50% de Qi/s (hasta 3 min).",
+      "name": "Depósito de Cristal II"
+    },
+    "u_crystal_click_t3": {
+      "desc": "El Depósito se llena al 70% de Qi/s (hasta 4 min).",
+      "name": "Depósito de Cristal III"
+    },
+    "u_crystal_click_t4": {
+      "desc": "El Depósito se llena al 85% de Qi/s (hasta 5 min).",
+      "name": "Reservorio de Cristal IV"
+    },
+    "u_crystal_click_t5": {
+      "desc": "El reservorio se llena al 100% de Qi/s (hasta 6 min).",
+      "name": "Reservorio de Cristal V"
+    },
+    "u_crystal_tap_1": {
+      "desc": "Duplica el Qi otorgado al tocar el cristal cuando su reserva está vacía.",
+      "name": "Toque Refinado I"
+    },
+    "u_crystal_tap_2": {
+      "desc": "Duplica el Qi otorgado al tocar el cristal cuando su reserva está vacía.",
+      "name": "Toque Refinado II"
+    },
+    "u_crystal_tap_3": {
+      "desc": "Duplica el Qi otorgado al tocar el cristal cuando su reserva está vacía.",
+      "name": "Toque Refinado III"
+    },
+    "u_crystal_tap_4": {
+      "desc": "Duplica el Qi otorgado al tocar el cristal cuando su reserva está vacía.",
+      "name": "Toque Refinado IV"
+    },
+    "u_crystal_tap_5": {
+      "desc": "Duplica el Qi otorgado al tocar el cristal cuando su reserva está vacía.",
+      "name": "Toque Refinado V"
+    },
+    "u_divine_qi_t2": {
+      "desc": "Orbe cada ~9 min, ventana de 10s. Toca para 35s de Qi.",
+      "name": "Qi Celestial II"
+    },
+    "u_divine_qi_t3": {
+      "desc": "Orbe cada ~8 min, ventana de 12s. Toca para 50s de Qi.",
+      "name": "Qi Celestial III"
+    },
+    "u_divine_qi_t4": {
+      "desc": "Orbe cada ~7 min, ventana de 15s. Toca para 65s de Qi.",
+      "name": "Qi Celestial IV"
+    },
+    "u_divine_qi_t5": {
+      "desc": "Dos orbes cada ~6 min. Recoge ambos para 75s de Qi + ×1.25 Qi/s durante 20s.",
+      "name": "Qi Celestial V"
+    },
+    "u_focus_1": {
+      "desc": "+35% al multiplicador de enfoque de cultivo sostenido.",
+      "name": "Respiración Profunda I"
+    },
+    "u_focus_2": {
+      "desc": "+35% al multiplicador de enfoque de cultivo sostenido.",
+      "name": "Respiración Profunda II"
+    },
+    "u_focus_3": {
+      "desc": "+35% al multiplicador de enfoque de cultivo sostenido.",
+      "name": "Respiración Profunda III"
+    },
+    "u_focus_4": {
+      "desc": "+75% al multiplicador de enfoque de cultivo sostenido.",
+      "name": "Respiración Profunda IV"
+    },
+    "u_offline_cap_1": {
+      "desc": "Extiende tu ventana de acumulación sin conexión +4 horas.",
+      "name": "Reposo Profundo I"
+    },
+    "u_offline_cap_2": {
+      "desc": "Extiende tu ventana de acumulación sin conexión +4 horas.",
+      "name": "Reposo Profundo II"
+    },
+    "u_offline_cap_3": {
+      "desc": "Extiende tu ventana de acumulación sin conexión +4 horas.",
+      "name": "Reposo Profundo III"
+    },
+    "u_offline_cap_4": {
+      "desc": "Extiende tu ventana de acumulación sin conexión +4 horas.",
+      "name": "Reposo Profundo IV"
+    },
+    "u_offline_rate_1": {
+      "desc": "Agrega +5% a tu tasa de acumulación de Qi sin conexión.",
+      "name": "Cultivo Ocioso I"
+    },
+    "u_offline_rate_2": {
+      "desc": "Agrega +5% a tu tasa de acumulación de Qi sin conexión.",
+      "name": "Cultivo Ocioso II"
+    },
+    "u_offline_rate_3": {
+      "desc": "Agrega +5% a tu tasa de acumulación de Qi sin conexión.",
+      "name": "Cultivo Ocioso III"
+    },
+    "u_offline_rate_4": {
+      "desc": "Agrega +5% a tu tasa de acumulación de Qi sin conexión.",
+      "name": "Cultivo Ocioso IV"
+    },
+    "u_p_beast_pact_double_1": {
+      "desc": "Duplica el rendimiento del Pacto de Bestia Espiritual.",
+      "name": "Pacto de Bestia Espiritual I"
+    },
+    "u_p_beast_pact_double_2": {
+      "desc": "Duplica nuevamente el rendimiento del Pacto de Bestia Espiritual (se apila ×4 con el primero).",
+      "name": "Pacto de Bestia Espiritual II"
+    },
+    "u_p_disciple_double_1": {
+      "desc": "Duplica el rendimiento del Discípulo de Templanza Corporal.",
+      "name": "Discípulo de Templanza Corporal I"
+    },
+    "u_p_disciple_double_2": {
+      "desc": "Duplica el rendimiento del Discípulo Templanza Corporal nuevamente (se apila ×4 con el primero).",
+      "name": "Discípulo Templanza Corporal II"
+    },
+    "u_p_dragon_double_1": {
+      "desc": "Duplica el rendimiento del Dragón Espíritu Durmiente.",
+      "name": "Dragón Espíritu Durmiente I"
+    },
+    "u_p_dragon_double_2": {
+      "desc": "Duplica el rendimiento del Dragón Espíritu Durmiente nuevamente (se apila ×4 con el primero).",
+      "name": "Dragón Espíritu Durmiente II"
+    },
+    "u_p_herb_garden_double_1": {
+      "desc": "Duplica el rendimiento del Jardín de Hierbas Espirituales.",
+      "name": "Jardín de Hierbas Espirituales I"
+    },
+    "u_p_herb_garden_double_2": {
+      "desc": "Duplica el rendimiento del Jardín de Hierbas Espirituales nuevamente (se apila ×4 con el primero).",
+      "name": "Jardín de Hierbas Espirituales II"
+    },
+    "u_p_meridian_furnace_double_1": {
+      "desc": "Duplica el rendimiento del Horno de Meridiano.",
+      "name": "Horno de Meridiano I"
+    },
+    "u_p_meridian_furnace_double_2": {
+      "desc": "Duplica el rendimiento del Horno de Meridiano nuevamente (se apila ×4 con el primero).",
+      "name": "Horno de Meridiano II"
+    },
+    "u_p_phoenix_double_1": {
+      "desc": "Duplica el rendimiento del Fénix Soberano.",
+      "name": "Fénix Soberano I"
+    },
+    "u_p_phoenix_double_2": {
+      "desc": "Duplica el rendimiento del Fénix Soberano nuevamente (se apila ×4 con el primero).",
+      "name": "Fénix Soberano II"
+    },
+    "u_p_pillar_double_1": {
+      "desc": "Duplica el rendimiento del Pilar Celestial.",
+      "name": "Pilar Celestial I"
+    },
+    "u_p_pillar_double_2": {
+      "desc": "Duplica el rendimiento del Pilar Celestial nuevamente (se apila ×4 con el primero).",
+      "name": "Pilar Celestial II"
+    },
+    "u_p_sect_followers_double_1": {
+      "desc": "Duplica el rendimiento de Seguidores de la Secta Mortal.",
+      "name": "Seguidores de la Secta Mortal I"
+    },
+    "u_p_sect_followers_double_2": {
+      "desc": "Duplica el rendimiento de Seguidores de la Secta Mortal nuevamente (se apila ×4 con el primero).",
+      "name": "Seguidores de la Secta Mortal II"
+    },
+    "u_p_treasure_double_1": {
+      "desc": "Duplica el rendimiento del Tesoro Ancestral.",
+      "name": "Tesoro Ancestral I"
+    },
+    "u_p_treasure_double_2": {
+      "desc": "Duplica el rendimiento del Tesoro Ancestral nuevamente (se apila ×4 con el primero).",
+      "name": "Tesoro Ancestral II"
+    },
+    "u_p_void_double_1": {
+      "desc": "Duplica el rendimiento del Conducto Vacío.",
+      "name": "Conducto del Vacío I"
+    },
+    "u_p_void_double_2": {
+      "desc": "Duplica la salida del Conducto del Vacío nuevamente (se acumula ×4 con el primero).",
+      "name": "Conducto del Vacío II"
+    },
+    "u_pattern_click_t2": {
+      "desc": "Chispa cada ~11 min. 4 puntos, ventana de 12s. Borrado completo: 40s de Qi.",
+      "name": "Trazando Meridianos II"
+    },
+    "u_pattern_click_t3": {
+      "desc": "Chispa cada ~10 min. 5 puntos, ventana de 14s. Borrado completo: 55s de Qi.",
+      "name": "Trazando Meridianos III"
+    },
+    "u_pattern_click_t4": {
+      "desc": "Chispa cada ~9 min. 6 puntos, ventana de 16s. Borrado completo: 70s de Qi.",
+      "name": "Trazando Meridianos IV"
+    },
+    "u_pattern_click_t5": {
+      "desc": "Chispa cada ~8 min. 7 puntos, ventana de 18s. Borrado completo: 90s de Qi + ×1.5 Qi/s durante 20s.",
+      "name": "Trazando Meridianos V"
     }
   }
 }

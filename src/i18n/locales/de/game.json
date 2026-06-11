@@ -1,689 +1,1457 @@
 {
-  "realms": {
-    "Tempered Body": "Gestählter Körper",
-    "Qi Transformation": "Qi-Wandlung",
-    "True Element": "Wahres Element",
-    "Separation & Reunion": "Trennung & Vereinigung",
-    "Immortal Ascension": "Unsterblicher Aufstieg",
-    "Saint": "Heiliger",
-    "Saint King": "Heiliger König",
-    "Origin Returning": "Rückkehr zum Ursprung",
-    "Origin King": "Ursprungskönig",
-    "Void King": "König der Leere",
-    "Dao Source": "Dao-Quelle",
-    "Emperor Realm": "Kaisersphäre",
-    "Open Heaven": "Offener Himmel"
+  "achievements": {
+    "ach_panel_50": {
+      "desc": "Öffne das Erfolge-Panel 50-mal. Wir sehen, dass du nachschaust.",
+      "title": "Geduld, junger Schüler"
+    },
+    "ach_unlocked_meta": {
+      "desc": "Schalte einen Erfolg frei. Überraschung. Das ist dein zweiter.",
+      "title": "Erfolg freigeschaltet"
+    },
+    "all_in": {
+      "desc": "Tätigen Sie einen einzelnen Produzenten- oder Upgrade-Kauf, der mindestens 1 Billionen Qi kostet.",
+      "title": "Alles Eingesetzt"
+    },
+    "audio_mute_30m": {
+      "desc": "Spielen Sie 30 Minuten lang mit komplett ausgeschaltetem Audio.",
+      "title": "Stumm"
+    },
+    "audio_toggle_10": {
+      "desc": "Schalte die Musik 10-mal um. Wähle eine Seite.",
+      "title": "Audiophil"
+    },
+    "bonk": {
+      "desc": "Tippen Sie 20-mal hintereinander auf ein nicht interaktives UI-Element. Nichts passiert.",
+      "title": "Schlag"
+    },
+    "cal_double_ninth": {
+      "desc": "Spielen Sie am 9. Tag des 9. Monats. Verheißungsvoll oder nicht.",
+      "title": "Tag der Heimsuchung"
+    },
+    "cal_lunar_new_year": {
+      "desc": "Spielen Sie am chinesischen Neujahrstag.",
+      "title": "Chinesisches Neujahr"
+    },
+    "capstone": {
+      "desc": "Du bist nicht den Berg hinaufgeklommen. Du bist einer geworden.",
+      "title": "Werde der Weg"
+    },
+    "daily_100": {
+      "desc": "Halte eine Login-Serie von 100 Tagen.",
+      "title": "Hundert-Tage Einsiedler"
+    },
+    "daily_30": {
+      "desc": "Halte eine Login-Serie von 30 Tagen.",
+      "title": "Eiserner Wille"
+    },
+    "daily_7": {
+      "desc": "Halte eine Login-Serie von 7 Tagen.",
+      "title": "Treuer Schüler"
+    },
+    "daily_skip_7_claim": {
+      "desc": "Überspringe 7 Tage hintereinander den täglichen Bonus, dann fordere ihn an. Lohnt sich.",
+      "title": "Kein tägliches Brot"
+    },
+    "gate_hit": {
+      "desc": "Treffe dein erstes Kultivierungs-Geschwindigkeitstor.",
+      "title": "Backsteinmauer"
+    },
+    "gate_pass_1": {
+      "desc": "Passiere zum ersten Mal ein Kultivierungs-Geschwindigkeitstor.",
+      "title": "Durch das Tor"
+    },
+    "gate_pass_max": {
+      "desc": "Überwinde das Kultivierungstor der höchsten Stufe.",
+      "title": "Eisernes Tor"
+    },
+    "hold_30m": {
+      "desc": "Halte den Kristall ununterbrochen 30 Minuten lang. Standbildmodus.",
+      "title": "Dao des Haltens"
+    },
+    "hold_5m": {
+      "desc": "Halte den Kristall ununterbrochen 5 Minuten lang.",
+      "title": "Eiserne Lunge"
+    },
+    "hold_60s": {
+      "desc": "Halte den Kristall ununterbrochen 60 Sekunden lang.",
+      "title": "Wachs auftragen, Wachs entfernen"
+    },
+    "karma_10": {
+      "desc": "Entsperre 10 Karma-Knoten am Ewigen Baum.",
+      "title": "Bodhi-Ast"
+    },
+    "karma_50": {
+      "desc": "Schalte 50 Karma-Knoten am Ewigen Baum frei.",
+      "title": "Bodhi-Baum"
+    },
+    "karma_first": {
+      "desc": "Gib deinen ersten Karma-Punkt am Ewigen Baum aus.",
+      "title": "Karmischer Samen"
+    },
+    "karma_full": {
+      "desc": "Schalte den gesamten Ewigen Baum frei.",
+      "title": "Bodhi-Krone"
+    },
+    "long_slumber": {
+      "desc": "Erhalte in einer einzigen Offline-Pause mehr Qi als aus deiner gesamten bisherigen Spielzeit.",
+      "title": "Der lange Schlummer"
+    },
+    "offline_1h": {
+      "desc": "Kehrte nach 1 Stunde Abwesenheit zum Spiel zurück.",
+      "title": "Kurzer Aufenthalt"
+    },
+    "offline_24h": {
+      "desc": "Kehrte nach 24 Stunden Abgeschiedenheit zurück. Der Berg regt sich nicht.",
+      "title": "Kultivierung hinter verschlossenen Türen"
+    },
+    "offline_30d": {
+      "desc": "Kehrte nach 30 Tagen Abwesenheit zurück. Deine Sekte hält dich für tot.",
+      "title": "Altes Ungeheuer"
+    },
+    "offline_365d": {
+      "desc": "Kehrte nach einem ganzen Jahr zurück. Willkommen. Die Welt ist anders.",
+      "title": "Ewiger Winterschlaf"
+    },
+    "offline_7d": {
+      "desc": "Kehrte nach 7 Tagen Abwesenheit zurück.",
+      "title": "Verschlief eine Dynastie"
+    },
+    "offline_qi_1b": {
+      "desc": "Sammle 1 Milliarde Qi völlig offline an.",
+      "title": "Reich der Müßiggänger"
+    },
+    "play_1000h": {
+      "desc": "Erreiche 1.000 Stunden Gesamtspielzeit.",
+      "title": "Dao der Müßiggänger"
+    },
+    "play_100h": {
+      "desc": "Erreiche 100 Stunden Gesamtspielzeit.",
+      "title": "Verbrüderter des Himmels"
+    },
+    "play_500h": {
+      "desc": "Erreiche 500 Stunden Gesamtspielzeit.",
+      "title": "Schlaflos im östlichen Kontinent"
+    },
+    "producer_42": {
+      "desc": "Besitze genau 42 einer einzelnen Produzentenart. Die Antwort.",
+      "title": "42"
+    },
+    "qis_666": {
+      "desc": "Halte genau 666 Qi pro Sekunde für eine ganze Sekunde lang.",
+      "title": "Nummer des Tieres"
+    },
+    "qis_9001": {
+      "desc": "Erreiche 9.001 Qi pro Sekunde.",
+      "title": "Es ist über 9000"
+    },
+    "realm_1": {
+      "desc": "Mache deinen ersten Schritt auf dem Pfad der Kultivierung.",
+      "title": "Erster Atemzug"
+    },
+    "realm_10": {
+      "desc": "Schmiedete deinen Körper durch alle zehn Stufen des Gehärteten Körpers.",
+      "title": "Grundlage errichtet"
+    },
+    "realm_13": {
+      "desc": "Beherrsche die Qi-Umwandlung. Das Qi in dir ist nicht länger sterblich.",
+      "title": "Qi verwandelt"
+    },
+    "realm_14": {
+      "desc": "Betritt das Reich der Wahren Elemente und gebiete über die Kräfte der Natur.",
+      "title": "Wahre Elemente erweckt"
+    },
+    "realm_18": {
+      "desc": "Erreiche Trennung & Wiedererkennung. Dein Geist spaltet sich, um zwei Wege gleichzeitig zu gehen.",
+      "title": "Geist getrennt"
+    },
+    "realm_21": {
+      "desc": "Beginne deinen Aufstieg über sterbliche Grenzen hinaus.",
+      "title": "Unsterblicher Aufstieg"
+    },
+    "realm_24": {
+      "desc": "Wandle neben denen, die die gewöhnliche Existenz transzendiert haben.",
+      "title": "Heiligen-Pfad"
+    },
+    "realm_27": {
+      "desc": "Erhebe dich zum Gipfel der Heiligen-Ränge.",
+      "title": "Heiligen-König"
+    },
+    "realm_30": {
+      "desc": "Kehre zu der Quelle zurück, aus der alles Qi fließt.",
+      "title": "Ursprung zurückgekehrt"
+    },
+    "realm_36": {
+      "desc": "Schreite in die Leere zwischen den Welten und beherrsche sie.",
+      "title": "König der Leere"
+    },
+    "realm_39": {
+      "desc": "Berühre den Dao an seiner Quelle.",
+      "title": "Dao-Quelle"
+    },
+    "realm_46": {
+      "desc": "Zerschmettere die Himmel und berühre das Reich des Open Heaven.",
+      "title": "Himmel öffnen"
+    },
+    "reincarnate_1": {
+      "desc": "Reinkarniere zum ersten Mal.",
+      "title": "Rad des Saṃsāra"
+    },
+    "reincarnate_10": {
+      "desc": "Reinkarniere 10 Mal. Du erinnerst dich an jedes Leben.",
+      "title": "Jenseits des Rades"
+    },
+    "reincarnate_2": {
+      "desc": "Reinkarniere ein zweites Mal. Es war einfacher, nicht wahr.",
+      "title": "Zweiter Wind"
+    },
+    "reincarnate_lowest": {
+      "desc": "Reinkarniere freiwillig beim niedrigsten verfügbaren Reich-Schwellenwert.",
+      "title": "Lin-Familie Müll"
+    },
+    "restless": {
+      "desc": "Wechsle in 5 Minuten 100 Mal die Bildschirme. Wähle einen, Freund.",
+      "title": "Ruhelose"
+    },
+    "settings_all": {
+      "desc": "Berühre jede Einstellung mindestens einmal.",
+      "title": "Einstellungen-Kenner"
+    },
+    "shop_100_visits": {
+      "desc": "Besuche den Laden 100 Mal. Immer arm. Immer lächelnd.",
+      "title": "Kohlverkäufer"
+    },
+    "shop_first_skin": {
+      "desc": "Kaufe dein erstes kosmetisches Skin.",
+      "title": "Eitelkeit"
+    },
+    "spark_100": {
+      "desc": "Fange 100 Qi-Funken.",
+      "title": "Funken-Jäger"
+    },
+    "spark_1000": {
+      "desc": "Fange 1.000 Qi-Funken.",
+      "title": "Funken-Weise"
+    },
+    "spark_drought": {
+      "desc": "Spiele 1 Stunde lang, ohne einen einzigen Funken zu sehen. Der Wind ist still.",
+      "title": "Dürre"
+    },
+    "spark_first": {
+      "desc": "Fange deinen ersten Qi-Funken.",
+      "title": "Erster Funke"
+    },
+    "sprite_tickle_100": {
+      "desc": "Tippe 100 Mal auf das Kultivator-Sprite. Er hat das gespürt.",
+      "title": "Den Meister kitzeln"
+    },
+    "tap_100": {
+      "desc": "Erreiche 100 Lebenszeit-Kristall-Taps.",
+      "title": "Federleicht"
+    },
+    "tap_100k": {
+      "desc": "Erreiche 100.000 Lebenszeit-Kristall-Taps.",
+      "title": "Steinhammer"
+    },
+    "tap_10k": {
+      "desc": "Erreiche 10.000 Lebenszeit-Kristall-Taps.",
+      "title": "Hand Gottes"
+    },
+    "tap_1m": {
+      "desc": "Erreiche 1.000.000 Kristall-Taps im Leben. Dein Telefon hält durch.",
+      "title": "Bergbezwinger"
+    },
+    "tap_burst_100": {
+      "desc": "Tippe 100 Mal in 10 Sekunden. Wir sind besorgt.",
+      "title": "Karpaltunnel"
+    },
+    "tap_dancer": {
+      "desc": "Tippe den Kristall 30 Sekunden lang im Tempo von 60 BPM. Tempo zählt.",
+      "title": "Tap-Tänzer"
+    },
+    "tap_first": {
+      "desc": "Tippe den Qi-Kristall zum ersten Mal.",
+      "title": "Erste Berührung"
+    },
+    "tap_rate_12": {
+      "desc": "Tippe den Kristall 12 Mal in einer einzigen Sekunde.",
+      "title": "Kolibri"
+    },
+    "time_all_brackets": {
+      "desc": "Spiele während aller vier Zeitblöcke (Nacht, Morgen, Nachmittag, Abend) innerhalb von 24 Stunden.",
+      "title": "Himmelswächter"
+    },
+    "time_early_bird": {
+      "desc": "Überquere eine Reichsgrenzen zwischen 05:00 und 07:00 Ortszeit.",
+      "title": "Frühaufsteher"
+    },
+    "time_lunch": {
+      "desc": "Spiele an einem Wochentag mindestens 10 Minuten zwischen 12 und 13 Uhr.",
+      "title": "Mittagspause"
+    },
+    "time_midnight_tap": {
+      "desc": "Tippe auf den Kristall genau um 00:00:00 Ortszeit.",
+      "title": "Hexenstunde"
+    },
+    "time_night_owl": {
+      "desc": "Überschreite eine Reichgrenze zwischen 1 und 4 Uhr morgens Ortszeit.",
+      "title": "Nachteule"
+    },
+    "tutorial_all": {
+      "desc": "Lese jede Anleitungskarte.",
+      "title": "Wusstest du schon?"
+    }
   },
-  "stages": {
-    "Layer 1": "Schicht 1",
-    "Layer 2": "Schicht 2",
-    "Layer 3": "Schicht 3",
-    "Layer 4": "Schicht 4",
-    "Layer 5": "Schicht 5",
-    "Layer 6": "Schicht 6",
-    "Layer 7": "Schicht 7",
-    "Layer 8": "Schicht 8",
-    "Layer 9": "Schicht 9",
-    "Layer 10": "Schicht 10",
-    "Early Stage": "Frühes Stadium",
-    "Middle Stage": "Mittleres Stadium",
-    "Late Stage": "Spätes Stadium",
-    "Peak Stage": "Gipfelstadium",
-    "1st Stage": "1. Stadium",
-    "2nd Stage": "2. Stadium",
-    "3rd Stage": "3. Stadium"
-  },
-  "worlds": {
+  "discipleTiers": {
     "1": {
-      "name": "Die Sterblichen Lande",
-      "realms": "Gestählter Körper → Wahres Element",
-      "description": "Eine nebelumhüllte Sektenanlage, gerahmt von einem zeremoniellen rot-goldenen Tor, steinernen Inschriftpfeilern und verwitterten Wächterstatuen. Bambuswälder erheben sich jenseits der Übungsplätze, und blasse Berge lösen sich in ewigen Nebel auf. Die Luft trägt den Geruch von Kreidestaub und dem Restqi aus Jahren der Schülerpraktiken."
+      "rank": "Äußerer Schüler"
     },
     "2": {
-      "name": "Die Uralte Grenzmark",
-      "realms": "Trennung & Vereinigung → Unsterblicher Aufstieg",
-      "description": "Eine weite Ödnis aus gerissenem, orangefarbenem Erdreich, gebrannt zur Textur uralter Töpferwaren. Eingestürzte Steinbögen und Ruinen ragen aus dem Wüstenboden auf, neben riesigen gebleichten Knochenüberresten. Ein massiver, angerosteter Kessel thront im Herzen der Ruinen — die einzige Struktur, die in einer sonst toten Landschaft noch intakt steht."
+      "rank": "Innerer Schüler"
     },
     "3": {
-      "name": "Die Verbotenen Lande",
-      "realms": "Heiliger → Heiliger König",
-      "description": "Ein verbotener Steinkorridor, gesäumt von alten Wächterstatuen, deren Augen mit kaltem grünem Geistesfeuer leuchten. Jenseits der Reihen von Wächtern ragt ein finsterer Palast empor, an dessen versiegelter Schwelle grüne Fackeln brennen. Die Luft ist still und schwer vom Qi der längst Verstorbenen, die Stille nur durchbrochen vom fernen Nachklang uralter Kriegssiegel."
+      "rank": "Kern-Schüler"
     },
     "4": {
-      "name": "Die Ursprungstiefe",
-      "realms": "Rückkehr zum Ursprung → Ursprungskönig",
-      "description": "Eine weite unterirdische Höhle, erhellt von zwei Steinpfeilern mit Drachenköpfen, die einen Wasserfall flankieren, der in einen leuchtenden Ursprungs-Qi-Pool fließt. Blaugrüne Kristallformationen häufen sich an den Höhlenwänden und werfen kühles Licht in die Dunkelheit. Uralte, knorrige Wurzeln senken sich von der fernen Decke herab, und die Luft ist schwer vom überwältigenden Druck urzeitlicher Erdenergie."
+      "rank": "Schwert-Schüler"
     },
     "5": {
-      "name": "Das Leere Meer",
-      "realms": "König der Leere → Kaisersphäre",
-      "description": "Eine zersplitterte Leerenweite unter einem Himmel aus tiefem Magenta, durchzogen von gezackten Energierissen und schwebenden Dao-Inschrifttafeln. Ein einsames Steintor steht auf bröckeligem Boden am Horizont, und ein Yin-Yang-Symbol treibt im aufgeladenen Schweigen darüber. Der Boden ist gerissen wie altes Lehm — die einzige feste Oberfläche in einem Raum, der an den Rändern beständig zerfällt."
+      "rank": "Ältester"
     },
     "6": {
-      "name": "Der Offene Himmel",
-      "realms": "Offener Himmel Schicht 1 → Offener Himmel Schicht 6",
-      "description": "Ein grenzenloser Offener-Himmel-Bereich aus blendendem Gold und Weiß, wo massive, inschriftbedeckte Pfeiler aus einem nahtlosen himmlischen Boden in Wolkenbänke aufsteigen, die sich bis ins Unendliche erstrecken. Kraniche gleiten lautlos durch den strahlenden Dunst zwischen den Pfeilern. Der bloße Umgebungsdruck genügt, um alles zu vernichten, das die Schwelle des Offenen Himmels nicht erreicht hat."
+      "rank": "Erster Ältester"
+    },
+    "7": {
+      "rank": "Hallmeister"
+    },
+    "8": {
+      "rank": "Sektenmeister"
+    },
+    "9": {
+      "rank": "Patriarch"
+    },
+    "10": {
+      "rank": "Ahnherr"
     }
   },
-  "regions": {
-    "Outer Sect Training Grounds": "Übungsgelände der Äußeren Sekte",
-    "Borderland Wilds": "Grenzlandwildnis",
-    "Bandit's Crossing": "Räuberfurt",
-    "Qi-Vein Ravines": "Qi-Ader-Schluchten",
-    "Misty Spirit Forest": "Nebelgeistwald",
-    "Shattered Sky Desert": "Zersplitterter-Himmel-Wüste",
-    "Demon Beast Plains": "Dämonenbest-Ebenen",
-    "Sunken Immortal City": "Versunkene Unsterblichenstadt",
-    "Blood Sea Wastes": "Blutmeer-Ödnis",
-    "Saint Burial Grounds": "Heilige Begräbnisstätte",
-    "Void Rift Expanse": "Leerenriss-Weite",
-    "Nine-Death Mountain Range": "Neun-Tod-Gebirge",
-    "Sealed War Altar": "Versiegelter Kriegsaltar",
-    "Origin Qi Spring Depths": "Ursprungs-Qi-Quelltiefe",
-    "World Root Caverns": "Weltwurzel-Höhlen",
-    "Ancient Root Grotto": "Uralte Wurzelgrotte",
-    "Primordial Forest Core": "Urzeitlicher Waldkern",
-    "Ancient Origin Altar": "Urälter Ursprungsaltar",
-    "Fractured Space Corridors": "Zerrissene Raumkorridore",
-    "Void Sea Shores": "Leere-Meer-Ufer",
-    "Dao Inscription Ruins": "Dao-Inschrift-Ruinen",
-    "Ancient Emperor Tomb": "Uraltes Kaisergrab",
-    "Heaven Sword Ridge": "Himmelsschwert-Grat",
-    "Heaven Pillar Ascent": "Himmelspfeiler-Aufstieg",
-    "Star Sea Approaches": "Sternen-Meer-Vorfeld",
-    "Celestial Rift Expanse": "Himmlische Riss-Weite",
-    "Heaven's Core": "Himmelskern"
-  },
-  "enemies": {
-    "outer_sect_disciple": {
-      "name": "Schüler der Äußeren Sekte",
-      "description": "Ein junger Kultivierer in einer schlichten weißen Übungsrobe, der ein einfaches Holzübungsschwert mit unbeholfenen, aber eifrigen Stellungen schwingt."
+  "eternalTree": {
+    "beast": {
+      "description": "Entsperre über mehrere Leben die verborgene Kunst \"Bestien-Pakt\". (Kommt bald.)",
+      "label": "Bestien-Arena"
     },
-    "training_golem": {
-      "name": "Trainingsgolem",
-      "description": "Ein gedrungener Lehm-und-Eisen-Automat, gestempelt mit Sektensiegel, für Beständigkeit über Schaden gebaut — seine Fäuste sind stumpfe Eisenkugeln."
+    "bloom": {
+      "description": "Beginne jedes Leben mit 50 Geistestau und dem Rezept für das Grüne Tonikum bereits bekannt.",
+      "label": "Geistesblüte"
     },
-    "wolf": {
-      "name": "Ruderwolf",
-      "description": "Ein schlanker, grau felliger Wolf mit schwach leuchtenden Augen, was auf minimale Qi-Aufnahme durch jahrelanges Streifen in geistereicher Wildnis hindeutet."
+    "cauldron_2": {
+      "description": "+1 Kessel im Meridian-Ofen (2 parallele Garungen).",
+      "label": "Zweiter Kessel"
     },
-    "bandit_scout": {
-      "name": "Räuberspäher",
-      "description": "Ein sehniger Kämpfer in grober Flickenrüstung, der eine kurze Klinge trägt und sich mit der geübten Heimlichkeit eines Menschen bewegt, der durch Hinterhalte überlebt."
+    "cauldron_3": {
+      "description": "+1 Kessel im Meridian-Ofen (3 parallele Gärungen).",
+      "label": "Dritter Kessel"
     },
-    "wandering_beast": {
-      "name": "Streifendes Ungetüm",
-      "description": "Ein großes, zottiges viergliedriges Ungetüm ohne festes Revier, dessen Fell von Jahren des Streifens durch gefährliche Wildnis vernarbt ist."
+    "cauldron_4": {
+      "description": "+1 Kessel im Meridian-Ofen (4 parallele Gärungen).",
+      "label": "Vierter Kessel"
     },
-    "rogue_disciple": {
-      "name": "Abtrünniger Schüler",
-      "description": "Ein ehemaliges Sektenmitglied in einer zerschlissenen und befleckten Kultivierungsrobe, das die Narben verbotener Qi-Techniken trägt und den Blick eines Menschen hat, dem nichts mehr zu verlieren ist."
+    "cauldron_5": {
+      "description": "+1 Kessel im Meridian-Ofen (5 parallele Gärungen).",
+      "label": "Fünfter Kessel"
     },
-    "iron_fang_wolf": {
-      "name": "Eisenzahnwolf",
-      "description": "Ein massiver Wolf mit eisendichten Reißzähnen und einem durch jahrelange Mineral-Qi-Aufnahme beim Streifen durch die uralten Ebenen verhärteten Fell."
+    "coffers": {
+      "description": "Alle Produzenten erhalten +15% erhöhte Qi/s-Leistung.",
+      "label": "Grenzenlose Schatzkammer"
     },
-    "iron_spine_boar": {
-      "name": "Eisenrückenschwein",
-      "description": "Ein stämmiges, aggressives Schwein, dessen Rückenborsten durch das Weiden auf mineralreichen Flachländern zu eisenharten Stacheln verkalkt sind. Stürmt Kopf voraus mit rücksichtsloser Kraft."
+    "core": {
+      "description": "Behalte 25% deines Qi-Kristall-Niveaus über die Reinkarnation.",
+      "label": "Ungebrochener Kern"
     },
-    "sand_dragon": {
-      "name": "Sanddrache",
-      "description": "Ein schlangenartiger Drache mit sonnengebleichten, messerscharfen Schuppen, der durch Wüstensande wie Wasser gleitet. Überfällt Beute, indem er von unten ausbricht und eine Sandwolke hinterlässt."
+    "crystal": {
+      "description": "Entsperrt eine neue Reihe von Qi-Kristall-Upgrades, gekauft mit Qi auf der Upgrades-Registerkarte. (In Kürze verfügbar.)",
+      "label": "Kristalliner Fokus"
     },
-    "bone_construct": {
-      "name": "Knochenkonstrukt",
-      "description": "Eine belebte Kriegsmaschine, zusammengesetzt aus den verschmolzenen Knochen gefallener Unsterblicher, zusammengehalten durch Rest-Kampf-Qi und verrostete Arrayysiegel. Überall dort zu finden, wo uralte Tote das Land übersäen."
+    "disc_base": {
+      "description": "Schüler-Erzeuger-Ausgabe wird verdoppelt (eine flache Anhebung des gesamten Rosters; stapelt sich mit Tausend Schüler).",
+      "label": "Schüler-Grundlagen"
     },
-    "city_guardian": {
-      "name": "Stadtwächter-Konstrukt",
-      "description": "Ein turmhohes menschenähnliches Konstrukt aus schwarzem Eisen und Jade, das das Wappen der Versunkenen Unsterblichenstadt trägt und noch immer treu die wassergetränkten Hallen seines längst toten Schutzbefohlenen patrouilliert."
+    "disc_transcend": {
+      "description": "Entsperre die Übernatürliche Stufe für deinen Schüler-Produzenten (über Mythisch). Das Sekte-Roster erhält auch einen Übernatürlichen Rang über Ahn.",
+      "label": "Übernatürliche Schüler"
     },
-    "immortal_shade": {
-      "name": "Gefangener Unsterblichen-Schatten",
-      "description": "Das gespenstische Überbleibsel eines unsterblichen Kultivierers, gefangen als die Stadt unter die Erde sank. Seine Form flackert zwischen Fest und Geisterhaft, auf ewig gebunden durch ein unvollendetes Gelübde."
+    "echoes": {
+      "description": "Schalte die Verborgene Kunst der Schatzkammer über alle Leben hinweg frei. (Kommt bald.)",
+      "label": "Ahnenechos"
     },
-    "corrupted_cultivator": {
-      "name": "Korrumpierter Kultivierer",
-      "description": "Ein ehemaliger Sektenschüler, dessen Qi-Kultivierung seinen Verstand verschluckte. Seine Robe ist zerrissen, seine Meridiane sichtbar unter der Haut geschwärzt, seine Augen blind vor Qi-Wahnsinn."
+    "eternal_alchemy": {
+      "description": "Behalte die Wirkung einer Grundstein-Pille durch Reinkarnation. (Die stärkste wird bewahrt.)",
+      "label": "Ewige Alchemie"
     },
-    "blood_leviathan": {
-      "name": "Blutmeer-Leviathan",
-      "description": "Ein kolossales Meeresungetüm, dessen Schuppen sich durch jahrhundertelanges Fressen im Blutmeer tiefrot gefärbt haben. Es hinterlässt ätzende rote Dämpfe beim Bewegen und schlägt mit seiner gesamten Masse zu."
+    "foundation": {
+      "description": "Behalte 20% der Anzahl aller bereits freigeschalteten Produzenten durch Reinkarnation.",
+      "label": "Ewiges Fundament"
     },
-    "burial_guardian": {
-      "name": "Begräbniswächter",
-      "description": "Ein massiver gepanzerter Soldat, dessen Seele als ewiger Wächter an die Begräbnisstätte gebunden wurde. Seine alte Rüstung ist kunstvoll, aber verrostet, und er bewegt sich mit der unnatürlichen Stille von etwas, das sich seit Jahrhunderten nicht ausgeruht hat."
+    "frugal": {
+      "description": "5% reduzierte Produktkaufkosten.",
+      "label": "Sparsame Kultivierung"
     },
-    "saint_corpse_soldier": {
-      "name": "Heiliger Leichensoldat",
-      "description": "Die makellos erhaltene Leiche eines Heiligen-Sphären-Kriegers, noch in Kampfrüstung und seine Waffe mit Todesgriff haltend. Schwursiegel leuchten auf seiner Brust und zwingen ihn vorwärts, ungeachtet des erlittenen Schadens."
+    "furnace": {
+      "description": "Pillen-Läuterung bleibt über alle Leben hinweg freigeschaltet.",
+      "label": "Ewiger Ofen"
     },
-    "void_rift_predator": {
-      "name": "Leerenriss-Räuber",
-      "description": "Ein im Inneren von Rissrissen geborenes Wesen, dessen Körper teilweise zwischen Dimensionen phasenverschoben ist. Greift aus unerwarteten Winkeln an, während es zwischen festem Raum und Leere gleitet."
+    "garden": {
+      "description": "Der Spirituelle Garten bleibt in jedem Leben freigeschaltet.",
+      "label": "Ewiger Garten"
     },
-    "rift_stalker": {
-      "name": "Rissanschleicher",
-      "description": "Ein schlankerer, schnellerer Räuber des Riss-Ökosystems. Jagt, indem er Qi-Signaturen durch Dimensionsgrenzen verfolgt, und lauert aus dem Inneren des Risses heraus auf."
+    "guidance": {
+      "description": "Erzeuger erhalten +0,5% erhöhtes Qi/s für jeden Erzeuger des vorherigen Typs, den du besitzt.",
+      "label": "Anleitung vom Senior"
     },
-    "saint_bone_sovereign": {
-      "name": "Heiliger Knochensouverän",
-      "description": "Das wiederbelebte Skelett eines Heiligen-Sphären-Souveräns, dessen Autorität über das Todes-Qi absolut ist. Er beansprucht die Gebirgskette als Territorium und befehligt mindere Untote von den Pässen aus."
+    "hand": {
+      "description": "Schüler-Platzierungen kosten 20% weniger Verdienst.",
+      "label": "Offene Hand"
     },
-    "void_shade": {
-      "name": "Leerenschatten",
-      "description": "Eine Schattenentität aus der Leere, die an verfluchten Gebirgspässen haftet. Sie besitzt keine physische Form, nur eine Silhouette konzentrierter Leerenenergie, die beim Berühren Qi entzieht."
+    "heaven": {
+      "description": "Während ein Schub aktiv ist, +25% Qi-Gewinn.",
+      "label": "Himmelberührt"
     },
-    "forbidden_construct": {
-      "name": "Verbotenes Konstrukt",
-      "description": "Ein turmhohes Kriegsautomat, jahrhundertelang im Altar versiegelt, hält Wache über die versiegelten Inschriften. Seine Aktivierung war verboten — bis du die Schwelle überschrittest."
+    "lattice": {
+      "description": "Qi-Kristall-Stufen kosten 20% weniger Qi zum Aufladen.",
+      "label": "Dichte Gitterstruktur"
     },
-    "ancient_war_spirit": {
-      "name": "Uralter Kriegsgeist",
-      "description": "Der gebundene Geist eines Kriegers, der während eines uralten Krieges in den Altar versiegelt wurde. Noch immer an die Sache gebunden, für die er starb, bleibt seine Wut durch die Jahrhunderte ungemindert."
+    "linger": {
+      "description": "Elixiere des Geistgartens wirken 30% länger.",
+      "label": "Nachhaltiges Gebräu"
     },
-    "origin_guardian": {
-      "name": "Ursprungswächter",
-      "description": "Eine kolossale humanoide Gestalt aus verdichtetem Ursprungs-Qi, dauerhaft am Eingang zur Tiefe stationiert. Sein Körper strahlt mit jedem Schritt erdrückenden urzeitlichen Druck aus."
+    "mastery": {
+      "description": "Stärkt die Belohnungen jeder Verborgenen Kunst. (Kommt bald – Effekt wird zusammen mit den Minispielen definiert.)",
+      "label": "Meisterschaft der Verborgenen Künste"
     },
-    "origin_crystal_golem": {
-      "name": "Ursprungskristallgolem",
-      "description": "Ein Golem aus Kristallformationen, die im Ursprungs-Qi-Frühling gewachsen sind. Seine Schläge entladen Ausbrüche roher urzeitlicher Energie aus den in seinen Fäusten eingebetteten Kristallen."
+    "merit": {
+      "description": "Verdiene 10% mehr Karma pro Leben.",
+      "label": "Grenzenloses Verdienst"
     },
-    "primordial_serpent": {
-      "name": "Urzeitliche Schlange",
-      "description": "Eine riesige Schlange, die die Weltwurzel-Höhlen seit dem Zeitalter vor jeglichen Aufzeichnungen durchstreift. Ihre Schuppen haben sich durch Jahrtausende von Mineralaufnahme zur Dichte von Weltstein verhärtet."
+    "n_1": {
+      "description": "Gewinne +0,1% Qi/s für jeden Karma, der am Ewigen Baum ausgegeben wurde.",
+      "label": "Hingabeweg"
     },
-    "cavern_elder_demon": {
-      "name": "Höhlenältester-Dämon",
-      "description": "Ein Dämon, der sich über unzählige Jahrhunderte mit der Höhle verschmolzen hat, sein Körper teilweise aus Stein und Wurzel. Er unterscheidet sich kaum von den Höhlenwänden, bis er sich bewegt."
+    "potency": {
+      "description": "Elixiere des Geistgartens sind 20% stärker.",
+      "label": "Grünende Kraft"
     },
-    "forest_spirit": {
-      "name": "Waldgeist",
-      "description": "Ein leuchtender Geist, der durch die Wurzelhöhlen treibt, angelockt von der konzentrierten Weltenergie in den uralten Wurzeln. Normalerweise passiv — gefährlich, wenn gestört."
+    "resonance": {
+      "description": "Erzeuger gewinnen +1% erhöhte Qi/s für jeden Erzeuger desselben Typs, den du besitzt.",
+      "label": "Sekte-Resonanz"
     },
-    "root_sovereign": {
-      "name": "Wurzelsouverän",
-      "description": "Die dominierende Kraft des Wurzelnetzes, eine massive Entität, deren Körper aus den dicksten Wurzeln des Weltbaums gewoben ist. Extrem territorial, betrachtet es alle Eindringlinge als Parasiten."
+    "roster": {
+      "description": "Das Verzeichnis (Schüler-Beförderung) bleibt jeden Leben entsperrt, anstatt erneut gesperrt zu werden, bis deine Schüler wieder Mythisch erreichen.",
+      "label": "Ewiges Verzeichnis"
     },
-    "ancient_beast": {
-      "name": "Uraltes Ungetüm",
-      "description": "Ein Ungetüm, das so alt ist, dass es das aktuelle Kultivierungszeitalter überdauert. Seine Instinkte sind auf Perfektion geschärft, und sein Körper trägt das Gewicht von hunderttausend Jahren des Überlebens."
+    "rspark": {
+      "description": "Permanente Qi-Funke-Schübe sind 25% stärker.",
+      "label": "Resonanter Funke"
     },
-    "world_root_wraith": {
-      "name": "Weltwurzel-Geist",
-      "description": "Ein ätherischer Wächter, manifestiert aus der Lebenskraft der Wurzeln des Weltbaums. Er phasiert durch das Wurzelnetz, um alles abzufangen, das den Waldkern bedroht."
+    "soil": {
+      "description": "Pflanzen des Geistgartens wachsen 20% schneller.",
+      "label": "Fruchtbares Land"
     },
-    "deep_earth_titan": {
-      "name": "Tiefer-Erde-Titan",
-      "description": "Der einzige Wächter des Uralten Ursprungsaltars — eine Entität von solcher Masse, dass seine Schritte Felsboden sprengen. Kein anderes Wesen überlebt in Reichweite seines Druckfeldes."
+    "star": {
+      "description": "+50% Schüler-Brettbonus: jeder Punkt hebt Schüler-Qi/s um 1,5% statt 1% an.",
+      "label": "Stern-Schüler"
     },
-    "spatial_fissure_beast": {
-      "name": "Raumriss-Ungetüm",
-      "description": "Ein in den zerrissenen Raumkorridoren beheimatetes Wesen, dessen Körper an das Existieren in teilweise kollabierten Dimensionen angepasst ist. Es nutzt die Risse als Jagdgründe."
+    "thousand": {
+      "description": "Dein Schüler-Erzeuger-Output wird verdoppelt.",
+      "label": "Tausend Schüler"
     },
-    "qi_beast": {
-      "name": "Qi-Spürendes Ungetüm",
-      "description": "Ein an die Leere angepasster Räuber, der ausschließlich durch Qi-Signaturen jagt. Blind gegenüber physischer Tarnung, kann es einen Kultivierer über Dimensionsgrenzen hinweg verfolgen."
-    },
-    "void_elemental": {
-      "name": "Leerenelementar",
-      "description": "Eine reine Manifestation von Leerenenergie, die sich in den zerrissenen Korridoren gebildet hat. Sie besitzt keinen Körper, nur eine konzentrierte Masse vernichtender Kraft."
-    },
-    "void_sea_leviathan": {
-      "name": "Leere-Meer-Leviathan",
-      "description": "Ein titanisches Meeresungetüm, das sich an das Fehlen von Wasser im Leere-Meer angepasst hat und durch reine Raumenergie schwimmt. Seine Masse ist so gewaltig, dass sie Dimensionsgrenzen beiseite schiebt."
-    },
-    "dao_inscription_guardian": {
-      "name": "Dao-Inschrift-Wächter",
-      "description": "Ein durch Inschrift-Arrays an die Ruinen gebundenes Konstrukt, das endlos die Dao-Tafeln pflegt, zu deren Schutz es gebaut wurde. Es greift alles an, das die Inschriften stört."
-    },
-    "dao_inscription_revenant": {
-      "name": "Dao-Inschrift-Revenante",
-      "description": "Das Überbleibsel eines Gelehrten, der beim Versuch starb, die Dao-Tafeln zu entschlüsseln. Sein Bewusstsein wurde in die Inschrift-Arrays aufgesaugt und dient nun als aggressiver Wächter."
-    },
-    "emperor_will_fragment": {
-      "name": "Kaiserwillen-Fragment",
-      "description": "Eine Scherbe des sterbenden Willens eines uralten Kaisers, der noch genug Autorität trägt, um sich als halb-physische Kraft zu manifestieren. Es greift Eindringlinge reflexartig an und schützt das Grab instinktiv."
-    },
-    "petrified_dao_lord": {
-      "name": "Versteinerter Dao-Herr",
-      "description": "Ein Dao-Herr, als letzte Verteidigungslinie im Kaisergrab versiegelt. Sein Körper ist zu Stein geworden, doch sein Dao-Verständnis ist intakt geblieben — er kämpft mit reinem Prinzip."
-    },
-    "star_sea_drifter": {
-      "name": "Sternen-Meer-Treiber",
-      "description": "Eine Entität, die durch die katastrophale Dao-Konvergenz am Himmelsschwert-Grat aus dem Sternen-Meer gezogen wurde. Jagt allein, desorientiert und aggressiv, weit von seiner heimatlichen Leere entfernt."
-    },
-    "heaven_pillar_guardian": {
-      "name": "Himmelspfeiler-Wächter",
-      "description": "Ein himmlischer Wächter, gebunden an die Inschrift-Pfeiler des Offenen-Himmel-Reichs, der die Grenze zwischen den Sphären aufrecht erhält. Er verhandelt keine Durchgänge."
-    },
-    "boundary_wraith": {
-      "name": "Grenzgeist",
-      "description": "Ein Geist, geformt aus dem Restdruck der Sphärengrenzen. Er treibt an der Schwelle des Offenen Himmels und macht Jagd auf Kultivierer, die beim Aufstieg verweilen."
-    },
-    "open_heaven_beast": {
-      "name": "Offener-Himmel-Ungetüm",
-      "description": "Ein im Offenen-Himmel-Reich beheimatetes Ungetüm, dessen Körper von Geburt an mit himmelsgradigem Qi gesättigt ist. Selbst sein Ruhezustand übt einen Druck aus, der mit dem eines Kultivierers auf dem Gipfel der Kaisersphäre vergleichbar ist."
-    },
-    "star_sea_leviathan": {
-      "name": "Sternen-Meer-Leviathan",
-      "description": "Ein Leviathan aus dem Sternen-Meer, der durch eine kollabierte Grenze in das Offene-Himmel-Reich eingedrungen ist. Sein Ausmaß überragt alles aus der Sterblichen Welt."
-    },
-    "celestial_sovereign": {
-      "name": "Himmlischer Souverän",
-      "description": "Ein Souverän des Offenen-Himmel-Reichs, der eine Domäne des Himmlischen Risses beherrscht. Seine Autorität über Raumenergie ist innerhalb seines Territoriums absolut."
-    },
-    "eternal_storm_titan": {
-      "name": "Ewiger-Sturm-Titan",
-      "description": "Eine Naturkraft, der durch die ewigen Stürme des Risses Form gegeben wurde. Er besitzt kein Bewusstsein — nur die endlose gewaltsame Energie von himmmlischem Wetter in manifestierter Form."
-    },
-    "open_heaven_sovereign": {
-      "name": "Offener-Himmel-Souverän",
-      "description": "Der oberste Herrscher des Offenen-Himmel-Reichs, dessen Dao-Verständnis jenseits alles in der Sterblichen Welt Erreichbaren liegt. Ihm zu begegnen ist die letzte Prüfung des Aufstiegs."
-    },
-    "void_apex_predator": {
-      "name": "Leerenspitzen-Räuber",
-      "description": "Der ultimative Räuber der Leere, der den Kollaps mehrerer Reiche überlebt hat. Er jagt himmlische Souveräne zum Zeitvertreib und betrachtet aufsteigende Kultivierer als Beute."
+    "vigil": {
+      "description": "Verdiene 30% mehr Qi während der Abwesenheit (Offline).",
+      "label": "Ungebrochene Wachsamkeit"
     }
   },
-  "items": {
-    "iron_herb_1": {
-      "name": "Sektengras",
-      "desc": "Ein Unkraut, das überall dort wächst, wo sterbliche Kultivierer trainieren, und Restqi vom Sektengelände aufsaugt."
+  "furnaceFoundations": {
+    "foundation_crucible": {
+      "desc": "Permanente -3% Durchbruch-Kosten für dieses Leben.",
+      "name": "Grundstein-Pille des Schmelztiegels"
     },
-    "iron_herb_2": {
-      "name": "Grenzlandwurzel",
-      "desc": "Eine knorrige Wurzel aus der Grenzland-Wildnis, angezogen von schwacher spiritueller Energie im Boden."
+    "foundation_frugal": {
+      "desc": "Permanente -3% Erzeuger-Kaufkosten für dieses Leben.",
+      "name": "Grundstein-Pille der Sparsamkeit"
     },
-    "bronze_herb_1": {
-      "name": "Qi-Ader-Ranke",
-      "desc": "Eine kriechende Ranke, die entlang unterirdischer Qi-Adern wächst, mit schwach leuchtenden Blättern."
+    "foundation_radiance": {
+      "desc": "Permanente +4% Qi/s für dieses Leben. Spätspiel.",
+      "name": "Grundstein-Pille des Glanzes"
     },
-    "bronze_herb_2": {
-      "name": "Geisterwaldblüte",
-      "desc": "Eine blasse Blume, die nur im Nebelgeistwald blüht, bestäubt von Waldgeistern."
+    "foundation_root": {
+      "desc": "Permanente +3% Karma-Gewinn für dieses Leben.",
+      "name": "Grundstein-Pille der Wurzel"
     },
-    "silver_herb_1": {
-      "name": "Zersplitterter-Himmel-Lotos",
-      "desc": "Ein silberner Lotos, der in den Ruinen der Zersplitterter-Himmel-Wüste überlebt und Wasser aus tiefen Kraftlinien zieht."
+    "foundation_tide": {
+      "desc": "Permanente +5% Offline-Qi-Aufholung für dieses Leben.",
+      "name": "Grundstein-Pille der Flut"
     },
-    "silver_herb_2": {
-      "name": "Blutmeer-Schilf",
-      "desc": "Ein blutroter Schilf, der an den Rändern des Blutmeers wächst, sein Saft dick mit korrumpierter Lebenskraft."
-    },
-    "gold_herb_1": {
-      "name": "Heiliger-Begräbnis-Lotos",
-      "desc": "Ein dunkler Lotos, der nur über Begräbnisstätten heiliger Güte blüht und sich von jahrhundertelangem Todes-Qi ernährt."
-    },
-    "gold_herb_2": {
-      "name": "Leerendorn-Ranke",
-      "desc": "Eine Dornenranke, die durch Rissrisse wächst, ihre Widerhaken scharf genug, um Verteidigungen heiliger Güte zu durchdringen."
-    },
-    "transcendent_herb_1": {
-      "name": "Ursprungsfrühlings-Blütenblatt",
-      "desc": "Ein Blütenblatt von Blumen, die an den Ursprungs-Qi-Quellen der Welt wachsen, gesättigt mit urzeitlicher Energie."
-    },
-    "transcendent_herb_2": {
-      "name": "Offener-Himmel-Ranke",
-      "desc": "Eine legendäre Ranke, deren Wurzeln hinauf in das Offene-Himmel-Reich selbst reichen und himmelsgradig Energie kanalisieren."
-    },
-    "iron_mineral_1": {
-      "name": "Sekten-Eisensplitter",
-      "desc": "Ein Fragment eisengradigen Materials, abgeworfen von Sektenkonstrukten, Trainingsausrüstung und dem Eisen sterblicher Kultivierer."
-    },
-    "iron_mineral_2": {
-      "name": "Eisenader-Splitter",
-      "desc": "Ein dichter Splitter Eisenerz, aus flachen Adern extrahiert, verwendet in der einfachen Transmutation."
-    },
-    "bronze_mineral_1": {
-      "name": "Qi-Reißzahn",
-      "desc": "Ein Reißzahn- oder Stachelsplitter von einem Tier, das durch jahrelanges Aufsaugen von Qi aus der Erde mineraldicht wurde."
-    },
-    "bronze_mineral_2": {
-      "name": "Geistholzkern",
-      "desc": "Der verhärtete Kern einer Geistentität oder eines uralten Baumes, durchdrungen von konzentriertem Wald-Qi."
-    },
-    "silver_mineral_1": {
-      "name": "Eisenrücken-Schuppe",
-      "desc": "Eine Schuppe oder ein Stachelsegment von eisenkalibrigen Raubtieren der uralten Grenzmark, dicht genug, um Angriffe silberner Güte abzulenken."
-    },
-    "silver_mineral_2": {
-      "name": "Unsterblichen-Array-Jade",
-      "desc": "Jade, durchdrungen von Formationsarrays aus versunkenen unsterblichen Ruinen, noch immer Spuren ihrer ursprünglichen Inschriften enthaltend."
-    },
-    "gold_mineral_1": {
-      "name": "Heiligen-Knochensplitter",
-      "desc": "Ein Splitter Knochen von Heiligen-Sphären-Leichen, der ein kaltes Todes-Qi ausstrahlt, das sich der Verfeinerung widersetzt."
-    },
-    "gold_mineral_2": {
-      "name": "Verbotenes-Siegel-Scherbe",
-      "desc": "Ein Fragment der Leerensiegel, die einst die Verbotenen Lande einschlossen, knisternd vor zurückgehaltener Macht."
-    },
-    "transcendent_mineral_1": {
-      "name": "Leerenkristall",
-      "desc": "Ein Kristall, der in Rissrissen gewachsen ist, seine Struktur vollständig aus komprimierter Leerenenergie geformt."
-    },
-    "transcendent_mineral_2": {
-      "name": "Weltsteinern",
-      "desc": "Ein unmöglich dichter Steinkern, geformt in den tiefsten Schichten der Welt oder von Titanen des oberen Himmels abgeworfen, nur in der fortschrittlichsten Transmutation verwendet."
-    },
-    "iron_cultivation_1": {
-      "name": "Eisen-Qi-Stein 1",
-      "desc": "Ein natürlich geformter Stein, der im Laufe der Zeit Umgebungs-Qi auf sterblichen Trainingsgeländen ansammelt."
-    },
-    "iron_cultivation_2": {
-      "name": "Eisen-Qi-Stein 2",
-      "desc": "Restliches Qi, das sich über einem besiegten sterblichen Kultivierer oder Tier verdichtet, kurz sichtbar bevor es sich verteilt."
-    },
-    "bronze_cultivation_1": {
-      "name": "Bronze-Qi-Stein 1",
-      "desc": "Der dichte Qi-Kern im Zentrum eines Tieres, das sich jahrelang von spiritueller Energie ernährt hat — noch schwach pulsierend nach dem Tod."
-    },
-    "bronze_cultivation_2": {
-      "name": "Bronze-Qi-Stein 2",
-      "desc": "Ein kristallisierter Qi-Splitter, herausgerissen aus einem gefallenen Kultivierer oder Konstrukt, dessen Energiepfade korrumpiert oder zersplittert worden waren."
-    },
-    "silver_cultivation_1": {
-      "name": "Silber-Qi-Stein 1",
-      "desc": "Das markartige Qi-Kondensat, das tief in Wesen der uralten Grenzmark gefunden wird, nach Jahrhunderten der Qi-Aufnahme gesättigt."
-    },
-    "silver_cultivation_2": {
-      "name": "Silber-Qi-Stein 2",
-      "desc": "Ein Splitter Seelenkraft, der nach dem Tod einer unsterblichgradigen Entität weiterbesteht und noch Echos ihrer Kultivierung trägt."
-    },
-    "gold_cultivation_1": {
-      "name": "Gold-Qi-Stein 1",
-      "desc": "Ein versteinertes Relikt heiligen-sphärischen Qi, aus Begräbnisstätten und Kriegsaltären geborgen."
-    },
-    "gold_cultivation_2": {
-      "name": "Gold-Qi-Stein 2",
-      "desc": "Eine kleine Perle, geformt in leerenbeeinflussten Raubtieren und Schatten, komprimierte leerenattributische Energie enthaltend."
-    },
-    "transcendent_cultivation_1": {
-      "name": "Transzendenter Qi-Stein 1",
-      "desc": "Der kristallisierte Qi-Kern einer urzeitlichen Entität — kondensiert aus Millionen von Jahren ununterbrochener Kultivierung."
-    },
-    "transcendent_cultivation_2": {
-      "name": "Transzendenter Qi-Stein 2",
-      "desc": "Ein Kristall aus reinem himmelsgradigem Qi, extrahiert aus Entitäten, die jenseits sterblicher Grenzen aufgestiegen sind."
-    },
-    "iron_essence_pill":          { "name": "Eisen-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_soul_pill":             { "name": "Eisen-Seelen-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_body_pill":             { "name": "Eisen-Körper-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_fist_pill":             { "name": "Eisen-Faust-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_ember_pill":            { "name": "Eisen-Glut-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_mind_pill":             { "name": "Eisen-Geist-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_skin_pill":             { "name": "Eisen-Haut-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_ward_pill":             { "name": "Eisen-Schutz-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_anchor_pill":           { "name": "Eisen-Anker-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "iron_vigor_pill":            { "name": "Eisen-Vitalitäts-Pille",       "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_essence_pill":        { "name": "Bronze-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_soul_pill":           { "name": "Bronze-Seelen-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_body_pill":           { "name": "Bronze-Körper-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_fist_pill":           { "name": "Bronze-Faust-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_ember_pill":          { "name": "Bronze-Glut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_mind_pill":           { "name": "Bronze-Geist-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_skin_pill":           { "name": "Bronze-Haut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_ward_pill":           { "name": "Bronze-Schutz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_anchor_pill":         { "name": "Bronze-Anker-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "bronze_vigor_pill":          { "name": "Bronze-Vitalitäts-Pille",      "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_essence_pill":        { "name": "Silber-Essenz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_soul_pill":           { "name": "Silber-Seelen-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_body_pill":           { "name": "Silber-Körper-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_fist_pill":           { "name": "Silber-Faust-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_ember_pill":          { "name": "Silber-Glut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_mind_pill":           { "name": "Silber-Geist-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_skin_pill":           { "name": "Silber-Haut-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_ward_pill":           { "name": "Silber-Schutz-Pille",          "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_anchor_pill":         { "name": "Silber-Anker-Pille",           "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "silver_vigor_pill":          { "name": "Silber-Vitalitäts-Pille",      "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_essence_pill":          { "name": "Gold-Essenz-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_soul_pill":             { "name": "Gold-Seelen-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_body_pill":             { "name": "Gold-Körper-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_fist_pill":             { "name": "Gold-Faust-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_ember_pill":            { "name": "Gold-Glut-Pille",              "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_mind_pill":             { "name": "Gold-Geist-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_skin_pill":             { "name": "Gold-Haut-Pille",              "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_ward_pill":             { "name": "Gold-Schutz-Pille",            "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_anchor_pill":           { "name": "Gold-Anker-Pille",             "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "gold_vigor_pill":            { "name": "Gold-Vitalitäts-Pille",        "desc": "Eine kultivierte Pille, die Grundwerte dauerhaft verbessert." },
-    "transcendent_essence_pill":  { "name": "Transzendente Essenz-Pille",   "desc": "Eine kultivierte Pille, die alle drei primären Grundwerte dauerhaft verbessert." },
-    "exploit_mastery_pill":       { "name": "Ausnutz-Meisterschafts-Pille", "desc": "Eine kultivierte Pille, die Ausnutzchance und Schaden dauerhaft verbessert." },
-    "world_harvest_pill":         { "name": "Welternte-Pille",              "desc": "Eine kultivierte Pille, die Sammel- und Bergbaugeschwindigkeit sowie Glück dauerhaft verbessert." },
-    "cataclysm_pill":             { "name": "Katastrophen-Pille",           "desc": "Eine kultivierte Pille, die alle Schadensarten dauerhaft verbessert." },
-    "dao_bulwark_pill":           { "name": "Dao-Bollwerk-Pille",           "desc": "Eine kultivierte Pille, die alle Verteidigungsarten dauerhaft verbessert." },
-    "eternal_vigor_pill":         { "name": "Ewige-Vitalitäts-Pille",       "desc": "Eine kultivierte Pille, die dauerhaft eine enorme Menge Trefferpunkte gewährt." },
-    "iron_blood_core_1": {
-      "name": "Eisen-Blutkern 1",
-      "desc": "Platzhalter — ein dichter eisengradiger Blutkern, extrahiert aus einem gefallenen Feind."
-    },
-    "iron_blood_core_2": {
-      "name": "Eisen-Blutkern 2",
-      "desc": "Platzhalter — eine kristallisierte eisengradige Blutessenz, kondensiert aus sterblichen Kultivierern."
-    },
-    "bronze_blood_core_1": {
-      "name": "Bronze-Blutkern 1",
-      "desc": "Platzhalter — ein bronzegradiger Blutkern, der mit tierischer Lebenskraft pulsiert."
-    },
-    "bronze_blood_core_2": {
-      "name": "Bronze-Blutkern 2",
-      "desc": "Platzhalter — ein Splitter kondensierter bronzegradiger Blut-Qi aus korrumpierten Entitäten."
-    },
-    "silver_blood_core_1": {
-      "name": "Silber-Blutkern 1",
-      "desc": "Platzhalter — ein silbergradiger Blutkern, gesättigt mit uralter Grenzland-Lebenskraft."
-    },
-    "silver_blood_core_2": {
-      "name": "Silber-Blutkern 2",
-      "desc": "Platzhalter — ein Restblutkristall von einer unsterblichgradigen Entität."
-    },
-    "gold_blood_core_1": {
-      "name": "Gold-Blutkern 1",
-      "desc": "Platzhalter — ein heiliggradiger Blutkern, der kaltes Todes-Qi ausstrahlt."
-    },
-    "gold_blood_core_2": {
-      "name": "Gold-Blutkern 2",
-      "desc": "Platzhalter — eine leerenattributische Blutperle von einem goldgradigen Raubtier."
-    },
-    "transcendent_blood_core_1": {
-      "name": "Transzendenter Blutkern 1",
-      "desc": "Platzhalter — ein urzeitlicher Blutkern, kondensiert aus einer Entität jenseits sterblicher Grenzen."
-    },
-    "transcendent_blood_core_2": {
-      "name": "Transzendenter Blutkern 2",
-      "desc": "Platzhalter — ein himmlischer Blut-Kristall, der überwältigenden Druck ausstrahlt."
+    "foundation_verdant": {
+      "desc": "Permanente +2% Qi/s für dieses Leben (pro Wärmestufe, skalierbar).",
+      "name": "Grundstein-Pille der Grüne"
     }
   },
-  "artefacts": {
-    "iron_sword": {
-      "name": "Eisenschwert",
-      "desc": "Ein schlichtes Eisenschwert, geschmiedet für Schüler der äußeren Sekte. Zuverlässig, aber unremarkabel."
+  "furnaceHeat": {
+    "0": {
+      "label": "Roh"
     },
-    "spirit_edge_sword": {
-      "name": "Geisterklingen-Schwert",
-      "desc": "Ein mit Geisterenergie geschärftes Schwert; die Klinge summt schwach, wenn Qi durch sie fließt."
+    "1": {
+      "label": "Gehärtet"
     },
-    "void_cleaver": {
-      "name": "Leerenhackbeil",
-      "desc": "Aus Leerenstein geschmiedet; jeder Schlag reißt einen haarfeinen Riss in das lokale Raumgefüge."
+    "2": {
+      "label": "Raffiniert"
     },
-    "dragon_fang_sword": {
-      "name": "Drachenzahn-Schwert",
-      "desc": "Aus einem Drachenungetüm-Reißzahn gefertigt; kanalisiert rohen drachenartigen Druck in jeden Schlag."
-    },
-    "heaven_slaying_sword": {
-      "name": "Himmelsbezwinger-Schwert",
-      "desc": "Eine legendäre Klinge, die die Barriere zwischen den Sphären durchschnitten haben soll. Die Schneide wird nie stumpf."
-    },
-    "iron_polearm": {
-      "name": "Eisenschaftwaffe",
-      "desc": "Eine schwere Eisenschaftwaffe, bevorzugt von Körper-Kultivierern für ihre Reichweite und Stoppkraft."
-    },
-    "serpent_spear": {
-      "name": "Schlangenspeer",
-      "desc": "Ein flexibler Speer mit einer Schlangenreißzahn-Spitze, der beim Eindringen ein schwaches spirituelles Gift injiziert."
-    },
-    "mountain_breaker": {
-      "name": "Bergbrecher",
-      "desc": "Eine breitkopfige Hellebarde, die einen kleinen Geisterberg gefällt haben soll. Zertrümmert physische Verteidigung."
-    },
-    "thunder_lance": {
-      "name": "Donnerlanze",
-      "desc": "Eine mit komprimiertem Blitzerz beschichtete Lanze; Schläge detonieren mit einem Donnerschlag."
-    },
-    "divine_pillar_spear": {
-      "name": "Göttlicher Pfeiler-Speer",
-      "desc": "Einst ein Pfeiler eines himmlischen Palastes, umgeformt zu einem Speer. Ein Vollkraftstoß zerreißt den Raum."
-    },
-    "spirit_headband": {
-      "name": "Geisterstirnband",
-      "desc": "Ein einfaches Stoffband, durchdrungen von grundlegender spiritueller Energie, das die Konzentration während der Kultivierung fördert."
-    },
-    "jade_cultivation_crown": {
-      "name": "Jade-Kultivierungs-Krone",
-      "desc": "Ein geschnitzter Jade-Reif, der das spirituelle Meer stabilisiert und die Turbulenzen beim Durchbruch reduziert."
-    },
-    "ghost_kings_circlet": {
-      "name": "Geisterkönig-Stirnreif",
-      "desc": "Aus Geistereisen geschmiedet; dämpft spirituelle Angriffe und unterdrückt seelbasierte Debuffs."
-    },
-    "heaven_forged_war_crown": {
-      "name": "Himmelsgeschmiedete Kriegskrone",
-      "desc": "Eine im Himmelsfeuer geschmolzene Kampfkrone; erhöht den Widerstand gegen Elementarschaden erheblich."
-    },
-    "crown_of_the_undying": {
-      "name": "Krone der Unsterblichen",
-      "desc": "Soll von einem Offenen-Himmel-Kultivierer getragen worden sein; schützt den Geist vor tödlichen Seelenangriffen."
-    },
-    "cotton_spirit_robe": {
-      "name": "Baumwoll-Geister-Robe",
-      "desc": "Leichte Robe, gewoben mit Geisterfaden, die minimale, aber beständige Qi-Zirkulation bietet."
-    },
-    "cloud_silk_battle_vest": {
-      "name": "Wolkenseide-Kampfweste",
-      "desc": "Eine aus hochgelegener Wolkenseide gesponnene Weste, die leichte physische und elementare Schläge ablenkt."
-    },
-    "dragon_scale_armour": {
-      "name": "Drachenschuppen-Rüstung",
-      "desc": "Von einem minderwertigen Drachenungetüm abgeworfene Schuppen; hart wie Eisen und widerstandsfähig gegen Feuer und Blitz."
-    },
-    "phoenix_feather_war_robe": {
-      "name": "Phönixfeder-Kriegsrobe",
-      "desc": "Aus Phönixdaunen gewoben; regeneriert im Laufe der Zeit leichten Schaden und widersteht extremer Hitze."
-    },
-    "heaven_piercing_divine_robe": {
-      "name": "Himmelsdurchbohrender Göttlicher Umhang",
-      "desc": "Ein Umhang höchster Güte, der zwischen Weichheit und Stahl wechselt; annulliert Schläge unterhalb einer Kraftschwelle."
-    },
-    "iron_bracers": {
-      "name": "Eisenarmschützer",
-      "desc": "Grundlegende Eisenarmschützer, die die Unterarme verstärken und die Blockstabilität verbessern."
-    },
-    "tiger_claw_gauntlets": {
-      "name": "Tigerklauen-Handschuhe",
-      "desc": "Nach Tigerklauen gestylte Handschuhe; erhöht leicht den Schaden von waffenloser und Schaftwaffenkampf."
-    },
-    "mithril_bracers": {
-      "name": "Mithril-Armschützer",
-      "desc": "Leichte Mithril-Armschützer, die elementare Energie durch jeden Schlag leiten."
-    },
-    "dragon_vein_gauntlets": {
-      "name": "Drachenader-Handschuhe",
-      "desc": "Mit Drachenader-Erz durchflochtene Handschuhe; kanalisieren Qi durch die Arme in einem merklich schnelleren Rhythmus."
-    },
-    "heaven_palm_guards": {
-      "name": "Himmelspalmen-Schutzhandschuhe",
-      "desc": "Uralte Schutzhandschuhe eines Handflächentechnik-Großmeisters; verstärken offene-Palmen-Geheimtechniken dramatisch."
-    },
-    "leather_cultivation_belt": {
-      "name": "Leder-Kultivierungs-Gürtel",
-      "desc": "Ein robuster Gürtel, der das Dantian stabilisiert und die Qi-Zerstreuung im Kampf reduziert."
-    },
-    "spirit_jade_sash": {
-      "name": "Geister-Jade-Schärpe",
-      "desc": "Eine Seidenschärpe, eingelegt mit Geister-Jade-Perlen; verbessert die Qi-Zirkulation zwischen Ober- und Unterkörper."
-    },
-    "serpent_skin_belt": {
-      "name": "Schlangenhaut-Gürtel",
-      "desc": "Aus der abgeworfenen Haut einer spirituellen Schlange gefertigt; erhöht Beweglichkeit und Giftresistenz."
-    },
-    "golden_dragon_belt": {
-      "name": "Goldener-Drachen-Gürtel",
-      "desc": "Ein breiter Gürtel, geprägt mit einem sich windenden Drachen; erhöht die Körperwert-Konversion erheblich."
-    },
-    "void_emperors_sash": {
-      "name": "Leere-Kaiser-Schärpe",
-      "desc": "Eine aus Raumfaden gewebte Schärpe; absorbiert einen Teil des eingehenden Schadens in eine Leere-Tasche."
-    },
-    "wind_step_boots": {
-      "name": "Windschritt-Stiefel",
-      "desc": "Leichte Stiefel, verzaubert für flinkes Fußwerk; erhöht die Ausweichrate geringfügig."
-    },
-    "swiftcloud_sandals": {
-      "name": "Schnellwolken-Sandalen",
-      "desc": "Sandalen, die eine Spur Wolkenenergie tragen; ermöglichen kurze Ausbrüche beschleunigter Bewegung."
-    },
-    "thunderstep_boots": {
-      "name": "Donnerschritt-Stiefel",
-      "desc": "Stiefel, knisternd vor gespeichertem Blitz; jeder Schritt gibt beim Kontakt einen schwachen Schlag ab."
-    },
-    "dragon_treading_boots": {
-      "name": "Drachentritt-Stiefel",
-      "desc": "Aus Drachenungetüm-Knochen geschmiedet; verbessert Bodenstabilität und Stampfattacken dramatisch."
-    },
-    "heaven_soaring_sandals": {
-      "name": "Himmelsoarende Sandalen",
-      "desc": "Sandalen, die dem Träger das Gehen auf Luft ermöglichen sollen; erhöhen Ausweichen und bewegungsbasierte Techniken massiv."
-    },
-    "jade_spirit_pendant": {
-      "name": "Jade-Geister-Anhänger",
-      "desc": "Ein geschliffenes Jadestück, nahe am Herzen getragen; stärkt das spirituelle Meer sanft."
-    },
-    "soul_calming_necklace": {
-      "name": "Seelenberuhigungs-Halskette",
-      "desc": "Eine Kette aus Geisterperlen, die Seelenfluktuationen und mentale Debuffs im Kampf unterdrückt."
-    },
-    "blood_dragon_talisman": {
-      "name": "Blutdrachen-Talisman",
-      "desc": "Ein geschnitzter Knochentalisman, in Drachenungetüm-Blut getränkt; erhöht den rohen physischen Widerstand."
-    },
-    "elemental_core_pendant": {
-      "name": "Elementarkern-Anhänger",
-      "desc": "Enthält einen komprimierten Elementarkern; verstärkt den Elementar-Affinitätsbonus."
-    },
-    "heavens_eye_amulet": {
-      "name": "Himmels-Auge-Amulett",
-      "desc": "Ein Talisman, der das versteinerte Auge eines göttlichen Tieres beherbergt; verleiht im Kampf kurze Vorahnung."
-    },
-    "copper_spirit_ring": {
-      "name": "Kupfer-Geister-Ring",
-      "desc": "Ein schlichter Kupferring, der einen schwachen Qi-Strom durch die Meridiane leitet."
-    },
-    "jade_focus_ring": {
-      "name": "Jade-Fokus-Ring",
-      "desc": "Ein geschnitzter Jade-Ring, der die elementare Technikkontrolle schärft und verschwendete Energie reduziert."
-    },
-    "void_stone_ring": {
-      "name": "Leerenstein-Ring",
-      "desc": "Mit einem Leerestein-Fragment besetzt; hat einen kleinen Lagerraum und verstärkt den Schaden von Raumtechniken."
-    },
-    "dragon_blood_ring": {
-      "name": "Drachenblut-Ring",
-      "desc": "Ein mit Drachenblut-Legierung geschmiedeter Ring; beschleunigt die Qi-Zirkulation des Trägers erheblich."
-    },
-    "immortal_soul_ring": {
-      "name": "Unsterblichen-Seelen-Ring",
-      "desc": "Ein Ring, der einen Splitter der Seele eines Unsterblichen enthalten soll; verstärkt die Qi-Geschwindigkeit des Trägers dramatisch."
+    "3": {
+      "label": "Gipfel"
     }
   },
-  "techniques": {},
-  "laws": {
-    "three_harmony_manual": {
-      "name": "Dreifaches-Harmonie-Handbuch",
-      "flavour": "Der uralte Text spricht von keinem Feuer, keinem Sturm, keinem Berg — nur dem gleichmäßigen Atem zwischen allen Dingen.",
-      "realmRequirementLabel": "Gestählter Körper"
+  "furnaceMaterials": {
+    "cinnabar_powder": {
+      "name": "Zinnoberpulver"
+    },
+    "dragon_root": {
+      "name": "Drachenwurzel"
+    },
+    "jade_tincture": {
+      "name": "Jadolinkt"
+    },
+    "mint_essence": {
+      "name": "Minz-Essenz"
+    },
+    "moon_dust": {
+      "name": "Mondstaub"
+    },
+    "phoenix_ash": {
+      "name": "Phönix-Asche"
+    },
+    "spirit_sediment": {
+      "name": "Geistsediment"
+    }
+  },
+  "furnacePills": {
+    "calm_pond": {
+      "desc": "+10% offline Qi-Aufholbonus für 4 Stunden.",
+      "name": "Pille des ruhigen Teiches"
+    },
+    "frugal_mind": {
+      "desc": "Nächste 10 Produzentenkäufe kosten 10% weniger.",
+      "name": "Pille des sparsamen Geistes"
+    },
+    "inner_flame": {
+      "desc": "Nächster Durchbruch kostet 10% weniger Qi (einmalig).",
+      "name": "Pille der inneren Flamme"
+    },
+    "mystery": {
+      "desc": "Eine mysteriöse Pille. Wirkung wird bei Einnahme offenbart.",
+      "name": "??? Pille"
+    },
+    "phoenix_radiance": {
+      "desc": "+10% Qi/s für 1 Stunde. Spiel-Endphase-Boost.",
+      "name": "Pille der Phönix-Ausstrahlung"
+    },
+    "quiet_tide": {
+      "desc": "-7% nächste 10 Produzenten UND +5% offline.",
+      "name": "Pille der stillen Flut"
+    },
+    "rooted_vigor": {
+      "desc": "+5% Karma-Gewinn für 4 Stunden.",
+      "name": "Pille der verwurzelten Kraft"
+    },
+    "spring_flame": {
+      "desc": "+4% Qi/s für 1 Stunde UND 5% Durchbruch-Rabatt.",
+      "name": "Pille der Frühjahrs-Flamme"
+    },
+    "trinity": {
+      "desc": "+3% Qi/s, +3% Durchbruch-Rabatt, +3% offline. Universalist.",
+      "name": "Dreieinige Pille"
+    },
+    "verdant_body": {
+      "desc": "+5% Qi/s für 2 Stunden (pro Hitz-Stufe, skaliert).",
+      "name": "Pille des üppigen Körpers"
+    },
+    "verdant_tide": {
+      "desc": "+4% Qi/s UND +5% offline für 2 Stunden.",
+      "name": "Pille der üppigen Flut"
+    }
+  },
+  "gardenPlants": {
+    "black_iron_reed": {
+      "name": "Schwarzeisen-Schilf"
+    },
+    "cinnabar_bloom": {
+      "name": "Zinnober-Blüte"
+    },
+    "dragonscale_ginseng": {
+      "name": "Drachenschuppen-Ginseng"
+    },
+    "gold_crown_peony": {
+      "name": "Goldkronen-Pfingstrose"
+    },
+    "heaven_pierce_bamboo": {
+      "name": "Himmels-Durchbohrer-Bambus"
+    },
+    "jade_lotus_bud": {
+      "name": "Jade-Lotus-Knospe"
+    },
+    "moonleaf_vine": {
+      "name": "Mondblattrebe"
+    },
+    "phoenix_tail_grass": {
+      "name": "Phönix-Schwanz-Gras"
+    },
+    "soul_lily": {
+      "name": "Seelen-Lilie"
+    },
+    "spirit_mint": {
+      "name": "Geist-Minze"
+    }
+  },
+  "gardenRecipes": {
+    "e_jade": {
+      "name": "Jade-Tau-Trank"
+    },
+    "e_spirit": {
+      "name": "Elixier der Geistblüte"
+    },
+    "e_verdant": {
+      "name": "Üppiges Tonikum"
+    }
+  },
+  "minigames": {
+    "p_beast_pact": {
+      "mode": "Aktiv · Kämpfer",
+      "name": "Bestien-Arena",
+      "tagline": "Lass deine Paktbestien die Geistleiter erklimmen."
+    },
+    "p_disciple": {
+      "mode": "Aktiv · Fusionsgitter",
+      "name": "Das Roster",
+      "tagline": "Beförder deine Schüler durch die Kultiverungsreiche. Die Rosterpunktsumme erhöht die Qi-Ausbeute jeden Schülers."
+    },
+    "p_dragon": {
+      "mode": "Aktiv · Glücksdruck",
+      "name": "Drachen-Traum",
+      "tagline": "Siphoniere während es atmet; sicher die Beute, bevor es erwacht."
+    },
+    "p_herb_garden": {
+      "mode": "Untätig · pflegen und sammeln",
+      "name": "Geist-Garten",
+      "tagline": "Säe Geistsamen, pflege die Beete, kehre zu reichlicher Ernte zurück."
+    },
+    "p_meridian_furnace": {
+      "mode": "Aktiv · Timing",
+      "name": "Pillen-Veredelung",
+      "tagline": "Halte die Flamme wahr und falte seltene Reagenzien zu einer mächtigen Pille."
+    },
+    "p_phoenix": {
+      "mode": "Aktiv · Arcade",
+      "name": "Phönix-Scheiterhaufen",
+      "tagline": "Reite die Flammenströmungen und sammle Federn."
+    },
+    "p_pillar": {
+      "mode": "Aktiv · Kletterer",
+      "name": "Säulen-Aufstieg",
+      "tagline": "Erklimme die himmlische Säule, weiche der Tribulation aus."
+    },
+    "p_sect_followers": {
+      "mode": "Lichtverwaltung",
+      "name": "Sekte-Opfergaben",
+      "tagline": "Führe zehntausend Schüler zur Zehnten an."
+    },
+    "p_treasure": {
+      "mode": "Untätig · Platzierung",
+      "name": "Ahnen-Echos",
+      "tagline": "Heilige deine Ahnen für bleibende Segnungen."
+    },
+    "p_void": {
+      "mode": "Aktiv · Rätsel",
+      "name": "Leere-Kanalisierung",
+      "tagline": "Leite den Riss, bevor er sich verschließt."
+    }
+  },
+  "producers": {
+    "p_beast_pact": {
+      "desc": "Du pfeifst einmal und sie kehren aus Orten zurück, die kein Sterblicher je gehen könnte. Tiger mit Qi-Stürmen in ihrem Fell verwickelt. Füchse mit Sternenlicht auf ihren Zungen. Sie bringen die Ernte zu deiner Tür.",
+      "name": "Geistbestie-Pakt"
+    },
+    "p_disciple": {
+      "desc": "Ein Lehrling kniet in deinem Hof, Atem gleichmäßig, Handflächen warm. Das Qi, das sie aus der Luft ziehen, ist ein einziger dünner Faden. Jeder Faden stärkt den Webstuhl.",
+      "name": "Körper-Hällungs-Schüler"
+    },
+    "p_dragon": {
+      "desc": "Es träumt in deinem Dantian, und einer seiner Träume bist du. Die Perle, die es umwindet, ist älter als Berge. Jeder langsame Atemzug vergoldet deine Meridiane mit einer Kultivierung, die du dir nie erarbeiten musstest.",
+      "name": "Schlummernder Geistdrache"
+    },
+    "p_herb_garden": {
+      "desc": "Jadebätter entfalten sich in der Morgenröte und trinken leise den Himmel leer. Was die Geistkräuter nicht verwenden können, geben sie dir ab.",
+      "name": "Geistkräuter-Garten"
+    },
+    "p_meridian_furnace": {
+      "desc": "Bronzebeine, versiegelter Deckel, ein Feuer, das nie erlischt. Rohes Qi tritt trübe und bitter ein; was deine Meridiane erreicht, ist dichter als Gold.",
+      "name": "Meridian-Ofen"
+    },
+    "p_phoenix": {
+      "desc": "Der Fenghuang steigt nur herab, wenn das Universum selbst zustimmt. Er faltet seine Regenbogenschwingen um deine Seele. Jede Feder ist ein Fluss. Jeder Schrei eine Sutra älter als der Himmel.",
+      "name": "Souveräner Phönix"
+    },
+    "p_pillar": {
+      "desc": "Gehauen, bevor dein Urgroßvater geboren war, erhebt sich die Säule, bis die Wolken vergessen, dass sie als Stein begann. Durch ihre Länge bluten die Himmel selbst in dein Dantian herab.",
+      "name": "Himmlische Säule"
+    },
+    "p_sect_followers": {
+      "desc": "Zehntausend Schüler erwachen bei Sonnenaufgang und verbeugen sich vor der Halle, die dein Siegel trägt. Ein Reiskorn von jedem wird zu einem Berg. Ein Atemzug Qi von jedem wird zu einem Fluss.",
+      "name": "Sterbliche Sekte-Anhänger"
+    },
+    "p_treasure": {
+      "desc": "Ein Jadanhänger, den deine Ahnen hundert Leben lang trugen. Jeder Atemzug, den sie nahmen, hinterließ eine Spur, und jede Spur blutet jetzt zurück in dich, geduldig wie eine Tide.",
+      "name": "Ahnen-Schatz"
+    },
+    "p_void": {
+      "desc": "Eine Wunde in der Realität, die nie heilt, nie weniger blutet. Durch sie ergießt sich Qi aus einer Welt, die nicht deine ist, in eine Welt, die es ist. Ein anderes Universum ist ein großzügiges Tribut.",
+      "name": "Leere-Kanal"
+    }
+  },
+  "qiSparks": {
+    "consecutive_focus_t1": {
+      "description": "Halte Fokus 2s → +5% Qi/s.",
+      "name": "Aufeinanderfolgender Fokus"
+    },
+    "consecutive_focus_t2": {
+      "description": "Ergänzung: Halte Fokus 4s → +7% mehr Qi/s (insgesamt +12%).",
+      "name": "Aufeinanderfolgender Fokus"
+    },
+    "consecutive_focus_t3": {
+      "description": "Ergänzung: Halte Fokus 6s → +13% mehr Qi/s (insgesamt +25%).",
+      "name": "Aufeinanderfolgender Fokus"
+    },
+    "consecutive_focus_t4": {
+      "description": "Ergänzung: Halte Fokus 8s → +15% mehr Qi/s (insgesamt +40%).",
+      "name": "Aufeinanderfolgender Fokus"
+    },
+    "consecutive_focus_t5": {
+      "description": "Ergänzung: Halte Fokus 10s → +20% mehr Qi/s (insgesamt +60%) und tritt in tiefe Meditation ein.",
+      "name": "Aufeinanderfolgender Fokus"
+    },
+    "crystal_click_t1": {
+      "description": "Der Kristall speichert 30% deines Qi/s (bis zu 2 Min.). Tippen zum Sammeln.",
+      "name": "Kristall-Reservoir"
+    },
+    "crystal_click_t2": {
+      "description": "Aktualisiert auf 50% deines Qi/s (bis zu 3 Min.). Tippen zum Sammeln.",
+      "name": "Kristall-Reservoir"
+    },
+    "crystal_click_t3": {
+      "description": "Aktualisiert auf 70% deiner Qi/s (bis zu 4 Min). Tippen zum Sammeln.",
+      "name": "Qi-Kristall-Reservoir"
+    },
+    "crystal_click_t4": {
+      "description": "Verbessert auf 85% deiner Qi/s (bis zu 5 Min). Antippen zum Einsammeln.",
+      "name": "Qi-Kristall-Reservoir"
+    },
+    "crystal_click_t5": {
+      "description": "Vollständiger Satz: 100% deines Qi/s (bis zu 6 Minuten). Berühre den Kristall zum Sammeln.",
+      "name": "Qi-Kristall-Vorrat"
+    },
+    "divine_qi_t1": {
+      "description": "Alle ~10 Min. erscheint eine goldene Kugel. Tippe sie innerhalb von 8s an für 25s Qi.",
+      "name": "Göttliches Qi"
+    },
+    "divine_qi_t2": {
+      "description": "Orb alle ~9 Min, 10s Fenster. Tippen für 35s Qi.",
+      "name": "Göttliches Qi"
+    },
+    "divine_qi_t3": {
+      "description": "Orb alle ~8 Min, 12s Fenster. Tippen für 50s Qi.",
+      "name": "Göttliches Qi"
+    },
+    "divine_qi_t4": {
+      "description": "Orb alle ~7 Min, 15s Fenster. Tippen für 65s Qi.",
+      "name": "Göttliches Qi"
+    },
+    "divine_qi_t5": {
+      "description": "Zwei Orbs alle ~6 Min. Sammle beide für 75s Qi + ×1,25 Qi/s für 20s.",
+      "name": "Göttliches Qi"
+    },
+    "enduring_stream": {
+      "description": "+1% Qi/s für den Rest dieser Runde. Stapelt sich.",
+      "name": "Andauernder Strom"
+    },
+    "heavens_bond": {
+      "description": "+3% Qi-Ansammlung im Offline-Modus für den Rest dieser Runde. Stapelt sich.",
+      "name": "Himmelsbund"
+    },
+    "legendary_a1_smoke_petal": {
+      "description": "Jedes Geisterkraut-Garten + Meridian-Ofen-Paar multipliziert beide ×1,5. Die Blätter des Gartens kräuseln sich im Ofenrauch und erblühen schneller; der Ofen schmeckt den Geisterhauch der Kräuter und brennt heißer.",
+      "name": "Rauch und Blüte"
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "description": "Jedes Paar aus Körper-Tempering-Schüler + Sterblicher Sekte-Anhänger multipliziert beide ×1,75. Ein einzelner Schüler wird zum Brennpunkt; zehntausend Pilger verneigen sich vor ihnen.",
+      "name": "Halle der Zehntausend"
+    },
+    "legendary_a3_pearl_pendant": {
+      "description": "Jedes Paar aus Schlummerndem Geistdrache + Ahnenreliquie multipliziert beide ×2. Die Schlummerperle des Drachen erkennt ein Erbstück, das deine Ahnen bei sich trugen — sie sollten sich wiederfinden.",
+      "name": "Die Perle und das Amulett"
+    },
+    "legendary_a4_climbing_beasts": {
+      "description": "Jedes Geistbestie-Pakt- + Himmelspfeiler-Paar addiert +10% globales Qi/s. Die Tiger erklimmen den Pfeiler um Mitternacht zum direkten Trinken. Sie erzählen es den Füchsen nicht. Die Füchse finden es heraus.",
+      "name": "Erklimmende Bestien"
+    },
+    "legendary_a5_void_garden": {
+      "description": "Jedes Void-Leiter + Geisterhafte Heilkräuter-Garten-Paar multipliziert beide ×2,5. Die Blutung der Leere trägt Samen aus einer anderen Welt; der Garten verschlingt sie, erblüht in Farben, die kein Auge benannt hat.",
+      "name": "Void-Garten"
+    },
+    "legendary_a6_phoenix_pillar": {
+      "description": "Jedes Paar aus Souveräner Phönix + Himmlische Säule multipliziert beide ×3. Der Fenghuang landet nur auf einer Stange, die hoch genug ist. Jede Säule ist einen Schritt näher zum Himmel.",
+      "name": "Phönix und Säule"
+    },
+    "legendary_b1_dragon_hoard": {
+      "description": "Schlafender Geistdrache +25% Qi/s pro besessenem Ahnen-Schatz. Die Perle des Drachens ist das, was du ihm angeboten hast. Jede Reliquie, die du bewahrt hast, hat es in sich selbst gefaltet.",
+      "name": "Drachenhort"
+    },
+    "legendary_b3_beast_tribute": {
+      "description": "Geist-Bestie-Pakt +12% Qi/s pro Geist-Kraut-Garten. Tiger fressen die Geist-Kräuter, die du züchtest. Sie kommen größer, schneller, schärfer zurück.",
+      "name": "Bestie-Tribut"
+    },
+    "legendary_b4_furnace_sect": {
+      "description": "Meridian-Ofen +4% Qi/s pro Körper-Temper-Schüler. Der Atem jedes Schülers lässt die bronzenen Beine ein wenig heller leuchten. Der Ofen war schon immer ein Werk der Sekte.",
+      "name": "Ofen der Sekte"
+    },
+    "legendary_b5_heavens_bend": {
+      "description": "Himmelspfeiler ×2 Qi/s, falls du mindestens 1 Void-Kanal besitzt. Wenn die Wirklichkeit bereits zerrissen ist, hört der Himmel auf, Widerstand zu leisten.",
+      "name": "Himmel Beugen Sich Herab"
+    },
+    "legendary_b6_phoenix_garden": {
+      "description": "Souveräner Phönix +5% Qi/s pro Spirit Herb Garten. Der Fenghuang nistet nur dort, wo die Erde Medizin ist. Hundert Gärten, hundert Gründe zu bleiben.",
+      "name": "Garten des Phönix"
+    },
+    "legendary_e2_phoenix_reborn": {
+      "description": "Jeder Reich-Durchbruch setzt deinen Phönix-Zähler auf 0 zurück, fügt aber dauerhaft +50% zur Qi/s jedes anderen Produzenten für diesen Durchlauf hinzu. Der Fenghuang wird aus seiner eigenen Asche wiedergeboren — um die Sekte seiner Feuerstelle zu segnen.",
+      "name": "Phönix wiedergeboren"
+    },
+    "legendary_f1_storm_tiger": {
+      "description": "Geist-Ungeheuer-Pakt ×2 Qi/s. Der Tiger schreitet, Ohren angelegt. Er wird nicht brüllen, bis ein Drache seinen Namen träumt und ein Phönix ihn zurück singt. Bis dahin murmelt der Sturm in seinem Fell nur.",
+      "name": "Sturmfelliger Tiger"
+    },
+    "legendary_f2_pearl_dragon": {
+      "description": "Schlummernder Geistdrache ×2 Qi/s. Die Perle wärmt sich, wenn der Drache zwei ferne Töne hört — einen Tiger, der umherschreitet, einen Phönix, der seine Regenbogenschwingen faltet. Nur dann endet der Traum.",
+      "name": "Perlen-Traum-Drache"
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "description": "Souverän-Phönix ×2 Qi/s. Der Ruf des Fenghuang hat drei Noten. Allein singt er eine — irgendwo schreitet ein Tiger, irgendwo träumt ein Drache. Wenn alle drei erklingen, beugt sich der Himmel herab.",
+      "name": "Regenbogen-Weinen Phönix"
+    },
+    "masters_patience": {
+      "description": "Jede Sekunde im Fokus in diesem Durchlauf gibt +0,1% Qi/s. Stapelbar. Pro-Stapel Obergrenze +12%.",
+      "name": "Geduld des Meisters"
+    },
+    "pattern_click_t1": {
+      "description": "Ein Musterfunke erscheint alle ~12 Min. Tippen zum Starten: 3 Punkte, 10s zum Löschen für 30s Qi.",
+      "name": "Meridiane nachzeichnen"
+    },
+    "pattern_click_t2": {
+      "description": "Funke alle ~11 Min. 4 Punkte, 12s Fenster. Vollständig gelöst: 40s Qi.",
+      "name": "Meridiane nachzeichnen"
+    },
+    "pattern_click_t3": {
+      "description": "Funke alle ~10 Min. 5 Punkte, 14s Fenster. Vollständig gelöst: 55s Qi.",
+      "name": "Meridiane nachzeichnen"
+    },
+    "pattern_click_t4": {
+      "description": "Funke alle ~9 Min. 6 Punkte, 16s Fenster. Vollständig gelöst: 70s Qi.",
+      "name": "Meridiane nachzeichnen"
+    },
+    "pattern_click_t5": {
+      "description": "Funke alle ~8 Min. 7 Punkte, 18s Fenster. Vollständig gelöst: 90s Qi + ×1,5 Qi/s für 20s.",
+      "name": "Meridiane nachzeichnen"
+    },
+    "quick_burst": {
+      "description": "Sofortiger Qi-Gewinn im Wert von 30 Sekunden deiner aktuellen Qi/s.",
+      "name": "Schneller Schub"
+    },
+    "resonant_soul": {
+      "description": "+0,2% Qi/s für jeden Schicht-Durchbruch, den du in diesem Durchlauf erreichst. Stapelbar.",
+      "name": "Resonante Seele"
+    },
+    "sect_discipline": {
+      "description": "Für 90 Sekunden gewinnt jeder Produzent +1 pro Einheit Qi/s. Schüler atmen im Takt.",
+      "name": "Sekten-Disziplin"
+    },
+    "sharper_focus": {
+      "description": "+2% Fokus-Multiplikator für den Rest dieses Durchlaufs. Stapelbar.",
+      "name": "Schärferer Fokus"
+    },
+    "steady_cultivation": {
+      "description": "+0,3 basis Qi/s für den Rest dieses Durchlaufs. Stapelbar.",
+      "name": "Stetige Kultivierung"
+    },
+    "steady_stream": {
+      "description": "+20% Qi/s für 60 Sekunden.",
+      "name": "Stetiger Strom"
+    },
+    "surging_stream": {
+      "description": "+50% Qi/s für 30 Sekunden.",
+      "name": "Anschwellender Strom"
+    },
+    "tinkers_bargain": {
+      "description": "Deine nächsten 5 Produzentenkäufe kosten -30% Qi. Das Schnäppchen bevorzugt Frühaufsteher.",
+      "name": "Bastlers Schnäppchen"
+    }
+  },
+  "rarity": {
+    "Bronze": {
+      "label": "Bronze"
+    },
+    "Gold": {
+      "label": "Gold"
+    },
+    "Iron": {
+      "label": "Eisen"
+    },
+    "Silver": {
+      "label": "Silber"
+    },
+    "Transcendent": {
+      "label": "Transzendent"
+    }
+  },
+  "shopBundles": {
+    "bundle_bone_court": {
+      "desc": "Kultivator + Kristall, ein Beinhaus-Design.",
+      "name": "Knochengericht"
+    },
+    "bundle_frost_sect": {
+      "desc": "Kultivator + Kristall, ein Gefrorenes Design.",
+      "name": "Frost-Sekte"
+    }
+  },
+  "shopItems": {
+    "buff_crimson_aura_12h": {
+      "desc": "×2 Qi/s für 12 Stunden. Das \"Schlafengehen\"-Paket.",
+      "name": "Karmesinaura — 12h"
+    },
+    "buff_crimson_aura_1h": {
+      "desc": "×2 Qi/s für 1 Stunde. Der Kultivator trägt einen karmesinroten Heiligenschein während der Aktivierung.",
+      "name": "Karmesinaura — 1h"
+    },
+    "buff_crimson_aura_4h": {
+      "desc": "×2 Qi/s für 4 Stunden. Bestes Preis-Leistungs-Verhältnis pro Minute für aktive Spieler.",
+      "name": "Karmesinaura — 4h"
+    },
+    "buff_crystal_resonance_30m": {
+      "desc": "×2 Qi pro Kristall-Tipp, 30 min. Stapelt sich mit Verfeinerte-Tipp-Upgrades für riesige Tipps.",
+      "name": "Kristallresonanz — 30m"
+    },
+    "buff_producer_surge_4h": {
+      "desc": "×1,5 auf die Basisrate jedes Erzeugers für 4 Stunden. Stapelt sich multiplikativ mit Upgrades.",
+      "name": "Erzeuger-Ansturm — 4h"
+    },
+    "consumable_major_bt_bypass": {
+      "desc": "Überspringe das Qi/s-Gate bei deinem nächsten großen Durchbruch. Du zahlst die Qi-Kosten immer noch — aber musst deine Rate nicht zuerst erhöhen.",
+      "name": "Himmels-Vergebung"
+    },
+    "cos_char_bone_patriarch": {
+      "desc": "Ein verwelkerter Ältester der Osseum-Sekte. Entwickelt sich durch alle 13 Reiche mit dir.",
+      "name": "Knochen-Patriarch"
+    },
+    "cos_char_frost_ascetic": {
+      "desc": "Ein von Wind zerzauster Mönch der gefrorenen Gipfel. Entwickelt sich durch alle 13 Reiche mit dir.",
+      "name": "Frost-Asket"
+    },
+    "cos_char_lotus_sage": {
+      "desc": "Blüten erblühen um den Rahmen eines Asketen. Entwickelt sich durch alle 13 Reiche.",
+      "name": "Lotus-Heiliger"
+    },
+    "cos_char_storm_caller": {
+      "desc": "Wolkengewebe-Roben, Augen erleuchtet von Blitzen. Entwickelt sich durch alle 13 Reiche.",
+      "name": "Sturm-Rufer"
+    },
+    "cos_crystal_frost": {
+      "desc": "Ein glazialer Splitter, von Winterschwinge-Kultivierern gemeißelt. Entwickelt sich durch alle 10 Stufen.",
+      "name": "Frost-Kristall"
+    },
+    "cos_crystal_ossuary": {
+      "desc": "Ein Kristallgitter, das durch uralte Knochen gewachsen ist. Entwickelt sich durch alle 10 Stufen.",
+      "name": "Osseum-Kristall"
+    },
+    "cos_crystal_phoenix": {
+      "desc": "Eine geschmolzene Glut, die in ein Kristallgitter gebunden ist. Entwickelt sich durch alle 10 Stufen.",
+      "name": "Phönix-Kern"
+    },
+    "cos_particles_c9_0": {
+      "desc": "Verdichtete-Abwesenheits-Orben. Unaufdringlich und rein.",
+      "name": "Void-Mote"
+    },
+    "cos_particles_c9_10": {
+      "desc": "Verwickelte Qi-Knoten mit geordnetem inneren Muster.",
+      "name": "Arkane Sphäre"
+    },
+    "cos_particles_c9_11": {
+      "desc": "Aufgerolltes Qi. Trägt die konzentrierte Kraft eines Drachen.",
+      "name": "Drachen-Mote"
+    },
+    "cos_particles_c9_12": {
+      "desc": "Warme aufsteigende Sphären. Heller Innenkern wie sich reformierendes Feuer.",
+      "name": "Phönix-Sphäre"
+    },
+    "cos_particles_c9_13": {
+      "desc": "Knistert vor gebändigter Ladung. Nie ganz still.",
+      "name": "Sturm-Mote"
+    },
+    "cos_particles_c9_14": {
+      "desc": "Trägt die Erinnerung an hundert Donnerschläge.",
+      "name": "Donner-Sphäre"
+    },
+    "cos_particles_c9_15": {
+      "desc": "Die Gipfelform. Dichtes, leuchtendes, vollkommen ausbalanciertes Qi.",
+      "name": "Höchste Mote"
+    },
+    "cos_particles_c9_2": {
+      "desc": "Schweifende Fasern von rohem Qi. Hinterlassen einen schwach leuchtenden Schweif.",
+      "name": "Hauch-Mote"
+    },
+    "cos_particles_c9_3": {
+      "desc": "Kompakte sternförmige Sphären, die mit himmlischem Licht flimmern.",
+      "name": "Stern-Mote"
+    },
+    "cos_particles_c9_4": {
+      "desc": "Komprimiertes Qi, schwer von Absicht. Enger Innenschein.",
+      "name": "Dichter Kern"
+    },
+    "cos_particles_c9_5": {
+      "desc": "Sanft und diffus. Löst sich wie Morgennebel in dir auf.",
+      "name": "Nebel-Sphäre"
+    },
+    "cos_particles_c9_6": {
+      "desc": "Eine ältere Form der Qi-Manifestation. Roh und resonant.",
+      "name": "Urwelt-Sphäre"
+    },
+    "cos_particles_c9_7": {
+      "desc": "Qi um ein kristallines Gitter geformt. Hartkantig mit Innenschein.",
+      "name": "Kristall-Mote"
+    },
+    "cos_particles_c9_8": {
+      "desc": "Kaum materielles Qi. Mehr Ausstrahlung als Substanz.",
+      "name": "Ätherische Sphäre"
+    },
+    "cos_particles_c9_9": {
+      "desc": "Sphären des Himmelsgrades. Tragen ein fernes, uraltes Echo.",
+      "name": "Himmlische Mote"
+    },
+    "qol_autobuy_cheapest": {
+      "desc": "Entsperrt einen Auto-Kauf-Schalter auf dem Sekte-Bildschirm. Wenn aktiviert, wird Qi automatisch für den günstigsten verfügbaren Produzenten ausgegeben.",
+      "name": "Fleiß des Schülers"
+    },
+    "qol_offline_cap_2h": {
+      "desc": "Verlängert die Offline-Qi-Obergrenze um 2 Stunden. Stapelbar bis zu 3x (max +6h auf die Basis 8h-Obergrenze).",
+      "name": "Geduldiger Geist +2h"
+    },
+    "qol_skip_bt_confirm": {
+      "desc": "Bestätigt große Durchbrüche automatisch, sobald das Tor sich klärt. Überspringt die Feier-Pause.",
+      "name": "Entschlossenes Herz"
+    }
+  },
+  "sparkCopy": {
+    "enduring_stream": {
+      "effectText": "**+1% Qi/s** diesen Durchlauf. Stapelbar.",
+      "exampleText": "Fünf Stapel kombinieren sich zu etwa <strong>+5% Qi/s gesamt</strong>. Klein, aber zuverlässig, läuft nie ab.",
+      "loreText": "Der Fluss, der nie stoppt, wird zum Meer."
+    },
+    "heavens_bond": {
+      "effectText": "**+3% Offline-Qi-Rate** diesen Durchlauf. Stapelbar.",
+      "exampleText": "Basis-Offline-Rate ist 20%. Drei Stapel heben sie auf <strong>29% Offline-Rate</strong>, sodass deine Sekte auch während du schläfst ein wenig mehr kultiviert.",
+      "loreText": "Der Himmel verlangt nicht deine Aufmerksamkeit. Nur deine Ausrichtung."
+    },
+    "legendary_a1_smoke_petal": {
+      "effectText": "Jedes **Kräutergarten + Meridian-Ofen**-Paar: beide produzieren **×1,5**.",
+      "exampleText": "Besitze <strong>3 Gärten + 5 Öfen</strong>, also 3 Paare, jeder Garten UND jeder Ofen wird um **×2,5** vervielfacht (1 + 3 × 0,5).",
+      "loreText": "Die jadegrünen Blätter des Gartens krümmen sich im Ofenrauch und blühen schneller; der Ofen schmeckt den Atem der Geisterkraut und brennt heißer."
+    },
+    "legendary_a2_hall_ten_thousand": {
+      "effectText": "Jedes **Schüler zum Härten + Sektengefährte**-Paar: beide produzieren **×1,75**.",
+      "exampleText": "Besitze <strong>10 Schüler + 4 Sektengefährten</strong>, also 4 Paare, jeder Produzent wird um **×4** vervielfacht (1 + 4 × 0,75).",
+      "loreText": "Ein einzelner Schüler wird zum Brennpunkt; zehntausend Pilger verbeugen sich vor ihm. Der Pilger sieht den Schüler; der Schüler spürt das Gewicht."
+    },
+    "legendary_a3_pearl_pendant": {
+      "effectText": "Jedes **Geist-Drache + Ahnen-Schatz**-Paar: beide produzieren **×2**.",
+      "exampleText": "Besitzt <strong>2 Drachen + 5 Schätze</strong>, also 2 Paare, jede Produzentenleistung wird mit <strong>×3</strong> multipliziert (1 + 2 × 1).",
+      "loreText": "Die Schlafperle des Drachen erkennt eine Reliquie, die von deinen Ahnen getragen wird. Sie wurden nie getrennt. Sie sollten sich immer wiederfinden."
+    },
+    "legendary_a4_climbing_beasts": {
+      "effectText": "Jedes **Geist-Bestie + Himmelspfeiler**-Paar: **+10% globale Qi/s**.",
+      "exampleText": "Besitzt <strong>5 Bestien-Pakte + 8 Pfeiler</strong>, also 5 Paare, gibt <strong>+50% globale Qi/s</strong> auf ALLE deine Produktion.",
+      "loreText": "Die Tiger erklimmen den Himmelspfeiler um Mitternacht zum Trinken. Sie sagen es den Füchsen nicht. Die Füchse finden es heraus."
+    },
+    "legendary_a5_void_garden": {
+      "effectText": "Jedes **Leere Kanal + Kräutergarten**-Paar: beide produzieren **×2.5**.",
+      "exampleText": "Besitzt <strong>3 Leere Kanäle + 10 Gärten</strong>, also 3 Paare, jede Produzentenleistung wird mit <strong>×5.5</strong> multipliziert (1 + 3 × 1.5).",
+      "loreText": "Die Leere blutet Samen aus einer anderen Welt; der Garten verschlingt sie, blüht in Farben, die kein Auge benannt hat."
+    },
+    "legendary_a6_phoenix_pillar": {
+      "effectText": "Jedes **Souveräner Phönix + Himmelspfeiler**-Paar: beide produzieren **×3**.",
+      "exampleText": "Besitze <strong>1 Phönix + 10 Pillen</strong>, also 1 Paar, dann wird das Qi/s beider Produzenten mit <strong>×3</strong> multipliziert. Ein 2. Phönix ergibt 2 Paare und ×5 jeweils.",
+      "loreText": "Der Fenghuang landet nur auf einer Stange, die hoch genug ist. Jede Säule ist ein Schritt näher zum Himmel."
+    },
+    "legendary_b1_dragon_hoard": {
+      "effectText": "**Spiritueller Drache** gewinnt **+25% Qi/s** pro Ancestral Treasure, das du besitzt.",
+      "exampleText": "Besitze **1 Drache + 10 Schätze**, Qi/s des Drachen ist **×3,5** (1 + 10 × 0,25). Bei 20 Schätzen ×6.",
+      "loreText": "Die Perle des Drachen ist das, was du ihm geopfert hast. Jede Reliquie, die du bewahrt hast, hat er in sich selbst gefaltet."
+    },
+    "legendary_b3_beast_tribute": {
+      "effectText": "**Geist-Bestie-Pakt** gewinnt **+12% Qi/s** pro Geist-Kraut-Garten.",
+      "exampleText": "Besitze <strong>10 Bestien-Pakte + 15 Gärten</strong>, jeder Bestien-Pakt's Qi/s ist <strong>×2,8</strong> (1 + 15 × 0,12).",
+      "loreText": "Tiger fressen die Geisterkräuter, die du züchtest. Sie kehren größer, schneller, schärfer zurück."
+    },
+    "legendary_b4_furnace_sect": {
+      "effectText": "**Meridian-Ofen** erhält **+4% Qi/s** pro Härtungs-Schüler.",
+      "exampleText": "Besitze <strong>5 Öfen + 50 Schüler</strong>, jeder Ofen's Qi/s ist <strong>×3</strong> (1 + 50 × 0,04).",
+      "loreText": "Der Atem jedes Schülers lässt die bronzenen Beine ein wenig heller leuchten. Der Ofen war schon immer ein Werk der Sekte."
+    },
+    "legendary_b5_heavens_bend": {
+      "effectText": "**Himmlische Säule** produziert **doppelte Qi/s** während du ≥1 Void Conduit besitzt.",
+      "exampleText": "Besitze <strong>10 Säulen + 1 Leere</strong>, jede Säule bekommt ×2 Qi/s. Mehr Leeren zu besitzen erhöht den Bonus nicht weiter.",
+      "loreText": "Wenn die Realität bereits gerissen ist, hört der Himmel auf zu widerstehen."
+    },
+    "legendary_b6_phoenix_garden": {
+      "effectText": "**Souveräner Phönix** gewinnt **+5% Qi/s** pro Geisterkräuter-Garten.",
+      "exampleText": "Besitze <strong>1 Phönix + 40 Gärten</strong>, Phönix's Qi/s ist <strong>×3</strong> (1 + 40 × 0,05).",
+      "loreText": "Fenghuang nistet nur dort, wo der Boden Medizin ist. Hundert Gärten, hundert Gründe zu bleiben."
+    },
+    "legendary_e2_phoenix_reborn": {
+      "effectText": "Jedes große Reich: **Phoenix → 0**, alle anderen Produzenten **+50% Qi/s** dauerhaft.",
+      "exampleText": "Überquere <strong>5 große Reiche</strong> mit dieser aktiv und jeder Nicht-Phönix-Erzeuger endet mit <strong>×3,5 ihrer normalen Ausgabe</strong> (1 + 5 × 0,5). Du verlierst alle Phönixe, aber der Rest deiner Sekte wächst stetig.",
+      "loreText": "Fenghuang wird aus ihrer eigenen Asche wiedergeboren, um die Sekte ihrer Heimat zu segnen."
+    },
+    "legendary_f1_storm_tiger": {
+      "effectText": "**Geistbestie-Pakt: verdoppelt Qi/s**. Dreifache Bestie: sammle alle 3 für **+100% global**.",
+      "exampleText": "Besitze <strong>10 Untiere-Pakte</strong>, kombiniertes Qi/s ist <strong>verdoppelt</strong>. Mit den Drachen- und Phönix-Funken ebenfalls aktiv, fügt Trinity Convergence <strong>+100% globales Qi/s</strong> auf jeden Erzeuger hinzu.",
+      "loreText": "Der Tiger schreitet umher, Ohren angelegt. Er wird nicht brüllen, bis ein Drache seinen Namen träumt und ein Phönix ihn zurücksingt. Bis dahin murmelt der Sturm in seinem Fell nur."
+    },
+    "legendary_f2_pearl_dragon": {
+      "effectText": "**Geist-Drache: doppeltes Qi/s**. Trinität-Bestie: sammle alle 3 für **+100% global**.",
+      "exampleText": "Besitze <strong>1 Drache</strong>, sein Qi/s wird <strong>verdoppelt</strong>. Mit den Qi-Funken Tiger und Phönix auch aktiv, fügt Trinity Convergence <strong>+100% globales Qi/s</strong> auf jeden Produzenten oben drauf.",
+      "loreText": "Die Perle wärmt sich, wenn der Drache zwei ferne Klänge hört – einen Tiger, der auf und ab geht, einen Phönix, der seine Regenbogenschwingen faltet. Erst dann endet der Traum."
+    },
+    "legendary_f3_rainbow_phoenix": {
+      "effectText": "**Souveräner Phönix: doppelte Qi/s**. Dreiheit Bestie: sammle alle 3 für **+100% global**.",
+      "exampleText": "Besitze <strong>1 Phönix</strong>, dessen Qi/s ist <strong>verdoppelt</strong>. Mit den Qi-Funken von Tiger und Drache auch aktiv, fügt die Trinity Convergence <strong>+100% globales Qi/s</strong> oben drauf zu jedem Producer.",
+      "loreText": "Der Ruf des Fenghuang hat drei Noten. Allein singt er eine. Irgendwo schreitet ein Tiger, irgendwo träumt ein Drache. Wenn alle drei erklingen, beugt sich der Himmel herab."
+    },
+    "masters_patience": {
+      "effectText": "**+0,1% Qi/s** pro Sekunde gehaltener Fokus. Begrenzt auf **+12%** pro Stapel.",
+      "exampleText": "Halte Fokus insgesamt **2 Minuten (120s)** während des Durchlaufs, und 1 Stapel gibt +12% Qi/s am Maximum. Drei Stapel erreichen **+36% Qi/s** bis zur Reinkarnation.",
+      "loreText": "Der längste Atem ist der langsamste. Ein Meister kann eine ganze Stunde in einem einzigen Atemzug ruhen."
+    },
+    "quick_burst": {
+      "effectText": "Augenblickliches Qi im Wert von **30 Sekunden** deiner aktuellen Qi/s.",
+      "exampleText": "Wenn dein Qi/s derzeit <strong>1,2M</strong> beträgt, fügt dieser Qi-Funke <strong>36M Qi</strong> zu deinem Guthaben hinzu.",
+      "loreText": "Ein schnell gezogener Atem, und die Welt neigt sich dir zu."
+    },
+    "resonant_soul": {
+      "effectText": "**+0,2% Qi/s** pro Durchbruch nach dem Ziehen. Stapelt sich.",
+      "exampleText": "Nach 50 Durchbrüchen mit dieser aktiv, ein Stapel gibt <strong>+10% Qi/s</strong>. Früh zeichnen für maximale Auszahlung.",
+      "loreText": "Jeder Durchbruch hinterlässt einen Ton. Die Seele sammelt sie wie Glocken in einem Tempel."
+    },
+    "sect_discipline": {
+      "effectText": "**+1 Basis Qi/s** für jede Producer-Einheit für 90 Sekunden.",
+      "exampleText": "Besitze <strong>20 Schüler</strong> (Basis 0,1 Qi/s jeder) und jeder Schüler produziert vorübergehend 1,1 Qi/s (×11) für 90s. Endgame mit 100+ mythischen Producern ist das +1 pro Einheit klein aber wirkt auf jede Einheit die du besitzt.",
+      "loreText": "Zehntausend Schüler verbeugen sich auf einmal. Die Halle erinnert sich, was ein Atem, vervielfacht, bewirken kann."
+    },
+    "sharper_focus": {
+      "effectText": "**+2% Fokus-Multiplikator** diesen Lauf. Stapelt sich.",
+      "exampleText": "Drei Stapel machen deinen Fokus **+6% stärker**. Besonders nützlich, wenn du oft Fokus nutzt.",
+      "loreText": "Die Klinge wird jeden Morgen an demselben Stein geschärft."
+    },
+    "steady_cultivation": {
+      "effectText": "**+0,3 Basis-Qi/s** in diesem Durchgang. Stapelbar.",
+      "exampleText": "Dreimal gezogen gibt <strong>+0,9 Basis-Qi/s</strong>. Der flache Bonus wird mit dem Kristall, dem Fokus und anderen Multiplikatoren multipliziert, daher ist er am wichtigsten in der frühen Phase.",
+      "loreText": "Ein Atemzug bei Sonnenaufgang, einer bei Sonnenuntergang. Der tausendste Atemzug ist derselbe wie der erste, und das ist das ganze Geheimnis."
+    },
+    "steady_stream": {
+      "effectText": "**+20% Qi/s** für die nächste volle Minute.",
+      "exampleText": "Ein konstanter +20%-Bonus für 60 Sekunden ergibt ungefähr <strong>12 Sekunden zusätzliche Produktion</strong>.",
+      "loreText": "Langsame Flamme. Lange Glut. Der Berg schleift den Regen ab."
+    },
+    "surging_stream": {
+      "effectText": "**+50% Qi/s** für 30 Sekunden.",
+      "exampleText": "Bei **1M Qi/s** Basis erhöht dies dich temporär auf **1.5M Qi/s** für eine halbe Minute.",
+      "loreText": "Die Strömung steigt. Der Fluss vergisst seine Ufer."
+    },
+    "tinkers_bargain": {
+      "effectText": "**-30% Qi** bei deinen nächsten **5 Produzentenkäufen**.",
+      "exampleText": "Ein Tier-4-Produzent, der normalerweise **1,2M Qi** kostet, kostet **840k Qi** mit angewendetem Rabatt. Jeder Kaufklick (×1 oder ×10) verbraucht eine Ladung. Ladungen bleiben über Neuladen hinweg erhalten, bis sie verbraucht sind.",
+      "loreText": "Der Bastler zählt Münzen beim Lampenlicht. \"Fünf Gefälligkeiten,\" sagt er. \"Gebt sie dort aus, wo der Preis am meisten schmerzt.\""
+    }
+  },
+  "tutorials": {
+    "first_layer_bt": {
+      "body": "Deine Meridiane werden weiter. Jede Stufe, die du durchquerst, bringt neue Schüler, Qi-Funken und Verbesserungen in Reichweite. Kultiviere weiter; die nächste Stufe ist bereits in Sicht.",
+      "ctaText": "Fortfahren",
+      "kicker": "Durchbruch",
+      "title": "Erster Durchbruch"
+    },
+    "first_major_gate": {
+      "body": "Ein großes Reich verlangt zwei Dinge zugleich. Du brauchst Qi in der Bank und eine konstante Qi/s-Rate, um das Tor zu durchbrechen. Baue mehr Produzenten auf, steigere deinen Kristall, halte Focus. Tippe DURCHBRUCH, wenn der Himmel nicht mehr dagegen drückt.",
+      "ctaText": "Verstanden",
+      "kicker": "Großes Reich",
+      "title": "Der Himmel prüft dich"
+    },
+    "first_producer": {
+      "body": "Ein Schüler kniet in deinem Hof. Jeder Schüler, den du trainierst, erhöht dein untätiges Qi/s ein wenig, und der nächste kostet etwas mehr als der letzte. Die gleiche Form gilt für jeden Erzeuger, den du freischalten wirst.",
+      "ctaText": "Vorwärts",
+      "kicker": "Erster Schüler",
+      "title": "Der Schüler verneigt sich"
+    },
+    "first_saint": {
+      "body": "Von hier an kannst du dich reinkarnieren. Der Fortschritt dieses Lebens wird zu Karma, und Karma kauft permanente Verbesserungen im Ewigen Baum. Jedes Leben lässt den nächsten Anfang etwas stärker beginnen. Fahre mit diesem Durchlauf fort, wenn er noch läuft, oder wiedergeboren dich, wenn der Aufstieg zu schleppend wird.",
+      "ctaText": "Verstanden",
+      "kicker": "Reinkarnation",
+      "title": "Ein zweites Leben"
+    },
+    "first_spark_offer": {
+      "body": "Jeder Durchbruch einer Stufe bringt einen Qi-Funken. Zwei Karten erscheinen und du wählst eine. Manche geben einen kurzen Schub, andere stapeln sich dauerhaft für diesen Durchlauf, und die seltenen schalten neue Mechaniken frei. Wenn dich keine Karte reizt, ist dein erster Neustart bei jedem Angebot kostenlos.",
+      "ctaText": "Wähle weise",
+      "kicker": "Qi-Funken",
+      "title": "Qi-Funken"
+    },
+    "hold_to_focus": {
+      "body": "Halte den Kultivator. Dein Qi/s steigt steil, während du hältst, und fällt ab, wenn du loslässt. Die frühen Stufen gehen viel schneller mit deinem Daumen auf dem Bildschirm.",
+      "ctaText": "Versuchen",
+      "kicker": "Fokus",
+      "title": "Zum Fokussieren halten"
+    },
+    "producers_hint": {
+      "body": "Dein Atem allein füllt die Meridiane langsam. Andere Hände können den Himmel mit dir herabziehen. Besuche die Sekte, um Schüler zu versammeln, Gärten zu kultivieren und Quellen zu formen, die Qi sammeln, während du still sitzt.",
+      "ctaText": "Zeig mir",
+      "kicker": "Ein Flüstern vom Pfad",
+      "title": "Du steigst nicht allein auf"
+    },
+    "producers_tab": {
+      "body": "Produzenten sammeln Qi für dich im Hintergrund, auch wenn du nicht tippst. Jeder erhöht dein Qi/s dauerhaft für den Rest dieses Lebens. Der Preis steigt nach jedem Kauf, aber jede neue Stufe übertrifft die vorherige. Gib dein Qi aus, sobald du es dir leisten kannst.",
+      "ctaText": "Verstanden",
+      "kicker": "Deine Sekte",
+      "title": "Produzenten"
+    },
+    "welcome": {
+      "body": "Qi strömt mit jedem Atemzug herein. Fülle die Leiste am unteren Bildschirmrand, um eine Stufe deines Reiches zu durchbrechen. Stufen stapeln sich zu Reichen, Reiche zu den Himmeln. Der Pfad ist lang.",
+      "ctaText": "Beginnen",
+      "kicker": "Willkommen, Kultivator",
+      "title": "Der Pfad beginnt"
+    }
+  },
+  "upgrades": {
+    "u_consecutive_focus_t2": {
+      "desc": "Hinzufügen: Fokus 4s halten → +7% Qi/s (insgesamt +12%).",
+      "name": "Aufeinanderfolgender Fokus II"
+    },
+    "u_consecutive_focus_t3": {
+      "desc": "Hinzufügen: Fokus 6s halten → +13% Qi/s (insgesamt +25%).",
+      "name": "Aufeinanderfolgender Fokus III"
+    },
+    "u_consecutive_focus_t4": {
+      "desc": "Hinzufügen: Fokus 8s halten → +15% Qi/s (insgesamt +40%).",
+      "name": "Aufeinanderfolgender Fokus IV"
+    },
+    "u_consecutive_focus_t5": {
+      "desc": "Hinzufügen: Fokus 10s halten → +20% Qi/s (insgesamt +60%); tiefe Meditation.",
+      "name": "Aufeinanderfolgender Fokus V"
+    },
+    "u_crystal_click_t2": {
+      "desc": "Reservoir füllt sich zu 50% des Qi/s (bis zu 3 Min).",
+      "name": "Qi-Kristall-Reservoir II"
+    },
+    "u_crystal_click_t3": {
+      "desc": "Reservoir füllt sich zu 70% des Qi/s (bis zu 4 Min).",
+      "name": "Qi-Kristall-Reservoir III"
+    },
+    "u_crystal_click_t4": {
+      "desc": "Reservoir füllt sich zu 85% des Qi/s (bis zu 5 Min).",
+      "name": "Qi-Kristall-Reservoir IV"
+    },
+    "u_crystal_click_t5": {
+      "desc": "Vorrat füllt sich zu 100% des Qi/s (bis zu 6 Min.).",
+      "name": "Qi-Kristall-Reservoir V"
+    },
+    "u_crystal_tap_1": {
+      "desc": "Verdoppelt das Qi gewährt durch das Antippen des Kristalls wenn sein Reservoir leer ist.",
+      "name": "Verfeinertes Antippen I"
+    },
+    "u_crystal_tap_2": {
+      "desc": "Verdoppelt das Qi, das durch das Antippen des Kristalls gewährt wird, wenn sein Vorrat leer ist.",
+      "name": "Verfeinerter Tap II"
+    },
+    "u_crystal_tap_3": {
+      "desc": "Verdoppelt das Qi, das durch das Tippen des Qi-Kristalls gewährt wird, wenn sein Reservoir leer ist.",
+      "name": "Verfeinertes Tippen III"
+    },
+    "u_crystal_tap_4": {
+      "desc": "Verdoppelt das durch Antippen des Kristalls gewährte Qi, wenn sein Reservoir leer ist.",
+      "name": "Verfeinerte Tap IV"
+    },
+    "u_crystal_tap_5": {
+      "desc": "Verdoppelt das Qi, das gewährt wird, wenn du den Kristall berührst, während sein Reservoir leer ist.",
+      "name": "Verfeinertes Tippen V"
+    },
+    "u_divine_qi_t2": {
+      "desc": "Sphäre alle ~9 Min, 10s Fenster. Antippen für 35s Qi.",
+      "name": "Göttliches Qi II"
+    },
+    "u_divine_qi_t3": {
+      "desc": "Sphäre alle ~8 Min, 12s Fenster. Antippen für 50s Qi.",
+      "name": "Göttliches Qi III"
+    },
+    "u_divine_qi_t4": {
+      "desc": "Kugel alle ~7 Min, 15s Fenster. Tippe für 65s Qi.",
+      "name": "Göttliches Qi IV"
+    },
+    "u_divine_qi_t5": {
+      "desc": "Zwei Kugeln alle ~6 Min. Sammle beide für 75s Qi + ×1,25 Qi/s für 20s.",
+      "name": "Göttliches Qi V"
+    },
+    "u_focus_1": {
+      "desc": "+35% zum Halten-zum-Kultivieren-Fokus-Multiplikator.",
+      "name": "Tieferer Atem I"
+    },
+    "u_focus_2": {
+      "desc": "+35% zum Halten-zum-Kultivieren-Fokus-Multiplikator.",
+      "name": "Tieferer Atem II"
+    },
+    "u_focus_3": {
+      "desc": "+35% auf den Multiplikator des Halte-zum-Kultivieren-Fokus.",
+      "name": "Tieferer Atem III"
+    },
+    "u_focus_4": {
+      "desc": "+75% zum Fokus-Multiplikator beim Halten und Kultivieren.",
+      "name": "Tieferer Atem IV"
+    },
+    "u_offline_cap_1": {
+      "desc": "Verlängert dein Offline-Akkumulationsfenster um +4 Stunden.",
+      "name": "Tieferer Schlummer I"
+    },
+    "u_offline_cap_2": {
+      "desc": "Verlängert dein Offline-Ansammlungsfenster um +4 Stunden.",
+      "name": "Tieferer Schlummer II"
+    },
+    "u_offline_cap_3": {
+      "desc": "Verlängert dein Offline-Ansammlungsfenster um +4 Stunden.",
+      "name": "Tieferer Schlummer III"
+    },
+    "u_offline_cap_4": {
+      "desc": "Verlängert dein Offline-Ansammlungsfenster um +4 Stunden.",
+      "name": "Tieferer Schlaf IV"
+    },
+    "u_offline_rate_1": {
+      "desc": "Erhöht deine Offline-Qi-Ansammlungsrate um +5%.",
+      "name": "Mühelose Kultivierung I"
+    },
+    "u_offline_rate_2": {
+      "desc": "Fügt +5% zu deiner Offline-Qi-Ansammlungsrate hinzu.",
+      "name": "Untätige Kultivierung II"
+    },
+    "u_offline_rate_3": {
+      "desc": "Erhöht deine Offline-Qi-Akkumulationsrate um +5%.",
+      "name": "Mühelose Kultivierung III"
+    },
+    "u_offline_rate_4": {
+      "desc": "Fügt +5% zu deiner Offline-Qi-Akkumulationsrate hinzu.",
+      "name": "Müßige Kultivierung IV"
+    },
+    "u_p_beast_pact_double_1": {
+      "desc": "Verdoppelt die Ausgabe von Geistbestien-Pakt.",
+      "name": "Geist-Ungeheuer-Pakt I"
+    },
+    "u_p_beast_pact_double_2": {
+      "desc": "Verdoppelt die Ausbeute des Geist-Bestien-Pakts erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Geist-Bestien-Pakt II"
+    },
+    "u_p_disciple_double_1": {
+      "desc": "Verdoppelt die Ausgabe von Körper-Temper-Schüler.",
+      "name": "Körperhärtungs-Schüler I"
+    },
+    "u_p_disciple_double_2": {
+      "desc": "Verdoppelt die Produktion des Schülers der Körperzähmung erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Körperzähmungs-Schüler II"
+    },
+    "u_p_dragon_double_1": {
+      "desc": "Verdoppelt die Produktion des Schlummernden Geistdrachen.",
+      "name": "Schlummerder Geistdrache I"
+    },
+    "u_p_dragon_double_2": {
+      "desc": "Verdoppelt die Produktion des Schlummernden Geistdrachen erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Schlummerder Geistdrache II"
+    },
+    "u_p_herb_garden_double_1": {
+      "desc": "Verdoppelt die Produktion des Geisterkräutergartens.",
+      "name": "Geisterkräutergarten I"
+    },
+    "u_p_herb_garden_double_2": {
+      "desc": "Verdoppelt die Produktion des Geisterkräutergartens erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Geisterkräutergarten II"
+    },
+    "u_p_meridian_furnace_double_1": {
+      "desc": "Verdoppelt die Produktion des Meridian-Ofens.",
+      "name": "Meridian-Ofen I"
+    },
+    "u_p_meridian_furnace_double_2": {
+      "desc": "Verdoppelt die Produktion des Meridian-Ofens erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Meridian-Ofen II"
+    },
+    "u_p_phoenix_double_1": {
+      "desc": "Verdoppelt die Produktion des Souveränen Phönix.",
+      "name": "Souveräner Phönix I"
+    },
+    "u_p_phoenix_double_2": {
+      "desc": "Verdoppelt die Produktion des Souveränen Phönix erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Souveräner Phönix II"
+    },
+    "u_p_pillar_double_1": {
+      "desc": "Verdoppelt die Produktion der Himmelssäule.",
+      "name": "Himmelssäule I"
+    },
+    "u_p_pillar_double_2": {
+      "desc": "Verdoppelt die Produktion der Himmelssäule erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Himmelssäule II"
+    },
+    "u_p_sect_followers_double_1": {
+      "desc": "Verdoppelt die Produktion der Sterblichen Sekte-Anhänger.",
+      "name": "Sterbliche Sekte-Anhänger I"
+    },
+    "u_p_sect_followers_double_2": {
+      "desc": "Verdoppelt die Produktion der Sterblichen Sekte-Anhänger erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Sterbliche Sekte-Anhänger II"
+    },
+    "u_p_treasure_double_1": {
+      "desc": "Verdoppelt die Produktion des Ancestralen Schatzes.",
+      "name": "Ancestraler Schatz I"
+    },
+    "u_p_treasure_double_2": {
+      "desc": "Verdoppelt die Produktion des Ancestralen Schatzes erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Ancestraler Schatz II"
+    },
+    "u_p_void_double_1": {
+      "desc": "Verdoppelt die Produktion des Leere-Kanals.",
+      "name": "Void-Kanal I"
+    },
+    "u_p_void_double_2": {
+      "desc": "Verdoppelt die Leistung von Void Conduit erneut (stapelt sich ×4 mit dem ersten).",
+      "name": "Void Conduit II"
+    },
+    "u_pattern_click_t2": {
+      "desc": "Qi-Funke alle ~11 Min. 4 Punkte, 12s Fenster. Vollständig klar: 40s Qi.",
+      "name": "Meridiane verfolgend II"
+    },
+    "u_pattern_click_t3": {
+      "desc": "Qi-Funke alle ~10 Min. 5 Punkte, 14s Fenster. Vollständige Löschung: 55s Qi.",
+      "name": "Meridiane verfolgen III"
+    },
+    "u_pattern_click_t4": {
+      "desc": "Qi-Funke alle ~9 Min. 6 Punkte, 16s Fenster. Vollständig: 70s Qi.",
+      "name": "Meridiane verfolgend IV"
+    },
+    "u_pattern_click_t5": {
+      "desc": "Funke alle ~8 Min. 7 Punkte, 18s Fenster. Vollständiger Abräum: 90s Qi + ×1,5 Qi/s für 20s.",
+      "name": "Meridiane verfolgend V"
     }
   }
 }
