@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-11T23:48:29.421Z",
+  "updatedAt": "2026-06-11T23:53:38.323Z",
   "records": {
     "ui_click": {
       "src": [
@@ -95,7 +95,7 @@
           ]
         }
       ],
-      "volume": 0.8
+      "volume": 0.7
     },
     "producer_tier_up": {
       "src": [
