@@ -111,7 +111,7 @@ function CodexModal({
           )}
           {safeTab === 'garden' && gardenState && (
             <CodexSectionsBody
-              sections={getGardenCodexEntries(gardenState)}
+              sections={getGardenCodexEntries(gardenState, t)}
               progress={getGardenCodexProgress(gardenState)}
             />
           )}

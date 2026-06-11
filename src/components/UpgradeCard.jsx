@@ -69,7 +69,7 @@ export default function InscribedTablet({ upgrade, unlocked, qi, onBuy }) {
         onClick={() => onBuy(upgrade.id)}
         disabled={!affordable}
       >
-        {unlocked ? `${fmt(upgrade.cost)} Qi` : t('upgrade.locked')}
+        {unlocked ? `${fmt(upgrade.cost)} ${t('common.qiSuffix')}` : t('upgrade.locked')}
       </button>
     </div>
   );

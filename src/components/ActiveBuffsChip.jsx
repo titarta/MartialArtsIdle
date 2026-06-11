@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useGameText } from '../i18n/gameText';
 import { QI_SPARK_BY_ID, SPARK_COPY } from '../data/qiSparks';
 
 const BASE = import.meta.env.BASE_URL;
@@ -68,6 +69,7 @@ function BuffIcon({ icon, fallback = '✦' }) {
 
 function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
   const { t } = useTranslation('ui');
+  const gt = useGameText();
   const [open, setOpen] = useState(false);
   // Single 250ms tick drives chip countdown text AND popover bar fills.
   const [now, setNow] = useState(() => Date.now());
@@ -81,7 +83,7 @@ function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
         const copy = SPARK_COPY[s.sparkId];
         return {
           key:       `spark:${s.instanceId}`,
-          name:      card?.name ?? t('activeBuffs.buffFallback'),
+          name:      gt('qiSparks', s.sparkId, 'name', card?.name ?? t('activeBuffs.buffFallback')),
           icon:      copy?.icon ?? '✦',
           expiresAt: s.expiresAt,
           total:     card?.duration ?? Math.max(1, s.expiresAt - tNow),
@@ -91,7 +93,7 @@ function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
       .filter(b => b?.expiresAtMs && b.expiresAtMs > tNow)
       .map(b => ({
         key:       `shop:${b.id}`,
-        name:      b.item?.name ?? t('activeBuffs.buffFallback'),
+        name:      b.item?.id ? gt('shopItems', b.item.id, 'name', b.item?.name ?? t('activeBuffs.buffFallback')) : (b.item?.name ?? t('activeBuffs.buffFallback')),
         icon:      b.item?.icon ?? '✦',
         expiresAt: b.expiresAtMs,
         total:     b.item?.effect?.durationMs ?? Math.max(1, b.expiresAtMs - tNow),
@@ -104,13 +106,13 @@ function ActiveBuffsChip({ activeSparks, activeBuffs, furnaceBuffs }) {
       .filter(b => b?.expiresAt && b.expiresAt > tNow)
       .map(b => ({
         key:       `furnace:${b.pillId}:${b.consumedAt}`,
-        name:      b.name ?? t('activeBuffs.pillFallback'),
+        name:      b.pillId ? gt('furnacePills', b.pillId, 'name', b.name ?? t('activeBuffs.pillFallback')) : (b.name ?? t('activeBuffs.pillFallback')),
         icon:      '丹', // Cinzel/Ma Shan Zheng calligraphy glyph for "pill"
         expiresAt: b.expiresAt,
         total:     b.durationMs ?? Math.max(1, b.expiresAt - tNow),
       }));
     return [...sparkEntries, ...shopEntries, ...furnaceEntries].sort((a, b) => a.expiresAt - b.expiresAt);
-  }, [activeSparks, activeBuffs, furnaceBuffs, now, t]);
+  }, [activeSparks, activeBuffs, furnaceBuffs, now, t, gt]);
 
   // Tick only while something is buffing. Stops the timer when the
   // pool is empty so we don't burn cycles in the common idle case.

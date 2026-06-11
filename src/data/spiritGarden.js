@@ -440,11 +440,17 @@ export function discoveredCount(g) {
 }
 
 // ── Small format helper (durations shown on seeds / recipes) ─────────────────────
-export function growLabel(ms) {
+// Pass i18next's `t` so the suffix ("min" / "hr") localises. Falls back to the
+// English unit when `t` isn't provided (e.g. data exports for tests/sims).
+export function growLabel(ms, t) {
   const min = ms / 60000;
-  if (min < 60) return `${Math.round(min)} min`;
+  if (min < 60) {
+    const n = Math.round(min);
+    return t ? t('common.minSuffix', { n }) : `${n} min`;
+  }
   const hr = min / 60;
-  return hr % 1 === 0 ? `${hr} hr` : `${hr.toFixed(1)} hr`;
+  const n = hr % 1 === 0 ? String(hr) : hr.toFixed(1);
+  return t ? t('common.hrSuffix', { n }) : `${n} hr`;
 }
 
 // ── Codex queries ───────────────────────────────────────────────────────────
@@ -465,50 +471,52 @@ const PLANT_HINTS = {
   soul_lily:           'Transcendent-tier seed. Requires a future content unlock.',
 };
 
-export function getGardenCodexEntries(g) {
+// `t` (i18next translator) is optional; when present, tier line, the
+// "future content" hint, section labels, and recipe descs localise.
+export function getGardenCodexEntries(g, t) {
   const disc = g.discovered || {};
   const plantEntries = SEEDS.map((s) => {
     const discovered = !!disc[s.id];
+    const tierLine = t
+      ? t('garden.codexTierLine', { rarity: s.rarity, time: growLabel(s.growMs, t) })
+      : `Tier: ${s.rarity}. Grows in ${growLabel(s.growMs)}.`;
     return {
       id:   s.id,
       name: discovered ? s.name : '???',
-      desc: discovered ? `Tier: ${s.rarity}. Grows in ${growLabel(s.growMs)}.` : null,
+      desc: discovered ? tierLine : null,
       hint: discovered ? null : (PLANT_HINTS[s.id] || ''),
       discovered,
       color: s.color,
       sprite: s.sprite,
     };
   });
-  // Locked plants are always undiscovered in v1 (no recipe to unlock them
-  // — they're v2 content). Surface them as silhouettes with the "future
-  // content" hint so the player knows the codex isn't full and where the
-  // gap lives.
+  const lockedHint = t ? t('garden.codexHintLocked') : 'Locked plant. Future content.';
   for (const id of LOCKED_SEEDS) {
     const meta = LOCKED_SEEDS_BY_ID[id];
     plantEntries.push({
       id,
       name: '???',
       desc: null,
-      hint: PLANT_HINTS[id] || 'Locked plant. Future content.',
+      hint: PLANT_HINTS[id] || lockedHint,
       discovered: false,
       color: meta?.color,
       sprite: `/sprites/plants/${id}.png`,
     });
   }
-  // Recipe entries — the 3 elixir recipes are always discovered (visible
-  // in the brewhouse from the start) but we expose them in the codex so
-  // the player has a unified view of what they can brew. Future locked
-  // recipes can join this section as comingSoon entries.
   const recipeEntries = RECIPES.map((r) => ({
     id:         r.id,
     name:       r.name,
-    desc:       r.desc,
+    desc:       t
+      ? t('garden.recipeDescTemplate', { pct: r.pct, time: growLabel(r.durationMs, t) })
+      : r.desc,
     hint:       null,
     discovered: true,
   }));
+  const plantsLabel  = t ? t('garden.codexPlantsLabel')  : 'Plants';
+  const recipesLabel = t ? t('garden.codexRecipesLabel') : 'Recipes';
   return [
-    { id: 'plants',  label: 'Plants',  entries: plantEntries },
-    { id: 'recipes', label: 'Recipes', entries: recipeEntries },
+    { id: 'plants',  label: plantsLabel,  entries: plantEntries },
+    { id: 'recipes', label: recipesLabel, entries: recipeEntries },
   ];
 }
 

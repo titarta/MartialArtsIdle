@@ -291,7 +291,7 @@ function JourneyBody({ realmIndex }) {
                               ) : (
                                 <span className="jc-stage-spark-mark jc-stage-spark-empty" aria-hidden="true" />
                               )}
-                              <span className="jc-stage-cost">{fmtQi(entry.cost)} Qi</span>
+                              <span className="jc-stage-cost">{fmtQi(entry.cost)} {t('common.qiSuffix')}</span>
                             </span>
                           </div>
                         );

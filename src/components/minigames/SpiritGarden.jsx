@@ -297,7 +297,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
                   />
                   <span className="gd-chip-name">{plantName(s)}</span>
                   <span className="gd-chip-cost">{s.dewCost === 0 ? t('common.free') : t('garden.dewCost', { n: s.dewCost })}</span>
-                  <span className="gd-chip-time">{growLabel(s.growMs)}</span>
+                  <span className="gd-chip-time">{growLabel(s.growMs, t)}</span>
                 </button>
               );
             })}

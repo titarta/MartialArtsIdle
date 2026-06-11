@@ -91,51 +91,54 @@ function renderRich(text) {
  * the strings here are tuned to read on one line. The detail modal renders
  * the same value but can wrap freely.
  */
-function describeContribution(spark, card, ctx, t) {
+function describeContribution(spark, card, ctx, t, gt) {
   const eff = card?.effect;
   if (!eff) return null;
   const { ownedMap, rate } = ctx;
   const stacks = spark.stacks ?? 1;
-  const pname = (pid) => PRODUCERS_BY_ID[pid]?.name ?? pid;
+  // pname resolves a producer's translated name; falls back to the data English.
+  const pname = (pid) => {
+    const p = PRODUCERS_BY_ID[pid];
+    return gt ? gt('producers', pid, 'name', p?.name ?? pid) : (p?.name ?? pid);
+  };
+  // Stacks suffix uses i18next interpolation; empty when only 1 stack.
+  const stackSuffix = stacks > 1 ? t('sparks.contribStacksSuffix', { n: stacks }) : '';
 
   switch (eff.type) {
-    // ── Timed / event-count common buffs ────────────────────────────
     case 'qi_mult': {
       const bonus = eff.value;
       const extra = rate * bonus;
-      return `+${Math.round(bonus * 100)}% qi/s → ≈ ${fmtRate(extra)} qi/s extra`;
+      return t('sparks.contribQiMult', { pct: Math.round(bonus * 100), extra: fmtRate(extra) });
     }
     case 'focus_mult_bonus':
-      return `+${Math.round(eff.value * 100)}% Focus multiplier (active while holding Focus)`;
-    // ── Permanent stacked uncommons ─────────────────────────────────
+      return t('sparks.contribFocusMult', { pct: Math.round(eff.value * 100) });
     case 'qi_flat_per_stack':
-      return `+${eff.value * stacks} base qi/s${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribQiFlatStack', { value: eff.value * stacks, suffix: stackSuffix });
     case 'qi_mult_per_stack':
-      return `+${Math.round(eff.value * stacks * 100)}% qi/s${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribQiMultStack', { pct: Math.round(eff.value * stacks * 100), suffix: stackSuffix });
     case 'focus_mult_bonus_per_stack':
-      return `+${Math.round(eff.value * stacks * 100)}% Focus mult${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribFocusMultStack', { pct: Math.round(eff.value * stacks * 100), suffix: stackSuffix });
     case 'gate_reduction_per_stack':
-      return `−${Math.round(eff.value * stacks * 100)}% major-realm gate cost${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribGateReduction', { pct: Math.round(eff.value * stacks * 100), suffix: stackSuffix });
     case 'offline_qi_mult_per_stack':
-      return `+${Math.round(eff.value * stacks * 100)}% offline qi${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribOfflineQi', { pct: Math.round(eff.value * stacks * 100), suffix: stackSuffix });
     case 'qi_mult_per_breakthrough_per_stack': {
       const accrued = spark.breakthroughsAccrued ?? 0;
       const totalPct = Math.round(eff.value * stacks * accrued * 100);
-      return `+${totalPct}% qi/s (${stacks}× × ${accrued} BT)`;
+      return t('sparks.contribBtStack', { pct: totalPct, stacks, accrued });
     }
-    // ── Legendary producer-synergy ──────────────────────────────────
     case 'producer_self_mult':
-      return `${pname(eff.target)} ×${eff.mult}`;
+      return t('sparks.contribProducerSelf', { name: pname(eff.target), mult: eff.mult });
     case 'producer_count_mult': {
       const src = ownedMap[eff.source] ?? 0;
       const mult = 1 + src * eff.perEach;
-      return `${src} × ${pname(eff.source)} → ×${mult.toFixed(2)}`;
+      return t('sparks.contribProducerCount', { count: src, name: pname(eff.source), mult: mult.toFixed(2) });
     }
     case 'producer_count_threshold_mult': {
       const src = ownedMap[eff.source] ?? 0;
       return src >= eff.threshold
-        ? `Active → ${pname(eff.target)} ×${eff.mult}`
-        : `Dormant — need ${eff.threshold} ${pname(eff.source)}`;
+        ? t('sparks.contribThresholdActive', { name: pname(eff.target), mult: eff.mult })
+        : t('sparks.contribThresholdDormant', { n: eff.threshold, name: pname(eff.source) });
     }
     case 'producer_pair_synergy': {
       const a = ownedMap[eff.producerA] ?? 0;
@@ -143,8 +146,8 @@ function describeContribution(spark, card, ctx, t) {
       const pairs = Math.min(a, b);
       const mult = 1 + pairs * (eff.mult - 1);
       return pairs > 0
-        ? `${pairs} pair${pairs > 1 ? 's' : ''} → both ×${mult.toFixed(2)}`
-        : `No pairs (need ≥1 of each)`;
+        ? t('sparks.contribPairSynergy', { count: pairs, n: pairs, mult: mult.toFixed(2) })
+        : t('sparks.contribPairNone');
     }
     case 'producer_pair_global_mult': {
       const a = ownedMap[eff.producerA] ?? 0;
@@ -152,18 +155,17 @@ function describeContribution(spark, card, ctx, t) {
       const pairs = Math.min(a, b);
       const totalPct = Math.round(pairs * (eff.mult - 1) * 100);
       return pairs > 0
-        ? `${pairs} pair${pairs > 1 ? 's' : ''} → +${totalPct}% global qi/s`
-        : `No pairs (need ≥1 of each)`;
+        ? t('sparks.contribPairGlobal', { count: pairs, n: pairs, pct: totalPct })
+        : t('sparks.contribPairNone');
     }
     case 'phoenix_reborn': {
       const phStacks = spark.phoenixRebornStacks ?? 0;
       return phStacks > 0
-        ? `${phStacks} rebirth${phStacks > 1 ? 's' : ''} → others ×${Math.pow(2, phStacks)}`
-        : t ? t('sparks.waitingNextRealm') : 'Waiting on next major realm';
+        ? t('sparks.contribRebirth', { count: phStacks, n: phStacks, mult: Math.pow(2, phStacks) })
+        : (t ? t('sparks.waitingNextRealm') : 'Waiting on next major realm');
     }
-    // ── Dial-9 additions ────────────────────────────────────────────
     case 'producer_flat_per_unit':
-      return `+${eff.value} per-unit qi/s on every producer`;
+      return t('sparks.contribPerUnit', { value: eff.value });
     case 'qi_mult_per_focus_second_per_stack': {
       let focusSeconds = 0;
       try {
@@ -172,14 +174,14 @@ function describeContribution(spark, card, ctx, t) {
       } catch {}
       const perStack = Math.min(eff.perStackCap ?? Infinity, (eff.value ?? 0) * focusSeconds);
       const totalPct = Math.round(perStack * stacks * 100);
-      return `${focusSeconds}s held → +${totalPct}% qi/s${stacks > 1 ? ` (${stacks} stacks)` : ''}`;
+      return t('sparks.contribFocusSeconds', { seconds: focusSeconds, pct: totalPct, suffix: stackSuffix });
     }
     case 'producer_cost_discount': {
       const charges = spark.chargesRemaining ?? 0;
       const pct = Math.round((eff.fraction ?? 0) * 100);
       return charges > 0
-        ? `−${pct}% producer cost · ${charges} buy${charges > 1 ? 's' : ''} left`
-        : t ? t('sparks.bargainSpent') : 'Bargain spent';
+        ? t('sparks.contribCostDiscount', { count: charges, n: charges, pct })
+        : (t ? t('sparks.bargainSpent') : 'Bargain spent');
     }
     default:
       return null;
@@ -202,7 +204,7 @@ function Charm({ spark, ctx, isTrinityActive, onOpen }) {
   const isLegendary = card.rarity === 'legendary';
   const isTrinityPiece = card.trinityPiece === true;
 
-  const contribution = describeContribution(spark, card, ctx, t);
+  const contribution = describeContribution(spark, card, ctx, t, gt);
   const stacks = spark.stacks ?? 1;
   const showStackBadge = card.kind === 'permanent' && stacks > 1;
 
@@ -255,11 +257,12 @@ function CharmDetail({ spark, ctx, isTrinityActive, onClose }) {
     : gt('qiSparks', spark.sparkId, 'description', card.description ?? '');
   const exampleHtml = copy?.exampleText != null ? gt('sparkCopy', spark.sparkId, 'exampleText', copy.exampleText) : null;
   const loreHtml = copy?.loreText != null ? gt('sparkCopy', spark.sparkId, 'loreText', copy.loreText) : null;
-  const contribution = describeContribution(spark, card, ctx, t);
+  const contribution = describeContribution(spark, card, ctx, t, gt);
 
   const isMechanic = card.kind === 'mechanic';
   const rarityToken = isMechanic ? 'var(--r-mechanic)' : rarity.color;
-  const rarityLabel = isMechanic ? t('sparks.mechanicLabel') : rarity.label;
+  const rarityKey   = `common.sparkRarity${card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}`;
+  const rarityLabel = isMechanic ? t('sparks.mechanicLabel') : t(rarityKey, { defaultValue: rarity.label });
   const rarityClass = isMechanic ? 'charm-detail-r-mechanic' : `charm-detail-r-${card.rarity}`;
 
   // Portal to <body> so the fixed overlay escapes .screen-container's

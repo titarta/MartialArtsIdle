@@ -77,10 +77,13 @@ function iconFor(sparkId) {
  * so players never have to hunt for the commit moment.
  */
 function SparkCardSlot({ sparkId, onPick }) {
+  const { t } = useTranslation('ui');
   const gt = useGameText();
   const card = QI_SPARK_BY_ID[sparkId];
   if (!card) return null;
   const rarity     = SPARK_RARITY[card.rarity] ?? SPARK_RARITY.common;
+  const rarityKey  = `common.sparkRarity${card.rarity.charAt(0).toUpperCase() + card.rarity.slice(1)}`;
+  const rarityLabel = t(rarityKey, { defaultValue: rarity.label });
   const copy       = SPARK_COPY[sparkId];
   const name       = gt('qiSparks', sparkId, 'name', card.name);
   const effectText = copy?.effectText != null
@@ -124,7 +127,7 @@ function SparkCardSlot({ sparkId, onPick }) {
         )}
 
         <div className="spk-inner">
-          <div className="spk-kicker">{rarity.label}</div>
+          <div className="spk-kicker">{rarityLabel}</div>
           <div className="spk-icon-area">
             <span className="spk-icon-glow" />
             <span className="spk-icon-glyph"><CardIcon icon={icon} /></span>
@@ -216,7 +219,8 @@ function QiSparkChoiceModal({
   // Offer-level rarity (all cards share the same tier under tier-locked).
   const firstCard        = offer.cards?.[0] ? QI_SPARK_BY_ID[offer.cards[0]] : null;
   const offerRarity      = firstCard?.rarity ?? 'common';
-  const offerRarityLabel = SPARK_RARITY[offerRarity]?.label ?? '';
+  const offerRarityKey   = `common.sparkRarity${offerRarity.charAt(0).toUpperCase() + offerRarity.slice(1)}`;
+  const offerRarityLabel = t(offerRarityKey, { defaultValue: SPARK_RARITY[offerRarity]?.label ?? '' });
 
   const pityRemaining  = Math.max(0, pityThreshold - pityCounter);
   const pityImminent   = pityRemaining <= 3;

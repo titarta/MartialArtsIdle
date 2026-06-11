@@ -282,11 +282,11 @@ export default function CultivationScreen({
       <header className="cs-qi-strip">
         <div className="cs-qi-strip-l">
           <div className="cs-qi-strip-eyebrow">{t('cultivation.reservoirLabel')}</div>
-          <div className="cs-qi-strip-amount">{fmt(qi)} Qi</div>
+          <div className="cs-qi-strip-amount">{fmt(qi)} {t('common.qiSuffix')}</div>
         </div>
         <div className="cs-qi-strip-r">
           <div className="cs-qi-strip-rate-label">{t('cultivation.flowingLabel')}</div>
-          <div className="cs-qi-strip-rate">+{fmtRate(rate)} / sec</div>
+          <div className="cs-qi-strip-rate">+{fmtRate(rate)} {t('common.qiPerSec')}</div>
         </div>
       </header>
 

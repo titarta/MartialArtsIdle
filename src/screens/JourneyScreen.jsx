@@ -138,7 +138,7 @@ function HeroHeader({ cultivation, vfxEnabled }) {
           <span className="jc-hero-name">{realmMajor ? gt('realmNames', realmMajor, 'name', realmMajor) : ''}</span>
           {realmStage && <span className="jc-hero-stage">{gt('realmStages', realmStage, 'label', realmStage)}</span>}
           <span className="jc-hero-chapter">
-            Chapter {chapterRomanCurrent} of {toRoman(totalChapters)} · Stage {realmIndex + 1} / {totalRealms}
+            {t('journey.chapterEyebrow', { cur: chapterRomanCurrent, total: toRoman(totalChapters), stage: realmIndex + 1, stages: totalRealms })}
           </span>
         </div>
       </div>
@@ -147,7 +147,7 @@ function HeroHeader({ cultivation, vfxEnabled }) {
         <div className="jc-hero-meter">
           <div className="jc-hero-meter-head">
             <span>{t('journey.nextBreakthrough')}</span>
-            <span><b>{fmtQi(qiProgress)}</b> / {fmtQi(qiCost)} Qi</span>
+            <span><b>{fmtQi(qiProgress)}</b> / {fmtQi(qiCost)} {t('common.qiSuffix')}</span>
           </div>
           <div className="jc-hero-bar">
             <div

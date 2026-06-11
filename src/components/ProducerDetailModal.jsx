@@ -135,7 +135,7 @@ export default function ProducerDetailModal({
               <div className="pdm-stat-row">
                 <span className="pdm-stat-label">{t('producerDetail.perUnit')}</span>
                 <span className="pdm-stat-value">
-                  {fmtRate(perUnitRate)} Qi/s
+                  {fmtRate(perUnitRate)} {t('common.qiPerSec')}
                   {upMult > 1 && (
                     <span className="pdm-stat-mult"> {t('producerDetail.upgrades', { n: upMult })}</span>
                   )}
@@ -147,7 +147,7 @@ export default function ProducerDetailModal({
               <div className="pdm-stat-row pdm-stat-row-emph">
                 <span className="pdm-stat-label">{t('producerDetail.baseContribution')}</span>
                 <span className="pdm-stat-value">
-                  {fmtRate(totalFromHere)} Qi/s
+                  {fmtRate(totalFromHere)} {t('common.qiPerSec')}
                 </span>
               </div>
               <div className="pdm-stat-row">

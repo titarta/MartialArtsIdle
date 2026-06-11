@@ -147,7 +147,7 @@ function QiRateReadout({ rateRef, focusMultRef, sparkFocusMultBonusRef, sparkCon
     const update = () => {
       const r = rateRef.current;
       if (textRef.current) {
-        textRef.current.textContent = `+${fmtRateNum(r)} Qi/s`;
+        textRef.current.textContent = `+${fmtRateNum(r)} ${t('common.qiPerSec')}`;
       }
       if (boostRef.current && focusMultRef) {
         const baseMult  = (focusMultRef.current ?? 250) / 100;
@@ -239,6 +239,7 @@ function GateBypassButton({ gateRef, tokenCount, onUse }) {
 /** Current / target qi — single chip updated via rAF.
  *  During a major-realm gate, switches to showing Qi/s current / required. */
 function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, ascended }) {
+  const { t } = useTranslation('ui');
   const textRef = useRef(null);
   const divRef  = useRef(null);
   useEffect(() => {
@@ -252,7 +253,7 @@ function QiProgressChip({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, 
         if (ascended) {
           // Ascended: total spendable qi (balance) is the only number left.
           const r = rateRef ? rateRef.current : 0;
-          textRef.current.textContent = `${fmt(qiRef.current)} Qi  ·  ${fmtRate(r)}/s`;
+          textRef.current.textContent = `${fmt(qiRef.current)} ${t('common.qiSuffix')}  ·  ${fmtRate(r)}/s`;
         } else if (gate) {
           // GATE redesign (2026-05-27): drop the current-rate from this
           // chip - the current rate is already shown on the RIGHT side
@@ -1319,7 +1320,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
             <span className="home-crystal-refine-verb">
               {t('home.refineVerb', { n: level + 1 })}
             </span>
-            <span className="home-crystal-refine-cost">{fmtNum(refineCost)} Qi</span>
+            <span className="home-crystal-refine-cost">{fmtNum(refineCost)} {t('common.qiSuffix')}</span>
           </span>
         </button>
       )}
@@ -1342,6 +1343,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
 /** Compact qi text updated via rAF — avoids a React re-render every frame.
  *  During a major-realm gate, switches to showing Qi/s current / required. */
 function PCQiProgressText({ qiRef, progressRef, costRef, gateRef, rateRef, maxed, ascended }) {
+  const { t } = useTranslation('ui');
   const textRef = useRef(null);
   const divRef  = useRef(null);
   useEffect(() => {
@@ -1355,7 +1357,7 @@ function PCQiProgressText({ qiRef, progressRef, costRef, gateRef, rateRef, maxed
         if (ascended) {
           // Ascended: spendable balance only.
           const r = rateRef ? rateRef.current : 0;
-          textRef.current.textContent = `${fmt(qiRef.current)} Qi  ·  ${fmtRate(r)}/s`;
+          textRef.current.textContent = `${fmt(qiRef.current)} ${t('common.qiSuffix')}  ·  ${fmtRate(r)}/s`;
         } else if (gate) {
           // Same redesign as QiProgressChip above: show only the GOAL
           // (required rate), not the current-vs-required ratio. Current
@@ -1364,7 +1366,7 @@ function PCQiProgressText({ qiRef, progressRef, costRef, gateRef, rateRef, maxed
         } else {
           // Cookie-Clicker pivot: numerator is realm-progress meter.
           const progress = (progressRef?.current ?? qiRef.current);
-          textRef.current.textContent = `${fmt(progress)} / ${fmt(costRef.current)} Qi`;
+          textRef.current.textContent = `${fmt(progress)} / ${fmt(costRef.current)} ${t('common.qiSuffix')}`;
         }
       }
       raf = requestAnimationFrame(tick);
