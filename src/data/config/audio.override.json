@@ -1,11 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-08T22:49:39.766Z",
+  "updatedAt": "2026-06-11T23:48:29.421Z",
   "records": {
     "ui_click": {
       "src": [
         "audio/sfx/ui_click.mp3"
-      ]
+      ],
+      "volume": 0.9
     },
     "bgm_cultivation": {
       "src": [
@@ -20,22 +21,26 @@
     "ui_notify": {
       "src": [
         "audio/sfx/ui_notify.mp3"
-      ]
+      ],
+      "volume": 0.9
     },
     "spark_pattern_miss": {
       "src": [
         "audio/sfx/spark_pattern_miss.mp3"
-      ]
+      ],
+      "volume": 0.9
     },
     "spark_pattern_clear": {
       "src": [
         "audio/sfx/spark_pattern_clear.mp3"
-      ]
+      ],
+      "volume": 0.9
     },
     "spark_pattern_tap": {
       "src": [
         "audio/sfx/spark_pattern_tap.mp3"
-      ]
+      ],
+      "volume": 0.9
     },
     "focus_cultivate": {
       "variations": [
@@ -64,7 +69,8 @@
             "audio/sfx/focus_cultivate_5.wav"
           ]
         }
-      ]
+      ],
+      "volume": 0.75
     },
     "cult_breakthrough": {
       "src": [
@@ -88,12 +94,14 @@
             "audio/sfx/divine_qi_collect_3.wav"
           ]
         }
-      ]
+      ],
+      "volume": 0.8
     },
     "producer_tier_up": {
       "src": [
         "audio/sfx/producer_tier_up.wav"
-      ]
+      ],
+      "volume": 0.9
     },
     "crystal_evolve_start": {
       "src": [
@@ -149,7 +157,8 @@
             "audio/sfx/focus_tick_5.wav"
           ]
         }
-      ]
+      ],
+      "volume": 0.85
     },
     "crystal_tap": {
       "variations": [
@@ -173,7 +182,8 @@
             "audio/sfx/crystal_tap_4.wav"
           ]
         }
-      ]
+      ],
+      "volume": 0.85
     },
     "crystal_level_up": {
       "src": [
