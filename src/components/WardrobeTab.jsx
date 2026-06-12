@@ -16,6 +16,15 @@ const BASE = import.meta.env.BASE_URL;
 const CULTIVATOR_SPRITE = `${BASE}sprites/cultivator/t1_qi_transformation_normal.png`;
 const CRYSTAL_SPRITE    = `${BASE}crystals/crystal_5.png`;
 
+// Particle cosmetics show their actual qi-orb sprite (the same art the Spirit
+// Bazaar and HomeScreen render), derived from the id: cos_particles_c9_N →
+// qi_orb_c9_N.png. The free default flow is C1. This keeps the Wardrobe
+// consistent with the shop instead of falling back to the emoji in `icon`.
+function particleOrbSrc(itemId) {
+  const n = (itemId ?? '').match(/cos_particles_c9_(\d+)/)?.[1] ?? '1';
+  return `${BASE}sprites/vfx/qi_particles/qi_orb_c9_${n}.png`;
+}
+
 const TINT_FILTERS = {
   cos_char_crimson:     'hue-rotate(-95deg) saturate(1.35) brightness(0.95)',
   cos_char_verdant:     'hue-rotate(60deg) saturate(1.2) brightness(0.95)',
@@ -69,12 +78,12 @@ function CosmeticPreview({ item }) {
   }
   if (item.cosmeticSlot === COSMETIC_SLOTS.PARTICLES) {
     return (
-      <span
-        className="wdb-tile-preview-icon"
-        style={TINT_FILTERS[item.id] ? { filter: TINT_FILTERS[item.id] } : undefined}
-      >
-        {item.icon}
-      </span>
+      <img
+        src={particleOrbSrc(item.id)}
+        alt=""
+        className="wdb-tile-preview-sprite"
+        draggable="false"
+      />
     );
   }
   if (item.cosmeticSlot === COSMETIC_SLOTS.BACKGROUND) {
@@ -190,7 +199,9 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                 <div className="wdb-eq-tile wdb-eq-tile-default">
                   <span className="wdb-eq-ribbon">{t('wardrobe.ribbonDefault')}</span>
                   <div className="wdb-eq-preview">
-                    <span className="wdb-tile-preview-icon">{SLOT_DEFAULTS[slot].icon}</span>
+                    {slot === COSMETIC_SLOTS.PARTICLES
+                      ? <img src={particleOrbSrc(null)} alt="" className="wdb-tile-preview-sprite" draggable="false" />
+                      : <span className="wdb-tile-preview-icon">{SLOT_DEFAULTS[slot].icon}</span>}
                   </div>
                   <div className="wdb-eq-body">
                     <div className="wdb-eq-name">{SLOT_DEFAULTS[slot].name}</div>
