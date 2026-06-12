@@ -18,10 +18,10 @@ Cheapest wins; both fix surfaces that currently look unfinished.
 - [ ] **Half-Step Open Heaven realm icon** (1) — `gen_realm_icons.py`. Currently the
   only realm still on an emoji (`🌅`, `JourneyBody.jsx:31`); every other one of the
   13 has a painted icon. One generation removes a visible odd-one-out.
-- [ ] **Wardrobe slot defaults** (3) — `gen_ui.py`. The empty-state of the premium
-  wardrobe: `🧘` character, `✨` particles, `🏔` background (`WardrobeTab.jsx:39-44`).
-  Note: the particles default now shows the real C1 orb (done 2026-06-11), so only
-  character + background defaults remain as emoji here.
+- [x] **Wardrobe slot defaults** — DONE 2026-06-11, zero new art. Every default tile
+  now reuses real game art instead of an emoji: cultivator (t1 sprite), crystal
+  (crystal_5), qi orb (C1), and the home.png meditation-hall backdrop
+  (`WardrobeTab.jsx` `DefaultPreview`). Matches the owned-cosmetic previews.
 
 ## Tier 2 — Core-mechanic completion (14 icons)
 

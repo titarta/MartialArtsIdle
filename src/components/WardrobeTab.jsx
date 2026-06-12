@@ -15,6 +15,9 @@ const BASE = import.meta.env.BASE_URL;
 // base. Particles + backgrounds fall back to the item icon / gradient.
 const CULTIVATOR_SPRITE = `${BASE}sprites/cultivator/t1_qi_transformation_normal.png`;
 const CRYSTAL_SPRITE    = `${BASE}crystals/crystal_5.png`;
+// The meditation-hall backdrop shown on the home screen (HomeScreen renders
+// backgrounds/home.png). Used as the default "backdrop" slot preview.
+const DEFAULT_BACKDROP  = `${BASE}backgrounds/home.png`;
 
 // Particle cosmetics show their actual qi-orb sprite (the same art the Spirit
 // Bazaar and HomeScreen render), derived from the id: cos_particles_c9_N →
@@ -41,16 +44,6 @@ const SLOT_ORDER = [
   COSMETIC_SLOTS.PARTICLES,
   COSMETIC_SLOTS.BACKGROUND,
 ];
-
-// Slot labels and defaults are resolved inside the component via t() so
-// they update when the language changes. The icon field is a non-text
-// decorative glyph/emoji and is not translated.
-const SLOT_DEFAULT_ICONS = {
-  [COSMETIC_SLOTS.CHARACTER]:  '🧘',
-  [COSMETIC_SLOTS.CRYSTAL]:    '◆',
-  [COSMETIC_SLOTS.PARTICLES]:  '✨',
-  [COSMETIC_SLOTS.BACKGROUND]: '🏔',
-};
 
 function CosmeticPreview({ item }) {
   if (!item) return null;
@@ -97,6 +90,31 @@ function CosmeticPreview({ item }) {
   return <span className="wdb-tile-preview-icon">{item?.icon ?? '◇'}</span>;
 }
 
+// The default tile (nothing equipped in a slot) shows the real base art the
+// player is already using — cultivator, crystal, qi orb, meditation-hall
+// backdrop — instead of a placeholder glyph. Mirrors the assets CosmeticPreview
+// uses for owned items so the default reads as "your current look".
+function DefaultPreview({ slot }) {
+  if (slot === COSMETIC_SLOTS.CHARACTER) {
+    return <img src={CULTIVATOR_SPRITE} alt="" className="wdb-tile-preview-sprite" draggable="false" />;
+  }
+  if (slot === COSMETIC_SLOTS.CRYSTAL) {
+    return <img src={CRYSTAL_SPRITE} alt="" className="wdb-tile-preview-sprite" draggable="false" />;
+  }
+  if (slot === COSMETIC_SLOTS.PARTICLES) {
+    return <img src={particleOrbSrc(null)} alt="" className="wdb-tile-preview-sprite" draggable="false" />;
+  }
+  if (slot === COSMETIC_SLOTS.BACKGROUND) {
+    return (
+      <div
+        className="wdb-tile-preview-bg"
+        style={{ backgroundImage: `url(${DEFAULT_BACKDROP})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      />
+    );
+  }
+  return <span className="wdb-tile-preview-icon">◇</span>;
+}
+
 /**
  * WardrobeTab — owned cosmetics by slot.
  *
@@ -124,10 +142,10 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
   };
 
   const SLOT_DEFAULTS = {
-    [COSMETIC_SLOTS.CHARACTER]:  { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.CHARACTER],  name: t('wardrobe.defaultCharName'),      desc: 'The default cultivator look that ships with your path.' },
-    [COSMETIC_SLOTS.CRYSTAL]:    { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.CRYSTAL],    name: t('wardrobe.defaultCrystalName'),   desc: 'The default qi crystal, white-gold across all tiers.' },
-    [COSMETIC_SLOTS.PARTICLES]:  { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.PARTICLES],  name: t('wardrobe.defaultParticlesName'), desc: 'The default qi particle flow that comes with your path.' },
-    [COSMETIC_SLOTS.BACKGROUND]: { icon: SLOT_DEFAULT_ICONS[COSMETIC_SLOTS.BACKGROUND], name: t('wardrobe.defaultBackdropName'),  desc: 'The default lacquered backdrop of your meditation hall.' },
+    [COSMETIC_SLOTS.CHARACTER]:  { name: t('wardrobe.defaultCharName'),      desc: 'The default cultivator look that ships with your path.' },
+    [COSMETIC_SLOTS.CRYSTAL]:    { name: t('wardrobe.defaultCrystalName'),   desc: 'The default qi crystal, white-gold across all tiers.' },
+    [COSMETIC_SLOTS.PARTICLES]:  { name: t('wardrobe.defaultParticlesName'), desc: 'The default qi particle flow that comes with your path.' },
+    [COSMETIC_SLOTS.BACKGROUND]: { name: t('wardrobe.defaultBackdropName'),  desc: 'The default lacquered backdrop of your meditation hall.' },
   };
 
   // Group every owned cosmetic by slot so we render each section in
@@ -199,9 +217,7 @@ function WardrobeTab({ inventory, onBrowseBazaar }) {
                 <div className="wdb-eq-tile wdb-eq-tile-default">
                   <span className="wdb-eq-ribbon">{t('wardrobe.ribbonDefault')}</span>
                   <div className="wdb-eq-preview">
-                    {slot === COSMETIC_SLOTS.PARTICLES
-                      ? <img src={particleOrbSrc(null)} alt="" className="wdb-tile-preview-sprite" draggable="false" />
-                      : <span className="wdb-tile-preview-icon">{SLOT_DEFAULTS[slot].icon}</span>}
+                    <DefaultPreview slot={slot} />
                   </div>
                   <div className="wdb-eq-body">
                     <div className="wdb-eq-name">{SLOT_DEFAULTS[slot].name}</div>
