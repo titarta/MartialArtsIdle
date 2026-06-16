@@ -12,6 +12,23 @@ import {
 
 const BASE = import.meta.env.BASE_URL;
 
+// Render a shop item icon: an <img> when `icon` is a /asset path, otherwise the
+// emoji string as-is. image-rendering follows the global Settings toggle (the
+// `.rendering-pixelated img` rule), so no per-element hardcode here.
+function ShopIcon({ icon, size }) {
+  if (typeof icon === 'string' && icon.startsWith('/')) {
+    return (
+      <img
+        src={`${BASE}${icon.replace(/^\//, '')}`}
+        alt=""
+        draggable="false"
+        style={{ width: size, height: size, objectFit: 'contain', verticalAlign: 'middle' }}
+      />
+    );
+  }
+  return icon;
+}
+
 // ── Cosmetic procession asset resolution ───────────────────────────────
 // Each cosmetic slot evolves through a different number of stages. The
 // procession card reveals the first 3 in colour and silhouettes the rest
@@ -346,7 +363,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
   return (
     <div className={`bls-buff-tile${activeBuff ? ' bls-buff-tile-active' : ''}`}>
       {activeBuff && <span className="bls-buff-tile-ribbon">{t('bazaar.active')}</span>}
-      <div className="bls-buff-tile-icon">{item.icon}</div>
+      <div className="bls-buff-tile-icon"><ShopIcon icon={item.icon} size={34} /></div>
       <div className="bls-buff-tile-headline">{headline}</div>
       <div className="bls-buff-tile-name">{cleanName}</div>
       <div className="bls-buff-tile-meta">
@@ -391,7 +408,7 @@ function CompactRow({ item, ownership, balance, onBuy, busy }) {
 
   return (
     <div className={`bls-item bls-item-${state}`}>
-      <div className="bls-item-icon">{item.icon}</div>
+      <div className="bls-item-icon"><ShopIcon icon={item.icon} size={32} /></div>
       <div className="bls-item-body">
         <div className="bls-item-name">
           {gt('shopItems', item.id, 'name', item.name)}
@@ -455,7 +472,7 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
             );
           })()
         ) : (
-          <span className="sbz-featured-preview-icon">{item.icon}</span>
+          <span className="sbz-featured-preview-icon"><ShopIcon icon={item.icon} size={48} /></span>
         )}
       </div>
 

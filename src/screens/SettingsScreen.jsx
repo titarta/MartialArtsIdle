@@ -129,25 +129,34 @@ function formatDuration(sec) {
 // stack-cap badge here, decoupled from shopItems.js copy (which is
 // shopper-facing). Ordering is purchase priority for now; if more perks
 // land we should split this into its own data file.
+// Perk icon: <img> for a /asset path, emoji string otherwise (mirrors ShopIcon).
+const PERK_ICON_BASE = import.meta.env.BASE_URL;
+function PerkIcon({ icon }) {
+  if (typeof icon === 'string' && icon.startsWith('/')) {
+    return <img src={`${PERK_ICON_BASE}${icon.replace(/^\//, '')}`} alt="" draggable="false" style={{ width: 26, height: 26, objectFit: 'contain', verticalAlign: 'middle' }} />;
+  }
+  return icon;
+}
+
 const PERK_ROWS = [
   {
     id:    'qol_skip_bt_confirm',
     kind:  'permanent',
-    icon:  '⚡',
+    icon:  '/ui/shop_decisive_heart.png',
     name:  'Decisive Heart',
     effect:'Auto-confirms major breakthroughs.',
   },
   {
     id:    'qol_autobuy_cheapest',
     kind:  'permanent',
-    icon:  '🤖',
+    icon:  '/ui/shop_disciples_diligence.png',
     name:  "Disciple's Diligence",
     effect:'Auto-Buy toggle on the Sect screen.',
   },
   {
     id:    'qol_offline_cap_2h',
     kind:  'stackable',
-    icon:  '⏳',
+    icon:  '/ui/shop_patient_mind.png',
     name:  'Patient Mind',
     // Effect string is templated with the live stack count so the row
     // reads as "+4h offline cap" when 2 are stacked, not just the static
@@ -183,7 +192,7 @@ function ActivePerks({ shopInventory, autoBuyEnabled }) {
       <div className="stg-perk-card">
         {owned.map(perk => (
           <div key={perk.id} className="stg-perk-row">
-            <span className="stg-perk-icon">{perk.icon}</span>
+            <span className="stg-perk-icon"><PerkIcon icon={perk.icon} /></span>
             <span className="stg-perk-body">
               <span className="stg-perk-name">{t(`settings.perks.${perk.id}.name`, { defaultValue: perk.name })}</span>
               <span className="stg-perk-effect">
