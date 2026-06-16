@@ -86,16 +86,49 @@ export const SHOP_ITEMS = [
     ownership: 'timed',
     effect: { type: 'crystal_tap_mult', mult: 2, durationMs: 30 * 60 * 1000 },
   },
-  // Producer Surge — pure idle buff, great for AFK / sleep cycles.
+  // Heavenly Resonance — the repurposed idle buff (was "Producer Surge",
+  // which collapsed onto Crimson Aura's qi/s axis). Channels Heavenly Qi
+  // CONTINUOUSLY with no ads: the same ×1.5 qi/s + heavenly bonuses (+ the
+  // halo VFX) as the rewarded-ad boost, riding the same adBoost path. Icon is
+  // the singing bowl (sustained resonance = continuous channeling); the war
+  // drum it freed up moved onto Crystal Resonance (the ×2 TAP buff).
+  //
+  // ACTIVE-ONLY by design: the pool (useShopInventory `resonanceMs`) drains
+  // ONLY while the app is foregrounded and PAUSES while backgrounded, so the
+  // player never loses paid time to a window where the boost wouldn't apply
+  // anyway (the ad boost is excluded from offline accrual — see
+  // useCultivation's offline formula). Buying more is CUMULATIVE: durations
+  // add to one shared pool. While the pool is live the Home "Heavenly Qi"
+  // tablet shows the remaining time and the ad petition is suppressed.
   {
-    id: 'buff_producer_surge_4h',
+    id: 'buff_heavenly_resonance_1h',
     category: 'buff',
-    name: 'Producer Surge — 4h',
-    desc: '×1.5 to every producer\'s base rate for 4 hours. Stacks multiplicatively with upgrades.',
-    icon: '/ui/shop_producer_surge.png',
-    cost: 80,
-    ownership: 'timed',
-    effect: { type: 'producer_mult', mult: 1.5, durationMs: 4 * 60 * 60 * 1000 },
+    name: 'Heavenly Resonance — 1h',
+    desc: 'Channels Heavenly Qi for 1h of active play — ×1.5 qi/s + heavenly bonuses, no ads. Drains only while you\'re playing; pauses when you close the app.',
+    icon: '/ui/shop_heavenly_resonance.png',
+    cost: 40,
+    ownership: 'resonance',
+    effect: { type: 'heavenly_resonance', durationMs: 60 * 60 * 1000 },
+  },
+  {
+    id: 'buff_heavenly_resonance_4h',
+    category: 'buff',
+    name: 'Heavenly Resonance — 4h',
+    desc: '4h of active-play Heavenly Qi — ×1.5 qi/s + heavenly bonuses, no ads. Cumulative: time stacks, and it only burns while the app is open.',
+    icon: '/ui/shop_heavenly_resonance.png',
+    cost: 130,
+    ownership: 'resonance',
+    effect: { type: 'heavenly_resonance', durationMs: 4 * 60 * 60 * 1000 },
+  },
+  {
+    id: 'buff_heavenly_resonance_12h',
+    category: 'buff',
+    name: 'Heavenly Resonance — 12h',
+    desc: '12h of active-play Heavenly Qi — ×1.5 qi/s + heavenly bonuses, no ads. The value pack; the pool pauses whenever you\'re away.',
+    icon: '/ui/shop_heavenly_resonance.png',
+    cost: 340,
+    ownership: 'resonance',
+    effect: { type: 'heavenly_resonance', durationMs: 12 * 60 * 60 * 1000 },
   },
 
   // ── Consumables ─────────────────────────────────────────────────────────
@@ -283,7 +316,7 @@ export const FEATURED_BY_WEEKDAY = [
   'cos_char_frost_ascetic',     // Sun  — cosmetic spotlight
   'buff_crimson_aura_4h',       // Mon
   'qol_skip_bt_confirm',        // Tue
-  'buff_producer_surge_4h',     // Wed
+  'buff_heavenly_resonance_4h', // Wed
   'consumable_major_bt_bypass', // Thu
   'buff_crimson_aura_12h',      // Fri
   'cos_crystal_phoenix',        // Sat  — cosmetic spotlight

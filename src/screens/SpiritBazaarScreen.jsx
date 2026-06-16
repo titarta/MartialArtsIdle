@@ -342,7 +342,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
     if (!e) return '';
     if (e.type === 'qi_mult')          return `×${e.mult} QI/S`;
     if (e.type === 'crystal_tap_mult') return `×${e.mult} TAP`;
-    if (e.type === 'producer_mult')    return `×${e.mult} RATE`;
+    if (e.type === 'heavenly_resonance') return '×1.5 QI/S';
     return '';
   })();
   const durationLabel = (() => {

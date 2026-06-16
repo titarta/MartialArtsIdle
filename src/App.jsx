@@ -495,11 +495,6 @@ function AppInner() {
     // legendary spark per-producer mult (pair synergies, count-based bonuses,
     // single-producer ×N, Phoenix Reborn). Both contribute multiplicatively.
     const ownedMap = producers.owned;
-    // Blood Lotus Shop — "Producer Surge" buff. Multiplies every
-    // producer's contribution uniformly. Folded into the perProducer
-    // callback so it stacks naturally with upgrade-driven and spark-
-    // driven per-producer multipliers (multiplicative chain).
-    const shopProducerMult = shopInventory.getActiveBuffMult('producer_mult');
     // Disciple Promotion grid (merge minigame) → +X% to p_disciple per-unit
     // qi/s. Folded into perProducer so it composes with upgrade doubling,
     // spark synergies, and shop buffs in the same multiplicative chain.
@@ -510,7 +505,6 @@ function AppInner() {
     const perProducer = (pid) =>
       upgrades.getProducerMult(pid)
         * qiSparks.getProducerSparkMult(pid, ownedMap)
-        * shopProducerMult
         * (pid === 'p_disciple' ? discipleMergeMult * (tree.modifiers.discipleOutputMult ?? 1) * (tree.modifiers.discipleBaseMult ?? 1) : 1);
     // 2026-05-21 Dial-9 — Sect Discipline (common timed spark) adds +N to
     // every producer's per-unit qi/s while active. Read from the spark ref
@@ -629,9 +623,8 @@ function AppInner() {
   // Re-runs whenever the shopInventory state changes (purchase, expiry).
   //   qi_mult         → cultivation.shopBuffQiMultRef
   //   crystal_tap_mult→ cultivation.shopBuffCrystalTapMultRef
-  // Producer surge is folded into the producer-rate effect above via
-  // shopInventory.getActiveBuffMult('producer_mult') in the perProducer
-  // callback — keeps producer composition in one place.
+  // (Heavenly Resonance rides adBoost via cultivation.resonanceActiveRef,
+  //  mirrored in its own effect above — not a getActiveBuffMult type.)
   useEffect(() => {
     if (cultivation.shopBuffQiMultRef) {
       cultivation.shopBuffQiMultRef.current = shopInventory.getActiveBuffMult('qi_mult');
@@ -640,6 +633,15 @@ function AppInner() {
       cultivation.shopBuffCrystalTapMultRef.current = shopInventory.getActiveBuffMult('crystal_tap_mult');
     }
   }, [shopInventory.inv, cultivation.shopBuffQiMultRef, cultivation.shopBuffCrystalTapMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Heavenly Resonance — mirror the shop's foreground-draining pool into the
+  // cultivation Heavenly Qi boost. While the resonance is live the cultivator
+  // gets the same ×1.5 + heavenly extras + halo as the rewarded-ad boost.
+  useEffect(() => {
+    if (cultivation.resonanceActiveRef) {
+      cultivation.resonanceActiveRef.current = !!shopInventory.resonanceActive;
+    }
+  }, [shopInventory.resonanceActive, cultivation.resonanceActiveRef]);
 
   // Mirror the Spirit Garden elixir buff into cultivation once per second. The
   // garden persists to localStorage independently of this component tree, so we
@@ -1551,7 +1553,7 @@ function AppInner() {
     // the v1 Cookie-Clicker pivot. The Rewards chip + idle assignment chip
     // are already null-guarded inside HomeScreen, so omitting the props lets
     // those branches fall through to render nothing.
-    home:   <HomeScreen cultivation={cultivation} selections={null} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} furnaceBuffs={furnace.activePillBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} />,
+    home:   <HomeScreen cultivation={cultivation} selections={null} onNavigate={navigate} crystal={crystal} isCrystalUnlocked={featureFlags.isUnlocked('qi_crystal')} openCrystal={screenParam?.openCrystal ?? false} activeSparks={qiSparks.activeSparks} activeBuffs={shopInventory.activeBuffs} furnaceBuffs={furnace.activePillBuffs} crystalReservoirRef={cultivation.crystalReservoirRef} crystalClickCapMinRef={cultivation.sparkCrystalClickCapMinRef} collectCrystalReservoir={cultivation.collectCrystalReservoir} bypassTokenCount={shopInventory.getConsumable('consumable_major_bt_bypass')} onUseBypassToken={() => { if (shopInventory.useConsumable('consumable_major_bt_bypass')) cultivation.bypassGate?.(); }} pendingSparkOffers={qiSparks.pendingOffersCount} sparkModalOpen={qiSparks.isOfferModalOpen} onReviewSparkQueue={qiSparks.openOfferModal} equippedParticle={shopInventory.inv?.equipped?.['particles'] ?? null} resonanceActive={shopInventory.resonanceActive} getResonanceRemainingMs={shopInventory.getResonanceRemainingMs} />,
     // The qi-investment shop — main loop of v1, always visible.
     cultivation: <CultivationScreen cultivation={cultivation} producers={producers} upgrades={upgrades} crystal={crystal} qiSparks={qiSparks} unlockedHiddenArts={tree.modifiers.unlockedHiddenArts} initialTab={typeof screenParam === 'string' ? screenParam : null} legendaryPoolInfo={legendaryPoolInfo} autoBuyOwned={shopInventory.hasQol('qol_autobuy_cheapest')} autoBuyEnabled={autoBuyEnabled} onToggleAutoBuy={toggleAutoBuy} treeMods={tree.modifiers} />,
     journey:    <JourneyScreen cultivation={cultivation} />,

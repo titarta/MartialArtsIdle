@@ -25,7 +25,7 @@
  *   activeBuffs        — array of currently-active buffs for UI surfaces
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SHOP_ITEMS_BY_ID } from '../data/shopItems';
 import { getBloodLotusBalance, spendBloodLotus } from '../systems/bloodLotus';
@@ -43,6 +43,7 @@ function emptyInventory() {
     buffs:       {},   // { [type]: { expiresAtMs, mult, itemId, vfx } } (one per type)
     cosmetics:   {},   // { [itemId]: true } — owned (purchased)
     equipped:    {},   // { [slotType]: itemId } — currently equipped per slot
+    resonanceMs: 0,    // Heavenly Resonance — cumulative active-time boost pool (ms)
   };
 }
 
@@ -70,7 +71,7 @@ function persist(inv) {
  * Normalise the timed-buff map to the TYPE-keyed model and drop expired ones.
  *
  * Model: `buffs[type] = { expiresAtMs, mult, itemId, vfx }` — ONE entry per
- * effect type (qi_mult, producer_mult, crystal_tap_mult). Every duration
+ * effect type (qi_mult, crystal_tap_mult). Every duration
  * product of the same buff shares that single entry: buying another EXTENDS
  * the timer (durations add up) and NEVER multiplies the effect.
  *
@@ -110,6 +111,84 @@ export default function useShopInventory() {
 
   // Persist on every change.
   useEffect(() => { persist(inv); }, [inv]);
+
+  // ── Heavenly Resonance — active-time boost pool ──────────────────────────
+  // Grants the Heavenly Qi boost (same ×1.5 + heavenly extras as a rewarded
+  // ad — App.jsx mirrors `resonanceActive` into cultivation) and is
+  // CUMULATIVE: each purchase adds to `inv.resonanceMs`. It is ACTIVE-ONLY by
+  // design — the pool drains solely while the document is visible
+  // (foreground) and PAUSES while backgrounded, so the player never loses
+  // paid time to a window where the boost wouldn't apply anyway (the ad boost
+  // is excluded from offline accrual). `resonanceRunningSinceRef` marks the
+  // start of the current foreground run; remaining = resonanceMs − (now −
+  // runningSince).
+  const resonanceRunningSinceRef = useRef(null);
+
+  // Live remaining resonance in ms: the frozen pool minus the current
+  // foreground run (0 when paused/empty). Polled for the countdown + active check.
+  const getResonanceRemainingMs = useCallback(() => {
+    const base = inv.resonanceMs ?? 0;
+    if (base <= 0) return 0;
+    const since = resonanceRunningSinceRef.current;
+    if (since == null) return base;
+    const live = base - (Date.now() - since);
+    return live > 0 ? live : 0;
+  }, [inv.resonanceMs]);
+
+  // Drain loop — runs only while a pool exists. Starts a foreground run when
+  // visible, pauses (settles spent time back into the pool) on hide /
+  // pagehide / unmount, and zeroes the pool on depletion so consumers see the
+  // boost switch off.
+  useEffect(() => {
+    if ((inv.resonanceMs ?? 0) <= 0) {
+      resonanceRunningSinceRef.current = null;
+      return undefined;
+    }
+
+    const settle = () => {
+      const since = resonanceRunningSinceRef.current;
+      if (since == null) return;
+      resonanceRunningSinceRef.current = null;
+      const spent = Date.now() - since;
+      if (spent <= 0) return;
+      setInv(prev => {
+        const cur = prev.resonanceMs ?? 0;
+        const next = Math.max(0, cur - spent);
+        return next === cur ? prev : { ...prev, resonanceMs: next };
+      });
+    };
+
+    const startIfVisible = () => {
+      if (document.visibilityState === 'visible' && resonanceRunningSinceRef.current == null) {
+        resonanceRunningSinceRef.current = Date.now();
+      }
+    };
+
+    startIfVisible();
+
+    const id = setInterval(() => {
+      const since = resonanceRunningSinceRef.current;
+      if (since == null) return;
+      if (Date.now() - since >= (inv.resonanceMs ?? 0)) {
+        resonanceRunningSinceRef.current = null;
+        setInv(prev => (prev.resonanceMs ? { ...prev, resonanceMs: 0 } : prev));
+      }
+    }, 1000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') startIfVisible();
+      else settle();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', settle);
+
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', settle);
+      settle();
+    };
+  }, [inv.resonanceMs]);
 
   // Tick once per second to expire timed buffs. Only re-renders when
   // a buff actually expires (cheap — keeps App.jsx render cost flat).
@@ -198,6 +277,11 @@ export default function useShopInventory() {
             vfx:         item.effect.vfx ?? null,
           },
         };
+      } else if (item.ownership === 'resonance') {
+        // Heavenly Resonance — cumulative active-time pool. Add the purchased
+        // duration; the drain effect spends it foreground-only. The boost
+        // itself rides the existing Heavenly Qi (ad) multiplier.
+        next.resonanceMs = Math.max(0, next.resonanceMs ?? 0) + (item.effect?.durationMs ?? 0);
       } else if (item.ownership === 'cosmetic') {
         // Cosmetics are permanent-owned. Bazaar v2 (2026-05-27) removed
         // the auto-equip-on-purchase behaviour: the player goes to
@@ -324,10 +408,17 @@ export default function useShopInventory() {
     .filter(Boolean)
     .sort((a, b) => a.expiresAtMs - b.expiresAtMs);
 
+  // True while the Heavenly Resonance pool is draining (foreground only).
+  // Snapshot per render; App.jsx mirrors it into cultivation's Heavenly Qi boost.
+  const resonanceActive = getResonanceRemainingMs() > 0;
+
   return {
     inv,
     purchase,
     useConsumable,
+    // Heavenly Resonance — active-time Heavenly Qi pool
+    resonanceActive,
+    getResonanceRemainingMs,
     hasQol,
     getStack,
     getConsumable,

@@ -466,6 +466,11 @@ export default function useCultivation() {
   const adBoostRef  = useRef(
     (saved?.adBoostEndsAt ?? 0) > Date.now() ? AD_BOOST_MULT : 1
   );
+  // Heavenly Resonance (Blood Lotus Shop) — mirrored from useShopInventory by
+  // App.jsx. True while the purchased active-time pool is draining (foreground
+  // only). Folded into the SAME Heavenly Qi boost as the rewarded ad, so it
+  // grants AD_BOOST_MULT and unlocks the heavenly extras + halo VFX.
+  const resonanceActiveRef = useRef(false);
   const lastTickRef = useRef(performance.now());
 
   // Mutable refs — updated every tick, no React re-render needed
@@ -652,11 +657,16 @@ export default function useCultivation() {
       } else {
         boostMult = 1;
       }
-      // Heavenly QI extras — only apply while the ad boost is live. Two
+      // Heavenly Qi boost — active when EITHER the rewarded-ad boost is live
+      // OR a purchased Heavenly Resonance pool is draining (foreground only). Both
+      // sources grant AD_BOOST_MULT and unlock the heavenly extras below.
+      const adBoostMult  = Math.max(adBoostRef.current, resonanceActiveRef.current ? AD_BOOST_MULT : 1);
+      const heavenlyLive = adBoostMult > 1;
+      // Heavenly QI extras — only apply while the boost is live. Two
       // independent multiplicative sources: the reincarnation tree node
       // and the artefact heavenly_qi_mult stat.
-      const heavenlyTree = adBoostRef.current > 1 ? treeHeavenlyMultRef.current : 1;
-      const heavenlyArt  = adBoostRef.current > 1 ? (1 + heavenlyQiMultRef.current) : 1;
+      const heavenlyTree = heavenlyLive ? treeHeavenlyMultRef.current : 1;
+      const heavenlyArt  = heavenlyLive ? (1 + heavenlyQiMultRef.current) : 1;
       // Producer flat scales by upgrade-doubling and Eternal-Tree producer-output
       // multipliers BEFORE folding into the base sum so it composes correctly
       // with the law/boost/tree-cult-speed multipliers downstream.
@@ -671,7 +681,7 @@ export default function useCultivation() {
         (BASE_RATE + sparkQiFlatRef.current + producerFlat) *
         crystalQiBonusRef.current * lawMult * qiUniqueMult *
         artefactQiMultRef.current *
-        adBoostRef.current * heavenlyTree * heavenlyArt *
+        adBoostMult * heavenlyTree * heavenlyArt *
         pillQiMultRef.current * sparkQiMultRef.current *
         treeQiMultRef.current * rebirthCultBuffRef.current *
         sparkLegendaryGlobalMultRef.current *
@@ -1374,6 +1384,8 @@ export default function useCultivation() {
     activateAdBoost,
     adBoostActive:  adBoostEndsAt > Date.now(),
     adBoostEndsAt,
+    // Heavenly Resonance — written by App.jsx from useShopInventory.resonanceActive
+    resonanceActiveRef,
     // Offline earnings
     offlineEarnings,
     offlineAwayMs,

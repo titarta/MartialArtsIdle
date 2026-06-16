@@ -127,10 +127,16 @@ export function useRewardedAd(onReward, cooldownMs = 30 * 60 * 1000, storageKey 
   };
 }
 
-/** Format ms as "MM:SS" for cooldown display */
+/** Format ms as "M:SS" (under an hour) or "H:MM:SS" (an hour or more). The
+ *  hours branch supports the Heavenly Resonance pool, which is measured in hours;
+ *  sub-hour values (ad cooldown / ad-boost remaining) keep the old "M:SS". */
 export function formatCooldown(ms) {
-  const totalSec = Math.ceil(ms / 1000);
-  const m = Math.floor(totalSec / 60);
+  const totalSec = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  }
   return `${m}:${s.toString().padStart(2, '0')}`;
 }

@@ -2381,6 +2381,10 @@ function HomeScreen({
   // Same chip, third source. Shape: { pillId, name, kind, magnitude,
   // expiresAt, durationMs }.
   furnaceBuffs,
+  // Heavenly Resonance (shop) — active-time Heavenly Qi pool. `resonanceActive` gates
+  // the boost UI; `getResonanceRemainingMs()` is polled for the live countdown.
+  resonanceActive = false,
+  getResonanceRemainingMs,
   crystalReservoirRef,
   crystalClickCapMinRef,
   collectCrystalReservoir,
@@ -2948,9 +2952,23 @@ function HomeScreen({
   };
   const handlePointerUp = () => { stopBoost(); };
 
-  // ── Ad boost countdown ───────────────────────────────────────────────────
-  const adBoostRemaining = adBoostActive
-    ? formatCooldown(adBoostEndsAt - Date.now())
+  // ── Heavenly Qi / Heavenly Resonance boost state ──────────────────────────────
+  // The Heavenly Resonance (paid, foreground-draining pool) rides the same boost
+  // as the rewarded ad. Treat either source as "boost active" so the ×1.5
+  // badge, halo, stage glow and petition tablet all light up, and show
+  // whichever has the longer remaining time on the plaque.
+  // A 1s tick keeps the countdown live while either source is running.
+  const [, setBoostTick] = useState(0);
+  useEffect(() => {
+    if (!adBoostActive && !resonanceActive) return undefined;
+    const id = setInterval(() => setBoostTick(n => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [adBoostActive, resonanceActive]);
+
+  const resonanceRemainingMs = resonanceActive ? (getResonanceRemainingMs?.() ?? 0) : 0;
+  const boostActive      = adBoostActive || resonanceActive;
+  const adBoostRemaining = boostActive
+    ? formatCooldown(Math.max(resonanceRemainingMs, adBoostActive ? (adBoostEndsAt - Date.now()) : 0))
     : null;
 
   // Cultivator: static 256×256 PNG per (tier, pose). Tier from realmIndex,
@@ -3008,7 +3026,7 @@ function HomeScreen({
           rateRef={rateRef}
           gateRef={gateRef}
           boosting={boosting}
-          adBoostActive={adBoostActive}
+          adBoostActive={boostActive}
           maxed={maxed}
           ascended={ascended}
         />
@@ -3073,7 +3091,7 @@ function HomeScreen({
           <div className="home-chips-tr">
             <HeavenlyQiButton
               ad={cultivationAd}
-              adBoostActive={adBoostActive}
+              adBoostActive={boostActive}
               adBoostRemaining={adBoostRemaining}
               maxed={maxed}
             />
@@ -3150,7 +3168,7 @@ function HomeScreen({
               )}
             </div>
             <div
-              className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${adBoostActive ? ' stage-ad-boosted' : ''}${currentEvent?.kind === 'character-evolution' ? ' home-fighter-stage-lifted' : ''}`}
+              className={`fighter-stage home-fighter-stage${boosting ? ' stage-boosted' : ''}${boostActive ? ' stage-ad-boosted' : ''}${currentEvent?.kind === 'character-evolution' ? ' home-fighter-stage-lifted' : ''}`}
               style={{ width: `${128 * spriteScale}px`, height: `${128 * spriteScale}px` }}
               onPointerDown={handlePointerDown}
               onPointerUp={handlePointerUp}
@@ -3180,7 +3198,7 @@ function HomeScreen({
                   lets the character show through. Both animations pause when the
                   player disables VFX or requests reduced motion (CSS), and the
                   image inherits the global Settings → Rendering toggle. */}
-              {adBoostActive && (
+              {boostActive && (
                 <div className="home-cultivator-halo" aria-hidden="true">
                   <img
                     src={haloSrc}
@@ -3251,7 +3269,7 @@ function HomeScreen({
                 sparkFocusMultBonusRef={sparkFocusMultBonusRef}
                 sparkConsecutiveCurrentBonusRef={sparkConsecutiveCurrentBonusRef}
                 boosting={boosting}
-                adBoostActive={adBoostActive}
+                adBoostActive={boostActive}
                 maxed={maxed}
               />
             </div>
