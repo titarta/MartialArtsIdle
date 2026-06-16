@@ -86,7 +86,7 @@ export const SHOP_ITEMS = [
     ownership: 'timed',
     effect: { type: 'crystal_tap_mult', mult: 2, durationMs: 30 * 60 * 1000 },
   },
-  // Heavenly Resonance — the repurposed idle buff (was "Producer Surge",
+  // Heavenly Resonance, the repurposed idle buff (was "Producer Surge",
   // which collapsed onto Crimson Aura's qi/s axis). Channels Heavenly Qi
   // CONTINUOUSLY with no ads: the same ×1.5 qi/s + heavenly bonuses (+ the
   // halo VFX) as the rewarded-ad boost, riding the same adBoost path. Icon is
@@ -96,15 +96,15 @@ export const SHOP_ITEMS = [
   // ACTIVE-ONLY by design: the pool (useShopInventory `resonanceMs`) drains
   // ONLY while the app is foregrounded and PAUSES while backgrounded, so the
   // player never loses paid time to a window where the boost wouldn't apply
-  // anyway (the ad boost is excluded from offline accrual — see
+  // anyway (the ad boost is excluded from offline accrual; see
   // useCultivation's offline formula). Buying more is CUMULATIVE: durations
   // add to one shared pool. While the pool is live the Home "Heavenly Qi"
   // tablet shows the remaining time and the ad petition is suppressed.
   {
     id: 'buff_heavenly_resonance_1h',
     category: 'buff',
-    name: 'Heavenly Resonance — 1h',
-    desc: 'Channels Heavenly Qi for 1h of active play — ×1.5 qi/s + heavenly bonuses, no ads. Drains only while you\'re playing; pauses when you close the app.',
+    name: 'Heavenly Resonance - 1h',
+    desc: 'Channels Heavenly Qi for 1h of active play. ×1.5 qi/s + heavenly bonuses, no ads. Drains only while you\'re playing; pauses when you close the app.',
     icon: '/ui/shop_heavenly_resonance.png',
     cost: 40,
     ownership: 'resonance',
@@ -113,8 +113,8 @@ export const SHOP_ITEMS = [
   {
     id: 'buff_heavenly_resonance_4h',
     category: 'buff',
-    name: 'Heavenly Resonance — 4h',
-    desc: '4h of active-play Heavenly Qi — ×1.5 qi/s + heavenly bonuses, no ads. Cumulative: time stacks, and it only burns while the app is open.',
+    name: 'Heavenly Resonance - 4h',
+    desc: '4h of active-play Heavenly Qi. ×1.5 qi/s + heavenly bonuses, no ads. Cumulative: time stacks, and it only burns while the app is open.',
     icon: '/ui/shop_heavenly_resonance.png',
     cost: 130,
     ownership: 'resonance',
@@ -123,8 +123,8 @@ export const SHOP_ITEMS = [
   {
     id: 'buff_heavenly_resonance_12h',
     category: 'buff',
-    name: 'Heavenly Resonance — 12h',
-    desc: '12h of active-play Heavenly Qi — ×1.5 qi/s + heavenly bonuses, no ads. The value pack; the pool pauses whenever you\'re away.',
+    name: 'Heavenly Resonance - 12h',
+    desc: '12h of active-play Heavenly Qi. ×1.5 qi/s + heavenly bonuses, no ads. The value pack; the pool pauses whenever you\'re away.',
     icon: '/ui/shop_heavenly_resonance.png',
     cost: 340,
     ownership: 'resonance',

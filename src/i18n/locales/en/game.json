@@ -1051,9 +1051,17 @@
       "desc": "×2 qi granted per crystal tap, 30 min. Stack with Refined Tap upgrades for huge taps.",
       "name": "Crystal Resonance — 30m"
     },
-    "buff_producer_surge_4h": {
-      "desc": "×1.5 to every producer's base rate for 4 hours. Stacks multiplicatively with upgrades.",
-      "name": "Producer Surge — 4h"
+    "buff_heavenly_resonance_12h": {
+      "desc": "12h of active-play Heavenly Qi. ×1.5 qi/s + heavenly bonuses, no ads. The value pack; the pool pauses whenever you're away.",
+      "name": "Heavenly Resonance - 12h"
+    },
+    "buff_heavenly_resonance_1h": {
+      "desc": "Channels Heavenly Qi for 1h of active play. ×1.5 qi/s + heavenly bonuses, no ads. Drains only while you're playing; pauses when you close the app.",
+      "name": "Heavenly Resonance - 1h"
+    },
+    "buff_heavenly_resonance_4h": {
+      "desc": "4h of active-play Heavenly Qi. ×1.5 qi/s + heavenly bonuses, no ads. Cumulative: time stacks, and it only burns while the app is open.",
+      "name": "Heavenly Resonance - 4h"
     },
     "consumable_major_bt_bypass": {
       "desc": "Skip the qi/s gate on your next major breakthrough. You still pay the qi cost — but no need to push your rate first.",
