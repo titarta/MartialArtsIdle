@@ -391,7 +391,12 @@ function SettingsScreen({
                   }}
                   aria-label={muted ? t('settings.unmute', { label }) : t('settings.mute', { label })}
                 >
-                  {muted ? '🔇' : '🔊'}
+                  <img
+                    src={`${BASE}ui/${muted ? 'sound_off' : 'sound_on'}.png`}
+                    alt=""
+                    draggable="false"
+                    style={{ width: 22, height: 22, objectFit: 'contain', verticalAlign: 'middle' }}
+                  />
                 </button>
               </div>
             );

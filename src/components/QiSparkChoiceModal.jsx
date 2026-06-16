@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useGameText } from '../i18n/gameText';
 import { QI_SPARK_BY_ID, SPARK_RARITY, SPARK_COPY } from '../data/qiSparks';
+import LockIcon from './LockIcon';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -238,7 +239,7 @@ function QiSparkChoiceModal({
     if (eligible === 0 && next) {
       return (
         <div className="spk-meta spk-meta-locked">
-          <span>🔒 {t('sparkChoice.legendaryUnlockHint', { producer: next.producerName })}</span>
+          <span><LockIcon size={13} style={{ marginRight: 4 }} />{t('sparkChoice.legendaryUnlockHint', { producer: next.producerName })}</span>
         </div>
       );
     }

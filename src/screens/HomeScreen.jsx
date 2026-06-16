@@ -7,6 +7,7 @@ import CrystalDetailModal from '../components/CrystalDetailModal';
 import OfflineEarningsModal from '../components/OfflineEarningsModal';
 import ActiveBuffsChip from '../components/ActiveBuffsChip';
 import CrimsonOrbitLayer from '../components/CrimsonOrbitLayer';
+import LockIcon from '../components/LockIcon';
 import { useVFX } from '../components/VFXLayer';
 import { useRewardedAd, formatCooldown } from '../rewards/useRewardedAd';
 import { fmt as fmtNum, fmtRate as fmtRateNum, fmtDelta } from '../utils/format';
@@ -1228,7 +1229,7 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
           <span className="home-crystal-tag home-crystal-tag-btn home-crystal-tag-locked">
             {t('home.crystalTag')}
             <span className="home-crystal-tag-divider">·</span>
-            <span className="home-crystal-tag-level" role="img" aria-label={t('common.locked')}>🔒</span>
+            <span className="home-crystal-tag-level" role="img" aria-label={t('common.locked')}><LockIcon size={13} /></span>
           </span>
           <div className="home-crystal-img-wrap">
             <img

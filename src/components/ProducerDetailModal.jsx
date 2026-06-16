@@ -4,6 +4,7 @@ import { fmt, fmtRate } from '../utils/format';
 import DetailModal from './DetailModal';
 import { getSpriteTier, SPRITE_TIERS, resolveSprite, resolveTierFor } from '../data/producers';
 import { getMinigame } from '../data/minigames';
+import LockIcon from './LockIcon';
 import './minigames/minigames.css';
 
 const BASE = import.meta.env.BASE_URL;
@@ -118,7 +119,7 @@ export default function ProducerDetailModal({
 
         {!unlocked ? (
           <div className="pdm-locked">
-            <div className="pdm-locked-icon">🔒</div>
+            <div className="pdm-locked-icon"><LockIcon size={36} /></div>
             <div className="pdm-locked-text">
               {t('producerDetail.unlocksAt', { n: producer.unlock?.minRealmIndex ?? '?' })}
             </div>

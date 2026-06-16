@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NODES, NODE_DESCRIPTIONS, TREE_TOTAL_COST, PEAK_INDEX, SAINT_UNLOCK_INDEX } from '../data/reincarnationTree';
+import LockIcon from '../components/LockIcon';
 
 /**
  * Reincarnation tab — displays karma, the passive tree, and the
@@ -107,7 +108,7 @@ function ReincarnationScreen({ karma, tree, lives, highestReached, peakKarmaTota
                     disabled={!affordable && !purchased}
                   >
                     <span className="reinc-node-label">
-                      {state === 'locked-prereq' ? '🔒 ' : ''}{node.label}
+                      {state === 'locked-prereq' ? <LockIcon size={12} style={{ marginRight: 4 }} /> : null}{node.label}
                     </span>
                     <span className="reinc-node-cost">
                       {purchased ? t('reincarnation.nodeOwned') : t('reincarnation.karmaUnit', { n: node.cost })}

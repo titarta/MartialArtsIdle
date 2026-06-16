@@ -1,3 +1,5 @@
+import LockIcon from './LockIcon';
+
 /**
  * LockTooltip — hover tooltip card for locked UI elements.
  * Parent must have `position: relative` and no `pointer-events: none`.
@@ -11,7 +13,7 @@ function LockTooltip({ desc, hint, position = 'above' }) {
       {desc && <div className="ltip-desc">{desc}</div>}
       {hint && (
         <div className="ltip-hint">
-          <span className="ltip-lock" aria-hidden="true">🔒</span>
+          <LockIcon className="ltip-lock" size={13} />
           {hint}
         </div>
       )}

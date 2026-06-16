@@ -1044,6 +1044,69 @@ ELEMENTS = {
         ),
     },
 
+    # Functional UI icons (lock + sound on/off). Batch grid: 3 distinct icons,
+    # one per candidate slot. Tiny display (14-26px) → bold simple silhouettes.
+    "ui_func_grid": {
+        "size": (64, 64),
+        "no_style_ref": True,
+        "desc": (
+            "THREE separate ornate xianxia UI icons, one bold icon per image, on a fully "
+            "transparent background — NO frame, NO grid lines, NO text. Tiny interface icons: "
+            "each must be a BOLD, high-contrast, instantly-readable silhouette, alive and "
+            "richly coloured, NOT flat or plain. "
+            "ICON 1 (LOCK): an ornate CHINESE-style PADLOCK — clear padlock silhouette "
+            "(rounded shackle + body) in aged bronze-gold with a JADE-GREEN front panel, a "
+            "small gold keyhole, and a soft warm glow. Reads instantly as 'locked'. "
+            "ICON 2 (SOUND ON): a small ornate bronze BELL (铃) ringing, a tiny RED-GOLD tassel "
+            "hanging from it, 2-3 bright CYAN qi sound-curls and a soft glow. "
+            "ICON 3 (SOUND OFF): the same ornate bronze bell, dimmed grey-bronze, silent, with "
+            "one bold diagonal SLASH across it and NO sound-curls (muted). "
+            "Each icon: rich bronze-gold + jade + cyan, thick charcoal outline, flat colour "
+            "bands with strong light-to-dark depth, alive, 16-bit pixel art, clean — bold "
+            "shapes only, no fine clutter that turns to noise at small size."
+        ),
+    },
+
+    # ── Audio-OFF bell — muted twin of the finalized sound_on.png ────────────
+    # Styles off the chosen audio-on bell so the muted version matches its
+    # silhouette (same bell, silenced + slashed). 64px → 16 candidates.
+    "ui_bell_off": {
+        "size": (64, 64),
+        "style_ref": "public/ui/sound_on.png",
+        "desc": (
+            "ONE bold xianxia UI icon on a fully transparent background — NO frame, NO text, "
+            "NO grid lines. It is the EXACT SAME ornate bronze hand-bell as the reference image, "
+            "but now SILENT and MUTED. Keep the identical bell silhouette: a small top loop handle, "
+            "a rounded body that flares to a wide rim, and a tiny clapper at the open mouth. "
+            "CHANGES from the reference: the bronze is DIMMED to a desaturated grey-bronze (drained, "
+            "lifeless); there are absolutely NO cyan sound-curls, ring-lines, or qi wisps anywhere "
+            "around it (total silence, empty air); and ONE bold dark diagonal SLASH cuts across the "
+            "whole bell from upper-left to lower-right — the universal mute mark. "
+            "Bold, high-contrast, instantly readable at tiny UI size. Thick charcoal outline, flat "
+            "colour bands with clear light-to-dark depth, clean 16-bit pixel art, no fine clutter."
+        ),
+    },
+
+    # ── Locked padlock bound in chains — styled off crystal_locked.png ───────
+    # Secondary attempt: a simpler, more thematic lock matching the locked-
+    # crystal's chains motif. 64px → 16 candidates.
+    "ui_lock_chained": {
+        "size": (64, 64),
+        "style_ref": "public/crystals/crystal_locked.png",
+        "desc": (
+            "ONE bold xianxia UI icon on a fully transparent background — NO frame, NO text, "
+            "NO grid lines. A single ornate PADLOCK bound in crisscrossing IRON CHAINS, reading "
+            "instantly as 'locked / sealed'. The padlock: an aged bronze-gold body with a rounded "
+            "shackle on top and a small jade-green keyhole panel centred on its face. Dark weathered "
+            "iron chain links cross diagonally OVER the padlock body in an X, with one or two loose "
+            "links dangling below — exactly the sealed-in-chains look of the reference locked crystal. "
+            "Simple and thematic: the chains are the main motif, the lock sits clear and central. "
+            "Bold, high-contrast, instantly readable at tiny UI size. Thick charcoal outline, flat "
+            "colour bands with clear light-to-dark depth, aged bronze + iron-grey + a touch of jade, "
+            "clean 16-bit pixel art, no fine clutter that turns to noise at small size."
+        ),
+    },
+
     # ── Cultivator halo — rotates behind the character sprite ────────────────
     # 256×256 RGBA. Only the ring band (r≈70..128 px from centre) is opaque;
     # centre and exterior are transparent so it composites cleanly behind any
@@ -1335,7 +1398,16 @@ def run_generate(element_id, ref_path=None):
     api_path = cfg.get("api_path", "/generate-image-v2")
 
     if ref_path is None:
-        ref_path = _style_ref_for(element_id)
+        # Explicit per-element style reference (project-root-relative path).
+        # Used to style off an asset outside public/ui (e.g. the locked-crystal
+        # chains motif) or to echo a finalized sibling icon (e.g. the audio-on
+        # bell, so the audio-off variant matches its silhouette).
+        sr = cfg.get("style_ref")
+        if sr:
+            cand = Path(__file__).parent.parent / sr
+            ref_path = cand if cand.exists() else None
+        else:
+            ref_path = _style_ref_for(element_id)
     # An element can opt out of the auto style reference (e.g. a warm-coloured
     # spark that the cool Surging Stream anchor would mute).
     if cfg.get("no_style_ref"):
@@ -1369,7 +1441,7 @@ def run_generate(element_id, ref_path=None):
     if status != 202:
         raise RuntimeError(f"generate-image-v2 returned {status}: {r}")
 
-    result = poll_job(r["background_job_id"])
+    result = poll_job(r["background_job_id"], max_wait=1200)
     images = result.get("last_response", {}).get("images", [])
     if not images:
         raise RuntimeError("No images returned")
