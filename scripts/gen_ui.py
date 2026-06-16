@@ -103,6 +103,20 @@ S = (
     "No western UI chrome, no flat gradients, no modern design language."
 )
 
+# Spark-specific suffix. Sparks are NOT framed medallions like the upgrades —
+# they are free-floating bursts of living qi, the same family as the qi/divine/
+# karma pearl currency icons. This suffix keeps the xianxia pixel treatment but
+# drops the "ornate jade/bronze frame" push so sparks stay frameless + unique.
+SPARK_S = (
+    "Xianxia cultivation fantasy pixel art game icon, in the style of a vibrant, "
+    "detailed qi-spirit. 16-bit pixel art, clean linework, thick charcoal outline, "
+    "flat colour fills in clean bands, no gradients. Fully transparent background. "
+    "A single standalone subject — NO frame, NO badge, NO ring, NO border, NO disc. "
+    "RICHLY COLOURED with several tones (never flat or monochrome), ALIVE with "
+    "glowing qi energy and a soft luminous aura, detailed yet CLEAN with no noise "
+    "or stray pixels. Bold high-contrast silhouette readable at small size."
+)
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Element definitions
 # ─────────────────────────────────────────────────────────────────────────────
@@ -630,6 +644,329 @@ ELEMENTS = {
         ),
     },
 
+    # ── Qi Spark card icons (128×128, sit in the spark picker / buffs chip) ───
+    # Common/uncommon sparks. NOT framed medallions like the upgrades — each is
+    # a free-floating burst of living qi (qi/divine/karma pearl family). The
+    # motif SHAPE carries each spark's identity; a thematic colour tint (within
+    # the game's cyan/teal/jade/bronze-gold range) keeps the set collectible
+    # while staying distinct from the framed upgrade icons.
+
+    "spark_quick_burst": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK for a xianxia cultivation game — Quick Burst, "
+            "an instant explosive burst of qi. Standalone glowing energy form, centred, "
+            "filling the middle 75-85% of the image. NO frame, NO ring, NO badge, NO disc "
+            "behind it — just the qi burst itself on a fully transparent background. "
+            ""
+            "FORM: a sudden explosive starburst of living qi. A small intensely bright "
+            "white-cyan core (~12 px) at the centre, from which sharp angular qi bolts blast "
+            "outward — eight long thin triangular spikes (N/NE/E/SE/S/SW/W/NW) and eight "
+            "shorter secondary bolts between them, for a 16-point flash. The bolts are bright "
+            "cyan near the core fading to deeper teal at the tips. A single faint expanding "
+            "shockwave ring of cyan sits partway out. A soft 1-2 px cyan halo bleeds off the "
+            "bolts so the whole form reads as luminous and radiant, captured at the instant "
+            "of release. "
+            ""
+            "Treatment: thick charcoal outline (#111) around the bolts and core, flat colour "
+            "fills, no gradients — build the glow with 3-4 colour bands (white-cyan core / "
+            "bright cyan / mid teal / faint halo). Bold high-contrast silhouette. "
+            ""
+            "Palette: white-cyan core (#e8ffff), bright pale cyan (#7adcc4), mid teal "
+            "(#2f9c86), deep teal shadow (#15564a), faint cyan halo at low alpha, charcoal "
+            "outline (#111). NO jade-green ring, NO bronze frame, NO badge, no red, no purple. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_surging_stream": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK for a xianxia cultivation game — Surging Stream, "
+            "a sudden surge of flowing qi. Standalone glowing energy form, centred, filling "
+            "the middle 75-85% of the image. NO frame, NO ring, NO badge, NO disc behind it "
+            "— just the qi wave itself on a fully transparent background. "
+            ""
+            "FORM: a single large stylised CRESTING WAVE of living qi, like a Great-Wave "
+            "swell curling over to the right. A bold spiral crest at the top that breaks "
+            "into 3-4 chunky rounded foam-curls, with a few bright qi droplets flung off the "
+            "tip. The wave body sweeps up from the lower-left in a strong S-curve. The whole "
+            "wave glows — bright white-cyan along the breaking crest and foam, deepening to "
+            "rich blue in the trough. A soft 1-2 px cyan halo bleeds off the crest so it "
+            "reads as luminous water-qi, surging and energetic. "
+            ""
+            "Treatment: thick charcoal outline (#111) around the wave and foam-curls, flat "
+            "colour fills, no gradients — build the volume with 3-4 colour bands (white-cyan "
+            "foam / bright cyan / mid blue / deep blue trough). Bold high-contrast silhouette "
+            "that reads clearly as a cresting wave when shrunk small. "
+            ""
+            "Palette: white-cyan foam (#e8ffff), bright cyan (#7adcc4), mid azure (#3a8fc8), "
+            "deep blue trough (#1a3a70), faint cyan halo at low alpha, charcoal outline "
+            "(#111). NO jade-green ring, NO bronze frame, NO badge, no red, no purple, no gold. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_steady_stream": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK for a xianxia cultivation game — Steady Stream, "
+            "a calm steady flow of qi. Standalone glowing energy form, centred, filling the "
+            "middle 70-80% of the image. NO frame, NO ring, NO badge, NO disc behind it — "
+            "just the qi droplet itself on a fully transparent background. "
+            ""
+            "FORM: a single large pristine glowing QI WATER-DROPLET (teardrop), upright, "
+            "centred — rounded fat bottom tapering to a fine point at the top, like a "
+            "falling drop. A small bright white-cyan specular highlight near the top-left of "
+            "the droplet sells the glassy water surface. Directly below the droplet, two "
+            "concentric thin cyan RIPPLE rings (as if it is about to land on still water) "
+            "and one tiny secondary droplet mid-fall beside it. The droplet glows softly "
+            "with a 1-2 px cyan halo. The mood is calm, steady, unhurried — not splashing. "
+            ""
+            "Treatment: thick charcoal outline (#111) around the droplet and ripples, flat "
+            "colour fills, no gradients — build the volume with 3-4 colour bands (white-cyan "
+            "highlight / bright cyan / mid azure / deep blue base). Bold high-contrast "
+            "silhouette that reads clearly as a water droplet when shrunk small. "
+            ""
+            "Palette: white-cyan highlight (#e8ffff), bright cyan (#7adcc4), mid azure "
+            "(#3a8fc8), deep blue (#1a3a70), faint cyan halo at low alpha, charcoal outline "
+            "(#111). NO jade-green ring, NO bronze frame, NO badge, no red, no purple, no gold. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_sect_discipline": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK for a xianxia cultivation game — Sect Discipline, "
+            "the unified martial order of ten thousand disciples. Standalone glowing energy "
+            "form, centred, filling the middle 80-90% of the image vertically. NO frame, NO "
+            "ring, NO badge, NO disc behind it — just the spirit-sword itself on a fully "
+            "transparent background. "
+            ""
+            "FORM: a single upright SPIRIT-SWORD (Chinese jian) made of pure qi, blade "
+            "pointing straight UP, perfectly vertical and centred. The blade is long, slender "
+            "and double-edged, glowing white-hot along its central spine and bright cyan along "
+            "its sharp edges, tapering to a clean point at the top. At the base sits a compact "
+            "cross-guard of two short bronze-gold bars and a small round cyan qi pommel-gem "
+            "below it. Thin qi wisps trail upward off the blade edges. The whole sword reads "
+            "as disciplined, sharp, and ceremonial. "
+            ""
+            "Treatment: thick charcoal outline (#111), flat colour fills, no gradients — build "
+            "the blade glow with 3-4 colour bands (white-cyan spine / bright cyan / mid teal "
+            "edge / charcoal). Perfectly symmetrical left-right. Bold vertical silhouette that "
+            "reads clearly as an upright sword when shrunk small. "
+            ""
+            "Palette: white-cyan blade spine (#e8ffff), bright cyan (#7adcc4), mid teal "
+            "(#2f9c86), bronze-gold cross-guard + pommel (#c08a3a), charcoal outline (#111). "
+            "NO jade-green ring, NO bronze frame, NO badge, no red, no purple. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_steady_cultivation": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK for a xianxia cultivation game — Steady "
+            "Cultivation, slow patient permanent growth of qi. Standalone glowing energy "
+            "form, centred, filling the middle 70-80% of the image. NO frame, NO ring, NO "
+            "badge, NO disc behind it — just the qi sprout itself on a fully transparent "
+            "background. "
+            ""
+            "FORM: a single bold, simple young QI SPROUT. Keep it CHUNKY and CLEAN — a thick "
+            "short straight stem and exactly TWO large broad rounded leaves (one to the left, "
+            "one to the right, mirrored and symmetrical), plus one single closed teardrop bud "
+            "at the very top. Big simple solid shapes only. Do NOT add extra leaves, veins, "
+            "tendrils, grass blades, floating motes, sparkles, or fine detail — those make it "
+            "noisy. The leaves are smooth solid rounded blobs with a clean 2px charcoal "
+            "outline and a single pale highlight stripe each. The sprout glows softly with a "
+            "1-2 px green halo. Calm, fresh, simple. "
+            ""
+            "Treatment: thick clean 2px charcoal outline (#111), flat solid colour fills, NO "
+            "gradients, NO dithering, NO single scattered stray pixels, NO noise — smooth "
+            "clean pixel shapes. Use only 3 green tones plus the highlight. Bold high-contrast "
+            "silhouette that reads instantly as a sprout when shrunk small. "
+            ""
+            "Palette: pale mint highlight (#d8ffe8), bright jade-green (#5ad88a), mid emerald "
+            "(#2f9c5a), deep green shadow (#155a34), faint green halo at low alpha, charcoal "
+            "outline (#111). NO jade-green RING, NO bronze frame, NO badge, no red, no purple, no blue. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_sharper_focus": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK — Sharper Focus: a serene qi lotus, the bloom of "
+            "a clear, focused mind. Standalone glowing form on a fully transparent background, "
+            "centred, filling 80-90% of the image. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single open LOTUS BLOSSOM made of glowing qi, viewed front-on, perfectly "
+            "symmetrical and centred. Layered petals: an outer ring of 5-7 broad pointed "
+            "petals opening outward, and a smaller inner ring cupping the centre. At the "
+            "centre a small round seed-pod holds a bright white-cyan qi pinpoint, with one "
+            "tiny qi mote rising just above it. Petals are translucent qi — bright white-cyan "
+            "along the tips and edges, deepening to teal toward the base — so the whole bloom "
+            "reads as living light. A soft 2-3 px cyan halo wraps the flower. Calm, pure, radiant. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat solid colour fills, no "
+            "gradients, NO dithering, NO stray pixels, NO noise — smooth clean petal shapes. "
+            "Symmetrical. Bold high-contrast silhouette that reads clearly as an open lotus "
+            "when shrunk small. "
+            ""
+            "Palette: white-cyan tips (#e8ffff), bright cyan (#7adcc4), mid teal (#2f9c86), "
+            "deep teal shadow (#15564a), faint cyan halo at low alpha, charcoal outline "
+            "(#111). NO RED, NO pink (this is NOT the blood lotus), NO bronze frame, NO badge, "
+            "no purple, no gold. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_enduring_stream": {
+        "size": (128, 128),
+        "desc": (
+            "A pixel art icon of a QI SPARK — Enduring Stream: the river that never stops "
+            "becomes the sea. Standalone glowing form on a fully transparent background, "
+            "centred, filling 80-90% of the image. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single graceful KOI FISH (Chinese carp) made of glowing qi, curved "
+            "mid-leap in a bold C / S-curve, centred — the carp that never stops swimming "
+            "upstream. Big clean rounded body, flowing dorsal fin, broad sweeping split "
+            "tail-fin and trailing whisker-barbels, one simple round eye. Suggest 3-4 scales "
+            "with a few clean highlight pixels only — NO dense scale texture. A small curl of "
+            "qi-water splashes at the tail. The koi glows: bright white-cyan along the back, "
+            "fins and tail edges, deepening to blue across the body, with a soft 2-3 px cyan "
+            "halo. Alive, flowing, in perpetual motion. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat solid colour fills, no "
+            "gradients, NO dithering, NO stray pixels, NO noise — smooth clean shapes, bold "
+            "body and fins. High-contrast silhouette that reads clearly as a leaping koi when "
+            "shrunk small. "
+            ""
+            "Palette: white-cyan highlight (#e8ffff), bright cyan (#7adcc4), mid azure "
+            "(#3a8fc8), deep blue (#1a3a70), faint cyan halo at low alpha, charcoal outline "
+            "(#111). NO jade-green ring, NO bronze frame, NO badge, no red, no purple, no gold. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_masters_patience": {
+        "size": (128, 128),
+        "no_style_ref": True,  # warm-coloured — skip the cool Surging Stream anchor
+        "desc": (
+            "A pixel art icon of a QI SPARK — Master's Patience: ancient, enduring, alive "
+            "with qi. Standalone glowing form on a fully transparent background, centred, "
+            "filling 80-90% of the image. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single MYSTICAL QI TORTOISE (the 玄武 black-tortoise of long life), viewed "
+            "3/4 side, ALIVE and powerful — head reared up high with mouth slightly open, one "
+            "front leg lifted mid-stride, eye glowing bright. The big domed SHELL is the hero: "
+            "jade-green plates each rimmed in bright BRONZE-GOLD, a warm AMBER glow in the "
+            "centre of each plate, and a brilliant white-cyan highlight along the top ridge — "
+            "a rich multi-toned shell, NOT flat. Four sturdy jade legs with cyan highlights "
+            "and a short tail. CYAN-and-GOLD qi energy wisps swirl and trail off the shell rim "
+            "and legs, and a soft bright aura wraps the whole creature so it crackles with life. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat colour fills in clean bands, "
+            "NO dithering, NO stray pixels, NO noise. Vibrant, saturated, energetic. Bold "
+            "high-contrast silhouette that reads clearly as a tortoise when shrunk small. "
+            ""
+            "Palette: rich and colourful — jade-green shell/body (#2f9c5a), emerald shadow "
+            "(#155a34), bronze-gold plate rims (#c08a3a), warm amber glow (#f0c050), "
+            "white-cyan ridge + qi wisps (#e8ffff / #7adcc4), charcoal outline (#111). Green + "
+            "gold + amber + cyan together. NO frame, NO badge, no red, no purple. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_tinkers_bargain": {
+        "size": (128, 128),
+        "no_style_ref": True,  # warm gold — full colour, no cool anchor
+        "desc": (
+            "A pixel art icon of a QI SPARK — Tinker's Bargain: a cultivator's coin, wealth "
+            "and shrewd thrift. Standalone glowing form on a fully transparent background, "
+            "centred, filling 80-90% of the image. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single large CHINESE CASH COIN (铜钱) — a round coin with a square hole in "
+            "the centre — front-on, tilted slightly for life. Gleaming aged BRONZE-GOLD with a "
+            "brighter gold rim and a warm amber inner glow; around the square hole sit four "
+            "small faux seal-script marks and a faint cloud-scroll relief on the face. A "
+            "deep-red silk CORD is threaded through the hole and trails into a short knotted "
+            "tassel below. A second smaller coin peeks behind it for depth. A scatter of 3-4 "
+            "bright cyan-gold qi SPARKLES and a soft golden aura make it gleam with life — "
+            "freshly conjured wealth. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat colour fills in clean bands, "
+            "NO dithering, NO stray pixels, NO noise. Vibrant and gleaming. Bold high-contrast "
+            "silhouette that reads instantly as a coin when shrunk small. "
+            ""
+            "Palette: bright gold (#f0c850), warm amber (#f0a030), aged bronze (#8a5a2a), "
+            "deep-red silk cord (#9a2020) accent only, white-gold gleam (#fff4c0), cyan qi "
+            "sparkle (#7adcc4), charcoal outline (#111). NO frame, NO badge, no purple. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_heavens_bond": {
+        "size": (128, 128),
+        "no_style_ref": True,  # rich gold/azure — full colour, no cool anchor
+        "desc": (
+            "A pixel art icon of a QI SPARK — Heaven's Bond: the cultivator's affinity with "
+            "the heavens. Standalone glowing form on a fully transparent background, centred, "
+            "filling 80-90% of the image. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single bold Chinese AUSPICIOUS CLOUD (祥云 / ruyi scroll-cloud) with 3-4 "
+            "crisp dimensional spiral curls — a SOLID, sculpted celestial cloud, NOT a pale "
+            "wispy puff. Render it like a rich Dunhuang temple-mural cloud: saturated GOLD "
+            "body with bright gold rim-light on the curl edges and DEEP BRONZE-and-AZURE "
+            "shadow pooled in the hollows for strong volume and depth. Cradled in the central "
+            "curl, a brilliant glowing CYAN qi-PEARL; from it two crisp CYAN qi threads (NOT "
+            "green) rise upward out of the cloud — the bond to heaven. A scatter of bright "
+            "cyan-gold sparkles and a warm gold aura make it gleam with life. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat colour fills in clean bands "
+            "with STRONG light-to-dark contrast (sculpted depth, like a solid object), NO "
+            "dithering, NO stray pixels, NO noise, NO pale washed-out colour. Vibrant, "
+            "saturated, richly detailed. Bold silhouette readable when shrunk small. "
+            ""
+            "Palette: bright gold (#f5cf5a), warm amber (#e0992a), deep bronze shadow "
+            "(#7a4a18), azure shadow accent (#2a5a8a), vivid cyan qi pearl + threads "
+            "(#7adcc4), white-gold highlight (#fff4c0), charcoal outline (#111). Rich and "
+            "saturated — gold + amber + bronze + azure + cyan. NO frame, NO badge, no red, no "
+            "purple, no pale ivory wash. "
+            f"{SPARK_S}"
+        ),
+    },
+
+    "spark_resonant_soul": {
+        "size": (128, 128),
+        "no_style_ref": True,  # bronze + cyan qi — full colour, no cool anchor
+        "desc": (
+            "A pixel art icon of a QI SPARK — Resonant Soul: a temple bell whose tone the soul "
+            "gathers. Standalone glowing form on a transparent background, centred, filling "
+            "80-90%. NO frame, NO ring, NO disc. "
+            ""
+            "FORM: a single Chinese bronze TEMPLE BELL (钟) hanging front-on — a SOLID sculpted "
+            "cast bell with strong depth: 2-3 raised horizontal bands, rows of small bosses "
+            "(乳钉), faint cloud-scroll relief, and an ornate dragon-loop handle (蒲牢) on top. "
+            "Saturated bronze-gold, bright gold rim-light, deep bronze shadow. From the bell "
+            "rise soft ethereal QI WISPS — curling flame-like tendrils of glowing spirit-qi "
+            "drifting up, with 2-3 bright qi soul-motes and a warm aura: resonance made "
+            "visible as living qi. IMPORTANT: NO concentric sound-wave arcs, NO signal bars, "
+            "NO ripple rings, NO wifi-style lines — resonance is ONLY organic curling wisps + motes. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat fills in clean bands with "
+            "STRONG light-to-dark contrast (sculpted metal depth), NO dithering, NO stray "
+            "pixels, NO noise, NO pale washed-out colour. Vibrant, saturated, detailed. "
+            ""
+            "Palette: bright gold (#f5cf5a), warm bronze (#c08a3a), deep bronze shadow "
+            "(#5a3a18), bright cyan qi wisps + motes (#7adcc4), white-gold highlight "
+            "(#fff4c0), charcoal outline (#111). Gold + bronze + cyan. NO purple, NO "
+            "sound-wave arcs, NO frame, no red, no green. "
+            f"{SPARK_S}"
+        ),
+    },
+
     # ── Cultivator halo — rotates behind the character sprite ────────────────
     # 256×256 RGBA. Only the ring band (r≈70..128 px from centre) is opaque;
     # centre and exterior are transparent so it composites cleanly behind any
@@ -891,6 +1228,10 @@ def _style_ref_for(element_id):
     if element_id.startswith("upgrade_") and element_id != "upgrade_focus":
         p = OUT_DIR / "upgrade_focus.png"
         return p if p.exists() else None
+    # Spark icons use NO style reference. The "golden standard" look (rich
+    # multi-tone colour + swirling qi energy + lively, detailed-yet-clean) comes
+    # from the SPARK_S suffix + each per-spark prompt. A cool style-anchor was
+    # tried but it MUTED warm-coloured sparks, so it was dropped.
     if element_id == "shop_nav":
         # Top-bar nav button — match the simple bold-silhouette orb style of
         # qi.png / karma.png, NOT the framed upgrade-icon style.
@@ -918,6 +1259,10 @@ def run_generate(element_id, ref_path=None):
 
     if ref_path is None:
         ref_path = _style_ref_for(element_id)
+    # An element can opt out of the auto style reference (e.g. a warm-coloured
+    # spark that the cool Surging Stream anchor would mute).
+    if cfg.get("no_style_ref"):
+        ref_path = None
 
     print(f"\n{'='*60}")
     print(f"  Generating: {element_id}  ({w}x{h})  via {api_path}")
