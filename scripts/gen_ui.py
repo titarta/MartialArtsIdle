@@ -968,6 +968,50 @@ ELEMENTS = {
         ),
     },
 
+    # ── Buff-icon GRID test (2x2 sheet → crop into four 64px icons) ──────────
+    # One call yields a 2x2 sheet of FOUR distinct icons; crop the chosen
+    # candidate into four separate PNGs. Credit-efficient batch generation.
+    "buff_grid_test": {
+        "size": (128, 128),
+        "no_style_ref": True,
+        "desc": (
+            "A 2x2 GRID of FOUR completely separate xianxia cultivation pixel-art icons on a "
+            "fully transparent background. One bold icon centred in each quadrant, with a "
+            "clear empty transparent gap between them — the four must NOT touch or overlap, "
+            "and there is NO frame or grid lines drawn, just four icons floating on "
+            "transparent space. "
+            "TOP-LEFT: a glowing RED-and-GOLD flame talisman (a paper fu charm wrapped in a "
+            "burning crimson qi flame). "
+            "TOP-RIGHT: a bronze HOURGLASS with glowing cyan qi-sand inside. "
+            "BOTTOM-LEFT: a red-and-bronze Chinese WAR DRUM (战鼓) on a small stand. "
+            "BOTTOM-RIGHT: a Chinese ABACUS (算盘), bronze frame with jade beads. "
+            "Each icon: rich saturated colour, thick charcoal outline, flat colour bands with "
+            "strong light-to-dark depth, a soft glow, 16-bit pixel art, clean with no noise. "
+            "Bold simple silhouettes that stay readable at small size. NO text, NO labels."
+        ),
+    },
+
+    # Batch 2 of the shop buff/QoL icons (4 distinct icons, one per candidate slot).
+    "buff_grid_test_2": {
+        "size": (128, 128),
+        "no_style_ref": True,
+        "desc": (
+            "FOUR completely separate xianxia cultivation pixel-art icons, one bold icon per "
+            "image, on a fully transparent background — NO frame, NO grid lines, NO text. "
+            "ICON 1: a bronze SINGING BOWL / chime (磬) with a glowing cyan qi resonance "
+            "rising from it. "
+            "ICON 2: an unrolled IMPERIAL DECREE scroll (圣旨) with gold rollers, red silk and "
+            "a small red seal mark. "
+            "ICON 3: an upright JADE SEAL / chop (印章) with a carved dragon top and a dab of "
+            "red seal-ink at its base. "
+            "ICON 4: a FROST emblem — a pale ice-blue six-point snow-crystal with a jade "
+            "core. "
+            "Each icon: rich saturated colour, thick charcoal outline, flat colour bands with "
+            "strong light-to-dark depth, a soft glow, 16-bit pixel art, clean with no noise. "
+            "Bold simple silhouettes readable at small size."
+        ),
+    },
+
     # ── Cultivator halo — rotates behind the character sprite ────────────────
     # 256×256 RGBA. Only the ring band (r≈70..128 px from centre) is opaque;
     # centre and exterior are transparent so it composites cleanly behind any
