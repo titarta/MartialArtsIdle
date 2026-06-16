@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-16T04:01:04.948Z",
+  "updatedAt": "2026-06-16T04:01:14.885Z",
   "records": {
     "ui_click": {
       "src": [
@@ -199,7 +199,10 @@
       ]
     },
     "crystal_tap_max": {
-      "volume": 0.6
+      "volume": 0.6,
+      "src": [
+        "audio/sfx/crystal_tap_max.wav"
+      ]
     }
   }
 }
