@@ -824,12 +824,14 @@ function AppInner() {
 
     // Focus-cultivation audio escalates in "levels". Level 1 is the plain hold
     // (fired on press); each Consecutive Focus rung climbed bumps the level by
-    // one (rung N → level N+1, see onRung), capped at the 5 uploaded samples.
+    // one (rung N → level N+1, see onRung), capped at the 6 uploaded samples.
+    // Level 6 is the distinct max-tier loop: the top rung (T5) used to clamp
+    // to level 5 and reuse rung 4's sound; now it earns its own pinnacle loop.
     // Entering a NEW level plays an instant focus_tick AND (re)starts the
     // focus_cultivate loop, both at that level's variant. `focusLoopVariant` is
     // the level currently playing (0 = none) so a no-op event (same level,
     // e.g. a rung edge that maps to the level already playing) never re-fires.
-    const FOCUS_LEVELS = 5;
+    const FOCUS_LEVELS = 6;
     const FOCUS_XFADE_MS = 350;        // crossfade between focus loop levels
     const FOCUS_RELEASE_FADE_MS = 220; // gentle fade when focus is released
     let focusLoopVariant = 0;

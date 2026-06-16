@@ -27,7 +27,8 @@
  *
  * A pool can also be played BY INDEX rather than at random. Pass
  * `playSfx(id, { variant: n })` to pick variant n (1-based, clamped). This is how
- * Consecutive Focus escalates: rung 1..5 maps to focus_cultivate variants 1..5.
+ * Consecutive Focus escalates: a plain hold is level 1, then rung 1..5 climbed
+ * maps to focus_cultivate levels 2..6 (rung 5 / T5 max = the distinct level 6).
  */
 
 import audioOverride from '../data/config/audio.override.json';
@@ -135,12 +136,13 @@ const _SFX_BASE = {
   cult_breakthrough_continue:   { src: sfx('cult_breakthrough_continue',   'ogg', 'mp3') },
   // Focus-cultivation escalating LOOP, played BY INDEX (variant = focus level).
   // Level 1 = the plain hold; each Consecutive Focus rung climbed = the next
-  // level (App.jsx maps rung N → level N+1), capped at 5. Designer can leave
-  // higher levels empty to reuse a lower sample.
-  focus_cultivate:     { variations: sfxVariants('focus_cultivate', 5, 'ogg', 'mp3') },
+  // level (App.jsx maps rung N → level N+1), capped at 6. Level 6 is the
+  // distinct top-tier loop the player reaches at the max Consecutive Focus
+  // rung (T5); designer can leave higher levels empty to reuse a lower sample.
+  focus_cultivate:     { variations: sfxVariants('focus_cultivate', 6, 'ogg', 'mp3') },
   // Instant "tick" fired at each focus-level transition (paired with the loop
-  // above). One per level (1..5), played by index: level N → variant N.
-  focus_tick:          { variations: sfxVariants('focus_tick', 5, 'ogg', 'mp3') },
+  // above). One per level (1..6), played by index: level N → variant N.
+  focus_tick:          { variations: sfxVariants('focus_tick', 6, 'ogg', 'mp3') },
 
   // ── Qi Crystal ────────────────────────────────────────────────────────────
   // Tapped constantly to collect the reservoir, so a 4-sample random pool
