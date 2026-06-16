@@ -13,10 +13,13 @@
  * BGM record keys are prefixed "bgm_" (e.g. "bgm_cultivation").
  * SFX record keys are the SFX id directly (e.g. "ui_click").
  * Supported patch fields:
- *   - volume     — number 0..1 (BGM + SFX)
+ *   - volume     — number 0..1 (BGM + SFX; the sound-wide gain)
  *   - loop       — boolean (BGM only)
  *   - src        — string[] of file URLs (single sample; legacy + non-variant SFX)
- *   - variations — { src: string[] }[] (multi-sample pool; e.g. crystal-tap variants)
+ *   - variations — { src: string[], volume?: number }[] (multi-sample pool; e.g.
+ *                  crystal-tap variants). A variant's optional volume trims that
+ *                  one sample, overriding the sound-wide volume (e.g. balancing
+ *                  each Consecutive Focus tick independently).
  *
  * Variation pool model
  * ──────────────────────────────────────────────────────────────────────────

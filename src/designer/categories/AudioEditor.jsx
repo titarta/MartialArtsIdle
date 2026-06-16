@@ -210,12 +210,28 @@ function SfxPanel({ records, onUpdate, onReset }) {
 
   // Update one variant slot. Pads the variations array to `count` length first
   // so the JSON shape stays stable even if earlier slots are still empty.
+  // Preserves any per-variant volume already set on the slot.
   function setVariantSrc(id, count, index, src) {
     const cur = { ...(records[id] || {}) };
     delete cur.src;
     const variations = Array.isArray(cur.variations) ? cur.variations.slice() : [];
     while (variations.length < count) variations.push(null);
-    variations[index] = { src };
+    variations[index] = { ...(variations[index] || {}), src };
+    cur.variations = variations;
+    onUpdate(id, cur, /* replace */ true);
+  }
+
+  // Set the per-variant volume (gain trim) for one slot. Preserves the slot's
+  // src and keeps the array index-stable so indexed playback (variant = rung)
+  // still maps slot N → index N-1.
+  function setVariantVolume(id, count, index, volume) {
+    const cur = { ...(records[id] || {}) };
+    delete cur.src;
+    const variations = Array.isArray(cur.variations)
+      ? cur.variations.map((v) => (v ? { ...v } : v))
+      : [];
+    while (variations.length < count) variations.push(null);
+    variations[index] = { ...(variations[index] || {}), volume };
     cur.variations = variations;
     onUpdate(id, cur, /* replace */ true);
   }
@@ -241,6 +257,7 @@ function SfxPanel({ records, onUpdate, onReset }) {
                   onVolumeChange={(v) => onUpdate(item.id, { volume: v })}
                   onUploadedSingle={(src) => setSingleSrc(item.id, src)}
                   onUploadedVariant={(index, src) => setVariantSrc(item.id, item.variants ?? 1, index, src)}
+                  onVariantVolume={(index, v) => setVariantVolume(item.id, item.variants ?? 1, index, v)}
                   onReset={() => onReset(item.id)}
                 />
               );
@@ -252,7 +269,7 @@ function SfxPanel({ records, onUpdate, onReset }) {
   );
 }
 
-function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onUploadedVariant, onReset }) {
+function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onUploadedVariant, onVariantVolume, onReset }) {
   const [expanded, setExpanded] = useState(false);
   const variantCount = item.variants ?? 1;
   const isVariant    = variantCount > 1;
@@ -330,11 +347,27 @@ function SfxRow({ item, rec, vol, isDirty, onVolumeChange, onUploadedSingle, onU
         <div className="au-sfx-row-extra">
           {variationSlots.map((slotSrc, i) => {
             const stem = `${item.id}_${i + 1}`;
+            // Per-variant volume defaults to the sound-wide volume, then unity —
+            // matching the engine's gain fallback so the slider reads true.
+            const slotVol = rec.variations?.[i]?.volume ?? rec.volume ?? 1.0;
             return (
               <div key={i} className="au-variant-block">
                 <div className="au-variant-header">
                   <span className="au-variant-label">{variantLabel} {i + 1}</span>
                   {!slotSrc && <span className="au-variant-empty">empty</span>}
+                  {slotSrc && (
+                    <label className="au-vol-row au-variant-vol">
+                      <span className="au-ctrl-label">Vol</span>
+                      <input
+                        type="range"
+                        min="0" max="1" step="0.01"
+                        value={slotVol}
+                        className="au-slider au-slider-sm"
+                        onChange={(e) => onVariantVolume(i, parseFloat(e.target.value))}
+                      />
+                      <span className="au-vol-val">{slotVol.toFixed(2)}</span>
+                    </label>
+                  )}
                 </div>
                 {slotSrc && (
                   <div className="au-src-list">

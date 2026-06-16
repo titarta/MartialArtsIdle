@@ -973,6 +973,40 @@
   color: var(--dz-accent);
 }
 
+/* ── Variation pool slots ──────────────────────────────────────────── */
+
+.au-variant-block {
+  padding: 8px 10px;
+  background: var(--dz-bg);
+  border: 1px solid var(--dz-border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.au-variant-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.au-variant-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dz-text);
+}
+.au-variant-empty {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dz-text-dim);
+  opacity: 0.7;
+}
+/* Push the per-variant volume control to the right edge of the slot header. */
+.au-variant-vol {
+  margin-left: auto;
+}
+
 /* ── Audio upload row ──────────────────────────────────────────────── */
 
 .au-upload-row {

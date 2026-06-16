@@ -154,9 +154,15 @@ function _getSfxHowls(sfxId) {
   // the nulls at pick time instead.
   const howls = rawVariations.map((variant, i) => {
     if (!variant || !Array.isArray(variant.src) || variant.src.length === 0) return null;
-    return new Howl({
+    // Per-sample gain, baked onto the Howl and folded into the channel mix at
+    // play time (see _sfxGain). A variant's own `volume` wins, else the
+    // sound-wide volume, else unity — so the designer can trim one sample of a
+    // pool independently (e.g. each Consecutive Focus tick) without touching
+    // the rest of the pool.
+    const gain = variant.volume ?? config.volume ?? 1.0;
+    const howl = new Howl({
       src:    variant.src,
-      volume: config.volume ?? 1.0,
+      volume: gain,
       html5:  false,
       preload: false,
       onloaderror: (_id, err) => {
@@ -166,6 +172,8 @@ function _getSfxHowls(sfxId) {
         console.error(`[Audio] SFX "${sfxId}"${rawVariations.length > 1 ? ` variant ${i + 1}` : ''} failed to play:`, err);
       },
     });
+    howl._maiGain = gain;
+    return howl;
   });
 
   if (!howls.some(Boolean)) {
@@ -192,6 +200,14 @@ function _resolveVariantHowl(howls, variant) {
   const filled = howls.filter(Boolean);
   if (filled.length === 0) return null;
   return filled.length === 1 ? filled[0] : filled[Math.floor(Math.random() * filled.length)];
+}
+
+// The per-sample volume trim baked onto a Howl in _getSfxHowls. Folded into the
+// channel mix at play time so per-sound / per-variant volumes actually apply —
+// playSfx/crossfade set the howl volume to the channel mix, which would
+// otherwise overwrite the trim. Defaults to unity for any howl without one.
+function _sfxGain(howl) {
+  return (howl && typeof howl._maiGain === 'number') ? howl._maiGain : 1;
 }
 
 // ── AudioContext lifecycle (iOS Safari hardening) ────────────────────────────
@@ -392,7 +408,9 @@ const AudioManager = {
 
     // Set howl-group volume + rate BEFORE play() — setting these on the id
     // returned by play() races when the howl is still loading (id is a placeholder).
-    howl.volume(vol);
+    // Fold the per-sample gain into the channel mix so per-sound / per-variant
+    // volumes actually bite (otherwise this line would overwrite them).
+    howl.volume(vol * _sfxGain(howl));
     // Set loop on the howl group before play(). Always set it explicitly (even
     // to false) so a cached howl can't carry stale loop state from a prior
     // looped play into a later one-shot.
@@ -458,13 +476,16 @@ const AudioManager = {
     _cancelPendingStop(target);
     target.loop(true);
     target.rate(rate ?? 1);
+    // Fold the per-sample gain in so a per-level loop volume (e.g. a louder
+    // pinnacle focus loop) carries through the crossfade, not just the mix.
+    const targetVol = vol * _sfxGain(target);
     if (target.playing()) {
-      target.fade(target.volume(), vol, duration);
+      target.fade(target.volume(), targetVol, duration);
       return undefined;
     }
     target.volume(0);
     const id = target.play();
-    target.fade(0, vol, duration);
+    target.fade(0, targetVol, duration);
     return id;
   },
 
