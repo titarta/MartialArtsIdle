@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-16T04:20:26.608Z",
+  "updatedAt": "2026-06-16T14:59:10.922Z",
   "records": {
     "ui_click": {
       "src": [
@@ -148,7 +148,8 @@
         {
           "src": [
             "audio/sfx/focus_tick_1.wav"
-          ]
+          ],
+          "volume": 0.61
         },
         {
           "src": [
