@@ -363,7 +363,7 @@ function BuffCard({ item, ownership, balance, onBuy, busy }) {
   return (
     <div className={`bls-buff-tile${activeBuff ? ' bls-buff-tile-active' : ''}`}>
       {activeBuff && <span className="bls-buff-tile-ribbon">{t('bazaar.active')}</span>}
-      <div className="bls-buff-tile-icon"><ShopIcon icon={item.icon} size={34} /></div>
+      <div className="bls-buff-tile-icon"><ShopIcon icon={item.icon} size={50} /></div>
       <div className="bls-buff-tile-headline">{headline}</div>
       <div className="bls-buff-tile-name">{cleanName}</div>
       <div className="bls-buff-tile-meta">
@@ -472,7 +472,7 @@ function FeaturedHero({ featured, balance, busy, onBuy }) {
             );
           })()
         ) : (
-          <span className="sbz-featured-preview-icon"><ShopIcon icon={item.icon} size={48} /></span>
+          <span className="sbz-featured-preview-icon"><ShopIcon icon={item.icon} size={66} /></span>
         )}
       </div>
 

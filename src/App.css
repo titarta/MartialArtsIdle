@@ -22966,7 +22966,7 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
   justify-content: center;
   background:
     radial-gradient(circle at 50% 40%, rgba(255, 200, 100, 0.20), rgba(60, 20, 16, 0.85));
-  border: 1px solid rgba(255, 104, 100, 0.30);
+  border: 1px solid rgba(255, 200, 120, 0.16);
   border-radius: 12px;
   position: relative;
   z-index: 1;
@@ -23540,17 +23540,17 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
 }
 
 .bls-buff-tile-icon {
-  width: 36px;
-  height: 36px;
+  width: 56px;
+  height: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(var(--accent-rgb), 0.10);
-  border: 1px solid rgba(var(--accent-rgb), 0.30);
-  border-radius: 8px;
-  font-size: 18px;
+  /* No bordered box — the pixel-art icon is the hero. A soft warm radial glow
+     gives it a lit-altar backing that fades into the card (no hard outline). */
+  background: radial-gradient(circle at 50% 46%, rgba(240, 190, 90, 0.18), transparent 70%);
+  font-size: 30px;
   margin-bottom: 6px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
 }
 
 .bls-buff-tile-headline {

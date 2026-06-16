@@ -1012,6 +1012,38 @@ ELEMENTS = {
         ),
     },
 
+    # Crimson Aura buff icon — echoes the in-game CrimsonOrbitLayer VFX (crimson
+    # qi-orbs + blood-crystal shards orbiting the cultivator). Named shop_* so
+    # finalize writes straight to the wired public/ui/shop_crimson_aura.png.
+    "shop_crimson_aura": {
+        "size": (128, 128),
+        "no_style_ref": True,
+        "desc": (
+            "A pixel art buff icon — Crimson Aura: a blood-red qi aura that doubles the "
+            "cultivator's power. Standalone glowing form on a fully transparent background, "
+            "centred, filling 80-90%. NO frame, NO badge, NO border box. "
+            ""
+            "FORM: a CRIMSON AURA orbital. At the centre, one bright glossy CRIMSON qi-ORB "
+            "with a hot white-pink core highlight and a deep blood-red body (a glowing blood-"
+            "pearl). Wreathing it, an ORBITAL arrangement on a tilted elliptical path (like "
+            "crossed rings seen at an angle) of 3-4 smaller crimson qi-orbs and 1-2 faceted "
+            "BLOOD-CRYSTAL shards (sharp dark-red gem fragments with bright facet highlights) "
+            "circling the core. A soft radiant crimson halo glows outward with a few tiny "
+            "ember-sparks. Powerful, premium, pulsing with crimson qi — the aura that wreathes "
+            "the cultivator. "
+            ""
+            "Treatment: thick clean charcoal outline (#111), flat colour fills in clean bands "
+            "with STRONG light-to-dark contrast (glossy orb depth + faceted shards), NO "
+            "dithering, NO stray pixels, NO noise. Vibrant, saturated, detailed. Bold "
+            "silhouette readable when small. "
+            ""
+            "Palette: hot white-pink core (#ffe0e8), bright crimson (#e0303a), deep blood-red "
+            "(#8a1a1a), darkest red shadow (#5a1010), gold ember accent (#f5cf5a), crimson "
+            "halo at low alpha, charcoal outline (#111). Crimson + blood-red + white-hot core "
+            "+ gold sparks. NO frame, NO badge, no green, no blue, no purple. "
+        ),
+    },
+
     # ── Cultivator halo — rotates behind the character sprite ────────────────
     # 256×256 RGBA. Only the ring band (r≈70..128 px from centre) is opaque;
     # centre and exterior are transparent so it composites cleanly behind any
