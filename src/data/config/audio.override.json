@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-16T04:00:19.674Z",
+  "updatedAt": "2026-06-16T04:01:04.948Z",
   "records": {
     "ui_click": {
       "src": [
@@ -197,6 +197,9 @@
       "src": [
         "audio/sfx/crystal_level_up.wav"
       ]
+    },
+    "crystal_tap_max": {
+      "volume": 0.6
     }
   }
 }
