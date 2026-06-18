@@ -35,7 +35,7 @@ import useFurnace from './hooks/useFurnace';
 import { MATERIALS as FURNACE_MATERIALS_REF, PILLS as FURNACE_PILLS_REF, FOUNDATIONS as FURNACE_FOUNDATIONS_REF } from './data/furnace';
 import { wipeReincarnation, SAVE_VERSION, SAVE_VERSION_KEY } from './systems/save';
 import useCultivation from './hooks/useCultivation';
-import useQiCrystal  from './hooks/useQiCrystal';
+import useQiCrystal, { getCrystalTier }  from './hooks/useQiCrystal';
 import useProducers  from './hooks/useProducers';
 import useUpgrades   from './hooks/useUpgrades';
 import useStats       from './hooks/useStats';
@@ -51,6 +51,7 @@ import achBus from './systems/achievementBus';
 import { isLunarNewYear, isDoubleNinth } from './systems/calendarEvents';
 import { FEATURES } from './data/featureFlags';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
+import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
 import { PRODUCERS_BY_ID } from './data/producers';
 import { loadGarden, saveGarden, gardenActiveQiMult } from './data/spiritGarden';
 import { fireTutorialOnce } from './systems/fireTutorial';
@@ -933,10 +934,34 @@ function AppInner() {
 
   const notifications = useNotifications({ cultivation });
 
-  // Round 3 — Crystal Discovery (retired). Used to grant mechanic-tier sparks
-  // on crystal tier crossings via crystalMechanicGrants. That table was
-  // deleted with the v1 Cookie-Clicker pivot — mechanic sparks now come from
-  // the regular spark-offer pool, so the tier-cross listener is gone.
+  // Crystal Discovery. Subscribes to HomeScreen's tier-crossed window event
+  // and grants any mechanic-tier T1 sparks attached to the crossed tiers
+  // (see data/crystalMechanicGrants.js). These mechanics are deterministic
+  // crystal-progression unlocks, NOT random spark offerings, so the cards
+  // stay `retired: true` in qiSparks.js and are granted only from here.
+  // `qiSparks.grant` is idempotent for mechanics so re-firing is safe; a
+  // toast lands per successful grant so the player sees the unlock.
+  useEffect(() => {
+    const handler = (e) => {
+      const { previousTier = 0, newTier = 0 } = e.detail ?? {};
+      const ids = sparksToGrantOnEvolution(previousTier, newTier);
+      for (const sparkId of ids) {
+        const ok = qiSparks?.grant?.(sparkId);
+        if (ok) {
+          const card = QI_SPARK_BY_ID[sparkId];
+          notifications.addToast({
+            type: 'unlock',
+            kicker: 'New Spark',
+            glyph: '符', // talisman / mechanism spark
+            message: card?.name ?? sparkId,
+            duration: 6000,
+          });
+        }
+      }
+    };
+    window.addEventListener('mai:crystal-tier-crossed', handler);
+    return () => window.removeEventListener('mai:crystal-tier-crossed', handler);
+  }, [qiSparks, notifications]);
 
   // 2026-05-21 bug-fix: surface a toast when the spark modal auto-picks the
   // leftmost card on inactivity timeout. Previously the modal would silently
@@ -957,12 +982,28 @@ function AppInner() {
     return () => window.removeEventListener('mai:spark-auto-picked', handler);
   }, [notifications]);
 
-  // Round 3 one-shot backfill (retired) — used to walk an existing crystal
-  // tier and grant any mechanic sparks the player would have rolled if the
-  // tier-crossed listener had been live during their earlier sessions. The
-  // crystalMechanicGrants table is gone, so there is nothing to backfill.
-  // The mai_v1_3_mechanic_backfill_seen localStorage flag stays untouched so
-  // any future re-introduction of the system doesn't double-fire.
+  // Crystal Discovery one-shot backfill. A player whose crystal is already
+  // past a grant threshold (e.g. leveled past L10 while the grant path was
+  // severed) never saw a live tier-cross event, so walk 0 -> current tier
+  // once and grant everything they should already own. `grant` is idempotent
+  // so anything already active is skipped. getCrystalTier is the canonical
+  // level->tier map (the deleted original hardcoded the stale pre-cap L1000
+  // thresholds here). Gated by a localStorage flag so it runs once per device.
+  const backfillRanRef = useRef(false);
+  useEffect(() => {
+    if (backfillRanRef.current) return;
+    if (!qiSparks?.grant) return;
+    let seen = null;
+    try { seen = localStorage.getItem('mai_v1_3_mechanic_backfill_seen'); } catch {}
+    if (seen) { backfillRanRef.current = true; return; }
+    const level = crystal?.level ?? 0;
+    if (level > 0) {
+      const ids = sparksToGrantOnEvolution(0, getCrystalTier(level));
+      for (const sparkId of ids) qiSparks.grant(sparkId);
+    }
+    try { localStorage.setItem('mai_v1_3_mechanic_backfill_seen', '1'); } catch {}
+    backfillRanRef.current = true;
+  }, [qiSparks, crystal?.level]);
 
   // (Removed) "Combat returns later" one-time toast. Combat may or may
   // not return; we're not committing to it in copy. If we later ship a
