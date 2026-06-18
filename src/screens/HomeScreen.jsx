@@ -21,6 +21,7 @@ import { TUTORIAL_IDS } from '../data/tutorialCards';
 import AudioManager from '../audio/AudioManager';
 import { getAudioTimeline } from '../data/audioTimeline';
 import { eventStat } from '../systems/statsRecorder';
+import { skinnedCultivatorPath, skinnedCrystalPath } from '../utils/skinSprites';
 const BASE = import.meta.env.BASE_URL;
 const AD_BOOST_DURATION_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -602,7 +603,7 @@ const CES_RETURN_MS  = 500;   // tap → shrink back to anchor + unmount
 // Per-beat sound trigger times live in data/audioTimeline.js (tunable in the dev
 // Audio Lab) so a riser can be placed ahead of its visual beat.
 
-function CrystalEvolutionOverlay({ event, onDone }) {
+function CrystalEvolutionOverlay({ event, onDone, equippedCrystal }) {
   const { t } = useTranslation('ui');
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
@@ -640,9 +641,9 @@ function CrystalEvolutionOverlay({ event, onDone }) {
   const variant = event.variant ?? 'shatter';
   const { glowA, glowB, textName } = CRYSTAL_COLORS[event.newTier] ?? CRYSTAL_COLORS[1];
   const oldSrc = event.previousTier > 0
-    ? `${BASE}crystals/crystal_${event.previousTier}.png`
+    ? skinnedCrystalPath(`${BASE}crystals/crystal_${event.previousTier}.png`, equippedCrystal)
     : `${BASE}crystals/crystal_locked.png`;
-  const newSrc = `${BASE}crystals/crystal_${event.newTier}.png`;
+  const newSrc = skinnedCrystalPath(`${BASE}crystals/crystal_${event.newTier}.png`, equippedCrystal);
   const tierName = CRYSTAL_TIER_NAMES[event.newTier] ?? `Tier ${event.newTier}`;
   // The pre-pivot evolution card surfaced "you unlocked X mechanic spark!"
   // hints when the crossed tier(s) had grants attached. crystalMechanicGrants
@@ -762,7 +763,7 @@ const CES_CHAR_PLAY_MS    = 4200; // matches cheOld/cheNew 4.2s in App.css
 const CES_CHAR_RETURN_MS  = 500;
 // Per-beat sound trigger times live in data/audioTimeline.js (Audio Lab editable).
 
-function CharacterEvolutionOverlay({ event, onDone }) {
+function CharacterEvolutionOverlay({ event, onDone, equippedCharacter }) {
   const { t } = useTranslation('ui');
   const gt = useGameText();
   const onDoneRef = useRef(onDone);
@@ -801,8 +802,8 @@ function CharacterEvolutionOverlay({ event, onDone }) {
   }, [phase]);
 
   if (!event) return null;
-  const oldSrc = `${BASE}sprites/cultivator/${event.oldTier}_normal.png`;
-  const newSrc = `${BASE}sprites/cultivator/${event.newTier}_normal.png`;
+  const oldSrc = skinnedCultivatorPath(`${BASE}sprites/cultivator/${event.oldTier}_normal.png`, equippedCharacter);
+  const newSrc = skinnedCultivatorPath(`${BASE}sprites/cultivator/${event.newTier}_normal.png`, equippedCharacter);
 
   // Match the crystal overlay's origin-x/y/scale geometry. Cultivator sprites
   // are square (256×256) so no letterbox compensation is needed — uniform
@@ -1106,7 +1107,7 @@ const CRYSTAL_COLORS = {
 
 /** Qi Crystal — locked (dim, greyscale) or unlocked (glowing, tapable when
  *  Crystal Click mechanic is active). Reservoir fill tracked via rAF. */
-function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail }) {
+function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hidden, cfRung, reservoirRef, crystalClickCapMinRef, rateRef, onCollect, qiRef, onRefine, onOpenDetail, equippedCrystal }) {
   const { t } = useTranslation('ui');
   // true only when the Crystal Reservoir (crystal_click) mechanic is actually
   // active — i.e. the player has been granted the spark. Until then the
@@ -1246,6 +1247,9 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
 
   const { level, crystalQiBonus } = crystal;
   const tier = getCrystalTier(level);
+  // Skin the crystal sprite by the equipped CRYSTAL cosmetic. No-op (base art)
+  // until that theme's sprites ship — see skinSprites.js.
+  const crystalSrc = skinnedCrystalPath(`${BASE}crystals/crystal_${tier}.png`, equippedCrystal);
   const { glowA, glowB } = CRYSTAL_COLORS[tier];
   const [vfxPc, vfxSc] = CRYSTAL_VFX_TIER_TINT[tier] ?? CRYSTAL_VFX_TIER_TINT[1];
   // SFX + VFX are fired by the parent's onCollect handler so cooldown-blocked
@@ -1286,12 +1290,12 @@ function KeyCrystal({ crystal, isUnlocked, tapMechanicActive, particleColors, hi
             // producing a red-tinted overlay that pulses in/out via
             // opacity. The CSS overlay is keyed off the
             // `.home-crystal-overcharged` class on the img below.
-            '--crystal-src': `url(${BASE}crystals/crystal_${tier}.png)`,
+            '--crystal-src': `url(${crystalSrc})`,
           }}
         >
           <img
             ref={crystalImgRef}
-            src={`${BASE}crystals/crystal_${tier}.png`}
+            src={crystalSrc}
             className="home-crystal-img"
             alt="Qi Crystal"
             draggable="false"
@@ -2405,6 +2409,11 @@ function HomeScreen({
   // use the default (C1). HomeScreen keeps _particleMaskBase in sync so the
   // module-level spawn functions always use the right orb shape.
   equippedParticle = null,
+  // Active character / crystal cosmetic skin item ids (e.g. 'cos_char_frost_ascetic').
+  // Null = default look. Resolved to a themed sprite set by skinSprites.js — a
+  // no-op that renders the base art until that theme's sprites ship.
+  equippedCharacter = null,
+  equippedCrystal   = null,
 }) {
   const { t } = useTranslation('ui');
   const gt = useGameText();
@@ -3152,6 +3161,7 @@ function HomeScreen({
             qiRef={cultivation.qiRef}
             onRefine={handleCrystalRefine}
             onOpenDetail={() => setCrystalDetailOpen(true)}
+            equippedCrystal={equippedCrystal}
           />
 
           {/* Character + Consecutive-Focus meter group — grounded at scene bottom.
@@ -3218,14 +3228,14 @@ function HomeScreen({
                   the breathing) only when the tier itself changes. */}
               <img
                 key={`${cultivatorTierName}-normal`}
-                src={`${BASE}sprites/cultivator/${cultivatorTierName}_normal.png`}
+                src={skinnedCultivatorPath(`${BASE}sprites/cultivator/${cultivatorTierName}_normal.png`, equippedCharacter)}
                 alt="Cultivator"
                 className={`home-cultivator-sprite${cultivatorPose === 'normal' ? '' : ' home-cultivator-sprite-fade'}`}
                 draggable="false"
               />
               <img
                 key={`${cultivatorTierName}-focused`}
-                src={`${BASE}sprites/cultivator/${cultivatorTierName}_focused.png`}
+                src={skinnedCultivatorPath(`${BASE}sprites/cultivator/${cultivatorTierName}_focused.png`, equippedCharacter)}
                 alt=""
                 aria-hidden="true"
                 className={`home-cultivator-sprite${cultivatorPose === 'focused' ? '' : ' home-cultivator-sprite-fade'}`}
@@ -3348,6 +3358,7 @@ function HomeScreen({
           key={currentEvent.id}
           event={currentEvent.payload}
           onDone={() => dismiss(currentEvent.id)}
+          equippedCrystal={equippedCrystal}
         />
       )}
 
@@ -3366,6 +3377,7 @@ function HomeScreen({
             dismiss(currentEvent.id);
             clearMajorBreakthrough();
           }}
+          equippedCharacter={equippedCharacter}
         />
       )}
 

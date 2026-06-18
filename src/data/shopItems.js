@@ -246,9 +246,9 @@ export const SHOP_ITEMS = [
   { id: 'cos_particles_c9_15', category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.PARTICLES, name: 'Supreme Mote',    desc: 'The pinnacle form. Dense, bright, perfectly balanced qi.',    icon: '👑', cost: 400, ownership: 'cosmetic' },
 
   // Untethered skins — no bundle association yet
-  { id: 'cos_char_storm_caller',   category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller',  desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',       icon: '⚡', cost: 1300, ownership: 'cosmetic', previewSprite: 7 },
-  { id: 'cos_char_lotus_sage',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',    desc: 'Petals bloom around an ascetic\'s frame. Evolves through all 13 realms.',         icon: '🪷', cost: 1100, ownership: 'cosmetic', previewSprite: 8 },
-  { id: 'cos_crystal_phoenix',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Phoenix Core',  desc: 'A molten ember bound in crystal lattice. Evolves through all 10 tiers.',          icon: '🔥', cost: 900,  ownership: 'cosmetic', previewSprite: 6 },
+  { id: 'cos_char_storm_caller',   category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Storm Caller',  desc: 'Cloud-silk robes, eyes lit with lightning. Evolves through all 13 realms.',       icon: '⚡', cost: 1300, ownership: 'cosmetic', theme: 'storm', previewSprite: 7 },
+  { id: 'cos_char_lotus_sage',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CHARACTER, name: 'Lotus Sage',    desc: 'Petals bloom around an ascetic\'s frame. Evolves through all 13 realms.',         icon: '🪷', cost: 1100, ownership: 'cosmetic', theme: 'lotus', previewSprite: 8 },
+  { id: 'cos_crystal_phoenix',     category: 'cosmetic', cosmeticSlot: COSMETIC_SLOTS.CRYSTAL,   name: 'Phoenix Core',  desc: 'A molten ember bound in crystal lattice. Evolves through all 10 tiers.',          icon: '🔥', cost: 900,  ownership: 'cosmetic', theme: 'phoenix', previewSprite: 6 },
 ];
 
 // ── Theme bundle packs ─────────────────────────────────────────────────────

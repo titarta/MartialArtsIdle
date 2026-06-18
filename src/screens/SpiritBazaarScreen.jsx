@@ -9,6 +9,7 @@ import {
   COSMETIC_SLOTS,
   getFeaturedItemForToday,
 } from '../data/shopItems';
+import { skinnedCultivatorPath, skinnedCrystalPath } from '../utils/skinSprites';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -73,10 +74,11 @@ function BuffCountdown({ expiresAtMs }) {
 
 function getSkinSprites(item) {
   if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
-    return CULTIVATOR_SPRITES.map(s => `${BASE}${s.replace(/^\//, '')}`);
+    // Skin the procession by THIS item's theme (no-op base art until it ships).
+    return CULTIVATOR_SPRITES.map(s => skinnedCultivatorPath(`${BASE}${s.replace(/^\//, '')}`, item.id));
   }
   if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
-    return Array.from({ length: 10 }, (_, i) => `${BASE}crystals/crystal_${i + 1}.png`);
+    return Array.from({ length: 10 }, (_, i) => skinnedCrystalPath(`${BASE}crystals/crystal_${i + 1}.png`, item.id));
   }
   // Particles / backdrop slots: 6 abstract stages. We fall back to the
   // cultivator sprite set sliced into 6 (the procession CSS treats them

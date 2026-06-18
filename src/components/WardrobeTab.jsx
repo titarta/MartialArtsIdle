@@ -6,6 +6,7 @@ import {
   SHOP_ITEMS_BY_ID,
   COSMETIC_SLOTS,
 } from '../data/shopItems';
+import { skinnedCultivatorPath, skinnedCrystalPath } from '../utils/skinSprites';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -50,7 +51,7 @@ function CosmeticPreview({ item }) {
   if (item.cosmeticSlot === COSMETIC_SLOTS.CHARACTER) {
     return (
       <img
-        src={CULTIVATOR_SPRITE}
+        src={skinnedCultivatorPath(CULTIVATOR_SPRITE, item.id)}
         alt=""
         className="wdb-tile-preview-sprite"
         draggable="false"
@@ -61,7 +62,7 @@ function CosmeticPreview({ item }) {
   if (item.cosmeticSlot === COSMETIC_SLOTS.CRYSTAL) {
     return (
       <img
-        src={CRYSTAL_SPRITE}
+        src={skinnedCrystalPath(CRYSTAL_SPRITE, item.id)}
         alt=""
         className="wdb-tile-preview-sprite"
         draggable="false"
