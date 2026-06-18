@@ -29,6 +29,7 @@ const BGM_FADE_IN  = 500;
 let settings      = loadAudioSettings();
 let bgmHowl       = null;   // currently active BGM Howl instance
 let bgmTrackId    = null;   // key into BGM_TRACKS
+let bgmGain       = 1;      // active track's own gain (its Designer volume override)
 let bgmPaused     = false;  // true while tab is hidden
 let adPlaying     = false;  // true while an ad has audio focus
 
@@ -57,7 +58,10 @@ const subscribers = new Set();
 
 function effectiveBgmVol() {
   if (settings.masterMuted || settings.bgmMuted) return 0;
-  return settings.masterVol * settings.bgmVol;
+  // bgmGain folds in the active track's own volume (its Designer override,
+  // merged into BGM_TRACKS by sounds.js) the same way SFX fold in _maiGain,
+  // so a per-track volume set in the Designer actually caps BGM playback.
+  return settings.masterVol * settings.bgmVol * bgmGain;
 }
 
 function effectiveSfxVol() {
@@ -346,6 +350,9 @@ const AudioManager = {
 
     bgmHowl   = howl;
     bgmPaused = false;
+    // Pick up this track's own gain so effectiveBgmVol() caps to the Designer
+    // volume. Set before targetVol below and before any later fade/resume.
+    bgmGain   = BGM_TRACKS[trackId]?.volume ?? 1;
 
     // The cached howl for this track may have lingering internal sounds from
     // a prior fade-out that's still in progress (rapid screen toggles). Cancel
