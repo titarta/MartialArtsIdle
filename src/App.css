@@ -4949,8 +4949,10 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   z-index: 1;
 }
 
-/* Hold-state edge vignette — soft warm glow at the screen edges that
-   blooms in while the player is holding the cultivator. Subtle on
+/* Hold-state edge vignette: soft glow at the screen edges that blooms in
+   while the player is holding the cultivator. Reads the active crystal
+   palette (--qi-aura-*, set by body.crystal-tier-N) so it matches the
+   particles and cultivator aura instead of a fixed blue. Subtle on
    purpose; the cultivator's aura carries the strong feedback. */
 .home-screen::after {
   content: '';
@@ -4961,14 +4963,16 @@ body.cf-rung-pop .home-fighter-stage.stage-boosted::after {
   background: radial-gradient(
     ellipse at center,
     transparent 42%,
-    rgba(92, 216, 255, 0.12)  78%,
-    rgba(20, 150, 220, 0.26)  100%
+    var(--qi-aura-fringe) 78%,
+    var(--qi-aura-core)   100%
   );
   opacity: 0;
   transition: opacity 280ms ease-out;
 }
 
-.home-screen.home-boosting::after { opacity: 1; }
+/* 0.5 (not 1) compensates for the aura vars carrying ~2x the alpha of the
+   old hardcoded tints, keeping the bloom as subtle as before. */
+.home-screen.home-boosting::after { opacity: 0.5; }
 
 .vfx-disabled .home-screen::after { display: none; }
 
