@@ -19737,14 +19737,17 @@ button.pl-leader.pl-leader-clickable:focus-visible {
        halo       (CTA + subtitle)                      (gold tablet) */
 
 .home-gate-bypass-btn {
-  /* Anchored to .home-scene-bottom (position:relative).
-     bottom:10px keeps it clear of the home-scene-bottom's padding;
-     left/right hug the card edge with the same gutter the qi bar uses. */
+  /* Anchored to .home-scene-bottom (position:relative). Sized + placed to
+     sit BELOW the qi readout row (gate-needs / your-output) instead of over
+     it: the trimmed height + small bottom offset land the top edge just
+     under the overlay row, so the two decision numbers stay visible while
+     the player weighs whether to spend the Pardon. Still position:absolute,
+     so it adds NO flow height; the bottom card never grows when it appears. */
   position: absolute;
-  bottom: 10px;
+  bottom: 4px;
   left: 16px;
   right: 16px;
-  height: 64px;
+  height: 52px;
   z-index: 8;
   display: flex;
   align-items: center;
@@ -19857,7 +19860,7 @@ button.pl-leader.pl-leader-clickable:focus-visible {
 .home-gate-bypass-btn:active .home-gate-bypass-seal { transform: scale(0.94); }
 .home-gate-bypass-seal-halo {
   position: absolute;
-  inset: -9px;
+  inset: -6px;
   border-radius: 50%;
   background: radial-gradient(circle,
     rgba(216, 50, 74, 0.55) 0%,

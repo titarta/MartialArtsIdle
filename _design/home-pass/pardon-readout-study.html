@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Heaven's Pardon · readout study</title>
+<style>
+  /* ---- page chrome (study only, not shipped) ---- */
+  :root{
+    --bronze:#c9923f; --bronze-hot:#f5cf7a;
+    --gold-hot:#ffcf83; --cream:#f5e6c8; --cream-dim:#e2c99e;
+    --verm:#d8324a; --verm-deep:#7c0f22;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#0b0a0c; color:#c9c4bb;
+    font-family:'Cinzel',Georgia,serif;
+    -webkit-font-smoothing:antialiased; padding:28px 16px 60px;
+  }
+  .wrap{max-width:430px;margin:0 auto}
+  h1{font-size:18px;color:#e9dcc0;letter-spacing:.04em;margin:0 0 4px;text-align:center;font-weight:700}
+  .sub{font-size:12px;color:#8a8278;text-align:center;margin:0 0 20px;font-family:system-ui,sans-serif}
+
+  /* tab buttons */
+  .tabs{display:flex;gap:6px;margin:0 0 16px;justify-content:center;flex-wrap:wrap}
+  .tab{
+    font-family:system-ui,sans-serif;font-size:12px;font-weight:600;cursor:pointer;
+    padding:7px 12px;border-radius:8px;border:1px solid #3a3228;background:#191510;color:#b6ab97;
+    transition:all .15s;
+  }
+  .tab[aria-selected="true"]{border-color:var(--bronze);background:#241a12;color:var(--gold-hot)}
+  .tab .rec{font-size:9px;color:#7fd48a;display:block;letter-spacing:.06em}
+
+  /* the phone scene */
+  .scene{
+    position:relative;margin:0 auto;width:390px;max-width:100%;
+    border-radius:18px;overflow:hidden;border:1px solid #241c16;
+    background:
+      radial-gradient(120% 80% at 50% 8%, rgba(120,40,46,.10) 0%, transparent 55%),
+      linear-gradient(to top, #0d0b0a 0%, #16110f 58%, #1f1813 100%);
+  }
+  .scene-art{
+    height:150px;display:grid;place-items:center;color:#3a3128;font-size:11px;
+    letter-spacing:.3em;text-transform:uppercase;font-family:system-ui,sans-serif;
+    background:
+      radial-gradient(60% 70% at 50% 96%, rgba(216,50,74,.10), transparent 70%);
+  }
+  .scene-art .who{opacity:.55}
+
+  /* ---- the bottom card (mirrors .home-scene-bottom) ---- */
+  .bottom{
+    position:relative;z-index:7;padding:0 0 8px;
+    background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.45) 65%, rgba(0,0,0,0) 100%);
+  }
+  .realm-header{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 16px 0;line-height:1.15}
+  .realm-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:.10em;text-shadow:0 0 14px rgba(220,175,110,.3),0 2px 4px rgba(0,0,0,.85)}
+  .realm-stage{font-size:9px;font-weight:600;color:rgba(255,210,100,.92);letter-spacing:.32em;text-transform:uppercase;margin-top:2px;text-shadow:0 0 8px rgba(220,150,20,.7),0 1px 4px #000}
+  .realm-rule{width:80px;height:1px;margin:8px auto 0;background:linear-gradient(90deg,transparent,#dcaf6e,transparent)}
+
+  /* qi numbers row (mirrors .home-scene-overlay-row) */
+  .qi-row{display:flex;align-items:center;justify-content:center;gap:18px;padding:6px 16px 4px;margin-top:2px}
+  .qi-half{display:flex;flex-direction:column;align-items:center;gap:1px}
+  .qi-label{font-family:system-ui,sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#9a8f7c}
+  .qi-val{font-size:14.5px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em;color:var(--gold-hot)}
+  .qi-val.req{color:var(--cream)}
+  .qi-val.low{color:#ff6f6f}
+  .qi-val.ok{color:#9be39b}
+
+  /* qi bar (mirrors .home-bar-wrap progress) */
+  .bar-wrap{padding:6px 22px 4px;position:relative}
+  .bar{height:14px;border-radius:7px;border:1px solid #4a3a22;background:#120d09;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,.7)}
+  .bar-fill{position:absolute;inset:0;width:62%;background:linear-gradient(90deg,#b21833,#ec3e58);box-shadow:0 0 10px rgba(216,50,74,.5)}
+
+  /* ============ HEAVEN'S PARDON PLAQUE (real CSS, ported) ============ */
+  .pardon{
+    height:64px;z-index:8;display:flex;align-items:center;gap:14px;
+    padding:0 14px;border:1px solid var(--bronze);border-radius:10px;color:#f3e7cf;
+    cursor:pointer;overflow:hidden;position:relative;
+    background:
+      radial-gradient(circle at 12% 60%, rgba(216,50,74,.20) 0%, transparent 38%),
+      linear-gradient(180deg, rgba(255,226,170,.10) 0%, rgba(255,226,170,0) 18%),
+      linear-gradient(180deg,#2c151a 0%,#190c10 100%);
+    box-shadow:inset 0 1px 0 rgba(255,220,160,.28),inset 0 -3px 10px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.55),0 0 22px rgba(216,50,74,.22);
+  }
+  .pardon::before{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+    background:linear-gradient(105deg,transparent 38%,rgba(255,224,160,.22) 50%,transparent 62%);
+    transform:translateX(-120%);animation:gleam 4.2s ease-in-out infinite}
+  @keyframes gleam{0%,60%{transform:translateX(-120%)}88%,100%{transform:translateX(120%)}}
+
+  .corner{position:absolute;width:12px;height:12px;pointer-events:none;z-index:3}
+  .corner::before,.corner::after{content:'';position:absolute;background:linear-gradient(135deg,var(--bronze-hot),var(--bronze));box-shadow:0 0 4px rgba(245,200,66,.55)}
+  .corner::before{width:12px;height:1.5px}.corner::after{width:1.5px;height:12px}
+  .c-tl{top:4px;left:4px}.c-tl::before,.c-tl::after{top:0;left:0}
+  .c-tr{top:4px;right:4px}.c-tr::before{top:0;right:0}.c-tr::after{top:0;right:0}
+  .c-bl{bottom:4px;left:4px}.c-bl::before,.c-bl::after{bottom:0;left:0}
+  .c-br{bottom:4px;right:4px}.c-br::before{bottom:0;right:0}.c-br::after{bottom:0;right:0}
+
+  .seal{position:relative;flex:0 0 auto;width:46px;height:46px;display:grid;place-items:center;z-index:2}
+  .seal-halo{position:absolute;inset:-9px;border-radius:50%;filter:blur(4px);pointer-events:none;
+    background:radial-gradient(circle,rgba(216,50,74,.55) 0%,rgba(216,50,74,.22) 38%,transparent 72%);
+    animation:halo 2.8s ease-in-out infinite}
+  @keyframes halo{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.16)}}
+  .seal-disc{position:relative;z-index:1;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;
+    font-size:26px;line-height:1;color:#fff2cf;border:1.5px solid var(--bronze);
+    background:radial-gradient(circle at 36% 28%,#ec3e58 0%,#b21833 60%,#7c0f22 100%);
+    box-shadow:inset 0 1px 2px rgba(255,210,210,.6),inset 0 -2px 5px rgba(70,6,16,.85),0 1px 3px rgba(0,0,0,.55),0 0 12px rgba(216,50,74,.5);
+    text-shadow:0 1px 2px rgba(80,8,18,.9)}
+
+  .body{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;flex:1 1 auto;min-width:0;gap:2px}
+  .cta{font-size:16px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#ffd97a;white-space:nowrap;line-height:1;text-shadow:0 1px 2px rgba(0,0,0,.92),0 0 14px rgba(245,200,66,.35)}
+  .pardon-sub{font-size:10.5px;font-weight:600;letter-spacing:.06em;color:rgba(226,201,158,.85);font-variant-numeric:tabular-nums;text-shadow:0 1px 2px rgba(0,0,0,.7);white-space:nowrap}
+
+  .count{position:relative;z-index:2;flex:0 0 auto;min-width:42px;padding:4px 8px 3px;display:flex;flex-direction:column;align-items:center;gap:1px;border-radius:6px;
+    background:linear-gradient(180deg,var(--bronze-hot) 0%,#c8923a 100%);border:1px solid #5a3818;
+    box-shadow:inset 0 1px 0 rgba(255,240,200,.7),inset 0 -2px 3px rgba(80,40,16,.5),0 2px 4px rgba(0,0,0,.6),0 0 10px rgba(245,200,66,.32)}
+  .count-num{font-weight:800;font-size:20px;line-height:1;color:#2a1408;font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,240,200,.55)}
+  .count-lbl{font-weight:700;font-size:8px;line-height:1;letter-spacing:.18em;text-transform:uppercase;color:rgba(42,20,8,.85)}
+
+  .ember{position:absolute;left:22px;right:22px;bottom:4px;height:1px;filter:blur(.4px);pointer-events:none;opacity:.75;z-index:2;
+    background:linear-gradient(90deg,transparent 0%,rgba(216,50,74,.6) 18%,rgba(245,200,66,.9) 50%,rgba(216,50,74,.6) 82%,transparent 100%);
+    animation:ember 3s ease-in-out infinite}
+  @keyframes ember{0%,100%{opacity:.55}50%{opacity:1}}
+
+  /* --- overlay positioning for the "NOW" tab (covers the card) --- */
+  .pardon.is-overlay{position:absolute;left:16px;right:16px;bottom:10px}
+
+  /* --- Fix A: comparison lives ON the plaque --- */
+  .verdict{display:flex;align-items:center;gap:8px;width:100%;margin-top:1px}
+  .verdict .vs{display:flex;align-items:baseline;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .verdict .k{font-family:system-ui,sans-serif;font-size:7.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#a08b6d}
+  .verdict .you{color:#ff6f6f}
+  .verdict .you.ok{color:#9be39b}
+  .verdict .gate{color:var(--cream)}
+  .verdict .arrow{color:#6f6354;font-size:10px}
+  .meter{flex:1 1 auto;height:5px;min-width:46px;border-radius:3px;background:#120d09;border:1px solid #4a3a22;position:relative;overflow:hidden}
+  .meter-fill{position:absolute;inset:0;width:24%;border-radius:3px;background:linear-gradient(90deg,#e24b4a,#ef9f27)}
+  .meter-fill.ok{background:linear-gradient(90deg,#caa23a,#9be39b)}
+  .meter-notch{position:absolute;top:-1px;bottom:-1px;left:100%;width:1px;background:rgba(245,200,66,.7)}
+
+  /* --- Fix B: plaque sits in its own band; shorter --- */
+  .pardon.is-band{height:54px}
+  .pardon.is-band .cta{font-size:15px}
+
+  .cap{font-family:system-ui,sans-serif;font-size:11px;color:#857c70;line-height:1.5;margin:14px 4px 0}
+  .cap b{color:#c4b48f;font-weight:600}
+
+  /* strength slider */
+  .ctrl{display:flex;align-items:center;gap:10px;margin:18px 2px 4px;font-family:system-ui,sans-serif}
+  .ctrl label{font-size:11px;color:#9a8f7c;letter-spacing:.04em;white-space:nowrap}
+  .ctrl input[type=range]{flex:1;accent-color:#c9923f}
+  .ctrl .read{font-size:12px;font-weight:700;color:var(--gold-hot);min-width:74px;text-align:right;font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Heaven's Pardon · readout study</h1>
+  <p class="sub">The decision: "Am I strong enough to push the gate, or burn a Pardon?" The player must see <b>their qi/s</b> vs <b>the gate's qi/s</b>.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-v="now" aria-selected="false">Now<span class="rec">covers the numbers</span></button>
+    <button class="tab" role="tab" data-v="a" aria-selected="true">Fix A<span class="rec">readout on plaque ★</span></button>
+    <button class="tab" role="tab" data-v="b" aria-selected="false">Fix B<span class="rec">plaque keeps own band</span></button>
+  </div>
+
+  <div class="scene">
+    <div class="scene-art"><span class="who">· seated cultivator ·</span></div>
+    <div class="bottom" id="bottom"></div>
+  </div>
+
+  <div class="ctrl">
+    <label>Your strength vs gate</label>
+    <input type="range" id="str" min="5" max="160" step="1" value="24" />
+    <span class="read" id="strread">24%</span>
+  </div>
+
+  <p class="cap" id="cap"></p>
+</div>
+
+<script>
+  var GATE = 5.0e3;            // required qi/s (demo value)
+  var TOKENS = 3;
+  var view = 'a';
+  var pct = 24;
+
+  function fmt(n){
+    if(n>=1e9) return (n/1e9).toFixed(2)+'B';
+    if(n>=1e6) return (n/1e6).toFixed(2)+'M';
+    if(n>=1e3) return (n/1e3).toFixed(1)+'K';
+    return Math.round(n).toString();
+  }
+
+  function plaqueCore(){
+    return ''
+      + '<span class="corner c-tl"></span><span class="corner c-tr"></span>'
+      + '<span class="corner c-bl"></span><span class="corner c-br"></span>'
+      + '<span class="seal"><span class="seal-halo"></span><span class="seal-disc">符</span></span>';
+  }
+  function countPlaque(){
+    return '<span class="count"><span class="count-num">'+TOKENS+'</span><span class="count-lbl">Left</span></span><span class="ember"></span>';
+  }
+
+  function render(){
+    var you = GATE * pct/100;
+    var ok = pct >= 100;
+    var fill = Math.max(4, Math.min(100, pct));
+    var youCls = ok ? 'ok' : '';
+
+    var b = document.getElementById('bottom');
+    var header =
+      '<div class="realm-header"><span class="realm-name">Origin Returning</span>'
+      + '<span class="realm-stage">Gate · 9th Stage</span><span class="realm-rule"></span></div>';
+
+    var barWrap = '<div class="bar-wrap"><div class="bar"><div class="bar-fill"></div></div></div>';
+
+    if(view==='now'){
+      // current behaviour: full-card overlay smothers the qi row
+      var qi =
+        '<div class="qi-row"><div class="qi-half"><span class="qi-val req">'+fmt(GATE)+'/s</span></div>'
+        + '<div class="qi-half"><span class="qi-val">'+fmt(you)+'/s</span></div></div>';
+      var pardon =
+        '<button class="pardon is-overlay">'+plaqueCore()
+        + '<span class="body"><span class="cta">Bypass Gate</span>'
+        + '<span class="pardon-sub">Heaven’s Pardon · talisman</span></span>'
+        + countPlaque()+'</button>';
+      b.innerHTML = header + qi + barWrap + pardon;
+      b.style.position='relative';
+    }
+    else if(view==='a'){
+      // Fix A — readout baked onto the plaque face (replaces flavor sub-line)
+      var meterCls = ok ? 'ok' : '';
+      var pardon =
+        '<button class="pardon">'+plaqueCore()
+        + '<span class="body"><span class="cta">Bypass Gate</span>'
+        + '<span class="verdict">'
+        +   '<span class="vs"><span class="k">You</span><span class="you '+youCls+'">'+fmt(you)+'</span>'
+        +     '<span class="arrow">▸</span><span class="k">Gate</span><span class="gate">'+fmt(GATE)+'</span></span>'
+        +   '<span class="meter"><span class="meter-fill '+meterCls+'" style="width:'+fill+'%"></span><span class="meter-notch"></span></span>'
+        + '</span></span>'
+        + countPlaque()+'</button>';
+      b.innerHTML = header + '<div style="padding:6px 16px 0"></div>' + pardon + '<div style="height:6px"></div>';
+      b.style.position='static';
+    }
+    else {
+      // Fix B — labelled qi row stays visible; plaque drops to its own band below
+      var qi =
+        '<div class="qi-row">'
+        + '<div class="qi-half"><span class="qi-label">Gate needs</span><span class="qi-val req">'+fmt(GATE)+'/s</span></div>'
+        + '<div class="qi-half"><span class="qi-label">You make</span><span class="qi-val '+(ok?'ok':'low')+'">'+fmt(you)+'/s</span></div></div>';
+      var pardon =
+        '<div class="bar-wrap" style="padding-top:2px"><button class="pardon is-band">'+plaqueCore()
+        + '<span class="body"><span class="cta">Bypass Gate</span>'
+        + '<span class="pardon-sub">Heaven’s Pardon · skip the gate</span></span>'
+        + countPlaque()+'</button></div>';
+      b.innerHTML = header + qi + pardon;
+      b.style.position='static';
+    }
+
+    var cap = document.getElementById('cap');
+    var verdict = ok
+      ? '<b>At/above the gate</b>, you could just push through; the Pardon saves grind time.'
+      : 'You make <b>'+Math.round(pct)+'%</b> of what the gate needs — a real wall, where a Pardon is worth it.';
+    var notes = {
+      now:'<b>Now:</b> the 64px plaque is <code>position:absolute</code> over the whole card, so both qi numbers vanish behind it. The player can’t weigh the choice.',
+      a:'<b>Fix A (recommended):</b> the flavor sub-line becomes the live <b>You ▸ Gate</b> readout + a deficit meter. The decision data now lives on the decision surface. Plaque style is untouched.',
+      b:'<b>Fix B:</b> the plaque shrinks to its own band at the bottom; the qi row stays above it, now <b>labelled</b> so the two bare /s numbers aren’t ambiguous.'
+    };
+    cap.innerHTML = notes[view] + '<br><br>' + verdict;
+  }
+
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected','false')});
+      t.setAttribute('aria-selected','true');
+      view = t.getAttribute('data-v');
+      render();
+    });
+  });
+  var str = document.getElementById('str');
+  str.addEventListener('input',function(){
+    pct = +str.value;
+    document.getElementById('strread').textContent = pct+'%';
+    render();
+  });
+  render();
+</script>
+</body>
+</html>
