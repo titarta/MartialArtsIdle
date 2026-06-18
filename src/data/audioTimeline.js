@@ -35,8 +35,8 @@ export const AUDIO_TIMELINE_DEFAULTS = {
     ],
     sounds: [
       { id: 'crystal_evolve_start', label: 'Start',   t: 0 },
-      { id: 'crystal_evolve_break', label: 'Break',   t: 520 },
-      { id: 'crystal_evolve',       label: 'Rebuild', t: 2170 },
+      { id: 'crystal_evolve_break', label: 'Break',   t: 0 },
+      { id: 'crystal_evolve',       label: 'Rebuild', t: 1900 },
     ],
     // Event-driven, not time-tuned (fired by the overlay on a discrete event).
     // Shown in the Lab for completeness so the full sound set is visible.
@@ -55,7 +55,7 @@ export const AUDIO_TIMELINE_DEFAULTS = {
     ],
     sounds: [
       { id: 'cult_breakthrough_start',      label: 'Start',      t: 0 },
-      { id: 'cult_breakthrough_transition', label: 'Transition', t: 785 },
+      { id: 'cult_breakthrough_transition', label: 'Transition', t: 775 },
     ],
     // Event-driven, not time-tuned (fired by the overlay on a discrete event).
     // Shown in the Lab for completeness so the full sound set is visible.
