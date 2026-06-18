@@ -11,13 +11,13 @@ Legend: [ ] todo  ·  [x] done
 
 ---
 
-## Tier 1 — Free polish (4 icons, do first)
+## Tier 1 — Free polish
 
-Cheapest wins; both fix surfaces that currently look unfinished.
+Cheapest wins; fixes surfaces that currently look unfinished.
 
-- [ ] **Half-Step Open Heaven realm icon** (1) — `gen_realm_icons.py`. Currently the
-  only realm still on an emoji (`🌅`, `JourneyBody.jsx:31`); every other one of the
-  13 has a painted icon. One generation removes a visible odd-one-out.
+(All 13 journey realms have painted icons. "Half-Step Open Heaven" is not a
+realm in the progression — the dead `🌅`/`半` map entries were removed.)
+
 - [x] **Wardrobe slot defaults** — DONE 2026-06-11, zero new art. Every default tile
   now reuses real game art instead of an emoji: cultivator (t1 sprite), crystal
   (crystal_5), qi orb (C1), and the home.png meditation-hall backdrop
