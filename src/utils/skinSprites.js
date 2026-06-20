@@ -26,6 +26,7 @@ import { SHOP_ITEMS_BY_ID } from '../data/shopItems';
 // Themes whose full sprite sets exist on disk. EMPTY until art is generated;
 // add a theme string here the moment its sprites/<theme>/ folder is populated.
 export const SKIN_ART_READY = new Set([
+  'legacy',
   // 'frost', 'bone', 'storm', 'lotus', 'phoenix',
 ]);
 
