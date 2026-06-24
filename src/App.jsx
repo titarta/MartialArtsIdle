@@ -633,6 +633,20 @@ function AppInner() {
     if (cultivation.shopBuffCrystalTapMultRef) {
       cultivation.shopBuffCrystalTapMultRef.current = shopInventory.getActiveBuffMult('crystal_tap_mult');
     }
+    // Crimson Aura (qi_mult) applies OFFLINE too, but only for the wall-clock
+    // hours the buff is still live. The offline calc runs before React mounts,
+    // so it can't read this hook; mirror the live buff's mult + absolute
+    // expiry into a localStorage snapshot it can read (same pattern as the
+    // artefact/furnace offline snapshots). Cleared when no qi_mult buff is live.
+    try {
+      const qiBuff = shopInventory.inv?.buffs?.qi_mult;
+      if (qiBuff && qiBuff.mult > 1 && qiBuff.expiresAtMs > Date.now()) {
+        localStorage.setItem('mai_shop_buff_offline_snapshot',
+          JSON.stringify({ qiMult: qiBuff.mult, expiresAtMs: qiBuff.expiresAtMs }));
+      } else {
+        localStorage.removeItem('mai_shop_buff_offline_snapshot');
+      }
+    } catch { /* storage unavailable; offline buff just won't apply */ }
   }, [shopInventory.inv, cultivation.shopBuffQiMultRef, cultivation.shopBuffCrystalTapMultRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Heavenly Resonance — mirror the shop's foreground-draining pool into the

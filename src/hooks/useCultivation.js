@@ -308,7 +308,31 @@ export default function useCultivation() {
     } catch {}
     const OFFLINE_QI_MULTIPLIER = 0.20 + offlineRateBonus;
     const baseRate = (BASE_RATE + producerOfflineRate) * crystalMult * lawMult * offlineQiMult * artefactOfflineMult * sparkOfflineMult * treeOfflineMult * furnaceOfflineMult * (1 + pillQiSpeedBonus) * OFFLINE_QI_MULTIPLIER;
-    const total = baseRate * awaySeconds;
+
+    // Crimson Aura (Blood Lotus qi_mult buff) keeps doubling qi while you're
+    // away, but only for the wall-clock hours it stays live. The credited
+    // offline window is the first `awaySeconds` of the absence (after the cap),
+    // starting at lastSeen; the buff applies up to its absolute expiry. Add the
+    // (mult - 1) surplus over just that buffed slice, still on the same reduced
+    // offline rate, so it never pays the full online value. Snapshot written by
+    // App.jsx (this calc runs pre-React-mount, so it reads localStorage).
+    let buffedSeconds = 0;
+    let shopQiBuffMult = 1;
+    try {
+      const raw = localStorage.getItem('mai_shop_buff_offline_snapshot');
+      if (raw) {
+        const snap = JSON.parse(raw);
+        const mult = snap?.qiMult ?? 1;
+        const expiresAtMs = snap?.expiresAtMs ?? 0;
+        if (mult > 1 && expiresAtMs > saved.lastSeen) {
+          const creditEndMs = saved.lastSeen + awaySeconds * 1000;
+          const buffedMs = Math.max(0, Math.min(creditEndMs, expiresAtMs) - saved.lastSeen);
+          buffedSeconds = Math.min(awaySeconds, buffedMs / 1000);
+          shopQiBuffMult = mult;
+        }
+      }
+    } catch { /* malformed snapshot; treat as no offline buff */ }
+    const total = baseRate * (awaySeconds + buffedSeconds * (shopQiBuffMult - 1));
 
     // Crystal Click offline reservoir fill — silently updates localStorage so
     // the crystalReservoirRef useRef below reads the already-accrued value.
