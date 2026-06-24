@@ -11,7 +11,9 @@
  *     hint:       string | null (shown when locked, gives a recipe hint),
  *     discovered: boolean,
  *     // optional, used by some sections:
- *     sprite:     string | null,  // /sprites/path.png OR a 128×128 sheet
+ *     sprite:     string | null,  // /sprites/path.png (single frame by default)
+ *     sheet:      boolean,        // true → sprite is a 2×2 growth sheet; crop
+ *                                 //        to the ripe (bottom-right) quadrant
  *     color:      string | null,  // hex for an orb placeholder
  *     badge:      string | null,  // ×N badge for sect ranks
  *   }
@@ -29,7 +31,13 @@ function EntryRow({ entry }) {
   return (
     <div className={`cx-entry ${entry.discovered ? 'cx-entry-on' : 'cx-entry-off'}`}>
       <div className="cx-entry-icon">
-        {entry.sprite ? (
+        {entry.sprite && entry.sheet ? (
+          // 2×2 growth sheet: show only the ripe (bottom-right) quadrant.
+          <span
+            className="cx-entry-sheet"
+            style={{ backgroundImage: `url(${url(entry.sprite)})` }}
+          />
+        ) : entry.sprite ? (
           <img src={url(entry.sprite)} alt="" className="cx-entry-sprite" draggable="false" />
         ) : entry.color ? (
           <span className="cx-entry-orb" style={{ background: entry.color }} />

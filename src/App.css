@@ -65,6 +65,7 @@ body.event-cinematic .char-evolve-overlay {
 .rendering-pixelated .combat-stage,
 .rendering-pixelated .sprite-animator,
 .rendering-pixelated .gd-plant,
+.rendering-pixelated .cx-entry-sheet,
 .rendering-pixelated .screen-container:not(.sc-fullbleed)::before {
   image-rendering: pixelated;
 }
@@ -32017,6 +32018,10 @@ body.body-crimson-aura-active .home-fighter-stage::before {
 .cx-entry-icon { position: relative; width: 40px; height: 40px; flex: 0 0 auto; border-radius: 8px; background: rgba(0, 0, 0, 0.35); display: grid; place-items: center; overflow: hidden; }
 .cx-entry-off .cx-entry-icon { filter: grayscale(1) brightness(0.6); }
 .cx-entry-sprite { width: 36px; height: 36px; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: contain; }
+/* Garden plants ship as 2×2 growth sheets; crop to the ripe (bloom) quadrant
+   (bottom-right) so the almanac shows the finished plant, not all 4 frames.
+   image-rendering is left to the global Settings → Rendering toggle below. */
+.cx-entry-sheet { width: 36px; height: 36px; background-repeat: no-repeat; background-size: 200% 200%; background-position: 100% 100%; }
 .cx-entry-orb { width: 24px; height: 24px; border-radius: 50%; box-shadow: 0 0 12px currentColor; opacity: 0.85; }
 .cx-entry-glyph { font-family: 'Cinzel', Georgia, serif; font-size: 18px; color: rgba(220, 175, 110, 0.4); }
 .cx-entry-badge { position: absolute; bottom: 2px; right: 3px; font-size: 9px; font-family: 'Cinzel', Georgia, serif; color: #f5c842; background: rgba(0, 0, 0, 0.6); padding: 1px 4px; border-radius: 4px; }

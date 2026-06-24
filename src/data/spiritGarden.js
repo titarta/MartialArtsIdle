@@ -488,6 +488,8 @@ export function getGardenCodexEntries(g, t) {
       discovered,
       color: s.color,
       sprite: s.sprite,
+      // 2x2 growth-stage sheet. The codex crops to the ripe (bloom) quadrant.
+      sheet: true,
     };
   });
   const lockedHint = t ? t('garden.codexHintLocked') : 'Locked plant. Future content.';
@@ -501,6 +503,8 @@ export function getGardenCodexEntries(g, t) {
       discovered: false,
       color: meta?.color,
       sprite: `/sprites/plants/${id}.png`,
+      // 2x2 growth-stage sheet. The codex crops to the ripe (bloom) quadrant.
+      sheet: true,
     });
   }
   const recipeEntries = RECIPES.map((r) => ({
