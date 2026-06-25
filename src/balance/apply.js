@@ -18,6 +18,7 @@ import { getOverrideDoc } from '../data/config/loader';
 export function changedParams(curve, params, defaults) {
   const out = [];
   for (const s of curve.paramsSpec) {
+    if (s.type === 'bands') continue; // structured param, not a scalar constant
     const to = params[s.key];
     const from = defaults[s.key];
     if (to !== from) out.push({ key: s.key, label: s.label, from, to });
@@ -34,29 +35,41 @@ function numStr(v) {
 
 /**
  * Build the merged override document for an index-backed curve (e.g. realms).
- * `overrides` is { x: value }. Returns a pretty JSON string, or null if empty.
+ * Emits every stage whose value (point override, else the tuned formula `fn`)
+ * differs from the live baseline, so band-model edits export directly with no
+ * "bake" step and the patch stays minimal. Returns a JSON string, or null when
+ * nothing differs.
  */
-export function buildOverrideJSON(curve, overrides) {
+export function buildOverrideJSON(curve, { overrides, params, xs, baseFn }) {
   const ap = curve.apply;
   if (!ap || ap.kind !== 'override') return null;
-  const keys = Object.keys(overrides || {});
-  if (keys.length === 0) return null;
 
   const doc = getOverrideDoc(ap.domain);
   const records = { ...(doc.records || {}) };
-  for (const x of keys) {
-    const val = overrides[x];
-    if (!Number.isFinite(val)) continue;
+  let any = false;
+  for (const x of (xs || [])) {
+    const has = Object.prototype.hasOwnProperty.call(overrides || {}, x);
+    const raw = has ? overrides[x] : curve.fn(x, params);
+    if (!Number.isFinite(raw)) continue;
+    const val = Math.round(raw);
+    // Skip stages that match the live baseline — the band model regenerates
+    // those, so only the genuinely-reshaped stages land in the override.
+    const base = baseFn ? baseFn(x) : null;
+    if (base != null && val === Math.round(base)) continue;
     // realms key by array index; the eternal tree keys by node id (ap.keys[x]).
     const recKey = ap.keys ? String(ap.keys[Number(x)]) : String(x);
     if (recKey === 'undefined') continue;
-    records[recKey] = { ...(records[recKey] || {}), [ap.field]: Math.round(val) };
+    records[recKey] = { ...(records[recKey] || {}), [ap.field]: val };
+    any = true;
   }
-  return JSON.stringify({ version: doc.version ?? 1, records }, null, 2);
+  return any ? JSON.stringify({ version: doc.version ?? 1, records }, null, 2) : null;
 }
 
 /** Build the human-readable snippet (param changes + point-override note). */
 export function buildSnippet(curve, params, defaults, overrides, variantLabel) {
+  // Override-backed curves (realms, tree) apply via JSON only — there's no
+  // constant to paste, so a snippet would just be noise.
+  if (curve.apply?.kind === 'override') return null;
   const changes = changedParams(curve, params, defaults);
   const ptCount = Object.keys(overrides || {}).length;
   const isOverrideDomain = curve.apply?.kind === 'override';
@@ -86,10 +99,10 @@ export function buildSnippet(curve, params, defaults, overrides, variantLabel) {
  * Full export for the active curve/variant. Returns { overrideJSON, overrideDomain,
  * snippet }, any field may be null.
  */
-export function buildExport(curve, { params, defaults, overrides, variantLabel }) {
+export function buildExport(curve, { params, defaults, overrides, variantLabel, xs, baseFn }) {
   return {
     overrideDomain: curve.apply?.kind === 'override' ? curve.apply.domain : null,
-    overrideJSON:   buildOverrideJSON(curve, overrides),
+    overrideJSON:   buildOverrideJSON(curve, { overrides, params, xs, baseFn }),
     snippet:        buildSnippet(curve, params, defaults, overrides, variantLabel),
   };
 }

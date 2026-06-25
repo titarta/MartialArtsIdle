@@ -48,6 +48,10 @@ export default function BalanceDashboard() {
   }, [key, defaults]);
 
   const setParam = (k, v) => setEntry(e => ({ ...e, params: { ...e.params, [k]: v } }));
+  const setBand  = (name, field, v) => setEntry(e => ({
+    ...e,
+    params: { ...e.params, bands: { ...e.params.bands, [name]: { ...(e.params.bands?.[name] ?? {}), [field]: v } } },
+  }));
   const setPoint = (x, v) => setEntry(e => ({ ...e, overrides: { ...e.overrides, [x]: v } }));
   const resetPoint = (x) => setEntry(e => { const o = { ...e.overrides }; delete o[x]; return { ...e, overrides: o }; });
   const resetPoints = () => setEntry(e => ({ ...e, overrides: {} }));
@@ -64,8 +68,8 @@ export default function BalanceDashboard() {
   );
 
   const exp = useMemo(
-    () => buildExport(curve, { params, defaults, overrides, variantLabel: variant?.label }),
-    [curve, params, defaults, overrides, variant],
+    () => buildExport(curve, { params, defaults, overrides, variantLabel: variant?.label, xs, baseFn: base }),
+    [curve, params, defaults, overrides, variant, xs, base],
   );
 
   const copy = (text, which) => {
@@ -161,6 +165,38 @@ export default function BalanceDashboard() {
             {curve.paramsSpec.length === 0 ? (
               <p className="bd-hint">Lookup table: no formula. Tune values point-by-point below.</p>
             ) : curve.paramsSpec.map(s => {
+              if (s.type === 'bands') {
+                return (
+                  <div key={s.key} className="bd-bands">
+                    <div className="bd-bands-grid bd-bands-head">
+                      <span>{s.label}</span>
+                      {s.cols.map(c => <span key={c.key} title={c.title}>{c.label}</span>)}
+                    </div>
+                    {s.bandDefs.map((bd) => {
+                      const b = params.bands?.[bd.name] ?? {};
+                      return (
+                        <div key={bd.name} className="bd-bands-grid bd-band-row">
+                          <span className="bd-band-name" title={`${bd.stages} stage${bd.stages === 1 ? '' : 's'}`}>{bd.name}</span>
+                          {s.cols.map(c => {
+                            const off = c.key === 'jump' && bd.firstRealm;
+                            return (
+                              <input
+                                key={c.key}
+                                className="bd-band-inp"
+                                type="number"
+                                step={c.step ?? 'any'}
+                                disabled={off}
+                                value={off ? '' : tidy(b[c.key] ?? 0)}
+                                onChange={e => setBand(bd.name, c.key, e.target.value === '' ? 0 : Number(e.target.value))}
+                              />
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              }
               const val = params[s.key];
               const hasRange = Number.isFinite(s.min) && Number.isFinite(s.max);
               return (

@@ -18,8 +18,6 @@
  */
 
 import REALMS, {
-  REALMS_RAW,
-  COST_STEEPNESS,
   getMajorBreakthroughRate,
   isMajorTransition,
   MAJOR_BREAKTHROUGH_BASE_PCT,
@@ -117,6 +115,77 @@ const CR_FIT    = linFit(CRYSTAL_RATE[1], CRYSTAL_RATE[5], 4);
 const DB_FIT    = linFit(DIVINE_BURST[1], DIVINE_BURST[5], 4);
 const CF_FIT    = linFit(CF_CUMULATIVE[1], CF_CUMULATIVE[5], 4);
 
+// ── realm cost band model (regional growth authoring) ────────────────────────
+// The realm ladder is authored PER REALM instead of as one global steepness:
+// within a realm each stage multiplies by that realm's `ratio` (its internal
+// sub-curve), and crossing INTO a realm multiplies by its `jump` (the wall).
+// Fitting both from the live REALMS table makes the DEFAULTS reproduce today's
+// curve, so a designer reshapes regions (steepen a band, drop a wall) instead
+// of hand-typing 56 absolute costs.
+function realmGroups(realms) {
+  const groups = [];
+  for (let i = 0; i < realms.length; i++) {
+    const last = groups[groups.length - 1];
+    if (last && last.name === realms[i].name) last.idxs.push(i);
+    else groups.push({ name: realms[i].name, idxs: [i] });
+  }
+  return groups;
+}
+const r3 = (v) => Math.round(v * 1000) / 1000;
+const REALM_GROUPS = realmGroups(REALMS);
+const REALM_BASE_COST = REALMS[0]?.cost ?? 100;
+const FITTED_BANDS = (() => {
+  const bands = {};
+  REALM_GROUPS.forEach((g, gi) => {
+    const costs = g.idxs.map(i => REALMS[i].cost);
+    const n = costs.length;
+    const ratio = n > 1 && costs[0] > 0 ? Math.pow(costs[n - 1] / costs[0], 1 / (n - 1)) : 1;
+    let jump = 1;
+    if (gi > 0) {
+      const prev = REALM_GROUPS[gi - 1];
+      const prevLast = REALMS[prev.idxs[prev.idxs.length - 1]].cost;
+      jump = prevLast > 0 ? costs[0] / prevLast : 1;
+    }
+    bands[g.name] = { ratio: r3(ratio), jump: r3(jump), accel: 1 };
+  });
+  return bands;
+})();
+const BAND_DEFS = REALM_GROUPS.map((g, gi) => ({ name: g.name, firstRealm: gi === 0, stages: g.idxs.length }));
+// 0-based ordinal of each stage within its realm (drives the `accel` curvature).
+const STAGE_ORD = [];
+REALM_GROUPS.forEach(g => g.idxs.forEach((idx, o) => { STAGE_ORD[idx] = o; }));
+/** Qi cost of stage `i`, built as a running product of per-step growth so each
+ *  realm's knobs compose. Every step starts from the hand-authored baseline step
+ *  (baseline[i]/baseline[i-1]) and is scaled by how far the realm's knobs deviate
+ *  from their fitted defaults, so DEFAULT knobs == identity == the live curve:
+ *    · ratio — within-realm magnitude (relative to the fitted ratio)
+ *    · jump  — the wall crossing into the realm (relative to the fitted jump)
+ *    · accel — within-realm curvature: each internal step is multiplied by
+ *              accel^(ordinal-1), so 1 = geometric (straight on the log chart),
+ *              >1 bends up (exponential → hyperbolic), <1 flattens. It accumulates
+ *              across the realm and compounds forward, so a curved realm lifts the
+ *              tail too. */
+function realmCostAt(i, p) {
+  const bands = p.bands || FITTED_BANDS;
+  let cost = Number.isFinite(p.baseCost) ? p.baseCost : REALM_BASE_COST;
+  for (let j = 1; j <= i; j++) {
+    const name = REALMS[j]?.name;
+    const fit = FITTED_BANDS[name] || { ratio: 1, jump: 1, accel: 1 };
+    const b = bands[name] || fit;
+    const prevCost = REALMS[j - 1]?.cost ?? 0;
+    const baseStep = prevCost > 0 ? (REALMS[j].cost / prevCost) : 1;
+    if (name !== REALMS[j - 1]?.name) {
+      cost *= baseStep * ((b.jump ?? fit.jump) / (fit.jump || 1));
+    } else {
+      const o = STAGE_ORD[j] ?? 1;            // 0-based ordinal; internal steps have o >= 1
+      const accel = b.accel ?? 1;
+      const cv = accel > 0 ? Math.pow(accel, Math.max(0, o - 1)) : 1;
+      cost *= baseStep * ((b.ratio ?? fit.ratio) / (fit.ratio || 1)) * cv;
+    }
+  }
+  return Math.round(cost);
+}
+
 // ── the registry ─────────────────────────────────────────────────────────────
 
 export const CURVES = [
@@ -126,15 +195,23 @@ export const CURVES = [
     id: 'realm_cost',
     group: 'Realms',
     label: 'Breakthrough qi cost',
-    blurb: 'Qi required to advance one stage. Base table × COST_STEEPNESS^index. ' +
-           'Drag a point to override a single stage (live via realms.override.json); ' +
-           'tune steepness to reshape the whole curve (snippet).',
+    blurb: 'Qi to advance one stage, per realm: ratio (within-realm magnitude), jump (the wall), ' +
+           'and curve (1 = geometric / straight on the log chart, >1 = exponential or hyperbolic, ' +
+           '<1 = flatten) which bends that realm and compounds forward. Every knob defaults to the ' +
+           'current curve, so an untouched realm is identity. Reshape regions here, fine-tune single ' +
+           'stages below, then copy the override JSON (live on reload).',
     x: { label: 'Realm stage index', from: 0, to: REALMS.length - 1, step: 1 },
     y: { label: 'Qi cost', log: true },
     paramsSpec: [
-      { key: 'steepness', label: 'COST_STEEPNESS', value: COST_STEEPNESS, min: 1.0, max: 1.03, step: 0.001 },
+      { key: 'baseCost', label: 'Stage-0 base cost', value: REALM_BASE_COST, step: 10 },
+      { key: 'bands', type: 'bands', label: 'Per-realm growth', value: FITTED_BANDS, bandDefs: BAND_DEFS,
+        cols: [
+          { key: 'ratio', label: '×/stg', step: 0.01, title: 'Per-stage multiplier within the realm (magnitude)' },
+          { key: 'jump',  label: 'jump',  step: 0.1,  title: 'Multiplier crossing into this realm (the wall)' },
+          { key: 'accel', label: 'curve', step: 0.05, title: '1 = geometric (straight on log) · >1 = exponential / hyperbolic · <1 = flatten' },
+        ] },
     ],
-    fn: (i, p) => Math.round((REALMS_RAW[i]?.cost ?? 0) * Math.pow(p.steepness, i)),
+    fn: (i, p) => realmCostAt(i, p),
     baseline: (i) => REALMS[i]?.cost ?? 0,
     pointLabel: (i) => `${REALMS[i]?.name ?? '?'} · ${REALMS[i]?.stage ?? ''}`,
     apply: { kind: 'override', domain: 'realms', byIndex: true, field: 'cost', target: 'src/data/realms.js' },

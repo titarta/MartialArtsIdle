@@ -53,8 +53,13 @@ export default function CurveChart({ curve, xs, baselineYs, tunedYs, overrides, 
   if (!Number.isFinite(yMin)) { yMin = 0; yMax = 1; }
   if (log) {
     yMin = Math.max(yMin, 1e-6);
-    if (yMin <= 0) yMin = 1e-6;
     if (yMax <= yMin) yMax = yMin * 10;
+    // Snap to clean decades and add a full decade of headroom on top, so a
+    // point can be dragged ABOVE the current peak. The old domain pinned the
+    // ceiling to the tallest existing point, which made the highest values
+    // impossible to raise by dragging.
+    yMin = Math.pow(10, Math.floor(Math.log10(yMin)));
+    yMax = Math.pow(10, Math.ceil(Math.log10(yMax)) + 1);
   } else {
     if (yMax === yMin) yMax = yMin + 1;
     const pad = (yMax - yMin) * 0.06;

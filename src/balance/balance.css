@@ -187,3 +187,24 @@
   margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--bd-line);
   font-size: 11.5px; color: var(--bd-dim); font-variant-numeric: tabular-nums;
 }
+
+/* ── per-realm band table (realm cost growth model) ── */
+.bd-bands { margin-top: 10px; }
+.bd-bands-grid { display: grid; grid-template-columns: minmax(0, 1fr) 52px 52px 52px; gap: 5px; align-items: center; }
+.bd-bands-head {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--bd-dim); padding: 0 2px 5px;
+}
+.bd-bands-head span:not(:first-child) { text-align: right; }
+.bd-band-row { margin-bottom: 4px; }
+.bd-band-name {
+  font-size: 11.5px; color: #c4d3ce;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bd-band-inp {
+  width: 100%; padding: 3px 6px; text-align: right;
+  background: #0e1413; color: var(--bd-text);
+  border: 1px solid var(--bd-line); border-radius: 6px; font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.bd-band-inp:disabled { opacity: 0.3; }
