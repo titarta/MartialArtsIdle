@@ -121,12 +121,19 @@ export function getCrystalQiMult(level) {
  * Targets above MAX_CRYSTAL_LEVEL still compute a cost (used by UI to
  * show "max reached") — actual level-up logic clamps the cap.
  */
+// Optional exponential overlay on the (otherwise polynomial) refine cost.
+// 1 = identity, i.e. the pure polynomial, which DECELERATES on a log chart.
+// Above 1, every level is multiplied by growth^(n-1), so the late levels can
+// be made genuinely exponential. Tune via the ?balance "Crystal refine cost"
+// curve (the `exp base / lvl` knob).
+export const CRYSTAL_COST_GROWTH = 1;
+
 export function getRequiredRefinedQi(targetLevel) {
   if (targetLevel < 1) return 0;
   const n = targetLevel;
   const base = 10 * Math.pow(n, 3) + 2 * Math.pow(n, 4);
   const lateMult = 1 + Math.pow(n / 40, 4);
-  const raw = base * lateMult;
+  const raw = base * lateMult * Math.pow(CRYSTAL_COST_GROWTH, n - 1);
   // Round to a clean step that scales with magnitude (keeps ~2 significant digits)
   const step = Math.pow(10, Math.max(1, Math.floor(Math.log10(raw)) - 1));
   return Math.round(raw / step) * step;

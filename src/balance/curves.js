@@ -28,6 +28,7 @@ import {
   getCrystalQiMult,
   MAX_CRYSTAL_LEVEL,
   CRYSTAL_MULT_PER_LEVEL,
+  CRYSTAL_COST_GROWTH,
 } from '../hooks/useQiCrystal';
 import { qiForKarma, KARMA_QI_SCALE } from '../hooks/useReincarnationKarma';
 import PRODUCERS from '../data/producers';
@@ -320,7 +321,10 @@ export const CURVES = [
     id: 'crystal_cost',
     group: 'Qi Crystal',
     label: 'Crystal refine cost',
-    blurb: 'Refined qi to reach a crystal level = round2sig((cubic·n³ + quart·n⁴) × (1 + (n/lateBase)^lateExp)).',
+    blurb: 'Refined qi to reach a crystal level = round2sig((cubic·n³ + quart·n⁴) × (1 + (n/lateBase)^lateExp) × growth^(n-1)). ' +
+           'The polynomial terms DECELERATE on the log chart; raise growth above 1 to overlay genuine exponential growth ' +
+           '(it dominates the late levels), or lower lateBase / raise lateExp for a steeper polynomial tail. growth maps to ' +
+           'CRYSTAL_COST_GROWTH in useQiCrystal.js.',
     x: { label: 'Crystal level', from: 1, to: 100, step: 1 },
     y: { label: 'Qi', log: true },
     paramsSpec: [
@@ -328,8 +332,9 @@ export const CURVES = [
       { key: 'quart',    label: 'n⁴ coeff', value: 2,  step: 1 },
       { key: 'lateBase', label: 'late base', value: 40, step: 1 },
       { key: 'lateExp',  label: 'late exp',  value: 4,  step: 1 },
+      { key: 'growth',   label: 'exp base / lvl', value: CRYSTAL_COST_GROWTH, min: 1, max: 1.1, step: 0.002 },
     ],
-    fn: (n, p) => round2sig((p.cubic * n ** 3 + p.quart * n ** 4) * (1 + Math.pow(n / p.lateBase, p.lateExp))),
+    fn: (n, p) => round2sig((p.cubic * n ** 3 + p.quart * n ** 4) * (1 + Math.pow(n / p.lateBase, p.lateExp)) * Math.pow(p.growth ?? 1, n - 1)),
     baseline: (n) => getRequiredRefinedQi(n),
     apply: { kind: 'snippet', target: 'src/hooks/useQiCrystal.js' },
   },
