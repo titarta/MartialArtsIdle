@@ -208,3 +208,10 @@
   font-variant-numeric: tabular-nums;
 }
 .bd-band-inp:disabled { opacity: 0.3; }
+
+/* ── universal shape overlay ── */
+.bd-shape-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 22px; gap: 5px; align-items: center; }
+.bd-shape-head { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--bd-dim); padding: 4px 2px 2px; }
+.bd-shape-head span { text-align: right; }
+.bd-shape-row { margin-bottom: 4px; }
+.bd-shape-del { padding: 2px 4px; line-height: 1; }

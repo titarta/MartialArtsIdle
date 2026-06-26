@@ -554,6 +554,31 @@ export function sampleXs(curve) {
   return xs;
 }
 
+// ── universal shape overlay ──────────────────────────────────────────────────
+// Any curve's tuned value is its fn output × this overlay, so ANY curve can be
+// reshaped without touching its formula. Each transform multiplies a slice of X:
+//   { from, to, amt, curve } → factor = amt ^ (t ^ curve), where t ramps 0..1
+//   across [from,to] and holds at 1 afterwards, so the effect compounds forward.
+//   curve = 1 → linear (geometric on the log chart), >1 → exponential → hyperbolic.
+//   from === to makes an instant jump (a wall). amt = 1 is a no-op.
+// Transforms compose (product); an empty list is identity, so defaults stay exact.
+export function shapeMult(transforms, x) {
+  if (!transforms || transforms.length === 0) return 1;
+  let m = 1;
+  for (const tr of transforms) {
+    const amt = tr.amt ?? 1;
+    if (!(amt > 0) || amt === 1) continue;
+    const span = (tr.to ?? tr.from) - tr.from;
+    const t = span > 0 ? Math.max(0, Math.min(1, (x - tr.from) / span)) : (x >= tr.from ? 1 : 0);
+    if (t <= 0) continue;
+    const k = tr.curve > 0 ? tr.curve : 1;
+    m *= Math.pow(amt, Math.pow(t, k));
+  }
+  return m;
+}
+/** A fresh identity transform spanning a curve's domain. */
+export const newShapeTransform = (from, to) => ({ from, to, amt: 1, curve: 1 });
+
 /** Curves grouped by `group`, preserving registry order. */
 export function groupedCurves() {
   const groups = [];

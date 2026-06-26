@@ -40,28 +40,29 @@ function numStr(v) {
  * "bake" step and the patch stays minimal. Returns a JSON string, or null when
  * nothing differs.
  */
-export function buildOverrideJSON(curve, { overrides, params, xs, baseFn }) {
+export function buildOverrideJSON(curve, { tunedYs, xs, baseFn }) {
   const ap = curve.apply;
   if (!ap || ap.kind !== 'override') return null;
 
   const doc = getOverrideDoc(ap.domain);
   const records = { ...(doc.records || {}) };
   let any = false;
-  for (const x of (xs || [])) {
-    const has = Object.prototype.hasOwnProperty.call(overrides || {}, x);
-    const raw = has ? overrides[x] : curve.fn(x, params);
-    if (!Number.isFinite(raw)) continue;
+  (xs || []).forEach((x, i) => {
+    const raw = tunedYs?.[i];
+    if (!Number.isFinite(raw)) return;
     const val = Math.round(raw);
-    // Skip stages that match the live baseline — the band model regenerates
-    // those, so only the genuinely-reshaped stages land in the override.
+    // Skip stages that match the live baseline so the override stays a minimal
+    // patch of only the genuinely-reshaped stages. `tunedYs` already folds in
+    // params, the shape overlay, and any point overrides, so this captures the
+    // full tuned curve.
     const base = baseFn ? baseFn(x) : null;
-    if (base != null && val === Math.round(base)) continue;
+    if (base != null && val === Math.round(base)) return;
     // realms key by array index; the eternal tree keys by node id (ap.keys[x]).
     const recKey = ap.keys ? String(ap.keys[Number(x)]) : String(x);
-    if (recKey === 'undefined') continue;
+    if (recKey === 'undefined') return;
     records[recKey] = { ...(records[recKey] || {}), [ap.field]: val };
     any = true;
-  }
+  });
   return any ? JSON.stringify({ version: doc.version ?? 1, records }, null, 2) : null;
 }
 
@@ -99,10 +100,10 @@ export function buildSnippet(curve, params, defaults, overrides, variantLabel) {
  * Full export for the active curve/variant. Returns { overrideJSON, overrideDomain,
  * snippet }, any field may be null.
  */
-export function buildExport(curve, { params, defaults, overrides, variantLabel, xs, baseFn }) {
+export function buildExport(curve, { params, defaults, overrides, variantLabel, xs, baseFn, tunedYs }) {
   return {
     overrideDomain: curve.apply?.kind === 'override' ? curve.apply.domain : null,
-    overrideJSON:   buildOverrideJSON(curve, { overrides, params, xs, baseFn }),
+    overrideJSON:   buildOverrideJSON(curve, { tunedYs, xs, baseFn }),
     snippet:        buildSnippet(curve, params, defaults, overrides, variantLabel),
   };
 }

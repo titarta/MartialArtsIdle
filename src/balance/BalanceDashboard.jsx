@@ -11,6 +11,7 @@
 import { useMemo, useState, useCallback } from 'react';
 import {
   CURVES, CURVE_COUNTS, groupedCurves, sampleXs, defaultParams, baselineFn, auditCurves,
+  shapeMult, newShapeTransform,
 } from './curves';
 import { buildExport } from './apply';
 import CurveChart from './CurveChart';
@@ -36,16 +37,21 @@ export default function BalanceDashboard() {
   const key = `${curve.id}::${variant?.id ?? '-'}`;
   const defaults = useMemo(() => defaultParams(curve, variant), [curve, variant]);
 
-  const entry = tuning[key] ?? { params: defaults, overrides: {} };
+  const entry = tuning[key] ?? { params: defaults, overrides: {}, shape: [] };
   const params = entry.params;
   const overrides = entry.overrides;
+  const shape = entry.shape ?? [];
 
   const setEntry = useCallback((updater) => {
     setTuning(t => {
-      const cur = t[key] ?? { params: { ...defaults }, overrides: {} };
+      const cur = t[key] ?? { params: { ...defaults }, overrides: {}, shape: [] };
       return { ...t, [key]: updater(cur) };
     });
   }, [key, defaults]);
+
+  const addShape = () => setEntry(e => ({ ...e, shape: [...(e.shape ?? []), newShapeTransform(curve.x.from, curve.x.to)] }));
+  const updShape = (i, field, v) => setEntry(e => ({ ...e, shape: (e.shape ?? []).map((t, k) => (k === i ? { ...t, [field]: v } : t)) }));
+  const delShape = (i) => setEntry(e => ({ ...e, shape: (e.shape ?? []).filter((_, k) => k !== i) }));
 
   const setParam = (k, v) => setEntry(e => ({ ...e, params: { ...e.params, [k]: v } }));
   const setBand  = (name, field, v) => setEntry(e => ({
@@ -56,20 +62,20 @@ export default function BalanceDashboard() {
   const resetPoint = (x) => setEntry(e => { const o = { ...e.overrides }; delete o[x]; return { ...e, overrides: o }; });
   const resetPoints = () => setEntry(e => ({ ...e, overrides: {} }));
   const resetParams = () => setEntry(e => ({ ...e, params: { ...defaults } }));
-  const resetAll = () => setEntry(() => ({ params: { ...defaults }, overrides: {} }));
+  const resetAll = () => setEntry(() => ({ params: { ...defaults }, overrides: {}, shape: [] }));
 
   // ── series ────────────────────────────────────────────────────────────────
   const xs = useMemo(() => sampleXs(curve), [curve]);
   const base = baselineFn(curve, variant);
   const baselineYs = useMemo(() => xs.map(x => base(x)), [xs, base]);
   const tunedYs = useMemo(
-    () => xs.map(x => (Object.prototype.hasOwnProperty.call(overrides, x) ? overrides[x] : curve.fn(x, params))),
-    [xs, overrides, params, curve],
+    () => xs.map(x => (Object.prototype.hasOwnProperty.call(overrides, x) ? overrides[x] : curve.fn(x, params) * shapeMult(shape, x))),
+    [xs, overrides, params, curve, shape],
   );
 
   const exp = useMemo(
-    () => buildExport(curve, { params, defaults, overrides, variantLabel: variant?.label, xs, baseFn: base }),
-    [curve, params, defaults, overrides, variant, xs, base],
+    () => buildExport(curve, { params, defaults, overrides, variantLabel: variant?.label, xs, baseFn: base, tunedYs }),
+    [curve, params, defaults, overrides, variant, xs, base, tunedYs],
   );
 
   const copy = (text, which) => {
@@ -81,14 +87,14 @@ export default function BalanceDashboard() {
   };
 
   const ovrKeys = Object.keys(overrides).map(Number).sort((a, b) => a - b);
-  const dirty = ovrKeys.length > 0 || JSON.stringify(params) !== JSON.stringify(defaults);
+  const dirty = ovrKeys.length > 0 || shape.length > 0 || JSON.stringify(params) !== JSON.stringify(defaults);
 
   const hasFormula = curve.paramsSpec.length > 0;
-  // Baseline pass → fine-tune: snapshot the current formula onto every point as
-  // an override, so each point can then be nudged numerically or by drag.
+  // Baseline pass → fine-tune: snapshot the current formula (and shape overlay)
+  // onto every point as an override, so each point can then be nudged.
   const bakeFormula = () => setEntry(e => ({
     ...e,
-    overrides: Object.fromEntries(xs.map(x => [x, curve.fn(x, e.params)])),
+    overrides: Object.fromEntries(xs.map(x => [x, curve.fn(x, e.params) * shapeMult(e.shape ?? [], x)])),
   }));
 
   return (
@@ -271,6 +277,41 @@ export default function BalanceDashboard() {
                       </div>
                     ))}
                   </div>
+                )}
+              </>
+            )}
+          </section>
+
+          <section className="bd-sec">
+            <div className="bd-sec-row">
+              <label className="bd-sec-title">Shape overlay ({shape.length})</label>
+              <button className="bd-mini" onClick={addShape}>+ add</button>
+            </div>
+            {shape.length === 0 ? (
+              <p className="bd-hint">
+                Bend any part of this curve, on top of its formula: add a transform over an X range.
+                curve 1 = linear, &gt;1 = exponential / hyperbolic; set from = to for an instant jump.
+                Stack several to mix shapes across X. amt 1 = no-op.
+              </p>
+            ) : (
+              <>
+                <div className="bd-shape-grid bd-shape-head">
+                  <span>from</span><span>to</span><span>×amt</span><span>curve</span><span /></div>
+                {shape.map((tr, i) => (
+                  <div key={i} className="bd-shape-grid bd-shape-row">
+                    <input className="bd-band-inp" type="number" step={curve.x.step || 1} value={tr.from}
+                      onChange={e => updShape(i, 'from', Number(e.target.value))} />
+                    <input className="bd-band-inp" type="number" step={curve.x.step || 1} value={tr.to}
+                      onChange={e => updShape(i, 'to', Number(e.target.value))} />
+                    <input className="bd-band-inp" type="number" step="0.1" value={tr.amt}
+                      onChange={e => updShape(i, 'amt', Number(e.target.value))} />
+                    <input className="bd-band-inp" type="number" step="0.1" value={tr.curve}
+                      onChange={e => updShape(i, 'curve', Number(e.target.value))} />
+                    <button className="bd-mini bd-shape-del" onClick={() => delShape(i)} title="remove">✕</button>
+                  </div>
+                ))}
+                {curve.apply?.kind !== 'override' && (
+                  <p className="bd-hint">Preview only on this formula curve. It applies live on override-backed curves (realms, tree); for others, bake the formula then export the points.</p>
                 )}
               </>
             )}
