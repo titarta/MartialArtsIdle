@@ -31,6 +31,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 const getRefinedQi = (_itemId) => 0;
 import { trackCrystalFed } from '../analytics';
 import { recordStat, peakStat } from '../systems/statsRecorder';
+import { getBakedValue } from '../data/config/loader';
 
 const SAVE_KEY = 'mai_qi_crystal';
 
@@ -130,6 +131,10 @@ export const CRYSTAL_COST_GROWTH = 1;
 
 export function getRequiredRefinedQi(targetLevel) {
   if (targetLevel < 1) return 0;
+  // Baked table wins: if a designer shaped this curve in ?balance and committed
+  // the values, read them directly instead of recomputing the formula below.
+  const baked = getBakedValue('crystalCost', targetLevel);
+  if (baked !== undefined) return baked;
   const n = targetLevel;
   const base = 10 * Math.pow(n, 3) + 2 * Math.pow(n, 4);
   const lateMult = 1 + Math.pow(n / 40, 4);

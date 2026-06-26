@@ -321,10 +321,9 @@ export const CURVES = [
     id: 'crystal_cost',
     group: 'Qi Crystal',
     label: 'Crystal refine cost',
-    blurb: 'Refined qi to reach a crystal level = round2sig((cubic·n³ + quart·n⁴) × (1 + (n/lateBase)^lateExp) × growth^(n-1)). ' +
-           'The polynomial terms DECELERATE on the log chart; raise growth above 1 to overlay genuine exponential growth ' +
-           '(it dominates the late levels), or lower lateBase / raise lateExp for a steeper polynomial tail. growth maps to ' +
-           'CRYSTAL_COST_GROWTH in useQiCrystal.js.',
+    blurb: 'Refined qi to reach a crystal level. Shape it with the polynomial knobs (cubic / quart / lateBase / lateExp), ' +
+           'the growth exponential overlay, and the universal Shape section. The editor then BAKES the final 100 values to ' +
+           'crystalCost.override.json and the game just reads that table (no formula re-implementation), live on reload.',
     x: { label: 'Crystal level', from: 1, to: 100, step: 1 },
     y: { label: 'Qi', log: true },
     paramsSpec: [
@@ -336,7 +335,7 @@ export const CURVES = [
     ],
     fn: (n, p) => round2sig((p.cubic * n ** 3 + p.quart * n ** 4) * (1 + Math.pow(n / p.lateBase, p.lateExp)) * Math.pow(p.growth ?? 1, n - 1)),
     baseline: (n) => getRequiredRefinedQi(n),
-    apply: { kind: 'snippet', target: 'src/hooks/useQiCrystal.js' },
+    apply: { kind: 'override', domain: 'crystalCost', byIndex: true, field: 'value', target: 'src/data/config/crystalCost.override.json' },
   },
 
   {

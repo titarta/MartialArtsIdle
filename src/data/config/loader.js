@@ -42,6 +42,7 @@ import qiSparksOverride     from './qiSparks.override.json';
 import artefactSetsOverride from './artefactSets.override.json';
 import techniquesOverride   from './techniques.override.json';
 import reincarnationTreeOverride from './reincarnationTree.override.json';
+import crystalCostOverride      from './crystalCost.override.json';
 
 const OVERRIDES = {
   worlds:       worldsOverride,
@@ -60,6 +61,7 @@ const OVERRIDES = {
   artefactSets: artefactSetsOverride,
   techniques:   techniquesOverride,
   reincarnationTree: reincarnationTreeOverride,
+  crystalCost:       crystalCostOverride,
 };
 
 /** Raw access — returns the full override document for a domain. */
@@ -70,6 +72,19 @@ export function getOverrideDoc(domain) {
 /** Returns just the `records` object (keyed by id or singleton name). */
 export function getRecordsPatch(domain) {
   return getOverrideDoc(domain).records || {};
+}
+
+/**
+ * Per-index BAKED value. A designer can bake a whole bounded curve to a
+ * discrete table (one value per index) from the ?balance editor, so the game
+ * just READS the numbers instead of recomputing a formula. Returns the baked
+ * value for `index`, or undefined when there is no entry (the caller falls back
+ * to its formula). This is what lets the curve math live only in the editor.
+ */
+export function getBakedValue(domain, index, field = 'value') {
+  const rec = getRecordsPatch(domain)[String(index)];
+  const v = rec ? rec[field] : undefined;
+  return Number.isFinite(v) ? v : undefined;
 }
 
 /**
