@@ -162,14 +162,14 @@ const CARDS = {
     kicker:  'A gift from the heavens',
     title:   'Divine Qi',
     body:    'Every so often a golden orb drifts across the scene. Tap it before it fades for a surge of qi that lasts a short while. Keep half an eye on the screen; the heavens reward the watchful.',
-    glyph:   '天',  // heaven
+    glyph:   '神',  // divine / spirit
     ctaText: 'I will watch',
   },
   [TUTORIAL_IDS.MECH_TRACING_MERIDIANS]: {
     kicker:  'Trace the path',
     title:   'Tracing Meridians',
     body:    'A pattern spark now appears from time to time. Tap it to begin, then trace the lit dots in order before the timer runs out. Clear the pattern and your qi pours faster for a while.',
-    glyph:   '紋',  // pattern / markings
+    glyph:   '脉',  // meridian (matches the 气脉 Tracing Meridians title)
     ctaText: 'Trace it',
   },
   // (Removed) PROGRESS_HUB_MIGRATION + ANNALS_TO_CODEX_MIGRATION card

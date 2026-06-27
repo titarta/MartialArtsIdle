@@ -1800,6 +1800,7 @@ function AppInner() {
           title={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'title', currentEvent.payload.title) : currentEvent.payload?.title}
           body={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'body', currentEvent.payload.body) : currentEvent.payload?.body}
           iconSrc={currentEvent.payload?.iconSrc}
+          glyph={currentEvent.payload?.glyph}
           ctaText={currentEvent.payload?.id ? gt('tutorials', currentEvent.payload.id, 'ctaText', currentEvent.payload.ctaText) : currentEvent.payload?.ctaText}
           glowA={currentEvent.payload?.glowA}
           glowB={currentEvent.payload?.glowB}
