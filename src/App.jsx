@@ -1446,6 +1446,12 @@ function AppInner() {
         targetScreen,
         targetParam,
       });
+      // The crystal is a whole system (refine for a permanent qi/s multiplier,
+      // evolve to unlock mechanics), so it gets an explainer card. Sparks now
+      // fire one stage earlier (L2) so this L3 unlock no longer collides.
+      if (featureId === 'qi_crystal') {
+        fireTutorialOnce(TUTORIAL_IDS.CRYSTAL_UNLOCKED, enqueue);
+      }
     },
   });
   featureFlagsRef.current = featureFlags;

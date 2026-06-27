@@ -230,16 +230,17 @@ export function getRealmStageOrdinal(stageIndex) {
 /**
  * True iff the breakthrough INTO `stageIndex` rewards a Qi Spark selection.
  *
- * Rule (Dial-12, deterministic by stage index):
+ * Rule (deterministic by stage index):
  *   - Major transition (entering a new realm name): YES.
- *   - Sub-stage at an even realm-internal ordinal (2, 4, 6, …): YES, UNLESS
- *     `stageIndex` is the last stage of its realm (in which case the immediate
- *     next BT will be the major and gives the spark; we don't double-up).
- *   - Everything else (1st, 3rd, 5th... sub-stage, plus stage 0 of the entire
- *     game which has no incoming BT): NO.
+ *   - Sub-stage at an ODD realm-internal ordinal (1, 3, 5, …): YES, UNLESS
+ *     `stageIndex` is the last stage of its realm (the next BT is the major,
+ *     which already gives the spark, so we do not double up).
+ *   - Everything else (stage 0, even sub-stages): NO.
  *
- * Replaces the old global-counter approach in useQiSparks (which wasn't
- * persisted across reloads and so couldn't be visualised on the roadmap).
+ * Sparks fire on ODD ordinals (previously even) so the first one lands at
+ * Tempered Body L2, before the Qi Crystal unlocks at L3, instead of colliding
+ * with it. Same spark count per realm, shifted one stage earlier. This is the
+ * single source the spark roadmap reads.
  */
 export function stageHasSpark(stageIndex) {
   if (stageIndex <= 0) return false;          // first stage of the game has no incoming BT
@@ -248,9 +249,9 @@ export function stageHasSpark(stageIndex) {
   if (!prev || !curr) return false;
   // Major transition: always spark.
   if (prev.name !== curr.name) return true;
-  // Sub-stage: even ordinal AND not the realm's last stage.
+  // Sub-stage: ODD ordinal AND not the realm's last stage.
   const ord = getRealmStageOrdinal(stageIndex);
-  if (ord <= 0 || ord % 2 !== 0) return false;
+  if (ord % 2 !== 1) return false;  // odd ordinals only (1, 3, 5, ...)
   const next = REALMS[stageIndex + 1];
   const isLastInRealm = !next || next.name !== curr.name;
   return !isLastInRealm;

@@ -46,6 +46,8 @@ export const TUTORIAL_IDS = Object.freeze({
   FIRST_MAJOR_GATE:   'first_major_gate',
   FIRST_SPARK_OFFER:  'first_spark_offer',
   FIRST_SAINT:        'first_saint',
+  // Fires when the Qi Crystal first unlocks (qi_crystal feature gate, ~L3).
+  CRYSTAL_UNLOCKED:   'crystal_unlocked',
   // Crystal-tier mechanic unlocks, granted deterministically as the Qi
   // Crystal evolves (L10/L20/L30/L40, see data/crystalMechanicGrants.js) and
   // fired from App.jsx's grant handler so each new mechanic explains itself.
@@ -133,6 +135,13 @@ const CARDS = {
     body:    'You can reincarnate from here on. The progress of this life turns into karma, and karma buys permanent boosts on the Eternal Tree. Every life makes the next one start a little stronger. Keep grinding this run if it\'s still moving, or rebirth whenever the climb starts to drag.',
     glyph:   '圣',  // saint (simplified)
     ctaText: 'Got it',
+  },
+  [TUTORIAL_IDS.CRYSTAL_UNLOCKED]: {
+    kicker:  'A vessel awakens',
+    title:   'The Qi Crystal',
+    body:    'A crystal forms in your dantian. Feed it qi to refine it, and it permanently lifts your cultivation speed, the more you refine, the faster everything grows. As it strengthens it evolves, and each evolution awakens a new mechanic to master.',
+    glyph:   '晶',  // crystal
+    ctaText: 'Refine it',
   },
   // ── Crystal-tier mechanic unlocks (fire as the crystal evolves) ──────────
   [TUTORIAL_IDS.MECH_CRYSTAL_RESERVOIR]: {

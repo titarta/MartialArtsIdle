@@ -1301,6 +1301,12 @@
     }
   },
   "tutorials": {
+    "crystal_unlocked": {
+      "body": "A crystal forms in your dantian. Feed it qi to refine it, and it permanently lifts your cultivation speed, the more you refine, the faster everything grows. As it strengthens it evolves, and each evolution awakens a new mechanic to master.",
+      "ctaText": "Refine it",
+      "kicker": "A vessel awakens",
+      "title": "The Qi Crystal"
+    },
     "first_layer_bt": {
       "body": "Your meridians widen. Each layer you cross brings new producers, sparks, and upgrades within reach. Keep cultivating; the next layer is already in sight.",
       "ctaText": "Continue",
