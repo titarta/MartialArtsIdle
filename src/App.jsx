@@ -51,7 +51,7 @@ import achBus from './systems/achievementBus';
 import { isLunarNewYear, isDoubleNinth } from './systems/calendarEvents';
 import { FEATURES } from './data/featureFlags';
 import { QI_SPARK_BY_ID, QI_SPARKS } from './data/qiSparks';
-import { sparksToGrantOnEvolution } from './data/crystalMechanicGrants';
+import { sparksToGrantOnEvolution, CRYSTAL_TIER_TUTORIALS } from './data/crystalMechanicGrants';
 import { PRODUCERS_BY_ID } from './data/producers';
 import { loadGarden, saveGarden, gardenActiveQiMult } from './data/spiritGarden';
 import { fireTutorialOnce } from './systems/fireTutorial';
@@ -970,12 +970,16 @@ function AppInner() {
             message: card?.name ?? sparkId,
             duration: 6000,
           });
+          // Explain the freshly-unlocked mechanic with its tutorial card. Once
+          // per account; it queues behind the crystal-evolution cinematic.
+          const tutId = CRYSTAL_TIER_TUTORIALS[sparkId];
+          if (tutId) fireTutorialOnce(tutId, enqueue);
         }
       }
     };
     window.addEventListener('mai:crystal-tier-crossed', handler);
     return () => window.removeEventListener('mai:crystal-tier-crossed', handler);
-  }, [qiSparks, notifications]);
+  }, [qiSparks, notifications, enqueue]);
 
   // 2026-05-21 bug-fix: surface a toast when the spark modal auto-picks the
   // leftmost card on inactivity timeout. Previously the modal would silently

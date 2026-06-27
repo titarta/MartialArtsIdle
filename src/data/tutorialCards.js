@@ -46,6 +46,13 @@ export const TUTORIAL_IDS = Object.freeze({
   FIRST_MAJOR_GATE:   'first_major_gate',
   FIRST_SPARK_OFFER:  'first_spark_offer',
   FIRST_SAINT:        'first_saint',
+  // Crystal-tier mechanic unlocks, granted deterministically as the Qi
+  // Crystal evolves (L10/L20/L30/L40, see data/crystalMechanicGrants.js) and
+  // fired from App.jsx's grant handler so each new mechanic explains itself.
+  MECH_CRYSTAL_RESERVOIR: 'mech_crystal_reservoir',
+  MECH_CONSECUTIVE_FOCUS: 'mech_consecutive_focus',
+  MECH_DIVINE_QI:         'mech_divine_qi',
+  MECH_TRACING_MERIDIANS: 'mech_tracing_meridians',
   // (Removed) Migration cards — both PROGRESS_HUB_MIGRATION (Journey
   // + Achievements layout shuffle) and ANNALS_TO_CODEX_MIGRATION
   // (Annals → Codex rename + Wardrobe tab). The player base has
@@ -126,6 +133,35 @@ const CARDS = {
     body:    'You can reincarnate from here on. The progress of this life turns into karma, and karma buys permanent boosts on the Eternal Tree. Every life makes the next one start a little stronger. Keep grinding this run if it\'s still moving, or rebirth whenever the climb starts to drag.',
     glyph:   '圣',  // saint (simplified)
     ctaText: 'Got it',
+  },
+  // ── Crystal-tier mechanic unlocks (fire as the crystal evolves) ──────────
+  [TUTORIAL_IDS.MECH_CRYSTAL_RESERVOIR]: {
+    kicker:  'Crystal awakens',
+    title:   'Crystal Reservoir',
+    body:    'Your crystal now stockpiles a slice of your qi/s while you cultivate, up to two minutes\' worth. Tap the crystal whenever the reservoir fills to collect the whole pool in one burst. Free qi on top of everything else.',
+    glyph:   '晶',  // crystal
+    ctaText: 'Tap to collect',
+  },
+  [TUTORIAL_IDS.MECH_CONSECUTIVE_FOCUS]: {
+    kicker:  'Focus deepens',
+    title:   'Consecutive Focus',
+    body:    'Holding Focus now rewards persistence. The longer you keep your thumb on the crystal, the higher your qi/s climbs, in steps. Settle in and let each rung stack on the last.',
+    glyph:   '念',  // intent / focus
+    ctaText: 'Hold longer',
+  },
+  [TUTORIAL_IDS.MECH_DIVINE_QI]: {
+    kicker:  'A gift from the heavens',
+    title:   'Divine Qi',
+    body:    'Every so often a golden orb drifts across the scene. Tap it before it fades for a surge of qi that lasts a short while. Keep half an eye on the screen; the heavens reward the watchful.',
+    glyph:   '天',  // heaven
+    ctaText: 'I will watch',
+  },
+  [TUTORIAL_IDS.MECH_TRACING_MERIDIANS]: {
+    kicker:  'Trace the path',
+    title:   'Tracing Meridians',
+    body:    'A pattern spark now appears from time to time. Tap it to begin, then trace the lit dots in order before the timer runs out. Clear the pattern and your qi pours faster for a while.',
+    glyph:   '紋',  // pattern / markings
+    ctaText: 'Trace it',
   },
   // (Removed) PROGRESS_HUB_MIGRATION + ANNALS_TO_CODEX_MIGRATION card
   // bodies. Their triggers are gone (see App.jsx) and the ids are no

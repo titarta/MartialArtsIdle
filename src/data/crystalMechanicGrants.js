@@ -32,6 +32,20 @@ export const CRYSTAL_TIER_GRANTS = {
 };
 
 /**
+ * Spark id → tutorial-card id. When a mechanic is granted by a live crystal
+ * evolution, App.jsx fires the matching card so the new mechanic explains
+ * itself (the backfill path deliberately does NOT fire these: a player who
+ * already owns the mechanic shouldn't be re-taught it). Card copy + ids live
+ * in data/tutorialCards.js (TUTORIAL_IDS.MECH_*).
+ */
+export const CRYSTAL_TIER_TUTORIALS = {
+  crystal_click_t1:     'mech_crystal_reservoir',
+  consecutive_focus_t1: 'mech_consecutive_focus',
+  divine_qi_t1:         'mech_divine_qi',
+  pattern_click_t1:     'mech_tracing_meridians',
+};
+
+/**
  * Walk every tier crossed in a single evolution event and return the ordered
  * list of spark ids to grant. Empty if no thresholds were crossed.
  *

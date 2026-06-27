@@ -1337,6 +1337,30 @@
       "kicker": "Focus",
       "title": "Hold to Focus"
     },
+    "mech_consecutive_focus": {
+      "body": "Holding Focus now rewards persistence. The longer you keep your thumb on the crystal, the higher your qi/s climbs, in steps. Settle in and let each rung stack on the last.",
+      "ctaText": "Hold longer",
+      "kicker": "Focus deepens",
+      "title": "Consecutive Focus"
+    },
+    "mech_crystal_reservoir": {
+      "body": "Your crystal now stockpiles a slice of your qi/s while you cultivate, up to two minutes' worth. Tap the crystal whenever the reservoir fills to collect the whole pool in one burst. Free qi on top of everything else.",
+      "ctaText": "Tap to collect",
+      "kicker": "Crystal awakens",
+      "title": "Crystal Reservoir"
+    },
+    "mech_divine_qi": {
+      "body": "Every so often a golden orb drifts across the scene. Tap it before it fades for a surge of qi that lasts a short while. Keep half an eye on the screen; the heavens reward the watchful.",
+      "ctaText": "I will watch",
+      "kicker": "A gift from the heavens",
+      "title": "Divine Qi"
+    },
+    "mech_tracing_meridians": {
+      "body": "A pattern spark now appears from time to time. Tap it to begin, then trace the lit dots in order before the timer runs out. Clear the pattern and your qi pours faster for a while.",
+      "ctaText": "Trace it",
+      "kicker": "Trace the path",
+      "title": "Tracing Meridians"
+    },
     "producers_hint": {
       "body": "Your breath alone fills the meridians slowly. Other hands can draw the heavens down with you. Visit the Sect hall to gather disciples, raise gardens, and shape the sources that gather qi while you sit still.",
       "ctaText": "Show me",
