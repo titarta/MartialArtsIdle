@@ -22775,6 +22775,31 @@ body.body-crimson-aura-active .home-fighter-stage > .home-cultivator-sprite {
   gap: 12px;
   align-items: center;
 }
+button.abt-team-row {
+  grid-template-columns: 36px 1fr auto;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 120ms ease;
+}
+button.abt-team-row:hover,
+button.abt-team-row:focus-visible {
+  background: rgba(var(--ui-purple-strong-rgb), 0.08);
+  outline: none;
+}
+button.abt-team-row .stg-action-chevron {
+  color: var(--ui-purple-strong);
+  opacity: 0.6;
+  font-size: 18px;
+  padding-right: 4px;
+}
 .abt-team-glyph {
   width: 36px;
   height: 36px;

@@ -7,9 +7,8 @@ import { useTranslation } from 'react-i18next';
 const APP_VERSION = (typeof __MAI_VERSION__ !== 'undefined') ? __MAI_VERSION__ : 'dev';
 
 const TEAM = [
-  { glyph: 'M', name: 'Miguel',  role: 'Producer · Monetization · Deployment' },
-  { glyph: 'A', name: 'Alex',    role: 'Lead Designer · Gameplay Systems' },
-  { glyph: 'C', name: 'Claude',  role: 'Pair-programmer · UI Audit · Typography' },
+  { glyph: 'T', name: 'Toamig',            role: 'Director · Designer · Producer' },
+  { glyph: 'A', name: 'Alexandre Bandola', role: 'Sound Design · BGM · SFX', href: 'https://www.alexandrebandola.com/' },
 ];
 
 const FONTS = [
@@ -83,15 +82,22 @@ function AboutScreen({ onBack }) {
       <section className="stg-section">
         <div className="stg-section-label stg-cinzel-label">Cultivators</div>
         <div className="stg-panel abt-team-card">
-          {TEAM.map(person => (
-            <div key={person.name} className="abt-team-row">
-              <span className="abt-team-glyph" aria-hidden="true">{person.glyph}</span>
-              <span className="abt-team-body">
-                <div className="abt-team-name">{person.name}</div>
-                <div className="abt-team-role">{person.role}</div>
-              </span>
-            </div>
-          ))}
+          {TEAM.map(person => {
+            const Tag = person.href ? 'button' : 'div';
+            const tagProps = person.href
+              ? { type: 'button', onClick: () => openLink(person.href) }
+              : {};
+            return (
+              <Tag key={person.name} className="abt-team-row" {...tagProps}>
+                <span className="abt-team-glyph" aria-hidden="true">{person.glyph}</span>
+                <span className="abt-team-body">
+                  <div className="abt-team-name">{person.name}</div>
+                  <div className="abt-team-role">{person.role}</div>
+                </span>
+                {person.href && <span className="stg-action-chevron" aria-hidden="true">›</span>}
+              </Tag>
+            );
+          })}
         </div>
       </section>
 
