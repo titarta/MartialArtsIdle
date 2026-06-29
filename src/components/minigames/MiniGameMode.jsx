@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useGameText } from '../../i18n/gameText';
 import { getMinigame, computeReward } from '../../data/minigames';
+import { trackMinigameEvent } from '../../analytics';
 import { fmt } from '../../utils/format';
 import SectMerge from './SectMerge';
 import SpiritGarden from './SpiritGarden';
@@ -64,11 +65,12 @@ export default function MiniGameMode({ producer, owned = 0, ratePerSec = 0, onAw
     document.body.classList.add('sheet-open');
     const onKey = (e) => { if (e.key === 'Escape') onClose?.(); };
     document.addEventListener('keydown', onKey);
+    if (producer?.id) { try { trackMinigameEvent(producer.id, 'open', owned); } catch {} }
     return () => {
       document.body.classList.remove('sheet-open');
       document.removeEventListener('keydown', onKey);
     };
-  }, [onClose]);
+  }, [onClose, producer?.id, owned]);
 
   if (!producer || !meta) return null;
 

@@ -24,6 +24,8 @@ import {
   trackAchievementUnlocked,
   trackScreenView,
   trackFirstTime,
+  trackStrategySnapshot,
+  trackBalanceSnapshot,
 } from './analytics';
 import CultivationScreen from './screens/CultivationScreen';
 import SettingsScreen from './screens/SettingsScreen';
@@ -71,6 +73,7 @@ const ALLOWED_SCREENS = new Set([
 ]);
 const isScreenAllowed = (screenId) => ALLOWED_SCREENS.has(screenId);
 import ToastStack from './components/ToastStack';
+import SplashIntro from './components/SplashIntro';
 import QiSparkChoiceModal from './components/QiSparkChoiceModal';
 import { AudioManager } from './audio';
 import { installGlobalClickSfx } from './audio/clickSfx';
@@ -144,6 +147,7 @@ function AppInner() {
 
   useEffect(() => { initAds(); }, []);
   useEffect(() => { initAnalytics(); }, []);
+  const sessionStartRef = useRef(Date.now());
   // RevenueCat IAP: no-op on non-native / empty key. After init, self-heal any
   // paid-but-ungranted purchase (SDK error after Google charged): syncing
   // validates + consumes it (unblocks rebuy) and the ledger grants the packs.
@@ -340,6 +344,34 @@ function AppInner() {
     [producers, cultivation.realmIndex],
   );
   const qiSparks        = useQiSparks({ cultivation, isFeatureUnlocked, producerUnlocked, sparkCommonWeightMult: tree.modifiers.sparkCommonWeightMult ?? 1 });
+
+  // Periodic balance snapshot — fires every 5 min of foreground play. Captures
+  // the live shape of the run (realm, qi/s, crystal tier, lives) so we can
+  // build cohort curves and see which builds correlate with fast progress.
+  // Pauses while the tab is hidden so background sessions don't pollute data.
+  useEffect(() => {
+    let cancelled = false;
+    const tick = () => {
+      if (cancelled || document.visibilityState !== 'visible') return;
+      try {
+        const cl = crystal?.level ?? 0;
+        const crystalTier = cl >= 100 ? 't10' : cl >= 80 ? 't9' : cl >= 70 ? 't8' : cl >= 60 ? 't7'
+                          : cl >= 50 ? 't6' : cl >= 40 ? 't5' : cl >= 30 ? 't4' : cl >= 20 ? 't3'
+                          : cl >= 10 ? 't2' : cl >= 1 ? 't1' : 't0';
+        const sessionMin = Math.floor((Date.now() - sessionStartRef.current) / 60000);
+        trackBalanceSnapshot({
+          realmIndex:      cultivation.realmIndex,
+          qiPerSec:        cultivation.producerRateRef?.current ?? 0,
+          crystalTier,
+          lives:           karma.lives ?? 0,
+          activeBuffCount: (furnace.activePillBuffs?.length ?? 0) + (qiSparks.activeSparks?.length ?? 0),
+          sessionMin,
+        });
+      } catch {}
+    };
+    const id = setInterval(tick, 5 * 60 * 1000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, [crystal, cultivation, karma, furnace, qiSparks]);
 
   // Legendary-pool transparency for the choice modal: tells the player how
   // much of the legendary pool is currently in reach AND what to chase next
@@ -1540,6 +1572,39 @@ function AppInner() {
     try {
       trackReincarnation(cultivation.realmIndex, (karma.lives ?? 0) + 1);
       trackFirstTime('Reincarnation', cultivation.realmIndex);
+      // Strategy fingerprint: a compact summary of the build that reached
+      // this peak. Lets us cluster runs by element / dominant producer /
+      // crystal tier to see which strategies actually break through.
+      const prodOwned = producers?.owned ?? {};
+      const prodTotal = Object.values(prodOwned).reduce((a, n) => a + (Number(n) || 0), 0);
+      let prodMaxTier = null;
+      // Best tier reached across all producers this life.
+      const TIER_THRESH = [['transcended',100],['mythic',50],['gold',25],['silver',10],['bronze',1]];
+      for (const [name, min] of TIER_THRESH) {
+        if (Object.values(prodOwned).some(n => (Number(n) || 0) >= min)) { prodMaxTier = name; break; }
+      }
+      // Dominant element by count of owned laws.
+      const eltCount = {};
+      for (const law of (cultivation.ownedLaws ?? [])) {
+        const e = law?.element ?? 'none';
+        eltCount[e] = (eltCount[e] || 0) + 1;
+      }
+      const dominantElement = Object.entries(eltCount).sort((a,b) => b[1]-a[1])[0]?.[0] ?? null;
+      // Crystal tier name from current crystal level.
+      const cl = crystal?.level ?? 0;
+      const crystalTier = cl >= 100 ? 't10' : cl >= 80 ? 't9' : cl >= 70 ? 't8' : cl >= 60 ? 't7'
+                        : cl >= 50 ? 't6' : cl >= 40 ? 't5' : cl >= 30 ? 't4' : cl >= 20 ? 't3'
+                        : cl >= 10 ? 't2' : cl >= 1 ? 't1' : 't0';
+      trackStrategySnapshot({
+        peakRealmIndex: cultivation.realmIndex,
+        crystalTier,
+        crystalLevel: cl,
+        producerTotal: prodTotal,
+        producerMaxTier: prodMaxTier,
+        dominantElement,
+        lawsKnown: (cultivation.ownedLaws ?? []).length,
+        treeNodesOwned: (tree?.owned?.size ?? tree?.owned?.length ?? 0),
+      });
     } catch {}
     // Sync-persist karma with karmaEarnedThisLife reset before the wipe.
     // ── Achievement: Lin Family Trash ──
@@ -1968,10 +2033,17 @@ function App() {
     };
   }, []);
 
+  // Splash intro — shown on every cold launch (mount). Skip on a soft reset
+  // (key={gen} > 0) so the player isn't forced through the ritual again
+  // mid-session when they wipe and restart. Tap/key/8s auto-dismiss handles
+  // the audio-unlock gesture so BGM kicks in the moment the splash leaves.
+  const [splashDone, setSplashDone] = useState(gen > 0);
+
   return (
     <EventQueueProvider>
       <AppInner key={gen} />
       {transitioning && <div className="app-reset-wash" aria-hidden="true" />}
+      {!splashDone && <SplashIntro onDone={() => setSplashDone(true)} />}
     </EventQueueProvider>
   );
 }

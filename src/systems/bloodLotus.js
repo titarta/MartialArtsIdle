@@ -97,6 +97,12 @@ function saveGrantedTxIds(set) {
   try { localStorage.setItem(GRANTED_TX_KEY, JSON.stringify([...set])); } catch {}
 }
 
+/** Catalog USD price in cents for analytics. '$4.99' → 499. */
+function priceCents(price) {
+  const usd = parseFloat(String(price).replace(/[^0-9.]/g, ''));
+  return Number.isFinite(usd) ? Math.round(usd * 100) : 0;
+}
+
 /**
  * Grant every Blood Lotus pack transaction in `customerInfo` that has not been
  * granted yet. Returns the total amount newly granted (0 if nothing new).
@@ -106,16 +112,25 @@ function reconcileBloodLotusTransactions(customerInfo) {
   if (!txs.length) return 0;
   const seen = loadGrantedTxIds();
   let total = 0;
+  const grantedThisCall = [];
   for (const tx of txs) {
     const txId = tx?.transactionIdentifier;
     const pkg  = BLOOD_LOTUS_PACKAGES.find(p => p.id === tx?.productIdentifier);
     if (!pkg || !txId || seen.has(txId)) continue;
     seen.add(txId);
     total += pkg.amount;
+    grantedThisCall.push(pkg);
   }
   if (total > 0) {
     saveGrantedTxIds(seen);
     addBloodLotus(total);
+    // Validated business events — one per newly granted transaction so
+    // refunds/recoveries don't double-count revenue in GameAnalytics.
+    for (const pkg of grantedThisCall) {
+      import('../analytics').then(({ trackPurchase }) => {
+        trackPurchase(pkg.id, priceCents(pkg.price), 'USD', 'shop');
+      }).catch(() => {});
+    }
   }
   return total;
 }
@@ -154,20 +169,33 @@ export async function purchaseBloodLotus(packageId) {
     const result = await purchaseProduct(packageId);
     if (result?.simulated) {
       // Browser/debug path: no store transaction exists, grant directly.
+      // Sim purchases are NOT tracked as revenue (they aren't real money).
       addBloodLotus(pkg.amount);
-      return { ok: true, amount: pkg.amount };
+      return { ok: true, amount: pkg.amount, simulated: true };
     }
     // Native: grant from the returned CustomerInfo via the ledger.
+    // trackPurchase is emitted inside reconcileBloodLotusTransactions for
+    // every newly-granted tx, so the recovery path and the buy-now path
+    // both count exactly once.
     const granted = reconcileBloodLotusTransactions(result);
     if (granted === 0) {
       // Defensive: transaction missing from the returned info. A paying player
-      // must never be left empty-handed, so grant directly.
+      // must never be left empty-handed, so grant directly. We DO record this
+      // as revenue (they paid Google) but tag it so we can see how often the
+      // fallback path fires.
       addBloodLotus(pkg.amount);
+      import('../analytics').then(({ trackPurchase, trackShopEvent }) => {
+        trackPurchase(pkg.id, priceCents(pkg.price), 'USD', 'fallback');
+        trackShopEvent('fallback_grant', pkg.id);
+      }).catch(() => {});
       return { ok: true, amount: pkg.amount };
     }
     return { ok: true, amount: granted };
   } catch (err) {
-    if (err?.message?.includes('cancel')) return { ok: false, cancelled: true };
+    if (err?.message?.includes('cancel')) {
+      import('../analytics').then(({ trackShopEvent }) => trackShopEvent('cancel', packageId)).catch(() => {});
+      return { ok: false, cancelled: true };
+    }
     // Keep the last real purchase error on disk — it rides along in the
     // support-ticket diagnostics so we can see what the player actually hit.
     try {
@@ -181,8 +209,15 @@ export async function purchaseBloodLotus(packageId) {
     // recover immediately so the player still gets their Blood Lotus.
     try {
       const { recovered } = await recoverPendingBloodLotus();
-      if (recovered > 0) return { ok: true, amount: recovered, recovered: true };
+      if (recovered > 0) {
+        import('../analytics').then(({ trackShopEvent }) => trackShopEvent('recovered_after_error', packageId)).catch(() => {});
+        return { ok: true, amount: recovered, recovered: true };
+      }
     } catch {}
+    import('../analytics').then(({ trackShopEvent, trackError }) => {
+      trackShopEvent('fail', packageId);
+      trackError(`iap:${packageId}:${err?.message ?? 'unknown'}`, 'warning');
+    }).catch(() => {});
     return { ok: false, error: err?.message ?? 'Purchase failed' };
   }
 }

@@ -1,0 +1,344 @@
+/* ─── SplashIntro — cold-boot title sequence ────────────────────────────────
+   Wuxia-cinema cold open. Pure CSS choreography; nothing here observes
+   external state past mount. Total scripted runtime ≈ 3.2 s, then the
+   "press to begin" prompt persists until tap / key / 8 s auto-dismiss.
+
+   The whole overlay is one click target — that gesture doubles as the
+   audio-unlock event so BGM kicks in the instant the splash leaves.
+
+   Visual budget:
+     • bronze double-border frame   (ancient artifact / scroll-mount cue)
+     • drifting qi particle column  (40 spans, paired sapphire + gold)
+     • Ma Shan Zheng 道 glyph       (vermillion ink-bleed)
+     • Saint cultivator silhouette  (existing sprite)
+     • Sapphire crystal at heart    (existing sprite) + 3 expanding rings
+     • Title.png with shimmer sweep
+     • Cinzel letter-spaced prompt with breathing pulse
+*/
+
+.mai-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: radial-gradient(ellipse at 50% 55%, #0d121c 0%, #05070b 65%, #000 100%);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Block any taps from reaching the app below until we explicitly dismiss. */
+  touch-action: manipulation;
+}
+
+.mai-splash[data-state="leave"] {
+  pointer-events: none;
+  animation: mai-splash-out 480ms cubic-bezier(0.6, 0, 0.85, 0.45) forwards;
+}
+@keyframes mai-splash-out {
+  0%   { opacity: 1; transform: scale(1); filter: brightness(1); }
+  40%  { opacity: 1; transform: scale(1.04); filter: brightness(1.8); }
+  100% { opacity: 0; transform: scale(1.12); filter: brightness(2.6); }
+}
+
+/* ── Bronze double-border frame ─────────────────────────────────────────── */
+.mai-splash__frame {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin: 18px 14px;
+  border: 1px solid rgba(196, 156, 92, 0.55);
+  outline: 1px solid rgba(196, 156, 92, 0.18);
+  outline-offset: 6px;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.85),
+    inset 0 0 4px rgba(196, 156, 92, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 0 28px rgba(0, 0, 0, 0.6);
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(40, 60, 95, 0.18) 0%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(ellipse at 50% 95%, rgba(200, 150, 70, 0.10) 0%, rgba(0, 0, 0, 0) 60%);
+  overflow: hidden;
+}
+
+/* Decorative bronze corner sigils — small, deliberate, sit just inside the
+   inner border so the frame reads as a sealed artifact. */
+.mai-splash__corner {
+  position: absolute;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(196, 156, 92, 0.85);
+  text-shadow: 0 0 6px rgba(196, 156, 92, 0.45);
+  letter-spacing: 0;
+  line-height: 1;
+  animation: mai-splash-corner-in 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  pointer-events: none;
+}
+.mai-splash__corner--tl { top: 8px;    left: 10px;   animation-delay: 80ms;  }
+.mai-splash__corner--tr { top: 8px;    right: 10px;  animation-delay: 160ms; }
+.mai-splash__corner--bl { bottom: 8px; left: 10px;   animation-delay: 240ms; }
+.mai-splash__corner--br { bottom: 8px; right: 10px;  animation-delay: 320ms; }
+@keyframes mai-splash-corner-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Stage (centered column) ───────────────────────────────────────────── */
+.mai-splash__stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 16px;
+  z-index: 2;
+}
+/* Push the glyph slightly above the cultivator without growing the gap
+   stack so very tall viewports still read as one centered composition. */
+.mai-splash__glyph { margin-bottom: 14px; }
+
+/* ── Glyph — calligraphic 道 ───────────────────────────────────────────── */
+.mai-splash__glyph {
+  font-family: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', serif;
+  font-size: clamp(82px, 18vw, 138px);
+  line-height: 1;
+  color: #e85b3a;
+  text-shadow:
+    0 0 18px rgba(232, 91, 58, 0.65),
+    0 0 38px rgba(232, 91, 58, 0.35),
+    0 0 72px rgba(232, 91, 58, 0.18);
+  opacity: 0;
+  transform: scale(0.6);
+  filter: blur(8px);
+  animation:
+    mai-splash-glyph-in 900ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards,
+    mai-splash-glyph-pulse 4s ease-in-out 1.1s infinite;
+}
+@keyframes mai-splash-glyph-in {
+  0%   { opacity: 0; transform: scale(0.55) rotate(-3deg); filter: blur(10px); }
+  60%  { opacity: 1; transform: scale(1.06) rotate(0deg);  filter: blur(0);    }
+  100% { opacity: 1; transform: scale(1)    rotate(0deg);  filter: blur(0);    }
+}
+@keyframes mai-splash-glyph-pulse {
+  0%, 100% { text-shadow: 0 0 18px rgba(232, 91, 58, 0.65), 0 0 38px rgba(232, 91, 58, 0.35), 0 0 72px rgba(232, 91, 58, 0.18); }
+  50%      { text-shadow: 0 0 24px rgba(232, 91, 58, 0.85), 0 0 58px rgba(232, 91, 58, 0.55), 0 0 110px rgba(232, 91, 58, 0.28); }
+}
+
+/* ── Cultivator silhouette + heart-crystal ─────────────────────────────── */
+.mai-splash__cultivator {
+  position: relative;
+  width: clamp(160px, 38vw, 240px);
+  aspect-ratio: 1 / 1;
+  opacity: 0;
+  transform: translateY(28px);
+  filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.65));
+  animation: mai-splash-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) 700ms forwards;
+}
+.mai-splash__cultivator img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Slight cool tint so the sprite reads as "spirit" against the deep void. */
+  filter: saturate(1.1) brightness(1.05) contrast(1.05);
+}
+@keyframes mai-splash-rise {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Heart crystal — anchored over the cultivator chest. Ignites with a
+   scale-up + halo bloom; 3 rings emanate outward in sequence. */
+/* Anchored over the cultivator's hands (the prayer-pose meridian point), low
+   enough to NOT cover his face. Smaller footprint so the crystal reads as
+   "qi gem" rather than "second character". */
+.mai-splash__crystal {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 24%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+  animation: mai-splash-ignite 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 1300ms forwards;
+  filter: drop-shadow(0 0 14px rgba(120, 200, 255, 0.65)) drop-shadow(0 0 28px rgba(60, 140, 255, 0.45));
+  z-index: 2;
+}
+.mai-splash__crystal img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+@keyframes mai-splash-ignite {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.mai-splash__ring {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 22%;
+  aspect-ratio: 1 / 1;
+  border: 2px solid rgba(120, 200, 255, 0.7);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.3);
+  opacity: 0;
+  pointer-events: none;
+  box-shadow:
+    0 0 18px rgba(120, 200, 255, 0.5),
+    inset 0 0 14px rgba(120, 200, 255, 0.35);
+}
+.mai-splash__ring--1 { animation: mai-splash-ring 1800ms ease-out 1500ms forwards; }
+.mai-splash__ring--2 { animation: mai-splash-ring 1800ms ease-out 1700ms forwards; border-color: rgba(255, 220, 130, 0.55); box-shadow: 0 0 18px rgba(255, 220, 130, 0.42), inset 0 0 14px rgba(255, 220, 130, 0.30); }
+.mai-splash__ring--3 { animation: mai-splash-ring 1800ms ease-out 1900ms forwards; }
+@keyframes mai-splash-ring {
+  0%   { opacity: 0;    transform: translate(-50%, -50%) scale(0.3);  border-width: 3px; }
+  20%  { opacity: 0.95; transform: translate(-50%, -50%) scale(0.7);  border-width: 2px; }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(3.2);  border-width: 1px; }
+}
+
+/* ── Title.png logo + shimmer sweep ────────────────────────────────────── */
+.mai-splash__logo {
+  position: relative;
+  width: clamp(260px, 80vw, 460px);
+  margin-top: 22px;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: mai-splash-rise 800ms cubic-bezier(0.16, 1, 0.3, 1) 1900ms forwards;
+  overflow: hidden;
+}
+.mai-splash__logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 22px rgba(255, 180, 70, 0.35));
+}
+.mai-splash__logo-shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(255, 240, 200, 0.55) 50%,
+    transparent 65%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-120%);
+  animation: mai-splash-shimmer 1400ms cubic-bezier(0.45, 0, 0.55, 1) 2600ms forwards;
+}
+@keyframes mai-splash-shimmer {
+  from { transform: translateX(-120%); }
+  to   { transform: translateX(120%);  }
+}
+
+/* ── Press-to-begin prompt ─────────────────────────────────────────────── */
+.mai-splash__prompt {
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: rgba(232, 220, 196, 0.85);
+  text-transform: uppercase;
+  margin-top: 18px;
+  opacity: 0;
+  animation:
+    mai-splash-prompt-in 500ms ease-out 2800ms forwards,
+    mai-splash-prompt-breathe 2400ms ease-in-out 3300ms infinite;
+  text-shadow: 0 0 8px rgba(196, 156, 92, 0.35);
+}
+.mai-splash__prompt::before,
+.mai-splash__prompt::after {
+  content: '';
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196, 156, 92, 0.7), transparent);
+  vertical-align: middle;
+  margin: 0 12px;
+}
+@keyframes mai-splash-prompt-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes mai-splash-prompt-breathe {
+  0%, 100% { opacity: 0.55; text-shadow: 0 0 6px rgba(196, 156, 92, 0.25); }
+  50%      { opacity: 1;    text-shadow: 0 0 14px rgba(196, 156, 92, 0.65); }
+}
+
+/* ── Drifting qi particle column ───────────────────────────────────────── */
+.mai-splash__particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.mai-splash__particles span {
+  position: absolute;
+  bottom: -12px;
+  width: var(--mai-p-size, 3px);
+  height: var(--mai-p-size, 3px);
+  border-radius: 50%;
+  background: var(--mai-p-color, rgba(120, 200, 255, 0.8));
+  box-shadow: 0 0 6px var(--mai-p-glow, rgba(120, 200, 255, 0.6));
+  left: var(--mai-p-left, 50%);
+  opacity: 0;
+  animation: mai-splash-drift var(--mai-p-dur, 7s) linear var(--mai-p-delay, 0s) infinite;
+}
+@keyframes mai-splash-drift {
+  0%   { transform: translateY(0)     translateX(0);                       opacity: 0; }
+  10%  {                                                                    opacity: var(--mai-p-peak, 0.85); }
+  90%  {                                                                    opacity: var(--mai-p-peak, 0.85); }
+  100% { transform: translateY(-110vh) translateX(var(--mai-p-drift, 14px)); opacity: 0; }
+}
+
+/* ── Dismiss flash — final white wash ──────────────────────────────────── */
+.mai-splash__flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 55%, rgba(255, 248, 232, 0.95) 0%, rgba(255, 220, 160, 0.5) 35%, rgba(0, 0, 0, 0) 75%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+.mai-splash[data-state="leave"] .mai-splash__flash {
+  animation: mai-splash-flash 480ms cubic-bezier(0.6, 0, 0.85, 0.45) forwards;
+}
+@keyframes mai-splash-flash {
+  0%   { opacity: 0; }
+  35%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Reduced motion: keep the composition, drop the choreography ───────── */
+@media (prefers-reduced-motion: reduce) {
+  .mai-splash__glyph,
+  .mai-splash__cultivator,
+  .mai-splash__crystal,
+  .mai-splash__logo,
+  .mai-splash__prompt,
+  .mai-splash__corner {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .mai-splash__crystal { transform: translate(-50%, -50%) !important; }
+  .mai-splash__ring { display: none; }
+  .mai-splash__particles { display: none; }
+  .mai-splash__logo-shimmer { display: none; }
+}

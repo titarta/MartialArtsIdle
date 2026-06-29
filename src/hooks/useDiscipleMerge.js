@@ -30,6 +30,7 @@ import {
   boardSum, tileCount, currentMerit, placeCost, nextExpansion,
   BONUS_PER_BOARD_SUM, MERIT_RATE,
 } from '../data/discipleMerge';
+import { trackDiscipleMerge, trackMinigameEvent } from '../analytics';
 
 export const DiscipleMergeContext = createContext(null);
 
@@ -60,6 +61,9 @@ export function useDiscipleMergeProvider() {
       out = resolveDrop(prev, fromIdx, toIdx);
       return out.state;
     });
+    if (out?.action === 'merge' && out.newTier) {
+      try { trackDiscipleMerge(`t${out.newTier}`, 1); } catch {}
+    }
     return out;  // { state, action, newTier?, meritYield }
   }, []);
 
@@ -89,6 +93,7 @@ export function useDiscipleMergeProvider() {
       if (!ok) { out = { expanded: false, reason: 'qi', qiCost: next.qiCost }; return prev; }
       const e = expandGrid(prev);
       if (!e.expanded) { out = { expanded: false, reason: e.reason, need: e.need }; return prev; }
+      try { trackMinigameEvent('disciple_merge', 'expand', e.next.size); } catch {}
       out = { expanded: true, newSize: e.next.size, qiCost: next.qiCost };
       return e.state;
     });

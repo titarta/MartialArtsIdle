@@ -16,6 +16,7 @@ import {
   nextPlotCost, expandPlot, discoveredCount, growLabel,
 } from '../../data/spiritGarden';
 import useFurnace from '../../hooks/useFurnace';
+import { trackGardenEvent, trackMinigameEvent } from '../../analytics';
 
 const BASE = import.meta.env.BASE_URL;
 const url = (s) => (typeof s === 'string' && s.startsWith('/')) ? `${BASE}${s.replace(/^\//, '')}` : s;
@@ -94,12 +95,13 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
     if (st === 'empty') {
       const seed = SEEDS_BY_ID[selSeed];
       const r = plantSeed(garden, i, selSeed, undefined, treeMods.growMult);
-      if (r.ok) commit(r.garden);
+      if (r.ok) { commit(r.garden); try { trackGardenEvent(`plant:${selSeed}`, 1); } catch {} }
       else if (r.reason === 'dew') flash(t('garden.needToSow', { cost: t('garden.dewCost', { n: seed.dewCost }), seed: plantName(seed) }));
     } else if (st === 'bloom') {
       const r = harvestPlot(garden, i);
       if (r.ok) {
         commit(r.garden);
+        try { trackGardenEvent('harvest', r.gained?.amount ?? 1); } catch {}
         const nm = SEEDS_BY_ID[r.gained.herbId] ? plantName(SEEDS_BY_ID[r.gained.herbId]) : 'herb';
         flash(r.firstTime ? t('garden.discovered', { herb: nm, n: DISCOVERY_BONUS }) : t('garden.gathered', { n: r.gained.amount, herb: nm }));
       }
@@ -119,7 +121,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   };
   const doSellAll = () => {
     const r = sellBasket(garden);
-    if (r.ok) { commit(r.garden); flash(t('garden.flashSoldBasket', { n: r.gained })); }
+    if (r.ok) { commit(r.garden); try { trackGardenEvent('sell', r.gained); } catch {} flash(t('garden.flashSoldBasket', { n: r.gained })); }
   };
   // Transfer the basket's plants into the Meridian Furnace pantry. The
   // furnace's useFurnace hook reads from the same localStorage key (the
@@ -136,7 +138,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
   };
   const doBrew = (rid) => {
     const r = brew(garden, rid, undefined, treeMods.durationMult);
-    if (r.ok) { commit(r.garden); flash(t('garden.flashBrewed', { name: RECIPES_BY_ID[rid].name })); setTab('garden'); }
+    if (r.ok) { commit(r.garden); try { trackGardenEvent(`brew:${rid}`, 1); } catch {} flash(t('garden.flashBrewed', { name: RECIPES_BY_ID[rid].name })); setTab('garden'); }
   };
   const doExpand = () => {
     const r = expandPlot(garden);
@@ -165,7 +167,7 @@ export default function SpiritGarden({ ratePerSec, onAward }) {
           ratePerSec={ratePerSec}
           performance01={channelPerformance(garden)}
           label={t('garden.channelledLabel', { n: bCount })}
-          onCollect={(qi) => { onAward?.(qi); commit(clearBasket(garden)); setCash(false); }}
+          onCollect={(qi) => { try { trackGardenEvent('channel', Math.round(qi)); } catch {} onAward?.(qi); commit(clearBasket(garden)); setCash(false); }}
           onAgain={() => setCash(false)}
           againLabel={t('garden.backToGarden')}
         />

@@ -29,7 +29,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 // feedMultiple paths below are unreachable. The local stub keeps their math
 // honest if a designer build re-enables the feed modal later.
 const getRefinedQi = (_itemId) => 0;
-import { trackCrystalFed } from '../analytics';
+import { trackCrystalFed, trackFirstTime } from '../analytics';
 import { recordStat, peakStat } from '../systems/statsRecorder';
 import { getBakedValue } from '../data/config/loader';
 
@@ -284,6 +284,11 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
       : empty;
     applyState({ level, refinedQi });
     try { trackCrystalFed(level, result.tierChanged, endTier); } catch {}
+    try {
+      if (level === 1) trackFirstTime('CrystalFed', 1);
+      if (endTier >= 5) trackFirstTime('CrystalTier5', level);
+      if (endTier >= 10) trackFirstTime('CrystalMaxed', level);
+    } catch {}
     // Stats — peak level reached + each tier evolution crossed. The
     // total-level-ups stat is omitted in v1 (level-ups across a run are
     // equal to the peak; lifetime would just be sum of run peaks).
@@ -333,6 +338,11 @@ export default function useQiCrystal({ getQuantity, removeItem } = {}) {
       : { tierChanged: false, previousTier: startTier, newTier: endTier, newLevel: level };
     applyState({ level, refinedQi });
     try { trackCrystalFed(level, result.tierChanged, endTier); } catch {}
+    try {
+      if (level === 1) trackFirstTime('CrystalFed', 1);
+      if (endTier >= 5) trackFirstTime('CrystalTier5', level);
+      if (endTier >= 10) trackFirstTime('CrystalMaxed', level);
+    } catch {}
     // Stats — peak level + each tier evolution crossed (see feedMultiple).
     try {
       peakStat('crystalLevelPeak', level);

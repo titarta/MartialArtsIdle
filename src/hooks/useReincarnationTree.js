@@ -31,7 +31,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { NODES, NODES_BY_ID } from '../data/reincarnationTree';
-import { trackTreeNodePurchased } from '../analytics';
+import { trackTreeNodePurchased, trackFirstTime } from '../analytics';
 
 const SAVE_KEY = 'mai_reincarnation_tree';
 
@@ -132,7 +132,10 @@ export default function useReincarnationTree({ karma, spendKarma } = {}) {
     const ok = spendKarma ? spendKarma(total, 'eternal_tree') : true;
     if (!ok) return; // availableKarma should have prevented this
     for (const id of pend) {
-      try { trackTreeNodePurchased(id, NODES_BY_ID[id]?.cost ?? 0); } catch {}
+      try {
+        trackTreeNodePurchased(id, NODES_BY_ID[id]?.cost ?? 0);
+        trackFirstTime(`TreeNode:${id}`, NODES_BY_ID[id]?.cost ?? 0);
+      } catch {}
     }
     setCommitted(prev => new Set([...prev, ...pend]));
     setPending(new Set());

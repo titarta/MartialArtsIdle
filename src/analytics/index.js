@@ -15,6 +15,7 @@
  */
 
 import { GameAnalytics, EGAResourceFlowType, EGAProgressionStatus, EGAAdAction, EGAAdType } from 'gameanalytics';
+// addBusinessEvent uses cents (integer) for the amount.
 import { Capacitor } from '@capacitor/core';
 
 const USER_ID_KEY    = 'mai_analytics_user_id';
@@ -25,13 +26,13 @@ let initialized = false;
 let enabled     = false;
 let firstsCache = null;
 
-const RESOURCE_CURRENCIES = ['Qi', 'Karma', 'BloodLotus'];
-const RESOURCE_ITEM_TYPES = [
-  'Cultivation', 'Spark', 'Crystal',                  // Qi sources
-  'Breakthrough', 'Pill',                             // Qi sinks
-  'RealmReached', 'TreeNode', 'Reincarnation', 'Reroll',
-  'OfflineGain', 'DailyBonus', 'AdReward',            // engagement / re-engagement
-];
+// Only currencies and item types that flow through addResourceEvent are
+// declared here. Blood Lotus revenue uses addBusinessEvent and is NOT a
+// resource currency. Item types are the (source / sink) tags actually emitted
+// by the wired call sites; adding new ones to this list is the only way the
+// SDK will accept them, so keep it in sync with the helpers below.
+const RESOURCE_CURRENCIES = ['Qi', 'Karma'];
+const RESOURCE_ITEM_TYPES = ['Breakthrough', 'RealmReached', 'TreeNode', 'OfflineGain'];
 
 // Custom dimensions slot 1 = platform (web / android / ios / electron). Lets
 // every dashboard be filtered by platform. Limited to 20 distinct values.
@@ -237,36 +238,6 @@ export const trackPillCrafted = safe((pillId, qty) => {
   GameAnalytics.addDesignEvent(`Pill:Crafted:${slug(pillId)}`, qty ?? 1);
 });
 
-// ─── Artefacts / sets ──────────────────────────────────────────────────────
-
-export const trackArtefactEquipped = safe((slotId, rarity, element) => {
-  GameAnalytics.addDesignEvent(`Artefact:Equipped:${slotId}:${rarity ?? 'unknown'}:${element ?? 'none'}`);
-});
-
-export const trackSetCompleted = safe((setId, pieceCount) => {
-  GameAnalytics.addDesignEvent(`Set:Completed:${setId}`, pieceCount);
-});
-
-// ─── Combat ────────────────────────────────────────────────────────────────
-
-export const trackCombatStart = safe((worldId, regionIndex, enemyName) => {
-  GameAnalytics.addDesignEvent(`Combat:Start:w${worldId}:r${regionIndex}:${slug(enemyName)}`);
-});
-
-export const trackCombatWin = safe((worldId, regionIndex, enemyName, durationMs, turns) => {
-  GameAnalytics.addDesignEvent(`Combat:Win:w${worldId}:r${regionIndex}:${slug(enemyName)}`, durationMs);
-  if (turns != null) GameAnalytics.addDesignEvent('Combat:Turns:Win', turns);
-});
-
-export const trackCombatLoss = safe((worldId, regionIndex, enemyName, durationMs, turns) => {
-  GameAnalytics.addDesignEvent(`Combat:Loss:w${worldId}:r${regionIndex}:${slug(enemyName)}`, durationMs);
-  if (turns != null) GameAnalytics.addDesignEvent('Combat:Turns:Loss', turns);
-});
-
-export const trackRegionCleared = safe((regionName) => {
-  GameAnalytics.addDesignEvent(`Region:Cleared:${slug(regionName)}`);
-});
-
 // ─── Achievements ──────────────────────────────────────────────────────────
 
 export const trackAchievementUnlocked = safe((achievementId) => {
@@ -278,21 +249,6 @@ export const trackAchievementUnlocked = safe((achievementId) => {
 export const trackCrystalFed = safe((newLevel, tierChanged, newTier) => {
   GameAnalytics.addDesignEvent('Crystal:Fed', newLevel);
   if (tierChanged) GameAnalytics.addDesignEvent(`Crystal:TierUp:${newTier}`, newLevel);
-});
-
-// ─── Laws / techniques ─────────────────────────────────────────────────────
-
-export const trackLawPicked = safe((lawId, element, realmIndex) => {
-  GameAnalytics.addDesignEvent(`Law:Picked:${element ?? 'x'}:${lawId}`, realmIndex);
-});
-
-/** Player skipped a law offer (free skip; not allowed for first-ever offer). */
-export const trackLawSkipped = safe((realmIndex) => {
-  GameAnalytics.addDesignEvent('Law:Skipped', realmIndex);
-});
-
-export const trackTechniqueDrop = safe((techId, quality, type, isDuplicate) => {
-  GameAnalytics.addDesignEvent(`Technique:Drop:${type}:${quality}:${isDuplicate ? 'Dup' : 'New'}`);
 });
 
 // ─── Reincarnation tree ────────────────────────────────────────────────────
@@ -312,10 +268,6 @@ export const trackOfflineQiCollected = safe((amount, awayMs, multiplier) => {
   if (!(amount > 0)) return;
   GameAnalytics.addResourceEvent(EGAResourceFlowType.Source, 'Qi', amount, 'OfflineGain', `m${multiplier ?? 1}`);
   if (awayMs > 0) GameAnalytics.addDesignEvent('Offline:Returned', Math.floor(awayMs / 1000));
-});
-
-export const trackAutoFarmToggled = safe((activity, enabled, worldIndex, regionIndex) => {
-  GameAnalytics.addDesignEvent(`AutoFarm:${enabled ? 'On' : 'Off'}:${slug(activity)}:w${worldIndex ?? 0}:r${regionIndex ?? 0}`);
 });
 
 // ─── Settings ──────────────────────────────────────────────────────────────
@@ -343,11 +295,6 @@ export const trackAdEvent = safe((action, placement, adSdkName = 'admob') => {
 
 // ─── Resource flow (qi / karma economy) ────────────────────────────────────
 
-export const trackQiSource = safe((amount, itemType, itemId) => {
-  if (!(amount > 0)) return;
-  GameAnalytics.addResourceEvent(EGAResourceFlowType.Source, 'Qi', amount, itemType, itemId);
-});
-
 export const trackQiSink = safe((amount, itemType, itemId) => {
   if (!(amount > 0)) return;
   GameAnalytics.addResourceEvent(EGAResourceFlowType.Sink, 'Qi', amount, itemType, itemId);
@@ -361,6 +308,105 @@ export const trackKarmaSource = safe((amount, source) => {
 export const trackKarmaSink = safe((amount, nodeId) => {
   if (!(amount > 0)) return;
   GameAnalytics.addResourceEvent(EGAResourceFlowType.Sink, 'Karma', amount, 'TreeNode', nodeId);
+});
+
+// ─── IAP / Business events ─────────────────────────────────────────────────
+
+/**
+ * Validated store purchase. Amount must be in cents and currency in ISO-4217
+ * (e.g. 499 / 'USD' for a $4.99 pack). cartType is a short tag for where the
+ * purchase originated (shop tier, daily-deal, breakthrough-prompt etc.).
+ *
+ * Catalog price is used when the player's local price isn't surfaced; for
+ * trend analysis across cohorts this is fine, and it stays consistent across
+ * regions for cohort comparison.
+ */
+export const trackPurchase = safe((productId, amountCents, currency = 'USD', cartType = 'shop') => {
+  if (!(amountCents > 0)) return;
+  GameAnalytics.addBusinessEvent(currency, Math.round(amountCents), 'BloodLotus', slug(productId), slug(cartType));
+});
+
+/**
+ * Funnel events around the shop: open, cancel, fail, restore, recovered. Lets
+ * us measure conversion: visits → clicks → purchases, drop-off per tier.
+ */
+export const trackShopEvent = safe((action, productId) => {
+  const id = productId ? `:${slug(productId)}` : '';
+  GameAnalytics.addDesignEvent(`Shop:${slug(action)}${id}`);
+});
+
+// ─── Producers (idle income sources) ───────────────────────────────────────
+
+export const trackProducerBought = safe((producerId, newLevel) => {
+  GameAnalytics.addDesignEvent(`Producer:Bought:${slug(producerId)}`, newLevel);
+});
+
+/** Producer crossed a tier threshold (Common→Uncommon→Rare…→Mythic). */
+export const trackProducerTierUp = safe((producerId, newTier, newLevel) => {
+  GameAnalytics.addDesignEvent(`Producer:Tier:${slug(producerId)}:${slug(newTier)}`, newLevel);
+});
+
+// ─── Furnace / pills ───────────────────────────────────────────────────────
+
+export const trackFurnaceCook = safe((kind, ingredientCount, heatInvest) => {
+  // kind is 'refine' | 'combine' | 'transcend'
+  GameAnalytics.addDesignEvent(`Furnace:Start:${slug(kind)}:${ingredientCount}ing`, heatInvest ?? 0);
+});
+
+// ─── Minigames / sub-loops ─────────────────────────────────────────────────
+
+export const trackMinigameEvent = safe((minigameId, action, value) => {
+  // action: 'open' | 'attempt' | 'win' | 'fail' | 'reward'
+  GameAnalytics.addDesignEvent(`Minigame:${slug(minigameId)}:${slug(action)}`, value);
+});
+
+export const trackGardenEvent = safe((action, value) => {
+  // action: 'plant' | 'harvest' | 'sell' | 'brew' | 'channel'
+  GameAnalytics.addDesignEvent(`Garden:${slug(action)}`, value);
+});
+
+export const trackDiscipleMerge = safe((tier, count) => {
+  GameAnalytics.addDesignEvent(`Disciple:Merge:${slug(tier)}`, count ?? 1);
+});
+
+// ─── Strategy / cohort snapshots ───────────────────────────────────────────
+
+/**
+ * Fired at reincarnation. Captures the "build" the player used so we can
+ * cluster runs (which producers, which element, which crystal tier, etc.)
+ * and see which strategies actually reach high realms.
+ *
+ * snapshot fields are emitted as individual design events so they show up
+ * as filterable series in the GA dashboard. We also send a compact summary
+ * event with a numeric value for quick cohort histograms.
+ */
+export const trackStrategySnapshot = safe((snapshot = {}) => {
+  const s = snapshot;
+  if (s.peakRealmIndex != null)   GameAnalytics.addDesignEvent('Snap:Reincarn:PeakRealm',  s.peakRealmIndex);
+  if (s.crystalTier != null)      GameAnalytics.addDesignEvent(`Snap:Reincarn:CrystalTier:${slug(s.crystalTier)}`);
+  if (s.crystalLevel != null)     GameAnalytics.addDesignEvent('Snap:Reincarn:CrystalLevel', s.crystalLevel);
+  if (s.producerTotal != null)    GameAnalytics.addDesignEvent('Snap:Reincarn:ProducerTotal', s.producerTotal);
+  if (s.producerMaxTier)          GameAnalytics.addDesignEvent(`Snap:Reincarn:ProdMax:${slug(s.producerMaxTier)}`);
+  if (s.dominantElement)          GameAnalytics.addDesignEvent(`Snap:Reincarn:Element:${slug(s.dominantElement)}`);
+  if (s.lawsKnown != null)        GameAnalytics.addDesignEvent('Snap:Reincarn:LawsKnown', s.lawsKnown);
+  if (s.runDurationSec > 0)       GameAnalytics.addDesignEvent('Snap:Reincarn:RunSec', s.runDurationSec);
+  if (s.treeNodesOwned != null)   GameAnalytics.addDesignEvent('Snap:Reincarn:TreeNodes', s.treeNodesOwned);
+  if (s.bloodLotusSpent > 0)      GameAnalytics.addDesignEvent('Snap:Reincarn:BLSpent', s.bloodLotusSpent);
+});
+
+/**
+ * Periodic snapshot of the live game state. Fired roughly every 5 minutes of
+ * foreground play. Use to see how qi/s, crystal tier, etc. distribute across
+ * the playerbase at various realms.
+ */
+export const trackBalanceSnapshot = safe((snapshot = {}) => {
+  const s = snapshot;
+  if (s.realmIndex != null)   GameAnalytics.addDesignEvent('Snap:Live:Realm', s.realmIndex);
+  if (s.qiPerSec != null)     GameAnalytics.addDesignEvent('Snap:Live:QiPerSec', Math.round(s.qiPerSec));
+  if (s.crystalTier)          GameAnalytics.addDesignEvent(`Snap:Live:CrystalTier:${slug(s.crystalTier)}`);
+  if (s.lives != null)        GameAnalytics.addDesignEvent('Snap:Live:Lives', s.lives);
+  if (s.activeBuffCount != null) GameAnalytics.addDesignEvent('Snap:Live:ActiveBuffs', s.activeBuffCount);
+  if (s.sessionMin != null)   GameAnalytics.addDesignEvent('Snap:Live:SessionMin', s.sessionMin);
 });
 
 // ─── Errors ────────────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ import {
   recoverPendingBloodLotus,
 } from '../systems/bloodLotus';
 import { restorePurchases } from '../iap/iapService';
+import { trackShopEvent } from '../analytics';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -88,6 +89,9 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
     if (typeof addToast === 'function') addToast(toast);
   }, [addToast]);
 
+  // Shop-open funnel marker. Lets us compute open→click→buy conversion.
+  useEffect(() => { trackShopEvent('open'); }, []);
+
   // Self-heal on open: if a previous purchase was charged but never granted
   // (SDK error after payment), sync + grant it now. The shop is where a
   // shorted player will come looking. No-op on web / when nothing is stuck.
@@ -112,6 +116,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
   }, []);
 
   const buy = useCallback(async (pkg) => {
+    trackShopEvent('click', pkg.id);
     setPending(pkg.id);
     const result = await purchaseBloodLotus(pkg.id);
     setPending(null);
@@ -139,6 +144,7 @@ export default function BloodLotusShopModal({ onClose, onBalanceChange, addToast
   }, [onBalanceChange, fire]);
 
   const restore = useCallback(async () => {
+    trackShopEvent('restore');
     setPending('restore');
     try {
       // Recovery first: sync validates + consumes any stuck purchase (which

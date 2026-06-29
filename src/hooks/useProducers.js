@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import PRODUCERS, { PRODUCERS_BY_ID } from '../data/producers';
+import PRODUCERS, { PRODUCERS_BY_ID, getSpriteTier } from '../data/producers';
 import { recordStat } from '../systems/statsRecorder';
+import { trackProducerBought, trackProducerTierUp, trackFirstTime } from '../analytics';
 
 const SAVE_KEY = 'mai_producers';
 
@@ -148,7 +149,21 @@ export default function useProducers() {
   const buy = useCallback((id, n = 1) => {
     if (n <= 0) return false;
     if (!PRODUCERS_BY_ID[id]) return false;
-    setOwned(prev => ({ ...prev, [id]: (prev[id] ?? 0) + n }));
+    setOwned(prev => {
+      const prevLevel = prev[id] ?? 0;
+      const nextLevel = prevLevel + n;
+      // Analytics — once per buy CALL (not per unit) to avoid event flood.
+      try { trackProducerBought(id, nextLevel); } catch {}
+      if (prevLevel === 0) {
+        try { trackFirstTime(`FirstProducer:${id}`, nextLevel); } catch {}
+      }
+      const prevTier = getSpriteTier(prevLevel)?.name;
+      const nextTier = getSpriteTier(nextLevel)?.name;
+      if (nextTier && nextTier !== prevTier) {
+        try { trackProducerTierUp(id, nextTier, nextLevel); } catch {}
+      }
+      return { ...prev, [id]: nextLevel };
+    });
     // Stats — aggregate counter (per-producer breakdown deferred to v2).
     try { recordStat('producersBought', n); } catch {}
     return true;

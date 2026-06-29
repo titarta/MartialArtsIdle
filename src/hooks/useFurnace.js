@@ -37,6 +37,7 @@ import {
   heatCap, heatRegenPerSec,
   DEFAULT_CAULDRONS,
 } from '../data/furnace';
+import { trackFurnaceCook, trackPillCrafted, trackPillDiscovered, trackPillConsumed, trackFirstTime } from '../analytics';
 
 const TICK_MS = 1000;
 
@@ -69,12 +70,22 @@ export default function useFurnace({ furnaceCount = 0, cauldronCount = DEFAULT_C
       // tick. Only commit if something actually changed (cheap identity test
       // on heat + cauldrons + inventory counts).
       if (next !== furnace) commit(next);
-      // Events fired only for cook completions; the caller may want to play
-      // an audio cue / spawn a toast. Currently we don't route them; the
-      // React layer reads from `furnace` and renders accordingly. Hook
-      // exposes `events` consumers via the optional handler.
-      // (intentionally left in case a future audio call is desired)
-      void events;
+      // Analytics — fire trackPillCrafted on every cook completion and
+      // trackPillDiscovered on first-ever entry in the codex. These tell us
+      // which pills players actually craft vs which recipes go undiscovered.
+      if (events?.length) {
+        for (const ev of events) {
+          if (ev.kind === 'cook-complete') {
+            try {
+              trackPillCrafted(`${ev.layer}:${ev.outputId}`, 1);
+              if (ev.layer === 'combine') trackFirstTime('FirstPillCrafted', 1);
+              if (ev.layer === 'transcend') trackFirstTime('FirstFoundationPill', 1);
+            } catch {}
+          } else if (ev.kind === 'codex-discover') {
+            try { trackPillDiscovered(`${ev.section}:${ev.id}`); } catch {}
+          }
+        }
+      }
     }
     const id = setInterval(step, TICK_MS);
     // Tick once immediately so offline catch-up resolves on mount instead
@@ -86,19 +97,28 @@ export default function useFurnace({ furnaceCount = 0, cauldronCount = DEFAULT_C
   // ── Action helpers ─────────────────────────────────────────────────────────
   const refine = useCallback((plantIds, heatInvest) => {
     const r = startRefine(furnace, plantIds, heatInvest, cauldronCountRef.current);
-    if (r.ok) commit(r.furnace);
+    if (r.ok) {
+      commit(r.furnace);
+      try { trackFurnaceCook('refine', plantIds?.length ?? 0, heatInvest ?? 0); } catch {}
+    }
     return r;
   }, [furnace, commit]);
 
   const combine = useCallback((materialIds, heatInvest) => {
     const r = startCombine(furnace, materialIds, heatInvest, cauldronCountRef.current);
-    if (r.ok) commit(r.furnace);
+    if (r.ok) {
+      commit(r.furnace);
+      try { trackFurnaceCook('combine', materialIds?.length ?? 0, heatInvest ?? 0); } catch {}
+    }
     return r;
   }, [furnace, commit]);
 
   const transcend = useCallback((pillIds, heatInvest) => {
     const r = startTranscend(furnace, pillIds, heatInvest, cauldronCountRef.current);
-    if (r.ok) commit(r.furnace);
+    if (r.ok) {
+      commit(r.furnace);
+      try { trackFurnaceCook('transcend', pillIds?.length ?? 0, heatInvest ?? 0); } catch {}
+    }
     return r;
   }, [furnace, commit]);
 
@@ -107,6 +127,7 @@ export default function useFurnace({ furnaceCount = 0, cauldronCount = DEFAULT_C
     if (r.ok) {
       commit(r.furnace);
       onPillBuffRef.current?.(r.buff);
+      try { trackPillConsumed(pillId, 1); } catch {}
     }
     return r;
   }, [furnace, commit]);
