@@ -1,86 +1,101 @@
 /**
- * SplashIntro — wuxia cold-open shown on every cold launch.
+ * SplashIntro — "The Long Road" cold open.
  *
- * One full-screen overlay, ~3.2 s of choreography, then a tap-to-begin
- * prompt persists. Any pointer / key / 8 s auto-timeout dismisses with a
- * white flash + scale-out. The dismiss gesture doubles as the audio-unlock
- * event the browser requires before BGM can play, so the cultivation track
- * (already requested at boot, buffered behind the unlock gate) kicks in
- * the instant the splash leaves.
+ * The splash IS the game's painted world. home.png (the cultivation hall
+ * with mountains visible through its central archway) sits as the backdrop,
+ * heavily vignetted so the archway opening becomes the focal point. Three
+ * brushed marks compose over it:
+ *   1. 道 — large vermilion seal in the archway sky (the dao)
+ *   2. Title.png — suspended in the archway with a warm gold backlight
+ *   3. A small hooded silhouette — the player standing at the threshold,
+ *      with a thin shaft of qi rising from his crown
  *
- * State machine:
- *   'enter'  → animations playing
- *   'leave'  → flash + fade-out (480 ms)
- *   unmount  → onDone() fires, App reveals
+ * No frame, no particles, no competing game-sprite assets. The painting
+ * carries atmosphere; the silhouettes carry meaning.
  *
- * Reduced-motion users keep the composition but lose the choreography
- * (handled in splashIntro.css).
+ * Lifecycle:
+ *   'enter' → 'leave' (520 ms flash + scale-out) → unmount
+ *   Dismiss on pointerdown / keydown / 8 s auto-timeout. The dismiss
+ *   gesture doubles as AudioManager.unlock() so the cultivation BGM
+ *   (buffered at boot) starts in sync with the white flash.
  */
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AudioManager } from '../audio';
 import './splashIntro.css';
 
 const BASE = import.meta.env.BASE_URL;
+const AUTO_DISMISS_MS = 8000;
+const LEAVE_MS        = 520;
 
-/** Choreography total before "tap" becomes the meaningful action. */
-const SHOW_PROMPT_AT_MS = 2800;
-/** Auto-dismiss if the player never interacts. Idle players want to land
- *  in the home screen so they can collect offline earnings — don't strand. */
-const AUTO_DISMISS_MS  = 8000;
-/** Match the leave animation length in splashIntro.css. */
-const LEAVE_MS = 480;
-
-function buildParticles(count) {
-  // Pre-compute particle styles ONCE — keeps the React tree static and lets
-  // CSS handle the per-particle drift. Pairs sapphire / gold so the column
-  // shares the game's qi palette (--qi-aura-core variants).
-  const out = [];
-  for (let i = 0; i < count; i++) {
-    const gold = i % 3 === 0;
-    const size = 2 + Math.random() * 3;          // 2-5 px
-    const dur  = 6 + Math.random() * 6;          // 6-12 s
-    const delay = -Math.random() * dur;          // negative → mid-cycle start
-    const left = Math.random() * 100;            // anywhere across width
-    const drift = (Math.random() * 60 - 30) | 0; // -30 to +30 px lateral
-    const peak = 0.45 + Math.random() * 0.45;    // 0.45-0.90 opacity
-    out.push({
-      '--mai-p-size':  `${size.toFixed(1)}px`,
-      '--mai-p-dur':   `${dur.toFixed(2)}s`,
-      '--mai-p-delay': `${delay.toFixed(2)}s`,
-      '--mai-p-left':  `${left.toFixed(1)}%`,
-      '--mai-p-drift': `${drift}px`,
-      '--mai-p-peak':  peak.toFixed(2),
-      '--mai-p-color': gold ? 'rgba(255, 220, 130, 0.85)' : 'rgba(120, 200, 255, 0.85)',
-      '--mai-p-glow':  gold ? 'rgba(255, 200, 90, 0.6)'   : 'rgba(120, 200, 255, 0.6)',
-    });
-  }
-  return out;
+/**
+ * Hooded cultivator silhouette, facing the archway (back to camera). Single
+ * SVG path — no sprite dependency, scales perfectly at any size, and reads
+ * as "the player" rather than "this specific NPC sprite". The silhouette
+ * tech ties cleanly into the painted background because pure-black shapes
+ * always sit confidently against any backdrop.
+ */
+function CultivatorSilhouette() {
+  return (
+    <svg viewBox="0 0 50 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path
+        fill="#020207"
+        d="
+          M25 6
+          C 21 6, 19 9, 19 13
+          C 19 15, 19.5 17, 20.5 18.5
+          L 17 22
+          C 14 24, 12 28, 12 32
+          L 12 44
+          C 12 46, 11 47.5, 10 49
+          L 6  58
+          C 5  60, 5  62, 6  64
+          L 8  72
+          L 6  88
+          L 17 88
+          L 19 76
+          L 20 64
+          L 21 60
+          L 21 56
+          L 29 56
+          L 29 60
+          L 30 64
+          L 31 76
+          L 33 88
+          L 44 88
+          L 42 72
+          L 44 64
+          C 45 62, 45 60, 44 58
+          L 40 49
+          C 39 47.5, 38 46, 38 44
+          L 38 32
+          C 38 28, 36 24, 33 22
+          L 29.5 18.5
+          C 30.5 17, 31 15, 31 13
+          C 31  9, 29  6, 25 6
+          Z
+        "
+      />
+    </svg>
+  );
 }
 
 export default function SplashIntro({ onDone }) {
   const [state, setState] = useState('enter');
   const armedRef = useRef(true);
-  const particles = useMemo(() => buildParticles(42), []);
 
   const dismiss = () => {
     if (!armedRef.current) return;
     armedRef.current = false;
-    // The tap IS the audio-unlock gesture — call unlock so the BGM that
-    // App.jsx requested at boot (and buffered) starts on the same frame
-    // the splash starts fading out.
+    // The tap IS the audio-unlock gesture — the cultivation BGM was
+    // requested by App.jsx at boot and is buffered behind this unlock.
     try { AudioManager.unlock(); } catch {}
     setState('leave');
     window.setTimeout(() => { onDone?.(); }, LEAVE_MS);
   };
 
   useEffect(() => {
-    // Auto-dismiss safety net so an absent player isn't blocked.
     const autoT = window.setTimeout(dismiss, AUTO_DISMISS_MS);
-    const onKey = (e) => {
-      // Any key dismisses — Escape/Enter/Space included.
-      if (e.repeat) return;
-      dismiss();
-    };
+    const onKey = (e) => { if (!e.repeat) dismiss(); };
     window.addEventListener('keydown', onKey);
     return () => {
       window.clearTimeout(autoT);
@@ -96,49 +111,29 @@ export default function SplashIntro({ onDone }) {
       role="dialog"
       aria-label="The Long Road to Heaven — press to begin"
       onPointerDown={dismiss}
+      style={{ '--mai-splash-bg': `url(${BASE}backgrounds/home.png)` }}
     >
-      <div className="mai-splash__frame">
-        <div className="mai-splash__corner mai-splash__corner--tl">✦</div>
-        <div className="mai-splash__corner mai-splash__corner--tr">✦</div>
-        <div className="mai-splash__corner mai-splash__corner--bl">✦</div>
-        <div className="mai-splash__corner mai-splash__corner--br">✦</div>
+      <div className="mai-splash__world" aria-hidden="true" />
+      <div className="mai-splash__vignette" aria-hidden="true" />
+      <div className="mai-splash__shroud" aria-hidden="true" />
 
-        <div className="mai-splash__particles" aria-hidden="true">
-          {particles.map((style, i) => <span key={i} style={style} />)}
+      <div className="mai-splash__stage">
+        <div className="mai-splash__glyph" aria-hidden="true">道</div>
+
+        <div className="mai-splash__title">
+          <img
+            src={`${BASE}Title.png`}
+            alt="The Long Road to Heaven"
+            draggable={false}
+          />
+          <div className="mai-splash__title-shimmer" aria-hidden="true" />
         </div>
 
-        <div className="mai-splash__stage">
-          <div className="mai-splash__glyph" aria-hidden="true">道</div>
-
-          <div className="mai-splash__cultivator">
-            <img
-              src={`${BASE}sprites/cultivator/t5_saint_focused.png`}
-              alt=""
-              draggable={false}
-            />
-            <div className="mai-splash__crystal">
-              <img
-                src={`${BASE}crystals/crystal_5.png`}
-                alt=""
-                draggable={false}
-              />
-            </div>
-            <div className="mai-splash__ring mai-splash__ring--1" />
-            <div className="mai-splash__ring mai-splash__ring--2" />
-            <div className="mai-splash__ring mai-splash__ring--3" />
-          </div>
-
-          <div className="mai-splash__logo">
-            <img
-              src={`${BASE}Title.png`}
-              alt="The Long Road to Heaven"
-              draggable={false}
-            />
-            <div className="mai-splash__logo-shimmer" aria-hidden="true" />
-          </div>
-
-          <div className="mai-splash__prompt">Press to Begin</div>
+        <div className="mai-splash__silhouette" aria-hidden="true">
+          <CultivatorSilhouette />
         </div>
+
+        <div className="mai-splash__prompt">Press to Begin</div>
       </div>
 
       <div className="mai-splash__flash" aria-hidden="true" />
