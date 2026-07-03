@@ -83,19 +83,30 @@ export default function SplashIntro({ onDone }) {
   const [state, setState] = useState('enter');
   const armedRef = useRef(true);
 
-  const dismiss = () => {
+  // `viaGesture` is true only for real user input (tap / keydown). The browser
+  // and Android WebView autoplay policy resume the AudioContext ONLY inside a
+  // user gesture, so that is the one moment we may unlock audio. The 8s
+  // auto-dismiss is a timer, NOT a gesture: calling unlock() there would flip
+  // AudioManager's `unlocked` flag while the context is still suspended, which
+  // silently breaks BGM and lags SFX for the rest of the session (the
+  // "auto-enter feels broken" bug). App.jsx already arms a global first-gesture
+  // unlock net, so on auto-enter audio starts cleanly on the player's first
+  // real in-game interaction instead.
+  const dismiss = (viaGesture) => {
     if (!armedRef.current) return;
     armedRef.current = false;
-    // The tap IS the audio-unlock gesture — the cultivation BGM was
-    // requested by App.jsx at boot and is buffered behind this unlock.
-    try { AudioManager.unlock(); } catch {}
+    if (viaGesture) {
+      // The tap/key IS the audio-unlock gesture. The cultivation BGM was
+      // requested by App.jsx at boot and is buffered behind this unlock.
+      try { AudioManager.unlock(); } catch {}
+    }
     setState('leave');
     window.setTimeout(() => { onDone?.(); }, LEAVE_MS);
   };
 
   useEffect(() => {
-    const autoT = window.setTimeout(dismiss, AUTO_DISMISS_MS);
-    const onKey = (e) => { if (!e.repeat) dismiss(); };
+    const autoT = window.setTimeout(() => dismiss(false), AUTO_DISMISS_MS);
+    const onKey = (e) => { if (!e.repeat) dismiss(true); };
     window.addEventListener('keydown', onKey);
     return () => {
       window.clearTimeout(autoT);
@@ -110,7 +121,7 @@ export default function SplashIntro({ onDone }) {
       data-state={state}
       role="dialog"
       aria-label="The Long Road to Heaven — press to begin"
-      onPointerDown={dismiss}
+      onPointerDown={() => dismiss(true)}
       style={{ '--mai-splash-bg': `url(${BASE}backgrounds/home.png)` }}
     >
       <div className="mai-splash__world" aria-hidden="true" />

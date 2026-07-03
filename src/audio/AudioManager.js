@@ -558,13 +558,31 @@ const AudioManager = {
    * and starts any BGM that was requested before unlock. Idempotent.
    */
   unlock() {
-    const firstTime = !unlocked;
-    unlocked = true;
+    // Ensure a context exists so we can verify it actually runs before opening
+    // the audio gate. Creating the cultivation howl (idempotent + cached) builds
+    // Howler.ctx if Howler hasn't yet; a context created outside a user gesture
+    // starts 'suspended', which is exactly what we need to detect below.
+    if (!Howler.ctx) this.preloadBgm(['cultivation']);
 
     // Resume the context. Works inside a user gesture (browser / iOS) and also
     // freely in autoplay-friendly shells (Electron with autoplayPolicy, or a
     // native WebView configured to not require a gesture).
     ensureContextRunning();
+
+    // Gate on the context REALLY running. On gesture-gated platforms resume()
+    // only succeeds inside a real user gesture, so a call from a non-gesture
+    // path (a stray timer) leaves the context suspended — we then stay locked
+    // and keep audio buffered rather than flipping `unlocked` onto a dead
+    // context (which drops BGM and backlogs/lags SFX). Re-enter unlock() from
+    // the resume promise once the context has actually reached 'running'.
+    const ctx = Howler.ctx;
+    if (ctx && ctx.state !== 'running') {
+      ctx.resume().then(() => { if (ctx.state === 'running') this.unlock(); }).catch(() => {});
+      return;
+    }
+
+    const firstTime = !unlocked;
+    unlocked = true;
 
     if (firstTime) {
       // Preload everything now that the context is allowed to run.
