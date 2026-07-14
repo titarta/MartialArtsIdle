@@ -9,7 +9,7 @@ import {
   COSMETIC_SLOTS,
   getFeaturedItemForToday,
 } from '../data/shopItems';
-import { skinnedCultivatorPath, skinnedCrystalPath } from '../utils/skinSprites';
+import { skinnedCultivatorPath, skinnedCrystalPath, SKIN_ART_READY } from '../utils/skinSprites';
 
 const BASE = import.meta.env.BASE_URL;
 
@@ -565,6 +565,10 @@ export default function SpiritBazaarScreen({
     for (const it of cosmetics) {
       if (!it.cosmeticSlot || !groups[it.cosmeticSlot]) continue;
       if (inventory.isCosmeticOwned(it.id)) continue;
+      // Release gate: a themed skin only surfaces once its art ships (its
+      // theme is in SKIN_ART_READY). Non-skin cosmetics (particles) carry no
+      // theme and always pass. Keeps the store to only what players can buy.
+      if (it.theme && !SKIN_ART_READY.has(it.theme)) continue;
       groups[it.cosmeticSlot].items.push(it);
     }
     return groups;
@@ -575,7 +579,8 @@ export default function SpiritBazaarScreen({
   // player has paid piecemeal). The remaining components stay buyable
   // as singles.
   const availableBundles = useMemo(
-    () => SHOP_BUNDLES.filter(b => inventory.isBundleAvailable?.(b.id) ?? true),
+    () => SHOP_BUNDLES.filter(b =>
+      (inventory.isBundleAvailable?.(b.id) ?? true) && SKIN_ART_READY.has(b.theme)),
     [inventory]
   );
 

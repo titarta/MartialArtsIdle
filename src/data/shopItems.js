@@ -315,14 +315,18 @@ export function canAfford(itemId, balance) {
 // weekdays. Pure-cosmetic spotlighting helps players discover the visual
 // catalogue; weekday buffs are the impulse-buy moments where a discount
 // can flip a "maybe later" into a purchase.
+// NOTE: every entry MUST be currently buyable. A skin's theme has to be in
+// SKIN_ART_READY, otherwise the hero card would spotlight a placeholder that
+// isn't in the store. Weekend cosmetic picks use the only shipped skin
+// (Founding Sovereign) + a real particle until more skin art lands.
 export const FEATURED_BY_WEEKDAY = [
-  'cos_char_frost_ascetic',     // Sun  — cosmetic spotlight
+  'cos_char_legacy',            // Sun: cosmetic spotlight (Founding Sovereign)
   'buff_crimson_aura_4h',       // Mon
   'qol_skip_bt_confirm',        // Tue
   'buff_heavenly_resonance_4h', // Wed
   'consumable_major_bt_bypass', // Thu
   'buff_crimson_aura_12h',      // Fri
-  'cos_crystal_phoenix',        // Sat  — cosmetic spotlight
+  'cos_particles_c9_12',        // Sat: cosmetic spotlight (Phoenix Orb)
 ];
 
 export const FEATURED_DISCOUNT = 0.20; // 20% off the daily pick
