@@ -779,23 +779,23 @@
     },
     "divine_qi_t1": {
       "description": "Una esfera dorada aparece cada ~10 min. Tócala dentro de 8s para obtener 25s de Qi.",
-      "name": "Qi Celestial"
+      "name": "Qi Divino"
     },
     "divine_qi_t2": {
       "description": "Esfera cada ~9 min, ventana de 10s. Toca para 35s de Qi.",
-      "name": "Qi Celestial"
+      "name": "Qi Divino"
     },
     "divine_qi_t3": {
       "description": "Esfera cada ~8 min, ventana de 12s. Toca para 50s de Qi.",
-      "name": "Qi Celestial"
+      "name": "Qi Divino"
     },
     "divine_qi_t4": {
       "description": "Esfera cada ~7 min, ventana de 15s. Toca para 65s de Qi.",
-      "name": "Qi Celestial"
+      "name": "Qi Divino"
     },
     "divine_qi_t5": {
       "description": "Dos esferas cada ~6 min. Recoge ambas para 75s Qi + ×1.25 Qi/s durante 20s.",
-      "name": "Qi Celestial"
+      "name": "Qi Divino"
     },
     "enduring_stream": {
       "description": "+1% Qi/s para el resto de esta carrera. Se acumula.",
@@ -1403,19 +1403,19 @@
     },
     "u_divine_qi_t2": {
       "desc": "Orbe cada ~9 min, ventana de 10s. Toca para 35s de Qi.",
-      "name": "Qi Celestial II"
+      "name": "Qi Divino II"
     },
     "u_divine_qi_t3": {
       "desc": "Orbe cada ~8 min, ventana de 12s. Toca para 50s de Qi.",
-      "name": "Qi Celestial III"
+      "name": "Qi Divino III"
     },
     "u_divine_qi_t4": {
       "desc": "Orbe cada ~7 min, ventana de 15s. Toca para 65s de Qi.",
-      "name": "Qi Celestial IV"
+      "name": "Qi Divino IV"
     },
     "u_divine_qi_t5": {
       "desc": "Dos orbes cada ~6 min. Recoge ambos para 75s de Qi + ×1.25 Qi/s durante 20s.",
-      "name": "Qi Celestial V"
+      "name": "Qi Divino V"
     },
     "u_focus_1": {
       "desc": "+35% al multiplicador de enfoque de cultivo sostenido.",

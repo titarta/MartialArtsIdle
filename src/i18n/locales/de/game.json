@@ -33,7 +33,7 @@
       "title": "Chinesisches Neujahr"
     },
     "capstone": {
-      "desc": "Du bist nicht den Berg hinaufgeklommen. Du bist einer geworden.",
+      "desc": "Du bist nicht den Berg hinaufgeklommen. Du bist zum Berg geworden.",
       "title": "Werde der Weg"
     },
     "daily_100": {
@@ -189,8 +189,8 @@
       "title": "Dao-Quelle"
     },
     "realm_46": {
-      "desc": "Zerschmettere die Himmel und berühre das Reich des Open Heaven.",
-      "title": "Himmel öffnen"
+      "desc": "Zerschmettere die Himmel und berühre das Reich des Offenen Himmels.",
+      "title": "Offener Himmel"
     },
     "reincarnate_1": {
       "desc": "Reinkarniere zum ersten Mal.",
@@ -701,14 +701,14 @@
     },
     "p_disciple": {
       "desc": "Ein Lehrling kniet in deinem Hof, Atem gleichmäßig, Handflächen warm. Das Qi, das sie aus der Luft ziehen, ist ein einziger dünner Faden. Jeder Faden stärkt den Webstuhl.",
-      "name": "Körper-Hällungs-Schüler"
+      "name": "Körper-Härtungs-Schüler"
     },
     "p_dragon": {
       "desc": "Es träumt in deinem Dantian, und einer seiner Träume bist du. Die Perle, die es umwindet, ist älter als Berge. Jeder langsame Atemzug vergoldet deine Meridiane mit einer Kultivierung, die du dir nie erarbeiten musstest.",
       "name": "Schlummernder Geistdrache"
     },
     "p_herb_garden": {
-      "desc": "Jadebätter entfalten sich in der Morgenröte und trinken leise den Himmel leer. Was die Geistkräuter nicht verwenden können, geben sie dir ab.",
+      "desc": "Jadeblätter entfalten sich in der Morgenröte und trinken leise den Himmel leer. Was die Geistkräuter nicht verwenden können, geben sie dir ab.",
       "name": "Geistkräuter-Garten"
     },
     "p_meridian_furnace": {
@@ -944,7 +944,7 @@
       "name": "Dao-Quelle"
     },
     "Emperor Realm": {
-      "name": "Kaiserreich"
+      "name": "Kaiser"
     },
     "Immortal Ascension": {
       "name": "Unsterblicher Aufstieg"
